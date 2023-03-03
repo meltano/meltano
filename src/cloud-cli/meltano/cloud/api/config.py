@@ -141,7 +141,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         try:
             return cls.from_config_file(config_path or cls.find_config_path())
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             config = cls()
             config.write_to_file()
             return config
