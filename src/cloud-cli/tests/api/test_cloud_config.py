@@ -41,7 +41,7 @@ class TestMeltanoCloudConfig:
                 config_dict,
                 config_file,
             )
-            return tmp_path / "meltano-cloud.json"
+        return tmp_path / "meltano-cloud.json"
 
     @pytest.fixture(scope="function")
     def subject(self, config_file: Path):

@@ -17,7 +17,12 @@ class TestCloudRun:
     def client(self):
         return MeltanoCloudClient()
 
-    def test_run_ok(self, monkeypatch: pytest.MonkeyPatch, client: MeltanoCloudClient):
+    def test_run_ok(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        client: MeltanoCloudClient,
+        tmp_path: Path,
+    ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
         environment = "dev"
@@ -43,6 +48,8 @@ class TestCloudRun:
             result = CliRunner().invoke(
                 cli,
                 [
+                    "--config-path",
+                    (tmp_path / "meltano-cloud.json"),
                     "run",
                     job_or_schedule,
                     "--project-id",
@@ -54,7 +61,7 @@ class TestCloudRun:
             assert result.exit_code == 0
             assert "Running Job" in result.output
 
-    def test_run_missing_env_var(self, monkeypatch: pytest.MonkeyPatch):
+    def test_run_missing_env_var(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
         project_id = "pytest-123"
         environment = "dev"
         job_or_schedule = "gh-to-snowflake"
@@ -66,6 +73,8 @@ class TestCloudRun:
         result = CliRunner().invoke(
             cli,
             [
+                "--config-path",
+                (tmp_path / "meltano-cloud.json"),
                 "run",
                 job_or_schedule,
                 "--project-id",
@@ -81,7 +90,10 @@ class TestCloudRun:
         )
 
     def test_run_unauthorized(
-        self, monkeypatch: pytest.MonkeyPatch, client: MeltanoCloudClient
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        client: MeltanoCloudClient,
+        tmp_path: Path,
     ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
@@ -108,6 +120,8 @@ class TestCloudRun:
             result = CliRunner().invoke(
                 cli,
                 [
+                    "--config-path",
+                    (tmp_path / "meltano-cloud.json"),
                     "run",
                     job_or_schedule,
                     "--project-id",

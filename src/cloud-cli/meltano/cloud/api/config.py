@@ -95,6 +95,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         if not self._config_path:
             self._config_path = self.find_config_path()
+
         return self._config_path
 
     @staticmethod
@@ -123,17 +124,20 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             return cls(**config, config_path=config_file)
 
     @classmethod
-    def find(cls) -> MeltanoCloudConfig:
+    def find(cls, config_path: Path | None = None) -> MeltanoCloudConfig:
         """Initialize config from the first config file found.
 
         If no config file is found, one with default setting values
         is created in the user config directory.
 
+        Args:
+            config_path: the path to the config file to use, if any.
+
         Returns:
             A MeltanoCloudConfig
         """
         try:
-            return cls.from_config_file(cls.find_config_path())
+            return cls.from_config_file(config_path or cls.find_config_path())
         except FileNotFoundError:
             config = cls()
             config.write_to_file()

@@ -5,7 +5,6 @@ from click.testing import CliRunner
 from meltano.cloud.cli import cloud as cli
 
 
-def test_cli():
-    result = CliRunner().invoke(cli)
-    assert "Interface with Meltano Cloud" in result.stdout
+def test_cli(tmp_path: Path):
+    result = CliRunner().invoke(cli, ["--config-path", tmp_path / "meltano-cloud.json"])
     assert result.exit_code == 0

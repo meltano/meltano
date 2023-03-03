@@ -10,7 +10,3 @@ from meltano.cloud.cli import cloud as cli
 
 class TestCloudLogin:
     """Test the Meltano Cloud login command."""
-
-    @pytest.fixture
-    def auth(self):
-        return MeltanoCloudAuth()
