@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import sys
 import typing as t
-from contextlib import contextmanager, suppress
+from contextlib import asynccontextmanager, contextmanager, suppress
 from urllib.parse import urljoin
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
@@ -44,9 +44,6 @@ class MeltanoCloudClient:  # noqa: WPS214
     """Client for the Meltano Cloud API.
 
     Attributes:
-        api_url: The API URL.
-        api_key: The API key.
-        runner_secret: The runner secret.
         _session: The client session.
     """
 
@@ -126,21 +123,21 @@ class MeltanoCloudClient:  # noqa: WPS214
             with suppress(KeyError):
                 del self.session.headers[key]
 
-    @contextmanager
-    def authenticated(self) -> t.Iterator[None]:
+    @asynccontextmanager
+    async def authenticated(self) -> t.AsyncIterator[None]:
         """Provide context for API calls which require authentication.
 
         Yields:
             None
         """
         if not self.auth.logged_in():
-            self.auth.login()
+            await self.auth.login()
         with self.headers(self.auth.get_auth_header()):
             yield
 
     async def _request(
         self, method: str, path: str, base_url: str | None = None, **kwargs
-    ) -> dict | str:
+    ) -> dict | bytes:
         """Make a request to the Meltano Cloud API.
 
         Args:
@@ -173,11 +170,11 @@ class MeltanoCloudClient:  # noqa: WPS214
             except ClientResponseError as e:
                 raise MeltanoCloudError(response) from e
             content = await response.content.read()
-            content = content.decode()
+            decoded_content = content.decode()
             try:
-                return json.loads(content)
+                return json.loads(decoded_content)
             except json.JSONDecodeError:
-                return content
+                return decoded_content
 
     @staticmethod
     def construct_runner_path(
@@ -205,7 +202,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         project_id: str,
         environment: str,
         job_or_schedule: str,
-    ) -> dict:
+    ) -> dict | bytes:
         """Run a Meltano project in Meltano Cloud.
 
         Args:

@@ -29,6 +29,8 @@ class TestMeltanoCloudClient:
     async def test_run_ok(self):
         """Test that a successful run returns the expected result."""
         async with MeltanoCloudClient() as client:
+            client.api_key = self.RUNNER_CREDS["api_key"]
+            client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
                 logging.debug(
@@ -44,13 +46,14 @@ class TestMeltanoCloudClient:
                 assert not client.session.closed
                 result = await client.run_project(
                     **self.RUNNER_ARGS,
-                    **self.RUNNER_CREDS,
                 )
                 assert result == "Running Job"
 
     async def test_run_error(self):
         """Test that a response error is raised as a MeltanoCloudError."""
         async with MeltanoCloudClient() as client:
+            client.api_key = self.RUNNER_CREDS["api_key"]
+            client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
                 m.post(
@@ -60,4 +63,4 @@ class TestMeltanoCloudClient:
                     reason="Forbidden",
                 )
                 with pytest.raises(MeltanoCloudError):
-                    await client.run_project(**self.RUNNER_ARGS, **self.RUNNER_CREDS)
+                    await client.run_project(**self.RUNNER_ARGS)

@@ -32,8 +32,6 @@ def get_env_var(name: str) -> str:
 
 
 async def run_project(
-    api_key: str,
-    runner_secret: str,
     organization_id: str,
     project_id: str,
     environment: str,
@@ -58,8 +56,6 @@ async def run_project(
             project_id,
             environment,
             job_or_schedule,
-            api_key,
-            runner_secret,
         )
 
 
@@ -76,15 +72,10 @@ def run(job_or_schedule: str, environment: str, project_id: str) -> None:
         project_id: The project identifier.
     """
     click.echo("Running a Meltano project in Meltano Cloud.")
-
-    api_key = get_env_var("MELTANO_CLOUD_RUNNER_API_KEY")
-    runner_secret = get_env_var("MELTANO_CLOUD_RUNNER_SECRET")
     organization_id = get_env_var("MELTANO_CLOUD_ORGANIZATION_ID")
 
     result = asyncio.run(
         run_project(
-            api_key,
-            runner_secret,
             organization_id,
             project_id,
             environment,

@@ -8,5 +8,6 @@ from meltano.cloud.cli import cloud as cli
 
 
 def test_cli(tmp_path: Path):
-    result = CliRunner().invoke(cli, ["--config-path", tmp_path / "meltano-cloud.json"])
+    result = CliRunner().invoke(cli)
+    assert "Interface with Meltano Cloud" in result.stdout
     assert result.exit_code == 0
