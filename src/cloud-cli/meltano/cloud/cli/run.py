@@ -38,7 +38,7 @@ async def run_project(
     environment: str,
     job_or_schedule: str,
     config: MeltanoCloudConfig,
-) -> str:
+) -> dict | str:
     """Run a project in Meltano Cloud.
 
     Args:

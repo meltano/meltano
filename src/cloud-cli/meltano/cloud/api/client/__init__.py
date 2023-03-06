@@ -141,7 +141,7 @@ class MeltanoCloudClient:  # noqa: WPS214
 
     async def _request(
         self, method: str, path: str, base_url: str | None = None, **kwargs
-    ) -> dict | bytes:
+    ) -> dict | str:
         """Make a request to the Meltano Cloud API.
 
         Args:
