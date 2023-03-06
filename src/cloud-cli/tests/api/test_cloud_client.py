@@ -30,7 +30,9 @@ class TestMeltanoCloudClient:
 
     @pytest.fixture(scope="function")
     def config(self, tmp_path: Path):
-        return MeltanoCloudConfig.find(config_path=tmp_path / "meltano-cloud.json")
+        path = tmp_path / "meltano-cloud.json"
+        path.touch()
+        return MeltanoCloudConfig.find(config_path=path)
 
     async def test_run_ok(self, config: MeltanoCloudConfig):
         """Test that a successful run returns the expected result."""

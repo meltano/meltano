@@ -15,7 +15,9 @@ class TestMeltanoCloudAuth:
 
     @pytest.fixture
     def config(self, tmp_path: Path):
-        return MeltanoCloudConfig.find(config_path=tmp_path / "meltano-cloud.json")
+        path = tmp_path / "meltano-cloud.json"
+        path.touch()
+        return MeltanoCloudConfig.find(config_path=path)
 
     @pytest.fixture
     def subject(self, monkeypatch: pytest.MonkeyPatch, config: MeltanoCloudConfig):

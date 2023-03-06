@@ -8,6 +8,7 @@ from aioresponses import aioresponses
 from click.testing import CliRunner
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.cli import cloud as cli
 
 
@@ -18,11 +19,17 @@ class TestCloudRun:
     def client(self):
         return MeltanoCloudClient()
 
+    @pytest.fixture
+    def config(self, tmp_path: Path):
+        path = tmp_path / "meltano-cloud.json"
+        path.touch()
+        return MeltanoCloudConfig.find(config_path=path)
+
     def test_run_ok(
         self,
         monkeypatch: pytest.MonkeyPatch,
         client: MeltanoCloudClient,
-        tmp_path: Path,
+        config: MeltanoCloudConfig,
     ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
@@ -51,7 +58,7 @@ class TestCloudRun:
                 cli,
                 [
                     "--config-path",
-                    tmp_path / "meltano-cloud.json",
+                    str(config.config_path),
                     "run",
                     job_or_schedule,
                     "--project-id",
@@ -67,7 +74,7 @@ class TestCloudRun:
         self,
         monkeypatch: pytest.MonkeyPatch,
         client: MeltanoCloudClient,
-        tmp_path: Path,
+        config: MeltanoCloudConfig,
     ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
@@ -95,7 +102,7 @@ class TestCloudRun:
                 cli,
                 [
                     "--config-path",
-                    (tmp_path / "meltano-cloud.json"),
+                    str(config.config_path),
                     "run",
                     job_or_schedule,
                     "--project-id",
