@@ -63,34 +63,6 @@ class TestCloudRun:
             assert result.exit_code == 0
             assert "Running Job" in result.output
 
-    def test_run_missing_env_var(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
-        project_id = "pytest-123"
-        environment = "dev"
-        job_or_schedule = "gh-to-snowflake"
-
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_API_KEY", "keepitsecret")
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_SECRET", "keepitsafe")
-        monkeypatch.delenv("MELTANO_CLOUD_ORGANIZATION_ID", raising=False)
-
-        result = CliRunner().invoke(
-            cli,
-            [
-                "--config-path",
-                (tmp_path / "meltano-cloud.json"),
-                "run",
-                job_or_schedule,
-                "--project-id",
-                project_id,
-                "--environment",
-                environment,
-            ],
-        )
-        assert result.exit_code == 2
-        assert (
-            "Environment variable MELTANO_CLOUD_ORGANIZATION_ID is not set"
-            in result.output
-        )
-
     def test_run_unauthorized(
         self,
         monkeypatch: pytest.MonkeyPatch,

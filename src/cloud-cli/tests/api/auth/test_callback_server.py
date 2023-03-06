@@ -15,18 +15,18 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 class TestMeltanoCloudAuthCallbackServer:
     """Test the Meltano Cloud Auth Callback Server."""
 
-    @pytest.fixture
+    @pytest.fixture(scope="function")
     def config(self, tmp_path: Path):
         return MeltanoCloudConfig(config_path=tmp_path / "meltano-cloud.json")
 
-    @pytest.fixture
+    @pytest.fixture(scope="function")
     def subject(
         self,
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
         config: MeltanoCloudConfig,
     ):
-        monkeypatch.setattr("meltano.cloud.api.auth.callback_server.CONFIG", config)
+        monkeypatch.setenv("MELTANO_CLOUD_CONFIG_PATH", str(config.config_path))
         return callback_server.APP
 
     @pytest.fixture
@@ -45,6 +45,7 @@ class TestMeltanoCloudAuthCallbackServer:
         response: TestResponse = client.get(
             "/tokens?id_token=meltano-cloud-testing&access_token=meltano-cloud-testing"
         )
+        config.refresh()
         assert response.status_code == 204
         assert config.access_token == "meltano-cloud-testing"
         assert config.id_token == "meltano-cloud-testing"
@@ -61,6 +62,7 @@ class TestMeltanoCloudAuthCallbackServer:
         config.write_to_file()
         response: TestResponse = client.get("/logout")
         assert response.status_code == 204
+        config.refresh()
         assert config.id_token is None
         assert config.access_token is None
         with open(config.config_path) as config_file:

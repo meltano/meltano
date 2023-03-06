@@ -1,22 +1,28 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from aioresponses import aioresponses
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
+from meltano.cloud.api.config import MeltanoCloudConfig
 
 
 class TestMeltanoCloudAuth:
     """Test the Meltano Cloud API Authentication."""
 
     @pytest.fixture
-    def subject(self, monkeypatch: pytest.MonkeyPatch):
+    def config(self, tmp_path: Path):
+        return MeltanoCloudConfig.find(config_path=tmp_path / "meltano-cloud.json")
+
+    @pytest.fixture
+    def subject(self, monkeypatch: pytest.MonkeyPatch, config: MeltanoCloudConfig):
         monkeypatch.setenv("MELTANO_CLOUD_AUTH_CALLBACK_PORT", 8080)
         monkeypatch.setenv("MELTANO_CLOUD_BASE_AUTH_URL", "http://meltano-cloud-test")
         monkeypatch.setenv("MELTANO_CLOUD_APP_CLIENT_ID", "meltano-cloud-test")
-        return MeltanoCloudAuth()
+        return MeltanoCloudAuth(config=config)
 
     def test_login_url(self, subject: MeltanoCloudAuth):
         assert (

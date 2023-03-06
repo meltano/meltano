@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from urllib.parse import urljoin
 
 import pytest
 from aioresponses import aioresponses
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.config import MeltanoCloudConfig
 
 
 class TestMeltanoCloudClient:
@@ -26,9 +28,13 @@ class TestMeltanoCloudClient:
         "runner_secret": "keepitsafe",
     }
 
-    async def test_run_ok(self):
+    @pytest.fixture(scope="function")
+    def config(self, tmp_path: Path):
+        return MeltanoCloudConfig.find(config_path=tmp_path / "meltano-cloud.json")
+
+    async def test_run_ok(self, config: MeltanoCloudConfig):
         """Test that a successful run returns the expected result."""
-        async with MeltanoCloudClient() as client:
+        async with MeltanoCloudClient(config=config) as client:
             client.api_key = self.RUNNER_CREDS["api_key"]
             client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
@@ -49,9 +55,9 @@ class TestMeltanoCloudClient:
                 )
                 assert result == "Running Job"
 
-    async def test_run_error(self):
+    async def test_run_error(self, config: MeltanoCloudConfig):
         """Test that a response error is raised as a MeltanoCloudError."""
-        async with MeltanoCloudClient() as client:
+        async with MeltanoCloudClient(config=config) as client:
             client.api_key = self.RUNNER_CREDS["api_key"]
             client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
