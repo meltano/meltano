@@ -46,11 +46,12 @@ class TestCloudRun:
                 status=200,
                 body=b"Running Job",
             )
+
             result = CliRunner().invoke(
                 cli,
                 [
                     "--config-path",
-                    (tmp_path / "meltano-cloud.json"),
+                    tmp_path / "meltano-cloud.json",
                     "run",
                     job_or_schedule,
                     "--project-id",

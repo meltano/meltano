@@ -26,11 +26,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     """Configuration for Meltano Cloud client."""
 
     env_var_prefix = "MELTANO_CLOUD_"
-    config_file_search_path = (
-        Path("./meltano_cloud.json"),
-        Path(Path.home(), ".meltano_cloud.json"),
-        Path(Path.home(), ".config", "meltano_cloud", "config.json"),
-    )
 
     def __init__(
         self,

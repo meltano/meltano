@@ -30,9 +30,13 @@ class MeltanoCloudAuthError(Exception):
 class MeltanoCloudAuth:  # noqa: WPS214
     """Authentication methods for Meltano Cloud."""
 
-    def __init__(self):
-        """Initialize a MeltanoCloudAuth instance."""
-        self.config = MeltanoCloudConfig.find()
+    def __init__(self, config: MeltanoCloudConfig | None = None):
+        """Initialize a MeltanoCloudAuth instance.
+
+        Args:
+            config: the MeltanoCloudConfig to use
+        """
+        self.config = config or MeltanoCloudConfig.find()
         self.base_url = self.config.base_auth_url
         self.client_id = self.config.app_client_id
 

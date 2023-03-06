@@ -26,5 +26,6 @@ def cloud(ctx: click.Context, config_path) -> None:
         config_path: path to config to use
     """
     ctx.ensure_object(dict)
-    ctx.obj["config"] = MeltanoCloudConfig.find(config_path=config_path)
-    ctx.obj["auth"] = MeltanoCloudAuth()
+    config = MeltanoCloudConfig.find(config_path=config_path)
+    ctx.obj["config"] = config
+    ctx.obj["auth"] = MeltanoCloudAuth(config=config)

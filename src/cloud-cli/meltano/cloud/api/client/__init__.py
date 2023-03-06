@@ -47,10 +47,14 @@ class MeltanoCloudClient:  # noqa: WPS214
         _session: The client session.
     """
 
-    def __init__(self) -> None:
-        """Initialize the client."""
+    def __init__(self, config: MeltanoCloudConfig | None = None) -> None:
+        """Initialize the client.
+
+        Args:
+            config: the MeltanoCloudConfig to use
+        """
         self._session: ClientSession | None = None
-        self.config = MeltanoCloudConfig.find()
+        self.config = config or MeltanoCloudConfig.find()
         self.auth = MeltanoCloudAuth()
         self.api_url = self.config.base_url
         self.runner_api_url = self.config.runner_api_url
