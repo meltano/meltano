@@ -104,7 +104,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             The path to the first meltano cloud config file found.
         """
         config_dir = Path(platformdirs.user_config_dir("meltano-cloud"))
-        config_dir.mkdir(exist_ok=True)
+        config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.json"
 
     @classmethod
