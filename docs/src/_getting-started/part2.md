@@ -173,7 +173,7 @@ Run your newly added extractor and loader in a pipeline using [`meltano run`](/r
 <div class="termy">
 
 ```console
-$ meltano run tap-github target-postgres --full-refresh
+$ meltano run tap-github target-postgres
 2022-09-20T13:16:13.885045Z [warning  ] No state was found, complete import.
 2022-09-20T13:16:15.441183Z [info     ] INFO Starting sync of repository: [...]
 2022-09-20T13:16:15.901789Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration",[...]
