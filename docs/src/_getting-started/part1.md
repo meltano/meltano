@@ -147,18 +147,23 @@ If you see the extractor's help message printed, the plugin was definitely insta
 ```console
 $ meltano invoke tap-github --help
 2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
-usage: tap-github [-h] -c CONFIG [-s STATE] [-p PROPERTIES] [--catalog CATALOG] [-d]
+Usage: tap-github [OPTIONS]
 
-options:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config CONFIG
-                        Config file
-  -s STATE, --state STATE
-                        State file
-  -p PROPERTIES, --properties PROPERTIES
-                        Property selections: DEPRECATED, Please use --catalog instead
-  --catalog CATALOG     Catalog file
-  -d, --discover        Do schema discovery
+  Execute the Singer tap.
+
+Options:
+  --state PATH              Use a bookmarks file for incremental replication.
+  --catalog PATH            Use a Singer catalog file with the tap.
+  --test TEXT               Use --test to sync a single record for each
+                            stream. Use --test=schema to test schema output
+                            without syncing records.
+  --discover                Run the tap in discovery mode.
+  --config TEXT             Configuration file location or 'ENV' to use
+                            environment variables.
+  --format [json|markdown]  Specify output style for --about
+  --about                   Display package metadata and settings.
+  --version                 Display the package version.
+  --help                    Show this message and exit.
 ```
 </div>
 
@@ -171,6 +176,7 @@ The GitHub tap requires [configuration](/guide/configuration) before it can star
 ```bash
 $ meltano config tap-github set --interactive
 ```
+
 2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories, start_date and your private_token.
 <br>
 <div class="termy">
@@ -208,7 +214,7 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
       extractors:
         - name: tap-github
           config:
-            start_date: 2022-01-01
+            start_date: '2022-01-01'
             repositories:
               - sbalnojan/meltano-lightdash
   ```
@@ -235,7 +241,10 @@ $ meltano config tap-github
 2022-09-19T11:26:23.573556Z [info     ] The default environment (dev) will be ignored for `meltano config`. To configure a specific Environment, please use option `--environment=[]`.
 
 {
-  "repository": "sbalnojan/meltano-lightdash",
+  "auth_token": "ghp_XXX",
+  "repositories": [
+  &ensp;&ensp;"sbalnojan/meltano-lightdash"
+  ],
   "start_date": "2022-01-01"
 }
 ```
@@ -313,8 +322,9 @@ This will add the [selection rules](/concepts/plugins#select-extra) to your [`me
       variant: meltanolabs
       pip_url: git+https://github.com/MeltanoLabs/tap-github.git
       config:
-        start_date: 2022-01-01
-        repository: sbalnojan/meltano-lightdash
+        start_date: '2022-01-01'
+        repositories:
+        - sbalnojan/meltano-lightdash
   ```
 
 
@@ -333,15 +343,15 @@ To test that the extraction process works, we add a JSON target.
 
 ```console
 $ meltano add loader target-jsonl</span>
-2022-09-19T13:47:42.389423Z [info     ] Environment 'dev' is active
-To add it to your project another time so that each can be configured differently,
-add a new plugin inheriting from the existing one with its own unique name:
- &nbsp;&nbsp;&nbsp;&nbsp;meltano add loader target-jsonl--new --inherit-from target-jsonl
+Added loader 'target-jsonl' to your Meltano project
+Variant:        andyh1203 (default)
+Repository:     https://github.com/andyh1203/target-jsonl
+Documentation:  https://hub.meltano.com/loaders/target-jsonl--andyh1203
 
 Installing loader 'target-jsonl'...
 Installed loader 'target-jsonl'
 
-To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl
+To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl--andyh1203
 ```
 </div>
 <br />
