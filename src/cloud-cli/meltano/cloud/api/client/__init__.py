@@ -206,7 +206,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         project_id: str,
         environment: str,
         job_or_schedule: str,
-    ) -> dict | bytes:
+    ) -> dict | str:
         """Run a Meltano project in Meltano Cloud.
 
         Args:
