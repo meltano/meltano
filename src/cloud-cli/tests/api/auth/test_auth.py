@@ -29,7 +29,7 @@ class TestMeltanoCloudAuth:
     def test_login_url(self, subject: MeltanoCloudAuth):
         assert (
             subject.login_url
-            == f"http://meltano-cloud-test/oauth2/authorize?client_id=meltano-cloud-test&response_type=token&scope=email+openid+profile&redirect_uri=http%3A%2F%2Flocalhost%3A8080"
+            == "http://meltano-cloud-test/oauth2/authorize?client_id=meltano-cloud-test&response_type=token&scope=email+openid+profile&redirect_uri=http%3A%2F%2Flocalhost%3A8080"
         )
 
     def test_get_auth_header(

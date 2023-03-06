@@ -50,8 +50,12 @@ meltano-cloud = "meltano.cloud.cli:main"
 aioresponses = "^0.7.4"
 
 [tool.flakeheaven.exceptions."*tests/*"]
+"pycodestyle" = [
+  "-E051", # Don't warn on long lines
+]
 "flake8-bandit" = [
   "-S101", # Don't warn on use of asserts in tests
+  "-S501", # Avoid false positive for hardcoded passwords
 ]
 # Don't require docstrings in tests
 "flake8-darglint" = [
@@ -91,4 +95,8 @@ aioresponses = "^0.7.4"
   "-WPS425", # Found boolean non-keyword argument
   "-WPS118", # Found too long name
   "-WPS342", # Avoid false positive for implicit raw strings
+  "-WPS323", # Avoid false positives for % string formatting in URL params
+  "-WPS121", # Allow use of hidden vars
+  "-WPS122", # Allow use of hidden vars
+  "-WPS450", # Allow import of protected objects
 ]
