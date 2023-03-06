@@ -216,7 +216,7 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
           config:
             start_date: '2022-01-01'
             repositories:
-              - sbalnojan/meltano-lightdash
+              - sbalnojan/meltano-example-el
   ```
 
 It will also add your secret auth token to the file `.env`:
@@ -243,7 +243,7 @@ $ meltano config tap-github
 {
   "auth_token": "ghp_XXX",
   "repositories": [
-  &ensp;&ensp;"sbalnojan/meltano-lightdash"
+  &ensp;&ensp;"sbalnojan/meltano-example-el"
   ],
   "start_date": "2022-01-01"
 }
@@ -324,7 +324,7 @@ This will add the [selection rules](/concepts/plugins#select-extra) to your [`me
       config:
         start_date: '2022-01-01'
         repositories:
-        - sbalnojan/meltano-lightdash
+        - sbalnojan/meltano-example-el
   ```
 
 
@@ -374,7 +374,7 @@ $ meltano run tap-github target-jsonl
 2022-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
 2022-09-19T13:53:41.062802Z [info     ] Found state from 2022-09-19 13:53:17.415907.
 2022-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
-2022-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
+2022-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-example-el cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
 2022-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
 2022-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
 2022-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2022-09-19 13:53:43.734535.
@@ -390,7 +390,7 @@ You can verify that it worked by looking inside the newly created file called ``
 
 ```console
 $ cat output/commits.jsonl
-{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0"}
+{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "url": "https://api.github.com/repos/sbalnojan/meltano-example-el/commits/409bdd601e0531833665f538bccecd0f69e101c0"}
 ```
 
 </div>

@@ -67,41 +67,35 @@ dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platfo
 <div class="termy">
 
 ```console
-$ meltano add transformer dbt-postgres
-2022-09-22T11:32:35.601357Z [info     ] Environment 'dev' is active
-Added transformer 'dbt-postgres' to your Meltano project
+$ meltano add utility dbt-postgres
+Added utility 'dbt-postgres' to your Meltano project
 Variant:        dbt-labs (default)
 Repository:     https://github.com/dbt-labs/dbt-core
-Documentation:  https://docs.meltano.com/guide/transformation
+Documentation:  https://hub.meltano.com/utilities/dbt-postgres--dbt-labs
 
-Adding required file bundle 'files-dbt-postgres' to your Meltano project...
-Variant:        meltano (default)
-Repository:     https://github.com/meltano/files-dbt-postgres
-Documentation:  https://hub.meltano.com/files/files-dbt-postgres
+Installing utility 'dbt-postgres'...
+Installed utility 'dbt-postgres'
 
-Installing transformer 'dbt-postgres'...
----> 100%
-Installing file bundle 'files-dbt-postgres'..
----> 100%
-Installed file bundle 'files-dbt-postgres'
-
-Adding 'files-dbt-postgres' files to project...
-Created transform/.gitignore (files-dbt-postgres)
-Created transform/dbt_project (files-dbt-postgres).yml
-Created transform/models/.gitkeep (files-dbt-postgres)
-Created transform/profiles/postgres/profiles (files-dbt-postgres).yml
-
-Installed transformer 'dbt-postgres'
-Installed 2/2 plugins
-
-To learn more about transformer 'dbt-postgres', visit https://docs.meltano.com/guide/transformation
-To learn more about file bundle 'files-dbt-postgres', visit https://hub.meltano.com/files/files-dbt-postgres
+To learn more about utility 'dbt-postgres', visit https://hub.meltano.com/utilities/dbt-postgres--dbt-labs
 ```
 
 </div>
 
 <br />
-As you can see, this adds both the transformer as well as a [file bundle](/concepts/plugins#file-bundles) to your project. You can verify that this worked by viewing the newly populated directory `transform`.
+The dbt-postgres utility can be used to scaffold your dbt project directory by running `meltano invoke dbt-postgres:initialize`:
+
+<div class="termy">
+
+```console
+$ meltano invoke dbt-postgres:initialize
+creating dbt project directory path=PosixPath('transform')
+creating dbt profiles directory path=PosixPath('[...]/transform/profiles/postgres')
+dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath('[...]/transform/profiles/postgres') dbt_project_dir=PosixPath('transform')
+```
+
+</div>
+
+You can verify that this worked by viewing the newly populated directory `transform`.
 
 ## Configure dbt
 Configure the dbt-postgres transformer to use the same configuration as our target-postgres loader using `meltano config`:
@@ -109,17 +103,17 @@ Configure the dbt-postgres transformer to use the same configuration as our targ
 <div class="termy">
 ```console
 $ meltano config dbt-postgres set host localhost
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
 $ meltano config dbt-postgres set port 5432
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'port' was set in `meltano.yml`: 5432
+&ensp;&ensp;Utility 'dbt-postgres' setting 'port' was set in `meltano.yml`: 5432
 $ meltano config dbt-postgres set user meltano
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config dbt-postgres set password password
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'password' was set in `.env`: 'password'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'password' was set in `.env`: '(redacted)'
 $ meltano config dbt-postgres set dbname postgres
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
 $ meltano config dbt-postgres set schema analytics
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
 ```
 </div>
 
@@ -172,8 +166,24 @@ To create the actual table, we run the dbt model via `meltano invoke dbt-postgre
 ```console
 $ meltano invoke dbt-postgres:run
 2022-09-22T12:30:31.842691Z [info     ] Environment 'dev' is active
-12:31:01  Running with dbt=1.1.2
-12:31:02  Found 1 model, 0 tests, 0 snapshots, 0 analyses, 167 macros, 0 operations, 0 seed files, 1 source, 0 exposures, 0 metrics
+Extension executing `dbt clean`...
+12:31:00  Running with dbt=1.3.3
+12:31:00  Checking ../.meltano/transformers/dbt/target/*
+12:31:00  Checking dbt_packages/*
+12:31:00  Cleaned dbt_packages/*
+12:31:00  Checking logs/*
+12:31:00  Cleaned logs/*
+12:31:00  Finished cleaning all paths.
+
+
+Extension executing `dbt deps`...
+12:31:01  Running with dbt=1.3.3
+12:31:01  Warning: No packages were found in packages.yml
+
+
+Extension executing `dbt run`...
+12:31:01  Running with dbt=1.3.3
+12:31:02  Found 1 model, 0 tests, 0 snapshots, 0 analyses, 289 macros, 0 operations, 0 seed files, 1 source, 0 exposures, 0 metrics
 12:31:02
 12:31:03  Concurrency: 2 threads (target='dev')
 12:31:03
