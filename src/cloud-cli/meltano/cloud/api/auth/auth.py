@@ -95,7 +95,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             yield
         finally:
             if server:
-                server.kill()  # TODO: terminate, then wait, then kill
+                server.kill()
 
     async def login(self) -> None:
         """Take user through login flow and get auth and id tokens."""
