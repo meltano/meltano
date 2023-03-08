@@ -597,3 +597,10 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 - Default: `False`
 
 Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.
+
+### <a name="ff-plugin-locks-required"></a>`ff.plugin_locks_required`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
+- Default: `False`
+
+When this flag is enabled, plugins will not be lookup up outside of `meltano add` and `meltano discover` operations. So, for example, calling `meltano run` will fail if a [lock file](/concepts/plugins#lock-artifacts) is not present for one of the plugins.
