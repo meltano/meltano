@@ -57,6 +57,21 @@ class MeltanoCloudAuth:  # noqa: WPS214
         )
         return f"{self.base_url}/oauth2/authorize?{query_params}"
 
+    @cached_property
+    def logout_url(self) -> str:
+        """Get the Meltano Cloud logout URL.
+
+        Returns:
+            the Meltano Cloud logout URL.
+        """
+        params = urlencode(
+            {
+                "client_id": self.client_id,
+                "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501)
+            }
+        )
+        return urljoin(self.base_url, f"logout?{params}")
+
     @contextmanager
     def callback_server(self) -> t.Iterator[None]:
         """Context manager to run callback server locally.
@@ -80,7 +95,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             yield
         finally:
             if server:
-                server.kill()
+                server.kill()  # TODO: terminate, then wait, then kill
 
     async def login(self) -> None:
         """Take user through login flow and get auth and id tokens."""
@@ -96,28 +111,21 @@ class MeltanoCloudAuth:  # noqa: WPS214
                 self.config.refresh()
                 time.sleep(0.2)  # noqa: WPS432
 
-    async def logout(self):
-        """Log out.
-
-        Raises:
-            MeltanoCloudAuthError: when logout request returns error
-        """
+    async def logout(self) -> None:  # noqa: WPS213
+        """Log out."""
         if not await self.logged_in():
+            click.secho("Not logged in.", fg="green")
             return
         with self.callback_server():
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    urljoin(self.base_url, "logout"),
-                    params=urlencode(
-                        {
-                            "client_id": self.client_id,
-                            "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501
-                        }
-                    ),
-                    headers=self.get_auth_header(),
-                ) as response:
-                    if not response.ok:
-                        raise MeltanoCloudAuthError()
+            click.echo("Logging out of Meltano Cloud.")
+            click.echo("You will be directed to a web browser to complete logout.")
+            click.echo("If a web browser does not open, open the following link:")
+            click.secho(self.logout_url, fg="green")
+            webbrowser.open_new_tab(self.logout_url)
+            while await self.logged_in():
+                self.config.refresh()
+                time.sleep(0.2)  # noqa: WPS432
+        click.secho("Successfully logged out.", fg="green")
 
     def get_auth_header(self) -> dict[str, str]:
         """Get the authorization header.

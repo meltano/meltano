@@ -48,4 +48,4 @@ def handle_logout():
     CONFIG.id_token = None
     CONFIG.access_token = None
     CONFIG.write_to_file()
-    return "", 204
+    return render_template("logout_page.html", port=CONFIG.auth_callback_port)
