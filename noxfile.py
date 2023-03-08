@@ -53,6 +53,7 @@ pytest_deps = (
     "pytest-randomly",
     "pytest-xdist",
     "requests-mock",
+    "pytest-structlog",
 )
 
 
