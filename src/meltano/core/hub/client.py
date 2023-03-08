@@ -289,14 +289,18 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         try:
             response.raise_for_status()
         except requests.HTTPError as http_err:
-            logger.error(
+            logger.exception(
                 "Can not retrieve plugin",
                 status_code=http_err.response.status_code,
                 error=http_err,
             )
             raise HubConnectionError(str(http_err)) from http_err
 
-        return PluginDefinition(**response.json(), plugin_type=plugin_type)
+        return PluginDefinition(
+            **response.json(),
+            plugin_type=plugin_type,
+            is_default_variant=variant_name == plugin.default_variant,
+        )
 
     def find_base_plugin(
         self,
@@ -347,7 +351,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         try:
             response.raise_for_status()
         except requests.HTTPError as err:
-            logger.error(
+            logger.exception(
                 "Can not retrieve plugin type",
                 status_code=err.response.status_code,
                 error=err,

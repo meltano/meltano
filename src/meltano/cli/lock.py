@@ -46,11 +46,12 @@ logger = structlog.get_logger(__name__)
 def lock(
     project: Project,
     ctx: click.Context,
+    *,
     all_plugins: bool,
     plugin_type: str | None,
     plugin_name: tuple[str, ...],
     update: bool,
-):
+) -> None:
     """Lock plugin definitions.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#lock

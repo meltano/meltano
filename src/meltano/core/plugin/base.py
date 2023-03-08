@@ -327,8 +327,10 @@ class PluginDefinition(PluginRef):
         plugin_type: PluginType,
         name: str,
         namespace: str,
+        *,
         variant: str | None = None,
         variants: list | None = None,
+        is_default_variant: bool | None = None,
         **extras,
     ):
         """Create a new PluginDefinition.
@@ -339,6 +341,7 @@ class PluginDefinition(PluginRef):
             namespace: The namespace of the plugin.
             variant: The variant of the plugin.
             variants: The variants of the plugin.
+            is_default_variant: Whether the variant is the default one.
             extras: Additional keyword arguments.
         """
         super().__init__(plugin_type, name)
@@ -370,6 +373,7 @@ class PluginDefinition(PluginRef):
         self.set_presentation_attrs(extras)
         self.extras = extras
         self.variants = list(map(Variant.parse, variants))
+        self.is_default_variant = is_default_variant
 
     def __iter__(self):
         """Iterate over the variants of the plugin definition.
@@ -441,10 +445,12 @@ class PluginDefinition(PluginRef):
         variant = self.find_variant(variant)
 
         label = variant.name or Variant.ORIGINAL_NAME
-        if variant == self.variants[0]:
-            label = f"{label} (default)"
-        elif variant.deprecated:
-            label = f"{label} (deprecated)"
+
+        if variant == self.variants[0] and self.is_default_variant is not False:
+            return f"{label} (default)"
+
+        if variant.deprecated:
+            return f"{label} (deprecated)"
 
         return label
 
