@@ -61,7 +61,7 @@ class TestMeltanoCloudAuthCallbackServer:
         config.id_token = "meltano-cloud-testing"
         config.write_to_file()
         response: TestResponse = client.get("/logout")
-        assert response.status_code == 204
+        assert response.status_code == 200
         config.refresh()
         assert config.id_token is None
         assert config.access_token is None
