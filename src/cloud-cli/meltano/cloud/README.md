@@ -23,7 +23,7 @@ The following settings are configurable:
 
 As part of authentication, `meltano-cloud` runs a lightweight, short-lived HTTP
 server on `localhost` to handle authentication callbacks. By default, this
-server runs on port 8080 but can be configured to another port using this setting.
+server runs on port 9999 but can be configured to another port using this setting.
 
 - Command line flag: `--auth-callback-port`
 - Environment variable: `MELTANO_CLOUD_AUTH_CALLBACK_PORT`
