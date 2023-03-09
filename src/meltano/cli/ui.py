@@ -6,6 +6,7 @@ import logging
 import os
 import secrets
 import signal
+import typing as t
 
 import click
 
@@ -13,11 +14,13 @@ from meltano.api.workers import APIWorker, UIAvailableWorker
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
-from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 

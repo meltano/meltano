@@ -2,13 +2,17 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @cli.command(

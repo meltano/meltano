@@ -336,7 +336,8 @@ class TestCliAdd:
             )
             assert_cli_runner(res)
             assert (
-                "Inherit from:\ttap-mock, variant singer-io (default)\n" in res.stdout
+                "Inherit from:\ttap-mock, variant singer-io (deprecated)\n"
+                in res.stdout
             )
 
             inherited_variant = project.plugins.find_plugin(

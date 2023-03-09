@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import click
 import structlog
@@ -15,15 +16,17 @@ from meltano.cli.utils import (
     PartialInstrumentedCmd,
 )
 from meltano.core.block.parser import BlockParser, validate_block_sets
-from meltano.core.project import Project
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
     JobAlreadyExistsError,
     JobNotFoundError,
     TaskSetsService,
 )
-from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 logger = structlog.getLogger(__name__)
 

@@ -493,7 +493,7 @@ source = [
 [tool.coverage.report]
 exclude_lines = [
   "pragma: no cover",
-  "if TYPE_CHECKING:",
+  '''if (t\.)?TYPE_CHECKING:''',
   "\\.\\.\\.",
 ]
 precision = 2

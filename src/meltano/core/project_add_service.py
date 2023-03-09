@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import enum
+import typing as t
 
 from meltano.core.plugin import BasePlugin, PluginType, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class PluginAddedReason(str, enum.Enum):
@@ -42,8 +45,9 @@ class ProjectAddService:
         self,
         plugin_type: PluginType,
         plugin_name: str,
+        *,
         lock: bool = True,
-        **attrs,
+        **attrs: t.Any,
     ) -> ProjectPlugin:
         """Add a new plugin to the project.
 
@@ -57,7 +61,10 @@ class ProjectAddService:
             The added plugin.
         """
         plugin = ProjectPlugin(
-            plugin_type, plugin_name, **attrs, default_variant=Variant.DEFAULT_NAME
+            plugin_type,
+            plugin_name,
+            **attrs,
+            default_variant=Variant.DEFAULT_NAME,
         )
 
         with self.project.plugins.disallow_discovery_yaml():
@@ -80,7 +87,7 @@ class ProjectAddService:
 
             return added
 
-    def add_plugin(self, plugin: ProjectPlugin):
+    def add_plugin(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Add a plugin to the project.
 
         Args:
@@ -94,8 +101,9 @@ class ProjectAddService:
     def add_required(
         self,
         plugin: ProjectPlugin,
+        *,
         lock: bool = True,
-    ):
+    ) -> list[ProjectPlugin]:
         """Add all required plugins to the project.
 
         Args:
@@ -105,7 +113,7 @@ class ProjectAddService:
         Returns:
             The added plugins.
         """
-        added_plugins = []
+        added_plugins: list[ProjectPlugin] = []
         for plugin_type, plugins in plugin.all_requires.items():
             for plugin_req in plugins:
                 try:
@@ -120,7 +128,7 @@ class ProjectAddService:
 
                 added_plugins.append(plugin)
 
-        added_plugins_with_required = []
+        added_plugins_with_required: list[ProjectPlugin] = []
         for added in added_plugins:
             added_plugins_with_required.extend([added, *self.add_required(added)])
 
