@@ -5,11 +5,10 @@ from __future__ import annotations
 import asyncio
 import shutil
 import sys
-from collections import abc
+import typing as t
 
 import click
 import structlog
-from sqlalchemy.orm.session import sessionmaker
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
@@ -19,8 +18,14 @@ from meltano.cli.utils import (
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
-from meltano.core.project import Project
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
+
+if t.TYPE_CHECKING:
+    from collections import abc
+
+    from sqlalchemy.orm.session import sessionmaker
+
+    from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
 

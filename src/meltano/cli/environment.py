@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.project import Project
 from meltano.core.tracking.contexts import CliEvent
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 

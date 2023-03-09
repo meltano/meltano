@@ -20,6 +20,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 
 __all__ = ["lock"]
@@ -45,16 +46,17 @@ logger = structlog.get_logger(__name__)
 def lock(
     project: Project,
     ctx: click.Context,
+    *,
     all_plugins: bool,
     plugin_type: str | None,
     plugin_name: tuple[str, ...],
     update: bool,
-):
+) -> None:
     """Lock plugin definitions.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#lock
     """
-    tracker = ctx.obj["tracker"]
+    tracker: Tracker = ctx.obj["tracker"]
 
     lock_service = PluginLockService(project)
     if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
@@ -77,6 +79,12 @@ def lock(
 
     tracked_plugins = []
 
+    if not plugins:
+        tracker.track_command_event(CliEvent.aborted)
+        errmsg = "No matching plugin(s) found"
+        raise CliError(errmsg)
+
+    click.echo(f"Locking {len(plugins)} plugin(s)...")
     for plugin in plugins:
         descriptor = f"{plugin.type.descriptor} {plugin.name}"
         if plugin.is_custom():

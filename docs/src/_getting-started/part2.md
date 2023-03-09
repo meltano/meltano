@@ -69,11 +69,19 @@ Use the ```meltano invoke target-postgres --help``` command to test that the ins
 
 ```console
 $ meltano invoke target-postgres --help
-usage: target-postgres [-h] [-c CONFIG]
+Usage: target-postgres [OPTIONS]
 
-optional arguments:
--h, --help            show this help message and exit
--c CONFIG, --config CONFIG Config file
+  Execute the Singer target.
+
+Options:
+  --input FILENAME          A path to read messages from instead of from
+                            standard in.
+  --config TEXT             Configuration file location or 'ENV' to use
+                            environment variables.
+  --format [json|markdown]  Specify output style for --about
+  --about                   Display package metadata and settings.
+  --version                 Display the package version.
+  --help                    Show this message and exit.
 ```
 </div>
 
@@ -98,15 +106,15 @@ password [env: TARGET_POSTGRES_PASSWORD] current value: None (default)
 database [env: TARGET_POSTGRES_DATABASE] current value: 'postgres' (from `meltano.yml`)
 &ensp;&ensp;Database: Database name. Note if sqlalchemy_url is set this will be ignored.
 [...]
-add_metadata_columns [env: TARGET_POSTGRES_ADD_METADATA_COLUMNS] current value: False (default)
-&ensp;&ensp;Add Metadata Columns: Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
+add_record_metadata [env: TARGET_POSTGRES_ADD_RECORD_METADATA] current value: None (default)
+&ensp;&ensp;Add Record Metadata: Note that this must be enabled for activate_version to work!This adds _sdc_extracted_at, _sdc_batched_at, and more to every table. See https://sdk.meltano.com/en/latest/implementation/record_metadata.html for more information.
 [...]
 
-To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres
+To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
 </div>
 <br />
-Fill in the details for these four attributes, and set add_metadata_columns to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
+Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
 
  <div class="termy">
 
@@ -114,11 +122,11 @@ Fill in the details for these four attributes, and set add_metadata_columns to T
 $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
-&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: 'password'
+&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: '(redacted)'
 $ meltano config target-postgres set database postgres
-&ensp;&ensp;Loader 'target-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
-$ meltano config target-postgres set add_metadata_columns True
-&ensp;&ensp;Loader 'target-postgres' setting 'add_metadata_columns' was set in `meltano.yml`: True
+&ensp;&ensp;Loader 'target-postgres' setting 'database' was set in `meltano.yml`: 'postgres'
+$ meltano config target-postgres set add_record_metadata True
+&ensp;&ensp;Loader 'target-postgres' setting 'add_record_metadata' was set in `meltano.yml`: True
 $ meltano config target-postgres set host localhost
 &ensp;&ensp;Loader 'target-postgres' setting 'host' was set in `meltano.yml`: localhost
 ```
@@ -135,7 +143,7 @@ This will add the non-sensitive configuration to your [`meltano.yml` project fil
          config:
            user: meltano
            database: postgres
-           add_metadata_columns: true
+           add_record_metadata: true
            host: localhost
    ```
 
@@ -147,10 +155,11 @@ You can use `meltano config target-postgres` to check the configuration, includi
 ```console
 $ meltano config target-postgres
 {
-&ensp;&ensp;&ensp;&ensp;"host": "postgres",
+&ensp;&ensp;&ensp;&ensp;"host": "localhost",
 &ensp;&ensp;&ensp;&ensp;"user": "meltano",
+&ensp;&ensp;&ensp;&ensp;"password": "password",
 &ensp;&ensp;&ensp;&ensp;"database": "postgres",
-&ensp;&ensp;&ensp;&ensp;"add_metadata_columns": "True"
+&ensp;&ensp;&ensp;&ensp;"add_record_metadata": true
 }
 ```
 </div>

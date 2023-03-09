@@ -28,10 +28,12 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_test_service import PluginTestServiceFactory
-from meltano.core.project import Project
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 
