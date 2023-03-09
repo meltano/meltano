@@ -603,4 +603,4 @@ Causes an exception to be raised if an environment variable is used within the p
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
 - Default: `False`
 
-When this flag is enabled, plugins will not be lookup up outside of `meltano add` and `meltano discover` operations. So, for example, calling `meltano run` will fail if a [lock file](/concepts/plugins#lock-artifacts) is not present for one of the plugins.
+When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` and `meltano discover` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.
