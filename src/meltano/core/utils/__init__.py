@@ -10,10 +10,12 @@ import hashlib
 import logging
 import math
 import os
+import platform
 import re
 import sys
 import traceback
 import typing as t
+import unicodedata
 from contextlib import suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time
@@ -807,3 +809,49 @@ def remove_suffix(string: str, suffix: str) -> str:
     elif string.endswith(suffix):
         return string[: -len(suffix)]
     return string
+
+
+_filename_restriction_pattern = re.compile(r"[^\w.-]")
+_reserved_windows_filenames = frozenset(
+    ("AUX", "COM1", "COM2", "COM3", "COM4", "CON", "LPT1", "LPT2", "LPT3", "NUL", "PRN")
+)
+_sanitize_filename_transformations = (
+    # Normalize unicode data in the string:
+    lambda x: unicodedata.normalize("NFKD", x),
+    # Limit the string to ASCII characters:
+    lambda x: x.encode("ascii", "ignore").decode("ascii"),
+    # Replace each path separator with a space:
+    lambda x: x.replace(os.path.sep, " "),
+    lambda x: x.replace(os.path.altsep, " ") if os.path.altsep else x,
+    # Replace each whitespace character with an underscore:
+    lambda x: "_".join(x.split()),
+    # Limit the string to alphanumeric characters, underscores, hyphens, and dots:
+    lambda x: _filename_restriction_pattern.sub("", x),
+    # Remove Remove illegal character combination `._` from front and back:
+    lambda x: x.strip("._"),
+    # Add a leading `_` if necessary to avoid conflict with reserved Windows filenames:
+    lambda x: f"_{x}"
+    if platform.system() == "Windows"
+    and x
+    and x.split(".")[0].upper() in _reserved_windows_filenames
+    else x,
+)
+
+
+def sanitize_filename(filename: str) -> str:
+    """Sanitize `filename` in a consistent cross-platform way.
+
+    Args:
+        filename: The name of the file to sanitize - not the full path.
+
+    Returns:
+        The provided filename after a series of santitization steps. It will
+        only contain ASCII characters. If necessary on Windows, the filename
+        will be prefixed by an underscore to avoid conflict with reserved
+        Windows file names.
+    """
+    return functools.reduce(
+        lambda x, y: y(x),  # noqa: WPS442
+        _sanitize_filename_transformations,
+        filename,
+    )
