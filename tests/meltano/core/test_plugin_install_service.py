@@ -10,8 +10,11 @@ from meltano.core.plugin_install_service import (
 
 
 class TestPluginInstallService:
-    @pytest.fixture
-    def subject(self, project):
+    @pytest.fixture(
+        params=({}, {"parallelism": -1}, {"parallelism": 2}),
+        ids=("default", "-p=-1", "-p=2"),
+    )
+    def subject(self, project, request):
         with open(project.meltanofile, "w") as file:
             file.write(
                 yaml.dump(
@@ -38,7 +41,7 @@ class TestPluginInstallService:
                 )
             )
         project.refresh()
-        return PluginInstallService(project)
+        return PluginInstallService(project, **request.param)
 
     def test_default_init_should_not_fail(self, subject):
         assert subject

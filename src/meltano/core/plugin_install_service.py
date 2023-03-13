@@ -151,12 +151,22 @@ class PluginInstallService:  # noqa: WPS214
         """
         self.project = project
         self.status_cb = status_cb
-        if parallelism is None:
-            self.parallelism = cpu_count()
-        elif parallelism < 1:
-            self.parallelism = sys.maxsize
+        self._parallelism = parallelism
         self.clean = clean
         self.force = force
+
+    @cached_property
+    def parallelism(self) -> int:
+        """Return the number of parallel installation processes to use.
+
+        Returns:
+            The number of parallel installation processes to use.
+        """
+        if self._parallelism is None:
+            return cpu_count()
+        elif self._parallelism < 1:
+            return sys.maxsize
+        return self._parallelism
 
     @cached_property
     def semaphore(self):
