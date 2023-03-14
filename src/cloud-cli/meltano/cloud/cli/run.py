@@ -66,16 +66,12 @@ async def run_project(
 @click.option("--project-id", required=True, help="The project identifier.")
 @click.pass_context
 def run(
-    ctx: click.Context, job_or_schedule: str, environment: str, project_id: str
+    ctx: click.Context,
+    job_or_schedule: str,
+    environment: str,
+    project_id: str,
 ) -> None:
-    """Run a Meltano project in Meltano Cloud.
-
-    Args:
-        ctx: click Context
-        job_or_schedule: The job or schedule identifier.
-        environment: The environment to run in.
-        project_id: The project identifier.
-    """
+    """Run a Meltano project in Meltano Cloud."""  # noqa: DAR101
     click.echo("Running a Meltano project in Meltano Cloud.")
     organization_id = get_env_var("MELTANO_CLOUD_ORGANIZATION_ID")
 

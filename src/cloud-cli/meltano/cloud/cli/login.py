@@ -1,4 +1,4 @@
-"""Log in to Meltano Cloud."""
+"""Login to or logout from Meltano Cloud."""
 
 from __future__ import annotations
 
@@ -13,11 +13,7 @@ from meltano.cloud.cli import cloud
 @cloud.command
 @click.pass_context
 def login(ctx: click.Context) -> None:
-    """Log in to Meltano Cloud.
-
-    Args:
-        ctx: the click Context
-    """
+    """Log in to Meltano Cloud."""  # noqa: DAR101
     auth: MeltanoCloudAuth = ctx.obj["auth"]
     asyncio.run(auth.login())
     user_info = asyncio.run(auth.get_user_info_json())
@@ -27,10 +23,6 @@ def login(ctx: click.Context) -> None:
 @cloud.command
 @click.pass_context
 def logout(ctx: click.Context) -> None:
-    """Log out of Meltano Cloud.
-
-    Args:
-        ctx: the click Context
-    """
+    """Log out of Meltano Cloud."""  # noqa: DAR101
     auth: MeltanoCloudAuth = ctx.obj["auth"]
     asyncio.run(auth.logout())
