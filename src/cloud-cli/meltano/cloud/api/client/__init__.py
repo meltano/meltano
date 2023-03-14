@@ -140,7 +140,11 @@ class MeltanoCloudClient:  # noqa: WPS214
             yield
 
     async def _request(
-        self, method: str, path: str, base_url: str | None = None, **kwargs
+        self,
+        method: str,
+        path: str,
+        base_url: str | None = None,
+        **kwargs,
     ) -> dict | str:
         """Make a request to the Meltano Cloud API.
 
@@ -184,36 +188,36 @@ class MeltanoCloudClient:  # noqa: WPS214
     def construct_runner_path(
         tenant_resource_key: str,
         project_id: str,
-        environment: str,
+        deployment: str,
         job_or_schedule: str,
     ) -> str:
         """Construct the Cloud Runners URL.
 
         Args:
             tenant_resource_key: The tenant resource key.
-            project_id: The project identifier.
-            environment: The Meltano environment to run.
-            job_or_schedule: The job or schedule identifier.
+            project_id: The Meltano Cloud project ID.
+            deployment: The name of the Meltano Cloud deployment in which to run.
+            job_or_schedule: The name of the job or schedule to run.
 
         Returns:
             The Cloud Runners URL.
         """
-        return f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}"
+        return f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
 
     async def run_project(
         self,
         tenant_resource_key: str,
         project_id: str,
-        environment: str,
+        deployment: str,
         job_or_schedule: str,
     ) -> dict | str:
         """Run a Meltano project in Meltano Cloud.
 
         Args:
             tenant_resource_key: The tenant resource key.
-            project_id: The project identifier.
-            environment: The Meltano environment to run.
-            job_or_schedule: The job or schedule identifier.
+            project_id: The Meltano Cloud project ID.
+            deployment: The name of the Meltano Cloud deployment in which to run.
+            job_or_schedule: The name of the job or schedule to run.
 
         Returns:
             The run details.
@@ -226,6 +230,6 @@ class MeltanoCloudClient:  # noqa: WPS214
         ):
             return await self._request(
                 "POST",
-                f"/{tenant_resource_key}/{project_id}/{environment}/{job_or_schedule}",
+                f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}",
                 base_url=self.runner_api_url,
             )
