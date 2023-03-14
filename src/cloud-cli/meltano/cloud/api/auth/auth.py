@@ -136,7 +136,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             the authorization header with bearer token.
 
         """
-        return {"Authorization": f"Bearer {self.config.id_token}"}
+        return {"Authorization": f"Bearer {self.config.access_token}"}
 
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
