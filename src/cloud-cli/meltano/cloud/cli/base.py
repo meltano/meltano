@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import click
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
@@ -14,8 +16,8 @@ from meltano.cloud.api.config import MeltanoCloudConfig
     "--config-path",
     required=False,
     default=None,
-    type=click.Path(),
-    help="Path to the meltano cloud config file to use.",
+    type=click.Path(exists=True, dir_okay=False, resolve_path=True, path_type=Path),
+    help="Path to the Meltano Cloud config file to use.",
 )
 @click.pass_context
 def cloud(ctx: click.Context, config_path) -> None:
