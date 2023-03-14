@@ -19,7 +19,7 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 )
 @click.pass_context
 def cloud(ctx: click.Context, config_path) -> None:
-    """Interface with Meltano Cloud."""  # noqa: DAR101
+    """Interface with Meltano Cloud."""
     ctx.ensure_object(dict)
     config = MeltanoCloudConfig.find(config_path=config_path)
     ctx.obj["config"] = config

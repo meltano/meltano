@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 
 from meltano.cloud.api.config import (
-    _MELTANO_CLOUD_APP_CLIENT_ID,
-    _MELTANO_CLOUD_BASE_AUTH_URL,
-    _MELTANO_CLOUD_BASE_URL,
-    _MELTANO_CLOUD_RUNNERS_URL,
+    MELTANO_CLOUD_APP_CLIENT_ID,
+    MELTANO_CLOUD_BASE_AUTH_URL,
+    MELTANO_CLOUD_BASE_URL,
+    MELTANO_CLOUD_RUNNERS_URL,
     MeltanoCloudConfig,
 )
 
@@ -22,10 +22,10 @@ class TestMeltanoCloudConfig:
     def config_dict(self):
         return {
             "auth_callback_port": 9999,
-            "base_url": _MELTANO_CLOUD_BASE_URL,
-            "base_auth_url": _MELTANO_CLOUD_BASE_AUTH_URL,
-            "app_client_id": _MELTANO_CLOUD_APP_CLIENT_ID,
-            "runner_api_url": _MELTANO_CLOUD_RUNNERS_URL,
+            "base_url": MELTANO_CLOUD_BASE_URL,
+            "base_auth_url": MELTANO_CLOUD_BASE_AUTH_URL,
+            "app_client_id": MELTANO_CLOUD_APP_CLIENT_ID,
+            "runner_api_url": MELTANO_CLOUD_RUNNERS_URL,
             "runner_api_key": f"{self._val_prefix}api-key",
             "runner_secret": f"{self._val_prefix}runner-secret",
             "organization_id": f"{self._val_prefix}organization-id",
@@ -35,13 +35,11 @@ class TestMeltanoCloudConfig:
         }
 
     @pytest.fixture(scope="function")
-    def config_file(self, tmp_path: Path, config_dict: dict):
-        with open(tmp_path / "meltano-cloud.json", "w+") as config_file:
-            json.dump(
-                config_dict,
-                config_file,
-            )
-        return tmp_path / "meltano-cloud.json"
+    def config_path(self, tmp_path: Path, config_dict: dict):
+        config_file_path = tmp_path / "meltano-cloud.json"
+        with open(config_file_path, "w") as config_file:
+            json.dump(config_dict, config_file)
+        return config_file_path
 
     @pytest.fixture(scope="function")
     def subject(self, config_file: Path):
@@ -49,10 +47,10 @@ class TestMeltanoCloudConfig:
 
     def config_assertions(self, config: MeltanoCloudConfig, suffix: str = ""):
         assert config.auth_callback_port == 9999
-        assert config.base_url == f"{_MELTANO_CLOUD_BASE_URL}{suffix}"
-        assert config.base_auth_url == f"{_MELTANO_CLOUD_BASE_AUTH_URL}{suffix}"
-        assert config.app_client_id == f"{_MELTANO_CLOUD_APP_CLIENT_ID}{suffix}"
-        assert config.runner_api_url == f"{_MELTANO_CLOUD_RUNNERS_URL}{suffix}"
+        assert config.base_url == f"{MELTANO_CLOUD_BASE_URL}{suffix}"
+        assert config.base_auth_url == f"{MELTANO_CLOUD_BASE_AUTH_URL}{suffix}"
+        assert config.app_client_id == f"{MELTANO_CLOUD_APP_CLIENT_ID}{suffix}"
+        assert config.runner_api_url == f"{MELTANO_CLOUD_RUNNERS_URL}{suffix}"
         assert config.runner_api_key == f"{self._val_prefix}api-key{suffix}"
         assert config.runner_secret == f"{self._val_prefix}runner-secret{suffix}"
         assert config.organization_id == f"{self._val_prefix}organization-id{suffix}"
@@ -65,7 +63,9 @@ class TestMeltanoCloudConfig:
         self.config_assertions(config)
 
     def test_env_var_override(
-        self, monkeypatch: pytest.MonkeyPatch, subject: MeltanoCloudConfig
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        subject: MeltanoCloudConfig,
     ):
         self.config_assertions(subject)
         monkeypatch.setenv("MELTANO_CLOUD_PROJECT_ID", "project-id-from-env-var")
@@ -74,26 +74,29 @@ class TestMeltanoCloudConfig:
         assert subject.app_client_id == "app-client-id-from-env-var"
 
     def test_refresh(
-        self, subject: MeltanoCloudConfig, config_file: Path, config_dict: dict
+        self,
+        subject: MeltanoCloudConfig,
+        config_path: Path,
+        config_dict: dict,
     ):
         self.config_assertions(subject)
-        os.remove(config_file)
-        with open(config_file, "w+") as _config_file:
+        os.remove(config_path)
+        with open(config_path, "w") as config_file:
             changed = {key: f"{val}-changed" for key, val in config_dict.items()}
-            changed.update({"auth_callback_port": 9999})
-            json.dump(
-                changed,
-                _config_file,
-            )
+            changed["auth_callback_port"] = 9999
+            json.dump(changed, config_file)
         subject.refresh()
         self.config_assertions(subject, suffix="-changed")
 
     def test_write_to_file(
-        self, monkeypatch: pytest.MonkeyPatch, subject: MeltanoCloudConfig
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        subject: MeltanoCloudConfig,
+        config_path: Path,
     ):
         self.config_assertions(subject)
         subject.organization_id = "organization-id-changed"
         subject.write_to_file()
-        with open(subject.config_path) as _config_file:
-            config = json.load(_config_file)
+        with open(subject.config_path) as config_file:
+            config = json.load(config_file)
             assert config["organization_id"] == "organization-id-changed"

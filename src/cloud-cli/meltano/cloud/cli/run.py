@@ -71,7 +71,7 @@ def run(
     environment: str,
     project_id: str,
 ) -> None:
-    """Run a Meltano project in Meltano Cloud."""  # noqa: DAR101
+    """Run a Meltano project in Meltano Cloud."""
     click.echo("Running a Meltano project in Meltano Cloud.")
     organization_id = get_env_var("MELTANO_CLOUD_ORGANIZATION_ID")
 

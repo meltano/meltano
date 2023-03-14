@@ -8,11 +8,11 @@ from pathlib import Path
 
 import platformdirs
 
-_MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
-_MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
+MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
+MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 # Runner settings will be deprecated when runner API moves to standard auth scheme.
-_MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
-_MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
+MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
+MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
 
 
 class InvalidMeltanoCloudConfigError(Exception):
@@ -31,10 +31,10 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     def __init__(
         self,
         auth_callback_port: int = 9999,
-        base_url: str = _MELTANO_CLOUD_BASE_URL,
-        base_auth_url: str = _MELTANO_CLOUD_BASE_AUTH_URL,
-        app_client_id: str = _MELTANO_CLOUD_APP_CLIENT_ID,
-        runner_api_url: str = _MELTANO_CLOUD_RUNNERS_URL,
+        base_url: str = MELTANO_CLOUD_BASE_URL,
+        base_auth_url: str = MELTANO_CLOUD_BASE_AUTH_URL,
+        app_client_id: str = MELTANO_CLOUD_APP_CLIENT_ID,
+        runner_api_url: str = MELTANO_CLOUD_RUNNERS_URL,
         runner_api_key: str | None = None,
         runner_secret: str | None = None,
         organization_id: str | None = None,

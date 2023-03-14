@@ -17,6 +17,8 @@ from meltano.api.security.auth import block_if_readonly, passes_authentication_c
 from meltano.core.project import Project
 from meltano.core.utils import truthy
 
+REQUEST_TIMEOUT_SECONDS = 30.0
+
 logger = logging.getLogger(__name__)
 root = Blueprint("root", __name__)
 
@@ -76,8 +78,9 @@ def version():
 
     if truthy(request.args.get("include_latest")):
         try:
-            res = requests.get("https://pypi.org/pypi/meltano/json")
-            pypi_payload = res.json()
+            pypi_payload = requests.get(
+                "https://pypi.org/pypi/meltano/json", timeout=REQUEST_TIMEOUT_SECONDS
+            ).json()
             response_payload["latest_version"] = pypi_payload["info"]["version"]
         except requests.exceptions.ConnectionError as e:
             logger.warning(

@@ -330,7 +330,7 @@ pyflakes = [
   "-WPS421", # Allow for print function calls
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/cli/*"]
+[tool.flakeheaven.exceptions."*/cli/*"]
 "flake8-docstrings" = [
   "-D301", # Allow backslashes in dosctrings
 ]
