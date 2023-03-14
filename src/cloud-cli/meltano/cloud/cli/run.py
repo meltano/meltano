@@ -24,28 +24,27 @@ def get_env_var(name: str) -> str:
     Raises:
         UsageError: If the environment variable is not set.
     """
-    value = os.getenv(name)
-    if not value:
+    try:
+        return os.environ[name]
+    except KeyError:
         msg = f"Environment variable {name} is not set."
         raise click.UsageError(msg)
-
-    return value
 
 
 async def run_project(
     organization_id: str,
     project_id: str,
-    environment: str,
+    deployment: str,
     job_or_schedule: str,
     config: MeltanoCloudConfig,
 ) -> dict | str:
     """Run a project in Meltano Cloud.
 
     Args:
-        organization_id: The organization ID.
-        project_id: The project identifier.
-        environment: The environment to run in.
-        job_or_schedule: The job or schedule identifier.
+        organization_id: The Meltano Cloud Organization ID.
+        project_id: The Meltano Cloud project ID.
+        deployment: The name of the Meltano Cloud deployment to run in.
+        job_or_schedule: The name of the job or schedule to run.
         config: the meltano config to use
 
     Returns:
@@ -55,20 +54,24 @@ async def run_project(
         return await client.run_project(
             organization_id,
             project_id,
-            environment,
+            deployment,
             job_or_schedule,
         )
 
 
 @cloud.command()
 @click.argument("job_or_schedule")
-@click.option("--environment", required=True, help="The environment to run in.")
-@click.option("--project-id", required=True, help="The project identifier.")
+@click.option(
+    "--deployment",
+    required=True,
+    help="The name of the Meltano Cloud deployment to run in.",
+)
+@click.option("--project-id", required=True, help="The Meltano Cloud project ID.")
 @click.pass_context
 def run(
     ctx: click.Context,
     job_or_schedule: str,
-    environment: str,
+    deployment: str,
     project_id: str,
 ) -> None:
     """Run a Meltano project in Meltano Cloud."""
@@ -77,7 +80,11 @@ def run(
 
     result = asyncio.run(
         run_project(
-            organization_id, project_id, environment, job_or_schedule, ctx.obj["config"]
+            organization_id,
+            project_id,
+            deployment,
+            job_or_schedule,
+            ctx.obj["config"],
         ),
     )
     click.echo(result)
