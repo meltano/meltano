@@ -8,11 +8,13 @@ from pathlib import Path
 
 import platformdirs
 
-_MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
-_MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
+MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
+MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 # Runner settings will be deprecated when runner API moves to standard auth scheme.
-_MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
-_MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
+MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
+MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
+
+USER_RW_FILE_MODE = 0o600
 
 
 class InvalidMeltanoCloudConfigError(Exception):
@@ -31,33 +33,33 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     def __init__(
         self,
         auth_callback_port: int = 9999,
-        base_url: str = _MELTANO_CLOUD_BASE_URL,
-        base_auth_url: str = _MELTANO_CLOUD_BASE_AUTH_URL,
-        app_client_id: str = _MELTANO_CLOUD_APP_CLIENT_ID,
-        runner_api_url: str = _MELTANO_CLOUD_RUNNERS_URL,
+        base_url: str = MELTANO_CLOUD_BASE_URL,
+        base_auth_url: str = MELTANO_CLOUD_BASE_AUTH_URL,
+        app_client_id: str = MELTANO_CLOUD_APP_CLIENT_ID,
+        runner_api_url: str = MELTANO_CLOUD_RUNNERS_URL,
         runner_api_key: str | None = None,
         runner_secret: str | None = None,
         organization_id: str | None = None,
-        project_id: str | None = None,  # disambiguate between meltano core project ID
+        project_id: str | None = None,
         id_token: str | None = None,
         access_token: str | None = None,
-        config_path: Path | None = None,
+        config_path: os.PathLike | str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
         Args:
-            auth_callback_port: port to run auth callback server at.
-            base_url: the base URL for Meltano API to interact with.
-            base_auth_url: the base URL for the Meltano Auth API to authenticate with.
-            app_client_id: the client ID to pass to oauth2 endpoints
-            runner_api_url: url for meltano cloud runners API
-            runner_api_key: key for meltano cloud runner API
-            runner_secret: secret for meltano cloud runner API
-            organization_id: the organization ID to use in API requests.
-            project_id: the project ID to use in API requests.
-            id_token: id token for use in authentication.
-            access_token: access token for use in authentication.
-            config_path: the path to the config file to use.
+            auth_callback_port: Port to run auth callback server at.
+            base_url: Base URL for Meltano API to interact with.
+            base_auth_url: Base URL for the Meltano Auth API to authenticate with.
+            app_client_id: Client ID for oauth2 endpoints.
+            runner_api_url: URL for meltano cloud runner API.
+            runner_api_key: Key for meltano cloud runner API.
+            runner_secret: Secret token for meltano cloud runner API.
+            organization_id: Organization ID to use in API requests.
+            project_id: Meltano Cloud project ID to use in API requests.
+            id_token: ID token for use in authentication.
+            access_token: Access token for use in authentication.
+            config_path: Path to the config file to use.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -73,7 +75,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.runner_secret = runner_secret
 
         self.access_token = access_token
-        self._config_path = config_path
+        self._config_path = Path(config_path).resolve() if config_path else None
 
     def __getattribute__(self, name):
         """Get config attribute.
@@ -107,26 +109,25 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Returns:
             The path to the first meltano cloud config file found.
         """
-        config_dir = Path(platformdirs.user_config_dir("meltano-cloud"))
+        config_dir = Path(platformdirs.user_config_dir("meltano-cloud")).resolve()
         config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.json"
 
     @classmethod
-    def from_config_file(cls, config_file: Path) -> MeltanoCloudConfig:
+    def from_config_file(cls, config_path: os.PathLike | str) -> MeltanoCloudConfig:
         """Initialize the configuration from a config file.
 
         Args:
-            config_file: the path to the config file.
+            config_path: Path to the config file.
 
         Returns:
             A MeltanoCloudConfig
         """
-        with open(config_file, encoding="utf-8") as config_f:
-            config = json.load(config_f)
-            return cls(**config, config_path=config_file)
+        with open(config_path, encoding="utf-8") as config_file:
+            return cls(**json.load(config_file), config_path=config_path)
 
     @classmethod
-    def find(cls, config_path: Path | None = None) -> MeltanoCloudConfig:
+    def find(cls, config_path: os.PathLike | str | None = None) -> MeltanoCloudConfig:
         """Initialize config from the first config file found.
 
         If no config file is found, one with default setting values
@@ -160,5 +161,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         config_to_write = {
             key: val for key, val in self.__dict__.items() if not key.startswith("_")
         }
-        with open(path_to_write, "w+", encoding="utf-8") as config:
+        # Write the config file with the same permissions that an SSH private
+        # key would typically have, since it contains secrets.
+        with open(
+            path_to_write,
+            "w",
+            opener=lambda path, flags: os.open(path, flags, USER_RW_FILE_MODE),
+        ) as config:
             json.dump(config_to_write, config)

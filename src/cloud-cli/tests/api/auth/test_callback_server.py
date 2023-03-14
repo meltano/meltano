@@ -47,8 +47,8 @@ class TestMeltanoCloudAuthCallbackServer:
         )
         config.refresh()
         assert response.status_code == 204
-        assert config.access_token == "meltano-cloud-testing"
-        assert config.id_token == "meltano-cloud-testing"
+        assert config.access_token == "meltano-cloud-testing"  # noqa: S105
+        assert config.id_token == "meltano-cloud-testing"  # noqa: S105
         with open(config.config_path) as config_file:
             config_on_disk = json.load(config_file)
         assert config_on_disk["access_token"] == "meltano-cloud-testing"
@@ -57,8 +57,8 @@ class TestMeltanoCloudAuthCallbackServer:
     def test_handle_logout(
         self, subject: Flask, client: FlaskClient, config: MeltanoCloudConfig
     ):
-        config.access_token = "meltano-cloud-testing"
-        config.id_token = "meltano-cloud-testing"
+        config.access_token = "meltano-cloud-testing"  # noqa: S105
+        config.id_token = "meltano-cloud-testing"  # noqa: S105
         config.write_to_file()
         response: TestResponse = client.get("/logout")
         assert response.status_code == 200

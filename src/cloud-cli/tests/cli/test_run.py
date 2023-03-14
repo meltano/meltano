@@ -33,7 +33,7 @@ class TestCloudRun:
     ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
-        environment = "dev"
+        deployment = "dev"
         job_or_schedule = "gh-to-snowflake"
 
         monkeypatch.setenv("MELTANO_CLOUD_RUNNER_API_KEY", "keepitsecret")
@@ -43,7 +43,7 @@ class TestCloudRun:
         path = client.construct_runner_path(
             tenant_resource_key=tenant_resource_key,
             project_id=project_id,
-            environment=environment,
+            deployment=deployment,
             job_or_schedule=job_or_schedule,
         )
 
@@ -63,8 +63,8 @@ class TestCloudRun:
                     job_or_schedule,
                     "--project-id",
                     project_id,
-                    "--environment",
-                    environment,
+                    "--deployment",
+                    deployment,
                 ],
             )
             assert result.exit_code == 0
@@ -78,7 +78,7 @@ class TestCloudRun:
     ):
         tenant_resource_key = "meltano-cloud-test"
         project_id = "pytest-123"
-        environment = "dev"
+        deployment = "dev"
         job_or_schedule = "gh-to-snowflake"
 
         monkeypatch.setenv("MELTANO_CLOUD_RUNNER_API_KEY", "keepitsecret")
@@ -88,7 +88,7 @@ class TestCloudRun:
         path = client.construct_runner_path(
             tenant_resource_key=tenant_resource_key,
             project_id=project_id,
-            environment=environment,
+            deployment=deployment,
             job_or_schedule=job_or_schedule,
         )
 
@@ -100,16 +100,16 @@ class TestCloudRun:
             )
             result = CliRunner().invoke(
                 cli,
-                [
+                (
                     "--config-path",
                     str(config.config_path),
                     "run",
                     job_or_schedule,
                     "--project-id",
                     project_id,
-                    "--environment",
-                    environment,
-                ],
+                    "--deployment",
+                    deployment,
+                ),
             )
 
             assert result.exit_code == 1

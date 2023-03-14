@@ -162,6 +162,7 @@ def mypy(session: Session) -> None:
     """
     session.install(
         ".",
+        "boto3-stubs",
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",

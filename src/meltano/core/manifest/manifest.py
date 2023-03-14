@@ -102,13 +102,15 @@ class YamlLimitedSafeLoader(type):
         return super().__new__(
             cls,
             name,
-            (yaml.SafeLoader, *bases),
+            tuple({yaml.SafeLoader, *bases}),
             {**namespace, "yaml_implicit_resolvers": implicit_resolvers},
         )
 
 
 class YamlNoTimestampSafeLoader(
-    metaclass=YamlLimitedSafeLoader, do_not_resolve={"tag:yaml.org,2002:timestamp"}
+    yaml.SafeLoader,
+    metaclass=YamlLimitedSafeLoader,
+    do_not_resolve={"tag:yaml.org,2002:timestamp"},
 ):
     """A safe YAML loader that leaves timestamps as strings."""
 
@@ -177,10 +179,7 @@ class Manifest:  # noqa: WPS214
     def _project_files(self) -> dict[str, t.Any]:
         project_files = flatten_dict.unflatten(
             deep_merge(
-                yaml.load(  # noqa: S506
-                    self._meltano_file,
-                    YamlNoTimestampSafeLoader,
-                ),
+                yaml.load(self._meltano_file, YamlNoTimestampSafeLoader),  # noqa: S506
                 *(
                     yaml.load(x.read_text(), YamlNoTimestampSafeLoader)  # noqa: S506
                     for x in self.project.project_files.include_paths

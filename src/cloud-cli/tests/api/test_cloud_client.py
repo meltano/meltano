@@ -19,7 +19,7 @@ class TestMeltanoCloudClient:
     RUNNER_ARGS = {
         "tenant_resource_key": "meltano-cloud-test",
         "project_id": "pytest-123",
-        "environment": "dev",
+        "deployment": "dev",
         "job_or_schedule": "gh-to-snowflake",
     }
 
