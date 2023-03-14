@@ -134,7 +134,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         Yields:
             None
         """
-        if not self.auth.logged_in():
+        if not await self.auth.logged_in():
             await self.auth.login()
         with self.headers(self.auth.get_auth_header()):
             yield
