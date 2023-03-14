@@ -38,26 +38,26 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         runner_api_key: str | None = None,
         runner_secret: str | None = None,
         organization_id: str | None = None,
-        project_id: str | None = None,  # disambiguate between meltano core project ID
+        project_id: str | None = None,
         id_token: str | None = None,
         access_token: str | None = None,
-        config_path: Path | None = None,
+        config_path: os.PathLike | str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
         Args:
-            auth_callback_port: port to run auth callback server at.
-            base_url: the base URL for Meltano API to interact with.
-            base_auth_url: the base URL for the Meltano Auth API to authenticate with.
-            app_client_id: the client ID to pass to oauth2 endpoints
-            runner_api_url: url for meltano cloud runners API
-            runner_api_key: key for meltano cloud runner API
-            runner_secret: secret for meltano cloud runner API
-            organization_id: the organization ID to use in API requests.
-            project_id: the project ID to use in API requests.
-            id_token: id token for use in authentication.
-            access_token: access token for use in authentication.
-            config_path: the path to the config file to use.
+            auth_callback_port: Port to run auth callback server at.
+            base_url: Base URL for Meltano API to interact with.
+            base_auth_url: Base URL for the Meltano Auth API to authenticate with.
+            app_client_id: Client ID for oauth2 endpoints.
+            runner_api_url: URL for meltano cloud runner API.
+            runner_api_key: Key for meltano cloud runner API.
+            runner_secret: Secret token for meltano cloud runner API.
+            organization_id: Organization ID to use in API requests.
+            project_id: Meltano Cloud project ID to use in API requests.
+            id_token: ID token for use in authentication.
+            access_token: Access token for use in authentication.
+            config_path: Path to the config file to use.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -73,7 +73,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.runner_secret = runner_secret
 
         self.access_token = access_token
-        self._config_path = config_path
+        self._config_path = Path(config_path).resolve() if config_path else None
 
     def __getattribute__(self, name):
         """Get config attribute.
@@ -107,26 +107,25 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Returns:
             The path to the first meltano cloud config file found.
         """
-        config_dir = Path(platformdirs.user_config_dir("meltano-cloud"))
+        config_dir = Path(platformdirs.user_config_dir("meltano-cloud")).resolve()
         config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.json"
 
     @classmethod
-    def from_config_file(cls, config_file: Path) -> MeltanoCloudConfig:
+    def from_config_file(cls, config_path: os.PathLike | str) -> MeltanoCloudConfig:
         """Initialize the configuration from a config file.
 
         Args:
-            config_file: the path to the config file.
+            config_path: Path to the config file.
 
         Returns:
             A MeltanoCloudConfig
         """
-        with open(config_file, encoding="utf-8") as config_f:
-            config = json.load(config_f)
-            return cls(**config, config_path=config_file)
+        with open(config_path, encoding="utf-8") as config_file:
+            return cls(**json.load(config_file), config_path=config_path)
 
     @classmethod
-    def find(cls, config_path: Path | None = None) -> MeltanoCloudConfig:
+    def find(cls, config_path: os.PathLike | str | None = None) -> MeltanoCloudConfig:
         """Initialize config from the first config file found.
 
         If no config file is found, one with default setting values

@@ -42,8 +42,8 @@ class TestMeltanoCloudConfig:
         return config_file_path
 
     @pytest.fixture(scope="function")
-    def subject(self, config_file: Path):
-        return MeltanoCloudConfig.from_config_file(config_file)
+    def subject(self, config_path: Path):
+        return MeltanoCloudConfig.from_config_file(config_path)
 
     def config_assertions(self, config: MeltanoCloudConfig, suffix: str = ""):
         assert config.auth_callback_port == 9999
@@ -58,8 +58,8 @@ class TestMeltanoCloudConfig:
         assert config.id_token == f"{self._val_prefix}id-token{suffix}"
         assert config.access_token == f"{self._val_prefix}access-token{suffix}"
 
-    def test_from_config_file(self, config_file: Path):
-        config = MeltanoCloudConfig.from_config_file(config_file)
+    def test_from_config_file(self, config_path: Path):
+        config = MeltanoCloudConfig.from_config_file(config_path)
         self.config_assertions(config)
 
     def test_env_var_override(

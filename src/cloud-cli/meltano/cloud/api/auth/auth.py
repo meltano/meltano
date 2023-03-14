@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
 import sys
-import time
 import typing as t
 import webbrowser
 from contextlib import contextmanager
@@ -21,6 +21,8 @@ if sys.version_info <= (3, 8):
     from cached_property import cached_property
 else:
     from functools import cached_property
+
+LOGIN_STATUS_CHECK_DELAY_SECONDS = 0.2
 
 
 class MeltanoCloudAuthError(Exception):
@@ -82,11 +84,11 @@ class MeltanoCloudAuth:  # noqa: WPS214
         server = None
         try:
             server = subprocess.Popen(  # noqa: S607
-                ["flask", "run", "--port", f"{self.config.auth_callback_port}"],
-                env={  # type: ignore
+                ("flask", "run", f"--port={self.config.auth_callback_port}"),
+                env={
                     **os.environ,
                     "FLASK_APP": "callback_server.py",
-                    "MELTANO_CLOUD_CONFIG_PATH": self.config.config_path,
+                    "MELTANO_CLOUD_CONFIG_PATH": str(self.config.config_path),
                 },
                 cwd=Path(__file__).parent,
                 stdout=subprocess.DEVNULL,
@@ -109,7 +111,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             webbrowser.open_new_tab(self.login_url)
             while not await self.logged_in():
                 self.config.refresh()
-                time.sleep(0.2)  # noqa: WPS432
+                await asyncio.sleep(LOGIN_STATUS_CHECK_DELAY_SECONDS)
 
     async def logout(self) -> None:  # noqa: WPS213
         """Log out."""
@@ -124,7 +126,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             webbrowser.open_new_tab(self.logout_url)
             while await self.logged_in():
                 self.config.refresh()
-                time.sleep(0.2)  # noqa: WPS432
+                await asyncio.sleep(LOGIN_STATUS_CHECK_DELAY_SECONDS)
         click.secho("Successfully logged out.", fg="green")
 
     def get_auth_header(self) -> dict[str, str]:
@@ -170,7 +172,5 @@ class MeltanoCloudAuth:  # noqa: WPS214
         """
         user_info_resp = await self.get_user_info_response()
         return bool(
-            self.config.access_token  # type: ignore
-            and self.config.id_token
-            and user_info_resp.ok
+            self.config.access_token and self.config.id_token and user_info_resp.ok
         )
