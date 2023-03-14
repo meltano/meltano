@@ -14,7 +14,6 @@ from pathlib import Path
 
 import fasteners
 from dotenv import dotenv_values
-from werkzeug.utils import secure_filename
 
 from meltano.core import yaml
 from meltano.core.behavior.versioned import Versioned
@@ -30,7 +29,7 @@ from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.utils import makedirs, truthy
+from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if sys.version_info >= (3, 8):
     from functools import cached_property
@@ -516,7 +515,7 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.run_dir(
-            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
@@ -532,7 +531,7 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.logs_dir(
-            "elt", secure_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
         )
 
     @makedirs
