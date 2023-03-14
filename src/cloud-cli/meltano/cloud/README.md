@@ -60,6 +60,6 @@ The Meltano Cloud CLI resolves configuration setting values as follows (from hig
 
 The Meltano Cloud CLI provides `login` and `logout` commands to handle authentication with the Meltano Cloud API.
 
-Upon running the `login` command, the CLI opens the Meltano Cloud login page in a browser. To authenticate, complete the login flow in the browser and then the CLI will store authentication credentials locally in a `.meltano-cloud` directory in the user's home directory. **These credentials should be considered secrets and kept secure.**
+Upon running the `login` command, the CLI opens the Meltano Cloud login page in a browser. To authenticate, complete the login flow in the browser and then the CLI will store authentication credentials locally in the Meltano Cloud config file. **These credentials should be considered secrets and kept secure**. If Meltano Cloud creates the config file itself, it restricts the permissions such that the OS user has read and write permissions, and no other user has access (aside from the root user). If you manually supply a Meltano Cloud config file, we recommend you take the same precaution.
 
 When running the `logout` command, the CLI makes a request to the Meltano Cloud authentication `logout` API endpoint, which invalidates the locally stored credentials. These invalidated credentials are then deleted from local storage.
