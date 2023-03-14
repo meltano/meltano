@@ -1,4 +1,5 @@
 """Minimal HTTP app for handling OAuth callbacks."""
+
 from __future__ import annotations
 
 import os
