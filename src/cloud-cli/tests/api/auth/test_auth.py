@@ -38,7 +38,7 @@ class TestMeltanoCloudAuth:
     def test_get_auth_header(
         self, subject: MeltanoCloudAuth, monkeypatch: pytest.MonkeyPatch
     ):
-        monkeypatch.setattr(subject.config, "access_token", "meltano-cloud-test")
+        monkeypatch.setattr(subject.config, "id_token", "meltano-cloud-test")
         assert subject.get_auth_header() == {
             "Authorization": "Bearer meltano-cloud-test"
         }
