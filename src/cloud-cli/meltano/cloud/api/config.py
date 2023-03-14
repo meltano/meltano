@@ -14,6 +14,8 @@ MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
 MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
 
+USER_RW_FILE_MODE = 0o600
+
 
 class InvalidMeltanoCloudConfigError(Exception):
     """Raised when provided configuration is invalid."""
@@ -159,5 +161,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         config_to_write = {
             key: val for key, val in self.__dict__.items() if not key.startswith("_")
         }
-        with open(path_to_write, "w+", encoding="utf-8") as config:
+        # Write the config file with the same permissions that an SSH private
+        # key would typically have, since it contains secrets.
+        with open(
+            path_to_write,
+            "w",
+            opener=lambda path, flags: os.open(path, flags, USER_RW_FILE_MODE),
+        ) as config:
             json.dump(config_to_write, config)
