@@ -81,7 +81,7 @@ class TestMeltanoCloudConfig:
     ):
         self.config_assertions(subject)
         os.remove(config_path)
-        with open(config_path, "w") as config_file:
+        with Path(config_path).open("w") as config_file:
             changed = {key: f"{val}-changed" for key, val in config_dict.items()}
             changed["auth_callback_port"] = 9999
             json.dump(changed, config_file)
