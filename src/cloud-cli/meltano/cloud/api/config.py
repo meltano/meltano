@@ -123,7 +123,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Returns:
             A MeltanoCloudConfig
         """
-        with open(config_path, encoding="utf-8") as config_file:
+        with Path(config_path).open(encoding="utf-8") as config_file:
             return cls(**json.load(config_file), config_path=config_path)
 
     @classmethod
