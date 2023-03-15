@@ -35,7 +35,11 @@ async def set_enabled_state(
         enabled: Whether the schedule should be enabled.
     """
     async with MeltanoCloudClient(config=config) as client:
-        await client.schedule_put_enabled(deployment, schedule, enabled)
+        await client.schedule_put_enabled(
+            deployment=deployment,
+            schedule=schedule,
+            enabled=enabled,
+        )
 
 
 deployment_option = click.option(
