@@ -132,11 +132,24 @@ class MeltanoCloudAuth:  # noqa: WPS214
     def get_auth_header(self) -> dict[str, str]:
         """Get the authorization header.
 
+        Used for authenticating to cloud API endpoints.
+
         Returns:
-            the authorization header with bearer token.
+            Authorization header using ID token as bearer token.
 
         """
         return {"Authorization": f"Bearer {self.config.id_token}"}
+
+    def get_access_token_header(self) -> dict[str, str]:
+        """Get the access token header.
+
+        Used for authenticating to auth endpoints.
+
+        Returns:
+            Authorization header using access token as bearer token.
+        """
+
+        return {"Authorization": f"Bearer {self.config.access_token}"}
 
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
@@ -147,7 +160,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_auth_header(),
+                headers=self.get_access_token_header(),
             ) as response:
                 return response
 
@@ -160,7 +173,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_auth_header(),
+                headers=self.get_access_token_header(),
             ) as response:
                 return await response.json()
 
