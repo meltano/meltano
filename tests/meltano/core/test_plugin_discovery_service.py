@@ -62,7 +62,10 @@ class TestPluginDiscoveryService:
     @pytest.mark.order(0)
     @pytest.mark.meta
     def test_discovery_url_mock(self, subject):
-        assert requests.get(subject.discovery_url).status_code == HTTP_STATUS_TEAPOT
+        assert (
+            requests.get(subject.discovery_url, timeout=30.0).status_code
+            == HTTP_STATUS_TEAPOT
+        )
 
     @pytest.fixture
     def discovery_yaml(self, subject):

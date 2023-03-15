@@ -53,6 +53,7 @@ pytest_deps = (
     "pytest-randomly",
     "pytest-xdist",
     "requests-mock",
+    "pytest-structlog",
 )
 
 
@@ -161,6 +162,7 @@ def mypy(session: Session) -> None:
     """
     session.install(
         ".",
+        "boto3-stubs",
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",

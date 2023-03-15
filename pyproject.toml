@@ -74,6 +74,7 @@ importlib-resources = {version = "^5.10.1", optional = true, python = "<3.9"}
 jsonschema = "^4.17"
 meltano-flask-security = "^0.1.0"
 packaging = "^21.3"
+platformdirs = "^3.0.0"
 psutil = "^5.6.3"
 psycopg2-binary = "^2.8.5"
 pydantic = "^1.10.5"
@@ -329,7 +330,7 @@ pyflakes = [
   "-WPS421", # Allow for print function calls
 ]
 
-[tool.flakeheaven.exceptions."src/meltano/cli/*"]
+[tool.flakeheaven.exceptions."*/cli/*"]
 "flake8-docstrings" = [
   "-D301", # Allow backslashes in dosctrings
 ]
@@ -450,7 +451,7 @@ pycodestyle = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --order-scope=module -ra -n auto --dist=loadfile"
+addopts = "--doctest-modules --order-scope=module -ra -n 6 --dist=loadfile"
 asyncio_mode = "auto"
 log_cli = 1
 log_cli_format = "%(message)s"
