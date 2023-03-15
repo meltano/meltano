@@ -148,7 +148,6 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Returns:
             Authorization header using access token as bearer token.
         """
-
         return {"Authorization": f"Bearer {self.config.access_token}"}
 
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
