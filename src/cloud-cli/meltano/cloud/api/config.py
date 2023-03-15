@@ -148,7 +148,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     def refresh(self) -> None:
         """Reread config from config file."""
-        with open(self.config_path, encoding="utf-8") as config_f:
+        with Path(self.config_path).open(encoding="utf-8") as config_f:
             self.__dict__.update(json.load(config_f))
 
     def write_to_file(self, config_path: Path | None = None) -> None:
