@@ -37,7 +37,7 @@ class TestMeltanoCloudConfig:
     @pytest.fixture(scope="function")
     def config_path(self, tmp_path: Path, config_dict: dict):
         config_file_path = tmp_path / "meltano-cloud.json"
-        with open(config_file_path, "w") as config_file:
+        with Path(config_file_path).open("w") as config_file:
             json.dump(config_dict, config_file)
         return config_file_path
 
