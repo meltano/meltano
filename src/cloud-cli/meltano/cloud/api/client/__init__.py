@@ -40,7 +40,7 @@ class MeltanoCloudError(Exception):
         super().__init__(response.reason)
 
 
-class MeltanoCloudClient:  # noqa: WPS214
+class MeltanoCloudClient:  # noqa: WPS214, WPS230
     """Client for the Meltano Cloud API.
 
     Attributes:
@@ -60,6 +60,10 @@ class MeltanoCloudClient:  # noqa: WPS214
         self.runner_api_url = self.config.runner_api_url
         self.api_key = self.config.runner_api_key
         self.runner_secret = self.config.runner_secret
+        try:
+            self.version = version("meltano.cloud.cli")
+        except Exception:
+            self.version = "0.0.0-dev"
 
     async def __aenter__(self) -> MeltanoCloudClient:
         """Enter the client context.
@@ -71,7 +75,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         self._session.headers.update(
             {
                 "Content-Type": "application/json",
-                "User-Agent": f"Meltano Cloud CLI/v{version('meltano.cloud.cli')}",
+                "User-Agent": f"Meltano Cloud CLI/v{self.version}",
             }
         )
         return self
@@ -162,11 +166,7 @@ class MeltanoCloudClient:  # noqa: WPS214
             MeltanoCloudError: If the response status is not OK.
         """
         url = urljoin(base_url if base_url else self.api_url, path)
-        logger.debug(
-            "Making request",
-            method=method,
-            url=url,
-        )
+        logger.debug("Making Cloud CLI request", method=method, url=url)
 
         async with self.session.request(
             method,
@@ -232,4 +232,33 @@ class MeltanoCloudClient:  # noqa: WPS214
                 "POST",
                 f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}",
                 base_url=self.runner_api_url,
+            )
+
+    async def schedule_put_enabled(
+        self,
+        *,
+        deployment: str,
+        schedule: str,
+        enabled: bool,
+    ):
+        """Use PUT to update the enabled state of a Meltano Cloud project schedule.
+
+        Args:
+            deployment: The name of the deployment the schedule belongs to.
+            schedule: The name of the schedule to enable/disable.
+            enabled: Whether the schedule should be enabled.
+        """
+        async with self.authenticated():
+            url = (
+                "/schedules/v1/"
+                f"{self.config.organization_id}/{self.config.project_id}/enabled"
+            )
+            await self._request(
+                "PUT",
+                url,
+                json={
+                    "deployment": deployment,
+                    "schedule": schedule,
+                    "enabled": enabled,
+                },
             )
