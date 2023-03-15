@@ -63,7 +63,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         try:
             self.version = version("meltano.cloud.cli")
         except Exception:
-            self.version = "0.0.0-dev"
+            self.version = version("meltano")
 
     async def __aenter__(self) -> MeltanoCloudClient:
         """Enter the client context.
