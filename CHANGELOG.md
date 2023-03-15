@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.17.0 (2023-03-14)
+
+### ✨ New
+
+- [#7343](https://github.com/meltano/meltano/issues/7343) Support arrow key text navigation during interactive config
+
+### 🐛 Fixes
+
+- [#7371](https://github.com/meltano/meltano/issues/7371) `meltano install --parallelism` error
+- [#7367](https://github.com/meltano/meltano/issues/7367) Resolve variant label from Hub response
+- [#7358](https://github.com/meltano/meltano/issues/7358) Add error and log for locking unknown plugins
+
+### 📚 Documentation Improvements
+
+- [#7364](https://github.com/meltano/meltano/issues/7364) Part2 gsg refresh target-postgres for meltanolabs
+
 ## v2.16.1 (2023-02-24)
 
 ### 🐛 Fixes
