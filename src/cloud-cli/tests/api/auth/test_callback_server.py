@@ -65,7 +65,7 @@ class TestMeltanoCloudAuthCallbackServer:
         config.refresh()
         assert config.id_token is None
         assert config.access_token is None
-        with open(config.config_path) as config_file:
+        with Path(config.config_path).open() as config_file:
             config_on_disk = json.load(config_file)
         assert config_on_disk.get("access_token") is None
         assert config_on_disk.get("id_token") is None
