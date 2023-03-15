@@ -49,7 +49,7 @@ class TestMeltanoCloudAuthCallbackServer:
         assert response.status_code == 204
         assert config.access_token == "meltano-cloud-testing"  # noqa: S105
         assert config.id_token == "meltano-cloud-testing"  # noqa: S105
-        with open(config.config_path) as config_file:
+        with Path(config.config_path).open() as config_file:
             config_on_disk = json.load(config_file)
         assert config_on_disk["access_token"] == "meltano-cloud-testing"
         assert config_on_disk["id_token"] == "meltano-cloud-testing"
