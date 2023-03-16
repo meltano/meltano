@@ -139,7 +139,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 return [perm.strip() for perm in trks_and_pids.split(",")]
         return []
 
-    @property
+    @cached_property
     def tenant_resource_keys(self) -> t.List[str]:
         """Get list of tenant resource keys from id token.
 
