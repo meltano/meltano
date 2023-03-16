@@ -14,6 +14,8 @@ from meltano.cloud.api.config import (
     MeltanoCloudConfig,
 )
 
+MeltanoCloudConfig.dir_name = "meltano-cloud-test"
+
 
 class TestMeltanoCloudConfig:
     _val_prefix = "meltano-cloud-test-"

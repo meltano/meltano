@@ -29,6 +29,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     """Configuration for Meltano Cloud client."""
 
     env_var_prefix = "MELTANO_CLOUD_"
+    dir_name = "meltano-cloud"
 
     def __init__(
         self,
@@ -102,14 +103,14 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         return self._config_path
 
-    @staticmethod
-    def find_config_path() -> Path:  # noqa: WPS605
+    @classmethod
+    def find_config_path(cls) -> Path:  # noqa: WPS605
         """Find the path to meltano config file.
 
         Returns:
             The path to the first meltano cloud config file found.
         """
-        config_dir = Path(platformdirs.user_config_dir("meltano-cloud")).resolve()
+        config_dir = Path(platformdirs.user_config_dir(cls.dir_name)).resolve()
         config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.json"
 
