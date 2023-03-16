@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 
+import jwt
 import pytest
 
 from meltano.cloud.api.config import (
@@ -28,8 +29,6 @@ class TestMeltanoCloudConfig:
             "runner_api_url": MELTANO_CLOUD_RUNNERS_URL,
             "runner_api_key": f"{self._val_prefix}api-key",
             "runner_secret": f"{self._val_prefix}runner-secret",
-            "organization_id": f"{self._val_prefix}organization-id",
-            "project_id": f"{self._val_prefix}project-id",
             "id_token": f"{self._val_prefix}id-token",
             "access_token": f"{self._val_prefix}access-token",
         }
@@ -53,8 +52,6 @@ class TestMeltanoCloudConfig:
         assert config.runner_api_url == f"{MELTANO_CLOUD_RUNNERS_URL}{suffix}"
         assert config.runner_api_key == f"{self._val_prefix}api-key{suffix}"
         assert config.runner_secret == f"{self._val_prefix}runner-secret{suffix}"
-        assert config.organization_id == f"{self._val_prefix}organization-id{suffix}"
-        assert config.project_id == f"{self._val_prefix}project-id{suffix}"
         assert config.id_token == f"{self._val_prefix}id-token{suffix}"
         assert config.access_token == f"{self._val_prefix}access-token{suffix}"
 
@@ -95,8 +92,8 @@ class TestMeltanoCloudConfig:
         config_path: Path,
     ):
         self.config_assertions(subject)
-        subject.organization_id = "organization-id-changed"
+        subject.id_token = "id-token-changed"
         subject.write_to_file()
         with Path(subject.config_path).open() as config_file:
             config = json.load(config_file)
-            assert config["organization_id"] == "organization-id-changed"
+            assert config["id_token"] == "id-token-changed"

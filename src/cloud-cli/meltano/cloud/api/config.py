@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import json
 import os
+import typing as t
+from contextlib import suppress
 from pathlib import Path
 
+import jwt
 import platformdirs
 
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
@@ -25,6 +28,14 @@ class MeltanoCloudConfigFileNotFoundError(Exception):
     """Raised when Meltano Cloud config file is missing."""
 
 
+class NoMeltanoCloudTenantResourceKeyError(Exception):
+    """Raised when currently logged in user does not belong to any tenants."""
+
+
+class NoMeltanoCloudProjectIDError(Exception):
+    """Raised when currently logged in user does not have any projects."""
+
+
 class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     """Configuration for Meltano Cloud client."""
 
@@ -39,8 +50,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         runner_api_url: str = MELTANO_CLOUD_RUNNERS_URL,
         runner_api_key: str | None = None,
         runner_secret: str | None = None,
-        organization_id: str | None = None,
-        project_id: str | None = None,
         id_token: str | None = None,
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
@@ -55,8 +64,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             runner_api_url: URL for meltano cloud runner API.
             runner_api_key: Key for meltano cloud runner API.
             runner_secret: Secret token for meltano cloud runner API.
-            organization_id: Organization ID to use in API requests.
-            project_id: Meltano Cloud project ID to use in API requests.
             id_token: ID token for use in authentication.
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
@@ -65,8 +72,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.base_url = base_url
         self.base_auth_url = base_auth_url
         self.app_client_id = app_client_id
-        self.organization_id = organization_id
-        self.project_id = project_id
         self.id_token = id_token
         # Runner settings will be deprecated when runner API
         # moves to standard auth scheme.
@@ -101,6 +106,84 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             self._config_path = self.find_config_path()
 
         return self._config_path
+
+    @staticmethod
+    def decode_jwt(token: str) -> dict[str, t.Any]:
+        """Decode a JWT without verifying.
+
+        Args:
+            token: the jwt to decode
+
+        Returns:
+            The decoded jwt.
+        """
+        return jwt.decode(token, options={"verify_signature": False})
+
+    @property
+    def trks_and_pids(self) -> t.List[str]:
+        """Get tenant resource keys and project ids from id token.
+
+        Returns:
+            List of trks and pids in the form '<trk>::<jpid>`
+
+        """
+        with suppress(jwt.DecodeError):
+            decoded = self.decode_jwt(self.id_token)
+            trks_and_pids = decoded.get("custom:trk_and_pid")
+            if trks_and_pids:
+                return [perm.strip() for perm in trks_and_pids.split(",")]
+        return []
+
+    @property
+    def tenant_resource_keys(self) -> t.List[str]:
+        """Get list of tenant resource keys from id token.
+
+        Returns:
+            List of trks in id token.
+
+        """
+        return [perm.split("::")[0] for perm in self.trks_and_pids]
+
+    @property
+    def internal_project_ids(self) -> t.List[str]:
+        """Get list of project IDs from id token.
+
+        Returns:
+            List of pids in id token.
+
+        """
+        return [perm.split("::")[1] for perm in self.trks_and_pids]
+
+    @property
+    def internal_project_id(self) -> str:
+        """Get the internal project ID.
+
+        Returns:
+            Internal project ID.
+
+        Raises:
+            NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
+        """
+        try:
+            return self.internal_project_ids[0]
+        except IndexError:
+            raise NoMeltanoCloudProjectIDError()
+
+    @property
+    def tenant_resource_key(self) -> str:
+        """Get the tenant resource key.
+
+        Returns:
+            The tenant resource key.
+
+        Raises:
+            NoMeltanoCloudTenantResourceKeyError: when ID token includes no
+                tenant resource keys.
+        """
+        try:
+            return self.tenant_resource_keys[0]
+        except IndexError:
+            raise NoMeltanoCloudTenantResourceKeyError()
 
     @staticmethod
     def find_config_path() -> Path:  # noqa: WPS605
