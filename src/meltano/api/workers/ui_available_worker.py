@@ -12,6 +12,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+REQUEST_TIMEOUT_SECONDS = 30.0
 SUCCESS_STATUS_CODE = 200
 
 
@@ -35,7 +36,11 @@ class UIAvailableWorker(threading.Thread):
 
         while not self._terminate:
             try:
-                response = requests.get(url, headers=headers)
+                response = requests.get(
+                    url,
+                    headers=headers,
+                    timeout=REQUEST_TIMEOUT_SECONDS,
+                )
                 if response.status_code == SUCCESS_STATUS_CODE:
                     click.secho(f"Meltano UI is now available at {url}", fg="green")
                     self._terminate = True
