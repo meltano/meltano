@@ -150,14 +150,14 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         return {perm.split("::")[0] for perm in self.trks_and_pids}
 
     @property
-    def internal_project_ids(self) -> t.List[str]:
-        """Get list of project IDs from id token.
+    def internal_project_ids(self) -> set[str]:
+        """Get the internal project IDs from the ID token
 
         Returns:
-            List of pids in id token.
+            The internal project IDs found in the ID token.
 
         """
-        return [perm.split("::")[1] for perm in self.trks_and_pids]
+        return {perm.split("::")[1] for perm in self.trks_and_pids}
 
     @property
     def internal_project_id(self) -> str:
