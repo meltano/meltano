@@ -33,8 +33,16 @@ class MeltanoCloudConfigFileNotFoundError(Exception):
     """Raised when Meltano Cloud config file is missing."""
 
 
+class MeltanoCloudTenantAmbiguityError(Exception):
+    """Raised when currently logged in user belongs to multiple tenants."""
+
+
 class NoMeltanoCloudTenantResourceKeyError(Exception):
     """Raised when currently logged in user does not belong to any tenants."""
+
+
+class MeltanoCloudProjectAmbiguityError(Exception):
+    """Raised when currently logged in user belongs to multiple projects."""
 
 
 class NoMeltanoCloudProjectIDError(Exception):
@@ -125,7 +133,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         return jwt.decode(token, options={"verify_signature": False})
 
     @property
-    def trks_and_pids(self) -> t.List[str]:
+    def _trks_and_pids(self) -> t.List[str]:
         """Get tenant resource keys and project ids from id token.
 
         Returns:
@@ -147,7 +155,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             The tenant resource keys found in the ID token.
 
         """
-        return {perm.split("::")[0] for perm in self.trks_and_pids}
+        return {perm.split("::")[0] for perm in self._trks_and_pids}
 
     @cached_property
     def internal_project_ids(self) -> set[str]:
@@ -157,7 +165,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             The internal project IDs found in the ID token.
 
         """
-        return {perm.split("::")[1] for perm in self.trks_and_pids}
+        return {perm.split("::")[1] for perm in self._trks_and_pids}
 
     @property
     def internal_project_id(self) -> str:
@@ -168,7 +176,10 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         Raises:
             NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
+            MeltanoCloudProjectAmbiguityError: when ID token includes morre than one project ID.
         """
+        if len(self.internal_project_ids) > 1:
+            raise MeltanoCloudProjectAmbiguityError()
         try:
             return self.internal_project_ids[0]
         except IndexError:
@@ -184,7 +195,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Raises:
             NoMeltanoCloudTenantResourceKeyError: when ID token includes no
                 tenant resource keys.
+            MeltanoCloudProjectAmbiguityError: when ID token includes more than
+                project ID.
         """
+        if len(self.tenant_resource_keys) > 1:
+            raise MeltanoCloudTenantAmbiguityError()
         try:
             return self.tenant_resource_keys[0]
         except IndexError:
