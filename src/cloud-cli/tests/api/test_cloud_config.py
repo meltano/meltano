@@ -18,7 +18,7 @@ from meltano.cloud.api.config import (
 class TestMeltanoCloudConfig:
     _val_prefix = "meltano-cloud-test-"
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def config_dict(self):
         return {
             "auth_callback_port": 9999,
@@ -32,14 +32,14 @@ class TestMeltanoCloudConfig:
             "access_token": f"{self._val_prefix}access-token",
         }
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def config_path(self, tmp_path: Path, config_dict: dict):
         config_file_path = tmp_path / "meltano-cloud.json"
         with Path(config_file_path).open("w") as config_file:
             json.dump(config_dict, config_file)
         return config_file_path
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def subject(self, config_path: Path):
         return MeltanoCloudConfig.from_config_file(config_path)
 
