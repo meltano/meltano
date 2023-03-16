@@ -49,7 +49,6 @@ pytest_deps = (
     "pytest-asyncio",
     "pytest-cov",
     "pytest-docker",
-    "pytest-env",
     "pytest-order",
     "pytest-randomly",
     "pytest-xdist",
