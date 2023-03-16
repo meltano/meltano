@@ -29,7 +29,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     """Configuration for Meltano Cloud client."""
 
     env_var_prefix = "MELTANO_CLOUD_"
-    dir_name = "meltano-cloud"
 
     def __init__(
         self,
@@ -47,6 +46,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         config_path: os.PathLike | str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
+
+        The configuration file is by default stored in the `meltano-cloud`
+        directory in the user's config directory. The directory can be
+        overridden by setting the `MELTANO_CLOUD_CONFIG_DIR` environment
+        variable.
 
         Args:
             auth_callback_port: Port to run auth callback server at.
@@ -110,7 +114,8 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Returns:
             The path to the first meltano cloud config file found.
         """
-        config_dir = Path(platformdirs.user_config_dir(cls.dir_name)).resolve()
+        dir_name = os.environ.get(f"{cls.env_var_prefix}CONFIG_DIR", "meltano-cloud")
+        config_dir = Path(platformdirs.user_config_dir(dir_name)).resolve()
         config_dir.mkdir(parents=True, exist_ok=True)
         return config_dir / "config.json"
 
