@@ -141,7 +141,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         """
         with suppress(jwt.DecodeError):
-            decoded = self.decode_jwt(self.id_token)
+            decoded = self.decode_jwt(self.id_token)  # type: ignore
             trks_and_pids = decoded.get("custom:trk_and_pid")
             if trks_and_pids:
                 return [perm.strip() for perm in trks_and_pids.split(",")]
@@ -159,7 +159,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @cached_property
     def internal_project_ids(self) -> set[str]:
-        """Get the internal project IDs from the ID token
+        """Get the internal project IDs from the ID token.
 
         Returns:
             The internal project IDs found in the ID token.
@@ -176,12 +176,13 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         Raises:
             NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
-            MeltanoCloudProjectAmbiguityError: when ID token includes morre than one project ID.
+            MeltanoCloudProjectAmbiguityError: when ID token includes more
+                than one project ID.
         """
         if len(self.internal_project_ids) > 1:
             raise MeltanoCloudProjectAmbiguityError()
         try:
-            return self.internal_project_ids[0]
+            return next(iter(self.internal_project_ids))
         except IndexError:
             raise NoMeltanoCloudProjectIDError()
 
@@ -195,13 +196,13 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Raises:
             NoMeltanoCloudTenantResourceKeyError: when ID token includes no
                 tenant resource keys.
-            MeltanoCloudProjectAmbiguityError: when ID token includes more than
-                project ID.
+            MeltanoCloudTenantAmbiguityError: when ID token includes more
+                than one tenant resource key.
         """
         if len(self.tenant_resource_keys) > 1:
             raise MeltanoCloudTenantAmbiguityError()
         try:
-            return self.tenant_resource_keys[0]
+            return next(iter(self.tenant_resource_keys))
         except IndexError:
             raise NoMeltanoCloudTenantResourceKeyError()
 
