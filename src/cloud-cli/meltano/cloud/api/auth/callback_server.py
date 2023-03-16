@@ -10,8 +10,8 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 
 APP = Flask(__name__)
 
-CONFIG: MeltanoCloudConfig = MeltanoCloudConfig.find(
-    config_path=os.environ.get("MELTANO_CLOUD_CONFIG_PATH")
+CONFIG: MeltanoCloudConfig = MeltanoCloudConfig(
+    config_path=os.environ.get("MELTANO_CLOUD_CONFIG_PATH"),
 )
 
 
