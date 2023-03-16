@@ -181,7 +181,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         if len(self.internal_project_ids) > 1:
             raise MeltanoCloudProjectAmbiguityError(
-                "Logged in Meltano user has multiple projects. Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project."
+                "Logged in Meltano user has multiple projects. Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project."  # noqa: E501
             )
         try:
             return next(iter(self.internal_project_ids))
@@ -205,13 +205,13 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         if len(self.tenant_resource_keys) > 1:
             raise MeltanoCloudTenantAmbiguityError(
-                "Logged in Meltano user has multiple tenant resource keys. Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one."
+                "Logged in Meltano user has multiple tenant resource keys. Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one."  # noqa: E501
             )
         try:
             return next(iter(self.tenant_resource_keys))
         except IndexError:
             raise NoMeltanoCloudTenantResourceKeyError(
-                "Logged in Meltano user has no tenant resource keys. Reach out to Meltano support to be assigned a tenant resource key."
+                "Logged in Meltano user has no tenant resource keys. Reach out to Meltano support to be assigned a tenant resource key."  # noqa: E501
             )
 
     @staticmethod
