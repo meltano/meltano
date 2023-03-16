@@ -4,7 +4,6 @@ import json
 import os
 from pathlib import Path
 
-import jwt
 import pytest
 
 from meltano.cloud.api.config import (
@@ -92,7 +91,7 @@ class TestMeltanoCloudConfig:
         config_path: Path,
     ):
         self.config_assertions(subject)
-        subject.id_token = "id-token-changed"
+        subject.id_token = "id-token-changed"  # noqa: S105
         subject.write_to_file()
         with Path(subject.config_path).open() as config_file:
             config = json.load(config_file)
