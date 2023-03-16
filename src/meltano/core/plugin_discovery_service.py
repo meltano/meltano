@@ -7,6 +7,7 @@ import logging
 import re
 import typing as t
 from abc import ABCMeta, abstractmethod
+from contextlib import suppress
 
 import requests
 from ruamel.yaml import YAMLError
@@ -25,6 +26,8 @@ from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+
+REQUEST_TIMEOUT_SECONDS = 30.0
 
 
 class DiscoveryInvalidError(Exception):
@@ -221,17 +224,15 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         raise DiscoveryInvalidError("No valid `discovery.yml` manifest could be found")
 
-    def load_local_discovery(self):
+    def load_local_discovery(self) -> DiscoveryFile | None:
         """Load the local `discovery.yml` manifest.
 
         Returns:
             The discovery file.
         """
-        try:
+        with suppress(FileNotFoundError):
             with self.project.root_dir("discovery.yml").open() as local_discovery:
                 return self.load_discovery(local_discovery)
-        except FileNotFoundError:
-            pass
 
     def load_remote_discovery(self) -> DiscoveryFile | None:
         """Load the remote `discovery.yml` manifest.
@@ -256,7 +257,12 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             params["project_id"] = project_id
 
         try:
-            response = requests.get(discovery_url, headers=headers, params=params)
+            response = requests.get(
+                discovery_url,
+                headers=headers,
+                params=params,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
             response.raise_for_status()
         except (
             requests.exceptions.ConnectionError,
@@ -270,17 +276,15 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         return self.load_discovery(remote_discovery, cache=True)
 
-    def load_cached_discovery(self):
+    def load_cached_discovery(self) -> DiscoveryFile | None:
         """Load the cached `discovery.yml` manifest.
 
         Returns:
             The discovery file.
         """
-        try:
+        with suppress(FileNotFoundError):
             with self.cached_discovery_file.open() as cached_discovery:
                 return self.load_discovery(cached_discovery)
-        except FileNotFoundError:
-            pass
 
     def load_bundled_discovery(self):
         """Load the bundled `discovery.yml` manifest.
@@ -436,21 +440,15 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         """
         plugin_types = plugin_types or list(PluginType)
 
-        try:
+        with suppress(ValueError):
             plugin_types.remove(target_plugin.type)
-        except ValueError:
-            pass
 
-        related_plugin_refs = []
-
-        related_plugin_refs.extend(
+        return [
             related_plugin_def
             for plugin_type in plugin_types
             for related_plugin_def in self.get_plugins_of_type(plugin_type)
             if related_plugin_def.namespace == target_plugin.namespace
-        )
-
-        return related_plugin_refs
+        ]
 
 
 class LockedDefinitionService(PluginRepository):
