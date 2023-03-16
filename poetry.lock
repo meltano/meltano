@@ -3361,24 +3361,6 @@ docker-compose-v1 = ["docker-compose (>=1.27.3,<2.0)"]
 tests = ["pytest-pycodestyle (>=2.0.0,<3.0)", "pytest-pylint (>=0.14.1,<1.0)", "requests (>=2.22.0,<3.0)"]
 
 [[package]]
-name = "pytest-env"
-version = "0.8.1"
-description = "py.test plugin that allows you to add environment variables."
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pytest_env-0.8.1-py3-none-any.whl", hash = "sha256:8c0605ae09a5b7e41c20ebcc44f2c906eea9654095b4b0c342b3814bcc3a8492"},
-    {file = "pytest_env-0.8.1.tar.gz", hash = "sha256:d7b2f5273ec6d1e221757998bc2f50d2474ed7d0b9331b92556011fadc4e9abf"},
-]
-
-[package.dependencies]
-pytest = ">=7.1.3"
-
-[package.extras]
-test = ["coverage (>=6.5)", "pytest-mock (>=3.10)"]
-
-[[package]]
 name = "pytest-forked"
 version = "1.6.0"
 description = "run tests in isolated forked subprocesses"
@@ -4706,4 +4688,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "21d8fc5c7509c4e53438b8487892c39466b75fbd456abf5308927a43c5115495"
+content-hash = "039cdc15f0bf895f4bd7dd433d925487bf10bd1a007db7fe4f2077dca2adca27"

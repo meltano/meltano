@@ -121,7 +121,6 @@ pytest = "^7.1.2"
 pytest-asyncio = "^0.18.3"
 pytest-cov = "^4.0.0"
 pytest-docker = "^1.0"
-pytest-env = "^0.8.1"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
 pytest-structlog = "^0.6"
@@ -454,9 +453,6 @@ pycodestyle = [
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --order-scope=module -ra -n 6 --dist=loadfile"
 asyncio_mode = "auto"
-env = [
-  "MELTANO_CLOUD_CONFIG_DIR=meltano-cloud-test",
-]
 log_cli = 1
 log_cli_format = "%(message)s"
 log_cli_level = "CRITICAL"
