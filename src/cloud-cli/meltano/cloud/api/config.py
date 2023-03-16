@@ -4,10 +4,18 @@ from __future__ import annotations
 
 import json
 import os
+import sys
+import typing as t
+from contextlib import suppress
 from pathlib import Path
 
+import jwt
 import platformdirs
 
+if sys.version_info <= (3, 8):
+    from cached_property import cached_property
+else:
+    from functools import cached_property
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
 MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 # Runner settings will be deprecated when runner API moves to standard auth scheme.
@@ -25,6 +33,22 @@ class MeltanoCloudConfigFileNotFoundError(Exception):
     """Raised when Meltano Cloud config file is missing."""
 
 
+class MeltanoCloudTenantAmbiguityError(Exception):
+    """Raised when currently logged in user belongs to multiple tenants."""
+
+
+class NoMeltanoCloudTenantResourceKeyError(Exception):
+    """Raised when currently logged in user does not belong to any tenants."""
+
+
+class MeltanoCloudProjectAmbiguityError(Exception):
+    """Raised when currently logged in user belongs to multiple projects."""
+
+
+class NoMeltanoCloudProjectIDError(Exception):
+    """Raised when currently logged in user does not have any projects."""
+
+
 class MeltanoCloudConfig:  # noqa: WPS214 WPS230
     """Configuration for Meltano Cloud client."""
 
@@ -39,8 +63,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         runner_api_url: str = MELTANO_CLOUD_RUNNERS_URL,
         runner_api_key: str | None = None,
         runner_secret: str | None = None,
-        organization_id: str | None = None,
-        project_id: str | None = None,
         id_token: str | None = None,
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
@@ -55,8 +77,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             runner_api_url: URL for meltano cloud runner API.
             runner_api_key: Key for meltano cloud runner API.
             runner_secret: Secret token for meltano cloud runner API.
-            organization_id: Organization ID to use in API requests.
-            project_id: Meltano Cloud project ID to use in API requests.
             id_token: ID token for use in authentication.
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
@@ -65,8 +85,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.base_url = base_url
         self.base_auth_url = base_auth_url
         self.app_client_id = app_client_id
-        self.organization_id = organization_id
-        self.project_id = project_id
         self.id_token = id_token
         # Runner settings will be deprecated when runner API
         # moves to standard auth scheme.
@@ -101,6 +119,100 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             self._config_path = self.find_config_path()
 
         return self._config_path
+
+    @staticmethod
+    def decode_jwt(token: str) -> dict[str, t.Any]:
+        """Decode a JWT without verifying.
+
+        Args:
+            token: the jwt to decode
+
+        Returns:
+            The decoded jwt.
+        """
+        return jwt.decode(token, options={"verify_signature": False})
+
+    @cached_property
+    def _trks_and_pids(self) -> t.List[str]:
+        """Get tenant resource keys and project ids from id token.
+
+        Returns:
+            List of trks and pids in the form '<trk>::<jpid>`
+
+        """
+        with suppress(jwt.DecodeError):
+            decoded = self.decode_jwt(self.id_token)  # type: ignore
+            trks_and_pids = decoded.get("custom:trk_and_pid")
+            if trks_and_pids:
+                return [perm.strip() for perm in trks_and_pids.split(",")]
+        return []
+
+    @property
+    def tenant_resource_keys(self) -> set[str]:
+        """Get the tenant resource keys from the ID token.
+
+        Returns:
+            The tenant resource keys found in the ID token.
+
+        """
+        return {perm.split("::")[0] for perm in self._trks_and_pids}
+
+    @property
+    def internal_project_ids(self) -> set[str]:
+        """Get the internal project IDs from the ID token.
+
+        Returns:
+            The internal project IDs found in the ID token.
+
+        """
+        return {perm.split("::")[1] for perm in self._trks_and_pids}
+
+    @property
+    def internal_project_id(self) -> str:
+        """Get the internal project ID.
+
+        Returns:
+            Internal project ID.
+
+        Raises:
+            NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
+            MeltanoCloudProjectAmbiguityError: when ID token includes more
+                than one project ID.
+        """
+        if len(self.internal_project_ids) > 1:
+            raise MeltanoCloudProjectAmbiguityError(
+                "Logged in Meltano user has multiple projects. Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project."  # noqa: E501
+            )
+        try:
+            return next(iter(self.internal_project_ids))
+        except IndexError:
+            raise NoMeltanoCloudProjectIDError(
+                "Logged in Meltano user has no projects."
+            )
+
+    @property
+    def tenant_resource_key(self) -> str:
+        """Get the tenant resource key.
+
+        Returns:
+            The tenant resource key.
+
+        Raises:
+            NoMeltanoCloudTenantResourceKeyError: when ID token includes no
+                tenant resource keys.
+            MeltanoCloudTenantAmbiguityError: when ID token includes more
+                than one tenant resource key.
+        """
+        if len(self.tenant_resource_keys) > 1:
+            raise MeltanoCloudTenantAmbiguityError(
+                "Logged in Meltano user has multiple tenant resource keys. Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one."  # noqa: E501
+            )
+        try:
+            return next(iter(self.tenant_resource_keys))
+        except IndexError:
+            raise NoMeltanoCloudTenantResourceKeyError(
+                "Logged in Meltano user has no tenant resource keys. Reach out to Meltano support to be assigned a tenant resource key."  # noqa: E501
+            )
 
     @staticmethod
     def find_config_path() -> Path:  # noqa: WPS605
