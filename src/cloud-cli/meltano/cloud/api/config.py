@@ -132,7 +132,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         return jwt.decode(token, options={"verify_signature": False})
 
-    @property
+    @cached_property
     def _trks_and_pids(self) -> t.List[str]:
         """Get tenant resource keys and project ids from id token.
 
@@ -147,7 +147,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 return [perm.strip() for perm in trks_and_pids.split(",")]
         return []
 
-    @cached_property
+    @property
     def tenant_resource_keys(self) -> set[str]:
         """Get the tenant resource keys from the ID token.
 
@@ -157,7 +157,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         return {perm.split("::")[0] for perm in self._trks_and_pids}
 
-    @cached_property
+    @property
     def internal_project_ids(self) -> set[str]:
         """Get the internal project IDs from the ID token.
 
@@ -180,11 +180,15 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 than one project ID.
         """
         if len(self.internal_project_ids) > 1:
-            raise MeltanoCloudProjectAmbiguityError()
+            raise MeltanoCloudProjectAmbiguityError(
+                "Logged in Meltano user has multiple projects. Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project."
+            )
         try:
             return next(iter(self.internal_project_ids))
         except IndexError:
-            raise NoMeltanoCloudProjectIDError()
+            raise NoMeltanoCloudProjectIDError(
+                "Logged in Meltano user has no projects."
+            )
 
     @property
     def tenant_resource_key(self) -> str:
@@ -200,11 +204,15 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 than one tenant resource key.
         """
         if len(self.tenant_resource_keys) > 1:
-            raise MeltanoCloudTenantAmbiguityError()
+            raise MeltanoCloudTenantAmbiguityError(
+                "Logged in Meltano user has multiple tenant resource keys. Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one."
+            )
         try:
             return next(iter(self.tenant_resource_keys))
         except IndexError:
-            raise NoMeltanoCloudTenantResourceKeyError()
+            raise NoMeltanoCloudTenantResourceKeyError(
+                "Logged in Meltano user has no tenant resource keys. Reach out to Meltano support to be assigned a tenant resource key."
+            )
 
     @staticmethod
     def find_config_path() -> Path:  # noqa: WPS605
