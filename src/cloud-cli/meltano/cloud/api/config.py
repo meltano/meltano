@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import typing as t
 from contextlib import suppress
 from pathlib import Path
@@ -11,6 +12,10 @@ from pathlib import Path
 import jwt
 import platformdirs
 
+if sys.version_info <= (3, 8):
+    from cached_property import cached_property
+else:
+    from functools import cached_property
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
 MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 # Runner settings will be deprecated when runner API moves to standard auth scheme.
