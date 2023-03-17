@@ -18,6 +18,10 @@ from meltano.cloud.api.config import (
 class TestMeltanoCloudConfig:
     _val_prefix = "meltano-cloud-test-"
 
+    @pytest.fixture(autouse=True)
+    def _no_config_path_env(self, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.delenv("MELTANO_CLOUD_CONFIG_PATH", raising=False)
+
     @pytest.fixture
     def config_dict(self):
         return {
