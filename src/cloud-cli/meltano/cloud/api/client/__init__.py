@@ -54,7 +54,7 @@ class MeltanoCloudClient:  # noqa: WPS214
             config: the MeltanoCloudConfig to use
         """
         self._session: ClientSession | None = None
-        self.config = config or MeltanoCloudConfig.find()
+        self.config = config or MeltanoCloudConfig()
         self.auth = MeltanoCloudAuth()
         self.api_url = self.config.base_url
 

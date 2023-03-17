@@ -17,27 +17,25 @@ from meltano.cloud.api.config import (
 class TestMeltanoCloudConfig:
     _val_prefix = "meltano-cloud-test-"
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def config_dict(self):
         return {
             "auth_callback_port": 9999,
             "base_url": MELTANO_CLOUD_BASE_URL,
             "base_auth_url": MELTANO_CLOUD_BASE_AUTH_URL,
             "app_client_id": MELTANO_CLOUD_APP_CLIENT_ID,
-            "organization_id": f"{self._val_prefix}organization-id",
-            "project_id": f"{self._val_prefix}project-id",
             "id_token": f"{self._val_prefix}id-token",
             "access_token": f"{self._val_prefix}access-token",
         }
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def config_path(self, tmp_path: Path, config_dict: dict):
         config_file_path = tmp_path / "meltano-cloud.json"
         with Path(config_file_path).open("w") as config_file:
             json.dump(config_dict, config_file)
         return config_file_path
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture
     def subject(self, config_path: Path):
         return MeltanoCloudConfig.from_config_file(config_path)
 
@@ -46,8 +44,6 @@ class TestMeltanoCloudConfig:
         assert config.base_url == f"{MELTANO_CLOUD_BASE_URL}{suffix}"
         assert config.base_auth_url == f"{MELTANO_CLOUD_BASE_AUTH_URL}{suffix}"
         assert config.app_client_id == f"{MELTANO_CLOUD_APP_CLIENT_ID}{suffix}"
-        assert config.organization_id == f"{self._val_prefix}organization-id{suffix}"
-        assert config.project_id == f"{self._val_prefix}project-id{suffix}"
         assert config.id_token == f"{self._val_prefix}id-token{suffix}"
         assert config.access_token == f"{self._val_prefix}access-token{suffix}"
 
@@ -88,8 +84,8 @@ class TestMeltanoCloudConfig:
         config_path: Path,
     ):
         self.config_assertions(subject)
-        subject.organization_id = "organization-id-changed"
+        subject.id_token = "id-token-changed"  # noqa: S105
         subject.write_to_file()
         with Path(subject.config_path).open() as config_file:
             config = json.load(config_file)
-            assert config["organization_id"] == "organization-id-changed"
+            assert config["id_token"] == "id-token-changed"
