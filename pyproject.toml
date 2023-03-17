@@ -139,6 +139,9 @@ types-requests = "^2.28.9"
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
 
+[tool.black]
+line-length = 88
+
 [tool.isort]
 add_imports = [
   "from __future__ import annotations",
