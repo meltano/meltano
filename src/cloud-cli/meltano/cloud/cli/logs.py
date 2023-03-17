@@ -44,7 +44,7 @@ def print_(context: click.Context, execution_id: str) -> None:
     """Print the logs.
 
     Args:
-        context: The ``click`` context.
+        context: The Click context.
         execution_id: The execution identifier.
     """
     config: MeltanoCloudConfig = context.obj["config"]
