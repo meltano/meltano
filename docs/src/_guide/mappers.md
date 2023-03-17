@@ -175,7 +175,7 @@ No, BATCH message type does not currently support mapping functionality.
 It's mostly preference but here are some trade offs to consider:
 - Mapper plugins can only be run using `meltano run`
 - Mappers work for SDK and non-SDK connectors. If your pipeline uses 2 non-SDK connectors this is your best option.
-- SDK stream maps are part of the SDK which inheritly makes them more difficult to change. If you need custom functionality then forking a mapper plugin and customizing it is you best option. Although if your behavior is generically useful, please open an issue in the [SDK repo](https://github.com/meltano/sdk) to get it added!
+- SDK stream maps are part of the SDK which inherently makes them more difficult to change. If you need custom functionality then forking a mapper plugin and customizing it is you best option. Although if your behavior is generically useful, please open an issue in the [SDK repo](https://github.com/meltano/sdk) to get it added!
 - SDK stream maps avoid having to install an additional plugin into your project.
 - Mapper plugins alter data after its been extracted whereas SDK based stream maps on the tap side could alter the extraction behavior.
 Depending on your use case, for example deleting streams, it might be slightly more efficient to do it in the tap and avoid extracting unneeded data.
