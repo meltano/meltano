@@ -76,7 +76,7 @@ Another example is for reverse ETL use cases where the target usually expects th
 There are two ways to use mapper functionality within Meltano.
 You can install a standalone mapper plugin that runs between a tap and a target i.e. `meltano run tap-csv <MAPPER> target-jsonl` or if either your tap or target is based on the Meltano SDK then you can configure the `stream_map_config` settings in the plugin configuration, also referred to as inline stream maps.
 
-## SDK Based Connectors
+## SDK Stream Maps
 
 If either your tap or your target is built on the Meltano SDK then it automatically has the mapper features, or also referred to as inline stream maps, built in.
 This is the easiest way to get mapper functionality into your pipeline by avoiding some of the limitations of standalone mappers (only works with `meltano run`, requires installing another plugin, etc.).
