@@ -36,17 +36,42 @@ class MeltanoCloudConfigFileNotFoundError(Exception):
 class MeltanoCloudTenantAmbiguityError(Exception):
     """Raised when currently logged in user belongs to multiple tenants."""
 
+    def __init__(self) -> None:
+        """Initialize exception with message."""
+        super().__init__(
+            "Logged in Meltano user has multiple tenant resource keys. "
+            "Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one.",
+        )
+
 
 class NoMeltanoCloudTenantResourceKeyError(Exception):
     """Raised when currently logged in user does not belong to any tenants."""
+
+    def __init__(self) -> None:
+        """Initialize exception with message."""
+        super().__init__(
+            "Logged in Meltano user has no tenant resource keys. "
+            "Reach out to Meltano support to be assigned a tenant resource key.",
+        )
 
 
 class MeltanoCloudProjectAmbiguityError(Exception):
     """Raised when currently logged in user belongs to multiple projects."""
 
+    def __init__(self) -> None:
+        """Initialize exception with message."""
+        super().__init__(
+            "Logged in Meltano user has multiple projects. "
+            "Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project.",
+        )
+
 
 class NoMeltanoCloudProjectIDError(Exception):
     """Raised when currently logged in user does not have any projects."""
+
+    def __init__(self) -> None:
+        """Initialize exception with message."""
+        super().__init__("Logged in Meltano user has no projects.")
 
 
 class MeltanoCloudConfig:  # noqa: WPS214 WPS230
@@ -176,15 +201,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 than one project ID.
         """
         if len(self.internal_project_ids) > 1:
-            raise MeltanoCloudProjectAmbiguityError(
-                "Logged in Meltano user has multiple projects. Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project."  # noqa: E501
-            )
+            raise MeltanoCloudProjectAmbiguityError
         try:
             return next(iter(self.internal_project_ids))
-        except IndexError:
-            raise NoMeltanoCloudProjectIDError(
-                "Logged in Meltano user has no projects."
-            )
+        except StopIteration:  # noqa: WPS329
+            raise NoMeltanoCloudProjectIDError from None
 
     @property
     def tenant_resource_key(self) -> str:
@@ -200,15 +221,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
                 than one tenant resource key.
         """
         if len(self.tenant_resource_keys) > 1:
-            raise MeltanoCloudTenantAmbiguityError(
-                "Logged in Meltano user has multiple tenant resource keys. Set MELTANO_CLOUD_TENANT_RESOURCE_KEY to select one."  # noqa: E501
-            )
+            raise MeltanoCloudTenantAmbiguityError
         try:
             return next(iter(self.tenant_resource_keys))
-        except IndexError:
-            raise NoMeltanoCloudTenantResourceKeyError(
-                "Logged in Meltano user has no tenant resource keys. Reach out to Meltano support to be assigned a tenant resource key."  # noqa: E501
-            )
+        except StopIteration:  # noqa: WPS329
+            raise NoMeltanoCloudTenantResourceKeyError from None
 
     @staticmethod
     def user_config_path() -> Path:  # noqa: WPS605
