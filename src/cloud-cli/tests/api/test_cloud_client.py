@@ -23,11 +23,6 @@ class TestMeltanoCloudClient:
         "job_or_schedule": "gh-to-snowflake",
     }
 
-    RUNNER_CREDS = {
-        "api_key": "keepitsecret",
-        "runner_secret": "keepitsafe",
-    }
-
     @pytest.fixture(scope="function")
     def config(self, tmp_path: Path):
         path = tmp_path / "meltano-cloud.json"
@@ -37,16 +32,14 @@ class TestMeltanoCloudClient:
     async def test_run_ok(self, config: MeltanoCloudConfig):
         """Test that a successful run returns the expected result."""
         async with MeltanoCloudClient(config=config) as client:
-            client.api_key = self.RUNNER_CREDS["api_key"]
-            client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
                 logging.debug(
-                    f"Mocking 200 response for {urljoin(client.runner_api_url, path)}"
+                    f"Mocking 200 response for {urljoin(client.api_url, path)}"
                 )
 
                 m.post(
-                    urljoin(client.runner_api_url, path),
+                    urljoin(client.api_url, path),
                     status=200,
                     body="Running Job",
                     repeat=True,
@@ -60,12 +53,10 @@ class TestMeltanoCloudClient:
     async def test_run_error(self, config: MeltanoCloudConfig):
         """Test that a response error is raised as a MeltanoCloudError."""
         async with MeltanoCloudClient(config=config) as client:
-            client.api_key = self.RUNNER_CREDS["api_key"]
-            client.runner_secret = self.RUNNER_CREDS["runner_secret"]
             path = client.construct_runner_path(**self.RUNNER_ARGS)
             with aioresponses() as m:
                 m.post(
-                    urljoin(client.runner_api_url, path),
+                    urljoin(client.api_url, path),
                     status=403,
                     payload={"status": "error"},
                     reason="Forbidden",

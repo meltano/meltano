@@ -36,8 +36,6 @@ class TestCloudRun:
         deployment = "dev"
         job_or_schedule = "gh-to-snowflake"
 
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_API_KEY", "keepitsecret")
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_SECRET", "keepitsafe")
         monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", tenant_resource_key)
 
         path = client.construct_runner_path(
@@ -49,7 +47,7 @@ class TestCloudRun:
 
         with aioresponses() as m:
             m.post(
-                urljoin(client.runner_api_url, path),
+                urljoin(client.api_url, path),
                 status=200,
                 body=b"Running Job",
             )
@@ -81,8 +79,6 @@ class TestCloudRun:
         deployment = "dev"
         job_or_schedule = "gh-to-snowflake"
 
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_API_KEY", "keepitsecret")
-        monkeypatch.setenv("MELTANO_CLOUD_RUNNER_SECRET", "keepitsafe")
         monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", tenant_resource_key)
 
         path = client.construct_runner_path(
@@ -94,7 +90,7 @@ class TestCloudRun:
 
         with aioresponses() as m:
             m.post(
-                urljoin(client.runner_api_url, path),
+                urljoin(client.api_url, path),
                 status=401,
                 reason="Unauthorized",
             )

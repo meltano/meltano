@@ -10,8 +10,6 @@ import platformdirs
 
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
 MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
-# Runner settings will be deprecated when runner API moves to standard auth scheme.
-MELTANO_CLOUD_RUNNERS_URL = "https://cloud-runners.meltano.com/v1"
 MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"
 
 USER_RW_FILE_MODE = 0o600
@@ -36,9 +34,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         base_url: str = MELTANO_CLOUD_BASE_URL,
         base_auth_url: str = MELTANO_CLOUD_BASE_AUTH_URL,
         app_client_id: str = MELTANO_CLOUD_APP_CLIENT_ID,
-        runner_api_url: str = MELTANO_CLOUD_RUNNERS_URL,
-        runner_api_key: str | None = None,
-        runner_secret: str | None = None,
         organization_id: str | None = None,
         project_id: str | None = None,
         id_token: str | None = None,
@@ -52,9 +47,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             base_url: Base URL for Meltano API to interact with.
             base_auth_url: Base URL for the Meltano Auth API to authenticate with.
             app_client_id: Client ID for oauth2 endpoints.
-            runner_api_url: URL for meltano cloud runner API.
-            runner_api_key: Key for meltano cloud runner API.
-            runner_secret: Secret token for meltano cloud runner API.
             organization_id: Organization ID to use in API requests.
             project_id: Meltano Cloud project ID to use in API requests.
             id_token: ID token for use in authentication.
@@ -68,12 +60,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.organization_id = organization_id
         self.project_id = project_id
         self.id_token = id_token
-        # Runner settings will be deprecated when runner API
-        # moves to standard auth scheme.
-        self.runner_api_url = runner_api_url
-        self.runner_api_key = runner_api_key
-        self.runner_secret = runner_secret
-
         self.access_token = access_token
         self._config_path = Path(config_path).resolve() if config_path else None
 

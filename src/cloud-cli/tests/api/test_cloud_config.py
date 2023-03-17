@@ -10,7 +10,6 @@ from meltano.cloud.api.config import (
     MELTANO_CLOUD_APP_CLIENT_ID,
     MELTANO_CLOUD_BASE_AUTH_URL,
     MELTANO_CLOUD_BASE_URL,
-    MELTANO_CLOUD_RUNNERS_URL,
     MeltanoCloudConfig,
 )
 
@@ -25,9 +24,6 @@ class TestMeltanoCloudConfig:
             "base_url": MELTANO_CLOUD_BASE_URL,
             "base_auth_url": MELTANO_CLOUD_BASE_AUTH_URL,
             "app_client_id": MELTANO_CLOUD_APP_CLIENT_ID,
-            "runner_api_url": MELTANO_CLOUD_RUNNERS_URL,
-            "runner_api_key": f"{self._val_prefix}api-key",
-            "runner_secret": f"{self._val_prefix}runner-secret",
             "organization_id": f"{self._val_prefix}organization-id",
             "project_id": f"{self._val_prefix}project-id",
             "id_token": f"{self._val_prefix}id-token",
@@ -50,9 +46,6 @@ class TestMeltanoCloudConfig:
         assert config.base_url == f"{MELTANO_CLOUD_BASE_URL}{suffix}"
         assert config.base_auth_url == f"{MELTANO_CLOUD_BASE_AUTH_URL}{suffix}"
         assert config.app_client_id == f"{MELTANO_CLOUD_APP_CLIENT_ID}{suffix}"
-        assert config.runner_api_url == f"{MELTANO_CLOUD_RUNNERS_URL}{suffix}"
-        assert config.runner_api_key == f"{self._val_prefix}api-key{suffix}"
-        assert config.runner_secret == f"{self._val_prefix}runner-secret{suffix}"
         assert config.organization_id == f"{self._val_prefix}organization-id{suffix}"
         assert config.project_id == f"{self._val_prefix}project-id{suffix}"
         assert config.id_token == f"{self._val_prefix}id-token{suffix}"
