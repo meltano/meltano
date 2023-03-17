@@ -38,7 +38,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Args:
             config: the MeltanoCloudConfig to use
         """
-        self.config = config or MeltanoCloudConfig.find()
+        self.config = config or MeltanoCloudConfig()
         self.base_url = self.config.base_auth_url
         self.client_id = self.config.app_client_id
 

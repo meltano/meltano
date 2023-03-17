@@ -23,7 +23,7 @@ class TestCloudRun:
     def config(self, tmp_path: Path):
         path = tmp_path / "meltano-cloud.json"
         path.touch()
-        return MeltanoCloudConfig.find(config_path=path)
+        return MeltanoCloudConfig(config_path=path)
 
     def test_run_ok(
         self,
