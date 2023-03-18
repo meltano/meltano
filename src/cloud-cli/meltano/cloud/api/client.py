@@ -266,16 +266,17 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             enabled: Whether the schedule should be enabled.
         """
         async with self.authenticated():
-            url = (
-                "/schedules/v1/"
-                f"{self.config.organization_id}/{self.config.project_id}/enabled"
-            )
-            await self._request(
+            await self._json_request(
                 "PUT",
-                url,
+                (
+                    "/schedules/v1/"
+                    f"{self.config.tenant_resource_key}/"
+                    f"{self.config.internal_project_id}/"
+                    "enabled"
+                ),
                 json={
-                    "deployment": deployment,
-                    "schedule": schedule,
+                    "deployment_name": deployment,
+                    "schedule_name": schedule,
                     "enabled": enabled,
                 },
             )
