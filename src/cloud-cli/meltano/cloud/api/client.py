@@ -266,20 +266,33 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             enabled: Whether the schedule should be enabled.
         """
         async with self.authenticated():
-            await self._json_request(
-                "PUT",
-                (
-                    "/schedules/v1/"
-                    f"{self.config.tenant_resource_key}/"
-                    f"{self.config.internal_project_id}/"
-                    "enabled"
-                ),
-                json={
-                    "deployment_name": deployment,
-                    "schedule_name": schedule,
-                    "enabled": enabled,
-                },
-            )
+            try:
+                await self._json_request(
+                    "PUT",
+                    (
+                        "/schedules/v1/"
+                        f"{self.config.tenant_resource_key}/"
+                        f"{self.config.internal_project_id}/"
+                        "enabled"
+                    ),
+                    json={
+                        "deployment_name": deployment,
+                        "schedule_name": schedule,
+                        "enabled": enabled,
+                    },
+                )
+            except MeltanoCloudError as ex:
+                if (
+                    isinstance(ex.__cause__, ClientResponseError)
+                    and ex.__cause__.status == 404
+                ):
+                    ex.response.reason = (
+                        f"Unable to find schedule with name {schedule!r} "
+                        f"within a deployment named {deployment!r}"
+                    )
+                    raise MeltanoCloudError(ex.response) from ex
+                else:
+                    raise
 
     @asynccontextmanager
     async def stream_logs(
