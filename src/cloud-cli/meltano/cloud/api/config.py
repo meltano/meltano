@@ -251,6 +251,26 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         with Path(config_path).open(encoding="utf-8") as config_file:
             return cls(**json.load(config_file), config_path=config_path)
 
+    @classmethod
+    def find(cls, config_path: os.PathLike | str | None = None) -> MeltanoCloudConfig:
+        """Initialize config from the first config file found.
+
+        If no config file is found, one with default setting values
+        is created in the user config directory.
+
+        Args:
+            config_path: the path to the config file to use, if any.
+
+        Returns:
+            A MeltanoCloudConfig
+        """
+        try:
+            return cls.from_config_file(config_path or cls.user_config_path())
+        except (FileNotFoundError, json.JSONDecodeError):
+            config = cls()
+            config.write_to_file()
+            return config
+
     def refresh(self) -> None:
         """Reread config from config file."""
         with Path(self.config_path).open(encoding="utf-8") as config_f:
@@ -275,4 +295,4 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             "w",
             opener=lambda path, flags: os.open(path, flags, USER_RW_FILE_MODE),
         ) as config:
-            json.dump(config_to_write, config)
+            json.dump(config_to_write, config, indent=2)
