@@ -48,7 +48,8 @@ class TestOutputLogger:
     @pytest.fixture(name="redirect_handler")
     def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
         formatter = structlog.stdlib.ProcessorFormatter(
-            processor=structlog.processors.JSONRenderer(),  # use a json renderer so output is easier to verify
+            # use a json renderer so output is easier to verify
+            processor=structlog.processors.JSONRenderer(),
         )
         handler = logging.FileHandler(subject.file)
         handler.setFormatter(formatter)

@@ -712,10 +712,8 @@ class TestSingerTap:
             True  # no output so return eof immediately
         )
 
-        process_mock.stdout.at_eof.side_effect = (
-            False,
-            True,
-        )  # first check needs to be false so loop starts read, after 1 line, we'll return true
+        # first check needs to be false so loop starts read, after 1 line, we'll return true
+        process_mock.stdout.at_eof.side_effect = (False, True)
         process_mock.stdout.readline = AsyncMock(return_value=b'{"discovered": true}\n')
 
         invoke_async = AsyncMock(return_value=process_mock)

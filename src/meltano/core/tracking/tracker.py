@@ -338,7 +338,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         self.save_telemetry_settings()
 
         if self.snowplow_tracker is None:
-            return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
+            # The Snowplow tracker is not available (e.g. because no endpoints are set)
+            return
 
         logger.debug(
             "Telemetry state change detected. A one-time "

@@ -92,9 +92,8 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         environment_plugin_env = (
             self.environment_plugin_config.env if self.environment_plugin_config else {}
         )
-        self.env_override.update(
-            environment_plugin_env
-        )  # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
+        # env vars stored under the `env:` key of the plugin definition of the active meltano Environment
+        self.env_override.update(environment_plugin_env)
 
     @property
     def project_settings_service(self):

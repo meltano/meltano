@@ -146,9 +146,16 @@ class TestScheduleService:
         self, subject, session, tap, target, plugin_settings_service_factory
     ):
         # curry the `add_elt` method to remove some arguments
-        add_elt = lambda name, start_date: subject.add_elt(  # noqa: E731
-            session, name, tap.name, target.name, "run", "@daily", start_date=start_date
-        )
+        def add_elt(name, start_date):
+            return subject.add_elt(  # noqa: E731
+                session,
+                name,
+                tap.name,
+                target.name,
+                "run",
+                "@daily",
+                start_date=start_date,
+            )
 
         mock_date = datetime(2002, 1, 1)  # noqa: WPS432
 
