@@ -290,8 +290,6 @@ def add_plugin(
         print_added_plugin(plugin)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
-        new_plugin = err.new_plugin
-
         click.secho(
             (
                 f"{plugin_type.descriptor.capitalize()} '{plugin_name}' "
@@ -300,12 +298,11 @@ def add_plugin(
             fg="yellow",
             err=True,
         )
-
         if variant and variant != plugin.variant:
-            variant = plugin.find_variant(variant)
+            new_plugin = err.new_plugin
             click.echo(
                 f"\nTo switch from the current '{plugin.variant}' variant "
-                f"to '{variant.name}':\n"
+                f"to '{new_plugin.variant}':\n"
                 "1. Update `variant` and `pip_url` in your `meltano.yml` "
                 "project file:\n"
                 f"\tname: {plugin.name}\n"
