@@ -613,7 +613,7 @@ suppress-dummy-args = true
 
 [tool.ruff.flake8-pytest-style]
 fixture-parentheses = false
-parametrize-names-type = "csv"
+parametrize-values-type = "tuple"
 
 [tool.ruff.isort]
 known-first-party = ["meltano", "fixtures"]
