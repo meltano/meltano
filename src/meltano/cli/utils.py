@@ -334,7 +334,7 @@ def add_plugin(
                 "1. Update `variant` and `pip_url` in your `meltano.yml` project file:",
             )
             click.echo(f"\tname: {plugin.name}")
-            click.echo(f"\tvariant: {new_plugin.name}")
+            click.echo(f"\tvariant: {new_plugin.variant}")
             click.echo(f"\tpip_url: {new_plugin.pip_url}")
 
             click.echo("2. Reinstall the plugin:")

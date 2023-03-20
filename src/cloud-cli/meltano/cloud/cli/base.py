@@ -23,6 +23,6 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 def cloud(ctx: click.Context, config_path) -> None:
     """Interface with Meltano Cloud."""
     ctx.ensure_object(dict)
-    config = MeltanoCloudConfig(config_path=config_path)
+    config = MeltanoCloudConfig.find(config_path=config_path)
     ctx.obj["config"] = config
     ctx.obj["auth"] = MeltanoCloudAuth(config=config)

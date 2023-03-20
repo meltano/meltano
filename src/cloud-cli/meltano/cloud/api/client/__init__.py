@@ -55,7 +55,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         """
         self._session: ClientSession | None = None
         self.config = config or MeltanoCloudConfig()
-        self.auth = MeltanoCloudAuth()
+        self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
 
     async def __aenter__(self) -> MeltanoCloudClient:
@@ -136,12 +136,47 @@ class MeltanoCloudClient:  # noqa: WPS214
         with self.headers(self.auth.get_auth_header()):
             yield
 
-    async def _request(
+    @asynccontextmanager
+    async def _raw_request(
         self,
         method: str,
         path: str,
         base_url: str | None = None,
-        **kwargs,
+        **kwargs: t.Any,
+    ) -> t.AsyncGenerator[ClientResponse, None]:
+        """Make a request to the Meltano Cloud API.
+
+        Args:
+            method: The HTTP method.
+            path: The API path.
+            base_url: The base_url. Uses base url from config by default.
+            **kwargs: Additional keyword arguments to pass to the request.
+
+        Yields:
+            The response object.
+
+        Raises:
+            MeltanoCloudError: If the response status is not OK.
+        """
+        url = urljoin(base_url if base_url else self.api_url, path)
+        logger.debug(
+            "Making request",
+            method=method,
+            url=url,
+        )
+        async with self.session.request(method, url, **kwargs) as response:
+            try:
+                response.raise_for_status()
+            except ClientResponseError as e:
+                raise MeltanoCloudError(response) from e
+            yield response
+
+    async def _json_request(
+        self,
+        method: str,
+        path: str,
+        base_url: str | None = None,
+        **kwargs: t.Any,
     ) -> dict | str:
         """Make a request to the Meltano Cloud API.
 
@@ -154,26 +189,13 @@ class MeltanoCloudClient:  # noqa: WPS214
         Returns:
             The response JSON if response body is json,
             else the response content as a string.
-
-        Raises:
-            MeltanoCloudError: If the response status is not OK.
         """
-        url = urljoin(base_url if base_url else self.api_url, path)
-        logger.debug(
-            "Making request",
-            method=method,
-            url=url,
-        )
-
-        async with self.session.request(
+        async with self._raw_request(
             method,
-            url,
+            path,
+            base_url=base_url,
             **kwargs,
         ) as response:
-            try:
-                response.raise_for_status()
-            except ClientResponseError as e:
-                raise MeltanoCloudError(response) from e
             content = await response.content.read()
             decoded_content = content.decode()
             try:
@@ -228,3 +250,26 @@ class MeltanoCloudClient:  # noqa: WPS214
                 "POST",
                 url,
             )
+
+    @asynccontextmanager
+    async def stream_logs(
+        self,
+        execution_id: str,
+    ) -> t.AsyncGenerator[ClientResponse, None]:
+        """Stream logs from a Meltano Cloud execution.
+
+        Args:
+            execution_id: The execution identifier.
+
+        Yields:
+            The response object.
+        """
+        url = (
+            "/logs/v1/"
+            f"{self.config.tenant_resource_key}"
+            f"/{self.config.internal_project_id}/{execution_id}"
+        )
+
+        async with self.authenticated():
+            async with self._raw_request("GET", url) as response:
+                yield response

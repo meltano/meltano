@@ -49,6 +49,7 @@ meltano-cloud = "meltano.cloud.cli:main"
 
 [tool.poetry.group.dev.dependencies]
 aioresponses = "^0.7.4"
+pytest = "^7.2.2"
 
 [tool.flakeheaven.exceptions."*tests/*"]
 "pycodestyle" = [
