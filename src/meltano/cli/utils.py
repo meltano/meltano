@@ -306,7 +306,7 @@ def add_plugin(
                 "1. Update `variant` and `pip_url` in your `meltano.yml` "
                 "project file:\n"
                 f"\tname: {plugin.name}\n"
-                f"\tvariant: {new_plugin.name}\n"
+                f"\tvariant: {new_plugin.variant}\n"
                 f"\tpip_url: {new_plugin.pip_url}\n"
                 "2. Reinstall the plugin:\n"
                 f"\tmeltano install {plugin_type.singular} {plugin.name}\n"
