@@ -57,6 +57,10 @@ class MeltanoCloudClient:  # noqa: WPS214
         self.config = config or MeltanoCloudConfig()
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
+        try:
+            self.version = version("meltano.cloud.cli")
+        except Exception:
+            self.version = version("meltano")
 
     async def __aenter__(self) -> MeltanoCloudClient:
         """Enter the client context.
@@ -68,7 +72,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         self._session.headers.update(
             {
                 "Content-Type": "application/json",
-                "User-Agent": f"Meltano Cloud CLI/v{version('meltano.cloud.cli')}",
+                "User-Agent": f"Meltano Cloud CLI/v{self.version}",
             }
         )
         return self
@@ -246,7 +250,7 @@ class MeltanoCloudClient:  # noqa: WPS214
                 "/run/v1/external/"
                 f"{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
             )
-            await self._request(
+            await self._json_request(
                 "POST",
                 url,
             )
