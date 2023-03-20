@@ -18,10 +18,10 @@ Stream level features allow you to modify the stream itself, whereas the propert
 ## Stream Level
 
 - Aliasing: streams can be aliased to provide custom naming downstream.
-- Filtering: streams records can be filtered based on any user-defined logic.
+- Filtering: stream records can be filtered based on any user-defined logic.
 - Duplication: streams can be split or duplicated and then sent as multiple distinct streams to the downstream target.
 
-## Property (Record) Level
+## Property (Column) Level
 
 - Aliasing: properties can be renamed in the resulting stream e.g. altering a column name from `id` -> `customer_id`
 - Transformations: properties can be transformed inline e.g. upper casing, casting types, etc.
