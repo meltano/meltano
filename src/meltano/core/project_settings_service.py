@@ -53,11 +53,14 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             config_override=config_override,
         )
 
+        # terminal env vars are already present from `SettingService.env`
         self.env_override = {
-            # terminal environment variables already present from SettingService.env
-            **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
-            **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
-            **self.env_override,  # overrides
+            # static, project-level env vars (e.g. MELTANO_ENVIRONMENT)
+            **self.project.env,
+            # env vars stored in the base `meltano.yml` `env:` key
+            **self.project.meltano.env,
+            # overrides
+            **self.env_override,
         }
 
         self.config_override = {  # noqa: WPS601
@@ -86,8 +89,9 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.
 
-        Every `meltano.yml` file should contain the `project_id` key-value pair. It should be
-        present in the top-level config, rather than in any environment-level configs.
+        Every `meltano.yml` file should contain the `project_id`
+        key-value pair. It should be present in the top-level config, rather
+        than in any environment-level configs.
 
         If it is not present, it will be restored from `analytics.json` if possible.
         """
@@ -164,13 +168,13 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         self.project.config_service.update_config(config)
 
     def process_config(self, config) -> dict:
-        """Process configuration dictionary for presentation in `meltano config meltano`.
+        """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:
             config: Config to process.
 
         Returns:
-            Processed configuration dictionary for presentation in `meltano config meltano`.
+            Processed configuration dict for presentation in `meltano config meltano`.
         """
         return nest_object(config)
 

@@ -107,24 +107,25 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
         f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
         fg="green",
     )
-    click.echo()
-
     click.echo(
-        f"Specify the plugin's {click.style('namespace', fg='blue')}, which will serve as the:"
+        f"\nSpecify the plugin's {click.style('namespace', fg='blue')}, which "
+        "will serve as the:\n"
+        "- identifier to find related/compatible plugins"
     )
-    click.echo("- identifier to find related/compatible plugins")
     if plugin_type == PluginType.EXTRACTORS:
-        click.echo("- default database schema (`load_schema` extra),")
-        click.echo("  for use by loaders that support a target schema")
+        click.echo(
+            "- default database schema (`load_schema` extra),"
+            "  for use by loaders that support a target schema"
+        )
     elif plugin_type == PluginType.LOADERS:
-        click.echo("- default target database dialect (`dialect` extra),")
-        click.echo("  for use by transformers that connect with the database")
-    click.echo()
-
+        click.echo(
+            "- default target database dialect (`dialect` extra),"
+            "  for use by transformers that connect with the database"
+        )
     click.echo(
-        "Hit Return to accept the default: plugin name with underscores instead of dashes"
+        "\nHit Return to accept the default: plugin name with underscores "
+        "instead of dashes"
     )
-    click.echo()
 
     return click.prompt(
         click.style("(namespace)", fg="blue"),
@@ -134,21 +135,18 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
 
 
 def _prompt_plugin_pip_url(plugin_name: str) -> str | None:
-    click.echo()
     click.echo(
-        f"Specify the plugin's {click.style('`pip install` argument', fg='blue')}, for example:"
+        "\nSpecify the plugin's "
+        f"{click.style('`pip install` argument', fg='blue')}, for example:"
+        "- PyPI package name:\n"
+        f"\t{plugin_name}\n"
+        "- Git repository URL:\n"
+        "\tgit+https://<PLUGIN REPO URL>.git\n"
+        "- local directory, in editable/development mode:\n"
+        f"\t-e extract/{plugin_name}\n"
+        "- 'n' if using a local executable (nothing to install)\n\n"
+        "Default: plugin name as PyPI package name\n"
     )
-    click.echo("- PyPI package name:")
-    click.echo(f"\t{plugin_name}")
-    click.echo("- Git repository URL:")
-    click.echo("\tgit+https://<PLUGIN REPO URL>.git")
-    click.echo("- local directory, in editable/development mode:")
-    click.echo(f"\t-e extract/{plugin_name}")
-    click.echo("- 'n' if using a local executable (nothing to install)")
-    click.echo()
-    click.echo("Default: plugin name as PyPI package name")
-    click.echo()
-
     result = click.prompt(
         click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
     )
@@ -161,13 +159,10 @@ def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
     if pip_url is None:
         derived_from = "the plugin name"
         prompt_request = "executable path"
-
-    click.echo()
-    click.echo(f"Specify the plugin's {click.style(prompt_request, fg='blue')}")
-    click.echo()
-    click.echo(f"Default: name derived from {derived_from}")
-    click.echo()
-
+    click.echo(
+        f"\nSpecify the plugin's {click.style(prompt_request, fg='blue')}\n"
+        f"\nDefault: name derived from {derived_from}\n"
+    )
     plugin_basename = os.path.basename(pip_url or plugin_name)
     package_name, _ = os.path.splitext(plugin_basename)
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
@@ -177,26 +172,19 @@ def _prompt_plugin_capabilities(plugin_type):
     if plugin_type != PluginType.EXTRACTORS:
         return []
 
-    click.echo()
     click.echo(
-        f"Specify the tap's {click.style('supported Singer features', fg='blue')} (executable flags), for example:"
+        f"\nSpecify the tap's {click.style('supported Singer features', fg='blue')} "
+        "(executable flags), for example:\n"
+        "\t`catalog`: supports the `--catalog` flag\n"
+        "\t`discover`: supports the `--discover` flag\n"
+        "\t`properties`: supports the `--properties` flag\n"
+        "\t`state`: supports the `--state` flag\n\n"
+        "To find out what features a tap supports, reference its "
+        "documentation or try one of the tricks under"
+        "https://docs.meltano.com/guide/integration#troubleshooting.\n\n"
+        "Multiple capabilities can be separated using commas.\n\n"
+        "Default: no capabilities\n"
     )
-    click.echo("\t`catalog`: supports the `--catalog` flag")
-    click.echo("\t`discover`: supports the `--discover` flag")
-    click.echo("\t`properties`: supports the `--properties` flag")
-    click.echo("\t`state`: supports the `--state` flag")
-    click.echo()
-    click.echo(
-        "To find out what features a tap supports, reference its documentation or try one"
-    )
-    click.echo(
-        "of the tricks under https://docs.meltano.com/guide/integration#troubleshooting."
-    )
-    click.echo()
-    click.echo("Multiple capabilities can be separated using commas.")
-    click.echo()
-    click.echo("Default: no capabilities")
-    click.echo()
 
     return click.prompt(
         click.style("(capabilities)", fg="blue"),
@@ -216,43 +204,29 @@ def _prompt_plugin_settings(plugin_type):
     }:
         return []
 
-    click.echo()
     click.echo(
-        f"Specify the {plugin_type.descriptor}'s {click.style('supported settings', fg='blue')} "
+        f"\nSpecify the {plugin_type.descriptor}'s "
+        f"{click.style('supported settings', fg='blue')}\n"
+        "Multiple setting names (keys) can be separated using commas.\n\n"
+        "A setting kind can be specified alongside the name (key) by using "
+        "the `:` delimiter,\n"
+        "e.g. `port:integer` to set the kind `integer` for the name `port`\n\n"
+        "Supported setting kinds:"
     )
-    click.echo()
-    click.echo("Multiple setting names (keys) can be separated using commas.")
-    click.echo()
-    click.echo(
-        "A setting kind can be specified alongside the name (key) by using the `:` delimiter,"
-    )
-    click.echo("e.g. `port:integer` to set the kind `integer` for the name `port`")
-    click.echo()
-    click.echo("Supported setting kinds:")
     click.echo(
         " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
     )
-    click.echo()
     click.echo(
-        "- Credentials and other sensitive setting types should use the "
-        + click.style("password", fg="magenta")
-        + " kind."
-    )
-    click.echo(
+        "\n- Credentials and other sensitive setting types should use the "
+        f"{click.style('password', fg='magenta')} kind.\n"
         "- If not specified, setting kind defaults to "
-        + click.style("string", fg="magenta")
-        + "."
-    )
-    click.echo(
+        f"{click.style('string', fg='magenta')}.\n"
         "- Nested properties can be represented using the `.` separator, "
-        + 'e.g. `auth.username` for `{ "auth": { "username": value } }`.'
+        'e.g. `auth.username` for `{ "auth": { "username": value } }`.\n'
+        f"- To find out what settings a {plugin_type.descriptor} supports, "
+        "reference its documentation.\n"
+        "\nDefault: no settings\n"
     )
-    click.echo(
-        f"- To find out what settings a {plugin_type.descriptor} supports, reference its documentation."
-    )
-    click.echo()
-    click.echo("Default: no settings")
-    click.echo()
 
     settings: dict | None = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
@@ -318,66 +292,52 @@ def add_plugin(
         plugin = err.plugin
 
         click.secho(
-            f"{plugin_type.descriptor.capitalize()} '{plugin_name}' already exists in your Meltano project",
+            (
+                f"{plugin_type.descriptor.capitalize()} '{plugin_name}' "
+                "already exists in your Meltano project"
+            ),
             fg="yellow",
             err=True,
         )
 
         if variant and variant != plugin.variant:
             variant = plugin.find_variant(variant)
-
-            click.echo()
             click.echo(
-                f"To switch from the current '{plugin.variant}' variant to '{variant.name}':"
-            )
-            click.echo(
-                "1. Update `variant` and `pip_url` in your `meltano.yml` project file:"
-            )
-            click.echo(f"\tname: {plugin.name}")
-            click.echo(f"\tvariant: {variant.name}")
-            click.echo(f"\tpip_url: {variant.pip_url}")
-
-            click.echo("2. Reinstall the plugin:")
-            click.echo(f"\tmeltano install {plugin_type.singular} {plugin.name}")
-
-            click.echo(
-                "3. Check if the configuration is still valid (and make changes until it is):"
-            )
-            click.echo(f"\tmeltano config {plugin.name} list")
-            click.echo()
-            click.echo(
-                "To learn more, visit https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another"
-            )
-
-            click.echo()
-            click.echo(
-                f"Alternatively, to keep the existing '{plugin.name}' with variant '{plugin.variant}',"
-            )
-            click.echo(
-                f"add variant '{variant.name}' as a separate plugin with its own unique name:"
-            )
-            click.echo(
-                "\tmeltano add {type} {name}--{variant} --inherit-from {name} --variant {variant}".format(
-                    type=plugin_type.singular, name=plugin.name, variant=variant.name
-                )
-            )
-
-            click.echo()
-            click.echo(
-                "To learn more, visit https://docs.meltano.com/guide/plugin-management#multiple-variants"
+                f"\nTo switch from the current '{plugin.variant}' variant "
+                f"to '{variant.name}':\n"
+                "1. Update `variant` and `pip_url` in your `meltano.yml` "
+                "project file:\n"
+                f"\tname: {plugin.name}\n"
+                f"\tvariant: {variant.name}\n"
+                f"\tpip_url: {variant.pip_url}\n"
+                "2. Reinstall the plugin:\n"
+                f"\tmeltano install {plugin_type.singular} {plugin.name}\n"
+                "3. Check if the configuration is still valid (and make "
+                "changes until it is):\n"
+                f"\tmeltano config {plugin.name} list\n\n"
+                "To learn more, visit "
+                "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"  # noqa: E501
+                f"Alternatively, to keep the existing '{plugin.name}' with "
+                f"variant '{plugin.variant}', add variant '{variant.name}' as "
+                "a separate plugin with its own unique name:\n"
+                f"\tmeltano add {plugin_type.singular} "
+                f"{plugin.name}--{variant.name} --inherit-from {plugin.name} "
+                f"--variant {variant.name}\n\n"
+                "To learn more, visit "
+                "https://docs.meltano.com/guide/plugin-management#multiple-variants"
             )
         else:
             click.echo(
-                "To add it to your project another time so that each can be configured differently,"
-            )
-            click.echo(
-                "add a new plugin inheriting from the existing one with its own unique name:"
-            )
-            click.echo(
-                f"\tmeltano add {plugin_type.singular} {plugin.name}--new --inherit-from {plugin.name}"
+                "To add it to your project another time so that each can be "
+                "configured differently,\n"
+                "add a new plugin inheriting from the existing one with its "
+                "own unique name:\n"
+                f"\tmeltano add {plugin_type.singular} {plugin.name}--new "
+                f"--inherit-from {plugin.name}"
             )
     except LockfileAlreadyExistsError as exc:
-        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method should return! Results in `KeyError: venv_name`
+        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method
+        # should return! Results in `KeyError: venv_name`
         plugin = exc.plugin
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
@@ -484,7 +444,7 @@ def install_plugins(
 
 @contextmanager
 def propagate_stop_signals(proc):
-    """When a stop signal is received, send it to `proc` and wait for it to terminate."""
+    """Propagate stop signals to `proc`, then wait for it to terminate."""
 
     def _handler(sig, _):  # noqa: WPS430
         proc.send_signal(sig)
@@ -510,7 +470,8 @@ def check_dependencies_met(
         plugin_service: Plugin service to use when checking for dependencies.
 
     Returns:
-        A tuple with dependency check outcome (True/False), and a string message with details of the check.
+        A tuple with dependency check outcome (True/False), and a string
+        message with details of the check.
     """
     passed = True
     messages = []
@@ -649,18 +610,18 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
 
 
 class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup):
-    """A variation of a `DefaultGroup` that instruments its invocation by updating the telemetry context."""
+    """Click group with telemetry instrumentation and a default command."""
 
 
 class InstrumentedGroup(InstrumentedGroupMixin, click.Group):
-    """A `click.Group` that instruments its invocation by updating the telemetry context."""
+    """Click group with telemetry instrumentation."""
 
 
 class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
-    """A `click.Command` that automatically fires telemetry events when invoked.
+    """Click command that automatically fires telemetry events when invoked.
 
-    Both starting and ending events are fired. The ending event fired is dependent on whether invocation of the command
-    resulted in an Exception.
+    Both starting and ending events are fired. The ending event fired is
+    dependent on whether invocation of the command resulted in an Exception.
     """
 
     def invoke(self, ctx: click.Context):
@@ -682,7 +643,10 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
 
 
 class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
-    """A `click.Command` that automatically fires an instrumentation 'start' event, if a tracker is available."""
+    """Click command with partial telemetry instrumentation.
+
+    Only automatically fires a 'start' event.
+    """
 
     def invoke(self, ctx):
         """Invoke the requested command firing only a start event."""

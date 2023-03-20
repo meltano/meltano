@@ -388,7 +388,7 @@ class TestPluginSettingsService:
         assert env_vars(service, "schema", for_writing=True) == [
             "MOCKED_SCHEMA",  # Custom `env`
             "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
-            "TARGET_MOCK_SCHEMA",  # Parent name  prefix
+            "TARGET_MOCK_SCHEMA",  # Parent name prefix
             "MOCK_SCHEMA",  # Parent namespace prefix
             "MELTANO_LOAD_SCHEMA",  # Generic prefix
         ]
@@ -511,7 +511,7 @@ class TestPluginSettingsService:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")

@@ -83,7 +83,8 @@ class TestCliAdd:
                     if (required_plugin_ref._type) == PluginType.FILES and (
                         required_plugin_ref.name == "dbt"
                     ):
-                        # file bundles with no managed files are added but do not appear in meltano.yml
+                        # File bundles with no managed files are added but
+                        # do not appear in meltano.yml
                         assert (
                             f"Adding required file bundle '{required_plugin_ref.name}'"
                             in res.stdout
@@ -172,7 +173,7 @@ class TestCliAdd:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
@@ -223,7 +224,7 @@ class TestCliAdd:
     def test_add_files_that_already_exists(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
@@ -387,9 +388,9 @@ class TestCliAdd:
             )
             assert res.exit_code == 1
             assert (
-                "Could not find parent plugin for extractor 'tap-foo': Extractor 'tap-bar' is not known to Meltano"
-                in str(res.exception)
-            )
+                "Could not find parent plugin for extractor 'tap-foo': "
+                "Extractor 'tap-bar' is not known to Meltano"
+            ) in str(res.exception)
 
     def test_add_custom(self, project, cli_runner):
         pip_url = "-e path/to/tap-custom"
@@ -565,7 +566,8 @@ class TestCliAdd:
                     if (required_plugin_ref._type) == PluginType.FILES and (
                         required_plugin_ref.name == "dbt"
                     ):
-                        # file bundles with no managed files are added but do not appear in meltano.yml
+                        # File bundles with no managed files are added but do
+                        # not appear in meltano.yml
                         assert (
                             f"Adding required file bundle '{required_plugin_ref.name}'"
                             in res.stdout

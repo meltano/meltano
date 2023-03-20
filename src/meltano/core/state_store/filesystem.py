@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class InvalidStateBackendConfigurationException(Exception):
-    """Occurs when state backend configuration is invalid."""
+    """State backend configuration is invalid."""
 
 
 class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
@@ -186,7 +186,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         return self.get_path(state_id, filename="lock")
 
     def is_locked(self, state_id: str) -> bool:
-        """Indicate whether or not the given state_id is currently locked.
+        """Indicate whether the given state_id is currently locked.
 
         Args:
             state_id: the state_id to check

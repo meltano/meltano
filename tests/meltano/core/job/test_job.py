@@ -96,7 +96,7 @@ class TestJob:
     async def test_run_interrupted(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
             )
         subject = self.sample_job({"original_state": 1}).save(session)
         with pytest.raises(KeyboardInterrupt):
@@ -112,7 +112,7 @@ class TestJob:
     async def test_run_terminated(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 

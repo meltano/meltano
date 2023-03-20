@@ -54,7 +54,7 @@ class InvokerError(Error):
 
 
 class ExecutableNotFoundError(InvokerError):
-    """Occurs when the executable could not be found."""
+    """The executable could not be found."""
 
     def __init__(self, plugin: PluginRef, executable: str):
         """Initialize ExecutableNotFoundError.
@@ -469,7 +469,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         service = ContainerService()
 
         logger.debug("Running containerized command", command=plugin_command)
-        async with self._invoke(*args, **kwargs) as (proc_args, _, proc_env):
+        async with self._invoke(*args, **kwargs) as (_proc_args, _, proc_env):
             plugin_name = self.plugin.name
             random_id = uuid.uuid4()
             name = f"meltano-{plugin_name}--{plugin_command}-{random_id}"
@@ -479,7 +479,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         return info["State"]["ExitCode"]
 
     async def dump(self, file_id: str) -> str:
-        """Dump a plugin file by id.
+        """Dump a plugin file by ID.
 
         Args:
             file_id: Dump this file identifier.
@@ -504,8 +504,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         """Append an output handler for a given stdio stream.
 
         Args:
-            src: stdio source you'd like to subscribe, likely either 'stdout' or 'stderr'
-            handler: either a StreamWriter or an object matching the utils.SubprocessOutputWriter proto
+            src: stdio source you'd like to subscribe, likely either 'stdout'
+                or 'stderr'
+            handler: A `StreamWriter` or object matching the
+                `utils.SubprocessOutputWriter` protocol
         """
         if self.output_handlers:
             self.output_handlers[src].append(handler)

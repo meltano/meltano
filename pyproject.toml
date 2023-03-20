@@ -173,6 +173,8 @@ exclude = [
   "*.md",
   "src/webapp/node_modules/",
   "src/meltano/migrations/",
+  "src/meltano/api/",
+  "src/meltano/cli/ui.py",
 ]
 format = "colored"
 inline_quotes = "double"
@@ -570,6 +572,8 @@ line-length = 88
 exclude = [
     "src/meltano/migrations/*",
     "src/webapp/*",
+    "src/meltano/api/*",
+    "src/meltano/cli/ui.py",
 ]
 ignore = [
     "ANN101", # Missing type annotation for `self` in method

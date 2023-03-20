@@ -44,7 +44,7 @@ class CatalogRule:
             breadcrumb: JSON property breadcrumb.
 
         Returns:
-            A boolean representing whether the stream ID or breadcrumb matches the rules.
+            Whether the stream ID or breadcrumb matches the rules.
         """
         patterns = (
             self.tap_stream_id
@@ -116,7 +116,12 @@ class SelectPattern(t.NamedTuple):
         Example:
 
         >>> SelectPattern.parse("!a.b.c")
-        SelectedPattern(stream_pattern='a', property_pattern='b.c', negated=True, raw='!a.b.c')
+        SelectedPattern(
+            stream_pattern='a',
+            property_pattern='b.c',
+            negated=True,
+            raw='!a.b.c'
+        )
         """
         raw = pattern
 
@@ -424,7 +429,7 @@ class MetadataExecutor(CatalogExecutor):
         breadcrumb = node["breadcrumb"]
 
         logging.debug(
-            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323
+            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323, E501
             tap_stream_id,
             breadcrumb,
         )
@@ -577,19 +582,13 @@ class ListSelectedExecutor(CatalogExecutor):
         except KeyError:
             return SelectionType.EXCLUDED
 
-        inclusion: str = metadata.get("inclusion")
-        selected: bool | None = metadata.get("selected")
-        selected_by_default: bool = metadata.get("selected-by-default", False)
-
-        if inclusion == "automatic":
+        if metadata.get("inclusion") == "automatic":
             return SelectionType.AUTOMATIC
-
-        if selected is True:
+        if metadata.get("selected") is True or (
+            metadata.get("selected") is None
+            and metadata.get("selected-by-default", False)
+        ):
             return SelectionType.SELECTED
-
-        if selected is None and selected_by_default:
-            return SelectionType.SELECTED
-
         return SelectionType.EXCLUDED
 
     def stream_node(self, node: Node, path: str):

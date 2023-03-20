@@ -74,7 +74,8 @@ class TestCliSchedule:
         assert schedule.job == "mock-job"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
 
-        # test default schedule case where no argument (set, remove, add, etc) is provided
+        # Test default schedule case where no argument (set, remove, add, etc)
+        # is provided
         with mock.patch(
             "meltano.cli.schedule.ScheduleService", return_value=schedule_service
         ):

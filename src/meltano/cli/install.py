@@ -32,7 +32,10 @@ if t.TYPE_CHECKING:
     "-p",
     type=click.INT,
     default=None,
-    help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
+    help=(
+        "Limit the number of plugins to install in parallel. "
+        "Defaults to the number of cores."
+    ),
 )
 @click.option(
     "--force",

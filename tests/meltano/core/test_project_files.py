@@ -111,7 +111,7 @@ class TestProjectFiles:
     def test_resolve_from_subdir(self, project_files, cd_temp_subdir):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         assert Path.cwd() == cd_temp_subdir
@@ -129,7 +129,7 @@ class TestProjectFiles:
     def test_resolve_from_any_dir(self, project_files, cd_temp_dir):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         assert Path.cwd() == cd_temp_dir

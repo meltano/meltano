@@ -26,13 +26,13 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
                                 }
                             ],
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
                                 }
                             ],
                         }

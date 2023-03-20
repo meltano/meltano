@@ -84,7 +84,10 @@ logger = structlog_stdlib.get_logger(__name__)
 @click.option(
     "--force",
     "-f",
-    help="Force a new run even when a pipeline with the same state ID is already running.",
+    help=(
+        "Force a new run even when a pipeline with the same state ID is "
+        "already running."
+    ),
     is_flag=True,
 )
 @click.pass_context
@@ -118,13 +121,16 @@ async def elt(
     """
     if platform.system() == "Windows":
         raise CliError(
-            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
+            "ELT command not supported on Windows. Please use the run command "
+            "as documented here: "
+            "https://docs.meltano.com/reference/command-line-interface#run"
         )
 
     tracker: Tracker = ctx.obj["tracker"]
 
-    # we no longer set a default choice for transform, so that we can detect explicit usages of the --transform option
-    # if transform is None we still need manually default to skip after firing the tracking event above.
+    # We no longer set a default choice for transform, so that we can detect
+    # explicit usages of the `--transform` option if transform is `None` we
+    # still need manually default to skip after firing the tracking event above
     if not transform:
         transform = "skip"
 
@@ -132,7 +138,10 @@ async def elt(
 
     job = Job(
         job_name=state_id
-        or f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--{extractor}--{loader}'
+        or (
+            f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
+            f"{extractor}--{loader}"
+        )
     )
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -223,8 +232,9 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
         existing = JobFinder(job.job_name).latest_running(session)
         if existing:
             raise CliError(
-                f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
-                + "To ignore this check use the '--force' option."
+                f"Another '{job.job_name}' pipeline is already running which "
+                f"started at {existing.started_at}. To ignore this check use "
+                "the '--force' option."
             )
 
     async with job.run(session):
@@ -249,7 +259,10 @@ async def _redirect_output(log, output_logger):
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
-        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316
+        async with (
+            meltano_stdout.redirect_stdout(),
+            meltano_stderr.redirect_stderr(),
+        ):  # noqa: WPS316
             try:
                 yield
             except CliError as err:
@@ -280,10 +293,12 @@ async def _run_elt(
                 log.info("Transformation skipped.")
         except RunnerError as err:
             raise CliError(
-                f"ELT could not be completed: {err}.\n"
-                + "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
-                + f"Note that you can also check the generated log file at '{output_logger.file}'.\n"
-                + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging"
+                f"ELT could not be completed: {err}.\nFor more detailed log "
+                "messages re-run the command using 'meltano "
+                "--log-level=debug ...' CLI flag.\nNote that you can also "
+                f"check the generated log file at '{output_logger.file}'.\n"
+                "For more information on debugging and logging: "
+                "https://docs.meltano.com/reference/command-line-interface#debugging"
             ) from err
 
 
@@ -324,8 +339,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     singer_runner = SingerRunner(elt_context)
     try:
-        with extractor_log.line_writer() as extractor_log_writer, loader_log.line_writer() as loader_log_writer:
-            with extractor_out_writer_ctxmgr() as extractor_out_writer, loader_out_writer_ctxmgr() as loader_out_writer:
+        with (
+            extractor_log.line_writer() as extractor_log_writer,
+            loader_log.line_writer() as loader_log_writer,
+        ):
+            with (
+                extractor_out_writer_ctxmgr() as extractor_out_writer,
+                loader_out_writer_ctxmgr() as loader_out_writer,
+            ):
                 await singer_runner.run(
                     **kwargs,
                     extractor_log=extractor_log_writer,

@@ -29,14 +29,14 @@ class LogEntry:
         level: str | None = None,
         stdio: str | None = None,
     ):
-        """Logentries is a simple support class for checking whether a log entry is in a list of dicts.
+        """Check whether a log entry is in a list of dicts.
 
         Args:
-            name: contents of the name field field to search for (or None if it should not be set)
-            cmd_type: contents of the cmd_type field to search for (or None if it should not be set)
-            event: str prefix of the event field to search for (or None if it should not be set)
-            level: contents of the level field to search for (or None if it should not be set)
-            stdio: optionally, if set also verify the stdio field matches. (or None to skip)
+            name: The name to search for.
+            cmd_type: The `cmd_type` to search for.
+            event: Prefix of the event to search for.
+            level: The level to search for.
+            stdio: If not `None`, verify the stdio matches.
         """
         self.name = name
         self.cmd_type = cmd_type
@@ -47,8 +47,9 @@ class LogEntry:
     def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
 
-        It's important to note that the 'event' field check doesn't look for exact matches, and is doing a prefix search.
-        This is because quite a few log lines have dynamic suffix segments.
+        It's important to note that the 'event' field check doesn't look for
+        exact matches, and is doing a prefix search. This is because quite a
+        few log lines have dynamic suffix segments.
 
         Args:
             lines: the log lines to check against
@@ -65,9 +66,7 @@ class LogEntry:
             )
 
             if matches:
-                if self.stdio:
-                    return line.get("stdio") == self.stdio
-                return True
+                return line.get("stdio") == self.stdio if self.stdio else True
 
 
 def assert_lines(output, *lines):
@@ -83,7 +82,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         exc: The exception to search for.
 
     Returns:
-        bool: Whether or not the exception was found
+        bool: Whether the exception was found
     """
     seen_lines: list[dict] = []
     for line in result_output.splitlines():
@@ -137,9 +136,11 @@ test_log_config = {
 
 def failure_help_log_suffix(job_logs_file):
     return (
-        "For more detailed log messages re-run the command using 'meltano --log-level=debug ...' CLI flag.\n"
-        + f"Note that you can also check the generated log file at '{job_logs_file}'.\n"
-        + "For more information on debugging and logging: https://docs.meltano.com/reference/command-line-interface#debugging"
+        "For more detailed log messages re-run the command using 'meltano "
+        "--log-level=debug ...' CLI flag.\nNote that you can also check the "
+        f"generated log file at '{job_logs_file}'.\nFor more information on "
+        "debugging and logging: "
+        "https://docs.meltano.com/reference/command-line-interface#debugging"
     )
 
 
@@ -236,11 +237,13 @@ class TestWindowsELT:
         args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
-        # Didn't use exception_logged() as result.stderr doensn't contain the error for some reason
+        # Didn't use `exception_logged()` as `result.stderr` doensn't contain
+        # the error for some reason
         assert (
-            "ELT command not supported on Windows. Please use the Run command as documented here https://docs.meltano.com/reference/command-line-interface#run"
-            in str(result.exception)
-        )
+            "ELT command not supported on Windows. Please use the run command "
+            "as documented here "
+            "https://docs.meltano.com/reference/command-line-interface#run"
+        ) in str(result.exception)
 
 
 @pytest.mark.skipif(
@@ -509,7 +512,8 @@ class TestCliEltScratchpadOne:
         state_id = "pytest_test_elt"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
+        # Have `tap_process.wait` take 2s to make sure the target can fail
+        # before tap finishes
         async def tap_wait_mock():
             await asyncio.sleep(2)
             return tap_process.wait.return_value
@@ -522,7 +526,8 @@ class TestCliEltScratchpadOne:
         target_process.stdin.drain = AsyncMock(side_effect=ConnectionResetError)
         target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
-        # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
+        # Have `target_process.wait` take 1s to make sure the
+        # `stdin.write`/`drain` exceptions can be raised
         async def target_wait_mock():
             await asyncio.sleep(1)
             return 1
@@ -719,7 +724,8 @@ class TestCliEltScratchpadOne:
         state_id = "pytest_test_elt"
         args = ["elt", "--state-id", state_id, tap.name, target.name]
 
-        # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
+        # Raise a `ValueError` wrapping a `LimitOverrunError`, like
+        # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         try:  # noqa: WPS328
             raise asyncio.LimitOverrunError(
@@ -733,7 +739,8 @@ class TestCliEltScratchpadOne:
             except ValueError as wrapper_err:
                 tap_process.stdout.readline.side_effect = wrapper_err
 
-        # Have `tap_process.wait` take 1s to make sure the LimitOverrunError exception can be raised before tap finishes
+        # Have `tap_process.wait` take 1s to make sure the `LimitOverrunError`
+        # exception can be raised before tap finishes
         async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value
@@ -756,7 +763,11 @@ class TestCliEltScratchpadOne:
                     LogEntry(
                         None,
                         None,
-                        "The extractor generated a message exceeding the message size limit of 5.0MiB (half the buffer size of 10.0MiB).",
+                        (
+                            "The extractor generated a message exceeding the "
+                            "message size limit of 5.0MiB (half the buffer "
+                            "size of 10.0MiB)."
+                        ),
                         "error",
                     ),
                 ],
@@ -790,7 +801,8 @@ class TestCliEltScratchpadOne:
         exc = Exception("Failed to read from target stderr.")
         target_process.stderr.readline.side_effect = exc
 
-        # Have `tap_process.wait` take 1s to make sure the exception can be raised before tap finishes
+        # Have `tap_process.wait` take 1s to make sure the exception can be
+        # raised before tap finishes
         async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value

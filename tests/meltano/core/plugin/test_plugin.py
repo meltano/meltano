@@ -397,7 +397,8 @@ class TestProjectPlugin:
         inherited_tap.namespace = None
         inherited_tap.label = None
 
-        # Shadowing plugins (with the same name as their parent) inherit namespace and label
+        # Shadowing plugins (with the same name as their parent) inherit
+        # namespace and label
         assert tap.namespace == base_plugin.namespace == "tap_mock"
         assert tap.label == base_plugin.label == "Mock"
 

@@ -165,7 +165,8 @@ class VenvService:  # noqa: WPS214
         """
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
-                f"Packages for '{self.namespace}/{self.name}' have changed so performing a clean install."
+                f"Packages for '{self.namespace}/{self.name}' have changed so "
+                "performing a clean install."
             )
             clean = True
 

@@ -323,7 +323,8 @@ class ELTContextBuilder:  # noqa: WPS214
         """Include full refresh flag when building context.
 
         Args:
-            full_refresh: Flag. Perform a full refresh (ignore state left behind by any previous runs).
+            full_refresh: Whether to perform a full refresh (ignore state left
+                behind by any previous runs).
 
         Returns:
             Updated ELTContextBuilder instance.

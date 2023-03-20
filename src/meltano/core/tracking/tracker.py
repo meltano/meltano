@@ -15,6 +15,7 @@ from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
+from traceback import format_exception
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -31,7 +32,6 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception
 
 if t.TYPE_CHECKING:
     from meltano.core.tracking.contexts import (  # noqa: F401
@@ -183,7 +183,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 return uuid.UUID(uuid_str)
             except ValueError:
                 warn(
-                    f"Invalid telemetry client UUID {uuid_str!r} from $MELTANO_CLIENT_ID",
+                    (
+                        f"Invalid telemetry client UUID {uuid_str!r} from "
+                        "$MELTANO_CLIENT_ID"
+                    ),
                     RuntimeWarning,
                 )
         if stored_telemetry_settings.client_id is not None:
@@ -199,8 +202,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         """
         from meltano.core.tracking.contexts import ExceptionContext
 
-        # The `ExceptionContext` is re-created every time this is accessed because it details the
-        # exceptions that are being processed when it is created.
+        # The `ExceptionContext` is re-created every time this is accessed
+        # because it details the exceptions that are being processed when it
+        # is created.
         return (*self._contexts, ExceptionContext())
 
     def telemetry_state_change_check(
@@ -243,14 +247,16 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 >>> Tracker(project).timezone_name
                 'Europe/Berlin'
 
-            The timezone name as an IANA timezone abbreviation because the full name was not found:
+            The timezone name as an IANA timezone abbreviation because the full
+            name was not found:
 
                 >>> Tracker(project).timezone_name
                 'CET'
 
         Returns:
-            The local timezone as an IANA TZ database name if possible, or abbreviation otherwise.
-        """
+            The local timezone as an IANA TZ database name if possible, or
+            abbreviation otherwise.
+        """  # noqa: F821
         try:
             return tzlocal.get_localzone_name()
         except Exception:
@@ -293,7 +299,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         """Fire an unstructured tracking event.
 
         Args:
-            event_json: The SelfDescribingJson event to track. See the Snowplow documentation for more information.
+            event_json: The SelfDescribingJson event to track. See the Snowplow
+                documentation for more information.
         """
         if not self.can_track():
             return
@@ -302,7 +309,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         except Exception as err:
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
-                err=format_exception(err),
+                err="".join(format_exception(type(err), err, err.__traceback__)),
             )
 
     def track_command_event(self, event: CliEvent) -> None:
@@ -361,7 +368,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         try:
             self.snowplow_tracker.track_unstruct_event(
                 event_json,
-                # If tracking is disabled, then include only the minimal Snowplow contexts required
+                # If tracking is disabled, then include only the minimal
+                # Snowplow contexts required
                 self.contexts
                 if self.send_anonymous_usage_stats
                 else tuple(
@@ -372,8 +380,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
         except Exception as err:
             logger.debug(
-                "Failed to submit 'telemetry_state_change' unstruct event to Snowplow, error",
-                err=format_exception(err),
+                (
+                    "Failed to submit 'telemetry_state_change' unstruct event "
+                    "to Snowplow, error"
+                ),
+                err="".join(format_exception(type(err), err, err.__traceback__)),
             )
 
     @property
@@ -405,7 +416,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         if missing_keys:
             logger.debug(
-                "'analytics.json' has missing keys, and will be overwritten with new 'analytics.json'",
+                (
+                    "'analytics.json' has missing keys, and will be "
+                    "overwritten with new 'analytics.json'"
+                ),
                 missing_keys=missing_keys,
             )
             return TelemetrySettings(None, None, None)
@@ -494,7 +508,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         cli.atexit_handler_registered = True
 
-        # Provide `meltano.cli` with this tracker to track the exit event with more context.
+        # Provide `meltano.cli` with this tracker to track the exit event with
+        # more context.
         cli.exit_event_tracker = self
 
         # As a fallback, use atexit to help ensure the exit event is sent.
@@ -510,8 +525,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
 
-        # This is the reported "end time" for this process, though in reality the process will end
-        # a short time after this time as it takes time to emit the event.
+        # This is the reported "end time" for this process, though in reality
+        # the process will end a short time after this time as it takes time
+        # to emit the event.
         now = datetime.utcnow()
 
         self.track_unstruct_event(
