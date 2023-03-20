@@ -241,7 +241,7 @@ class TestWindowsELT:
         # the error for some reason
         assert (
             "ELT command not supported on Windows. Please use the run command "
-            "as documented here "
+            "as documented here: "
             "https://docs.meltano.com/reference/command-line-interface#run"
         ) in str(result.exception)
 
