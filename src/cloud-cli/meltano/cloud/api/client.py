@@ -6,6 +6,7 @@ import json
 import sys
 import typing as t
 from contextlib import asynccontextmanager, contextmanager, suppress
+from http import HTTPStatus
 from urllib.parse import urljoin
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
@@ -264,6 +265,9 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             deployment: The name of the deployment the schedule belongs to.
             schedule: The name of the schedule to enable/disable.
             enabled: Whether the schedule should be enabled.
+
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
         """
         async with self.authenticated():
             try:
@@ -282,17 +286,13 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     },
                 )
             except MeltanoCloudError as ex:
-                if (
-                    isinstance(ex.__cause__, ClientResponseError)
-                    and ex.__cause__.status == 404
-                ):
+                if ex.response.status == HTTPStatus.NOT_FOUND:
                     ex.response.reason = (
                         f"Unable to find schedule with name {schedule!r} "
                         f"within a deployment named {deployment!r}"
                     )
                     raise MeltanoCloudError(ex.response) from ex
-                else:
-                    raise
+                raise
 
     @asynccontextmanager
     async def stream_logs(

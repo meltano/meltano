@@ -21,7 +21,7 @@ def main() -> int:
     try:
         cloud()
     except MeltanoCloudError as e:
-        click.secho(e.response.reason, fg="red")
+        click.secho(e.reason, fg="red")
         return 1
     except Exception as e:
         logger.error("An unexpected error occurred.", exc_info=e)
