@@ -259,10 +259,7 @@ async def _redirect_output(log, output_logger):
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
-        async with (
-            meltano_stdout.redirect_stdout(),
-            meltano_stderr.redirect_stderr(),
-        ):  # noqa: WPS316
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316, E501
             try:
                 yield
             except CliError as err:
