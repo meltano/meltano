@@ -104,7 +104,8 @@ def validate_plugin_config(
         resolved_file_path = project.root_dir(value).resolve()
         if not str(resolved_file_path).startswith(f"{uploads_directory}/"):
             logging.warning(
-                "Cannot set a file configuration to a path outside the project directory"
+                "Cannot set a file configuration to a path outside the "
+                "project directory"
             )
             return False
 
@@ -140,7 +141,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"A pipeline with the name '{ex.schedule.name}' already exists. Try renaming the pipeline.",
+                "code": (
+                    f"A pipeline with the name '{ex.schedule.name}' "
+                    "already exists. Try renaming the pipeline."
+                ),
             }
         ),
         409,
@@ -171,7 +175,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"The file '{ex.file.filename}' must be one of the following types: {ex.extensions}",
+                "code": (
+                    f"The file '{ex.file.filename}' must be one of the "
+                    f"following types: {ex.extensions}"
+                ),
             }
         ),
         400,
@@ -184,7 +191,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"The file '{ex.file.filename}' is empty or exceeds the {ex.max_file_size} size limit.",
+                "code": (
+                    f"The file '{ex.file.filename}' is empty or exceeds the "
+                    f"{ex.max_file_size} size limit."
+                ),
             }
         ),
         400,
@@ -454,7 +464,8 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
 def get_pipeline_schedules():
     """Endpoint for getting the pipeline schedules.
 
-    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this endpoint will filter out scheduled jobs.
+    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this
+    endpoint will filter out scheduled jobs.
 
     Returns:
         JSON containing the pipline schedules.
@@ -474,8 +485,8 @@ def get_pipeline_schedules():
 
     for schedule in schedules:
         if schedule.get("job") and jobs_in_list:
-            # we only return API results for scheduled jobs if the feature flag is explicitly enabled
-            # as the UI is not job aware yet.
+            # We only return API results for scheduled jobs if the feature flag
+            # is explicitly enabled as the UI is not job aware yet.
             formatted_schedules.append(schedule)
         elif not schedule.get("job"):  # a legacy elt task
             finder = JobFinder(schedule["name"])

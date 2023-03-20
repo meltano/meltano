@@ -1,4 +1,4 @@
-"""Install plugins into the project, using pip in separate virtual environments by default."""
+"""Install plugins into the project, using pip in separate venv by default."""
 
 from __future__ import annotations
 
@@ -183,18 +183,18 @@ class PluginInstallService:  # noqa: WPS214
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
-        Trying to install multiple plugins into the same venv via `asyncio.run` will fail
-        due to a race condition between the duplicate installs. This is particularly
-        problematic if `clean` is set as one async `clean` operation causes the other
-        install to fail.
+        Trying to install multiple plugins into the same venv via `asyncio.run`
+        will fail due to a race condition between the duplicate installs. This
+        is particularly problematic if `clean` is set as one async `clean`
+        operation causes the other install to fail.
 
         Args:
             plugins: An iterable containing plugins to dedupe.
             reason: Plugins install reason.
 
         Returns:
-            A tuple containing a list of PluginInstallState instance (for skipped plugins)
-            and a deduplicated list of plugins to install.
+            A tuple containing a list of PluginInstallState instance (for
+            skipped plugins) and a deduplicated list of plugins to install.
         """
         seen_venvs = set()
         deduped_plugins = []
@@ -390,14 +390,16 @@ class PluginInstallService:  # noqa: WPS214
     def _is_mapping(plugin: ProjectPlugin) -> bool:
         """Check if a plugin is a mapping, as mappings are not installed.
 
-        Mappings are PluginType.MAPPERS with extra attribute of `_mapping` which will indicate
-        that this instance of the plugin is actually a mapping - and should not be installed.
+        Mappings are `PluginType.MAPPERS` with extra attribute of `_mapping`
+        which will indicate that this instance of the plugin is actually a
+        mapping - and should not be installed.
 
         Args:
             plugin: ProjectPlugin to evaluate.
 
         Returns:
-            A boolean determining if the given plugin is a mapping (of type PluginType.MAPPERS).
+            A boolean determining if the given plugin is a mapping (of type
+            `PluginType.MAPPERS`).
         """
         return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
 
@@ -415,7 +417,7 @@ class PluginInstallService:  # noqa: WPS214
             A special env var (with lowest precedence) `$MELTANO__PYTHON_VERSION`
             is included, and has the value
             `<major Python version>.<minor Python version>`.
-        """
+        """  # noqa: E501
         plugin_settings_service = PluginSettingsService(self.project, plugin)
         with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
@@ -426,7 +428,9 @@ class PluginInstallService:  # noqa: WPS214
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
             )
             return {
-                "MELTANO__PYTHON_VERSION": f"{sys.version_info.major}.{sys.version_info.minor}",
+                "MELTANO__PYTHON_VERSION": (
+                    f"{sys.version_info.major}.{sys.version_info.minor}"
+                ),
                 **expanded_project_env,
                 **expand_env_vars(
                     plugin_settings_service.project.dotenv_env,

@@ -70,7 +70,7 @@ def _meltanofile_update_dict(
                     {
                         "name": plugin_name,
                         "env": {
-                            "TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"
+                            "TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"  # noqa: E501
                         },
                     }
                 ]
@@ -125,7 +125,7 @@ _env_var_resolution_expectations = {
         _meltanofile_update_dict(environment_level_env=True),
         _terminal_env_var,
     ),
-    "04 Environment-level plugin env (with terminal context)": EnvVarResolutionExpectation(
+    "04 Environment-level plugin env (with terminal context)": EnvVarResolutionExpectation(  # noqa: E501
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"},
         _meltanofile_update_dict(environment_level_plugin_env=True),
         _terminal_env_var,
@@ -168,7 +168,7 @@ _env_var_resolution_expectations = {
         ),
         _terminal_env_var,
     ),
-    "12 Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(
+    "12 Environment-level plugin config (with terminal context)": EnvVarResolutionExpectation(  # noqa: E501
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
             environment_level_env=True,
@@ -231,7 +231,7 @@ class TestEnvVarResolution:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         for key, val in terminal_env.items():

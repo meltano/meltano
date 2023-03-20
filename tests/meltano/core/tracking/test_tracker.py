@@ -117,7 +117,8 @@ class TestTracker:
 
         original_project_id = project.settings.get("project_id")
 
-        # Delete the project ID from `meltano.yml`, but leave it unchanged in `analytics.json`
+        # Delete the project ID from `meltano.yml`,
+        # but leave it unchanged in `analytics.json`
         config = project.settings.meltano_yml_config
         del config["project_id"]
         project.settings.update_meltano_yml_config(config)
@@ -125,9 +126,10 @@ class TestTracker:
         # creates a new `ProjectSettingsService`, restoring the `project_id`.
         restored_project_id = project.settings.get("project_id")
 
-        # Depending on what tests were run before this one, the project ID might have been randomly
-        # generated, or taken from `analytics.json`, so we accept the restored one if it is equal
-        # to the original, or if it is equal after the same transformation that gets applied to the
+        # Depending on what tests were run before this one, the project ID
+        # might have been randomly generated, or taken from `analytics.json`,
+        # so we accept the restored one if it is equal to the original, or if
+        # it is equal after the same transformation that gets applied to the
         # project ID when it is originally stored in `analytics.json`.
         assert original_project_id == restored_project_id or (
             str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
@@ -217,9 +219,10 @@ class TestTracker:
         # creates a new `ProjectSettingsService`, restoring the `project_id`.
         restored_project_id = project.settings.get("project_id")
 
-        # Depending on what tests were run before this one, the project ID might have been randomly
-        # generated, or taken from `analytics.json`, so we accept the restored one if it is equal
-        # to the original, or if it is equal after the same transformation that gets applied to the
+        # Depending on what tests were run before this one, the project ID
+        # might have been randomly generated, or taken from `analytics.json`,
+        # so we accept the restored one if it is equal to the original, or if
+        # it is equal after the same transformation that gets applied to the
         # project ID when it is originally stored in `analytics.json`.
         assert original_project_id == restored_project_id or (
             str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id

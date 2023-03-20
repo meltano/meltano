@@ -87,7 +87,8 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
 
     protected_dir = tmp_path.joinpath("protected")
     protected_dir.mkdir()
-    protected_dir.chmod(stat.S_IREAD | stat.S_IEXEC)  # read and execute, but not write
+    # read and execute, but not write
+    protected_dir.chmod(stat.S_IREAD | stat.S_IEXEC)
     pushd(protected_dir)
 
     project_dir = protected_dir.joinpath("test_project")
@@ -102,7 +103,8 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
 def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
     if platform.system() == "Windows":
         pytest.xfail(
-            "Windows can't remove a directory that is in use. See https://docs.python.org/3/library/os.html#os.remove"
+            "Windows can't remove a directory that is in use. "
+            "See https://docs.python.org/3/library/os.html#os.remove"
         )
 
     missing_dir = tmp_path.joinpath("missing")

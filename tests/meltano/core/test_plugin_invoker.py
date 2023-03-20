@@ -79,7 +79,7 @@ class TestPluginInvoker:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
@@ -129,9 +129,9 @@ class TestPluginInvoker:
             await plugin_invoker.invoke_async(command="cmd")
 
         assert (
-            "Command 'cmd' referenced unset environment variable '$ENV_VAR_ARG' in an argument"
-            in str(err.value)
-        )
+            "Command 'cmd' referenced unset environment "
+            "variable '$ENV_VAR_ARG' in an argument"
+        ) in str(err.value)
 
     def test_alternate_command_executable(self, plugin_invoker):
         exec_args = plugin_invoker.exec_args(
@@ -160,7 +160,7 @@ class TestPluginInvoker:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         nonpip_plugin_invoker.plugin.executable = executable_str
         exec_args = nonpip_plugin_invoker.exec_args()

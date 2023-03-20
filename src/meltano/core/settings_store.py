@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConflictingSettingValueException(Exception):  # noqa: N818
-    """Occurs when a setting has multiple conflicting values via aliases."""
+    """A setting has multiple conflicting values via aliases."""
 
     def __init__(self, setting_names):
         """Instantiate the error.
@@ -52,7 +52,7 @@ class ConflictingSettingValueException(Exception):  # noqa: N818
 
 
 class MultipleEnvVarsSetException(Exception):  # noqa: N818
-    """Occurs when a setting value is set via multiple environment variable names."""
+    """A setting value is set via multiple environment variable names."""
 
     def __init__(self, names):
         """Instantiate the error.
@@ -108,9 +108,10 @@ def cast_setting_value(
 class SettingValueStore(str, Enum):
     """Setting Value Store.
 
-    Note: The declaration order of stores determins store precedence when using the Auto store manager.
-            This is because the `.readables()` and `.writables()` methods return ordered lists that
-            the Auto store manager iterates over when retrieveing setting values.
+    Note: The declaration order of stores determins store precedence when using
+        the Auto store manager. This is because the `.readables()` and
+        `.writables()` methods return ordered lists that the Auto store manager
+        iterates over when retrieveing setting values.
     """
 
     CONFIG_OVERRIDE = "config_override"
@@ -148,7 +149,9 @@ class SettingValueStore(str, Enum):
         Returns:
             SettingsStoreManager for this store.
         """
-        managers = {  # ordering here is not significant, other than being consistent with the order of precedence.
+        # ordering here is not significant, other than being consistent with
+        # the order of precedence.
+        managers = {
             self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
             self.ENV: EnvStoreManager,
             self.DOTENV: DotEnvStoreManager,
@@ -448,13 +451,16 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         self._env = None
 
     def ensure_supported(self, method: str = "get") -> None:
-        """Ensure named method is supported and project is not read-only and the passed method is supported.
+        """Ensure named method is supported.
+
+        Checks that the project is not read-only and an environment is active.
 
         Args:
             method: Setting method (get, set, etc.)
 
         Raises:
-            StoreNotSupportedError: if the project is read-only or named method is not "get".
+            StoreNotSupportedError: If the project is read-only or named method
+                is not "get".
         """
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
@@ -606,13 +612,16 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         self._flat_config = None
 
     def ensure_supported(self, method: str = "get") -> None:
-        """Ensure named method is supported and project is not read-only and an environment is active.
+        """Ensure named method is supported.
+
+        Checks that the project is not read-only and an environment is active.
 
         Args:
             method: Setting method (get, set, etc.)
 
         Raises:
-            StoreNotSupportedError: if the project is read-only or named method is not "get".
+            StoreNotSupportedError: If the project is read-only or named method
+                is not "get".
         """
         if method != "get" and self.project.readonly:
             raise StoreNotSupportedError(ProjectReadonly())
@@ -822,7 +831,8 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             method: Setting method (get, set, etc.)
 
         Raises:
-            StoreNotSupportedError: if the project is read-only or no environment is active.
+            StoreNotSupportedError: if the project is read-only or no
+                environment is active.
         """
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
@@ -870,7 +880,7 @@ class DbStoreManager(SettingsStoreManager):
 
         Args:
             args: Positional arguments to pass to parent class.
-            bulk:  Flag to determine whether parent metadata is returned alongside child.
+            bulk: Flag to determine whether parent metadata is returned alongside child.
             session: SQLAlchemy Session to use when querying the system database.
             kwargs: Keyword arguments to pass to parent class.
         """
@@ -1147,7 +1157,7 @@ class DefaultStoreManager(SettingsStoreManager):
 
 
 class AutoStoreManager(SettingsStoreManager):
-    """Automatic store manager, for determining the appropriate store based on current context."""
+    """Manager that determines the appropriate store based on current context."""
 
     label = "the system database, `meltano.yml`, and `.env`"
     writable = True
@@ -1226,7 +1236,8 @@ class AutoStoreManager(SettingsStoreManager):
 
         Args:
             name: Setting name.
-            setting_def: SettingDefinition. If None is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: The setting definition. If `None`, one will be
+                discovered using `self.find_setting(name)`.
 
         Returns:
             A SettingValueStore, if found, else None.
@@ -1272,8 +1283,8 @@ class AutoStoreManager(SettingsStoreManager):
         # any remaining config routed to meltano environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
             return SettingValueStore.MELTANO_ENV
-        # fall back to root `meltano.yml`
-        # this is required for Meltano settings, which cannot be stored in an Environment
+        # Fall back to root `meltano.yml`. This is required for Meltano
+        # settings, which cannot be stored in an Environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
             return SettingValueStore.MELTANO_YML
         # fall back to dotenv
@@ -1350,13 +1361,15 @@ class AutoStoreManager(SettingsStoreManager):
             name: Setting name.
             path: Setting path.
             value: New Setting value.
-            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: Setting definition. If none is passed, one will be
+                discovered using `self.find_setting(name)`.
 
         Returns:
             A dictionary of metadata pertaining to the set operation.
 
         Raises:
-            StoreNotSupportedError: exception encountered when attempting to write to store.
+            StoreNotSupportedError: exception encountered when attempting to
+                write to store.
         """
         setting_def = setting_def or self.find_setting(name)
         store = self.auto_store(name, setting_def=setting_def)
@@ -1376,12 +1389,13 @@ class AutoStoreManager(SettingsStoreManager):
         path: list[str],
         setting_def: SettingDefinition | None = None,
     ) -> dict:
-        """Unset value, by name, path and SettingDefinition, in all stores.
+        """Unset value, by name, path and `SettingDefinition`, in all stores.
 
         Args:
             name: Setting name.
             path: Setting path.
-            setting_def: SettingDefinition. If none is passed, one will be discovered using `self.find_setting(name)`.
+            setting_def: Setting definition. If none is passed, one will be
+                discovered using `self.find_setting(name)`.
 
         Returns:
             A metadata dictionary containing details of the last value unset.

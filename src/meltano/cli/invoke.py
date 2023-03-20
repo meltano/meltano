@@ -45,7 +45,10 @@ logger = logging.getLogger(__name__)
 )
 @click.option(
     "--print-var",
-    help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",
+    help=(
+        "Print to stdout the values for the provided environment variables, "
+        "as passed to the plugininvoker context. Useful for debugging."
+    ),
     multiple=True,
 )
 @click.option(

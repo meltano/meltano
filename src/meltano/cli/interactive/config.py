@@ -63,7 +63,7 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 {%- endfor %}
 
 {% if plugin_url %}To learn more about {{ plugin_name | safe }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
-"""
+"""  # noqa: E501
 
 
 class InteractiveConfig:  # noqa: WPS230, WPS214
@@ -144,21 +144,25 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         pre = [
             Text.from_markup(
-                f"[bold underline][{PLUGIN_COLOR}]{self.settings.label.capitalize()}[/{PLUGIN_COLOR}][/bold underline] Setting {index} of {last_index}"
+                f"[bold underline][{PLUGIN_COLOR}]"
+                f"{self.settings.label.capitalize()}[/{PLUGIN_COLOR}]"
+                f"[/bold underline] Setting {index} of {last_index}"
             )
         ]
 
         if setting_def.is_extra:
             pre.append(
                 Text.from_markup(
-                    "[yellow1]Custom Extra: plugin-specific options handled by Meltano[/yellow1]"
+                    "[yellow1]Custom Extra: plugin-specific options handled "
+                    "by Meltano[/yellow1]"
                 )
             )
 
         elif setting_def.is_custom:
             pre.append(
                 Text.from_markup(
-                    "[yellow1]Custom Setting: possibly unsupported by the plugin[/yellow1]"
+                    "[yellow1]Custom Setting: possibly unsupported by the "
+                    "plugin[/yellow1]"
                 )
             )
 
@@ -211,7 +215,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if docs_url:
             post.append(
                 Text.from_markup(
-                    f" To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
+                    f" To learn more about {self.settings.label} and its "
+                    f"settings, visit [link={docs_url}]{docs_url}[/link]"
                 )
             )
 
@@ -388,7 +393,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             else:
                 self.tracker.track_command_event(CliEvent.aborted)
             raise CliError(
-                f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
+                f"{settings.label.capitalize()} setting '{path}' could not be "
+                f"set in {store.label}: {err}"
             ) from err
 
         name = metadata["name"]
@@ -397,7 +403,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if is_redacted:
             value = REDACTED_VALUE
         click.secho(
-            f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
+            (
+                f"{settings.label.capitalize()} setting '{name}' was set in "
+                f"{store.label}: {value!r}"
+            ),
             fg=VALUE_COLOR,
         )
 

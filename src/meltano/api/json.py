@@ -13,12 +13,19 @@ class KeyFrozenDict(dict):
     """Dict subclass that marks the dict as "frozen"."""
 
 
-def freeze_keys(d: dict):
-    """Mark the dictionary as frozen - no automatic conversion will be operated on it."""
-    if isinstance(d, KeyFrozenDict):
-        return d
+def freeze_keys(d: dict) -> KeyFrozenDict:
+    """Mark the dictionary as frozen.
 
-    return KeyFrozenDict(d)
+    No automatic conversion will be operated on it.
+
+    Args:
+        d: The dictionary to mark as frozen.
+
+    Returns:
+        A shallow copy of the dict with a `dict` subclass that denotes the
+        dictionary as being frozen.
+    """
+    return d if isinstance(d, KeyFrozenDict) else KeyFrozenDict(d)
 
 
 class JSONScheme(str, Enum):
@@ -32,11 +39,7 @@ def key_convert(obj, converter):
         for k, v in obj.items():
             # humps fails to convert undescored values
             # see https://github.com/nficano/humps/issues/2
-            if k.startswith("_"):
-                new_k = k
-            else:
-                new_k = converter(k)
-
+            new_k = k if k.startswith("_") else converter(k)
             if new_k in converted:
                 raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
 

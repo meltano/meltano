@@ -66,7 +66,7 @@ class EnvVar:
 
 
 class SettingMissingError(Error):
-    """Occurs when a setting is missing."""
+    """A setting is missing."""
 
     def __init__(self, name: str):
         """Instantiate SettingMissingError.
@@ -179,7 +179,8 @@ class SettingDefinition(NameEq, Canonical):
             name: Setting name.
             aliases: Setting alias names.
             env: Setting target environment variable.
-            env_aliases: Deprecated. Used to delegate alternative environment variables for overriding this setting's value.
+            env_aliases: Deprecated. Used to delegate alternative environment
+                variables for overriding this setting's value.
             kind: Setting kind.
             value: Setting value.
             label: Setting label.
@@ -192,8 +193,10 @@ class SettingDefinition(NameEq, Canonical):
             protected: A protected setting cannot be changed from the UI.
             env_specific: Flag for environment-specific setting.
             custom: Custom setting flag.
-            value_processor: Used with `kind: object` to pre-process the keys in a particular way.
-            value_post_processor: Used with `kind: object` to post-process the keys in a particular way.
+            value_processor: Used with `kind: object` to pre-process the keys
+                in a particular way.
+            value_post_processor: Used with `kind: object` to post-process the
+                keys in a particular way.
             attrs: Keyword arguments to pass to parent class.
         """
         aliases = aliases or []
@@ -303,7 +306,7 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             True if setting is a config extra.
-        """
+        """  # noqa: E501
         return self.name.startswith("_")
 
     @property
