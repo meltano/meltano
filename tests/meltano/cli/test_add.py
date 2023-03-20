@@ -140,6 +140,25 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
             )
 
+    @pytest.mark.order(1)
+    def test_add_different_variant(self, cli_runner):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock" in res.stdout
+
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-mock", "--variant", "singer-io"],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert (
+                "Extractor 'tap-mock' already exists in your Meltano project"
+                in res.stderr
+            )
+            assert "To switch from the current" in res.stdout
+
     @pytest.mark.order(2)
     def test_add_transform(self, project, cli_runner):
         # adding Transforms requires the legacy 'dbt' Transformer

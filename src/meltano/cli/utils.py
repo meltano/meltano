@@ -290,6 +290,7 @@ def add_plugin(
         print_added_plugin(plugin)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
+        new_plugin = err.new_plugin
 
         click.secho(
             (
@@ -308,8 +309,8 @@ def add_plugin(
                 "1. Update `variant` and `pip_url` in your `meltano.yml` "
                 "project file:\n"
                 f"\tname: {plugin.name}\n"
-                f"\tvariant: {variant.name}\n"
-                f"\tpip_url: {variant.pip_url}\n"
+                f"\tvariant: {new_plugin.name}\n"
+                f"\tpip_url: {new_plugin.pip_url}\n"
                 "2. Reinstall the plugin:\n"
                 f"\tmeltano install {plugin_type.singular} {plugin.name}\n"
                 "3. Check if the configuration is still valid (and make "
@@ -318,11 +319,11 @@ def add_plugin(
                 "To learn more, visit "
                 "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"  # noqa: E501
                 f"Alternatively, to keep the existing '{plugin.name}' with "
-                f"variant '{plugin.variant}', add variant '{variant.name}' as "
-                "a separate plugin with its own unique name:\n"
+                f"variant '{new_plugin.variant}', add variant '{new_plugin.variant}' "
+                "as a separate plugin with its own unique name:\n"
                 f"\tmeltano add {plugin_type.singular} "
-                f"{plugin.name}--{variant.name} --inherit-from {plugin.name} "
-                f"--variant {variant.name}\n\n"
+                f"{plugin.name}--{new_plugin.variant} --inherit-from {plugin.name} "
+                f"--variant {new_plugin.variant}\n\n"
                 "To learn more, visit "
                 "https://docs.meltano.com/guide/plugin-management#multiple-variants"
             )

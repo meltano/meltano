@@ -45,13 +45,15 @@ class DefinitionSource(str, enum.Enum):
 class PluginAlreadyAddedException(Exception):
     """Raised when a plugin is already added to the project."""
 
-    def __init__(self, plugin: PluginRef):
+    def __init__(self, plugin: PluginRef, new_plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
 
         Args:
             plugin: The plugin that was already added.
+            new_plugin: The plugin that was attempted to be added.
         """
         self.plugin = plugin
+        self.new_plugin = new_plugin
         super().__init__()
 
 
@@ -126,7 +128,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin)
+            raise PluginAlreadyAddedException(existing_plugin, plugin)
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
