@@ -8,7 +8,7 @@ weight: 5
 Meltano gives you the flexibility to alter data passing through your EL pipelines to do precisely what you need for your use case.
 Although commonly users want to replicate their data in the most raw format, using [ELT vs ETL](https://meltano.com/blog/the-benefits-of-elt-vs-etl-what-you-need-to-know/
 ), there are many use cases that require minor alterations to data on the fly.
-This is where mappers, or also referred to as inline stream maps, shine!
+This is where mappers, also referred to as inline stream maps, shine!
 
 # Features
 
@@ -103,9 +103,9 @@ For more details and examples refer to the [SDK documentation](https://sdk.melta
 ## Standalone Mapper Plugins
 
 The other way of getting mapper functionality is to use a standalone mapper plugin that is inserted between your tap and target to do the translation `meltano run tap-csv <MAPPER> target-jsonl`.
-These can be used even whether or not your tap and/or target are SDK based, it's your choice how you implement mappers.
+These can be used even when your your tap and/or target are not SDK based.
 
-The limitation with this approach is that currently you can only run these using the `meltano run` command.
+The limitation with this approach is that currently you can only run these using the `meltano run` command and not using `meltano elt` or `meltano invoke`.
 The advantage relative to the SDK inline stream maps is that you can fork the mapper plugin or build your own to do whatever you need.
 
 The two most common mapper plugins are:
@@ -134,7 +134,9 @@ id,first_name,last_name,email,ip_address
 ```
 
 ```yaml
-  - name: meltano-map-transformer
+plugins
+  mapper:
+    - name: meltano-map-transformer
     variant: meltano
     pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
     mappings:
@@ -169,6 +171,7 @@ No, currently only `meltano run` support standalone mapper plugins.
 ### Can I use mapping features with the BATCH message type?
 
 No, BATCH message type does not currently support mapping functionality.
+Follow along with [this discussion](https://github.com/meltano/meltano/discussions/6639#discussioncomment-3417860) where we talk about how stream maps could support BATCH messages.
 
 ### When would I use standalone mapper plugins vs SDK based stream maps?
 
