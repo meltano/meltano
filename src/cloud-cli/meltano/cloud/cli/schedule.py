@@ -15,8 +15,16 @@ if t.TYPE_CHECKING:
 
 
 @cloud.group(name="schedule")
-def schedule_group() -> None:
+@click.option(
+    "--deployment",
+    required=True,
+    help="The Meltano Cloud deployment the schedule is for.",
+)
+@click.pass_context
+def schedule_group(context: click.Context, deployment: str) -> None:
     """Interact with Meltano Cloud project schedules."""
+    context.ensure_object(dict)
+    context.obj["deployment"] = deployment
 
 
 async def set_enabled_state(
@@ -42,24 +50,15 @@ async def set_enabled_state(
         )
 
 
-deployment_option = click.option(
-    "--deployment",
-    required=True,
-    help="The Meltano Cloud deployment the schedule is for.",
-)
-
-
 @schedule_group.command("enable")
-@deployment_option
 @click.argument("schedule")
 @click.pass_context
-def enable(context: click.Context, deployment: str, schedule: str) -> None:
+def enable(context: click.Context, schedule: str) -> None:
     """Enable a Meltano Cloud schedule."""
-    config: MeltanoCloudConfig = context.obj["config"]
     asyncio.run(
         set_enabled_state(
-            config=config,
-            deployment=deployment,
+            config=context.obj["config"],
+            deployment=context.obj["deployment"],
             schedule=schedule,
             enabled=True,
         )
@@ -67,16 +66,14 @@ def enable(context: click.Context, deployment: str, schedule: str) -> None:
 
 
 @schedule_group.command("disable")
-@deployment_option
 @click.argument("schedule")
 @click.pass_context
-def disable(context: click.Context, deployment: str, schedule: str) -> None:
+def disable(context: click.Context, schedule: str) -> None:
     """Disable a Meltano Cloud schedule."""
-    config: MeltanoCloudConfig = context.obj["config"]
     asyncio.run(
         set_enabled_state(
-            config=config,
-            deployment=deployment,
+            config=context.obj["config"],
+            deployment=context.obj["deployment"],
             schedule=schedule,
             enabled=False,
         )
