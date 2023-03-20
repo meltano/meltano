@@ -3,56 +3,21 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
+import typing as t
 from urllib.parse import urljoin
 
-import jwt
-import pytest
 from aioresponses import aioresponses
 from click.testing import CliRunner
 
-from meltano.cloud.api import MeltanoCloudClient
-from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.cli import cloud as cli
+
+if t.TYPE_CHECKING:
+    from meltano.cloud.api import MeltanoCloudClient
+    from meltano.cloud.api.config import MeltanoCloudConfig
 
 
 class TestLogsCommand:
     """Test the logs command."""
-
-    @pytest.fixture
-    def tenant_resource_key(self):
-        return "meltano-cloud-test"
-
-    @pytest.fixture
-    def internal_project_id(self):
-        return "pytest-123"
-
-    @pytest.fixture
-    def id_token(self, tenant_resource_key: str, internal_project_id: str):
-        return jwt.encode(
-            {
-                "sub": "meltano-cloud-test",
-                "custom:trk_and_pid": f"{tenant_resource_key}::{internal_project_id}",
-            },
-            key="",
-        )
-
-    @pytest.fixture
-    def config(self, config_path: Path, id_token: str):
-        config = MeltanoCloudConfig(  # noqa: S106
-            config_path=config_path,
-            base_auth_url="http://auth-test.meltano.cloud",
-            base_url="https://internal.api-test.meltano.cloud/",
-            app_client_id="meltano-cloud-test",
-            access_token="meltano-cloud-test",  # noqa: S106
-            id_token=id_token,
-        )
-        config.write_to_file()
-        return config
-
-    @pytest.fixture
-    def client(self, config: MeltanoCloudConfig):
-        return MeltanoCloudClient(config=config)
 
     def test_logs_print(
         self,
