@@ -316,6 +316,7 @@ def add_plugin(
         print_added_plugin(plugin)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
+        new_plugin = err.new_plugin
 
         click.secho(
             f"{plugin_type.descriptor.capitalize()} '{plugin_name}' already exists in your Meltano project",
@@ -324,18 +325,17 @@ def add_plugin(
         )
 
         if variant and variant != plugin.variant:
-            variant = plugin.find_variant(variant)
-
             click.echo()
             click.echo(
-                f"To switch from the current '{plugin.variant}' variant to '{variant.name}':"
+                f"To switch from the current '{plugin.variant}' variant to "
+                f"'{new_plugin.variant}':",
             )
             click.echo(
-                "1. Update `variant` and `pip_url` in your `meltano.yml` project file:"
+                "1. Update `variant` and `pip_url` in your `meltano.yml` project file:",
             )
             click.echo(f"\tname: {plugin.name}")
-            click.echo(f"\tvariant: {variant.name}")
-            click.echo(f"\tpip_url: {variant.pip_url}")
+            click.echo(f"\tvariant: {new_plugin.name}")
+            click.echo(f"\tpip_url: {new_plugin.pip_url}")
 
             click.echo("2. Reinstall the plugin:")
             click.echo(f"\tmeltano install {plugin_type.singular} {plugin.name}")
@@ -351,14 +351,18 @@ def add_plugin(
 
             click.echo()
             click.echo(
-                f"Alternatively, to keep the existing '{plugin.name}' with variant '{plugin.variant}',"
+                f"Alternatively, to keep the existing '{plugin.name}' with variant "
+                f"'{plugin.variant}',",
             )
             click.echo(
-                f"add variant '{variant.name}' as a separate plugin with its own unique name:"
+                f"add variant '{new_plugin.variant}' as a separate plugin with its own "
+                "unique name:",
             )
             click.echo(
                 "\tmeltano add {type} {name}--{variant} --inherit-from {name} --variant {variant}".format(
-                    type=plugin_type.singular, name=plugin.name, variant=variant.name
+                    type=plugin_type.singular,
+                    name=plugin.name,
+                    variant=new_plugin.variant,
                 )
             )
 
