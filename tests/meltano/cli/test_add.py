@@ -157,6 +157,8 @@ class TestCliAdd:
                 in res.stderr
             )
             assert "To switch from the current" in res.stdout
+            assert "name: tap-mock" in res.stdout
+            assert "variant: singer-io" in res.stdout
 
     @pytest.mark.order(2)
     def test_add_transform(self, project, cli_runner):
