@@ -606,7 +606,6 @@ select = [
     "F401", # Permit unused imports in `__init__.py` files
 ]
 
-
 [tool.ruff.flake8-annotations]
 allow-star-arg-any = true
 mypy-init-return = true
