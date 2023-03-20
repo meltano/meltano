@@ -15,7 +15,6 @@ from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from traceback import format_exception
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -32,6 +31,7 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
+from meltano.core.utils import format_exception
 
 if t.TYPE_CHECKING:
     from meltano.core.tracking.contexts import (  # noqa: F401
@@ -309,7 +309,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         except Exception as err:
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
-                err="".join(format_exception(type(err), err, err.__traceback__)),
+                err=format_exception(err),
             )
 
     def track_command_event(self, event: CliEvent) -> None:
@@ -384,7 +384,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     "Failed to submit 'telemetry_state_change' unstruct event "
                     "to Snowplow, error"
                 ),
-                err="".join(format_exception(type(err), err, err.__traceback__)),
+                err=format_exception(err),
             )
 
     @property

@@ -614,6 +614,21 @@ def hash_sha256(value: str | bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
+def format_exception(exception: BaseException) -> str:
+    """Get the exception with its traceback formatted as it would have been printed.
+
+    Args:
+        exception: The exception value to be turned into a string.
+
+    Returns:
+        A string that shows the exception object as it would have been printed
+        had it been raised and not caught.
+    """
+    return "".join(
+        traceback.format_exception(type(exception), exception, exception.__traceback__)
+    )
+
+
 def safe_hasattr(obj: t.Any, name: str) -> bool:
     """Safely checks if an object has a given attribute.
 
