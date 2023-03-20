@@ -143,6 +143,9 @@ meltano = "meltano.cli:main"
 # `meltano-cloud` won't break.
 meltano-cloud = "meltano.cloud.cli:main"
 
+[tool.black]
+line-length = 88
+
 [tool.isort]
 add_imports = [
   "from __future__ import annotations",
