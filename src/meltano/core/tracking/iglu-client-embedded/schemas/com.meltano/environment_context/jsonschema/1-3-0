@@ -185,6 +185,7 @@
         "is_dev_build",
         "is_ci_environment",
         "notable_flag_env_vars",
+        "notable_hashed_env_vars",
         "python_version",
         "python_implementation",
         "system_name",
