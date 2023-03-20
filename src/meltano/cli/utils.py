@@ -124,7 +124,7 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
         )
     click.echo(
         "\nHit Return to accept the default: plugin name with underscores "
-        "instead of dashes"
+        "instead of dashes\n"
     )
 
     return click.prompt(
