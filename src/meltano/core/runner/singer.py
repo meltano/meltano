@@ -242,7 +242,7 @@ class SingerRunner(Runner):
         logging.error(
             f"The extractor generated a message exceeding the message size "
             f"limit of {human_size(line_length_limit)} (half the buffer size "
-            "of {human_size(stream_buffer_size)})."
+            f"of {human_size(stream_buffer_size)})."
         )
         logging.error(
             "To let this message be processed, increase the 'elt.buffer_size' "

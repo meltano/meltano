@@ -10,8 +10,8 @@ from meltano.core.state_store import DBStateStoreManager
 
 class TestDBStateStoreManager:
     @pytest.fixture
-    def subject(self, session, state_ids_with_jobs):
-        return DBStateStoreManager(session=session)
+    def subject(self, job_history_session, state_ids_with_jobs):
+        return DBStateStoreManager(session=job_history_session)
 
     def test_get_state(
         self, subject: DBStateStoreManager, state_ids_with_expected_states

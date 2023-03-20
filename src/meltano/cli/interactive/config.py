@@ -405,7 +405,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         click.secho(
             (
                 f"{settings.label.capitalize()} setting '{name}' was set in "
-                "{store.label}: {value!r}"
+                f"{store.label}: {value!r}"
             ),
             fg=VALUE_COLOR,
         )
