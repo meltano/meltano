@@ -146,27 +146,6 @@ meltano-cloud = "meltano.cloud.cli:main"
 [tool.black]
 line-length = 88
 
-[tool.isort]
-add_imports = [
-  "from __future__ import annotations",
-]
-ensure_newline_before_comments = true
-force_grid_wrap = 0
-include_trailing_comma = true
-line_length = 88
-multi_line_output = 3
-skip_glob = [
-  "*.md",
-  "*.vue",
-  "*.js",
-  "src/meltano/migrations/versions/*",
-]
-src_paths = [
-  "src/",
-  "tests/",
-]
-use_parentheses = true
-
 [tool.flakeheaven]
 accept_encodings = "utf-8"
 baseline = "flakeheaven-baseline"
@@ -194,6 +173,9 @@ statistics = true
 [tool.flakeheaven.plugins]
 "flake8-*" = [
   "+*",
+]
+"flake8-isort" = [
+  "-*",
 ]
 "flake8-commas" = [
   "-*",
@@ -608,6 +590,7 @@ ignore = [
 select = [
   "E",   # pycodestyle (error)
   "F",   # pyflakes
+  "I",   # isort
   "W",   # pycodestyle (warning)
 ]
 
@@ -626,7 +609,7 @@ fixture-parentheses = false
 parametrize-values-type = "tuple"
 
 [tool.ruff.isort]
-known-first-party = ["meltano", "fixtures"]
+known-first-party = ["asserts", "fixtures", "meltano"]
 required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.pydocstyle]
