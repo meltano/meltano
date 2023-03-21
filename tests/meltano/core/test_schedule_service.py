@@ -101,7 +101,7 @@ class TestScheduleService:
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         schedules = list(subject.schedules())
@@ -146,9 +146,16 @@ class TestScheduleService:
         self, subject, session, tap, target, plugin_settings_service_factory
     ):
         # curry the `add_elt` method to remove some arguments
-        add_elt = lambda name, start_date: subject.add_elt(  # noqa: E731
-            session, name, tap.name, target.name, "run", "@daily", start_date=start_date
-        )
+        def add_elt(name, start_date):
+            return subject.add_elt(  # noqa: E731
+                session,
+                name,
+                tap.name,
+                target.name,
+                "run",
+                "@daily",
+                start_date=start_date,
+            )
 
         mock_date = datetime(2002, 1, 1)  # noqa: WPS432
 
@@ -173,7 +180,7 @@ class TestScheduleService:
     def test_run_elt_schedule(self, subject, session, tap, target):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         schedule = subject.add_elt(
@@ -215,7 +222,7 @@ class TestScheduleService:
     def test_run_job_schedule(self, subject, session, tap, target):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         schedule = subject.add(

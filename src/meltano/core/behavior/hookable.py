@@ -1,8 +1,8 @@
-"""
-Hookable class and supporting functions, classes, and decorators.
+"""Hookable class and supporting functions, classes, and decorators.
 
-This module contains the Hookable class which allows for implementation of a classic before/after hook pattern. Allowing
-you to register functions to be called before or after given trigger.
+This module contains the Hookable class which allows for implementation of a
+classic before/after hook pattern. Allowing you to register functions to be
+called before or after given trigger.
 """
 from __future__ import annotations
 
@@ -64,13 +64,17 @@ class HookObject(metaclass=Hookable):
 
     @asynccontextmanager
     async def trigger_hooks(self, hook_name, *args, **kwargs):
-        """
-        Trigger all registered before and after functions for a given hook - yielding to the caller in between.
+        """Trigger all registered before and after functions for a given hook.
+
+        Yields to the caller in between triggers.
 
         Args:
             hook_name: The hook who's registered functions that should be triggered
+            args: Positional arguments to pass to the hooks being triggered.
+            kwargs: Keyword arguments to pass to the hooks being triggered.
 
-        Yields: None
+        Yields:
+            `None`
 
         Examples:
             async with self.obj.trigger_hooks("cleanup", self):

@@ -180,6 +180,8 @@ exclude = [
   "*.md",
   "src/webapp/node_modules/",
   "src/meltano/migrations/",
+  "src/meltano/api/",
+  "src/meltano/cli/ui.py",
 ]
 format = "colored"
 inline_quotes = "double"
@@ -589,3 +591,43 @@ module = [
 requires = ["poetry-core==1.5.0"]
 build-backend = "build:api"
 backend-path = ["scripts"]
+
+[tool.ruff]
+target-version = "py37"
+line-length = 88
+exclude = [
+  "src/meltano/migrations/*",
+  "src/webapp/*",
+  "src/meltano/api/*",
+  "src/meltano/cli/ui.py",
+]
+ignore = [
+  "ANN101", # Missing type annotation for `self` in method
+  "ANN102", # Missing type annotation for `cls` in class method
+]
+select = [
+  "E",   # pycodestyle (error)
+  "F",   # pyflakes
+  "W",   # pycodestyle (warning)
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = [
+  "F401", # Permit unused imports in `__init__.py` files
+]
+
+[tool.ruff.flake8-annotations]
+allow-star-arg-any = true
+mypy-init-return = true
+suppress-dummy-args = true
+
+[tool.ruff.flake8-pytest-style]
+fixture-parentheses = false
+parametrize-values-type = "tuple"
+
+[tool.ruff.isort]
+known-first-party = ["meltano", "fixtures"]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

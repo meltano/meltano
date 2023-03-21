@@ -42,8 +42,8 @@ class SingerRunner(Runner):
 
         # The StreamReader line length limit also acts as half the buffer size,
         # which cannot be set directly:
-        # - https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L395-L396
-        # - https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L482
+        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L395-L396
+        # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L482
         stream_buffer_size = self.context.project.settings.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
 
@@ -96,7 +96,8 @@ class SingerRunner(Runner):
             capture_subprocess_output(p_target.stderr, loader_log)
         )
 
-        # Wait for tap or target to complete, or for one of the output handlers to raise an exception.
+        # Wait for tap or target to complete, or for one of the output handlers
+        # to raise an exception.
         tap_process_future = asyncio.ensure_future(p_tap.wait())
         target_process_future = asyncio.ensure_future(p_target.wait())
         output_exception_future = asyncio.ensure_future(
@@ -116,7 +117,8 @@ class SingerRunner(Runner):
             return_when=asyncio.FIRST_COMPLETED,
         )
 
-        # If `output_exception_future` completes first, one of the output handlers raised an exception or all completed successfully.
+        # If `output_exception_future` completes first, one of the output
+        # handlers raised an exception or all completed successfully.
         if output_exception_future in done:
             output_futures_done, _ = output_exception_future.result()
             output_futures_failed = [
@@ -128,7 +130,8 @@ class SingerRunner(Runner):
             if output_futures_failed:
                 # If any output handler raised an exception, re-raise it.
 
-                # Special behavior for the tap stdout handler raising a line length limit error.
+                # Special behavior for the tap stdout handler raising a line
+                # length limit error.
                 if tap_stdout_future in output_futures_failed:
                     self._handle_tap_line_length_limit_error(
                         tap_stdout_future.exception(),
@@ -139,8 +142,9 @@ class SingerRunner(Runner):
                 failed_future = output_futures_failed.pop()
                 raise failed_future.exception()
             else:
-                # If all of the output handlers completed without raising an exception,
-                # we still need to wait for the tap or target to complete.
+                # If all of the output handlers completed without raising an
+                # exception, we still need to wait for the tap or target to
+                # complete.
                 done, _ = await asyncio.wait(
                     [tap_process_future, target_process_future],
                     return_when=asyncio.FIRST_COMPLETED,
@@ -152,9 +156,11 @@ class SingerRunner(Runner):
             if tap_process_future in done:
                 tap_code = tap_process_future.result()
             else:
-                # If the target completes before the tap, it failed before processing all tap output
+                # If the target completes before the tap, it failed before
+                # processing all tap output
 
-                # Kill tap and cancel output processing since there's no more target to forward messages to
+                # Kill tap and cancel output processing since there's no more
+                # target to forward messages to
                 p_tap.kill()
                 await tap_process_future
                 tap_stdout_future.cancel()
@@ -166,7 +172,8 @@ class SingerRunner(Runner):
             # Wait for all buffered target output to be processed
             await asyncio.wait([target_stdout_future, target_stderr_future])
         else:  # if tap_process_future in done:
-            # If the tap completes before the target, the target should have a chance to process all tap output
+            # If the tap completes before the target, the target should have a
+            # chance to process all tap output
             tap_code = tap_process_future.result()
 
             # Wait for all buffered tap output to be processed
@@ -233,12 +240,17 @@ class SingerRunner(Runner):
             return
 
         logging.error(
-            f"The extractor generated a message exceeding the message size limit of {human_size(line_length_limit)} (half the buffer size of {human_size(stream_buffer_size)})."
+            f"The extractor generated a message exceeding the message size "
+            f"limit of {human_size(line_length_limit)} (half the buffer size "
+            f"of {human_size(stream_buffer_size)})."
         )
         logging.error(
-            "To let this message be processed, increase the 'elt.buffer_size' setting to at least double the size of the largest expected message, and try again."
+            "To let this message be processed, increase the 'elt.buffer_size' "
+            "setting to at least double the size of the largest expected "
+            "message, and try again."
         )
         logging.error(
-            "To learn more, visit https://docs.meltano.com/reference/settings#eltbuffer_size"
+            "To learn more, visit "
+            "https://docs.meltano.com/reference/settings#eltbuffer_size"
         )
         raise RunnerError("Output line length limit exceeded") from exception

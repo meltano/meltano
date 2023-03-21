@@ -125,7 +125,7 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """
+    """  # noqa: E501
     if job and (extractor or loader):
         raise click.ClickException(
             "Cannot mix --job with --extractor/--loader/--transform"
@@ -205,12 +205,16 @@ def list(ctx, format):  # noqa: WPS125
             for txt_schedule in schedule_service.schedules():
                 if txt_schedule.job:
                     click.echo(
-                        f"[{txt_schedule.interval}] job {txt_schedule.name}: {txt_schedule.job} → {task_sets_service.get(txt_schedule.job).tasks}"
+                        f"[{txt_schedule.interval}] job {txt_schedule.name}: "
+                        f"{txt_schedule.job} → "
+                        f"{task_sets_service.get(txt_schedule.job).tasks}"
                     )
                 else:
                     markers = transform_elt_markers[txt_schedule.transform]
                     click.echo(
-                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
+                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: "
+                        f"{txt_schedule.extractor} {markers[0]} "
+                        f"{txt_schedule.loader} {markers[1]} transforms"
                     )
 
         elif format == "json":
@@ -287,7 +291,8 @@ def _update_job_schedule(
     """
     if not candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with job only flags as its a elt schedule"
+            f"Cannot update schedule {candidate.name} with job only flags as "
+            "its a elt schedule"
         )
     if job:
         candidate.job = job
@@ -320,7 +325,8 @@ def _update_elt_schedule(
     """
     if candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with elt only flags as its a scheduled job"
+            f"Cannot update schedule {candidate.name} with elt only flags as "
+            "its a scheduled job"
         )
 
     if extractor:
@@ -354,7 +360,7 @@ def set_cmd(ctx, name, interval, job, extractor, loader, transform):
 
     Usage:
         meltano schedule set <name> [--interval <interval>] [--job <job>] [--extractor <extractor>] [--loader <loader>] [--transform <transform>]
-    """
+    """  # noqa: E501
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     candidate = schedule_service.find_schedule(name)
 

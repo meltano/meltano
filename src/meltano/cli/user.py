@@ -44,7 +44,10 @@ def user(ctx, project):
     "-G",
     multiple=True,
     default=[],
-    help="Add the user to the role. Meltano ships with two built-in roles: admin and regular.",
+    help=(
+        "Add the user to the role. Meltano ships with two built-in roles: "
+        "admin and regular."
+    ),
 )
 @click.pass_context
 def add(ctx, username, password, role, **flags):

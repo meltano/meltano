@@ -44,7 +44,8 @@ class GUID(TypeDecorator):
     Uses PostgreSQL's UUID type, otherwise uses
     CHAR(32), storing as stringified hex values.
 
-    Reference: https://docs.sqlalchemy.org/en/13/core/custom_types.html#backend-agnostic-guid-type
+    Reference:
+    https://docs.sqlalchemy.org/en/13/core/custom_types.html#backend-agnostic-guid-type
     """
 
     impl = CHAR

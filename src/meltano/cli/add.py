@@ -56,7 +56,10 @@ if t.TYPE_CHECKING:
 @click.option(
     "--custom",
     is_flag=True,
-    help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
+    help=(
+        "Add a custom plugin. The command will prompt you for the package's "
+        "base plugin description metadata."
+    ),
 )
 @click.option(
     "--no-install",
@@ -165,5 +168,6 @@ def _print_plugins(plugins):
             printed_empty_line = True
 
         click.echo(
-            f"To learn more about {plugin.type.descriptor} '{plugin.name}', visit {docs_url}"
+            f"To learn more about {plugin.type.descriptor} '{plugin.name}', "
+            f"visit {docs_url}"
         )

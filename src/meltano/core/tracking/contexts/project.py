@@ -69,12 +69,13 @@ class ProjectContext(SelfDescribingJson):
 
     @property
     def environment_name(self) -> str | None:
-        """Get the name of the active environment, or `None` if there is no active environment.
+        """Get the name of the active environment.
 
         Only the hash of this value is reported to Snowplow.
 
         Returns:
-            The name of the active environment, or `None` if there is no active environment.
+            The name of the active environment, or `None` if there is no active
+            environment.
         """
         return self._environment_name
 
@@ -101,8 +102,8 @@ class ProjectContext(SelfDescribingJson):
     def project_uuid(self) -> uuid.UUID:
         """Obtain the `project_id` from the project config file.
 
-        If it is not found (e.g. first time run), generate a valid v4 UUID, and and store it in the
-        project config file.
+        If it is not found (e.g. first time run), generate a valid v4 UUID,
+        and and store it in the project config file.
 
         Returns:
             The project UUID.
@@ -114,7 +115,8 @@ class ProjectContext(SelfDescribingJson):
                 # Project ID might already be a UUID
                 project_id = uuid.UUID(project_id_str)
             except ValueError:
-                # If the project ID is not a UUID, then we hash it, and use the hash to make a UUID
+                # If the project ID is not a UUID, then we hash it, and use the
+                # hash to make a UUID
                 project_id = uuid.UUID(hash_sha256(project_id_str)[::2])
                 self._project_uuid_source = ProjectUUIDSource.derived
             else:

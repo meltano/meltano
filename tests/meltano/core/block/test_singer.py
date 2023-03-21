@@ -168,7 +168,8 @@ class TestSingerBlocks:
 
         # This test is a great proxy for general io tests
         # if you link the output logger, you can use structlog's capture method
-        # to capture the output and check output was actually consumed AND linked correctly.
+        # to capture the output and check output was actually consumed AND
+        # linked correctly.
         with capture_logs() as cap_logs:
             await producer.start()
 
