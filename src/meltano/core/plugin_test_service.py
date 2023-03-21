@@ -95,8 +95,9 @@ class ExtractorTestService(PluginTestService):
 
         returncode = await process.wait()
 
-        # considered valid if subprocess is terminated (exit status < 0) on RECORD message received
-        # see https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode
+        # Considered valid if subprocess is terminated (exit status < 0) on
+        # RECORD message received. See
+        # https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode  # noqa: E501
         return (
             returncode < 0,
             last_line if returncode else "No RECORD message received",

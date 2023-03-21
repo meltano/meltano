@@ -112,7 +112,8 @@ def all(ctx, pip_url, force, skip_package):
                 )
         else:
             click.echo(
-                "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
+                "Then, run `meltano upgrade --skip-package` to upgrade your "
+                "project based on the latest version."
             )
 
 

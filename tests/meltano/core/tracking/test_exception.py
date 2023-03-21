@@ -38,8 +38,9 @@ def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     try:
         with warnings.catch_warnings():
             # Ignore the misleading warning thrown by `jsonschema`:
-            #     The metaschema specified by `$schema` was not found. Using the latest draft to
-            #     validate, but this will raise an error in the future.
+            #     The metaschema specified by `$schema` was not found. Using
+            #     the latest draft to validate, but this will raise an error
+            #     in the future.
             # This is a bug in `jsonschema`, as our value for `$schema` is fine.
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             validate(instance, EXCEPTION_CONTEXT_SCHEMA)
@@ -94,9 +95,7 @@ def test_simple_exception_context():
 
 def test_complex_exception_context():
     if platform.system() == "Windows":
-        pytest.xfail(
-            "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
-        )
+        pytest.xfail("Fails on Windows: https://github.com/meltano/meltano/issues/3444")
 
     line_nums: list[int] = []
     file_not_found_error = None
@@ -144,8 +143,8 @@ def test_complex_exception_context():
         "context_uuid": ctx.data["context_uuid"],
         "exception": {
             "type": "CustomException",
-            "str_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "repr_hash": "ad9443d77d731da456747bd47282a51afe86be7058533f44dcc979320ad62c73",
+            "str_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",  # noqa: E501
+            "repr_hash": "ad9443d77d731da456747bd47282a51afe86be7058533f44dcc979320ad62c73",  # noqa: E501
             "traceback": [
                 {
                     "file": f".../{THIS_FILE_BASENAME}",
@@ -155,8 +154,8 @@ def test_complex_exception_context():
             "cause": None,
             "context": {
                 "type": "ValueError",
-                "str_hash": "1009263b7f48917b8f0edafcfc8a06d22156122fbcbfbb7c9139f420b8472e0c",
-                "repr_hash": "0015450e35aed13f4802973752ee45d02c8f8eaa5d57417962986f4b8ef1bf88",
+                "str_hash": "1009263b7f48917b8f0edafcfc8a06d22156122fbcbfbb7c9139f420b8472e0c",  # noqa: E501
+                "repr_hash": "0015450e35aed13f4802973752ee45d02c8f8eaa5d57417962986f4b8ef1bf88",  # noqa: E501
                 "traceback": [
                     {
                         "file": f".../{THIS_FILE_BASENAME}",

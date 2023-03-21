@@ -23,7 +23,7 @@ class TestPluginInstallService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -33,7 +33,7 @@ class TestPluginInstallService:
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
                                 }
                             ],
                         }

@@ -21,7 +21,7 @@ from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_da
 
 
 class ScheduleAlreadyExistsError(MeltanoError):
-    """Occurs when a schedule already exists."""
+    """A schedule already exists."""
 
     def __init__(self, schedule: Schedule):
         """Initialize the exception.
@@ -34,7 +34,7 @@ class ScheduleAlreadyExistsError(MeltanoError):
 
 
 class ScheduleDoesNotExistError(MeltanoError):
-    """Occurs when a schedule does not exist."""
+    """A schedule does not exist."""
 
     def __init__(self, name: str):
         """Initialize the exception.
@@ -52,7 +52,7 @@ class ScheduleDoesNotExistError(MeltanoError):
 
 
 class ScheduleNotFoundError(MeltanoError):
-    """Occurs when a schedule for a namespace cannot be found."""
+    """A schedule for a namespace cannot be found."""
 
     def __init__(self, namespace: str):
         """Initialize the exception.
@@ -68,7 +68,7 @@ class ScheduleNotFoundError(MeltanoError):
 
 
 class BadCronError(MeltanoError):
-    """Occurs when a cron expression is invalid."""
+    """A cron expression is invalid."""
 
     def __init__(self, cron: str):
         """Initialize the exception.
@@ -260,7 +260,8 @@ class ScheduleService:  # noqa: WPS214
         """Search for a Schedule that runs for a certain plugin namespace.
 
         Example:
-            `tap_carbon` would yield the first schedule that runs for the `tap-carbon` extractor.
+            `tap_carbon` would yield the first schedule that runs for the
+            `tap-carbon` extractor.
 
         Args:
             namespace: The plugin namespace to search.

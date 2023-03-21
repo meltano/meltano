@@ -308,8 +308,8 @@ class TestExtractLoadBlocks:
 
             await elb._link_io()
 
-            # explicitly check the counts of each block's output to ensure they are linked
-            # count is going to be logger + 1 for next blocks stdin
+            # Explicitly check the counts of each block's output to ensure they
+            # are linked count is going to be logger + 1 for next blocks stdin
             assert len(elb.blocks[0].outputs) == 2
 
             # block0 should write output to block1 stdin
@@ -570,7 +570,7 @@ class TestExtractLoadBlocks:
 
             assert elb.context.job.job_name == "test:tap-mock-to-target-mock"
 
-            # just to be sure, we'll double-check the state_id is the same for each block
+            # Just to be sure, we double-check that state_id is the same for each block
             for block in blocks:
                 assert block.context.job.job_name == "test:tap-mock-to-target-mock"
 
@@ -582,7 +582,6 @@ class TestExtractLoadBlocks:
 
 class TestExtractLoadUtils:
     def test_generate_state_id(self):
-        """Verify that a state ID is generated correctly given an active environment and optional suffix."""
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -592,17 +591,17 @@ class TestExtractLoadUtils:
         project = mock.Mock()
         project.environment = Environment(name="test")
 
+        # Verify that a state ID is generated correctly given an active
+        # environment and optional suffix.
         assert (
             generate_state_id(project, None, block1, block2) == "test:block1-to-block2"
         )
-
         assert (
             generate_state_id(project, "suffix", block1, block2)
             == "test:block1-to-block2:suffix"
         )
 
     def test_generate_state_id_no_environment(self):
-        """Verify an error is raised when attempting to generate a state ID with no active environment."""
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -612,11 +611,12 @@ class TestExtractLoadUtils:
         project = mock.Mock()
         project.environment = None
 
+        # Verify an error is raised when attempting to generate a state ID
+        # with no active environment.
         with pytest.raises(RunnerError):
             generate_state_id(project, None, block1, block2)
 
     def test_generate_state_id_component_contains_delimiter(self):
-        """Verify an error is raised when attempting to generate a state ID with a component that contains the defined delimiter string."""
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -626,5 +626,7 @@ class TestExtractLoadUtils:
         project = mock.Mock()
         project.environment = Environment(name="test")
 
+        # Verify an error is raised when attempting to generate a state ID
+        # with a component that contains the defined delimiter string.
         with pytest.raises(RunnerError):
             generate_state_id(project, STATE_ID_COMPONENT_DELIMITER, block1, block2)

@@ -101,7 +101,8 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
             A boto3.Client.
 
         Raises:
-            InvalidStateBackendConfigurationException: when configured AWS settings are invalid.
+            InvalidStateBackendConfigurationException: when configured AWS
+                settings are invalid.
         """
         with requires_boto3():
             if self.aws_secret_access_key and self.aws_access_key_id:

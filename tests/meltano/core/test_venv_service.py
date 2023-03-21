@@ -29,7 +29,7 @@ class TestVenvService:
     async def test_clean_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         await subject.install(["example"], clean=True)
@@ -81,7 +81,7 @@ class TestVenvService:
     async def test_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
 
         # Make sure the venv exists already

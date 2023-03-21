@@ -195,7 +195,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
-                f"Plugin configuration profiles are no longer supported, ignoring `@{profile_name}` in plugin name."
+                "Plugin configuration profiles are no longer supported, "
+                f"ignoring `@{profile_name}` in plugin name."
             )
 
         try:
@@ -337,7 +338,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Yields:
-            A generator of all plugins.
+            Plugins.
         """
         yield from (
             plugin

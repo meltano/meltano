@@ -22,7 +22,7 @@ logger = structlog.getLogger(__name__)
 
 
 class InvalidJobStateError(Exception):
-    """Occurs when invalid job state is parsed."""
+    """Invalid job state is parsed."""
 
 
 class StateService:  # noqa: WPS214
@@ -115,7 +115,8 @@ class StateService:  # noqa: WPS214
         """Add state for the given Job.
 
         Args:
-            job: either an existing Job or a state_id that future runs may look up state for.
+            job: either an existing Job or a state_id that future runs may look
+                up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
             validate: whether to validate the supplied state
@@ -161,7 +162,7 @@ class StateService:  # noqa: WPS214
         Args:
             state_id: the state_id to set state for
             new_state: the state to update to
-            validate: whether or not to validate the supplied state.
+            validate: Whether to validate the supplied state.
         """
         self.add_state(
             state_id,
@@ -175,7 +176,7 @@ class StateService:  # noqa: WPS214
 
         Args:
             state_id: the state_id to clear state for
-            save: whether or not to immediately save the state
+            save: Whether to immediately save the state
         """
         self.state_store_manager.clear(state_id)
 

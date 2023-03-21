@@ -12,7 +12,7 @@ ALLOWED_EXTENSIONS = {"json"}
 
 
 class InvalidFileTypeError(Exception):
-    """Occurs when a file does not meet our file type criteria."""
+    """A file does not meet our file type criteria."""
 
     def __init__(self, file):
         self.file = file
@@ -20,7 +20,7 @@ class InvalidFileTypeError(Exception):
 
 
 class InvalidFileSizeError(Exception):
-    """Occurs when a file does not conform to MAX_FILE_SIZE."""
+    """A file does not conform to MAX_FILE_SIZE."""
 
     def __init__(self, file):
         self.file = file
@@ -46,7 +46,8 @@ class UploadHelper:
         return file.filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
     def is_valid_size(self, file):
-        # File size calculated due to multipart/form data (initial header content-length may differ when complete file data has been uploaded)
+        # File size calculated due to multipart/form data (initial header
+        # content-length may differ when complete file data has been uploaded)
         file.seek(0, SEEK_END)
         file_size = file.tell()
         file.seek(0)  # Return to 0 so subsequent write occurs from beginning of file

@@ -255,7 +255,9 @@ class Out:  # noqa: WPS230
                 yield
 
     def writeline(self, line: str) -> None:
-        """Write a line to the underlying structured logger, cleaning up any dangling control chars.
+        """Write a line to the underlying structured logger.
+
+        Cleans up any dangling control chars.
 
         Args:
             line: A line to write.

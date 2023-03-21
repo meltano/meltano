@@ -125,7 +125,8 @@ def cli(  # noqa: C901,WPS231
             fg="yellow",
         )
         click.echo(
-            "For more details, visit https://docs.meltano.com/guide/installation#upgrading-meltano-version"
+            "For more details, visit "
+            "https://docs.meltano.com/guide/installation#upgrading-meltano-version"
         )
         sys.exit(3)
 

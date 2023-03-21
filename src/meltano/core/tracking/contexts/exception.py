@@ -26,7 +26,7 @@ class ExceptionContext(SelfDescribingJson):
     """Exception context for the Snowplow tracker."""
 
     def __init__(self):
-        """Initialize the exceptions context with the exceptions currently being handled."""
+        """Init the exceptions context with the exceptions currently being handled."""
         ex = sys.exc_info()[1]
         super().__init__(
             ExceptionContextSchema.url,
@@ -44,8 +44,8 @@ def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
         ex: The exception from which data will be extracted.
 
     Returns:
-        A JSON-compatible dictionary of anonymized telemetry data compliant with the exception
-        context schema for an exception.
+        A JSON-compatible dictionary of anonymized telemetry data compliant
+        with the exception context schema for an exception.
     """
     cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__  # noqa: WPS609
     return {
@@ -82,7 +82,8 @@ def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
 def get_relative_traceback_path(tb: TracebackType) -> str | None:
     """Get an anonymous path from a traceback by making it relative if possible.
 
-    The path is made relative to the first element in `BASE_PATHS` it can be made relative to.
+    The path is made relative to the first element in `BASE_PATHS` it can be
+    made relative to.
 
     Args:
         tb: The traceback from which to extract the path info.
@@ -91,7 +92,8 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
         The first valid option of the following is returned:
         - If the path is `'<stdin>'`: `'<stdin>'`
         - If possible: the path made relative to a path in `BASE_PATHS`
-        - If the file name is `__init__.py` or `__main__.py`: `'.../<module name>/<file name>.py'`.
+        - If the file name is `__init__.py` or `__main__.py`:
+            `'.../<module name>/<file name>.py'`.
         - Otherwise: `'.../<filename>.py'`.
     """
     try:

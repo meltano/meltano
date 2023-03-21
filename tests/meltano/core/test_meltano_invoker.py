@@ -24,7 +24,7 @@ class TestMeltanoInvoker:
     def test_invoke(self, subject: MeltanoInvoker):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
@@ -48,7 +48,7 @@ class TestMeltanoInvoker:
     def test_invoke_executable(self, subject: MeltanoInvoker, project: Project):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         process_mock = mock.Mock(returncode=0)
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:
@@ -61,7 +61,8 @@ class TestMeltanoInvoker:
             # If a different command is used...
             subject.invoke(["--version"], command="gunicorn")
 
-            # ...the symlink is not relevant and we find the executable next to the `python` executable
+            # ...the symlink is not relevant and we find the executable next
+            # to the `python` executable
             gunicorn_path = Path(os.path.dirname(sys.executable), "gunicorn")
             assert run_mock.call_args[0][0][0] == str(gunicorn_path)
 

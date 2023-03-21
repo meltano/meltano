@@ -34,7 +34,7 @@ MULTI_FILE_KEYS = {
 
 
 class InvalidIncludePathError(Exception):
-    """Occurs when an included file path matches a provided pattern but is not a valid config file."""
+    """Included file path matches a provided pattern but is not a valid config file."""
 
 
 class ProjectFiles:  # noqa: WPS214
@@ -145,8 +145,8 @@ class ProjectFiles:  # noqa: WPS214
             List of paths matching the given glob patterns.
 
         Raises:
-            InvalidIncludePathError: If a path is matched by a pattern but is not a valid
-                file.
+            InvalidIncludePathError: If a path is matched by a pattern but is
+                not a valid file.
         """
         include_paths = []
         for pattern in include_path_patterns:
@@ -177,7 +177,8 @@ class ProjectFiles:  # noqa: WPS214
             key_path_string = ":".join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
-                f'Plugin with path "{key_path_string}" already added in file {existing_key_file_path}.'
+                f'Plugin with path "{key_path_string}" already added in '
+                f"file {existing_key_file_path}."
             )
             raise Exception("Duplicate plugin name found.")
         else:
@@ -236,7 +237,8 @@ class ProjectFiles:  # noqa: WPS214
                 raise exc
             else:
                 self._raw_contents_map[str(path)] = contents
-                # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
+                # TODO: validate dict schema
+                # https://gitlab.com/meltano/meltano/-/issues/3029
                 self._index_file(include_file_path=path, include_file_contents=contents)
                 included_file_contents.append(contents)
         return included_file_contents
