@@ -211,13 +211,14 @@ def config(  # noqa: WPS231
     cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
-        "List all settings for the specified plugin with their names, environment variables, and current values."
+        "List all settings for the specified plugin with their names, "
+        "environment variables, and current values."
     ),
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
 def list_settings(ctx, extras: bool):
-    """List all settings for the specified plugin with their names, environment variables, and current values."""
+    """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
@@ -318,7 +319,8 @@ def reset(ctx, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} settings in {store.label} could not be reset: {err}"
+            f"{settings.label.capitalize()} settings in {store.label} could "
+            f"not be reset: {err}"
         ) from err
 
     store = metadata["store"]
@@ -412,7 +414,8 @@ def unset(ctx, setting_name, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
+            f"{settings.label.capitalize()} setting '{path}' in {store.label} "
+            f"could not be unset: {err}"
         ) from err
 
     name = metadata["name"]

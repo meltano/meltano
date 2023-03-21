@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 
 class IncompatibleVersionError(Exception):
-    """Occurs when a component is incompatible with its representation."""
+    """A component is incompatible with its representation."""
 
     def __init__(self, message, file_version: int, version: int):
         super().__init__(message)

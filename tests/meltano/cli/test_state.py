@@ -38,7 +38,7 @@ class TestCliState:
         assert state.state_service_from_state_id(project, state_id) is None
 
     @pytest.mark.parametrize("state_id", conventional_state_ids)
-    def test_state_service_from_state_id_returns_state_service_convention(  # noqa: WPS118
+    def test_state_service_from_state_id_returns_state_service_convention(  # noqa: WPS118, E501
         self, project, state_id
     ):
         with mock.patch(
@@ -134,20 +134,16 @@ class TestCliState:
 
     def test_merge_from_string(self, state_service, state_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            job_pairs = []
-            for idx in range(0, len(state_ids) - 1, 2):
-                job_pairs.append((state_ids[idx], state_ids[idx + 1]))
+            job_pairs = [
+                (state_ids[idx], state_ids[idx + 1])
+                for idx in range(0, len(state_ids) - 1, 2)
+            ]
             for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 job_dst_state = state_service.get_state(job_dst)
                 result = cli_runner.invoke(
                     cli,
-                    [
-                        "state",
-                        "merge",
-                        job_dst,
-                        json.dumps(job_src_state),
-                    ],
+                    ["state", "merge", job_dst, json.dumps(job_src_state)],
                 )
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == merge(
@@ -159,12 +155,13 @@ class TestCliState:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
             )
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            job_pairs = []
-            for idx in range(0, len(state_ids) - 1, 2):
-                job_pairs.append((state_ids[idx], state_ids[idx + 1]))
+            job_pairs = [
+                (state_ids[idx], state_ids[idx + 1])
+                for idx in range(0, len(state_ids) - 1, 2)
+            ]
             for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 job_dst_state = state_service.get_state(job_dst)
@@ -182,9 +179,10 @@ class TestCliState:
 
     def test_merge_from_job(self, state_service, state_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            job_pairs = []
-            for idx in range(0, len(state_ids) - 1, 2):
-                job_pairs.append((state_ids[idx], state_ids[idx + 1]))
+            job_pairs = [
+                (state_ids[idx], state_ids[idx + 1])
+                for idx in range(0, len(state_ids) - 1, 2)
+            ]
             for job_src, job_dst in job_pairs:
                 job_state_src = state_service.get_state(job_src)
                 job_state_dst = state_service.get_state(job_dst)
@@ -197,9 +195,10 @@ class TestCliState:
 
     def test_copy_over_existing(self, state_service, state_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            job_pairs = []
-            for idx in range(0, len(state_ids) - 1, 2):
-                job_pairs.append((state_ids[idx], state_ids[idx + 1]))
+            job_pairs = [
+                (state_ids[idx], state_ids[idx + 1])
+                for idx in range(0, len(state_ids) - 1, 2)
+            ]
             for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(
@@ -223,9 +222,10 @@ class TestCliState:
 
     def test_move(self, state_service, state_ids, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            job_pairs = []
-            for idx in range(0, len(state_ids) - 1, 2):
-                job_pairs.append((state_ids[idx], state_ids[idx + 1]))
+            job_pairs = [
+                (state_ids[idx], state_ids[idx + 1])
+                for idx in range(0, len(state_ids) - 1, 2)
+            ]
             for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 result = cli_runner.invoke(

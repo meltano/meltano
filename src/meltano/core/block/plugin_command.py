@@ -1,4 +1,4 @@
-"""A `CommandBlock` pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
+"""Classes & functions for plugin commands like `dbt:run`, `dbt:docs` or `dbt:test`."""
 
 from __future__ import annotations
 
@@ -37,7 +37,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def command(self) -> str | None:
-        """Command is the specific plugin command to use when invoking the plugin (if any)."""
+        """Get the plugin command to use when invoking the plugin (if any)."""
         raise NotImplementedError
 
     @abstractmethod
@@ -47,7 +47,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
 
 
 class InvokerCommand(InvokerBase, PluginCommandBlock):
-    """A basic PluginCommandBlock interface implementation that supports running plugin commands."""
+    """`PluginCommandBlock` that supports invoking plugin commands."""
 
     def __init__(
         self,
@@ -101,7 +101,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 
     @property
     def command_args(self) -> str | None:
-        """Command args are the specific plugin command args to use when invoking the plugin (if any).
+        """Get the command args to use when invoking the plugin.
 
         Returns:
             The command args if any.
@@ -153,7 +153,8 @@ def plugin_command_invoker(
         plugin: Plugin to make command from.
         project: Project to use.
         command: the command to invoke on the plugin i.e. `run` in dbt run.
-        command_args: any additional command args that should be passed in during invocation.
+        command_args: any additional command args that should be passed in
+            during invocation.
         run_dir: Optional directory to run commands in.
 
     Returns:

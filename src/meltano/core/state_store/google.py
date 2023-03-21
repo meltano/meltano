@@ -60,7 +60,8 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         Args:
             bucket: the bucket to store state in
             prefix: the prefix to store state at
-            application_credentials: application credentials to  use in authenticating to GCS
+            application_credentials: application credentials to use in
+                authenticating to GCS
             kwargs: additional keyword args to pass to parent
         """
         super().__init__(**kwargs)

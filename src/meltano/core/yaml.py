@@ -59,5 +59,6 @@ def load(path: os.PathLike) -> CommentedMap:
     return parsed
 
 
-# Alias to provide a clean interface when using this module via `from meltano.core import yaml`
+# Alias to provide a clean interface when using this
+# module via `from meltano.core import yaml`
 dump = yaml.dump

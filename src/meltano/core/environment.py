@@ -21,7 +21,7 @@ class NoActiveEnvironment(Exception):  # noqa: N818
 
 
 class EnvironmentNameContainsStateIdDelimiterError(Exception):
-    """Occurs when an environment name contains the state ID component delimiter."""
+    """An environment name contains the state ID component delimiter."""
 
     def __init__(self, name: str):
         """Create a new exception.

@@ -111,7 +111,8 @@ def target_process(process_mock_factory, target):
 def mapper_process(process_mock_factory, mapper):
     mapper = process_mock_factory(mapper)
 
-    # Have `mapper.wait` take 1s to make sure the mapper always finishes after the tap but before the target
+    # Have `mapper.wait` take 1s to make sure the mapper always finishes after
+    # the tap but before the target
     async def wait_mock():
         await asyncio.sleep(1)
         return mapper.wait.return_value
@@ -235,7 +236,10 @@ class TestCliRunScratchpadOne:
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
-                match="Unknown command type or bad block sequence at index 1, starting block 'tap-mock'",
+                match=(
+                    "Unknown command type or bad block sequence at index 1, "
+                    "starting block 'tap-mock'"
+                ),
             ):
                 result = cli_runner.invoke(cli, args, catch_exceptions=False)
                 assert result.exit_code == 1
@@ -247,7 +251,10 @@ class TestCliRunScratchpadOne:
             asyncio_mock3.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
-                match="Unknown command type or bad block sequence at index 3, starting block 'target-mock'",
+                match=(
+                    "Unknown command type or bad block sequence at index 3, "
+                    "starting block 'target-mock'"
+                ),
             ):
                 result = cli_runner.invoke(cli, args, catch_exceptions=False)
                 assert result.exit_code == 1
@@ -352,7 +359,8 @@ class TestCliRunScratchpadOne:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
-        # verify that a state ID with custom suffix from command option is generated for an ELB run
+        # Verify that a state ID with custom suffix from command option is
+        # generated for an ELB run
         args = ["run", tap.name, target.name, "--state-id-suffix", "test-suffix"]
 
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -420,7 +428,8 @@ class TestCliRunScratchpadOne:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
-        # verify that a state ID with custom suffix from active environment is generated for an ELB run
+        # Verify that a state ID with custom suffix from active environment is
+        # generated for an ELB run
         project.activate_environment("dev")
         project.environment.state_id_suffix = state_id_suffix
 
@@ -459,7 +468,8 @@ class TestCliRunScratchpadOne:
         dbt_process,
         job_logging_service,
     ):
-        # Verify that requesting the same command plugin multiple time with different args works
+        # Verify that requesting the same command plugin multiple time with
+        # different args works
         invoke_async = AsyncMock(
             side_effect=(
                 dbt_process,
@@ -645,7 +655,8 @@ class TestCliRunScratchpadOne:
         dbt_process,
         job_logging_service,
     ):
-        # in this scenario, the tap fails on the third read. Target should still complete, but dbt should not.
+        # In this scenario, the tap fails on the third read. Target should still
+        # complete, but dbt should not.
         args = ["run", tap.name, target.name, "dbt:run"]
 
         tap_process.wait.return_value = 1
@@ -662,9 +673,9 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args)
 
             assert (
-                "Run invocation could not be completed as block failed: Extractor failed"
-                in str(result.exception)
-            )
+                "Run invocation could not be completed as block failed: "
+                "Extractor failed"
+            ) in str(result.exception)
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -717,7 +728,8 @@ class TestCliRunScratchpadOne:
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
-        # Have `tap_process.wait` take 2s to make sure the target can fail before tap finishes
+        # Have `tap_process.wait` take 2s to make sure the target can fail
+        # before tap finishes
         async def tap_wait_mock():
             await asyncio.sleep(2)
             return tap_process.wait.return_value
@@ -726,13 +738,15 @@ class TestCliRunScratchpadOne:
 
         # Writing to target stdin will fail because (we'll pretend) it has already died
         target_process.stdin = mock.Mock(spec=asyncio.StreamWriter)
-        # capture_subprocess_output writer will return and close the pipe when either BrokenPipeError or ConnectionResetError is enccountered
-        # it does not itself reraise the exception - so you shouldn't expect to see these.
+        # capture_subprocess_output writer will return and close the pipe when
+        # either BrokenPipeError or ConnectionResetError is enccountered it
+        # does not itself reraise the exception - so you shouldn't expect to see these.
         target_process.stdin.write.side_effect = BrokenPipeError
         target_process.stdin.drain = AsyncMock(side_effect=ConnectionResetError)
         target_process.stdin.wait_closed = AsyncMock(return_value=True)
 
-        # Have `target_process.wait` take 1s to make sure the `stdin.write`/`drain` exceptions can be raised
+        # Have `target_process.wait` take 1s to make sure the
+        # `stdin.write`/`drain` exceptions can be raised
         async def target_wait_mock():
             await asyncio.sleep(1)
             return 1
@@ -775,7 +789,8 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["err"] == "RunnerError('Loader failed')"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
 
-            # the tap should NOT have finished, we'll have a write of the SCHEMA message and then nothing further:
+            # The tap should NOT have finished, we'll have a write of the
+            # SCHEMA message and then nothing further:
             assert matcher.event_matches("SCHEMA")
             assert not matcher.event_matches("RECORD")
             assert not matcher.event_matches("STATE")
@@ -903,9 +918,9 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args)
 
             assert (
-                "Run invocation could not be completed as block failed: Extractor and loader failed"
-                in str(result.exception)
-            )
+                "Run invocation could not be completed as block failed: "
+                "Extractor and loader failed"
+            ) in str(result.exception)
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -961,7 +976,8 @@ class TestCliRunScratchpadOne:
     ):
         args = ["run", tap.name, target.name]
 
-        # Raise a ValueError wrapping a LimitOverrunError, like StreamReader.readline does:
+        # Raise a `ValueError` wrapping a `LimitOverrunError`, like
+        # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         try:  # noqa: WPS328
             raise asyncio.LimitOverrunError(
@@ -975,7 +991,8 @@ class TestCliRunScratchpadOne:
             except ValueError as wrapper_err:
                 tap_process.stdout.readline.side_effect = wrapper_err
 
-        # Have `tap_process.wait` take 1s to make sure the LimitOverrunError exception can be raised before tap finishes
+        # Have `tap_process.wait` take 1s to make sure the `LimitOverrunError`
+        # exception can be raised before tap finishes
         async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value
@@ -987,9 +1004,9 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args)
 
             assert (
-                "Run invocation could not be completed as block failed: Output line length limit exceeded"
-                in str(result.exception)
-            )
+                "Run invocation could not be completed as block failed: "
+                "Output line length limit exceeded"
+            ) in str(result.exception)
             assert result.exit_code == 1
 
             matcher = EventMatcher(result.stderr)
@@ -1055,12 +1072,16 @@ class TestCliRunScratchpadOne:
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
-                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-01",
+                match=(
+                    "block violates set requirements: Expected unique mappings "
+                    "name not the mapper plugin name: mapper-collision-01"
+                ),
             ):
                 result = cli_runner.invoke(cli, args, catch_exceptions=False)
                 assert result.exit_code == 1
 
-        # test mapper/mapping name collision detection - mappings name same a mapper plugin name
+        # Test mapper/mapping name collision detection - mappings name same a
+        # mapper plugin name
         project_add_service.add(
             PluginType.MAPPERS,
             "mapper-collision-02",
@@ -1087,7 +1108,10 @@ class TestCliRunScratchpadOne:
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
-                match="block violates set requirements: Expected unique mappings name not the mapper plugin name: mapper-collision-02",
+                match=(
+                    "block violates set requirements: Expected unique mappings "
+                    "name not the mapper plugin name: mapper-collision-02"
+                ),
             ):
                 result = cli_runner.invoke(cli, args, catch_exceptions=False)
                 assert result.exit_code == 1
@@ -1141,9 +1165,9 @@ class TestCliRunScratchpadOne:
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 1
             assert (
-                "Error: Ambiguous mapping name mock-mapping-dupe, found multiple matches."
-                in result.stderr
-            )
+                "Error: Ambiguous mapping name mock-mapping-dupe, "
+                "found multiple matches."
+            ) in result.stderr
 
     @pytest.mark.backend("sqlite")
     @mock.patch(
@@ -1164,7 +1188,8 @@ class TestCliRunScratchpadOne:
         dbt_process,
         job_logging_service,
     ):
-        # in this scenario, the map fails on the second read. Target should still complete, but dbt should not.
+        # In this scenario, the map fails on the second read. Target should
+        # still complete, but dbt should not.
         args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
 
         mapper_process.wait.return_value = 1
@@ -1199,7 +1224,8 @@ class TestCliRunScratchpadOne:
             # the tap should have completed successfully
             matcher.event_matches("tap done")
 
-            # we should see a debug line for from the run manager indicating a intermediate block failed
+            # We should see a debug line for from the run manager indicating a
+            # intermediate block failed
             matcher.event_matches("Intermediate block in sequence failed.")
 
             # the failed block should have been the mapper
@@ -1259,10 +1285,11 @@ class TestCliRunScratchpadOne:
                 "All ExtractLoadBlocks validated, starting execution."
             )
 
-            # we should have seen the --dry-run specific log line
+            # We should have seen the --dry-run specific log line
             assert matcher.event_matches("Dry run, but would have run block 1/1.")
 
-            # we should NOT see any mock done events, and definitely no block completion log lines
+            # We should NOT see any mock done events, and definitely no block
+            # completion log lines
             assert not matcher.find_by_event("tap done")
             assert not matcher.find_by_event("target done")
             assert not matcher.find_by_event("Block run completed.")
@@ -1294,7 +1321,8 @@ class TestCliRunScratchpadOne:
                 "colors": colors,
             }
 
-        # in this scenario, the tap fails on the third read. Target should still complete.
+        # In this scenario, the tap fails on the third read. Target should
+        # still complete.
         args = ["run", tap.name, target.name]
 
         tap_process.wait.return_value = 1

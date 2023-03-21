@@ -5,6 +5,7 @@ import configparser
 import logging
 import os
 import subprocess
+from contextlib import suppress
 
 from packaging.version import Version
 
@@ -161,7 +162,10 @@ class Airflow(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Airflow metadata database could not be initialized: `airflow initdb` failed",
+                (
+                    "Airflow metadata database could not be initialized: "
+                    "`airflow initdb` failed"
+                ),
                 handle,
             )
 
@@ -175,8 +179,6 @@ class Airflow(BasePlugin):
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]
-        try:
+        with suppress(FileNotFoundError):
             config_file.unlink()
             logging.debug(f"Deleted configuration at {config_file}")
-        except FileNotFoundError:
-            pass

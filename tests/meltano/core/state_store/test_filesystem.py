@@ -235,7 +235,8 @@ class TestAZStorageStateStoreManager:
         mock_container_client.container_name = subject.container_name
         subject.client.get_container_client.return_value = mock_container_client
         mock_container_client.get_blob_client.side_effect = ResourceNotFoundError(
-            "Operation returned an invalid status 'The specified blob does not exist.'\nErrorCode:BlobNotFound"
+            "Operation returned an invalid status 'The specified blob does "
+            "not exist.'\nErrorCode:BlobNotFound"
         )
         try:
             with subject.get_reader("nonexistent"):
@@ -252,7 +253,8 @@ class TestAZStorageStateStoreManager:
         mock_container_client.container_name = subject.container_name
         subject.client.get_container_client.return_value = mock_container_client
         mock_container_client.get_blob_client.side_effect = ResourceNotFoundError(
-            "Operation returned an invalid status 'The specified container does not exist.'\nErrorCode:ContainerNotFound"
+            "Operation returned an invalid status 'The specified container "
+            "does not exist.'\nErrorCode:ContainerNotFound"
         )
         try:
             with subject.get_reader("nonexistent"):

@@ -126,7 +126,7 @@ def job(project, ctx):
     \tmeltano job remove <job_name>
 
     \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
-    """
+    """  # noqa: E501
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
@@ -179,7 +179,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
     \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """
+    """  # noqa: E501
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
@@ -236,7 +236,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list string lists, or mix of both.
     \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """
+    """  # noqa: E501
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
@@ -277,7 +277,10 @@ def remove(ctx, job_name: str):  # noqa: WPS442
 
 
 def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:
-    """Validate the job's tasks by attempting to parse them into valid Blocks and using the Block's validation logic.
+    """Validate a job's tasks.
+
+    Validates the tasks by attempting to parse them into valid `Blocks`, and by
+    using the `Block` validation logic.
 
     Args:
         project: Project to use.

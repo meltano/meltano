@@ -8,6 +8,7 @@ import logging
 import shutil
 import sys
 from asyncio.streams import StreamReader
+from contextlib import suppress
 from hashlib import sha1
 from io import StringIO
 from pathlib import Path
@@ -56,13 +57,17 @@ async def _stream_redirect(
 def _debug_logging_handler(
     name: str, plugin_invoker: PluginInvoker, stderr: StreamReader, *other_dsts
 ) -> asyncio.Task:
-    """Route debug log lines to stderr or an OutputLogger if one is present in our invocation context.
+    """Route debug log lines.
+
+    Routes to stderr, or an `OutputLogger` if one is present in our invocation
+    context.
 
     Args:
         name: name of the plugin
         plugin_invoker: the PluginInvoker to route log lines for
         stderr: stderr StreamReader to route to
-        other_dsts: other destinations that the stream should be routed too along with logging output
+        other_dsts: other destinations that the stream should be routed too
+            along with logging output
 
     Returns:
         asyncio.Task which performs the routing of log lines
@@ -182,7 +187,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
                 args += ["--properties", catalog_path]
             else:
                 logger.warn(
-                    "A catalog file was found, but it will be ignored as the extractor does not advertise the `catalog` or `properties` capability"
+                    "A catalog file was found, but it will be ignored as the "
+                    "extractor does not advertise the `catalog` or "
+                    "`properties` capability"
                 )
 
         state_path = plugin_invoker.files["state"]
@@ -191,7 +198,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
                 args += ["--state", state_path]
             else:
                 logger.warn(
-                    "A state file was found, but it will be ignored as the extractor does not advertise the `state` capability"
+                    "A state file was found, but it will be ignored as the "
+                    "extractor does not advertise the `state` capability"
                 )
 
         return args
@@ -230,10 +238,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
         if exec_args:
             return
 
-        try:
+        with suppress(PluginLacksCapabilityError):
             await self.look_up_state(plugin_invoker)
-        except PluginLacksCapabilityError:
-            pass
 
     async def look_up_state(  # noqa: WPS231, WPS213, WPS210
         self, plugin_invoker: PluginInvoker
@@ -248,7 +254,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
 
         Raises:
             PluginExecutionError: if state could not be found for this plugin
-            PluginLacksCapabilityError: if this plugin does not support incremental state
+            PluginLacksCapabilityError: if this plugin does not support
+                incremental state
         """
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
@@ -257,11 +264,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
 
         state_path = plugin_invoker.files["state"]
 
-        try:
+        with suppress(FileNotFoundError):
             # Delete state left over from different pipeline run for same extractor
             state_path.unlink()
-        except FileNotFoundError:
-            pass
         elt_context = plugin_invoker.context
         if not elt_context or not elt_context.job:
             # Running outside pipeline context: incremental state could not be loaded
@@ -269,7 +274,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
 
         if elt_context.full_refresh:
             logger.info(
-                "Performing full refresh, ignoring state left behind by any previous runs."
+                "Performing full refresh, ignoring state left behind by any "
+                "previous runs."
             )
             return
 
@@ -318,10 +324,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
         if exec_args:
             return
 
-        try:
+        with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
-        except PluginLacksCapabilityError:
-            pass
 
     async def discover_catalog(  # noqa: WPS231, WPS210,
         self, plugin_invoker: PluginInvoker
@@ -340,23 +344,18 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
         if catalog_path.exists():
-            try:
+            with suppress(FileNotFoundError):
                 cached_key = catalog_cache_key_path.read_text()
                 new_cache_key = self.catalog_cache_key(plugin_invoker)
 
                 if cached_key == new_cache_key:
                     logger.debug("Using cached catalog file")
                     return
-            except FileNotFoundError:
-                pass
-
             logging.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
-        try:
+        with suppress(FileNotFoundError):
             catalog_cache_key_path.unlink()
-        except FileNotFoundError:
-            pass
 
         custom_catalog_filename = plugin_invoker.plugin_config_extras["_catalog"]
         if custom_catalog_filename:
@@ -395,13 +394,15 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
             catalog_path: Where discovery output should be written.
 
         Raises:
-            PluginExecutionError: if state could not be found for this plugin
-            PluginLacksCapabilityError: if this plugin does not support incremental state
-            Exception: if any other exception occurs
+            PluginExecutionError: if state could not be found for this plugin.
+            PluginLacksCapabilityError: if this plugin does not support
+                incremental state.
+            Exception: if any other exception occurs.
         """
         if "discover" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support catalog discovery (the `discover` capability is not advertised)"
+                f"Extractor '{self.name}' does not support catalog discovery "
+                "(the `discover` capability is not advertised)"
             )
         with StringIO("") as stderr_buff:
             try:
@@ -453,7 +454,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
                 catalog_path.unlink()
                 stderr_buff.seek(0)
                 raise PluginExecutionError(
-                    f"Catalog discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code} with stderr:\n {stderr_buff.read()}"
+                    "Catalog discovery failed: command "
+                    f"{plugin_invoker.exec_args('--discover')} returned "
+                    f"{exit_code} with stderr:\n {stderr_buff.read()}"
                 )
 
     @hook("before_invoke")
@@ -473,10 +476,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
         if exec_args:
             return
 
-        try:
+        with suppress(PluginLacksCapabilityError):
             self.apply_catalog_rules(plugin_invoker, exec_args)
-        except PluginLacksCapabilityError:
-            pass
 
     def apply_catalog_rules(  # noqa: WPS213, WPS231, WPS210
         self,
@@ -501,7 +502,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
             and "properties" not in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support entity selection or catalog metadata and schema rules"
+                f"Extractor '{self.name}' does not support entity selection "
+                "or catalog metadata and schema rules"
             )
 
         config = plugin_invoker.plugin_config_extras
@@ -543,10 +545,8 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
             if cache_key:
                 catalog_cache_key_path.write_text(cache_key)
             else:
-                try:  # noqa: WPS505
+                with suppress(FileNotFoundError):
                     catalog_cache_key_path.unlink()
-                except FileNotFoundError:
-                    pass
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 "Applying catalog rules failed: catalog file is missing."

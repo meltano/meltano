@@ -31,15 +31,16 @@ REQUEST_TIMEOUT_SECONDS = 30.0
 
 
 class DiscoveryInvalidError(Exception):
-    """Occurs when the discovery.yml fails to be parsed."""
+    """The discovery.yml fails to be parsed."""
 
 
 class DiscoveryUnavailableError(Exception):
-    """Occurs when the discovery.yml cannot be found or downloaded."""
+    """The discovery.yml cannot be found or downloaded."""
 
 
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
+# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for
+# more information.
 VERSION = 22
 
 
@@ -208,11 +209,14 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
                 errored = True
 
                 logging.warning(
-                    f"{description.capitalize()} has version {err.file_version}, while this version of Meltano requires version {err.version}."
+                    f"{description.capitalize()} has version "
+                    f"{err.file_version}, while this version of Meltano "
+                    f"requires version {err.version}."
                 )
                 if err.file_version > err.version:
                     logging.warning(
-                        "Please install the latest compatible version of Meltano using `meltano upgrade`."
+                        "Please install the latest compatible version of "
+                        "Meltano using `meltano upgrade`."
                     )
             except DiscoveryInvalidError as err:
                 errored = True

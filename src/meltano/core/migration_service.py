@@ -26,7 +26,7 @@ class MigrationError(Exception):
 
 
 class MigrationUneededException(Exception):
-    """Occurs when no migrations are needed."""
+    """No migrations are needed."""
 
 
 class MigrationService:
@@ -107,7 +107,8 @@ class MigrationService:
         except Exception as err:
             logging.exception(str(err))
             raise MigrationError(
-                "Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)"
+                "Cannot upgrade the system database. It might be corrupted or "
+                "was created before database migrations where introduced (v0.34.0)"
             )
         finally:
             conn.close()
