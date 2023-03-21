@@ -58,9 +58,6 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self.config = config or MeltanoCloudConfig()
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
-        self.runner_api_url = self.config.runner_api_url
-        self.api_key = self.config.runner_api_key
-        self.runner_secret = self.config.runner_secret
         try:
             self.version = version("meltano.cloud.cli")
         except Exception:
@@ -220,7 +217,10 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         Returns:
             The Cloud Runners URL.
         """
-        return f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
+        return (
+            f"/run/v1/external/"
+            f"{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
+        )
 
     async def run_project(
         self,
@@ -228,7 +228,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         project_id: str,
         deployment: str,
         job_or_schedule: str,
-    ) -> dict | str:
+    ):
         """Run a Meltano project in Meltano Cloud.
 
         Args:
@@ -236,20 +236,15 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             project_id: The Meltano Cloud project ID.
             deployment: The name of the Meltano Cloud deployment in which to run.
             job_or_schedule: The name of the job or schedule to run.
-
-        Returns:
-            The run details.
         """
-        with self.headers(
-            {
-                "x-api-key": self.api_key,
-                "meltano-runner-secret": self.runner_secret,
-            }
-        ):
-            return await self._json_request(
+        async with self.authenticated():
+            url = (
+                "/run/v1/external/"
+                f"{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
+            )
+            await self._json_request(
                 "POST",
-                f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}",
-                base_url=self.runner_api_url,
+                url,
             )
 
     async def schedule_put_enabled(
