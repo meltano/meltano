@@ -97,11 +97,6 @@ repos:
       - id: black
         exclude: ^(src/meltano/migrations/)
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.3.1
     hooks:
@@ -125,7 +120,6 @@ repos:
           - flake8-debugger==4.1.2
           - flake8-docstrings==1.6.0
           - flake8-eradicate==1.4.0
-          - flake8-isort==4.2.0
           - flake8-polyfill==1.0.2
           - flake8-quotes==3.3.1
           - flake8-rst-docstrings==0.2.7

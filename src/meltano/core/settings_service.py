@@ -16,9 +16,8 @@ from meltano.core.setting_definition import (
     SettingMissingError,
 )
 from meltano.core.settings_store import SettingValueStore
-from meltano.core.utils import EnvVarMissingBehavior
+from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
-from meltano.core.utils import flatten
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
