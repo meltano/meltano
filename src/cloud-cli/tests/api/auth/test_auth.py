@@ -21,7 +21,7 @@ class TestMeltanoCloudAuth:
 
     @pytest.fixture
     def subject(self, monkeypatch: pytest.MonkeyPatch, config: MeltanoCloudConfig):
-        monkeypatch.setenv("MELTANO_CLOUD_AUTH_CALLBACK_PORT", 8080)
+        monkeypatch.setenv("MELTANO_CLOUD_AUTH_CALLBACK_PORT", "8080")
         monkeypatch.setenv("MELTANO_CLOUD_BASE_AUTH_URL", "http://meltano-cloud-test")
         monkeypatch.setenv("MELTANO_CLOUD_APP_CLIENT_ID", "meltano-cloud-test")
         return MeltanoCloudAuth(config=config)

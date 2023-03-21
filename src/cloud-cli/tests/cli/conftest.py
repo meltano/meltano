@@ -37,7 +37,7 @@ def id_token(tenant_resource_key: str, internal_project_id: str):
 
 
 @pytest.fixture
-def config(config_path: Path, id_token: str):
+def config(config_path: Path, id_token: str) -> MeltanoCloudConfig:
     """Return a MeltanoCloudConfig instance with fake credentials."""
     config = MeltanoCloudConfig(  # noqa: S106
         config_path=config_path,
@@ -52,6 +52,6 @@ def config(config_path: Path, id_token: str):
 
 
 @pytest.fixture
-def client(config: MeltanoCloudConfig):
+def client(config: MeltanoCloudConfig) -> MeltanoCloudClient:
     """Return a MeltanoCloudClient instance with fake credentials."""
     return MeltanoCloudClient(config=config)

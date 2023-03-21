@@ -6,6 +6,7 @@ import json
 import sys
 import typing as t
 from contextlib import asynccontextmanager, contextmanager, suppress
+from http import HTTPStatus
 from urllib.parse import urljoin
 
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
@@ -40,7 +41,7 @@ class MeltanoCloudError(Exception):
         super().__init__(response.reason)
 
 
-class MeltanoCloudClient:  # noqa: WPS214
+class MeltanoCloudClient:  # noqa: WPS214, WPS230
     """Client for the Meltano Cloud API.
 
     Attributes:
@@ -60,6 +61,10 @@ class MeltanoCloudClient:  # noqa: WPS214
         self.runner_api_url = self.config.runner_api_url
         self.api_key = self.config.runner_api_key
         self.runner_secret = self.config.runner_secret
+        try:
+            self.version = version("meltano.cloud.cli")
+        except Exception:
+            self.version = version("meltano")
 
     async def __aenter__(self) -> MeltanoCloudClient:
         """Enter the client context.
@@ -71,7 +76,7 @@ class MeltanoCloudClient:  # noqa: WPS214
         self._session.headers.update(
             {
                 "Content-Type": "application/json",
-                "User-Agent": f"Meltano Cloud CLI/v{version('meltano.cloud.cli')}",
+                "User-Agent": f"Meltano Cloud CLI/v{self.version}",
             }
         )
         return self
@@ -162,11 +167,7 @@ class MeltanoCloudClient:  # noqa: WPS214
             MeltanoCloudError: If the response status is not OK.
         """
         url = urljoin(base_url if base_url else self.api_url, path)
-        logger.debug(
-            "Making request",
-            method=method,
-            url=url,
-        )
+        logger.debug("Making Cloud CLI HTTP request", method=method, url=url)
         async with self.session.request(method, url, **kwargs) as response:
             try:
                 response.raise_for_status()
@@ -193,12 +194,7 @@ class MeltanoCloudClient:  # noqa: WPS214
             The response JSON if response body is json,
             else the response content as a string.
         """
-        async with self._raw_request(
-            method,
-            path,
-            base_url=base_url,
-            **kwargs,
-        ) as response:
+        async with self._raw_request(method, path, base_url, **kwargs) as response:
             content = await response.content.read()
             decoded_content = content.decode()
             try:
@@ -255,6 +251,48 @@ class MeltanoCloudClient:  # noqa: WPS214
                 f"/{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}",
                 base_url=self.runner_api_url,
             )
+
+    async def schedule_put_enabled(
+        self,
+        *,
+        deployment: str,
+        schedule: str,
+        enabled: bool,
+    ):
+        """Use PUT to update the enabled state of a Meltano Cloud project schedule.
+
+        Args:
+            deployment: The name of the deployment the schedule belongs to.
+            schedule: The name of the schedule to enable/disable.
+            enabled: Whether the schedule should be enabled.
+
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
+        """
+        async with self.authenticated():
+            try:
+                await self._json_request(
+                    "PUT",
+                    (
+                        "/schedules/v1/"
+                        f"{self.config.tenant_resource_key}/"
+                        f"{self.config.internal_project_id}/"
+                        "enabled"
+                    ),
+                    json={
+                        "deployment_name": deployment,
+                        "schedule_name": schedule,
+                        "enabled": enabled,
+                    },
+                )
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.NOT_FOUND:
+                    ex.response.reason = (
+                        f"Unable to find schedule with name {schedule!r} "
+                        f"within a deployment named {deployment!r}"
+                    )
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
 
     @asynccontextmanager
     async def stream_logs(
