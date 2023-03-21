@@ -908,6 +908,21 @@ tests = ["coverage[toml]", "freezegun (>=0.2.8)", "pretend", "pytest (>=6.0)", "
 typing = ["mypy", "rich", "twisted"]
 
 [[package]]
+name = "tabulate"
+version = "0.9.0"
+description = "Pretty-print tabular data"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f"},
+    {file = "tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c"},
+]
+
+[package.extras]
+widechars = ["wcwidth"]
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -1074,4 +1089,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "d2e9d3a48530ecd8c0caf45300cb8f0a790410cbeb3baab11d8fab8b09670af7"
+content-hash = "29ce34eb0857e58a8d0a3a6dc5492e63b26cb08cd6b752ae9d7fe7eebf022c7f"

@@ -287,6 +287,40 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     raise MeltanoCloudError(ex.response) from ex
                 raise
 
+    async def get_execution_history(
+        self,
+        *,
+        schedule: str | None = None,
+        page_size: int = 10,
+        page_token: str | None = None,
+    ) -> dict:
+        """Get the execution history for a Meltano Cloud project.
+
+        Args:
+            schedule: The name of the schedule to get the history for.
+            page_size: The number of executions to return.
+            page_token: The page token to use for pagination.
+
+        Returns:
+            The execution history.
+        """
+        params = {"page_size": page_size}
+
+        if page_token:
+            params["page_token"] = page_token
+
+        async with self.authenticated():
+            url = (
+                "/history/v1/"
+                f"{self.config.tenant_resource_key}/"
+                f"{self.config.internal_project_id}"
+            )
+
+            if schedule:
+                params["schedule"] = schedule
+
+            return await self._json_request("GET", url, params=params)
+
     @asynccontextmanager
     async def stream_logs(
         self,
