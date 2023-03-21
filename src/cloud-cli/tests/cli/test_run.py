@@ -6,6 +6,7 @@ import json
 import typing as t
 from urllib.parse import urljoin
 
+import pytest
 from aioresponses import aioresponses
 from click.testing import CliRunner
 
@@ -21,14 +22,17 @@ class TestCloudRun:
 
     def test_run_ok(
         self,
+        monkeypatch: pytest.MonkeyPatch,
         tenant_resource_key: str,
         internal_project_id: str,
-        deployment: str,
-        job_or_schedule: str,
         client: MeltanoCloudClient,
         config: MeltanoCloudConfig,
     ):
         """Test the `run` subcommand."""
+        monkeypatch.setenv("MELTANO_CLOUD_ORGANIZATION_ID", tenant_resource_key)
+
+        deployment = "sandbox"
+        job_or_schedule = "daily"
         path = (
             f"run/v1/external/"
             f"{tenant_resource_key}/{internal_project_id}/"
@@ -41,7 +45,11 @@ class TestCloudRun:
                 status=200,
                 body=json.dumps({"sub": "meltano-cloud-test"}),
             )
-            m.post(urljoin(client.api_url, path), status=200)
+            m.post(
+                urljoin(client.api_url, path),
+                status=200,
+                body=b"Running a Meltano project in Meltano Cloud",
+            )
             result = CliRunner().invoke(
                 cli,
                 [
@@ -56,4 +64,4 @@ class TestCloudRun:
                 ],
             )
             assert result.exit_code == 0
-            assert "Running Job" in result.output
+            assert "Running a Meltano project in Meltano Cloud" in result.output

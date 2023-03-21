@@ -22,18 +22,6 @@ def internal_project_id():
 
 
 @pytest.fixture
-def deployment():
-    """Return a fake deployment ID."""
-    return "sandbox"
-
-
-@pytest.fixture
-def job_or_schedule():
-    """Return a fake job or schedule name."""
-    return "daily"
-
-
-@pytest.fixture
 def id_token(tenant_resource_key: str, internal_project_id: str):
     """Return a fake ID token.
 
