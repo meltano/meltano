@@ -7,15 +7,15 @@ from meltano.core.job_state import JobState
 
 
 class UnsupportedStateBackendURIError(Exception):
-    """Occurs when a provided state backend URI is not supported."""
+    """Provided state backend URI is not supported."""
 
 
 class MissingStateBackendSettingsError(Exception):
-    """Occurs when required setting values for a configured State Backend are missing from the Meltano project."""
+    """Required setting values for a configured State Backend are missing."""
 
 
 class StateIDLockedError(Exception):
-    """Occurs whan a job attempts to acquire a lock on an already-locked state ID."""
+    """A job attempted to acquire a lock on an already-locked state ID."""
 
 
 class StateStoreManager(ABC):

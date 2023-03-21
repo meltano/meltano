@@ -33,9 +33,8 @@ class TestPluginTestServiceFactory:
 
         with pytest.raises(PluginNotSupportedError) as err:
             PluginTestServiceFactory(self.mock_invoker).get_test_service()
-            assert (
-                str(err.value)
-                == f"Operation not supported for {target.type.descriptor} '{target.name}'"
+            assert str(err.value) == (
+                f"Operation not supported for {target.type.descriptor} {target.name!r}"
             )
 
 

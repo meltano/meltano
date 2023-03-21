@@ -119,10 +119,15 @@ class MeltanoFile(Canonical):
 
     @staticmethod
     def get_plugins_for_mappings(mapper_config: dict) -> list[ProjectPlugin]:
-        """Mapper plugins are a special case. They are not a single plugin, but actually a list of plugins generated from the mapping config defined within the mapper config.
+        """Get plugins for mappings.
+
+        Mapper plugins are a special case. They are not a single plugin, but
+        actually a list of plugins generated from the mapping config defined
+        within the mapper config.
 
         Args:
-            mapper_config: The dict representation of a mapper config found in in meltano.yml.
+            mapper_config: The dict representation of a mapper config found in
+                in `meltano.yml`.
 
         Returns:
             A list of `ProjectPlugin` instances.

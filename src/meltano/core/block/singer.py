@@ -61,7 +61,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
 
     @property
     def command(self) -> str | None:
-        """Command is the specific plugin command to use when invoking the plugin (if any).
+        """Get the command to use when invoking the plugin.
 
         Returns:
             The command to use when invoking the plugin.
@@ -128,7 +128,8 @@ class InvokerBase:  # noqa: WPS230, WPS214
             The stdout proxy future.
 
         Raises:
-            IOLinkError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so there is no IO
+                to proxy.
         """
         if self.process_handle is None:
             raise IOLinkError("No IO to proxy, process not running")
@@ -148,7 +149,8 @@ class InvokerBase:  # noqa: WPS230, WPS214
             The stderr proxy future.
 
         Raises:
-            IOLinkError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so there is no IO
+                to proxy.
         """
         if self.process_handle is None:
             raise IOLinkError("No IO to proxy, process not running")
@@ -289,7 +291,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def producer(self) -> bool:
-        """Whether or not this plugin is a producer.
+        """Whether this plugin is a producer.
 
         Currently if the underlying plugin is of type extractor, it is a producer.
 
@@ -300,7 +302,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def consumer(self) -> bool:
-        """Whether or not this plugin is a consumer.
+        """Whether this plugin is a consumer.
 
         Currently if the underlying plugin is of type loader, it is a consumer.
 
@@ -311,7 +313,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def has_state(self) -> bool:
-        """Whether or not this plugin has state.
+        """Whether this plugin has state.
 
         Returns:
             bool indicating whether this plugin has state
@@ -345,7 +347,7 @@ class SingerBlock(InvokerBase, IOBlock):
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
-            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+            kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
             return

@@ -228,7 +228,8 @@ class Project(Versioned):  # noqa: WPS214
         except OSError as error:
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
-                    f"Could not create symlink: {error}\nPlease make sure that the underlying filesystem supports symlinks."
+                    f"Could not create symlink: {error}\nPlease make sure "
+                    "that the underlying filesystem supports symlinks."
                 )
             else:
                 raise
@@ -258,17 +259,19 @@ class Project(Versioned):  # noqa: WPS214
         """Find a Project.
 
         Args:
-            project_root: The path to the root directory of the project. If not supplied,
-                infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
-            activate: Save the found project so that future calls to `find` will
-                continue to use this project.
+            project_root: The path to the root directory of the project. If not
+                supplied, infer from PROJECT_ROOT_ENV or the current working
+                directory and it's parents.
+            activate: Save the found project so that future calls to `find`
+                will continue to use this project.
 
         Returns:
             the found project
 
         Raises:
-            ProjectNotFound: if the provided `project_root` is not a Meltano project, or
-                the current working directory is not a Meltano project or a subfolder of one.
+            ProjectNotFound: if the provided `project_root` is not a Meltano
+                project, or the current working directory is not a Meltano
+                project or a subfolder of one.
         """
         if cls._default:
             return cls._default

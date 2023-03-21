@@ -85,9 +85,20 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         """
         return "\n".join(
             (
-                f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
-                f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
-                f"#     meltano config --plugin-type={self.type} {self.name} set _update {relative_path} false",
+                (
+                    f"# This file is managed by the '{self.name}' "
+                    f"{self.type.descriptor} and updated automatically when "
+                    "`meltano upgrade` is run."
+                ),
+                (
+                    f"# To prevent any manual changes from being overwritten, "
+                    f"remove the {self.type.descriptor} from `meltano.yml` or "
+                    "disable automatic updates:"
+                ),
+                (
+                    f"#     meltano config --plugin-type={self.type} "
+                    f"{self.name} set _update {relative_path} false"
+                ),
             )
         )
 

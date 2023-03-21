@@ -338,7 +338,8 @@ class TestAutoStoreManager:
             # Even though `.env` can't be overwritten
             assert_value_source("from_dotenv", Store.DOTENV)
 
-        # Falls back on system database when neither `.env` or `meltano.yml` are supported
+        # Falls back on system database when
+        # neither `.env` or `meltano.yml` are supported
         with unsupported(Store.DOTENV), unsupported(Store.MELTANO_YML):
             metadata = set_value("from_db")
             assert metadata["store"] == Store.DB

@@ -34,7 +34,7 @@ logger = structlog.getLogger(__name__)
 
 
 class BlockSetHasNoStateError(Exception):
-    """Occurs when state_service is accessed for ExtractLoadBlocks instance for which no block has state."""
+    """Block has no state."""
 
 
 class ELBContext:  # noqa: WPS230
@@ -143,8 +143,8 @@ class ELBContextBuilder:  # noqa: WPS214
     def with_no_state_update(self, no_state_update: bool):
         """Set whether this run should not update state.
 
-        By default we typically attempt to track state. This allows avoiding state management.
-
+        By default we typically attempt to track state. This allows avoiding
+        state management.
 
         Args:
             no_state_update: whether this run should update state.
@@ -276,7 +276,7 @@ class ELBContextBuilder:  # noqa: WPS214
 
 
 class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
-    """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
+    """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
         self,
@@ -338,7 +338,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     project=self.context.project, session=self.context.session
                 )
             else:
-                raise BlockSetHasNoStateError()
+                raise BlockSetHasNoStateError
         return self._state_service
 
     def index_last_input_done(self) -> int | None:
@@ -346,7 +346,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Returns:
             The index of the block furthest from the start that has exited and required input.
-        """
+        """  # noqa: E501
         for idx, block in reversed(list(enumerate(self.blocks))):
             if block.requires_input and block.proxy_stderr.done():
                 return idx
@@ -436,7 +436,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 return
         else:
             logger.warning(
-                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
+                "No active environment, proceeding with stateless run! See "
+                "https://docs.meltano.com/reference/command-line-interface#run "
+                "for details."
             )
         await self.execute()
 
@@ -444,7 +446,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """Run the ELT task within the context of a job.
 
         Raises:
-            RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
+            RunnerError: if failures are encountered during execution or if the
+                underlying pipeline/job is already running.
         """
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
@@ -452,8 +455,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
                 raise RunnerError(
-                    f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
-                    + "To ignore this check use the '--force' option."
+                    f"Another '{job.job_name}' pipeline is already running "
+                    f"which started at {existing.started_at}. To ignore this "
+                    "check use the '--force' option."
                 )
 
         with closing(self.context.session) as session:
@@ -466,7 +470,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Not actually implemented yet.
 
         Args:
-            graceful: Whether or not the BlockSet should try to gracefully quit.
+            graceful: Whether the BlockSet should try to gracefully quit.
 
         Raises:
             NotImplementedError: if graceful termination is not implemented.
@@ -534,7 +538,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Returns:
             The intermediate blocks in the block set.
-        """
+        """  # noqa: E501
         return self.blocks[1:-1]
 
     @asynccontextmanager
@@ -559,7 +563,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     async def _link_io(self) -> None:  # noqa: WPS231
         """Link the blocks in the set together.
 
-        This method does one last validation check to ensure that a consumer has a producer upstream.
+        This method does one last validation check to ensure that a consumer
+        has a producer upstream.
 
         Raises:
             BlockSetValidationError: if consumer does not have an upstream producer.
@@ -599,10 +604,10 @@ class ELBExecutionManager:
     """Execution manager for ExtractLoadBlock sets."""
 
     def __init__(self, elb: ExtractLoadBlocks) -> None:
-        """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
+        """Initialize the `ELBExecutionManager`.
 
         Args:
-            elb: The ExtractLoadBlocks to manage.
+            elb: The `ExtractLoadBlocks` to manage.
         """
         self.elb = elb
         self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
@@ -635,11 +640,13 @@ class ELBExecutionManager:
         if self.elb.upstream_complete(len(self.elb.blocks) - 1):
             self._producer_code = producer.process_future.result()
         else:
-            # If the last consumer (target) completes before the upstream producers, it failed before processing all
-            # output. So we should kill the upstream producers and cancel output processing since there's no final
-            # destination to forward output to.
+            # If the last consumer (target) completes before the upstream
+            # producers, it failed before processing all output. So we should
+            # kill the upstream producers and cancel output processing since
+            # there's no final destination to forward output to.
             await self.elb.upstream_stop(len(self.elb.blocks) - 1)
-            # Pretend the producer (tap) finished successfully since it didn't itself fail
+            # Pretend the producer (tap) finished successfully since it didn't
+            # itself fail
             self._producer_code = 0
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
@@ -680,7 +687,8 @@ class ELBExecutionManager:
 
         output_futures_failed = first_failed_future(output_exception_future, done)
         if output_futures_failed:
-            # Special behavior for a producer stdout handler raising a line length limit error.
+            # Special behavior for a producer stdout handler raising a line
+            # length limit error.
             if self.elb.head.proxy_stdout() == output_futures_failed:
                 handle_producer_line_length_limit_error(
                     output_futures_failed.exception(),
@@ -689,9 +697,10 @@ class ELBExecutionManager:
                 )
             raise output_futures_failed.exception()
         else:
-            # If all the output handlers completed without raising an exception,
-            # we still need to wait for all the underlying block processes to complete.
-            # note that since all output handlers completed we DO NOT need to wait for any output futures!
+            # If all the output handlers completed without raising an
+            # exception, we still need to wait for all the underlying block
+            # processes to complete. Note that since all output handlers
+            # completed we DO NOT need to wait for any output futures!
             done = await self.elb.process_wait(None, start_idx)
         if self.elb.tail.process_future.done():
             logger.debug("tail consumer completed first")
@@ -706,7 +715,10 @@ class ELBExecutionManager:
             logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
             raise RunnerError(
-                "Unexpected completion sequence in ExtractLoadBlock set. Intermediate block (likely a mapper) failed.",
+                (
+                    "Unexpected completion sequence in ExtractLoadBlock set. "
+                    "Intermediate block (likely a mapper) failed."
+                ),
                 {
                     PluginType.EXTRACTORS: 1,
                     PluginType.LOADERS: 1,
@@ -753,7 +765,9 @@ class ELBExecutionManager:
 
 
 def _check_exit_codes(  # noqa: WPS238
-    producer_code: int, consumer_code: int, intermediate_codes: dict[str, int]
+    producer_code: int,
+    consumer_code: int,
+    intermediate_codes: dict[str, int],
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
 
@@ -765,31 +779,36 @@ def _check_exit_codes(  # noqa: WPS238
     Raises:
         RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """
-    if producer_code and consumer_code:
-        raise RunnerError(
-            "Extractor and loader failed",
-            {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
-        )
-
     if producer_code:
+        if consumer_code:
+            raise RunnerError(
+                "Extractor and loader failed",
+                {
+                    PluginType.EXTRACTORS: producer_code,
+                    PluginType.LOADERS: consumer_code,
+                },
+            )
         raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})
 
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
 
-    failed_mappers = []
-    for mapper_id in intermediate_codes.keys():
-        if intermediate_codes[mapper_id]:
-            failed_mappers.append({mapper_id: intermediate_codes[mapper_id]})
-
+    failed_mappers = [
+        {mapper_id: exit_code}
+        for mapper_id, exit_code in intermediate_codes.items()
+        if exit_code
+    ]
     if failed_mappers:
         raise RunnerError("Mappers failed", failed_mappers)
 
 
 def generate_state_id(
-    project: Project, state_id_suffix: str | None, consumer: IOBlock, producer: IOBlock
+    project: Project,
+    state_id_suffix: str | None,
+    consumer: IOBlock,
+    producer: IOBlock,
 ) -> str:
-    """Generate a state id based on a project active environment and consumer and producer names.
+    """Generate a state ID from the active environment and consumer & producer names.
 
     Args:
         project: Project to retrieve active environment from.
@@ -805,7 +824,7 @@ def generate_state_id(
     """
     if not project.environment:
         raise RunnerError(
-            "No active environment for invocation, but requested state id"
+            "No active environment for invocation, but requested state ID"
         )
 
     state_id_components = [
@@ -816,7 +835,8 @@ def generate_state_id(
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
         raise RunnerError(
-            f"Cannot generate a state ID from components containing the delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            "Cannot generate a state ID from components containing the "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
         )
 
     return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)

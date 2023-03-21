@@ -84,7 +84,10 @@ class MockAdapter(BaseAdapter):
                         default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        )
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -102,7 +105,10 @@ class MockAdapter(BaseAdapter):
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        )
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"

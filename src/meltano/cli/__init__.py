@@ -47,8 +47,8 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 
-# Holds the exit code for error reporting during process exiting. In particular, a function
-# registered by the `atexit` module uses this value.
+# Holds the exit code for error reporting during process exiting. In
+# particular, a function registered by the `atexit` module uses this value.
 exit_code: None | int = None
 
 atexit_handler_registered = False

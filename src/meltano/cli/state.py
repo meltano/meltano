@@ -1,4 +1,5 @@
 """State management in CLI."""
+
 from __future__ import annotations
 
 import json
@@ -28,7 +29,7 @@ logger = structlog.getLogger(__name__)
 
 
 class MutuallyExclusiveOptionsError(Exception):
-    """Occurs when mutually exclusive options are provided incorrectly."""
+    """Mutually exclusive options are provided incorrectly."""
 
     def __init__(self, *options: str) -> None:
         """Instantiate the error.
@@ -163,7 +164,7 @@ def copy_state(
     dst_state_id: str,
     force: bool,
 ):
-    """Copy state to another job id."""
+    """Copy state to another job ID."""
     # Retrieve state for copying
     state_service: StateService = (
         state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -172,7 +173,8 @@ def copy_state(
     state_service.copy_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {dst_state_id} was successfully copied from {src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {dst_state_id} was successfully copied from "
+        f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
@@ -191,7 +193,7 @@ def move_state(
     dst_state_id: str,
     force: bool,
 ):
-    """Move state to another job id, clearing the original."""
+    """Move state to another job ID, clearing the original."""
     # Retrieve state for moveing
     state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -200,7 +202,8 @@ def move_state(
     state_service.move_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {src_state_id} was successfully moved to {dst_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {src_state_id} was successfully moved to {dst_state_id} "
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
@@ -248,7 +251,8 @@ def merge_state(
     elif from_state_id:
         state_service.merge_state(from_state_id, state_id)
     logger.info(
-        f"State for {state_id} was successfully merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {state_id} was successfully "
+        f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 
@@ -289,7 +293,8 @@ def set_state(
     elif state:
         state_service.set_state(state_id, state)
     logger.info(
-        f"State for {state_id} was successfully set at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {state_id} was successfully set "
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
     )
 
 

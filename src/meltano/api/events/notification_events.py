@@ -94,7 +94,8 @@ class NotificationEvents:
             # ensure it is not a duplicate mail
             if subscription.recipient in sent_recipients:
                 logger.debug(
-                    f"Skipping duplicate notification for recipient '{subscription.recipient}'."
+                    "Skipping duplicate notification for "
+                    f"recipient '{subscription.recipient}'."
                 )
                 continue
 

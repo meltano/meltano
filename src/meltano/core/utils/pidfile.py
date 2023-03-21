@@ -52,7 +52,7 @@ class PIDFile:
 
 
 class UnknownProcessError(Exception):
-    """Occurs when the PIDFile doesn't yield a readable PID."""
+    """The PIDFile doesn't yield a readable PID."""
 
     def __init__(self, pid_file: PIDFile):
         self.pid_file = pid_file
