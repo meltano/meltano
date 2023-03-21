@@ -224,23 +224,21 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
 
     async def run_project(
         self,
-        tenant_resource_key: str,
-        project_id: str,
         deployment: str,
         job_or_schedule: str,
     ):
         """Run a Meltano project in Meltano Cloud.
 
         Args:
-            tenant_resource_key: The tenant resource key.
-            project_id: The Meltano Cloud project ID.
             deployment: The name of the Meltano Cloud deployment in which to run.
             job_or_schedule: The name of the job or schedule to run.
         """
         async with self.authenticated():
             url = (
                 "/run/v1/external/"
-                f"{tenant_resource_key}/{project_id}/{deployment}/{job_or_schedule}"
+                f"{self.config.tenant_resource_key}/"
+                f"{self.config.internal_project_id}/"
+                f"{deployment}/{job_or_schedule}"
             )
             await self._json_request(
                 "POST",
