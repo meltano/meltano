@@ -563,11 +563,13 @@ exclude = [
 ignore = [
   "ANN101", # Missing type annotation for `self` in method
   "ANN102", # Missing type annotation for `cls` in class method
+  "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
 ]
 select = [
   "E",   # pycodestyle (error)
   "F",   # pyflakes
   "I",   # isort
+  "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]
 
