@@ -7,14 +7,65 @@ import re
 import typing as t
 from urllib.parse import urljoin
 
+import pytest
 from aioresponses import aioresponses
 from click.testing import CliRunner
 
 from meltano.cloud.cli import cloud as cli
+from meltano.cloud.cli.history import process_table_row
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api import MeltanoCloudClient
     from meltano.cloud.api.config import MeltanoCloudConfig
+
+
+@pytest.mark.parametrize(
+    "execution, expected",
+    [
+        pytest.param(
+            {
+                "execution_id": "123",
+                "start_time": "2023-09-02T00:00:00+00:00",
+                "end_time": "2023-09-02T00:10:00+00:00",
+                "status": "STOPPED",
+                "exit_code": 0,
+                "environment_name": "dev",
+                "schedule_name": "daily",
+                "job_name": "N/A",
+            },
+            (
+                "123",
+                "daily",
+                "2023-09-02T00:00:00+00:00",
+                "Success",
+                "00:10:00",
+            ),
+            id="stopped",
+        ),
+        pytest.param(
+            {
+                "execution_id": "123",
+                "start_time": "2023-09-02T00:00:00+00:00",
+                "end_time": None,
+                "status": "RUNNING",
+                "exit_code": None,
+                "environment_name": "dev",
+                "schedule_name": "daily",
+                "job_name": "N/A",
+            },
+            (
+                "123",
+                "daily",
+                "2023-09-02T00:00:00+00:00",
+                "Running",
+                "N/A",
+            ),
+            id="running",
+        ),
+    ],
+)
+def test_table_rows(execution: dict, expected: tuple):
+    assert process_table_row(execution) == expected
 
 
 class TestHistoryCommand:
