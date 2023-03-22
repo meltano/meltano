@@ -293,7 +293,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         schedule: str | None = None,
         page_size: int = 10,
         page_token: str | None = None,
-    ) -> dict:
+    ):
         """Get the execution history for a Meltano Cloud project.
 
         Args:
@@ -304,7 +304,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         Returns:
             The execution history.
         """
-        params = {"page_size": page_size}
+        params: dict[str, t.Any] = {"page_size": page_size}
 
         if page_token:
             params["page_token"] = page_token

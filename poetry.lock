@@ -4207,6 +4207,18 @@ files = [
 types-awscrt = "*"
 
 [[package]]
+name = "types-tabulate"
+version = "0.9.0.1"
+description = "Typing stubs for tabulate"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-tabulate-0.9.0.1.tar.gz", hash = "sha256:e486292c279f19247865bdabe802419740a0e74b53444e7f7a8009e08129da5d"},
+    {file = "types_tabulate-0.9.0.1-py3-none-any.whl", hash = "sha256:be2ea0de05f615ccfcbadf6206aa720e265955eb1de23e343aec9d8bf3fa9aaa"},
+]
+
+[[package]]
 name = "types-urllib3"
 version = "1.26.25.8"
 description = "Typing stubs for urllib3"
@@ -4703,4 +4715,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "917fe0fa1dec99c8d5a0a52bdbcf734c21dda22304660579da9f7ebcc40303a1"
+content-hash = "391e8529ea085b7f2c6651aed6825833a7f58ad0de80e20427d2edb8a809b757"

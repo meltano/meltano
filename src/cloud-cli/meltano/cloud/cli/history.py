@@ -71,10 +71,9 @@ def _format_history_table(history: list[CloudExecution]) -> str:
 
     for execution in history:
         start_time = datetime.datetime.fromisoformat(execution["start_time"])
-        end_time = execution["end_time"]
 
-        if end_time:
-            end_time = datetime.datetime.fromisoformat(end_time)
+        if execution["end_time"]:
+            end_time = datetime.datetime.fromisoformat(execution["end_time"])
             td = end_time - start_time
             duration = f"{td.total_seconds() / 60:.2f} minutes"
         else:
