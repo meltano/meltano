@@ -140,7 +140,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         return jwt.decode(token, options={"verify_signature": False})
 
     @cached_property
-    def _trks_and_pids(self) -> t.List[str]:
+    def _trks_and_pids(self) -> list[str]:
         """Get tenant resource keys and project ids from id token.
 
         Returns:
