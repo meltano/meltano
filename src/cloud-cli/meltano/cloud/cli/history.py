@@ -57,7 +57,7 @@ async def _get_history(
     return results[:limit]
 
 
-def _format_history_table(history: list[CloudExecution]) -> str:
+def _format_history_table(history: list[CloudExecution], table_format: str) -> str:
     """Format the history as a table.
 
     Args:
@@ -92,7 +92,7 @@ def _format_history_table(history: list[CloudExecution]) -> str:
             ],
         )
 
-    return tabulate.tabulate(table, headers, tablefmt="github")
+    return tabulate.tabulate(table, headers, tablefmt=table_format)
 
 
 @cloud.command()
@@ -113,8 +113,8 @@ def _format_history_table(history: list[CloudExecution]) -> str:
     "--format",
     "output_format",
     required=False,
-    default="table",
-    type=click.Choice(["table", "json"]),
+    default="terminal",
+    type=click.Choice(["terminal", "markdown", "json"]),
     help="The output format to use.",
 )
 @click.pass_context
@@ -136,7 +136,9 @@ def history(
 
     if output_format == "json":
         output = json.dumps(items, indent=2)
+    elif output_format == "markdown":
+        output = _format_history_table(items, table_format="github")
     else:
-        output = _format_history_table(items)
+        output = _format_history_table(items, table_format="rounded_outline")
 
     click.echo(output)
