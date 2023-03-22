@@ -75,7 +75,10 @@ def _format_history_table(history: list[CloudExecution]) -> str:
         if execution["end_time"]:
             end_time = datetime.datetime.fromisoformat(execution["end_time"])
             td = end_time - start_time
-            duration = f"{td.total_seconds() / 60:.2f} minutes"
+            sec = int(td.total_seconds())
+            hours, remainder = divmod(sec, 3600)  # noqa: WPS432
+            minutes, seconds = divmod(remainder, 60)
+            duration = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         else:
             duration = "N/A"
 
