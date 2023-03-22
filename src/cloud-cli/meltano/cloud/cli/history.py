@@ -104,14 +104,11 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     Returns:
         The formatted history.
     """
-    table = []
-    headers = ["Execution ID", "Schedule Name", "Executed At", "Result", "Duration"]
-
-    for execution in history:
-        row = process_table_row(execution)
-        table.append(row)
-
-    return tabulate.tabulate(table, headers, tablefmt=table_format)
+    return tabulate.tabulate(
+        [process_table_row(execution) for execution in history],
+        headers=["Execution ID", "Schedule Name", "Executed At", "Result", "Duration"],
+        tablefmt=table_format,
+    )
 
 
 @cloud.command()
