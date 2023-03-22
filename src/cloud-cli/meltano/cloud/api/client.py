@@ -28,6 +28,18 @@ __all__ = ["MeltanoCloudClient"]
 logger = get_logger()
 
 
+def _cleanup_params(params: dict) -> dict:
+    """Remove None values from params.
+
+    Args:
+        params: The params to clean.
+
+    Returns:
+        The cleaned params.
+    """
+    return {k: v for k, v in params.items() if v is not None}
+
+
 class MeltanoCloudError(Exception):
     """Base error for the Meltano Cloud API."""
 
@@ -291,7 +303,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self,
         *,
         schedule: str | None = None,
-        page_size: int = 10,
+        page_size: int | None = None,
         page_token: str | None = None,
     ):
         """Get the execution history for a Meltano Cloud project.
@@ -303,11 +315,15 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
 
         Returns:
             The execution history.
-        """
-        params: dict[str, t.Any] = {"page_size": page_size}
 
-        if page_token:
-            params["page_token"] = page_token
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
+        """
+        params: dict[str, t.Any] = {
+            "page_size": page_size,
+            "page_token": page_token,
+            "schedule": schedule,
+        }
 
         async with self.authenticated():
             url = (
@@ -315,11 +331,17 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                 f"{self.config.tenant_resource_key}/"
                 f"{self.config.internal_project_id}"
             )
-
-            if schedule:
-                params["schedule"] = schedule
-
-            return await self._json_request("GET", url, params=params)
+            try:
+                return await self._json_request(
+                    "GET",
+                    url,
+                    params=_cleanup_params(params),
+                )
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.UNPROCESSABLE_ENTITY:
+                    ex.response.reason = "Unable to process request"
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
 
     @asynccontextmanager
     async def stream_logs(

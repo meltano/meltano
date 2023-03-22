@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudExecution
 
-PAGE_SIZE = 100
+MAX_PAGE_SIZE = 250
 
 
 async def _get_history(
@@ -36,7 +36,7 @@ async def _get_history(
         The execution history.
     """
     page_token = None
-    page_size = min(limit, PAGE_SIZE)
+    page_size = min(limit, MAX_PAGE_SIZE)
     results: list[CloudExecution] = []
 
     async with MeltanoCloudClient(config=config) as client:
