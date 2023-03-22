@@ -170,5 +170,6 @@ def mypy(session: Session) -> None:
         "types-psutil",
         "types-PyYAML",
         "types-requests",
+        "types-tabulate",
     )
     session.run("mypy", *session.posargs)
