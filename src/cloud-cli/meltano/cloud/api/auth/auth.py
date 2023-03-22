@@ -84,7 +84,11 @@ class MeltanoCloudAuth:  # noqa: WPS214
         server = None
         try:
             server = subprocess.Popen(  # noqa: S607
-                ("flask", "run", f"--port={self.config.auth_callback_port}"),
+                (
+                    str(Path(sys.prefix) / "bin" / "flask"),
+                    "run",
+                    f"--port={self.config.auth_callback_port}",
+                ),
                 env={
                     **os.environ,
                     "FLASK_APP": "callback_server.py",
