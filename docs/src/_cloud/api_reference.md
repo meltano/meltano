@@ -4,7 +4,6 @@ description: Details the Private API of Meltano Cloud
 layout: doc
 weight: 3
 ---
-# API Reference
 
 API usage and examples for features of Meltano Cloud.
 

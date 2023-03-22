@@ -4,10 +4,11 @@ description: Details the security stature of Meltano Cloud
 layout: doc
 weight: 3
 ---
-# Meltano Cloud - Security Whitepaper
+## Security Whitepaper
 
-> **Note**
-> Meltano Cloud is currently in Alpha. Features and implementation details may change between Alpha and GA.
+<div class="notification is-info">
+  <p>Meltano Cloud is currently in Alpha. Features and implementation details may change between Alpha and GA.</p>
+</div>
 
 ## Securing Project Secrets
 

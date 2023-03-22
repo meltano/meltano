@@ -4,9 +4,6 @@ description: Details the onboarding process of Meltano Cloud
 layout: doc
 weight: 2
 ---
-# Onboarding overview
-
-The onboarding process requires the below steps.
 
 ## Prereqs
 
