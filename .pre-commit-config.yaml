@@ -97,12 +97,6 @@ repos:
       - id: black
         exclude: ^(src/meltano/migrations/)
 
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py3-plus", "--py37-plus", "--keep-mock"]
-
   - repo: https://github.com/flakeheaven/flakeheaven
     rev: 3.2.1
     hooks:
