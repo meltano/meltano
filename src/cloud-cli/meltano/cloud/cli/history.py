@@ -57,6 +57,44 @@ async def _get_history(
     return results[:limit]
 
 
+def process_table_row(row: CloudExecution) -> tuple[str, str, str, str, str]:
+    """Process a table row.
+
+    Args:
+        row: The row to process.
+
+    Returns:
+        The processed row.
+    """
+    start_time = datetime.datetime.fromisoformat(row["start_time"])
+
+    if row["end_time"]:
+        end_time = datetime.datetime.fromisoformat(row["end_time"])
+        td = end_time - start_time
+        sec = int(td.total_seconds())
+        hours, remainder = divmod(sec, 3600)  # noqa: WPS432
+        minutes, seconds = divmod(remainder, 60)
+        duration = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    else:
+        duration = "N/A"
+
+    status = (
+        "Running"
+        if row["status"] not in {"STOPPED", "DELETED"}
+        else "Success"
+        if row["exit_code"] == 0
+        else "Failed"
+    )
+
+    return (
+        row["execution_id"],
+        row["schedule_name"],
+        row["start_time"],
+        status,
+        duration,
+    )
+
+
 def _format_history_table(history: list[CloudExecution], table_format: str) -> str:
     """Format the history as a table.
 
@@ -70,27 +108,8 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     headers = ["Execution ID", "Schedule Name", "Executed At", "Result", "Duration"]
 
     for execution in history:
-        start_time = datetime.datetime.fromisoformat(execution["start_time"])
-
-        if execution["end_time"]:
-            end_time = datetime.datetime.fromisoformat(execution["end_time"])
-            td = end_time - start_time
-            sec = int(td.total_seconds())
-            hours, remainder = divmod(sec, 3600)  # noqa: WPS432
-            minutes, seconds = divmod(remainder, 60)
-            duration = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-        else:
-            duration = "N/A"
-
-        table.append(
-            [
-                execution["execution_id"],
-                execution["schedule_name"],
-                execution["start_time"],
-                "Success" if execution["exit_code"] == 0 else "Failed",
-                duration,
-            ],
-        )
+        row = process_table_row(execution)
+        table.append(row)
 
     return tabulate.tabulate(table, headers, tablefmt=table_format)
 
