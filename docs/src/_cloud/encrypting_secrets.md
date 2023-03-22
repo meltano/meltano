@@ -2,7 +2,7 @@
 title: "Encrypting Secrets"
 description: Details the Alpha process for encrypting Meltano Cloud secrets
 layout: doc
-hidden: true
+weight: 8
 ---
 # Encrypting Secrets
 

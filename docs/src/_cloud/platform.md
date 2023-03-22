@@ -1,7 +1,7 @@
 ---
 title: "Platform Information"
 layout: doc
-hidden: true
+weight: 5
 ---
 
 # Meltano Cloud
