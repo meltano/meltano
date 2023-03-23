@@ -21,11 +21,11 @@ class MeltanoFile(Canonical):
     def __init__(
         self,
         version: int = VERSION,
-        plugins: dict[str, dict] = None,
-        schedules: list[dict] = None,
-        environments: list[dict] = None,
-        jobs: list[dict] = None,
-        env: dict[str, str] = None,
+        plugins: dict[str, dict] | None = None,
+        schedules: list[dict] | None = None,
+        environments: list[dict] | None = None,
+        jobs: list[dict] | None = None,
+        env: dict[str, str] | None = None,
         **extras,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.

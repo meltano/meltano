@@ -6,23 +6,21 @@ import asyncio
 
 import click
 
-from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.cli import cloud
+from meltano.cloud.cli.base import MeltanoCloudCLIContext, pass_context
 
 
 @cloud.command
-@click.pass_context
-def login(ctx: click.Context) -> None:
+@pass_context
+def login(context: MeltanoCloudCLIContext) -> None:
     """Log in to Meltano Cloud."""
-    auth: MeltanoCloudAuth = ctx.obj["auth"]
-    asyncio.run(auth.login())
-    user_info = asyncio.run(auth.get_user_info_json())
+    asyncio.run(context.auth.login())
+    user_info = asyncio.run(context.auth.get_user_info_json())
     click.secho(f"Logged in as {user_info['preferred_username']}", fg="green")
 
 
 @cloud.command
-@click.pass_context
-def logout(ctx: click.Context) -> None:
+@pass_context
+def logout(context: MeltanoCloudCLIContext) -> None:
     """Log out of Meltano Cloud."""
-    auth: MeltanoCloudAuth = ctx.obj["auth"]
-    asyncio.run(auth.logout())
+    asyncio.run(context.auth.logout())

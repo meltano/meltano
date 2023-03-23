@@ -11,7 +11,7 @@ import click
 import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import cloud
+from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -142,9 +142,9 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     type=click.Choice(["terminal", "markdown", "json"]),
     help="The output format to use.",
 )
-@click.pass_context
+@pass_context
 def history(
-    ctx: click.Context,
+    context: MeltanoCloudCLIContext,
     *,
     schedule_filter: str | None,
     limit: int,
@@ -153,7 +153,7 @@ def history(
     """Get a Meltano project execution history in Meltano Cloud."""
     items = asyncio.run(
         _get_history(
-            ctx.obj["config"],
+            context.config,
             schedule_filter=schedule_filter,
             limit=limit,
         ),

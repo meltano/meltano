@@ -23,6 +23,12 @@ else:
 if t.TYPE_CHECKING:
     import types
 
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
+
+
 __all__ = ["MeltanoCloudClient"]
 
 logger = get_logger()
@@ -75,7 +81,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         except Exception:
             self.version = version("meltano")
 
-    async def __aenter__(self) -> MeltanoCloudClient:
+    async def __aenter__(self) -> Self:
         """Enter the client context.
 
         Returns:
@@ -261,48 +267,6 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                 if ex.response.status == HTTPStatus.BAD_REQUEST:
                     ex.response.reason = (
                         f"Unable to find schedule named {job_or_schedule!r} "
-                        f"within a deployment named {deployment!r}"
-                    )
-                    raise MeltanoCloudError(ex.response) from ex
-                raise
-
-    async def schedule_put_enabled(
-        self,
-        *,
-        deployment: str,
-        schedule: str,
-        enabled: bool,
-    ):
-        """Use PUT to update the enabled state of a Meltano Cloud project schedule.
-
-        Args:
-            deployment: The name of the deployment the schedule belongs to.
-            schedule: The name of the schedule to enable/disable.
-            enabled: Whether the schedule should be enabled.
-
-        Raises:
-            MeltanoCloudError: The Meltano Cloud API responded with an error.
-        """
-        async with self.authenticated():
-            try:
-                await self._json_request(
-                    "PUT",
-                    (
-                        "/schedules/v1/"
-                        f"{self.config.tenant_resource_key}/"
-                        f"{self.config.internal_project_id}/"
-                        "enabled"
-                    ),
-                    json={
-                        "deployment_name": deployment,
-                        "schedule_name": schedule,
-                        "enabled": enabled,
-                    },
-                )
-            except MeltanoCloudError as ex:
-                if ex.response.status == HTTPStatus.NOT_FOUND:
-                    ex.response.reason = (
-                        f"Unable to find schedule with name {schedule!r} "
                         f"within a deployment named {deployment!r}"
                     )
                     raise MeltanoCloudError(ex.response) from ex

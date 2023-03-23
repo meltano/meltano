@@ -8,7 +8,7 @@ import typing as t
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import cloud
+from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -43,9 +43,9 @@ async def run_project(
     required=True,
     help="The name of the Meltano Cloud deployment to run in.",
 )
-@click.pass_context
+@pass_context
 def run(
-    ctx: click.Context,
+    context: MeltanoCloudCLIContext,
     job_or_schedule: str,
     deployment: str,
 ) -> None:
@@ -56,7 +56,7 @@ def run(
         run_project(
             deployment,
             job_or_schedule,
-            ctx.obj["config"],
+            context.config,
         ),
     )
     click.echo(result)
