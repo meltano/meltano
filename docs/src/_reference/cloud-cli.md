@@ -25,6 +25,21 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 meltano cloud logout
 ```
 
+## `history`
+
+Display the history of executions for a project.
+
+```sh
+$ meltano cloud history --format terminal --limit 3
+╭──────────────────────────────────┬─────────────────┬──────────────────────────────────┬──────────┬────────────╮
+│ Execution ID                     │ Schedule Name   │ Executed At                      │ Result   │ Duration   │
+├──────────────────────────────────┼─────────────────┼──────────────────────────────────┼──────────┼────────────┤
+│ 15e1cbbde6b2424f86c04b237291d652 │ daily           │ 2023-03-22T00:04:49.452000+00:00 │ Success  │ 00:05:08   │
+│ ad2b34087e7c4332a1398321552f2a82 │ daily           │ 2023-03-22T00:03:23.992000+00:00 │ Failed   │ 00:10:13   │
+│ 695de7b041b445f5a46a7aac1d0879b9 │ daily           │ 2023-03-21T15:44:55.317000+00:00 │ Failed   │ 00:08:09   │
+╰──────────────────────────────────┴─────────────────┴──────────────────────────────────┴──────────┴────────────╯
+```
+
 ## `logs`
 
 ```sh
