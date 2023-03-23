@@ -244,18 +244,27 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         Args:
             deployment: The name of the Meltano Cloud deployment in which to run.
             job_or_schedule: The name of the job or schedule to run.
+
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
         """
         async with self.authenticated():
-            url = (
-                "/run/v1/external/"
-                f"{self.config.tenant_resource_key}/"
-                f"{self.config.internal_project_id}/"
-                f"{deployment}/{job_or_schedule}"
-            )
-            await self._json_request(
-                "POST",
-                url,
-            )
+            try:
+                url = (
+                    "/run/v1/external/"
+                    f"{self.config.tenant_resource_key}/"
+                    f"{self.config.internal_project_id}/"
+                    f"{deployment}/{job_or_schedule}"
+                )
+                await self._json_request("POST", url)
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.BAD_REQUEST:
+                    ex.response.reason = (
+                        f"Unable to find schedule named {job_or_schedule!r} "
+                        f"within a deployment named {deployment!r}"
+                    )
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
 
     async def schedule_put_enabled(
         self,
