@@ -9,7 +9,7 @@ from http import HTTPStatus
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import cloud, pass_context, shared_option
+from meltano.cloud.cli.base import pass_context, shared_option
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -100,7 +100,7 @@ schedule_option = shared_option(
 )
 
 
-@cloud.group(name="schedule")
+@click.group(name="schedule")
 @deployment_option
 @schedule_option
 def schedule_group() -> None:
