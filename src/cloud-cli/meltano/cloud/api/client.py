@@ -249,11 +249,13 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     url,
                 )
             except MeltanoCloudError as ex:
-                ex.response.reason = (
-                    f"Unable to find schedule with name {job_or_schedule!r} "
-                    f"within a deployment named {deployment!r}"
-                )
-                raise MeltanoCloudError(ex.response) from ex
+                if ex.response.status == 400:  # noqa: WPS432
+                    ex.response.reason = (
+                        f"Unable to find schedule named {job_or_schedule!r} "
+                        f"within a deployment named {deployment!r}"
+                    )
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
 
     async def schedule_put_enabled(
         self,
