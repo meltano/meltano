@@ -257,48 +257,6 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                 url,
             )
 
-    async def schedule_put_enabled(
-        self,
-        *,
-        deployment: str,
-        schedule: str,
-        enabled: bool,
-    ):
-        """Use PUT to update the enabled state of a Meltano Cloud project schedule.
-
-        Args:
-            deployment: The name of the deployment the schedule belongs to.
-            schedule: The name of the schedule to enable/disable.
-            enabled: Whether the schedule should be enabled.
-
-        Raises:
-            MeltanoCloudError: The Meltano Cloud API responded with an error.
-        """
-        async with self.authenticated():
-            try:
-                await self._json_request(
-                    "PUT",
-                    "/".join(
-                        (
-                            "/schedules/v1",
-                            f"{self.config.tenant_resource_key}",
-                            f"{self.config.internal_project_id}",
-                            deployment,
-                            schedule,
-                            "enabled",
-                        )
-                    ),
-                    json=enabled,
-                )
-            except MeltanoCloudError as ex:
-                if ex.response.status == HTTPStatus.NOT_FOUND:
-                    ex.response.reason = (
-                        f"Unable to find schedule named {schedule!r} "
-                        f"within a deployment named {deployment!r}"
-                    )
-                    raise MeltanoCloudError(ex.response) from ex
-                raise
-
     async def get_execution_history(
         self,
         *,
