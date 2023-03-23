@@ -278,22 +278,22 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             try:
                 await self._json_request(
                     "PUT",
-                    (
-                        "/schedules/v1/"
-                        f"{self.config.tenant_resource_key}/"
-                        f"{self.config.internal_project_id}/"
-                        "enabled"
+                    "/".join(
+                        (
+                            "/schedules/v1",
+                            f"{self.config.tenant_resource_key}",
+                            f"{self.config.internal_project_id}",
+                            deployment,
+                            schedule,
+                            "enabled",
+                        )
                     ),
-                    json={
-                        "deployment_name": deployment,
-                        "schedule_name": schedule,
-                        "enabled": enabled,
-                    },
+                    json=enabled,
                 )
             except MeltanoCloudError as ex:
                 if ex.response.status == HTTPStatus.NOT_FOUND:
                     ex.response.reason = (
-                        f"Unable to find schedule with name {schedule!r} "
+                        f"Unable to find schedule named {schedule!r} "
                         f"within a deployment named {deployment!r}"
                     )
                     raise MeltanoCloudError(ex.response) from ex
