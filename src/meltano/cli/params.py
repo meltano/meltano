@@ -57,7 +57,7 @@ class pass_project:  # noqa: N801
             if not project:
                 raise CliError(
                     f"`{ctx.command_path}` must be run inside a Meltano project.\n"
-                    + "Use `meltano init <project_directory>` to create one."
+                    "Use `meltano init <project_directory>` to create one."
                 )
 
             # register the system database connection

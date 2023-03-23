@@ -51,8 +51,8 @@ class SelectService:
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 "Could not find catalog. Verify that the tap supports discovery "
-                + "mode and advertises the `discover` capability as well as either "
-                + "`catalog` or `properties`"
+                "mode and advertises the `discover` capability as well as either "
+                "`catalog` or `properties`"
             ) from err
 
         list_all = ListSelectedExecutor()

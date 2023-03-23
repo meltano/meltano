@@ -483,7 +483,7 @@ def check_dependencies_met(
                 passed = False
                 messages.append(
                     f"Plugin '{plugin.name}' requires a transformer plugin. "
-                    + "Please first add a transformer using `meltano add transformer`."
+                    "Please first add a transformer using `meltano add transformer`."
                 )
     if passed:
         message = "All dependencies met"
