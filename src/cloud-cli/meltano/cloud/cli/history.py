@@ -58,7 +58,7 @@ async def _get_history(
     return results[:limit]
 
 
-def process_table_row(row: CloudExecution) -> tuple[str, str, str, str, str]:
+def process_table_row(row: CloudExecution) -> tuple[str, ...]:
     """Process a table row.
 
     Args:
