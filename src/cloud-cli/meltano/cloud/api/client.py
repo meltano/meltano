@@ -256,10 +256,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     f"{self.config.internal_project_id}/"
                     f"{deployment}/{job_or_schedule}"
                 )
-                await self._json_request(
-                    "POST",
-                    url,
-                )
+                await self._json_request("POST", url)
             except MeltanoCloudError as ex:
                 if ex.response.status == HTTPStatus.BAD_REQUEST:
                     ex.response.reason = (
