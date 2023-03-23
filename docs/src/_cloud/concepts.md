@@ -5,6 +5,11 @@ layout: doc
 weight: 1
 ---
 
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
+
 ## Meltano Cloud Users
 
 Your Meltano Cloud user account is associated with a GitHub account for single-sign-on. If you do not have a GitHub account, you can create a free account at [github.com](https://github.com).

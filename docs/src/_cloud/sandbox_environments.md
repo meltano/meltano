@@ -3,8 +3,12 @@ title: "Sandbox"
 layout: doc
 hidden: true
 ---
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
 
-# Creating a Sandbox Environment for Meltano Cloud
+## Creating a Sandbox Environment for Meltano Cloud
 
 We recommend creating a new Meltano environment named `sandbox`. You can create a new environment definition using the following CLI command:
 

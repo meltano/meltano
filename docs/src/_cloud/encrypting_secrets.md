@@ -4,10 +4,11 @@ description: Details the Alpha process for encrypting Meltano Cloud secrets
 layout: doc
 weight: 8
 ---
-# Encrypting Secrets
 
-> **Note**
-> Meltano Cloud is currently in Alpha. Features and implementation details may change between Alpha and GA.
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
 
 This document covers information on encrypting secrets in your Meltano `secrets.yml` file.
 

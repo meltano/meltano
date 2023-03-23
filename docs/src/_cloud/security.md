@@ -4,6 +4,11 @@ description: Details the security stature of Meltano Cloud
 layout: doc
 weight: 3
 ---
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
+
 ## Security Whitepaper
 
 <div class="notification is-info">

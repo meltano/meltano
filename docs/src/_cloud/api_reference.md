@@ -5,6 +5,11 @@ layout: doc
 weight: 3
 ---
 
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
+
 API usage and examples for features of Meltano Cloud.
 
 The API functionalities documented here may be adjusted during the Meltano Cloud alpha, and will definitely be adjusted prior to the Meltano Cloud GA release.

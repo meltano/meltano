@@ -5,9 +5,14 @@ layout: doc
 weight: 2
 ---
 
+<div class="notification is-info">
+  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+</div>
+
 ## Prereqs
 
-## Prereq #1: Provide access to your repo
+### Prereq #1: Provide access to your repo
 
 Install the [Meltano Cloud GitHub App](https://github.com/apps/meltano-cloud) to your organization.
 When asked "Where do you want to install this app?" you _must_ select your GitHub organization, not your personal account.
