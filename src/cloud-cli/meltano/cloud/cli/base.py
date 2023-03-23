@@ -22,8 +22,8 @@ class MeltanoCloudCLIContext:
     command level.
     """
 
-    config: MeltanoCloudConfig | None = None
-    auth: MeltanoCloudAuth | None = None
+    config: MeltanoCloudConfig = None  # type: ignore[assignment]
+    auth: MeltanoCloudAuth = None  # type: ignore[assignment]
 
     # Schedule subcommand:
     deployment: str | None = None
@@ -35,11 +35,11 @@ pass_context = click.make_pass_decorator(MeltanoCloudCLIContext, ensure=True)
 
 def _set_shared_option(ctx: click.Context, opt: click.Option, value: t.Any) -> None:
     if value is not None:
-        if getattr(ctx.obj, opt.name) is not None:
+        if getattr(ctx.obj, t.cast(str, opt.name)) is not None:
             raise click.UsageError(
                 f"Option '--{opt.name}' must not be specified multiple times."
             )
-        setattr(ctx.obj, opt.name, value)
+        setattr(ctx.obj, t.cast(str, opt.name), value)
 
 
 shared_option = partial(click.option, expose_value=False, callback=_set_shared_option)

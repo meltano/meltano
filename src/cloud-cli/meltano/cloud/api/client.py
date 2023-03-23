@@ -15,6 +15,11 @@ from structlog import get_logger
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
+
 if sys.version_info >= (3, 8):
     from importlib.metadata import version
 else:
@@ -75,7 +80,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         except Exception:
             self.version = version("meltano")
 
-    async def __aenter__(self) -> MeltanoCloudClient:
+    async def __aenter__(self) -> Self:
         """Enter the client context.
 
         Returns:
