@@ -349,8 +349,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             return
 
         logger.debug(
-            "Telemetry state change detected. A one-time "
-            + "'telemetry_state_change' event will now be sent.",
+            (
+                "Telemetry state change detected. A one-time "
+                "'telemetry_state_change' event will now be sent."
+            ),
             setting_name=setting_name,
         )
         if isinstance(from_value, uuid.UUID):

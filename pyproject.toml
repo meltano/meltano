@@ -594,6 +594,7 @@ select = [
   "E",   # pycodestyle (error)
   "F",   # pyflakes
   "I",   # isort
+  "ISC", # flake8-implicit-str-concat
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]
