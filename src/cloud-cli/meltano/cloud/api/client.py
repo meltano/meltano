@@ -28,6 +28,18 @@ __all__ = ["MeltanoCloudClient"]
 logger = get_logger()
 
 
+def _cleanup_params(params: dict) -> dict:
+    """Remove None values from params.
+
+    Args:
+        params: The params to clean.
+
+    Returns:
+        The cleaned params.
+    """
+    return {k: v for k, v in params.items() if v is not None}
+
+
 class MeltanoCloudError(Exception):
     """Base error for the Meltano Cloud API."""
 
@@ -296,6 +308,50 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                         f"Unable to find schedule with name {schedule!r} "
                         f"within a deployment named {deployment!r}"
                     )
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
+
+    async def get_execution_history(
+        self,
+        *,
+        schedule: str | None = None,
+        page_size: int | None = None,
+        page_token: str | None = None,
+    ):
+        """Get the execution history for a Meltano Cloud project.
+
+        Args:
+            schedule: The name of the schedule to get the history for.
+            page_size: The number of executions to return.
+            page_token: The page token to use for pagination.
+
+        Returns:
+            The execution history.
+
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
+        """
+        params: dict[str, t.Any] = {
+            "page_size": page_size,
+            "page_token": page_token,
+            "schedule": schedule,
+        }
+
+        async with self.authenticated():
+            url = (
+                "/history/v1/"
+                f"{self.config.tenant_resource_key}/"
+                f"{self.config.internal_project_id}"
+            )
+            try:
+                return await self._json_request(
+                    "GET",
+                    url,
+                    params=_cleanup_params(params),
+                )
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.UNPROCESSABLE_ENTITY:
+                    ex.response.reason = "Unable to process request"
                     raise MeltanoCloudError(ex.response) from ex
                 raise
 
