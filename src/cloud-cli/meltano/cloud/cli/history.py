@@ -18,6 +18,7 @@ if t.TYPE_CHECKING:
     from meltano.cloud.api.types import CloudExecution
 
 MAX_PAGE_SIZE = 250
+UTC = datetime.timezone.utc
 
 
 async def _get_history(
@@ -86,10 +87,11 @@ def process_table_row(row: CloudExecution) -> tuple[str, str, str, str, str]:
         else "Failed"
     )
 
-    return (
+    return (  # noqa: WPS227
         row["execution_id"],
         row["schedule_name"],
-        row["start_time"],
+        row["environment_name"],
+        start_time.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S"),
         status,
         duration,
     )
@@ -106,7 +108,14 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     """
     return tabulate.tabulate(
         [process_table_row(execution) for execution in history],
-        headers=["Execution ID", "Schedule Name", "Executed At", "Result", "Duration"],
+        headers=[
+            "Execution ID",
+            "Schedule Name",
+            "Deployment",
+            "Executed At (UTC)",
+            "Result",
+            "Duration",
+        ],
         tablefmt=table_format,
     )
 
