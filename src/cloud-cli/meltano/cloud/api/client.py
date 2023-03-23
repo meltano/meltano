@@ -261,7 +261,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     url,
                 )
             except MeltanoCloudError as ex:
-                if ex.response.status == 400:  # noqa: WPS432
+                if ex.response.status == HTTPStatus.BAD_REQUEST:
                     ex.response.reason = (
                         f"Unable to find schedule named {job_or_schedule!r} "
                         f"within a deployment named {deployment!r}"
