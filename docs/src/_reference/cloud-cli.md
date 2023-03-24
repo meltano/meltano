@@ -30,7 +30,7 @@ meltano cloud logout
 Display the history of executions for a project.
 
 ```sh
-$ meltano cloud history --format terminal --limit 3
+$ meltano cloud history --limit 3
 ╭──────────────────────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮
 │ Execution ID                     │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │
 ├──────────────────────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤
@@ -38,6 +38,15 @@ $ meltano cloud history --format terminal --limit 3
 │ ad2b34087e7c4332a1398321552f2a82 │ daily           │ sandbox      │ 2023-03-22 00:03:23 │ Failed   │ 00:10:13   │
 │ 695de7b041b445f5a46a7aac1d0879b9 │ daily           │ sandbox      │ 2023-03-21 15:44:55 │ Failed   │ 00:08:09   │
 ╰──────────────────────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯
+
+# Display the last 12 hours of executions
+$ meltano cloud history --lookback 12h
+
+# Display the last week of executions
+$ meltano cloud history --lookback 1w
+
+# Display the last hour and a half of executions
+$ meltano cloud history --lookback 1h30m
 ```
 
 ## `logs`
