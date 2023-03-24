@@ -36,5 +36,8 @@ The following features are not currently scoped for inclusion for the Meltano Cl
    - At launch, Meltano will not allow incoming traffic to any running container. This is for security reasons.
    - Workarounds:
      - We may in the future offer BYO-services when defined as Meltano plugins. Due to the additional security provisions required, this additional functionality may only be available for premium service tiers.
+1. Manipulating state artifacts
+   - Although incremental replication is supported in Meltano Cloud, [direct state manipulation](https://docs.meltano.com/reference/command-line-interface#state) is not yet supported.
+   - In the future, users will be able to, for example, seed initial state by setting Meltano Cloud as a [state backend](https://docs.meltano.com/concepts/state_backends).
 
 Based upon user feedback, we will continue to reevaluate the list of supported and non-supported features for Meltano Cloud. If you have an urgenct need for any of the above features, please let us know!
