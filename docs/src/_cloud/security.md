@@ -2,7 +2,7 @@
 title: "Security"
 description: Details the security stature of Meltano Cloud
 layout: doc
-weight: 3
+weight: 4
 ---
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>

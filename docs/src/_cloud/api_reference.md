@@ -2,7 +2,7 @@
 title: "API Reference"
 description: Details the Private API of Meltano Cloud
 layout: doc
-weight: 3
+hidden: true
 ---
 
 <div class="notification is-info">
