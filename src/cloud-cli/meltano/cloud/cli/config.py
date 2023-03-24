@@ -7,7 +7,7 @@ import typing as t
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import cloud, pass_context, run_async
+from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
 MAX_PAGE_SIZE = 250
 
 
-@cloud.group("config")
+@click.group("config")
 def config() -> None:
     """Configure Meltano Cloud project settings and secrets."""
 

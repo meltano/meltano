@@ -7,14 +7,13 @@ import typing as t
 
 import click
 
-from meltano.cloud.cli import cloud
 from meltano.cloud.cli.base import pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 
-@cloud.command
+@click.command
 @pass_context
 def login(context: MeltanoCloudCLIContext) -> None:
     """Log in to Meltano Cloud."""
@@ -23,7 +22,7 @@ def login(context: MeltanoCloudCLIContext) -> None:
     click.secho(f"Logged in as {user_info['preferred_username']}", fg="green")
 
 
-@cloud.command
+@click.command
 @pass_context
 def logout(context: MeltanoCloudCLIContext) -> None:
     """Log out of Meltano Cloud."""

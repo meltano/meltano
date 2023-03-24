@@ -6,10 +6,17 @@ import click
 from structlog import get_logger
 
 from meltano.cloud.api import MeltanoCloudError
-from meltano.cloud.cli import config, history, logs, run, schedule
+from meltano.cloud.cli import config, history, login, logs, run, schedule
 from meltano.cloud.cli.base import cloud
 
 logger = get_logger()
+
+cloud.add_command(config.config)
+cloud.add_command(history.history)
+cloud.add_command(login.login)
+cloud.add_command(logs.logs)
+cloud.add_command(run.run)
+cloud.add_command(schedule.schedule_group)
 
 
 def main() -> int:

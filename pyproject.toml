@@ -598,10 +598,11 @@ select = [
   "ISC", # flake8-implicit-str-concat
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
+  "TID", # flake8-tidy-imports
 ]
 
 [tool.ruff.per-file-ignores]
-"__init__.py" = [
+"src/meltano/**/__init__.py" = [
   "F401", # Permit unused imports in `__init__.py` files
 ]
 
@@ -620,3 +621,7 @@ required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.ruff.flake8-tidy-imports.banned-api]
+"meltano.cloud.cli.base.cloud.command".msg = "Use `click.command` and `cloud.add_command` instead"
+"meltano.cloud.cli.base.cloud.group".msg = "Use `click.group` and `cloud.add_command` instead"
