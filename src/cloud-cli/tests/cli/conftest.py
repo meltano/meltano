@@ -22,14 +22,19 @@ def internal_project_id():
 
 
 @pytest.fixture
-def id_token(tenant_resource_key: str, internal_project_id: str):
+def auth_token():
+    return "meltano-cloud-test"
+
+
+@pytest.fixture
+def id_token(tenant_resource_key: str, internal_project_id: str, auth_token: str):
     """Return a fake ID token.
 
     Includes the tenant_resource_key and internal_project_id as a custom attribute.
     """
     return jwt.encode(
         {
-            "sub": "meltano-cloud-test",
+            "sub": auth_token,
             "custom:trk_and_pid": f"{tenant_resource_key}::{internal_project_id}",
         },
         key="",
