@@ -63,7 +63,7 @@ meltano cloud schedule enable --deployment <deployment name> --schedule <schedul
 meltano cloud schedule disable --deployment <deployment name> --schedule <schedule name>
 ```
 
-Schedules can be listed using the `list` command. For example:
+Schedules can be listed using the `list` command:
 
 ```sh
 meltano cloud schedule list
@@ -85,4 +85,21 @@ meltano cloud schedule list --deployment prod
 │ prod         │ schedule_3 │ 0 6 * * *            │        1.000 │ True     │
 │ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │       10.268 │ False    │
 ╰──────────────┴────────────┴──────────────────────┴──────────────┴──────────╯
+```
+
+Individual schedules can be more thoroughly described using the `describe` command:
+
+```sh
+meltano cloud schedule describe --deployment staging --schedule schedule_4
+Deployment name: prod
+Schedule name:   schedule_4
+Interval:        15,45 */2 * * 1,3,5
+Enabled:         True
+
+Approximate starting date and time (UTC) of next 5 schedule runs:
+2023-03-24 20:45
+2023-03-24 22:15
+2023-03-24 22:45
+2023-03-27 00:15
+2023-03-27 00:45
 ```
