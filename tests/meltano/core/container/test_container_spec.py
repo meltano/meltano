@@ -33,7 +33,7 @@ class TestContainerService:
                                     {
                                         "HostPort": "8080",
                                         "HostIP": "0.0.0.0",  # noqa: S104v
-                                    }
+                                    },
                                 ],
                             },
                         ),
@@ -66,7 +66,7 @@ class TestContainerService:
         """Check Docker container config from container spec."""
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         config = spec.get_docker_config()
         assert config == payload

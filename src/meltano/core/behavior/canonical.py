@@ -134,7 +134,8 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
 
     @classmethod
     def as_canonical(
-        cls: type[T], target: t.Any
+        cls: type[T],
+        target: t.Any,
     ) -> dict | list | CommentedMap | CommentedSeq | t.Any:
         """Return a canonical representation of the given instance.
 
@@ -395,7 +396,9 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return dumper.represent_mapping(
-            "tag:yaml.org,2002:map", cls.as_canonical(obj), flow_style=False
+            "tag:yaml.org,2002:map",
+            cls.as_canonical(obj),
+            flow_style=False,
         )
 
     @classmethod
@@ -410,7 +413,8 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return representer.represent_mapping(
-            "tag:yaml.org,2002:map", cls.as_canonical(obj)
+            "tag:yaml.org,2002:map",
+            cls.as_canonical(obj),
         )
 
     @classmethod

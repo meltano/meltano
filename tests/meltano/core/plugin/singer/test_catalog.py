@@ -619,11 +619,11 @@ class TestLegacyCatalogSelectVisitor:
             field_metadata = metadata["metadata"]
             if field_metadata.get("inclusion") == "unsupported":
                 assert not cls.metadata_is_selected(
-                    field_metadata
+                    field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is selected"
             else:
                 assert cls.metadata_is_selected(
-                    field_metadata
+                    field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
     def test_visit(self, catalog, select_all_executor):
@@ -651,13 +651,17 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             return False
 
     @pytest.mark.parametrize(
-        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+        "catalog",
+        ["CATALOG", "JSON_SCHEMA"],
+        indirect=["catalog"],
     )
     def test_visit(self, catalog, select_all_executor):
         super().test_visit(catalog, select_all_executor)
 
     @pytest.mark.parametrize(
-        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+        "catalog",
+        ["CATALOG", "JSON_SCHEMA"],
+        indirect=["catalog"],
     )
     def test_select_all(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
@@ -670,7 +674,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 for stream in streams.values()
                 for metadata in stream["metadata"]
                 if len(metadata["breadcrumb"]) == 0
-            ]
+            ],
         )
 
         assert stream_metadata == 1, "Extraneous stream metadata"
@@ -695,7 +699,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(
-            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"]
+            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"],
         )
         visit(catalog, selector)
 
@@ -723,7 +727,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 "!UniqueEntitiesName.name",
                 "!*.*.hash",
                 "!*.*.timestamp",
-            ]
+            ],
         )
         visit(catalog, selector)
 
@@ -813,7 +817,9 @@ class TestMetadataExecutor:
         return json.loads(globals()[request.param])  # noqa: WPS421
 
     @pytest.mark.parametrize(
-        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+        "catalog",
+        ["CATALOG", "JSON_SCHEMA"],
+        indirect=["catalog"],
     )
     def test_visit(self, catalog):
         executor = MetadataExecutor(
@@ -831,7 +837,7 @@ class TestMetadataExecutor:
                     "custom-metadata",
                     "custom-value",
                 ),
-            ]
+            ],
         )
         visit(catalog, executor)
 
@@ -901,7 +907,7 @@ class TestSchemaExecutor:
                     ["properties", "*load", "properties", "hash"],
                     {"type": ["string", "null"]},
                 ),
-            ]
+            ],
         )
         visit(catalog, executor)
 
@@ -911,7 +917,7 @@ class TestSchemaExecutor:
         properties_node = stream_node["schema"]["properties"]
 
         assert properties_node["code"] == {
-            "anyOf": [{"type": "string"}, {"type": "null"}]
+            "anyOf": [{"type": "string"}, {"type": "null"}],
         }
 
         if "created_at" in properties_node:
@@ -955,5 +961,5 @@ class TestListExecutor:
                 "payload.content",
                 "payload.hash",
                 "payload.timestamp",
-            }
+            },
         }

@@ -64,15 +64,15 @@ class TestProjectFiles:
                                 "name": "token",
                                 "kind": "password",
                                 "description": "Token for the API. This is a secret.",
-                            }
+                            },
                         ],
-                    }
+                    },
                 ],
                 "mappers": [
                     {
                         "name": "map-meltano-yml",
                         "mappings": [{"name": "transform-meltano-yml"}],
-                    }
+                    },
                 ],
                 "loaders": [{"name": "target-meltano-yml"}],
             },
@@ -84,10 +84,10 @@ class TestProjectFiles:
                     "transform": "skip",
                     "interval": "@once",
                     "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: WPS432
-                }
+                },
             ],
             "environments": [
-                {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}}
+                {"name": "test-meltano-environment", "env": {"TEST": "TEST-MELTANO"}},
             ],
             "jobs": [
                 {
@@ -111,7 +111,7 @@ class TestProjectFiles:
     def test_resolve_from_subdir(self, project_files, cd_temp_subdir):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         assert Path.cwd() == cd_temp_subdir
@@ -129,7 +129,7 @@ class TestProjectFiles:
     def test_resolve_from_any_dir(self, project_files, cd_temp_dir):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         assert Path.cwd() == cd_temp_dir
@@ -158,7 +158,7 @@ class TestProjectFiles:
                                 "name": "token",
                                 "kind": "password",
                                 "description": "Token for the API. This is a secret.",
-                            }
+                            },
                         ],
                     },
                     {"name": "tap-subconfig-2-yml"},
@@ -168,7 +168,7 @@ class TestProjectFiles:
                     {
                         "name": "map-meltano-yml",
                         "mappings": [{"name": "transform-meltano-yml"}],
-                    }
+                    },
                 ],
                 "loaders": [
                     {"name": "target-meltano-yml"},
@@ -255,7 +255,7 @@ class TestProjectFiles:
                                 "name": "token",
                                 "kind": "password",
                                 "description": "Token for the API. This is a secret.",
-                            }
+                            },
                         ],
                     },
                     {"name": "modified-tap-subconfig-2-yml"},
@@ -265,7 +265,7 @@ class TestProjectFiles:
                     {
                         "name": "map-meltano-yml",
                         "mappings": [{"name": "transform-meltano-yml"}],
-                    }
+                    },
                 ],
                 "loaders": [
                     {"name": "target-meltano-yml"},

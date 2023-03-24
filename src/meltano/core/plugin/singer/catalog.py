@@ -61,7 +61,8 @@ class CatalogRule:
         # If provided, the breadcrumb should still match, even on negated rules
         if breadcrumb is not None:
             result = result and fnmatch.fnmatch(
-                ".".join(breadcrumb), ".".join(self.breadcrumb)
+                ".".join(breadcrumb),
+                ".".join(self.breadcrumb),
             )
 
         return result
@@ -171,7 +172,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=[],
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
         if prop_pattern:
@@ -183,7 +184,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=property_breadcrumb(props),
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
     return include_rules + exclude_rules
@@ -201,11 +202,18 @@ def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
     include_rule = MetadataRule(
-        negated=True, tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        negated=True,
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
     # Or if it matches one of the exclusion patterns
     exclude_rule = MetadataRule(
-        tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
 
     for pattern in patterns:
@@ -436,7 +444,10 @@ class MetadataExecutor(CatalogExecutor):
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
-                node["metadata"], f"{path}.metadata", rule.key, rule.value
+                node["metadata"],
+                f"{path}.metadata",
+                rule.key,
+                rule.value,
             )
 
     def set_metadata(self, node: Node, path: str, key: str, value: t.Any):

@@ -26,7 +26,7 @@ def recreate_database(engine, db_name):
             DDL(
                 "DROP DATABASE IF EXISTS %(db_name)s",  # noqa: WPS323
                 {"db_name": db_name},
-            )
+            ),
         )
 
     with contextlib.suppress(sa.exc.ProgrammingError):
@@ -34,12 +34,16 @@ def recreate_database(engine, db_name):
             DDL(
                 "CREATE DATABASE %(db_name)s",  # noqa: WPS323
                 {"db_name": db_name},
-            )
+            ),
         )
 
 
 def create_connection_url(
-    host: str, port: int, user: str, password: str, database: str
+    host: str,
+    port: int,
+    user: str,
+    password: str,
+    database: str,
 ) -> URL:
     """Create a MSSQL connection URL for the given parameters.
 

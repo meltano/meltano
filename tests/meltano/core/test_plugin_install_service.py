@@ -34,11 +34,11 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
-                                }
+                                },
                             ],
-                        }
-                    }
-                )
+                        },
+                    },
+                ),
             )
         project.refresh()
         return PluginInstallService(project, **request.param)

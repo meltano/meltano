@@ -345,7 +345,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
                     redacted=redacted,
                     source=source,
                     source_manager=source_manager,
-                )
+                ),
             )
 
         manager = source_manager or source.manager(self, **kwargs)
@@ -456,7 +456,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         return value
 
     def set_with_metadata(  # noqa: WPS615, WPS210
-        self, path: str | list[str], value, store=SettingValueStore.AUTO, **kwargs
+        self,
+        path: str | list[str],
+        value,
+        store=SettingValueStore.AUTO,
+        **kwargs,
     ):
         """Set the value and metadata for a setting.
 
@@ -497,8 +501,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         metadata.update(
             store.manager(self, **kwargs).set(
-                name, path, value, setting_def=setting_def
-            )
+                name,
+                path,
+                value,
+                setting_def=setting_def,
+            ),
         )
 
         self.log(f"Set setting {name!r} with metadata: {metadata}")
@@ -651,7 +658,9 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     @contextmanager
     def feature_flag(
-        self, feature: str, raise_error: bool = True
+        self,
+        feature: str,
+        raise_error: bool = True,
     ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 

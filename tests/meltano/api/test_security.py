@@ -162,7 +162,9 @@ class TestReadonlyEnabled:
     def app(self, create_app, project):
         with pytest.MonkeyPatch.context() as monkeypatch:
             monkeypatch.setitem(
-                type(project.settings).config_override, "ui.readonly", True
+                type(project.settings).config_override,
+                "ui.readonly",
+                True,
             )
             project.refresh()
             yield create_app()
@@ -217,7 +219,9 @@ class TestAuthenticationEnabled:
     def app(self, create_app, project):
         with pytest.MonkeyPatch.context() as monkeypatch:
             monkeypatch.setitem(
-                type(project.settings).config_override, "ui.readonly", True
+                type(project.settings).config_override,
+                "ui.readonly",
+                True,
             )
             project.refresh()
             yield create_app()
@@ -242,7 +246,7 @@ class TestAuthenticationEnabled:
                     and OAuth.id_token == token["id_token"]
                     and OAuth.provider_user_id == user.id  # noqa: F821
                     and OAuth.provider_id == "gitlab"
-                    and User.email == user.email  # noqa: F821
+                    and User.email == user.email,  # noqa: F821
                 )
                 .first()
             )
@@ -384,7 +388,9 @@ class TestAuthenticationAndReadonlyEnabled:
         with pytest.MonkeyPatch.context() as monkeypatch:
             for setting in ("ui.readonly", "ui.authentication"):
                 monkeypatch.setitem(
-                    type(project.settings).config_override, setting, True
+                    type(project.settings).config_override,
+                    setting,
+                    True,
                 )
             project.refresh()
             yield create_app()
@@ -484,7 +490,9 @@ class TestAuthenticationAndAnonymousReadonlyEnabled:
         with pytest.MonkeyPatch.context() as monkeypatch:
             for setting in ("ui.authentication", "ui.anonymous_readonly"):
                 monkeypatch.setitem(
-                    type(project.settings).config_override, setting, True
+                    type(project.settings).config_override,
+                    setting,
+                    True,
                 )
             project.refresh()
             yield create_app()

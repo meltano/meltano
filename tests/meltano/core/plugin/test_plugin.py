@@ -174,7 +174,9 @@ class TestPluginDefinition:
 
     def test_label(self):
         plugin_def = PluginDefinition(
-            PluginType.EXTRACTORS, name="tap-foo", namespace="tap_foo"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            namespace="tap_foo",
         )
         assert plugin_def.label == "tap-foo"
 
@@ -183,7 +185,9 @@ class TestPluginDefinition:
 
     def test_logo_url(self):
         plugin_def = PluginDefinition(
-            PluginType.EXTRACTORS, name="tap-foo", namespace="tap_foo"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            namespace="tap_foo",
         )
         assert plugin_def.logo_url == "/static/logos/foo-logo.png"
 
@@ -195,7 +199,8 @@ class TestBasePlugin:
     @pytest.fixture
     def plugin_def(self):
         return PluginDefinition(
-            PluginType.EXTRACTORS, **TestPluginDefinition.ATTRS["variants"]
+            PluginType.EXTRACTORS,
+            **TestPluginDefinition.ATTRS["variants"],
         )
 
     @pytest.fixture
@@ -416,13 +421,19 @@ class TestProjectPlugin:
 
     def test_set_parent(self):
         plugin_one = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-one", inherit_from="tap-two"
+            PluginType.EXTRACTORS,
+            name="tap-one",
+            inherit_from="tap-two",
         )
         plugin_two = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-two", inherit_from="tap-three"
+            PluginType.EXTRACTORS,
+            name="tap-two",
+            inherit_from="tap-three",
         )
         plugin_three = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-three", inherit_from="tap-one"
+            PluginType.EXTRACTORS,
+            name="tap-three",
+            inherit_from="tap-one",
         )
 
         plugin_one.parent = plugin_two
@@ -446,7 +457,9 @@ class TestProjectPlugin:
 
         # With a variant set, that variant is used
         plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-mock", variant="meltano"
+            PluginType.EXTRACTORS,
+            name="tap-mock",
+            variant="meltano",
         )
         assert plugin.variant == "meltano"
 

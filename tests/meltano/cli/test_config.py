@@ -15,7 +15,7 @@ class TestCliConfig:
     def test_config(self, project: Project, cli_runner, tap):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["config", tap.name])
         assert_cli_runner(result)
@@ -33,7 +33,7 @@ class TestCliConfig:
     def test_config_env(self, project: Project, cli_runner, tap):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
         assert_cli_runner(result)
@@ -50,7 +50,8 @@ class TestCliConfig:
 
     def test_config_meltano_set(self, project: Project, cli_runner):
         result = cli_runner.invoke(
-            cli, ["config", "meltano", "set", "cli.log_config", "log_config.yml"]
+            cli,
+            ["config", "meltano", "set", "cli.log_config", "log_config.yml"],
         )
         assert_cli_runner(result)
         assert (

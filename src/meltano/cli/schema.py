@@ -17,7 +17,8 @@ def schema():
 
 
 @schema.command(
-    cls=InstrumentedCmd, short_help="Create system DB schema, if not exists."
+    cls=InstrumentedCmd,
+    short_help="Create system DB schema, if not exists.",
 )
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)

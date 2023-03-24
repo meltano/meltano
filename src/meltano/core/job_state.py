@@ -85,7 +85,9 @@ class JobState(SystemModel):  # noqa: WPS214
         # completed job. If there are no completed jobs, get the full history of
         # incomplete jobs and use the most recent state emitted per stream
         incomplete_state_jobs = finder.with_payload(
-            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+            session,
+            flags=Payload.INCOMPLETE_STATE,
+            since=incomplete_since,
         )
         for incomplete_state_job in incomplete_state_jobs:
             if SINGER_STATE_KEY in incomplete_state_job.payload:
@@ -122,7 +124,7 @@ class JobState(SystemModel):  # noqa: WPS214
             json representation of this JobState
         """
         return json.dumps(
-            {"completed": self.completed_state, "partial": self.partial_state}
+            {"completed": self.completed_state, "partial": self.partial_state},
         )
 
     def json_merged(self) -> str:
@@ -156,7 +158,8 @@ class JobState(SystemModel):  # noqa: WPS214
             state: the partial state to merge onto this state.
         """
         self.partial_state = merge(  # noqa: WPS601
-            state.partial_state, self.partial_state
+            state.partial_state,
+            self.partial_state,
         )
 
     def is_complete(self) -> bool:

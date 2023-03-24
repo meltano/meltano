@@ -122,11 +122,18 @@ class ScheduleService:  # noqa: WPS214
             The added schedule.
         """
         start_date = coerce_datetime(start_date) or self.default_start_date(  # TODO
-            session, extractor
+            session,
+            extractor,
         )
 
         schedule = Schedule(
-            name, extractor, loader, transform, interval, start_date, env=env
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date,
+            env=env,
         )
         return self.add_schedule(schedule)
 
@@ -168,7 +175,8 @@ class ScheduleService:  # noqa: WPS214
             The start_date of the extractor, or now.
         """
         extractor_plugin = self.project.plugins.find_plugin(
-            extractor, plugin_type=PluginType.EXTRACTORS
+            extractor,
+            plugin_type=PluginType.EXTRACTORS,
         )
         start_date: str | datetime | date | None = None
         try:
@@ -274,7 +282,8 @@ class ScheduleService:  # noqa: WPS214
         """
         try:
             extractor = self.project.plugins.find_plugin_by_namespace(
-                PluginType.EXTRACTORS, namespace
+                PluginType.EXTRACTORS,
+                namespace,
             )
 
             return next(
@@ -311,7 +320,11 @@ class ScheduleService:  # noqa: WPS214
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: dict | None = None, **kwargs
+        self,
+        schedule: Schedule,
+        *args,
+        env: dict | None = None,
+        **kwargs,
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 
@@ -335,5 +348,7 @@ class ScheduleService:  # noqa: WPS214
             )
 
         return MeltanoInvoker(self.project).invoke(
-            ["elt", *schedule.elt_args, *args], env={**schedule.env, **env}, **kwargs
+            ["elt", *schedule.elt_args, *args],
+            env={**schedule.env, **env},
+            **kwargs,
         )

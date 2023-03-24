@@ -53,7 +53,8 @@ class DbtRunner(Runner):
         if exitcode:
             command = kwargs["command"] or args[0]
             raise RunnerError(
-                f"`dbt {command}` failed", {PluginType.TRANSFORMERS: exitcode}
+                f"`dbt {command}` failed",
+                {PluginType.TRANSFORMERS: exitcode},
             )
 
     async def run(self, log=None):
