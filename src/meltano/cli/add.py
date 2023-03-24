@@ -37,7 +37,7 @@ if t.TYPE_CHECKING:
     "--inherit-from",
     help=(
         "Add a plugin inheriting from an existing plugin in the project"
-        + " or a discoverable plugin identified, by name."
+        " or a discoverable plugin identified, by name."
     ),
 )
 @click.option(
@@ -48,9 +48,9 @@ if t.TYPE_CHECKING:
     "--as",
     "as_name",
     help=(
-        "Shorthand for '--inherit-from', that can be used to add a discoverable "
-        + "plugin to your project with a different name. "
-        + "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
+        "Shorthand for '--inherit-from', that can be used to add a "
+        "discoverable plugin to your project with a different name. "
+        "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
     ),
 )
 @click.option(
