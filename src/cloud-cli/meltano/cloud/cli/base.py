@@ -2,15 +2,33 @@
 
 from __future__ import annotations
 
+import asyncio
 import typing as t
 from dataclasses import dataclass
-from functools import partial
+from functools import partial, wraps
 from pathlib import Path
 
 import click
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
+
+
+def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
+    """Run the given async function using `asyncio.run`.
+
+    Args:
+        f: An async function.
+
+    Returns:
+        The given function wrapped so as to run within `asyncio.run`.
+    """
+
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return asyncio.run(f(*args, **kwargs))
+
+    return wrapper
 
 
 @dataclass

@@ -11,11 +11,12 @@ import click
 import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
+from meltano.cloud.cli.base import cloud, pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudExecution
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 MAX_PAGE_SIZE = 250
 UTC = datetime.timezone.utc
