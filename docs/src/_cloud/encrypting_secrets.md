@@ -29,6 +29,8 @@ meltano cloud config env delete <SECRET_NAME>
 
 Secrets are not able to be decrypted after they are set. If you need to change a secret, you can set the secret again.
 
+### Alpha Phase Encryption Method
+> The following method will be deprecated in Beta
 #### Public Key
 
 During the on-boarding process, Meltano will provide you with the Public Key of your public/private encryption key pair.
