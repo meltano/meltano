@@ -146,7 +146,7 @@ def _report_and_exit(results: dict[str, dict[str, int]]):
     status = "successfully" if failed_count == 0 else "with failures"
     message = (
         f"Testing completed {status}. "
-        + f"{passed_count} test(s) successful. {failed_count} test(s) failed."
+        f"{passed_count} test(s) successful. {failed_count} test(s) failed."
     )
 
     write_sep_line(message, "=", fg=("red" if exit_code else "green"))

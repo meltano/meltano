@@ -26,27 +26,38 @@ class TestScheduleCommand:
         client: MeltanoCloudClient,
         config: MeltanoCloudConfig,
     ):
-        path = f"schedules/v1/{tenant_resource_key}/{internal_project_id}/enabled"
+        url = urljoin(
+            client.api_url,
+            "/".join(
+                (
+                    "schedules",
+                    "v1",
+                    tenant_resource_key,
+                    internal_project_id,
+                    "dev",
+                    "daily",
+                    "enabled",
+                )
+            ),
+        )
         runner = CliRunner()
         for cmd in ("enable", "disable"):
-            with aioresponses() as m:
-                m.get(
-                    f"{config.base_auth_url}/oauth2/userInfo",
-                    status=200,
-                    body=json.dumps({"sub": "meltano-cloud-test"}),
-                )
-                m.put(urljoin(client.api_url, path), status=204)
-                result = runner.invoke(
-                    cli,
-                    (
-                        "--config-path",
-                        config.config_path,
-                        "schedule",
-                        "--deployment",
-                        "dev",
-                        cmd,
-                        "daily",
-                    ),
-                )
-                assert result.exit_code == 0
-                assert not result.output
+            for opts in (
+                ("--deployment=dev", cmd, "--schedule=daily"),
+                ("--schedule=daily", "--deployment=dev", cmd),
+                (cmd, "--schedule=daily", "--deployment=dev"),
+                ("--schedule=daily", cmd, "--deployment=dev"),
+            ):
+                with aioresponses() as m:
+                    m.get(
+                        f"{config.base_auth_url}/oauth2/userInfo",
+                        status=200,
+                        body=json.dumps({"sub": "meltano-cloud-test"}),
+                    )
+                    m.put(url, status=204)
+                    result = runner.invoke(
+                        cli,
+                        ("--config-path", config.config_path, "schedule", *opts),
+                    )
+                    assert result.exit_code == 0, result.output
+                    assert not result.output

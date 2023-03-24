@@ -154,9 +154,9 @@ class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
         name: str | None = None,
-        aliases: list[str] = None,
+        aliases: list[str] | None = None,
         env: str | None = None,
-        env_aliases: list[str] = None,
+        env_aliases: list[str] | None = None,
         kind: SettingKind | None = None,
         value=None,
         label: str | None = None,
