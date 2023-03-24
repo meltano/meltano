@@ -15,10 +15,6 @@ from structlog import get_logger
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 if sys.version_info >= (3, 8):
     from importlib.metadata import version
@@ -28,21 +24,14 @@ else:
 if t.TYPE_CHECKING:
     import types
 
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
+
 __all__ = ["MeltanoCloudClient"]
 
 logger = get_logger()
-
-
-def _cleanup_params(params: dict) -> dict:
-    """Remove None values from params.
-
-    Args:
-        params: The params to clean.
-
-    Returns:
-        The cleaned params.
-    """
-    return {k: v for k, v in params.items() if v is not None}
 
 
 class MeltanoCloudError(Exception):
@@ -157,6 +146,18 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             await self.auth.login()
         with self.headers(self.auth.get_auth_header()):
             yield
+
+    @staticmethod
+    def clean_params(params: dict) -> dict:
+        """Remove None values from params.
+
+        Args:
+            params: The params to clean.
+
+        Returns:
+            The cleaned params.
+        """
+        return {k: v for k, v in params.items() if v is not None}
 
     @asynccontextmanager
     async def _raw_request(
@@ -307,7 +308,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                 return await self._json_request(
                     "GET",
                     url,
-                    params=_cleanup_params(params),
+                    params=self.clean_params(params),
                 )
             except MeltanoCloudError as ex:
                 if ex.response.status == HTTPStatus.UNPROCESSABLE_ENTITY:
