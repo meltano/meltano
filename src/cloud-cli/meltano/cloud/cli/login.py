@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import typing as t
 
 import click
 
 from meltano.cloud.cli import cloud
-from meltano.cloud.cli.base import MeltanoCloudCLIContext, pass_context
+from meltano.cloud.cli.base import pass_context
+
+if t.TYPE_CHECKING:
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 
 @cloud.command
