@@ -35,4 +35,4 @@ The algorithm for encrypting secrets is an RSA assymetric encryption, using 4096
 
 More information is available on the AWS website:
 
-- https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html#key-spec-rsa-encryption
+- [https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html#key-spec-rsa-encryption](https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html#key-spec-rsa-encryption)
