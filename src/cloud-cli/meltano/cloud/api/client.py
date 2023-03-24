@@ -15,7 +15,6 @@ from structlog import get_logger
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 
-
 if sys.version_info >= (3, 8):
     from importlib.metadata import version
 else:

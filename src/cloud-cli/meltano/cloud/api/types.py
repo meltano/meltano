@@ -23,6 +23,7 @@ class CloudExecution(TypedDict):
     schedule_name: str
     job_name: str
 
+
 class CloudProjectSchedule(TypedDict):
     """Meltano Cloud project schedule details."""
 
