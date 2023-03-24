@@ -61,9 +61,9 @@ class TestMeltanoCloudConfig:
         subject: MeltanoCloudConfig,
     ):
         self.config_assertions(subject)
-        monkeypatch.setenv("MELTANO_CLOUD_PROJECT_ID", "project-id-from-env-var")
+        monkeypatch.setenv("MELTANO_CLOUD_INTERNAL_PROJECT_ID", "project-id-from-env-var")
         monkeypatch.setenv("MELTANO_CLOUD_APP_CLIENT_ID", "app-client-id-from-env-var")
-        assert subject.project_id == "project-id-from-env-var"
+        assert subject.internal_project_id == "project-id-from-env-var"
         assert subject.app_client_id == "app-client-id-from-env-var"
 
     def test_refresh(

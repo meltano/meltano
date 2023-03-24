@@ -9,15 +9,11 @@ from http import HTTPStatus
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import (
-    MeltanoCloudCLIContext,
-    cloud,
-    pass_context,
-    shared_option,
-)
+from meltano.cloud.cli.base import cloud, pass_context, shared_option
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 
 class SchedulesCloudClient(MeltanoCloudClient):
