@@ -110,7 +110,7 @@ class SchedulesCloudClient(MeltanoCloudClient):
     async def get_schedules(
         self,
         *,
-        deployment_name: str,
+        deployment_name: str | None = None,
         page_size: int | None = None,
         page_token: str | None = None,
     ):
@@ -332,7 +332,7 @@ schedule_list_formatters = {
 @pass_context
 def list_schedules(
     context: MeltanoCloudCLIContext,
-    output_format: str | None,
+    output_format: str,
     limit: int,
 ) -> None:
     """List Meltano Cloud schedules."""
