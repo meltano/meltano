@@ -204,9 +204,10 @@ async def _get_schedules(
     return results[:limit]
 
 
-def _process_table_row(row: CloudProjectSchedule) -> tuple[str, ...]:
+def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str, ...]:
     return tuple(
-        row[key] for key in ("deployment_name", "schedule_name", "interval", "enabled")
+        schedule[key]
+        for key in ("deployment_name", "schedule_name", "interval", "enabled")
     )
 
 
