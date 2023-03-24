@@ -63,8 +63,46 @@ class SchedulesCloudClient(MeltanoCloudClient):
             except MeltanoCloudError as ex:
                 if ex.response.status == HTTPStatus.NOT_FOUND:
                     ex.response.reason = (
-                        f"Unable to find schedule named {deployment_name!r} "
-                        f"within a deployment named {schedule_name!r}"
+                        f"Unable to find schedule named {schedule_name!r} "
+                        f"within a deployment named {deployment_name!r}"
+                    )
+                    raise MeltanoCloudError(ex.response) from ex
+                raise
+
+    async def get_schedule(
+        self,
+        *,
+        deployment_name: str,
+        schedule_name: str,
+    ):
+        """Use GET to get a Meltano Cloud project schedule.
+
+        Args:
+            deployment_name: The name of the deployment the schedule belongs to.
+            schedule_name: The name of the schedule.
+
+        Raises:
+            MeltanoCloudError: The Meltano Cloud API responded with an error.
+        """
+        async with self.authenticated():
+            try:
+                return await self._json_request(
+                    "GET",
+                    "/".join(
+                        (
+                            "/schedules/v1",
+                            self.config.tenant_resource_key,
+                            self.config.internal_project_id,
+                            deployment_name,
+                            schedule_name,
+                        )
+                    ),
+                )
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.NOT_FOUND:
+                    ex.response.reason = (
+                        f"Unable to find schedule named {schedule_name!r} "
+                        f"within a deployment named {deployment_name!r}"
                     )
                     raise MeltanoCloudError(ex.response) from ex
                 raise
@@ -76,12 +114,12 @@ class SchedulesCloudClient(MeltanoCloudClient):
         page_size: int | None = None,
         page_token: str | None = None,
     ):
-        """Use PUT to update the enabled state of a Meltano Cloud project schedule.
+        """Use GET to get Meltano Cloud project schedules.
 
         Args:
-            deployment: The name of the deployment the schedule belongs to.
-            schedule: The name of the schedule to enable/disable.
-            enabled: Whether the schedule should be enabled.
+            deployment_name: The name of the deployment the schedule belongs to.
+            page_size: The number of items to request per page.
+            page_token: The page token.
 
         Raises:
             MeltanoCloudError: The Meltano Cloud API responded with an error.
@@ -100,15 +138,9 @@ class SchedulesCloudClient(MeltanoCloudClient):
             path.append(deployment_name)
 
         async with self.authenticated():
-            try:
-                return await self._json_request(
-                    "GET", "/".join(path), params=self.clean_params(params)
-                )
-            except MeltanoCloudError as ex:
-                if ex.response.status == HTTPStatus.NOT_FOUND:
-                    ex.response.reason = "sad"
-                    raise MeltanoCloudError(ex.response) from ex
-                raise
+            return await self._json_request(
+                "GET", "/".join(path), params=self.clean_params(params)
+            )
 
 
 async def _set_enabled_state(
@@ -180,6 +212,21 @@ def disable(context: MeltanoCloudCLIContext) -> None:
     )
 
 
+async def _get_schedule(
+    config: MeltanoCloudConfig,
+    deployment_name: str | None,
+    schedule_name: str | None,
+) -> CloudProjectSchedule:
+    if schedule_name is None:
+        raise click.UsageError("Missing option '--schedule'")
+    if deployment_name is None:
+        raise click.UsageError("Missing option '--deployment'")
+    async with SchedulesCloudClient(config=config) as client:
+        return await client.get_schedule(
+            deployment_name=deployment_name, schedule_name=schedule_name
+        )
+
+
 async def _get_schedules(
     config: MeltanoCloudConfig,
     deployment_name: str | None,
@@ -209,7 +256,7 @@ async def _get_schedules(
 
 def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
     now = datetime.now(timezone.utc)
-    return tuple(it.islice(croniter(cron_expr, now), n))
+    return tuple(it.islice(croniter(cron_expr, now, ret_type=datetime), n))
 
 
 def _approx_daily_freq(cron_expr: str) -> float:
@@ -300,3 +347,30 @@ def list_schedules(
             )
         )
     )
+
+
+@schedule_group.command("describe")
+@deployment_option
+@schedule_option
+@pass_context
+def describe_schedule(context: MeltanoCloudCLIContext) -> None:
+    """List Meltano Cloud schedules."""
+    schedule = asyncio.run(
+        _get_schedule(
+            config=context.config,
+            deployment_name=context.deployment,
+            schedule_name=context.schedule,
+        ),
+    )
+    click.echo(
+        f"Deployment name: {schedule['deployment_name']}\n"
+        f"Schedule name:   {schedule['schedule_name']}\n"
+        f"Interval:        {schedule['interval']}\n"
+        f"Enabled:         {schedule['enabled']}"
+    )
+    if schedule["enabled"]:
+        click.echo(
+            "\nApproximate starting date and time (UTC) of next 5 schedule runs:"
+        )
+        for dt in _next_n_runs(5, schedule["interval"]):
+            click.echo(dt.strftime("%Y-%m-%d %H:%M"))
