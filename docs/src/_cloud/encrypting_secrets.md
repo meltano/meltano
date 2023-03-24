@@ -7,21 +7,36 @@ weight: 8
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 This document covers information on encrypting secrets in your Meltano `secrets.yml` file.
 
 ## Components for Encryption
 
-### Public Key
+### Encryption Method
+
+Use the `meltano cloud config env set <SECRET_NAME>` cli command to set an environment variable secret.
+
+This will set secrets via the `.env` file at runtime for a job or schedule.
+
+You can list and delete secrets configured as well.
+
+```
+meltano cloud config env list
+meltano cloud config env delete <SECRET_NAME>
+```
+
+Secrets are not able to be decrypted after they are set. If you need to change a secret, you can set the secret again.
+
+#### Public Key
 
 During the on-boarding process, Meltano will provide you with the Public Key of your public/private encryption key pair.
 For details on the encryption algorithms and other security related information, refer to the [Security page](/security).
 
 Save your public key somewhere for use during encryption.
 
-### Utility kms-ext
+#### Utility kms-ext
 
 We have a utility extension for encrypting your secrets:
 https://github.com/meltano/kms-ext
@@ -39,7 +54,7 @@ Once installed, you should be able to run `kms --help` to see usage, options, an
 > If you need to change or confirm your values, you will need to re-encrypt your .env file.
 > Each time encryption is performed, all contents in the .env file will update.
 
-### Example
+#### Example
 
 For this example, the following statements are true:
 
