@@ -70,6 +70,37 @@ Each deployment has a "Deployment Name", which defaults to the "Environment Name
   <p>At the current time, the Deployment Name will always be equivalent to the name of the environment that was deployed - and we do not yet support deploying the same environment twice as two different deployments. In future versions of Meltano, we plan to allow Environments to be deployed more than once (for example, for CI use cases), and for Deployment to be renamed.</p>
 </div>
 
+## Meltano Cloud Runs
+
+A "run" within Meltano is an instance of a Meltano operation that performed some compute. If you execute any of the following CLI commands, that is considered a Run:
+
+* invoke
+* elt
+* run
+* test
+
+Each run has additional adjectives that give more information about what kind of run it is.
+
+### On-demand, Unnamed Runs
+
+An unnamed run is one that is specified directly on the command line. If a user executes `invoke` or `test`, that is always an on-demand unnamed run. If a user executes `meltano run` or `meltano elt` and specifies each plugin on the command line, that is an unnamed run.
+
+### On-demand, Named Runs
+
+A named run is defined in the meltano.yml file either under the `jobs` key in the case of `meltano run` or via the `schedules` key in the case of `meltano elt`.
+
+On-demand, named run can be triggered via the following commands:
+
+* `meltano schedule run <schedule_name>` (this works for `meltano elt` or `meltano run`)
+* `meltano run <job_name>` (this works only for `meltano run`)
+
+### Scheduled Runs
+
+Scheduled runs are named jobs that have been set to execute on an interval and have been triggered automatically according to that schedule. These are defined under the `schedules` key in the meltano.yml file. [Documentation here.](/concepts/project#schedules)
+
+All scheduled runs are named runs.
+
+
 ## Meltano Cloud Schedules
 
 Schedules within Meltano Cloud map directly to schedules defined in `meltano.yml`. However, in Meltano Cloud, each schedule starts off disabled by default, and each schedule is enabled or disabled on a per-Deployment basis.
