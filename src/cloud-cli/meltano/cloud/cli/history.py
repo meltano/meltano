@@ -11,11 +11,12 @@ import click
 import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
+from meltano.cloud.cli.base import pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudExecution
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 MAX_PAGE_SIZE = 250
 UTC = datetime.timezone.utc
@@ -102,6 +103,7 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
 
     Args:
         history: The history to format.
+        table_format: The table format to use.
 
     Returns:
         The formatted history.
@@ -120,7 +122,7 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     )
 
 
-@cloud.command()
+@click.command()
 @click.option(
     "--filter",
     "schedule_filter",

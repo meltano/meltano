@@ -11,16 +11,12 @@ import click
 import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import (
-    MeltanoCloudCLIContext,
-    cloud,
-    pass_context,
-    shared_option,
-)
+from meltano.cloud.cli.base import pass_context, shared_option
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProjectSchedule
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 MAX_PAGE_SIZE = 250
 
@@ -133,7 +129,7 @@ async def _set_enabled_state(
 
 deployment_option = shared_option(
     "--deployment",
-    help="The name of a deployment within the active Meltano Cloud project.",
+    help="The name of the Meltano Cloud deployment the schedule belongs to.",
 )
 
 schedule_option = shared_option(
@@ -141,8 +137,7 @@ schedule_option = shared_option(
     help="The name of a schedule within the specified deployment.",
 )
 
-
-@cloud.group("schedule")
+@click.group("schedule")
 @deployment_option
 @schedule_option
 def schedule_group() -> None:

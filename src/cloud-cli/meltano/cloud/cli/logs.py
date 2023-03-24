@@ -9,13 +9,14 @@ import typing as t
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
+from meltano.cloud.cli.base import pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 
-@cloud.group()
+@click.group()
 def logs() -> None:
     """Meltano Cloud `logs` command."""
 

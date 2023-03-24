@@ -196,7 +196,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         path: str,
         base_url: str | None = None,
         **kwargs: t.Any,
-    ) -> dict | str:
+    ) -> dict[str, t.Any] | list[t.Any] | str | int | float | None:
         """Make a request to the Meltano Cloud API.
 
         Args:

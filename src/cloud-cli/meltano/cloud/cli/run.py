@@ -8,10 +8,11 @@ import typing as t
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import MeltanoCloudCLIContext, cloud, pass_context
+from meltano.cloud.cli.base import pass_context
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
+    from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 
 async def run_project(
@@ -36,7 +37,7 @@ async def run_project(
         )
 
 
-@cloud.command()
+@click.command()
 @click.argument("job_or_schedule")
 @click.option(
     "--deployment",
