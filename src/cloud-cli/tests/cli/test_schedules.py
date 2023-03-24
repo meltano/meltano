@@ -69,15 +69,15 @@ class TestScheduleCommand:
     def schedules(self) -> list[CloudProjectSchedule]:
         return [
             {
-                "deployment_name": "test deployment 1",
-                "schedule_name": "test schedule 1",
-                "interval": "1 2 3 4 5",
+                "deployment_name": "deployment 1",
+                "schedule_name": "schedule 1",
+                "interval": "1 2 * * *",
                 "enabled": True,
             },
             {
-                "deployment_name": "test deployment 2",
-                "schedule_name": "test schedule 2",
-                "interval": "5 4 3 2 1",
+                "deployment_name": "deployment 2",
+                "schedule_name": "schedule 2",
+                "interval": "15,45 */2 * * 1,3,5",
                 "enabled": False,
             },
         ]
@@ -115,12 +115,12 @@ class TestScheduleCommand:
         )
         assert result.exit_code == 0, result.output
         assert result.output == (
-            "╭───────────────────┬─────────────────┬────────────┬───────────╮\n"
-            "│ Deployment Name   │ Schedule Name   │ Interval   │ Enabled   │\n"
-            "├───────────────────┼─────────────────┼────────────┼───────────┤\n"
-            "│ test deployment 1 │ test schedule 1 │ 1 2 3 4 5  │ True      │\n"
-            "│ test deployment 2 │ test schedule 2 │ 5 4 3 2 1  │ False     │\n"
-            "╰───────────────────┴─────────────────┴────────────┴───────────╯\n"
+            "╭──────────────┬────────────┬─────────────────────┬──────────────┬───────────╮\n"  # noqa: E501
+            "│ Deployment   │ Schedule   │ Interval            │   Runs / Day │ Enabled   │\n"  # noqa: E501
+            "├──────────────┼────────────┼─────────────────────┼──────────────┼───────────┤\n"  # noqa: E501
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *           │        1.000 │ True      │\n"  # noqa: E501
+            "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │       10.268 │ False     │\n"  # noqa: E501
+            "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
         )
 
     @pytest.mark.usefixtures("schedules_get_reponse")

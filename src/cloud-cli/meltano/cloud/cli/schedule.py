@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import itertools as it
 import json
 import typing as t
+from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
 import click
 import tabulate
+from croniter import croniter, croniter_range
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import pass_context, shared_option
@@ -204,10 +207,25 @@ async def _get_schedules(
     return results[:limit]
 
 
-def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str, ...]:
-    return tuple(
-        schedule[key]
-        for key in ("deployment_name", "schedule_name", "interval", "enabled")
+def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
+    now = datetime.now(timezone.utc)
+    return tuple(it.islice(croniter(cron_expr, now), n))
+
+
+def _approx_daily_freq(cron_expr: str) -> float:
+    now = datetime.now(timezone.utc)
+    num_days = 365
+    num_runs = sum(1 for _ in croniter_range(now, now + timedelta(num_days), cron_expr))
+    return num_runs / num_days
+
+
+def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | float, ...]:
+    return (
+        schedule["deployment_name"],
+        schedule["schedule_name"],
+        schedule["interval"],
+        _approx_daily_freq(schedule["interval"]),
+        schedule["enabled"],
     )
 
 
@@ -224,8 +242,15 @@ def _format_schedules_table(
     """
     return tabulate.tabulate(
         [_process_table_row(schedule) for schedule in schedules],
-        headers=("Deployment Name", "Schedule Name", "Interval", "Enabled"),
+        headers=(
+            "Deployment",
+            "Schedule",
+            "Interval",
+            "Runs / Day",
+            "Enabled",
+        ),
         tablefmt=table_format,
+        floatfmt=".3f",
     )
 
 

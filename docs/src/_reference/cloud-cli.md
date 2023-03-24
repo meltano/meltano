@@ -57,8 +57,32 @@ Currently, updating a schedule requires a redeployment. In the future it will be
 
 ```sh
 # Enable a schedule
-meltano cloud schedule --deployment <deployment name> enable <schedule name>
+meltano cloud schedule enable --deployment <deployment name> --schedule <schedule name>
 
 # Disable a schedule
-meltano cloud schedule --deployment <deployment name> disable <schedule name>
+meltano cloud schedule disable --deployment <deployment name> --schedule <schedule name>
+```
+
+Schedules can be listed using the `list` command. For example:
+
+```sh
+meltano cloud schedule list
+╭──────────────┬────────────┬──────────────────────┬──────────────┬──────────╮
+│ Deployment   │ Schedule   │ Interval             │   Runs / Day │Enabled   │
+├──────────────┼────────────┼──────────────────────┼──────────────┼──────────┤
+│ staging      │ schedule_1 │ 0 6 * * *            │        1.000 │ False    │
+│ staging      │ schedule_2 │ 0 */6 * * *          │        4.000 │ True     │
+│ prod         │ schedule_3 │ 0 6 * * *            │        1.000 │ True     │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │       10.268 │ False    │
+╰──────────────┴────────────┴──────────────────────┴──────────────┴──────────╯
+```
+
+```sh
+meltano cloud schedule list --deployment prod
+╭──────────────┬────────────┬──────────────────────┬──────────────┬──────────╮
+│ Deployment   │ Schedule   │ Interval             │   Runs / Day │Enabled   │
+├──────────────┼────────────┼──────────────────────┼──────────────┼──────────┤
+│ prod         │ schedule_3 │ 0 6 * * *            │        1.000 │ True     │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │       10.268 │ False    │
+╰──────────────┴────────────┴──────────────────────┴──────────────┴──────────╯
 ```
