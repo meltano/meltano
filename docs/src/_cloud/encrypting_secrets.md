@@ -16,7 +16,7 @@ This document covers information on encrypting secrets in your Meltano `secrets.
 
 ### Encryption Method
 
-Use the `meltano cloud config env set <SECRET_NAME>` cli command to set an environment variable secret.
+Use the `meltano cloud config env set <SECRET_NAME>` CLI command to set an environment variable secret.
 
 This will set secrets via the `.env` file at runtime for a job or schedule.
 
@@ -27,7 +27,7 @@ meltano cloud config env list
 meltano cloud config env delete <SECRET_NAME>
 ```
 
-Secrets are not able to be decrypted after they are set. If you need to change a secret, you can set the secret again.
+Secrets cannot be decrypted after they are set. If you need to change a secret, you can set the secret again.
 
 ### Alpha Phase Encryption Method
 > The following method will be deprecated in Beta
