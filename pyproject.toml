@@ -566,6 +566,7 @@ ignore = [
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
 ]
 select = [
+  "C4",  # flake8-comprehensions
   "E",   # pycodestyle (error)
   "F",   # pyflakes
   "I",   # isort
