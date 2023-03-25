@@ -81,7 +81,7 @@ def _debug_logging_handler(
         return asyncio.ensure_future(
             _stream_redirect(
                 stderr,
-                *sys.stderr,
+                sys.stderr,
                 *other_dsts,
                 write_str=True,  # noqa: WPS517
             ),
