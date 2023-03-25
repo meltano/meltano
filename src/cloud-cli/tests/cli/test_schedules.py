@@ -144,7 +144,7 @@ class TestScheduleCommand:
         assert result.exit_code == 0, result.output
         assert json.loads(result.output) == schedules
 
-    @freeze_time("2023-03-24 20:30:00")
+    @freeze_time("2023-03-24 16:00:00")
     def test_schedule_describe(
         self,
         tenant_resource_key: str,
@@ -154,7 +154,7 @@ class TestScheduleCommand:
     ):
         deployment_name = "test deployment name"
         schedule_name = "test schedule name"
-        interval = "15,45 */2 * * 1,3,5"
+        interval = "15,45 */8 * * 1,3,5"
         path = urljoin(
             client.api_url,
             (
@@ -172,6 +172,18 @@ class TestScheduleCommand:
             deployment_name,
             "--schedule",
             schedule_name,
+            "--num-upcoming=9",
+        )
+        upcoming_datetimes = (
+            "2023-03-24 16:15\n"
+            "2023-03-24 16:45\n"
+            "2023-03-27 00:15\n"
+            "2023-03-27 00:45\n"
+            "2023-03-27 08:15\n"
+            "2023-03-27 08:45\n"
+            "2023-03-27 16:15\n"
+            "2023-03-27 16:45\n"
+            "2023-03-29 00:15\n"
         )
         with aioresponses() as m:
             m.get(
@@ -191,19 +203,37 @@ class TestScheduleCommand:
             )
             result = runner.invoke(cli, cli_args)
             assert result.exit_code == 0, result.output
-            assert result.output == (
-                "Deployment name: test deployment name\n"
-                "Schedule name:   test schedule name\n"
-                "Interval:        15,45 */2 * * 1,3,5\n"
-                "Enabled:         True\n"
-                "\n"
-                "Approximate starting date and time (UTC) of next 5 schedule runs:\n"
-                "2023-03-24 20:45\n"
-                "2023-03-24 22:15\n"
-                "2023-03-24 22:45\n"
-                "2023-03-27 00:15\n"
-                "2023-03-27 00:45\n"
+            assert (
+                result.output
+                == (
+                    "Deployment name: test deployment name\n"
+                    "Schedule name:   test schedule name\n"
+                    "Interval:        15,45 */8 * * 1,3,5\n"
+                    "Enabled:         True\n"
+                    "\n"
+                    "Approximate starting date and time (UTC) of next 9 scheduled runs:\n"
+                )
+                + upcoming_datetimes
             )
+
+            m.get(
+                f"{config.base_auth_url}/oauth2/userInfo",
+                status=200,
+                body=json.dumps({"sub": "meltano-cloud-test"}),
+            )
+            m.get(
+                path,
+                status=200,
+                payload={
+                    "deployment_name": deployment_name,
+                    "schedule_name": schedule_name,
+                    "interval": interval,
+                    "enabled": True,
+                },
+            )
+            result = runner.invoke(cli, (*cli_args, "--only-upcoming"))
+            assert result.exit_code == 0, result.output
+            assert result.output == upcoming_datetimes
 
             m.get(
                 f"{config.base_auth_url}/oauth2/userInfo",
@@ -225,6 +255,6 @@ class TestScheduleCommand:
             assert result.output == (
                 "Deployment name: test deployment name\n"
                 "Schedule name:   test schedule name\n"
-                "Interval:        15,45 */2 * * 1,3,5\n"
+                "Interval:        15,45 */8 * * 1,3,5\n"
                 "Enabled:         False\n"
             )

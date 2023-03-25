@@ -90,7 +90,7 @@ meltano cloud schedule list --deployment prod
 Individual schedules can be more thoroughly described using the `describe` command:
 
 ```sh
-meltano cloud schedule describe --deployment staging --schedule schedule_4
+meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5
 Deployment name: prod
 Schedule name:   schedule_4
 Interval:        15,45 */2 * * 1,3,5
@@ -103,3 +103,16 @@ Approximate starting date and time (UTC) of next 5 schedule runs:
 2023-03-27 00:15
 2023-03-27 00:45
 ```
+
+The `--only-upcoming` option can be used to have the command only output the upcoming scheduled run start dates and times:
+
+```sh
+meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5 --only-upcoming
+2023-03-24 20:45
+2023-03-24 22:15
+2023-03-24 22:45
+2023-03-27 00:15
+2023-03-27 00:45
+```
+
+If a schedule is disabled, it will never have any upcoming scheduled runs.

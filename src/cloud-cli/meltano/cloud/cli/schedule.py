@@ -259,14 +259,18 @@ def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
     return tuple(it.islice(croniter(cron_expr, now, ret_type=datetime), n))
 
 
-def _approx_daily_freq(cron_expr: str) -> float:
+def _approx_daily_freq(
+    cron_expr: str,
+    sample_period: timedelta = timedelta(days=365),
+    num_digits_precision: int = 1,
+) -> str:
     now = datetime.now(timezone.utc)
-    num_days = 365
-    num_runs = sum(1 for _ in croniter_range(now, now + timedelta(num_days), cron_expr))
-    return num_runs / num_days
+    num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
+    freq = round(num_runs / sample_period.days, num_digits_precision)
+    return str(int(freq) if freq.is_integer() else freq)
 
 
-def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | float, ...]:
+def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | int | float, ...]:
     return (
         schedule["deployment_name"],
         schedule["schedule_name"],
@@ -297,7 +301,6 @@ def _format_schedules_table(
             "Enabled",
         ),
         tablefmt=table_format,
-        floatfmt=".3f",
     )
 
 
@@ -352,8 +355,23 @@ def list_schedules(
 @schedule_group.command("describe")
 @deployment_option
 @schedule_option
+@click.option(
+    "--only-upcoming",
+    is_flag=True,
+    help="Only list upcoming scheduled run start datetimes",
+)
+@click.option(
+    "--num-upcoming",
+    type=int,
+    default=10,
+    help="The number of upcoming scheduled run start datetimes to list",
+)
 @pass_context
-def describe_schedule(context: MeltanoCloudCLIContext) -> None:
+def describe_schedule(
+    context: MeltanoCloudCLIContext,
+    only_upcoming: bool,
+    num_upcoming: int,
+) -> None:
     """List Meltano Cloud schedules."""
     schedule = asyncio.run(
         _get_schedule(
@@ -362,15 +380,18 @@ def describe_schedule(context: MeltanoCloudCLIContext) -> None:
             schedule_name=context.schedule,
         ),
     )
-    click.echo(
-        f"Deployment name: {schedule['deployment_name']}\n"
-        f"Schedule name:   {schedule['schedule_name']}\n"
-        f"Interval:        {schedule['interval']}\n"
-        f"Enabled:         {schedule['enabled']}"
-    )
-    if schedule["enabled"]:
+    if not only_upcoming:
         click.echo(
-            "\nApproximate starting date and time (UTC) of next 5 schedule runs:"
+            f"Deployment name: {schedule['deployment_name']}\n"
+            f"Schedule name:   {schedule['schedule_name']}\n"
+            f"Interval:        {schedule['interval']}\n"
+            f"Enabled:         {schedule['enabled']}"
         )
-        for dt in _next_n_runs(5, schedule["interval"]):
+        if schedule["enabled"]:
+            click.echo(
+                "\nApproximate starting date and time (UTC) of "
+                f"next {num_upcoming} scheduled runs:"
+            )
+    if schedule["enabled"]:
+        for dt in _next_n_runs(num_upcoming, schedule["interval"]):
             click.echo(dt.strftime("%Y-%m-%d %H:%M"))
