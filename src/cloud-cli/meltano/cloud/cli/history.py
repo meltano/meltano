@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import datetime
 import json
 import typing as t
@@ -11,7 +10,7 @@ import click
 import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import pass_context
+from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -145,7 +144,8 @@ def _format_history_table(history: list[CloudExecution], table_format: str) -> s
     help="The output format to use.",
 )
 @pass_context
-def history(
+@run_async
+async def history(
     context: MeltanoCloudCLIContext,
     *,
     schedule_filter: str | None,
@@ -153,13 +153,11 @@ def history(
     output_format: str,
 ) -> None:
     """Get a Meltano project execution history in Meltano Cloud."""
-    items = asyncio.run(
-        _get_history(
+    items = await _get_history(
             context.config,
             schedule_filter=schedule_filter,
             limit=limit,
-        ),
-    )
+        )
 
     if output_format == "json":
         output = json.dumps(items, indent=2)

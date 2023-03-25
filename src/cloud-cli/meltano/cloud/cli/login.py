@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 import click
 
-from meltano.cloud.cli.base import pass_context
+from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
@@ -15,15 +14,17 @@ if t.TYPE_CHECKING:
 
 @click.command
 @pass_context
-def login(context: MeltanoCloudCLIContext) -> None:
+@run_async
+async def login(context: MeltanoCloudCLIContext) -> None:
     """Log in to Meltano Cloud."""
-    asyncio.run(context.auth.login())
-    user_info = asyncio.run(context.auth.get_user_info_json())
+    await context.auth.login()
+    user_info = await context.auth.get_user_info_json()
     click.secho(f"Logged in as {user_info['preferred_username']}", fg="green")
 
 
 @click.command
 @pass_context
-def logout(context: MeltanoCloudCLIContext) -> None:
+@run_async
+async def logout(context: MeltanoCloudCLIContext) -> None:
     """Log out of Meltano Cloud."""
-    asyncio.run(context.auth.logout())
+    await context.auth.logout()

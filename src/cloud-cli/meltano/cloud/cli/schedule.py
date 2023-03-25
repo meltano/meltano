@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import itertools as it
 import json
 import typing as t
@@ -14,7 +13,7 @@ import tabulate
 from croniter import croniter, croniter_range
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import pass_context, shared_option
+from meltano.cloud.cli.base import pass_context, shared_option, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -184,15 +183,14 @@ def schedule_group() -> None:
 @deployment_option
 @schedule_option
 @pass_context
-def enable(context: MeltanoCloudCLIContext) -> None:
+@run_async
+async def enable(context: MeltanoCloudCLIContext) -> None:
     """Enable a Meltano Cloud schedule."""
-    asyncio.run(
-        _set_enabled_state(
-            config=context.config,
-            deployment_name=context.deployment,
-            schedule_name=context.schedule,
-            enabled=True,
-        )
+    await _set_enabled_state(
+        config=context.config,
+        deployment_name=context.deployment,
+        schedule_name=context.schedule,
+        enabled=True,
     )
 
 
@@ -200,15 +198,14 @@ def enable(context: MeltanoCloudCLIContext) -> None:
 @deployment_option
 @schedule_option
 @pass_context
-def disable(context: MeltanoCloudCLIContext) -> None:
+@run_async
+async def disable(context: MeltanoCloudCLIContext) -> None:
     """Disable a Meltano Cloud schedule."""
-    asyncio.run(
-        _set_enabled_state(
-            config=context.config,
-            deployment_name=context.deployment,
-            schedule_name=context.schedule,
-            enabled=False,
-        )
+    await _set_enabled_state(
+        config=context.config,
+        deployment_name=context.deployment,
+        schedule_name=context.schedule,
+        enabled=False,
     )
 
 
@@ -333,7 +330,8 @@ schedule_list_formatters = {
     help="The output format to use.",
 )
 @pass_context
-def list_schedules(
+@run_async
+async def list_schedules(
     context: MeltanoCloudCLIContext,
     output_format: str,
     limit: int,
@@ -341,12 +339,10 @@ def list_schedules(
     """List Meltano Cloud schedules."""
     click.echo(
         schedule_list_formatters[output_format](
-            asyncio.run(
-                _get_schedules(
-                    config=context.config,
-                    deployment_name=context.deployment,
-                    limit=limit,
-                ),
+            await _get_schedules(
+                config=context.config,
+                deployment_name=context.deployment,
+                limit=limit,
             )
         )
     )
@@ -367,19 +363,19 @@ def list_schedules(
     help="The number of upcoming scheduled run start datetimes to list",
 )
 @pass_context
-def describe_schedule(
+@run_async
+async def describe_schedule(
     context: MeltanoCloudCLIContext,
     only_upcoming: bool,
     num_upcoming: int,
 ) -> None:
     """List Meltano Cloud schedules."""
-    schedule = asyncio.run(
-        _get_schedule(
-            config=context.config,
-            deployment_name=context.deployment,
-            schedule_name=context.schedule,
-        ),
+    schedule = await _get_schedule(
+        config=context.config,
+        deployment_name=context.deployment,
+        schedule_name=context.schedule,
     )
+
     if not only_upcoming:
         click.echo(
             f"Deployment name: {schedule['deployment_name']}\n"
