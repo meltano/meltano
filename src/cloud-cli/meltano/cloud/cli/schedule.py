@@ -13,7 +13,7 @@ import tabulate
 from croniter import croniter, croniter_range
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import pass_context, shared_option, run_async
+from meltano.cloud.cli.base import pass_context, run_async, shared_option
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig

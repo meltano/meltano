@@ -154,10 +154,10 @@ async def history(
 ) -> None:
     """Get a Meltano project execution history in Meltano Cloud."""
     items = await _get_history(
-            context.config,
-            schedule_filter=schedule_filter,
-            limit=limit,
-        )
+        context.config,
+        schedule_filter=schedule_filter,
+        limit=limit,
+    )
 
     if output_format == "json":
         output = json.dumps(items, indent=2)
