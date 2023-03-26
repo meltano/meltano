@@ -360,7 +360,6 @@ pyflakes = [
 [tool.flakeheaven.exceptions."src/meltano/core/project_init_service.py"]
 "wemake-python-styleguide" = [
   "-WPS226", # Found string constant over-use: blue > 3
-  "-WPS229", # Found too long ``try`` body length: 3 > 1
   "-WPS213", # Found too many expressions: 27 > 9
 ]
 
@@ -566,6 +565,7 @@ ignore = [
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
 ]
 select = [
+  "B",   # flake8-bugbear
   "COM", # flake8-commas
   "E",   # pycodestyle (error)
   "F",   # pyflakes

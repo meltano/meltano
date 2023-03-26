@@ -104,7 +104,7 @@ def cli(  # noqa: C901,WPS231
         except OSError as ex:
             raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
 
-    try:  # noqa: WPS229
+    try:
         project = Project.find()
         setup_logging(project)
         if project.readonly:

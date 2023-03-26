@@ -326,7 +326,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
             return self._discovery
         except (YAMLError, Exception) as err:
-            raise DiscoveryInvalidError(str(err))
+            raise DiscoveryInvalidError(str(err)) from err
 
     def cache_discovery(self):
         """Cache the `discovery.yml` manifest."""

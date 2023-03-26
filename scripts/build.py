@@ -30,17 +30,25 @@ def build_webapp() -> None:
         )
         node_version_check.check_returncode()
     except Exception:
-        warn(f"{warning_prefix} could not execute 'node --version'", Warning)
+        warn(
+            f"{warning_prefix} could not execute 'node --version'",
+            Warning,
+            stacklevel=2,
+        )
         return
 
     try:
         subprocess.run(("yarn", "--version")).check_returncode()
     except Exception:
-        warn(f"{warning_prefix} could not execute 'yarn --version'", Warning)
+        warn(
+            f"{warning_prefix} could not execute 'yarn --version'",
+            Warning,
+            stacklevel=2,
+        )
         return
 
     if not node_version_check.stdout.startswith("v16"):
-        warn(f"{warning_prefix} NodeJS v16 is required", Warning)
+        warn(f"{warning_prefix} NodeJS v16 is required", Warning, stacklevel=2)
         return
 
     # Build static web app
