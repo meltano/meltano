@@ -122,11 +122,10 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         state_ids = set()
         for blob in self.client.list_blobs(bucket_or_name=self.bucket):
             (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json":
-                if not pattern:
-                    state_ids.add(state_id)
-                elif pattern_re.match(state_id):
-                    state_ids.add(state_id)
+            if filename == "state.json" and (
+                not pattern or pattern and pattern_re.match(state_id)
+            ):
+                state_ids.add(state_id)
         return list(state_ids)
 
     def delete(self, file_path: str):

@@ -500,8 +500,6 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             state_id = b64decode(
                 os.path.basename(os.path.dirname(state_file)).encode(),
             ).decode()
-            if not pattern:
-                state_ids.add(state_id)
-            elif pattern_re.match(state_id):
+            if not pattern or pattern and pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids

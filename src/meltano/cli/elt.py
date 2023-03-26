@@ -344,10 +344,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     singer_runner = SingerRunner(elt_context)
     try:
-        with extractor_log.line_writer() as extractor_log_writer:
-            with loader_log.line_writer() as loader_log_writer:
-                with extractor_out_writer_ctxmgr() as extractor_out_writer:
-                    with loader_out_writer_ctxmgr() as loader_out_writer:
+        # Once Python 3.9 support has been dropped, update this with statement
+        # to use parentheses instead of backslashes.
+        # fmt: off
+        with extractor_log.line_writer() as extractor_log_writer, \
+             loader_log.line_writer() as loader_log_writer, \
+             extractor_out_writer_ctxmgr() as extractor_out_writer, \
+             loader_out_writer_ctxmgr() as loader_out_writer:
+             # fmt: on
                         await singer_runner.run(
                             **kwargs,
                             extractor_log=extractor_log_writer,

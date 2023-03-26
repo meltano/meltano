@@ -573,6 +573,7 @@ select = [
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "RSE", # flake8-raise
+  "SIM", # flake8-simplify
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]

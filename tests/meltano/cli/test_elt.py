@@ -90,9 +90,8 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         seen_lines.append(parsed_line)
 
     for line in seen_lines:
-        if line.get("exc_info"):
-            if repr(exc) in line.get("exc_info"):
-                return True
+        if line.get("exc_info") and repr(exc) in line.get("exc_info"):
+            return True
     return False
 
 

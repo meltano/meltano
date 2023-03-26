@@ -206,7 +206,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         """Close the underlying process stdin if the block is a consumer."""
         if self.consumer:
             self.process_handle.stdin.close()
-            with suppress(AttributeError):  # `wait_closed` is Python 3.8+ (see #3347
+            with suppress(AttributeError):  # `wait_closed` is Python 3.8+ (see #3347)
                 await self.process_handle.stdin.wait_closed()
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
@@ -248,12 +248,10 @@ class InvokerBase:  # noqa: WPS230, WPS214
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""
-        try:
+        with suppress(FileNotFoundError):
+            # TODO: should we preserve these on a failure?
+            # The invoker prepared context manager was able to clean up the configs
             await self.invoker.cleanup()
-        except FileNotFoundError:
-            # TODO: should we preserve these on a failure ?
-            # the invoker prepared context manager was able to clean up the configs
-            pass
 
     def _merge_outputs(self, source: str, outputs: list) -> list:
         if not self.invoker.output_handlers:
@@ -367,8 +365,6 @@ class SingerBlock(InvokerBase, IOBlock):
             self._stdout_future.cancel()
         if self._stderr_future is not None:
             self._stderr_future.cancel()
-        try:
-            await self.invoker.cleanup()
-        except FileNotFoundError:
+        with suppress(FileNotFoundError):
             # the invoker prepared context manager was able to clean up the configs
-            pass
+            await self.invoker.cleanup()
