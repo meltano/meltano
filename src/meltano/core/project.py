@@ -315,7 +315,7 @@ class Project(Versioned):  # noqa: WPS214
 
         conf: dict[str, t.Any] = yaml.load(self.meltanofile)
         if conf is None:
-            raise EmptyMeltanoFileException()
+            raise EmptyMeltanoFileException
 
         lock = (
             self._meltano_rw_lock.write_lock
