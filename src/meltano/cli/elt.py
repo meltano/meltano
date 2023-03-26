@@ -95,7 +95,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @click.pass_context
 @pass_project(migrate=True)
 @click_run_async
-async def elt(
+async def elt(  # noqa: WPS 408
     project: Project,
     ctx: click.Context,
     extractor: str,
@@ -303,7 +303,12 @@ async def _run_elt(
             ) from err
 
 
-async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231
+async def _run_extract_load(  # noqa: WPS210, WPS231
+    log,
+    elt_context,
+    output_logger,
+    **kwargs,
+):
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -344,14 +349,12 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     singer_runner = SingerRunner(elt_context)
     try:
-        # Once Python 3.9 support has been dropped, update this with statement
-        # to use parentheses instead of backslashes.
-        # fmt: off
-        with extractor_log.line_writer() as extractor_log_writer, \
-             loader_log.line_writer() as loader_log_writer, \
-             extractor_out_writer_ctxmgr() as extractor_out_writer, \
-             loader_out_writer_ctxmgr() as loader_out_writer:
-             # fmt: on
+        # Once Python 3.9 support has been dropped, consolidate these
+        # with-statements by using parentheses.
+        with extractor_log.line_writer() as extractor_log_writer:  # noqa: SIM117
+            with loader_log.line_writer() as loader_log_writer:
+                with extractor_out_writer_ctxmgr() as extractor_out_writer:
+                    with loader_out_writer_ctxmgr() as loader_out_writer:
                         await singer_runner.run(
                             **kwargs,
                             extractor_log=extractor_log_writer,

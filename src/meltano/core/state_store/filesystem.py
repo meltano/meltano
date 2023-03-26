@@ -492,14 +492,11 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
         if pattern:
             pattern_re = re.compile(pattern.replace("*", ".*"))
         for state_file in glob.glob(
-            os.path.join(
-                self.state_dir,
-                os.path.join("*", "state.json"),
-            ),
+            os.path.join(self.state_dir, os.path.join("*", "state.json")),
         ):
             state_id = b64decode(
                 os.path.basename(os.path.dirname(state_file)).encode(),
             ).decode()
-            if not pattern or pattern and pattern_re.match(state_id):
+            if (not pattern) or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids
