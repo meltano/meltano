@@ -566,6 +566,7 @@ ignore = [
 ]
 select = [
   "B",   # flake8-bugbear
+  "C4",  # flake8-comprehensions
   "COM", # flake8-commas
   "E",   # pycodestyle (error)
   "F",   # pyflakes
