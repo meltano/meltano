@@ -463,7 +463,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
                     ]
                     if failed:
                         failed_future = failed.pop()
-                        raise failed_future.exception  # noqa: RSE102
+                        raise failed_future.exception()  # noqa: RSE102
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
