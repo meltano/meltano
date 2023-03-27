@@ -34,13 +34,16 @@ body {
   color: #080216;
 }
 
-a {
+a, a:hover {
   color: #f963bc;
 }
 
-a:hover {
-  color: #f963bc;
+.content a:hover {
   text-decoration: underline;
+}
+
+hr {
+  background-color: #311772;
 }
 
 h1, h2, h3, h4, h5, h6 {
