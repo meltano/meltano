@@ -70,10 +70,10 @@ meltano cloud schedule list
 ╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
 │ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
 ├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
-│ staging      │ schedule_1 │ 0 6 * * *            │        1.000 │ False     │
-│ staging      │ schedule_2 │ 0 */6 * * *          │        4.000 │ True      │
-│ prod         │ schedule_3 │ 0 6 * * *            │        1.000 │ True      │
-│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │       10.268 │ False     │
+│ staging      │ schedule_1 │ 0 6 * * 1,3,5        │        < 1.0 │ False     │
+│ staging      │ schedule_2 │ 0 */6 * * *          │          4.0 │ True      │
+│ prod         │ schedule_3 │ 0 6 * * *            │          1.0 │ True      │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │         10.3 │ False     │
 ╰──────────────┴────────────┴──────────────────────┴──────────────┴───────────╯
 ```
 
@@ -82,8 +82,8 @@ meltano cloud schedule list --deployment prod
 ╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
 │ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
 ├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
-│ prod         │ schedule_3 │ 0 6 * * *            │        1.000 │ True      │
-│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │       10.268 │ False     │
+│ prod         │ schedule_3 │ 0 6 * * *            │          1.0 │ True      │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │         10.3 │ False     │
 ╰──────────────┴────────────┴──────────────────────┴──────────────┴───────────╯
 ```
 
