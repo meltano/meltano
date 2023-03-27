@@ -111,7 +111,7 @@ a.navbar-item:hover, .navbar-item.has-dropdown:hover .navbar-link {
   color: #080216;
 }
 
-.menu-list a, .breadcrumb a, .breadcrumb li + li::before {
+.tab > * > a, .menu-list a, .breadcrumb a, .breadcrumb li + li::before {
   color: rgb(98, 98, 110);
 }
 
