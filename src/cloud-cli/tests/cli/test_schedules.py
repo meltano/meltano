@@ -130,7 +130,7 @@ class TestScheduleCommand:
             "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │         10.3 │ False     │\n"  # noqa: E501
             "│ deployment 3 │ schedule 3 │ 0 0 * * 1,3,5       │          < 1 │ False     │\n"  # noqa: E501
             "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
-        )
+        )  # noqa: E501
 
     @pytest.mark.usefixtures("schedules_get_reponse")
     def test_schedule_list_json(
@@ -218,7 +218,7 @@ class TestScheduleCommand:
                     "Interval:        15,45 */8 * * 1,3,5\n"
                     "Enabled:         True\n"
                     "\n"
-                    "Approximate starting date and time (UTC) of next 9 scheduled runs:\n"
+                    "Approximate starting date and time (UTC) of next 9 scheduled runs:\n"  # noqa: E501
                 )
                 + upcoming_datetimes
             )

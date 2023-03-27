@@ -256,15 +256,18 @@ def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
     return tuple(it.islice(croniter(cron_expr, now, ret_type=datetime), n))
 
 
+timedelta_year = timedelta(days=365)  # noqa: WPS432
+
+
 def _approx_daily_freq(
     cron_expr: str,
-    sample_period: timedelta = timedelta(days=365),
+    sample_period: timedelta = timedelta_year,
     num_digits_precision: int = 1,
 ) -> str:
     now = datetime.now(timezone.utc)
     num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
     freq = round(num_runs / sample_period.days, num_digits_precision)
-    return "< 1" if freq < 1.0 else str(freq)
+    return "< 1" if freq < 1 else str(freq)
 
 
 def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | int | float, ...]:
@@ -298,9 +301,10 @@ def _format_schedules_table(
             "Enabled",
         ),
         tablefmt=table_format,
-        floatfmt='.1f',
+        floatfmt=".1f",
         colalign=("left", "left", "left", "right", "left"),
     )
+
 
 schedule_list_formatters = {
     "json": lambda schedules: json.dumps(schedules, indent=2),
