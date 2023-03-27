@@ -264,7 +264,7 @@ def _approx_daily_freq(
     now = datetime.now(timezone.utc)
     num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
     freq = round(num_runs / sample_period.days, num_digits_precision)
-    return str(int(freq) if freq.is_integer() else freq)
+    return "< 1" if freq < 1.0 else str(freq)
 
 
 def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | int | float, ...]:
@@ -298,8 +298,9 @@ def _format_schedules_table(
             "Enabled",
         ),
         tablefmt=table_format,
+        floatfmt='.1f',
+        colalign=("left", "left", "left", "right", "left"),
     )
-
 
 schedule_list_formatters = {
     "json": lambda schedules: json.dumps(schedules, indent=2),

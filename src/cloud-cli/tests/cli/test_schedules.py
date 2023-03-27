@@ -81,6 +81,12 @@ class TestScheduleCommand:
                 "interval": "15,45 */2 * * 1,3,5",
                 "enabled": False,
             },
+            {
+                "deployment_name": "deployment 3",
+                "schedule_name": "schedule 3",
+                "interval": "0 0 * * 1,3,5",
+                "enabled": False,
+            },
         ]
 
     @pytest.fixture
@@ -120,8 +126,9 @@ class TestScheduleCommand:
             "╭──────────────┬────────────┬─────────────────────┬──────────────┬───────────╮\n"  # noqa: E501
             "│ Deployment   │ Schedule   │ Interval            │   Runs / Day │ Enabled   │\n"  # noqa: E501
             "├──────────────┼────────────┼─────────────────────┼──────────────┼───────────┤\n"  # noqa: E501
-            "│ deployment 1 │ schedule 1 │ 1 2 * * *           │        1.000 │ True      │\n"  # noqa: E501
-            "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │       10.268 │ False     │\n"  # noqa: E501
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *           │          1.0 │ True      │\n"  # noqa: E501
+            "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │         10.3 │ False     │\n"  # noqa: E501
+            "│ deployment 3 │ schedule 3 │ 0 0 * * 1,3,5       │          < 1 │ False     │\n"  # noqa: E501
             "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
         )
 
