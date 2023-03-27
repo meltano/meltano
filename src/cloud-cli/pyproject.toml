@@ -53,6 +53,7 @@ meltano-cloud = "meltano.cloud.cli:main"
 [tool.poetry.group.dev.dependencies]
 aioresponses = "^0.7.4"
 freezegun = "^1.2.2"
+hypothesis = "^6.70.0"
 pytest = "^7.2.2"
 pytest-asyncio = "^0.21.0"
 pytest-randomly = "^3.12"
