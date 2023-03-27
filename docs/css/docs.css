@@ -40,6 +40,8 @@ a {
 
 a:hover {
   color: #f963bc;
+}
+.content a:hover {
   text-decoration: underline;
 }
 
@@ -63,7 +65,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar a {
-  color: #485fc7;
+  color: #311772;
 }
 
 .navbar-burger {
@@ -92,7 +94,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-item.has-dropdown:hover .navbar-link {
-  color: #485fc7;
+  color: #311772;
 }
 
 .navbar-item.has-dropdown:hover .navbar-dropdown .navbar-item {
@@ -136,8 +138,12 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
-.title {
-  color: #3e3c8e;
+.footer h1, .footer h2, .footer h3 {
+  color: white;
+}
+
+.title, h1.title {
+  color: #311772;
 }
 
 .chiclet {
