@@ -44,6 +44,7 @@ pytest_deps = (
     "aioresponses",
     "colorama",  # colored output in Windows
     "freezegun",
+    "hypothesis",
     "mock",
     "pytest",
     "pytest-asyncio",
