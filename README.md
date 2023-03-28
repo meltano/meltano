@@ -1,6 +1,6 @@
 
 <h1 align="center">Meltano - Extract & Load /with joy/</h1>
-<h3 align="center"> — CLI & version control for ELT without limitations. No more black box. Let your creativity flow.</h3>
+<h3 align="center">CLI & version control for ELT without limitations. No more black box. Let your creativity flow.</h3>
 
 <div align="center">
 <a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
@@ -10,7 +10,7 @@
 
 ---
 
-![Meltano Logo](/meltano.png)
+![Meltano Logo](meltano.png)
 
 <div align="center">
 <a href="https://docs.meltano.com/">
