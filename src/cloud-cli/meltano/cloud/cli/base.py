@@ -55,7 +55,7 @@ def _set_shared_option(ctx: click.Context, opt: click.Option, value: t.Any) -> N
     if value is not None:
         if getattr(ctx.obj, t.cast(str, opt.name)) is not None:
             raise click.UsageError(
-                f"Option '--{opt.name}' must not be specified multiple times."
+                f"Option '--{opt.name}' must not be specified multiple times.",
             )
         setattr(ctx.obj, t.cast(str, opt.name), value)
 

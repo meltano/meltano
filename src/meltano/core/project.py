@@ -91,7 +91,7 @@ class Project(Versioned):  # noqa: WPS214
         self.environment: Environment | None = environment
         self.readonly = readonly
         self.sys_dir_root = Path(
-            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano")
+            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
     def refresh(self, **kwargs) -> None:
@@ -212,12 +212,12 @@ class Project(Versioned):  # noqa: WPS214
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "
-                            f"present in {str(Path(sys.executable).parent)}"
+                            f"present in {str(Path(sys.executable).parent)}",
                         )
                 else:
                     logger.warning(
                         "Failed to create symlink to 'meltano.exe': "
-                        "administrator privilege required"
+                        "administrator privilege required",
                     )
             else:
                 executable = Path(sys.executable).parent / "meltano"
@@ -229,7 +229,7 @@ class Project(Versioned):  # noqa: WPS214
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
                     f"Could not create symlink: {error}\nPlease make sure "
-                    "that the underlying filesystem supports symlinks."
+                    "that the underlying filesystem supports symlinks.",
                 )
             else:
                 raise
@@ -518,7 +518,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.run_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            sanitize_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs
@@ -534,7 +537,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.logs_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            sanitize_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs
@@ -550,7 +556,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to plugin installation dir optionally joined to given paths.
         """
         return self.meltano_dir(
-            plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
+            plugin.type,
+            plugin.name,
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs

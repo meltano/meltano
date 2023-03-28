@@ -13,13 +13,13 @@ class TestStateService:
     def test_validate_state(self, state_service):
         with pytest.raises(InvalidJobStateError):
             state_service.validate_state(
-                json.loads('{"root key not singer_state": {}}')
+                json.loads('{"root key not singer_state": {}}'),
             )
         assert (
             state_service.validate_state(
                 json.loads(
-                    '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}'
-                )
+                    '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}',
+                ),
             )
             is None
         )
@@ -34,14 +34,15 @@ class TestStateService:
     def test_add_state(self, state_service, payloads):
         mock_state_id = "nonexistent"
         state_service.add_state(
-            mock_state_id, json.dumps(payloads.mock_state_payloads[0])
+            mock_state_id,
+            json.dumps(payloads.mock_state_payloads[0]),
         )
         assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
     def test_set_state(self, job_history_session, jobs, payloads, state_service):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         for job in jobs:

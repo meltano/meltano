@@ -53,7 +53,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
+                project,
+                [tap, tap_gitlab],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
@@ -63,7 +67,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False, force=False
+                project,
+                [target],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
@@ -100,7 +108,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap], parallelism=None, clean=False, force=False
+                project,
+                [tap],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
@@ -110,7 +122,11 @@ class TestCliInstall:
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False, force=False
+                project,
+                [target],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
@@ -135,12 +151,17 @@ class TestCliInstall:
             install_plugin_mock.return_value = True
 
             result = cli_runner.invoke(
-                cli, ["install", "extractors", tap.name, tap_gitlab.name]
+                cli,
+                ["install", "extractors", tap.name, tap_gitlab.name],
             )
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False, force=False
+                project,
+                [tap, tap_gitlab],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
     def test_install_parallel(
@@ -222,7 +243,9 @@ class TestCliInstall:
 # For more details
 @pytest.mark.order(-1)
 def test_new_folder_should_autocreate_on_install(
-    un_engine_uri, project_function, cli_runner
+    un_engine_uri,
+    project_function,
+    cli_runner,
 ):
     """Be sure .meltano auto creates a db on install by default.
 

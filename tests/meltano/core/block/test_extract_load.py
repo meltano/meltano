@@ -151,7 +151,8 @@ class TestELBContextBuilder:
         assert target_env["MELTANO_LOADER_VARIANT"] == target_postgres.variant
 
         assert target_env["MELTANO_LOAD_HOST"] == os.getenv(
-            "TARGET_POSTGRES_HOST", "localhost"
+            "TARGET_POSTGRES_HOST",
+            "localhost",
         )
 
         assert (
@@ -258,7 +259,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         mapper_process.sterr.at_eof.side_effect = True
@@ -267,7 +268,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-mocked-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
@@ -275,7 +276,7 @@ class TestExtractLoadBlocks:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         invoke_async = AsyncMock(
-            side_effect=(tap_process, mapper_process, target_process)
+            side_effect=(tap_process, mapper_process, target_process),
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (
@@ -346,7 +347,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         mapper_process.sterr.at_eof.side_effect = True
@@ -355,7 +356,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
@@ -363,7 +364,7 @@ class TestExtractLoadBlocks:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         invoke_async = AsyncMock(
-            side_effect=(tap_process, mapper_process, target_process)
+            side_effect=(tap_process, mapper_process, target_process),
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (
@@ -425,7 +426,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
@@ -522,7 +523,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         mapper_process.sterr.at_eof.side_effect = True
@@ -531,7 +532,7 @@ class TestExtractLoadBlocks:
             side_effect=(
                 b"%b" % json.dumps({"key": "mapper-value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
@@ -541,7 +542,7 @@ class TestExtractLoadBlocks:
         project.refresh(environment=Environment(name="test"))
 
         invoke_async = AsyncMock(
-            side_effect=(tap_process, mapper_process, target_process)
+            side_effect=(tap_process, mapper_process, target_process),
         )
         with mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
             blocks = (

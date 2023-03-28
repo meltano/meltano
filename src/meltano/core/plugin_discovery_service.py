@@ -110,7 +110,8 @@ class PluginRepository(metaclass=ABCMeta):
 
 
 class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
-    PluginRepository, Versioned
+    PluginRepository,
+    Versioned,
 ):
     """Discover plugin definitions."""
 
@@ -149,9 +150,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         """
         discovery_url = self.project.settings.get("discovery_url")
 
-        if not discovery_url or not re.match(
-            r"^https?://", discovery_url  # noqa: WPS360
-        ):
+        if not discovery_url or not re.match("^https?://", discovery_url):
             return None
 
         return discovery_url
@@ -211,12 +210,12 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
                 logging.warning(
                     f"{description.capitalize()} has version "
                     f"{err.file_version}, while this version of Meltano "
-                    f"requires version {err.version}."
+                    f"requires version {err.version}.",
                 )
                 if err.file_version > err.version:
                     logging.warning(
                         "Please install the latest compatible version of "
-                        "Meltano using `meltano upgrade`."
+                        "Meltano using `meltano upgrade`.",
                     )
             except DiscoveryInvalidError as err:
                 errored = True
@@ -405,7 +404,9 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
 
     def find_definition_by_namespace(
-        self, plugin_type: PluginType, namespace: str
+        self,
+        plugin_type: PluginType,
+        namespace: str,
     ) -> PluginDefinition:
         """Find a plugin definition by type and namespace.
 

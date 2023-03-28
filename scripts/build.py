@@ -24,7 +24,9 @@ def build_webapp() -> None:
 
     try:
         node_version_check = subprocess.run(
-            ("node", "--version"), text=True, capture_output=True
+            ("node", "--version"),
+            text=True,
+            capture_output=True,
         )
         node_version_check.check_returncode()
     except Exception:

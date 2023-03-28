@@ -88,7 +88,7 @@ def _run_cli():
             cli(obj={"project": None})
         except ProjectReadonly as err:
             raise CliError(
-                f"The requested action could not be completed: {err}"
+                f"The requested action could not be completed: {err}",
             ) from err
         except KeyboardInterrupt:  # noqa: WPS329
             raise

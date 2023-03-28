@@ -121,7 +121,12 @@ class TestELTContext:
 
     @pytest.mark.asyncio
     async def test_transformer(
-        self, elt_context, session, target_postgres, tap_mock_transform, dbt
+        self,
+        elt_context,
+        session,
+        target_postgres,
+        tap_mock_transform,
+        dbt,
     ):
         transformer = elt_context.transformer
         assert transformer.type == PluginType.TRANSFORMERS

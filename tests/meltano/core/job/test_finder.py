@@ -42,7 +42,7 @@ class TestJobFinder:
         last_heartbeat_at = None
         if last_heartbeat_at_minutes_ago is not None:
             last_heartbeat_at = datetime.utcnow() - timedelta(
-                minutes=last_heartbeat_at_minutes_ago
+                minutes=last_heartbeat_at_minutes_ago,
             )
 
         job = Job(

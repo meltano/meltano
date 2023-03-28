@@ -41,7 +41,7 @@ class TestScheduleCommand:
                     "dev",
                     "daily",
                     "enabled",
-                )
+                ),
             ),
         )
         runner = CliRunner()

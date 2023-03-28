@@ -24,7 +24,11 @@ class TestSingerTarget:
 
     @pytest.mark.asyncio
     async def test_setup_bookmark_writer(
-        self, subject, session, plugin_invoker_factory, elt_context_builder
+        self,
+        subject,
+        session,
+        plugin_invoker_factory,
+        elt_context_builder,
     ):
         job = Job(job_name="pytest_test_runner")
 

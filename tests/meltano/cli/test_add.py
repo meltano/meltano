@@ -22,7 +22,9 @@ from meltano.core.project_init_service import ProjectInitService
 class TestCliAdd:
     @pytest.fixture
     def reset_project_context(
-        self, project: Project, project_init_service: ProjectInitService
+        self,
+        project: Project,
+        project_init_service: ProjectInitService,
     ):
         shutil.rmtree(".", ignore_errors=True)
         project_init_service.create_files(project)
@@ -110,7 +112,8 @@ class TestCliAdd:
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             res = cli_runner.invoke(
-                cli, ["add", "extractors", "tap-gitlab", "tap-adwords", "tap-facebook"]
+                cli,
+                ["add", "extractors", "tap-gitlab", "tap-adwords", "tap-facebook"],
             )
 
             assert res.exit_code == 0, res.stdout
@@ -122,15 +125,18 @@ class TestCliAdd:
             assert "Added extractor 'tap-facebook'" in res.stdout
 
             tap_gitlab = project.plugins.find_plugin(
-                "tap-gitlab", PluginType.EXTRACTORS
+                "tap-gitlab",
+                PluginType.EXTRACTORS,
             )
             assert tap_gitlab
             tap_adwords = project.plugins.find_plugin(
-                "tap-adwords", PluginType.EXTRACTORS
+                "tap-adwords",
+                PluginType.EXTRACTORS,
             )
             assert tap_adwords
             tap_facebook = project.plugins.find_plugin(
-                "tap-facebook", PluginType.EXTRACTORS
+                "tap-facebook",
+                PluginType.EXTRACTORS,
             )
             assert tap_facebook
 
@@ -183,7 +189,7 @@ class TestCliAdd:
 
         assert "tap_google_analytics" in project_yaml["models"]
         assert project_yaml["vars"]["tap_google_analytics"] == {
-            "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}"
+            "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}",
         }
 
     def test_add_files_with_updates(
@@ -194,7 +200,7 @@ class TestCliAdd:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
@@ -245,7 +251,7 @@ class TestCliAdd:
     def test_add_files_that_already_exists(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
@@ -301,7 +307,8 @@ class TestCliAdd:
             assert_cli_runner(res)
 
             plugin = project.plugins.find_plugin(
-                plugin_type=PluginType.MAPPERS, plugin_name="mapper-mock"
+                plugin_type=PluginType.MAPPERS,
+                plugin_name="mapper-mock",
             )
             assert plugin.variant == "alternative"
 
@@ -333,7 +340,8 @@ class TestCliAdd:
             assert "Inherit from:\ttap-mock, variant meltano (default)\n" in res.stdout
 
             inherited = project.plugins.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inherited"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock-inherited",
             )
             assert inherited.inherit_from == "tap-mock"
             assert inherited.variant == "meltano"
@@ -363,7 +371,8 @@ class TestCliAdd:
             )
 
             inherited_variant = project.plugins.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock--singer-io"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock--singer-io",
             )
             assert inherited_variant.inherit_from == "tap-mock"
             assert inherited_variant.variant == "singer-io"
@@ -391,7 +400,8 @@ class TestCliAdd:
             assert "Inherit from:\ttap-mock-inherited\n" in res.stdout
 
             inception = project.plugins.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-mock-inception"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock-inception",
             )
             assert inception.inherit_from == "tap-mock-inherited"
             assert inception.parent == inherited
@@ -418,18 +428,21 @@ class TestCliAdd:
         executable = "tap-custom-bin"
         stdin = os.linesep.join(
             # namespace, pip_url, executable, capabilities, settings
-            ["tap_custom", pip_url, executable, "foo,bar", "baz,qux"]
+            ["tap_custom", pip_url, executable, "foo,bar", "baz,qux"],
         )
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
-                cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
+                cli,
+                ["add", "--custom", "extractor", "tap-custom"],
+                input=stdin,
             )
             assert_cli_runner(res)
 
             plugin = project.plugins.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-custom",
             )
             assert plugin.name == "tap-custom"
             assert plugin.pip_url == pip_url
@@ -451,7 +464,9 @@ class TestCliAdd:
             assert plugin.settings == plugin_variant.settings
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD
+                project,
+                [plugin],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_custom_no_install(self, project, cli_runner):
@@ -464,7 +479,7 @@ class TestCliAdd:
                 executable,
                 "foo,bar",
                 "baz,qux",
-            ]
+            ],
         )
 
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
@@ -497,7 +512,9 @@ class TestCliAdd:
             assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
-                project, [plugin], reason=PluginInstallReason.ADD
+                project,
+                [plugin],
+                reason=PluginInstallReason.ADD,
             )
 
     def test_add_custom_variant(self, project, cli_runner, plugin_discovery_service):
@@ -517,7 +534,8 @@ class TestCliAdd:
             assert_cli_runner(res)
 
             plugin = project.plugins.find_plugin(
-                plugin_type=PluginType.EXTRACTORS, plugin_name="tap-custom-variant"
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-custom-variant",
             )
             plugin_def = plugin.custom_definition
             plugin_variant = plugin_def.variants[0]
@@ -562,7 +580,8 @@ class TestCliAdd:
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
-                cli, ["add", plugin_type.singular, plugin_name, "--no-install"]
+                cli,
+                ["add", plugin_type.singular, plugin_name, "--no-install"],
             )
 
             if plugin_type is PluginType.TRANSFORMS:
@@ -580,7 +599,7 @@ class TestCliAdd:
                 # check plugin lock file is added
                 plugins_dir = project.root_dir("plugins")
                 assert plugins_dir.joinpath(
-                    f"{plugin_type}/{plugin_name}--{default_variant}.lock"
+                    f"{plugin_type}/{plugin_name}--{default_variant}.lock",
                 ).exists()
 
                 for required_plugin_ref in required_plugin_refs:
@@ -605,8 +624,9 @@ class TestCliAdd:
                     # check required plugin lock files are added
                     assert list(
                         plugins_dir.glob(
-                            f"{required_plugin_ref._type}/{required_plugin_ref.name}--*.lock"
-                        )
+                            f"{required_plugin_ref._type}/"
+                            f"{required_plugin_ref.name}--*.lock",
+                        ),
                     )
 
                 install_plugin_mock.assert_not_called()

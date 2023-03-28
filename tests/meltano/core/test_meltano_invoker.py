@@ -24,7 +24,7 @@ class TestMeltanoInvoker:
     def test_invoke(self, subject: MeltanoInvoker):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
@@ -48,7 +48,7 @@ class TestMeltanoInvoker:
     def test_invoke_executable(self, subject: MeltanoInvoker, project: Project):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         process_mock = mock.Mock(returncode=0)
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:

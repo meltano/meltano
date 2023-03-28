@@ -17,7 +17,7 @@ from meltano.core.project import Project
 
 
 class PluginContext(
-    namedtuple("PluginContext", "plugin settings_service session")  # noqa: WPS606
+    namedtuple("PluginContext", "plugin settings_service session"),  # noqa: WPS606
 ):
     """Plugin Context container."""
 
@@ -406,14 +406,17 @@ class ELTContextBuilder:  # noqa: WPS214
                     "compatible with the 'meltano run ...' command.\n"
                     "https://docs.meltano.com/guide/transformation\n"
                     "To continue using the legacy 'dbt' Transformer, "
-                    "add it to your Project using 'meltano add transformer dbt'."
+                    "add it to your Project using 'meltano add transformer dbt'.",
                 ) from err
             raise
 
         return PluginContext(
             plugin=plugin,
             settings_service=PluginSettingsService(
-                self.project, plugin, env_override=env, config_override=config
+                self.project,
+                plugin,
+                env_override=env,
+                config_override=config,
             ),
             session=self._session,
         )

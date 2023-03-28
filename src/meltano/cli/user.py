@@ -67,7 +67,7 @@ def add(ctx, username, password, role, **flags):
             # make sure our User doesn't already exist
             if not flags["overwrite"] and users.get_user(username):
                 raise Exception(
-                    f"User '{username}' already exists. Use --overwrite to update it."
+                    f"User '{username}' already exists. Use --overwrite to update it.",
                 )
 
             # make sure all roles exists
@@ -80,7 +80,7 @@ def add(ctx, username, password, role, **flags):
                 roles.append(this_role)
 
             current_user = users.get_user(username) or users.create_user(
-                username=username
+                username=username,
             )
 
             current_user.password = hash_password(password)

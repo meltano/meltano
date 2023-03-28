@@ -42,14 +42,16 @@ class TestProjectSettingsService:
         # A warning is raised because the setting does not exist.
         with pytest.warns(RuntimeWarning):
             assert subject.get_with_source(
-                "and_now_for_something_completely_different"
+                "and_now_for_something_completely_different",
             ) == (None, SettingValueStore.DEFAULT)
 
         def assert_value_source(value, source):
             assert subject.get_with_source("project_id") == (value, source)
 
         subject.set(
-            "project_id", "from_meltano_yml", store=SettingValueStore.MELTANO_YML
+            "project_id",
+            "from_meltano_yml",
+            store=SettingValueStore.MELTANO_YML,
         )
 
         assert_value_source("from_meltano_yml", SettingValueStore.MELTANO_YML)
@@ -86,7 +88,8 @@ class TestProjectSettingsService:
 
         with monkeypatch.context() as ctx:
             ctx.setenv(
-                subject.setting_env(subject.find_setting("ui.server_name")), "from_env"
+                subject.setting_env(subject.find_setting("ui.server_name")),
+                "from_env",
             )
 
             assert_value_source("from_env", SettingValueStore.ENV)
@@ -155,7 +158,8 @@ class TestProjectSettingsService:
             subject.get("disable_tracking")
 
             ProjectSettingsService.config_override.pop(
-                "send_anonymous_usage_stats", None
+                "send_anonymous_usage_stats",
+                None,
             )
             subject.config_override.pop("send_anonymous_usage_stats", None)
             subject.unset("send_anonymous_usage_stats")
@@ -178,7 +182,10 @@ class TestProjectSettingsService:
                 subject.get(setting)
 
     def test_meltano_settings_with_active_environment(
-        self, subject, monkeypatch, environment
+        self,
+        subject,
+        monkeypatch,
+        environment,
     ):
         # make sure that meltano setting values are written to the root of `meltano.yml`
         # even if there is an active environment
@@ -190,7 +197,8 @@ class TestProjectSettingsService:
         assert value == 10000
 
     def test_fully_missing_env_var_setting_is_none(
-        self, subject: ProjectSettingsService
+        self,
+        subject: ProjectSettingsService,
     ):
         subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
         # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
@@ -199,7 +207,8 @@ class TestProjectSettingsService:
         assert subject.get("port") is None
 
     def test_env_var_settings_expanded_before_cast(
-        self, subject: ProjectSettingsService
+        self,
+        subject: ProjectSettingsService,
     ):
         name = "database_max_retries"  # Using this because it's an int setting
         setting_def = subject.find_setting(name)
@@ -208,7 +217,10 @@ class TestProjectSettingsService:
         assert subject.get(name) == setting_def.value
 
         SettingValueStore.MELTANO_YML.manager(subject).set(
-            name, [name], "$DB_MAX_RETRIES_TEST", setting_def=setting_def
+            name,
+            [name],
+            "$DB_MAX_RETRIES_TEST",
+            setting_def=setting_def,
         )
 
         subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)

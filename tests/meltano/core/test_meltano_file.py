@@ -23,8 +23,8 @@ class TestMeltanoFile:
                                 "field_id": "author_email",
                                 "tap_stream_name": "commits",
                                 "type": "MASK-HIDDEN",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
                 {
@@ -35,8 +35,8 @@ class TestMeltanoFile:
                                 "field_id": "given_name",
                                 "tap_stream_name": "users",
                                 "type": "lowercase",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
             ],

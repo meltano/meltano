@@ -55,7 +55,7 @@ class SchedulesCloudClient(MeltanoCloudClient):
                             deployment_name,
                             schedule_name,
                             "enabled",
-                        )
+                        ),
                     ),
                     json=enabled,
                 )
@@ -94,7 +94,7 @@ class SchedulesCloudClient(MeltanoCloudClient):
                             self.config.internal_project_id,
                             deployment_name,
                             schedule_name,
-                        )
+                        ),
                     ),
                 )
             except MeltanoCloudError as ex:
@@ -138,7 +138,9 @@ class SchedulesCloudClient(MeltanoCloudClient):
 
         async with self.authenticated():
             return await self._json_request(
-                "GET", "/".join(path), params=self.clean_params(params)
+                "GET",
+                "/".join(path),
+                params=self.clean_params(params),
             )
 
 
@@ -220,7 +222,8 @@ async def _get_schedule(
         raise click.UsageError("Missing option '--deployment'")
     async with SchedulesCloudClient(config=config) as client:
         return await client.get_schedule(
-            deployment_name=deployment_name, schedule_name=schedule_name
+            deployment_name=deployment_name,
+            schedule_name=schedule_name,
         )
 
 
@@ -281,7 +284,8 @@ def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | int | floa
 
 
 def _format_schedules_table(
-    schedules: list[CloudProjectSchedule], table_format: str
+    schedules: list[CloudProjectSchedule],
+    table_format: str,
 ) -> str:
     """Format the schedules as a table.
 
@@ -309,10 +313,12 @@ def _format_schedules_table(
 schedule_list_formatters = {
     "json": lambda schedules: json.dumps(schedules, indent=2),
     "markdown": lambda schedules: _format_schedules_table(
-        schedules, table_format="github"
+        schedules,
+        table_format="github",
     ),
     "terminal": lambda schedules: _format_schedules_table(
-        schedules, table_format="rounded_outline"
+        schedules,
+        table_format="rounded_outline",
     ),
 }
 
@@ -348,8 +354,8 @@ async def list_schedules(
                 config=context.config,
                 deployment_name=context.deployment,
                 limit=limit,
-            )
-        )
+            ),
+        ),
     )
 
 
@@ -386,12 +392,12 @@ async def describe_schedule(
             f"Deployment name: {schedule['deployment_name']}\n"
             f"Schedule name:   {schedule['schedule_name']}\n"
             f"Interval:        {schedule['interval']}\n"
-            f"Enabled:         {schedule['enabled']}"
+            f"Enabled:         {schedule['enabled']}",
         )
         if schedule["enabled"]:
             click.echo(
                 "\nApproximate starting date and time (UTC) of "
-                f"next {num_upcoming} scheduled runs:"
+                f"next {num_upcoming} scheduled runs:",
             )
     if schedule["enabled"]:
         for dt in _next_n_runs(num_upcoming, schedule["interval"]):

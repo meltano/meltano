@@ -21,7 +21,7 @@ try:
 except ImportError:
     raise SystemExit(
         "Nox failed to import the 'nox-poetry' package. Please install it "
-        f"using the following command: {sys.executable} -m pip install nox-poetry"
+        f"using the following command: {sys.executable} -m pip install nox-poetry",
     ) from None
 
 # NOTE: The module docstring above is printed when `nox -l` is run.
@@ -65,9 +65,9 @@ def _run_pytest(session: Session) -> None:
             {
                 "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
                 "COVERAGE_FILE": str(
-                    root_path / f".coverage.{random_seed:010}.{session.name}"
+                    root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
-            }
+            },
         )
         session.run(
             "pytest",

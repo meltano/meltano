@@ -79,7 +79,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             {
                 "Content-Type": "application/json",
                 "User-Agent": f"Meltano Cloud CLI/v{self.version}",
-            }
+            },
         )
         return self
 

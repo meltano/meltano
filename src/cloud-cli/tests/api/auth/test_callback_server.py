@@ -40,10 +40,13 @@ class TestMeltanoCloudAuthCallbackServer:
         )
 
     def test_handle_tokens(
-        self, subject: Flask, client: FlaskClient, config: MeltanoCloudConfig
+        self,
+        subject: Flask,
+        client: FlaskClient,
+        config: MeltanoCloudConfig,
     ):
         response: TestResponse = client.get(
-            "/tokens?id_token=meltano-cloud-testing&access_token=meltano-cloud-testing"
+            "/tokens?id_token=meltano-cloud-testing&access_token=meltano-cloud-testing",
         )
         config.refresh()
         assert response.status_code == 204
@@ -55,7 +58,10 @@ class TestMeltanoCloudAuthCallbackServer:
         assert config_on_disk["id_token"] == "meltano-cloud-testing"
 
     def test_handle_logout(
-        self, subject: Flask, client: FlaskClient, config: MeltanoCloudConfig
+        self,
+        subject: Flask,
+        client: FlaskClient,
+        config: MeltanoCloudConfig,
     ):
         config.access_token = "meltano-cloud-testing"  # noqa: S105
         config.id_token = "meltano-cloud-testing"  # noqa: S105

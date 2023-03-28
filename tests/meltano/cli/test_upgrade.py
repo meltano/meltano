@@ -12,13 +12,13 @@ from meltano.cli import cli
 
 
 @pytest.mark.skip(
-    reason="The upgrade command is disabled on the 'cloud' feature branch"
+    reason="The upgrade command is disabled on the 'cloud' feature branch",
 )
 class TestCliUpgrade:
     def test_upgrade(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["upgrade"])
         assert_cli_runner(result)
@@ -29,7 +29,7 @@ class TestCliUpgrade:
         assert "run `meltano upgrade --skip-package`" in result.stdout
 
         with mock.patch(
-            "meltano.cli.upgrade.UpgradeService._upgrade_package"
+            "meltano.cli.upgrade.UpgradeService._upgrade_package",
         ) as upgrade_package_mock:
             upgrade_package_mock.return_value = True
 
@@ -49,7 +49,7 @@ class TestCliUpgrade:
     def test_upgrade_package(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["upgrade", "package"])
         assert_cli_runner(result)
@@ -63,7 +63,7 @@ class TestCliUpgrade:
     def test_upgrade_files(self, session, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         output = result.stdout + result.stderr
@@ -157,7 +157,7 @@ class TestCliUpgrade:
     def test_upgrade_files_glob_path(self, session, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         result = cli_runner.invoke(cli, ["add", "files", "airflow"])

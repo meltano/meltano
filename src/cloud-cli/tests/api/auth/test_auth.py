@@ -36,15 +36,19 @@ class TestMeltanoCloudAuth:
         )
 
     def test_get_auth_header(
-        self, subject: MeltanoCloudAuth, monkeypatch: pytest.MonkeyPatch
+        self,
+        subject: MeltanoCloudAuth,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.setattr(subject.config, "id_token", "meltano-cloud-test")
         assert subject.get_auth_header() == {
-            "Authorization": "Bearer meltano-cloud-test"
+            "Authorization": "Bearer meltano-cloud-test",
         }
 
     async def test_logged_in_success(
-        self, subject: MeltanoCloudAuth, monkeypatch: pytest.MonkeyPatch
+        self,
+        subject: MeltanoCloudAuth,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.setattr(subject.config, "access_token", "meltano-cloud-test")
         monkeypatch.setattr(subject.config, "id_token", "meltano-cloud-test")
@@ -57,7 +61,9 @@ class TestMeltanoCloudAuth:
             assert await subject.logged_in() is True
 
     async def test_logged_in_no_tokens(
-        self, subject: MeltanoCloudAuth, monkeypatch: pytest.MonkeyPatch
+        self,
+        subject: MeltanoCloudAuth,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.setattr(subject.config, "access_token", None)
         monkeypatch.setattr(subject.config, "id_token", None)
@@ -70,7 +76,9 @@ class TestMeltanoCloudAuth:
             assert await subject.logged_in() is False
 
     async def test_logged_in_fail(
-        self, subject: MeltanoCloudAuth, monkeypatch: pytest.MonkeyPatch
+        self,
+        subject: MeltanoCloudAuth,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.setattr(subject.config, "access_token", "meltano-cloud-test")
         monkeypatch.setattr(subject.config, "id_token", "meltano-cloud-test")

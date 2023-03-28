@@ -84,7 +84,7 @@ class ValidationsRunner(metaclass=ABCMeta):
             self.tests_selection[name] = True
         except KeyError as exc:
             raise KeyError(
-                f"Plugin {self.plugin_name} does not have a test named '{name}'"
+                f"Plugin {self.plugin_name} does not have a test named '{name}'",
             ) from exc
 
     def select_all(self) -> None:

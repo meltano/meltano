@@ -83,7 +83,7 @@ def check_subproject_deps(
         if missing_deps:
             raise Exception(
                 f"Subproject defined at '{subproject_pyproject_toml}' has dependencies "
-                f"missing from the root 'pyproject.toml': {missing_deps!r}"
+                f"missing from the root 'pyproject.toml': {missing_deps!r}",
             )
 
 

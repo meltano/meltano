@@ -57,7 +57,7 @@ def _list_single_job(
         click.echo(f"{task_set.name}: {task_set.tasks}")
     elif list_format == "json":
         click.echo(
-            json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
+            json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2),
         )
     tracker.track_command_event(CliEvent.completed)
 
@@ -81,10 +81,10 @@ def _list_all_jobs(
                     "jobs": [
                         {"job_name": tset.name, "tasks": tset.tasks}
                         for tset in task_sets_service.list()
-                    ]
+                    ],
                 },
                 indent=2,
-            )
+            ),
         )
     elif list_format == "text":
         for task_set in task_sets_service.list():
@@ -151,7 +151,9 @@ def list_jobs(ctx, list_format: str, job_name: str):
 
 
 @job.command(
-    cls=PartialInstrumentedCmd, name="add", short_help="Add a new job with tasks."
+    cls=PartialInstrumentedCmd,
+    name="add",
+    short_help="Add a new job with tasks.",
 )
 @click.argument(
     "job_name",
@@ -208,7 +210,9 @@ def add(ctx, job_name: str, raw_tasks: str):
 
 
 @job.command(
-    cls=PartialInstrumentedCmd, name="set", short_help="Update an existing jobs tasks"
+    cls=PartialInstrumentedCmd,
+    name="set",
+    short_help="Update an existing jobs tasks",
 )
 @click.argument(
     "job_name",

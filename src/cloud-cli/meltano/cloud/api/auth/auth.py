@@ -55,7 +55,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
                 "response_type": "token",
                 "scope": "email openid profile",
                 "redirect_uri": f"http://localhost:{self.config.auth_callback_port}",
-            }
+            },
         )
         return f"{self.base_url}/oauth2/authorize?{query_params}"
 
@@ -70,7 +70,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
             {
                 "client_id": self.client_id,
                 "logout_uri": f"http://localhost:{self.config.auth_callback_port}/logout",  # noqa: E501)
-            }
+            },
         )
         return urljoin(self.base_url, f"logout?{params}")
 
@@ -188,5 +188,5 @@ class MeltanoCloudAuth:  # noqa: WPS214
         """
         user_info_resp = await self.get_user_info_response()
         return bool(
-            self.config.access_token and self.config.id_token and user_info_resp.ok
+            self.config.access_token and self.config.id_token and user_info_resp.ok,
         )

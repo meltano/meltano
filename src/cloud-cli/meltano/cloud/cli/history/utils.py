@@ -19,7 +19,7 @@ MINUTES_IN_HOUR = 60
 MINUTES_IN_DAY = MINUTES_IN_HOUR * 24
 MINUTES_IN_WEEK = MINUTES_IN_DAY * 7
 LOOKBACK_PATTERN = re.compile(
-    r"^(?:(?P<weeks>\d{1,3}w)?(?P<days>[1-6]d)?(?P<hours>\d{1,2}h)?(?P<minutes>\d{1,2}m)?)$"  # noqa: E501
+    r"^(?:(?P<weeks>\d{1,3}w)?(?P<days>[1-6]d)?(?P<hours>\d{1,2}h)?(?P<minutes>\d{1,2}m)?)$",  # noqa: E501
 )
 UTC = datetime.timezone.utc
 

@@ -22,7 +22,10 @@ class SingerMapper(SingerPlugin):
 
     EXTRA_SETTINGS = [
         SettingDefinition(
-            name="_mappings", kind=SettingKind.ARRAY, aliases=["mappings"], value={}
+            name="_mappings",
+            kind=SettingKind.ARRAY,
+            aliases=["mappings"],
+            value={},
         ),
         SettingDefinition(
             name="_mapping_name",

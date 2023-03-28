@@ -123,7 +123,8 @@ class Airflow(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Command `airflow --help` failed", process=handle
+                "Command `airflow --help` failed",
+                process=handle,
             )
 
         # Read and update airflow.cfg
@@ -145,7 +146,8 @@ class Airflow(BasePlugin):
 
         if handle.returncode:
             raise AsyncSubprocessError(
-                "Command `airflow version` failed", process=handle
+                "Command `airflow version` failed",
+                process=handle,
             )
 
         version = stdout.decode()

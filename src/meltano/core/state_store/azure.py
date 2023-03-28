@@ -120,7 +120,7 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         state_ids = set()
         container_client = self.client.get_container_client(self.container_name)
         for blob in container_client.list_blobs(
-            name_starts_with=self.prefix.lstrip("/")
+            name_starts_with=self.prefix.lstrip("/"),
         ):
             (state_id, filename) = blob.name.split("/")[-2:]
             if filename == "state.json":
@@ -140,7 +140,8 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
             Exception: if error not indicating file is not found is thrown
         """
         blob_client = self.client.get_blob_client(
-            container=self.container_name, blob=file_path
+            container=self.container_name,
+            blob=file_path,
         )
         try:
             blob_client.delete_blob()
