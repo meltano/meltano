@@ -190,13 +190,13 @@ def add(ctx, job_name: str, raw_tasks: str):
         task_sets = tasks_from_yaml_str(job_name, raw_tasks)
     except InvalidTasksError as yerr:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(yerr)
+        raise CliError(yerr) from yerr
 
     try:
         _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(err)
+        raise CliError(err) from err
 
     try:
         task_sets_service.add(task_sets)
@@ -251,7 +251,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
         _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(err)
+        raise CliError(err) from err
 
     try:
         task_sets_service.update(task_sets)
@@ -312,7 +312,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
             tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:
             tracker.track_command_event(CliEvent.aborted)
-            raise InvalidTasksError(task_set.name, err)
+            raise InvalidTasksError(task_set.name, err) from err
         if not validate_block_sets(logger, parsed_blocks):
             tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(

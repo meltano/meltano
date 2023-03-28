@@ -188,6 +188,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                         "$MELTANO_CLIENT_ID"
                     ),
                     RuntimeWarning,
+                    stacklevel=2,
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id

@@ -90,7 +90,7 @@ class MigrationService:
 
         context = MigrationContext.configure(conn)
 
-        try:  # noqa: WPS229
+        try:
             # try to find the locked version
             head = LOCK_PATH.open().read().strip()
             self.ensure_migration_needed(script, context, head)
@@ -101,19 +101,19 @@ class MigrationService:
 
             if silent:
                 migration_logger.setLevel(original_log_level)
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
             raise MigrationError(
                 "Cannot upgrade the system database, revision lock not found.",
-            )
+            ) from ex
         except MigrationUneededException:
             if not silent:
                 click.secho("System database up-to-date.")
-        except Exception as err:
-            logging.exception(str(err))
+        except Exception as ex:
+            logging.exception(str(ex))
             raise MigrationError(
                 "Cannot upgrade the system database. It might be corrupted or "
                 "was created before database migrations where introduced (v0.34.0)",
-            )
+            ) from ex
         finally:
             conn.close()
 

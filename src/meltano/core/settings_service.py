@@ -152,9 +152,10 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
 
-    @property  # noqa: B027
+    @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
+        return None  # noqa: DAR201
 
     @property
     @abstractmethod
@@ -425,6 +426,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
                     f"`{value!r}` will be used"
                 ),
                 RuntimeWarning,
+                stacklevel=2,
             )
 
         return value, metadata
@@ -484,7 +486,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
-            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning)
+            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
             setting_def = None
 
         metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
