@@ -190,11 +190,14 @@ class TestOutputLogger:
 
         logging_out = subject.out("logging")
 
-        with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
-            with logging_out.redirect_logging():
-                logging.info("info")
-                logging.warning("warning")
-                logging.error("error")
+        with mock.patch.object(
+            Out,
+            "redirect_log_handler",
+            redirect_handler,
+        ), logging_out.redirect_logging():
+            logging.info("info")
+            logging.warning("warning")
+            logging.error("error")
 
         with open(subject.file) as logf:
             log_file_contents = [json.loads(line) for line in logf.readlines()]
@@ -221,10 +224,12 @@ class TestOutputLogger:
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
-        with pytest.raises(Exception) as exc:
-            with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
-                with logging_out.redirect_logging():
-                    raise exception
+        with pytest.raises(Exception) as exc, mock.patch.object(
+            Out,
+            "redirect_log_handler",
+            redirect_handler,
+        ), logging_out.redirect_logging():
+            raise exception
 
         # make sure it let the exception through
         # All code below here in this test cannot be reached

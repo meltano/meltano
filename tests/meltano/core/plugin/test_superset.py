@@ -71,7 +71,7 @@ class TestSuperset:
             if {"db", "upgrade"}.issubset(popen_args):
                 project.plugin_dir(subject, "superset.db").touch()
             # second time, it inits
-            elif "init" in popen_args:
+            elif "init" in popen_args:  # noqa: SIM114
                 return handle_mock
             # third time, it runs the requested command
             elif "--version" in popen_args:
@@ -110,8 +110,8 @@ class TestSuperset:
                 config_keys = dir(config_module)  # noqa: WPS421
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
-                    config_module.SQLALCHEMY_DATABASE_URI
-                    == f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
+                    f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
+                    == config_module.SQLALCHEMY_DATABASE_URI
                 )
                 assert "SECRET_KEY" in config_keys
 

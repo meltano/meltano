@@ -313,7 +313,7 @@ class ProjectFiles:  # noqa: WPS214
 
             # Restore sorting in project files
             sorted_file_dicts[file] = CommentedMap()
-            for key in contents.keys():
+            for key in contents:
                 if key in file_dicts[file]:
                     sorted_file_dicts[file][key] = file_dicts[file][key]
 

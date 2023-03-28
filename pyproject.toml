@@ -224,6 +224,7 @@ pyflakes = [
   "-WPS300", # Allow local folder imports (import .module)
   "-WPS305", # Allow f-strings
   "-WPS306", # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
+  "-WPS309", # Allow reversed compare order
   "-WPS316",
   "-WPS317", # Allow "incorrect multi-line parameters", since Black forces them to be "incorrect"
   "-WPS324", # Allow inconsistent returns - permitted because of too many false positives
@@ -573,6 +574,7 @@ select = [
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "RSE", # flake8-raise
+  "SIM", # flake8-simplify
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]

@@ -90,7 +90,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_reader(self, subject: LocalFilesystemStateStoreManager, state_path):
         filepath = os.path.join(state_path, "get_reader")
-        open(filepath, "a").close()  # noqa: WPS515
+        open(filepath, "a").close()  # noqa: WPS515, SIM115
         with subject.get_reader(path=filepath) as reader:
             assert reader.name == filepath
 
@@ -127,7 +127,7 @@ class TestLocalFilesystemStateStoreManager:
         prod_ids = [f"prod:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         for state_id in dev_ids + prod_ids:
             Path(subject.get_path(state_id)).mkdir(parents=True)
-            open(  # noqa: WPS515
+            open(  # noqa: WPS515, SIM115
                 subject.get_path(state_id, filename="state.json"),
                 "w+",
             ).close()

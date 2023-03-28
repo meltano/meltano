@@ -103,9 +103,10 @@ class TestProjectSettingsService:
 
     def test_experimental_off_by_default(self, subject, monkeypatch):
         changed = []
-        with pytest.raises(FeatureNotAllowedException):
-            with subject.feature_flag(EXPERIMENTAL):
-                changed.append(True)
+        with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
+            EXPERIMENTAL,
+        ):
+            changed.append(True)
 
     def test_feature_flag_allowed(self, subject):
         changed = []

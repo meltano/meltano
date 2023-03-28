@@ -247,11 +247,7 @@ class TestEnvVarResolution:
             (
                 "meltano",
                 "invoke",
-                *(
-                    arg
-                    for key in expected_env_values.keys()
-                    for arg in ("--print-var", key)
-                ),
+                *(arg for key in expected_env_values for arg in ("--print-var", key)),
                 "test-env-var-resolution",
             ),
             text=True,
