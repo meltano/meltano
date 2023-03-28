@@ -108,7 +108,7 @@ async def list_items(
 
 @env.command("set")
 @click.argument("secret_name", type=str, required=True)
-@click.argument("value", type=str, required=True)
+@click.option("--value", type=str, required=True)
 @pass_context
 @run_async
 async def set_value(
