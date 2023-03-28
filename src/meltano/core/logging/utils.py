@@ -200,7 +200,7 @@ class SubprocessOutputWriter(Protocol):
 async def _write_line_writer(writer, line):
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
-        try:  # noqa: WPS229
+        try:
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):

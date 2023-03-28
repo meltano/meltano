@@ -80,11 +80,11 @@ class JobLoggingService:
         except StopIteration:
             raise MissingJobLogException(
                 f"Could not find any log for job with ID '{state_id}'",
-            )
-        except FileNotFoundError:
+            ) from None
+        except FileNotFoundError as ex:
             raise MissingJobLogException(
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",
-            )
+            ) from ex
 
     def get_downloadable_log(self, state_id):
         """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501, DAR101, DAR201, DAR401
@@ -94,11 +94,11 @@ class JobLoggingService:
         except StopIteration:
             raise MissingJobLogException(
                 f"Could not find any log for job with ID '{state_id}'",
-            )
-        except FileNotFoundError:
+            ) from None
+        except FileNotFoundError as ex:
             raise MissingJobLogException(
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",
-            )
+            ) from ex
 
     def get_all_logs(self, state_id):
         """Get all the log files for any ELT job that ran with the provided `state_id`.
