@@ -492,7 +492,10 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
         if pattern:
             pattern_re = re.compile(pattern.replace("*", ".*"))
         for state_file in glob.glob(
-            os.path.join(self.state_dir, os.path.join("*", "state.json")),
+            os.path.join(
+                self.state_dir,
+                os.path.join("*", "state.json"),
+            ),
         ):
             state_id = b64decode(
                 os.path.basename(os.path.dirname(state_file)).encode(),
