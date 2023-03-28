@@ -43,7 +43,7 @@ class DerivedHooked(Hooked):
 class Hooked2(HookObject):
     @hook("before_test")
     async def another_class(self):
-        raise Exception()
+        raise Exception
 
 
 class TestHookable:
@@ -67,7 +67,7 @@ class TestHookable:
         subject = Hooked()
         with pytest.raises(Exception):
             async with subject.trigger_hooks("test"):
-                raise Exception()
+                raise Exception
 
         assert subject.calls == ["before_test", "before_test_2"]
 

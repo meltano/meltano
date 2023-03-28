@@ -140,7 +140,7 @@ class SingerRunner(Runner):
                     )
 
                 failed_future = output_futures_failed.pop()
-                raise failed_future.exception()
+                raise failed_future.exception()  # noqa: RSE102
             else:
                 # If all of the output handlers completed without raising an
                 # exception, we still need to wait for the tap or target to

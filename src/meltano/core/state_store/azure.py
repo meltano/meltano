@@ -39,7 +39,7 @@ def requires_azure():
         None
     """
     if not BlobServiceClient:
-        raise MissingAzureError()
+        raise MissingAzureError
     yield
 
 

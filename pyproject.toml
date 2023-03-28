@@ -598,6 +598,7 @@ select = [
   "F",   # pyflakes
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
+  "RSE", # flake8-raise
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
   "TID", # flake8-tidy-imports
