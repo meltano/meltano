@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
 import typing as t
 
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import pass_context
+from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -45,7 +44,8 @@ async def run_project(
     help="The name of the Meltano Cloud deployment to run in.",
 )
 @pass_context
-def run(
+@run_async
+async def run(
     context: MeltanoCloudCLIContext,
     job_or_schedule: str,
     deployment: str,
@@ -53,11 +53,10 @@ def run(
     """Run a Meltano project in Meltano Cloud."""
     click.echo("Running a Meltano project in Meltano Cloud.")
 
-    result = asyncio.run(
-        run_project(
-            deployment,
-            job_or_schedule,
-            context.config,
-        ),
+    result = await run_project(
+        deployment,
+        job_or_schedule,
+        context.config,
     )
+
     click.echo(result)

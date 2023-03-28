@@ -66,8 +66,62 @@ Currently, updating a schedule requires a redeployment. In the future it will be
 
 ```sh
 # Enable a schedule
-meltano cloud schedule --deployment <deployment name> enable <schedule name>
+meltano cloud schedule enable --deployment <deployment name> --schedule <schedule name>
 
 # Disable a schedule
-meltano cloud schedule --deployment <deployment name> disable <schedule name>
+meltano cloud schedule disable --deployment <deployment name> --schedule <schedule name>
 ```
+
+Schedules can be listed using the `list` command:
+
+```sh
+meltano cloud schedule list
+╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
+│ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
+├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
+│ staging      │ schedule_1 │ 0 6 * * 1,3,5        │        < 1.0 │ False     │
+│ staging      │ schedule_2 │ 0 */6 * * *          │          4.0 │ True      │
+│ prod         │ schedule_3 │ 0 6 * * *            │          1.0 │ True      │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │         10.3 │ False     │
+╰──────────────┴────────────┴──────────────────────┴──────────────┴───────────╯
+```
+
+```sh
+meltano cloud schedule list --deployment prod
+╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
+│ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
+├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
+│ prod         │ schedule_3 │ 0 6 * * *            │          1.0 │ True      │
+│ prod         │ schedule_4 │ 15,45 */2 * * 1,3,5  │         10.3 │ False     │
+╰──────────────┴────────────┴──────────────────────┴──────────────┴───────────╯
+```
+
+Individual schedules can be more thoroughly described using the `describe` command:
+
+```sh
+meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5
+Deployment name: prod
+Schedule name:   schedule_4
+Interval:        15,45 */2 * * 1,3,5
+Enabled:         True
+
+Approximate starting date and time (UTC) of next 5 schedule runs:
+2023-03-24 20:45
+2023-03-24 22:15
+2023-03-24 22:45
+2023-03-27 00:15
+2023-03-27 00:45
+```
+
+The `--only-upcoming` option can be used to have the command only output the upcoming scheduled run start dates and times:
+
+```sh
+meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5 --only-upcoming
+2023-03-24 20:45
+2023-03-24 22:15
+2023-03-24 22:45
+2023-03-27 00:15
+2023-03-27 00:45
+```
+
+If a schedule is disabled, it will never have any upcoming scheduled runs.
