@@ -11,7 +11,7 @@ else:
 
 
 class CloudExecution(TypedDict):
-    """Cloud execution details."""
+    """Meltano Cloud execution details."""
 
     execution_id: str
     start_time: str
@@ -22,3 +22,12 @@ class CloudExecution(TypedDict):
     environment_name: str
     schedule_name: str
     job_name: str
+
+
+class CloudProjectSchedule(TypedDict):
+    """Meltano Cloud project schedule details."""
+
+    deployment_name: str
+    schedule_name: str
+    interval: str
+    enabled: bool

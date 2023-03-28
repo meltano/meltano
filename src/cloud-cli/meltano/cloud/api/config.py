@@ -16,6 +16,7 @@ if sys.version_info <= (3, 8):
     from cached_property import cached_property
 else:
     from functools import cached_property
+
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
 MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"
 MELTANO_CLOUD_APP_CLIENT_ID = "45rpn5ep3g4qjut8jd3s4iq872"

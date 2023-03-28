@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import asyncio
 import sys
 import typing as t
 
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import pass_context
+from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -41,7 +40,8 @@ async def print_logs(
 @logs.command("print")
 @click.option("--execution-id", required=True)
 @pass_context
-def print_(context: MeltanoCloudCLIContext, execution_id: str) -> None:
+@run_async
+async def print_(context: MeltanoCloudCLIContext, execution_id: str) -> None:
     """Print the logs.
 
     Args:
@@ -49,4 +49,4 @@ def print_(context: MeltanoCloudCLIContext, execution_id: str) -> None:
         execution_id: The execution identifier.
     """
     click.echo(f"Fetching logs for execution {execution_id}")
-    asyncio.run(print_logs(context.config, execution_id))
+    await print_logs(context.config, execution_id)
