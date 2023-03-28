@@ -390,7 +390,7 @@ class SettingDefinition(NameEq, Canonical):
             The parsed value.
         """
         parse_error = ValueError(
-            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}"
+            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}",
         )
         try:
             parsed = json.loads(unparsed)

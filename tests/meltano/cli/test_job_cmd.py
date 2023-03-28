@@ -13,7 +13,8 @@ class TestCliJob:
     def test_job_add(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -95,7 +96,8 @@ class TestCliJob:
     def test_job_set(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -129,7 +131,8 @@ class TestCliJob:
     def test_job_remove(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -151,7 +154,8 @@ class TestCliJob:
     def test_job_list(self, session, project, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             cli_args = [
                 "job",
@@ -183,7 +187,8 @@ class TestCliJob:
 
             # test singular json list
             res = cli_runner.invoke(
-                cli, ["job", "list", "--format=json", "job-list-mock"]
+                cli,
+                ["job", "list", "--format=json", "job-list-mock"],
             )
             assert_cli_runner(res)
             output = json.loads(res.output)

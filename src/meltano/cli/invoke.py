@@ -52,7 +52,9 @@ logger = logging.getLogger(__name__)
     multiple=True,
 )
 @click.option(
-    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+    "--plugin-type",
+    type=click.Choice(PluginType.cli_arguments()),
+    default=None,
 )
 @click.option(
     "--dump",
@@ -102,7 +104,9 @@ def invoke(
     session = Session()
     try:
         plugin = project.plugins.find_plugin(
-            plugin_name, plugin_type=plugin_type, invokable=True
+            plugin_name,
+            plugin_type=plugin_type,
+            invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(CliEvent.inflight)
@@ -128,7 +132,7 @@ def invoke(
                 command_name,
                 containers,
                 print_var=print_var,
-            )
+            ),
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
@@ -194,7 +198,8 @@ def do_list_commands(plugin):
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
-            f"Plugin '{plugin.name}' does not define any commands.", fg="yellow"
+            f"Plugin '{plugin.name}' does not define any commands.",
+            fg="yellow",
         )
         return
 

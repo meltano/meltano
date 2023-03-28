@@ -29,7 +29,7 @@ class TestVenvService:
     async def test_clean_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         await subject.install(["example"], clean=True)
@@ -40,7 +40,8 @@ class TestVenvService:
 
         # ensure that the binary is python3
         assert os.path.samefile(
-            venv_dir.joinpath("bin/python"), venv_dir.joinpath("bin/python3")
+            venv_dir.joinpath("bin/python"),
+            venv_dir.joinpath("bin/python3"),
         )
 
         # ensure that the package is installed
@@ -81,7 +82,7 @@ class TestVenvService:
     async def test_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         # Make sure the venv exists already
@@ -145,6 +146,7 @@ class TestVirtualEnv:
 
     def test_unknown_platform(self, project):
         with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
-            Exception, match="(?i)Platform 'commodore64'.*?not supported."
+            Exception,
+            match="(?i)Platform 'commodore64'.*?not supported.",
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))

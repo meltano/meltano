@@ -79,7 +79,9 @@ logger = structlog_stdlib.get_logger(__name__)
     help="Dump content of pipeline-specific generated file.",
 )
 @click.option(
-    "--state-id", envvar="MELTANO_STATE_ID", help="A custom string to identify the job."
+    "--state-id",
+    envvar="MELTANO_STATE_ID",
+    help="A custom string to identify the job.",
 )
 @click.option(
     "--force",
@@ -123,7 +125,7 @@ async def elt(
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "
             "as documented here: "
-            "https://docs.meltano.com/reference/command-line-interface#run"
+            "https://docs.meltano.com/reference/command-line-interface#run",
         )
 
     tracker: Tracker = ctx.obj["tracker"]
@@ -141,7 +143,7 @@ async def elt(
         or (
             f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
             f"{extractor}--{loader}"
-        )
+        ),
     )
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -234,7 +236,7 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
             raise CliError(
                 f"Another '{job.job_name}' pipeline is already running which "
                 f"started at {existing.started_at}. To ignore this check use "
-                "the '--force' option."
+                "the '--force' option.",
             )
 
     async with job.run(session):
@@ -252,10 +254,12 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 @asynccontextmanager
 async def _redirect_output(log, output_logger):
     meltano_stdout = output_logger.out(
-        "meltano", log.bind(stdio="stdout", cmd_type="elt")
+        "meltano",
+        log.bind(stdio="stdout", cmd_type="elt"),
     )
     meltano_stderr = output_logger.out(
-        "meltano", log.bind(stdio="stderr", cmd_type="elt")
+        "meltano",
+        log.bind(stdio="stderr", cmd_type="elt"),
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
@@ -295,7 +299,7 @@ async def _run_elt(
                 "--log-level=debug ...' CLI flag.\nNote that you can also "
                 f"check the generated log file at '{output_logger.file}'.\n"
                 "For more information on debugging and logging: "
-                "https://docs.meltano.com/reference/command-line-interface#debugging"
+                "https://docs.meltano.com/reference/command-line-interface#debugging",
             ) from err
 
 
@@ -321,10 +325,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
             stdio="stdout",
         )
         extractor_out = output_logger.out(
-            f"{extractor} (out)", stdout_log.bind(cmd_type="extractor"), logging.DEBUG
+            f"{extractor} (out)",
+            stdout_log.bind(cmd_type="extractor"),
+            logging.DEBUG,
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
+            f"{loader} (out)",
+            stdout_log.bind(cmd_type="loader"),
+            logging.DEBUG,
         )
 
         extractor_out_writer_ctxmgr = extractor_out.line_writer
@@ -391,12 +399,14 @@ def _find_transform_for_extractor(extractor: str, plugins_service):
     discovery_service = plugins_service.discovery_service
     try:
         extractor_plugin_def = discovery_service.find_definition(
-            PluginType.EXTRACTORS, extractor
+            PluginType.EXTRACTORS,
+            extractor,
         )
 
         # Check if there is a default transform for this extractor
         transform_plugin_def = discovery_service.find_definition_by_namespace(
-            PluginType.TRANSFORMS, extractor_plugin_def.namespace
+            PluginType.TRANSFORMS,
+            extractor_plugin_def.namespace,
         )
 
         # Check if the transform has been added to the project

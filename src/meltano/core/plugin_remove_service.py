@@ -69,7 +69,8 @@ class PluginRemoveService:
         return removed_plugins, num_plugins
 
     def remove_plugin(
-        self, plugin: ProjectPlugin
+        self,
+        plugin: ProjectPlugin,
     ) -> tuple[PluginLocationRemoveManager, ...]:
         """Remove a plugin.
 

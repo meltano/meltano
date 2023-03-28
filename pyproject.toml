@@ -567,6 +567,7 @@ ignore = [
 ]
 select = [
   "C4",  # flake8-comprehensions
+  "COM", # flake8-commas
   "E",   # pycodestyle (error)
   "F",   # pyflakes
   "I",   # isort

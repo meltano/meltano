@@ -13,9 +13,9 @@ from meltano.core.project_settings_service import (
 class TestCliUi:
     def test_ui(self, project, cli_runner):
         with mock.patch(
-            "meltano.cli.ui.APIWorker.start"
+            "meltano.cli.ui.APIWorker.start",
         ) as start_api_worker, mock.patch(
-            "meltano.cli.ui.UIAvailableWorker.start"
+            "meltano.cli.ui.UIAvailableWorker.start",
         ) as start_ui_available_worker:
             result = cli_runner.invoke(cli, "ui")
             assert_cli_runner(result)

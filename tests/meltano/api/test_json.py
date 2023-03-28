@@ -57,7 +57,7 @@ class TestJSON:
     )
     def test_json_scheme_encoder(self, app, scheme, payload, expected):
         with app.test_request_context(
-            headers={app.config["JSON_SCHEME_HEADER"]: scheme}
+            headers={app.config["JSON_SCHEME_HEADER"]: scheme},
         ):
             encoded = json.dumps(payload)
 
@@ -84,7 +84,7 @@ class TestJSON:
                     # `_` prefixed are not converted
                     "_aVal": "simpleValue",
                 },
-            )
+            ),
         ],
     )
     def test_json_scheme_decoder(self, app, payload, expected):

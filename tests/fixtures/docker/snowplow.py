@@ -77,7 +77,8 @@ def snowplow_session(request) -> SnowplowMicro | None:
 
 @pytest.fixture
 def snowplow_optional(
-    snowplow_session: SnowplowMicro | None, monkeypatch
+    snowplow_session: SnowplowMicro | None,
+    monkeypatch,
 ) -> SnowplowMicro | None:
     """Provide a clean `SnowplowMicro` instance.
 

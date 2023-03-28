@@ -51,7 +51,8 @@ class BookmarkWriter:
         """
         if self.job is None:
             logger.info(
-                "Running outside a Job context: incremental state could not be updated."
+                "Running outside a Job context: "
+                "incremental state could not be updated.",
             )
             return
 
@@ -60,7 +61,7 @@ class BookmarkWriter:
             new_state = json.loads(line)
         except Exception:
             logger.warning(
-                "Received state is invalid, incremental state has not been updated"
+                "Received state is invalid, incremental state has not been updated",
             )
 
         job = self.job
@@ -69,12 +70,14 @@ class BookmarkWriter:
         try:
             job.save(self.session)
             self.state_service.add_state(
-                job, json.dumps(job.payload), job.payload_flags
+                job,
+                json.dumps(job.payload),
+                job.payload_flags,
             )
         except Exception:
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated"
+                "incremental state has not been updated",
             )
         else:
             logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")
@@ -122,7 +125,9 @@ class SingerTarget(SingerPlugin):
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: list[str]
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: list[str],
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 

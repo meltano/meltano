@@ -56,7 +56,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
         """
         super().__init__(
             f"The plugin name '{name}' cannot contain the state ID component "
-            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
 
@@ -640,8 +640,11 @@ class BasePlugin(HookObject):  # noqa: WPS214
         # including flattened keys of default nested object items
         existing_settings.extend(
             SettingDefinition.from_missing(
-                existing_settings, defaults, custom=False, default=True
-            )
+                existing_settings,
+                defaults,
+                custom=False,
+                default=True,
+            ),
         )
 
         return existing_settings

@@ -22,14 +22,17 @@ class TestOrchestration:
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
-            "secure", "thisisatest", store=SettingValueStore.DOTENV, session=session
+            "secure",
+            "thisisatest",
+            store=SettingValueStore.DOTENV,
+            session=session,
         )
 
         monkeypatch.setenv("TAP_MOCK_BOOLEAN", "false")
 
         with app.test_request_context():
             res = api.get(
-                url_for("orchestrations.get_plugin_configuration", plugin_ref=tap)
+                url_for("orchestrations.get_plugin_configuration", plugin_ref=tap),
             )
 
             assert res.status_code == 200
@@ -39,7 +42,8 @@ class TestOrchestration:
             # make sure that set `password` is still present
             # but redacted in the response
             assert plugin_settings_service.get_with_source(
-                "secure", session=session
+                "secure",
+                session=session,
             ) == ("thisisatest", SettingValueStore.DOTENV)
             assert config["secure"] == REDACTED_VALUE
             assert config_metadata["secure"]["redacted"] is True
@@ -50,7 +54,8 @@ class TestOrchestration:
             # make sure the `hidden` setting is still present
             # but hidden in the response
             assert plugin_settings_service.get_with_source(
-                "hidden", session=session
+                "hidden",
+                session=session,
             ) == (42, SettingValueStore.DEFAULT)
             assert "hidden" not in config
 
@@ -74,10 +79,16 @@ class TestOrchestration:
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
-            "secure", "thisisatest", store=SettingValueStore.DOTENV, session=session
+            "secure",
+            "thisisatest",
+            store=SettingValueStore.DOTENV,
+            session=session,
         )
         plugin_settings_service.set(
-            "protected", "iwontchange", store=SettingValueStore.DB, session=session
+            "protected",
+            "iwontchange",
+            store=SettingValueStore.DB,
+            session=session,
         )
 
         with app.test_request_context():
@@ -92,19 +103,22 @@ class TestOrchestration:
             # make sure that set `password` has been updated
             # but redacted in the response
             assert plugin_settings_service.get_with_source(
-                "secure", session=session
+                "secure",
+                session=session,
             ) == ("newvalue", SettingValueStore.DOTENV)
             assert config["secure"] == REDACTED_VALUE
 
             # make sure the `readonly` field has not been updated
             assert plugin_settings_service.get_with_source(
-                "protected", session=session
+                "protected",
+                session=session,
             ) == ("iwontchange", SettingValueStore.DB)
 
             # make sure the `hidden` setting is still present
             # but hidden in the response
             assert plugin_settings_service.get_with_source(
-                "hidden", session=session
+                "hidden",
+                session=session,
             ) == (42, SettingValueStore.DEFAULT)
             assert "hidden" not in config
 

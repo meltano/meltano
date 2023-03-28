@@ -94,7 +94,7 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         with requires_gcs():
             if self.application_credentials:
                 return google.cloud.storage.Client.from_service_account_json(
-                    self.application_credentials
+                    self.application_credentials,
                 )
             # Use default authentication in environment
             return google.cloud.storage.Client()

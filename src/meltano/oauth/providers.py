@@ -27,7 +27,9 @@ def facebook(app: Flask) -> None:
     def login():
         redirect_uri = url_for(".authorize", _external=True)
         return OAuth.facebook.authorize_redirect(
-            redirect_uri, display="popup", auth_type="rerequest"
+            redirect_uri,
+            display="popup",
+            auth_type="rerequest",
         )
 
     @oauth_bp.route("/authorize")
@@ -59,7 +61,9 @@ def google_adwords(app: Flask) -> None:
         # `consent` prompt is required to have a refresh_token
         # `offline` access_type is required to have a refresh_token
         return OAuth.google_adwords.authorize_redirect(
-            redirect_uri, prompt="consent", access_type="offline"
+            redirect_uri,
+            prompt="consent",
+            access_type="offline",
         )
 
     @oauth_bp.route("/authorize")
