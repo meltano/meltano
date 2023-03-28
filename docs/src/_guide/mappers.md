@@ -125,7 +125,7 @@ meltano add mapper meltano-map-transform
 
 #### Example
 
-An example taken from the [meltano-map-transformer](https://github.com/MeltanoLabs/meltano-map-transform/examples) repository shows the mapper altering casing of the data.
+An example taken from the [meltano-map-transformer](https://github.com/MeltanoLabs/meltano-map-transform/tree/main/examples) repository shows the mapper altering casing of the data.
 Given this input CSV and mapper configurations:
 
 ```csv
@@ -159,7 +159,7 @@ After running `meltano run tap-csv hash_email target-sqlite` the result would be
 | 0       | EBOOK0@TWITTER.COM         | ethe       | 1  | book       | 2023-03-17 16:57:19.095880 |
 
 
-To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/meltano-map-transform/examples).
+To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/meltano-map-transform/tree/main/examples).
 
 
 ## FAQs
