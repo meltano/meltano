@@ -10,7 +10,7 @@
 
 ---
 
-![Meltano Logo](meltano.png)
+![Meltano Logo](https://user-images.githubusercontent.com/16805946/228282901-9301c246-8df4-4814-a4be-b2bb7cde8e48.png)
 
 <div align="center">
 <a href="https://docs.meltano.com/">
