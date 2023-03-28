@@ -107,19 +107,19 @@ async def list_items(
 
 
 @env.command("set")
-@click.argument("secret_name", type=str, required=True)
+@click.option("--key", type=str, required=True)
 @click.option("--value", type=str, required=True)
 @pass_context
 @run_async
 async def set_value(
     context: MeltanoCloudCLIContext,
-    secret_name: str,
+    key: str,
     value: str,
 ) -> None:
     """Create a new Meltano Cloud config item."""
     async with ConfigCloudClient(config=context.config) as client:
-        await client.set_value(secret_name=secret_name, secret_value=value)
-        click.echo(f"Successfully set config item {secret_name!r}.")
+        await client.set_value(secret_name=key, secret_value=value)
+        click.echo(f"Successfully set config item {key!r}.")
 
 
 @env.command()
