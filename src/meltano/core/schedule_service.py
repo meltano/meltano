@@ -240,8 +240,8 @@ class ScheduleService:  # noqa: WPS214
             try:
                 # guard if it doesn't exist
                 schedule = find_named(self.schedules(), name)
-            except NotFound:
-                raise ScheduleDoesNotExistError(name)
+            except NotFound as ex:
+                raise ScheduleDoesNotExistError(name) from ex
 
             # find the schedules plugin config
             meltano.schedules.remove(schedule)
@@ -260,9 +260,10 @@ class ScheduleService:  # noqa: WPS214
         with self.project.meltano_update() as meltano:
             try:
                 idx = meltano.schedules.index(schedule)
-                meltano.schedules[idx] = schedule
             except ValueError:
-                raise ScheduleDoesNotExistError(schedule.name)
+                raise ScheduleDoesNotExistError(schedule.name) from None
+            else:
+                meltano.schedules[idx] = schedule
 
     def find_namespace_schedule(self, namespace: str) -> Schedule:
         """Search for a Schedule that runs for a certain plugin namespace.

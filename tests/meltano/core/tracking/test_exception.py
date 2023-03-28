@@ -116,7 +116,7 @@ def test_complex_exception_context():
             _function_to_deepen_traceback()
         except Exception:
             line_nums.append(1 + inspect.currentframe().f_lineno)
-            raise CustomException
+            raise CustomException from None
     except Exception:
         ctx = ExceptionContext()
 
