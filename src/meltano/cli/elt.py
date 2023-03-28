@@ -95,7 +95,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @click.pass_context
 @pass_project(migrate=True)
 @click_run_async
-async def elt(  # noqa: WPS 408
+async def elt(  # WPS408
     project: Project,
     ctx: click.Context,
     extractor: str,
