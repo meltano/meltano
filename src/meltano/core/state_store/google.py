@@ -39,7 +39,7 @@ def requires_gcs():
         None
     """
     if not google:
-        raise MissingGoogleError()
+        raise MissingGoogleError
     yield
 
 

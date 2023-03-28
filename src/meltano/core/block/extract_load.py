@@ -707,7 +707,7 @@ class ELBExecutionManager:
                     line_length_limit=self.line_length_limit,
                     stream_buffer_size=self.stream_buffer_size,
                 )
-            raise output_futures_failed.exception()
+            raise output_futures_failed.exception()  # noqa: RSE102
         else:
             # If all the output handlers completed without raising an
             # exception, we still need to wait for all the underlying block

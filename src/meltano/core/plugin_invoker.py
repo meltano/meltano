@@ -414,7 +414,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         env = env or {}
 
         if require_preparation and not self._prepared:
-            raise InvokerNotPreparedError()
+            raise InvokerNotPreparedError
 
         async with self.plugin.trigger_hooks("invoke", self, args):
             popen_options = {**self.Popen_options(), **kwargs}
