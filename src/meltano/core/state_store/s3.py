@@ -42,7 +42,7 @@ def requires_boto3():
         None
     """
     if not boto3:
-        raise MissingBoto3Error()
+        raise MissingBoto3Error
     yield
 
 
