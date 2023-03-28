@@ -246,7 +246,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Yields:
             Yields to the caller, then resetting the config.
         """
-        try:  # noqa: WPS229. Allow try body of length > 1.
+        try:
             await self.prepare(session)
             yield
         finally:
@@ -500,7 +500,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Raises:
             __cause__: If file is not found.
         """
-        try:  # noqa: WPS229. Allow try body of length > 1.
+        try:
             if file_id != "config":
                 async with self._invoke():
                     return self.files[file_id].read_text()
@@ -508,7 +508,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:  # noqa: WPS329. Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__  # noqa: WPS609. Allow accessing magic attribute.
+            raise err.__cause__ from None  # noqa: WPS469, WPS609
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.

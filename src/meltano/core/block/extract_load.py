@@ -557,7 +557,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Yields:
             None
         """
-        try:  # noqa:  WPS229
+        try:
             for block in self.blocks:
                 await block.pre(self.context)
                 await block.start()
