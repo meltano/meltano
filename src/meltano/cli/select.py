@@ -101,7 +101,12 @@ async def select(
 
 
 def update(
-    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    exclude=False,
+    remove=False,
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)

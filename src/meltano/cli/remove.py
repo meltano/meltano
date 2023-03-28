@@ -76,7 +76,8 @@ def removal_manager_status_update(removal_manager: PluginLocationRemoveManager):
 
     elif removal_manager.plugin_not_found:
         click.secho(
-            f"Could not find {plugin_descriptor} in {location} to remove", fg="yellow"
+            f"Could not find {plugin_descriptor} in {location} to remove",
+            fg="yellow",
         )
 
     elif removal_manager.plugin_removed:

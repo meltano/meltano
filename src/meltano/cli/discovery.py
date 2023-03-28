@@ -20,7 +20,9 @@ if t.TYPE_CHECKING:
     short_help="List the available plugins in Meltano Hub and their variants.",
 )
 @click.argument(
-    "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
+    "plugin_type",
+    type=click.Choice([*list(PluginType), "all"]),
+    default="all",
 )
 @pass_project()
 @click.pass_context
@@ -45,7 +47,7 @@ def discover(ctx: click.Context, project: Project, plugin_type: str):
 
         try:
             plugin_type_index = project.hub_service.get_plugins_of_type(
-                discovered_plugin_type
+                discovered_plugin_type,
             )
         except Exception:
             click.secho(

@@ -45,7 +45,8 @@ class Hookable(type):
             if hasattr(func, "__hook__")  # noqa: WPS421
         ):
             new_type.__hooks__[hook_name] = new_type.__hooks__.get(  # noqa: WPS609
-                hook_name, []
+                hook_name,
+                [],
             )  # noqa: WPS609
             new_type.__hooks__[hook_name].append(hook)  # noqa: WPS609
 
@@ -113,7 +114,7 @@ class HookObject(metaclass=Hookable):
                 if hook_func.__hook__.can_fail:  # noqa: WPS609
                     logger.debug(str(err), exc_info=True)
                     logger.warning(
-                        f"{hook_name} hook '{hook_func.__name__}' has failed: {err}"
+                        f"{hook_name} hook '{hook_func.__name__}' has failed: {err}",
                     )
                 else:
                     raise err

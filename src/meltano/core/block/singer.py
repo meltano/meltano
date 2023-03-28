@@ -138,7 +138,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
             outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
             self._stdout_future = asyncio.ensure_future(
                 # forward subproc stdout to downstream (i.e. targets stdin, loggers)
-                capture_subprocess_output(self.process_handle.stdout, *outputs)
+                capture_subprocess_output(self.process_handle.stdout, *outputs),
             )
         return self._stdout_future
 
@@ -157,10 +157,11 @@ class InvokerBase:  # noqa: WPS230, WPS214
 
         if self._stderr_future is None:
             err_outputs = self._merge_outputs(
-                self.invoker.StdioSource.STDERR, self.err_outputs
+                self.invoker.StdioSource.STDERR,
+                self.err_outputs,
             )
             self._stderr_future = asyncio.ensure_future(
-                capture_subprocess_output(self.process_handle.stderr, *err_outputs)
+                capture_subprocess_output(self.process_handle.stderr, *err_outputs),
             )
         return self._stderr_future
 
@@ -185,7 +186,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self._process_future is None:
             if self.process_handle is None:
                 raise ProcessWaitError(
-                    "No process to wait, process not running running"
+                    "No process to wait, process not running running",
                 )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future

@@ -42,11 +42,16 @@ class TestSuperset:
 
     @pytest.mark.asyncio  # noqa:  WPS210
     async def test_hooks(  # noqa:  WPS210
-        self, subject, project, session, plugin_invoker_factory, monkeypatch
+        self,
+        subject,
+        project,
+        session,
+        plugin_invoker_factory,
+        monkeypatch,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         run_dir = project.run_dir("superset")
         config_path = run_dir.joinpath("superset_config.py")
@@ -76,9 +81,11 @@ class TestSuperset:
             return handle_mock
 
         with mock.patch.object(
-            asyncio, "create_subprocess_exec", side_effect=popen_mock
+            asyncio,
+            "create_subprocess_exec",
+            side_effect=popen_mock,
         ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure"
+            "meltano.core.plugin_invoker.PluginConfigService.configure",
         ):
             invoker: SupersetInvoker = plugin_invoker_factory(subject)
             # This ends up calling the hooks

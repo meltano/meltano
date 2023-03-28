@@ -183,7 +183,7 @@ async def _run_blocks(
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise CliError(
-                f"Run invocation could not be completed as block failed: {err}"
+                f"Run invocation could not be completed as block failed: {err}",
             ) from err
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions

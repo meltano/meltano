@@ -72,7 +72,8 @@ class StateBackend(str, Enum):
 
 
 def state_store_manager_from_project_settings(  # noqa: WPS210
-    settings_service: ProjectSettingsService, session: Session | None = None
+    settings_service: ProjectSettingsService,
+    session: Session | None = None,
 ) -> StateStoreManager:
     """Return a StateStoreManager based on the project's settings.
 
@@ -87,14 +88,14 @@ def state_store_manager_from_project_settings(  # noqa: WPS210
     parsed = urlparse(state_backend_uri)
     if state_backend_uri == StateBackend.SYSTEMDB:
         return DBStateStoreManager(
-            session=session or project_engine(settings_service.project)[1]()
+            session=session or project_engine(settings_service.project)[1](),
         )
     scheme = parsed.scheme
     # Get backend-specific settings
     # AND top-level state_backend settings
     setting_defs = filter(
         lambda setting_def: setting_def.name.startswith(
-            f"state_backend.{'gcs' if scheme == 'gs' else scheme}"  # noqa: WPS509
+            f"state_backend.{'gcs' if scheme == 'gs' else scheme}",  # noqa: WPS509
         )
         or (
             setting_def.name.startswith("state_backend")

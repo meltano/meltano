@@ -64,7 +64,11 @@ class TestPluginInvoker:
 
     @pytest.mark.asyncio
     async def test_environment_env(
-        self, project_with_environment, tap, session, plugin_invoker_factory
+        self,
+        project_with_environment,
+        tap,
+        session,
+        plugin_invoker_factory,
     ):
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
@@ -75,18 +79,22 @@ class TestPluginInvoker:
 
     @pytest.mark.asyncio
     async def test_expanded_environment_env(
-        self, project_with_environment, tap, session, plugin_invoker_factory
+        self,
+        project_with_environment,
+        tap,
+        session,
+        plugin_invoker_factory,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
             env = subject.env()
 
         assert env["ENVIRONMENT_ENV_VAR"] == str(
-            project_with_environment.root / "file.txt"
+            project_with_environment.root / "file.txt",
         )
 
     @pytest.mark.asyncio
@@ -156,11 +164,15 @@ class TestPluginInvoker:
     )
     @pytest.mark.asyncio
     async def test_expand_nonpip_command_exec_args(
-        self, nonpip_plugin_invoker, session, executable_str, assert_fn
+        self,
+        nonpip_plugin_invoker,
+        session,
+        executable_str,
+        assert_fn,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         nonpip_plugin_invoker.plugin.executable = executable_str
         exec_args = nonpip_plugin_invoker.exec_args()

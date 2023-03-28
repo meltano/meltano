@@ -20,7 +20,9 @@ class TestRoles:
             ("alice", 201),
             ("rob", 403),
             pytest.param(
-                None, 401, marks=pytest.mark.xfail(reason="UI/API is deprecated")
+                None,
+                401,
+                marks=pytest.mark.xfail(reason="UI/API is deprecated"),
             ),
         ],
     )
@@ -28,7 +30,8 @@ class TestRoles:
         with app.test_request_context():
             with impersonate(users.get_user(user)):
                 res = api.post(
-                    url_for("settings.roles"), json={"role": {"name": "pytest"}}
+                    url_for("settings.roles"),
+                    json={"role": {"name": "pytest"}},
                 )
 
             assert res.status_code == status_code, res.data
@@ -41,7 +44,9 @@ class TestRoles:
             ("alice", 201),
             ("rob", 403),
             pytest.param(
-                None, 401, marks=pytest.mark.xfail(reason="UI/API is deprecated")
+                None,
+                401,
+                marks=pytest.mark.xfail(reason="UI/API is deprecated"),
             ),
         ],
     )
@@ -69,7 +74,9 @@ class TestRoles:
             ("alice", 403),
             ("rob", 403),
             pytest.param(
-                None, 401, marks=pytest.mark.xfail(reason="UI/API is deprecated")
+                None,
+                401,
+                marks=pytest.mark.xfail(reason="UI/API is deprecated"),
             ),
         ],
     )
@@ -77,7 +84,8 @@ class TestRoles:
         with app.test_request_context():
             with impersonate(users.get_user(user)):
                 res = api.delete(
-                    url_for("settings.roles"), json={"role": {"name": "admin"}}
+                    url_for("settings.roles"),
+                    json={"role": {"name": "admin"}},
                 )
 
         assert res.status_code == status_code, res.data
@@ -88,7 +96,9 @@ class TestRoles:
             ("alice", 201),
             ("rob", 403),
             pytest.param(
-                None, 401, marks=pytest.mark.xfail(reason="UI/API is deprecated")
+                None,
+                401,
+                marks=pytest.mark.xfail(reason="UI/API is deprecated"),
             ),
         ],
     )
@@ -103,7 +113,8 @@ class TestRoles:
 
             with impersonate(users.get_user(user)):
                 res = api.delete(
-                    url_for("settings.roles"), json={"role": {"name": "pytest"}}
+                    url_for("settings.roles"),
+                    json={"role": {"name": "pytest"}},
                 )
 
             assert res.status_code == status_code, res.data
@@ -116,7 +127,9 @@ class TestRoles:
             ("alice", 201),
             ("rob", 403),
             pytest.param(
-                None, 401, marks=pytest.mark.xfail(reason="UI/API is deprecated")
+                None,
+                401,
+                marks=pytest.mark.xfail(reason="UI/API is deprecated"),
             ),
         ],
     )

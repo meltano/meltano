@@ -91,13 +91,13 @@ class Superset(BasePlugin):
                         "for key in dir(custom_config):",
                         "    if key.isupper():",
                         "        setattr(module, key, getattr(custom_config, key))",
-                    ]
+                    ],
                 )
 
                 logger.info(f"Merged in config from {custom_config_path}")
             else:
                 raise PluginExecutionError(
-                    f"Could not find config file {custom_config_path}"
+                    f"Could not find config file {custom_config_path}",
                 )
 
         config_path = invoker.files["config"]

@@ -25,7 +25,7 @@ with open(
     / "com.meltano"
     / "exception_context"
     / "jsonschema"
-    / "1-0-0"
+    / "1-0-0",
 ) as exception_context_schema_file:
     EXCEPTION_CONTEXT_SCHEMA = json.load(exception_context_schema_file)
 
@@ -149,7 +149,7 @@ def test_complex_exception_context():
                 {
                     "file": f".../{THIS_FILE_BASENAME}",
                     "line_number": line_nums[3],
-                }
+                },
             ],
             "cause": None,
             "context": {

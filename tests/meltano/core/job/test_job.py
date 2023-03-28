@@ -20,7 +20,9 @@ from meltano.core.job.job import (
 class TestJob:
     def sample_job(self, payload=None):
         return Job(
-            job_name="meltano:sample-elt", state=State.IDLE, payload=payload or {}
+            job_name="meltano:sample-elt",
+            state=State.IDLE,
+            payload=payload or {},
         )
 
     def test_save(self, session):
@@ -96,7 +98,7 @@ class TestJob:
     async def test_run_interrupted(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
         with pytest.raises(KeyboardInterrupt):
@@ -112,7 +114,7 @@ class TestJob:
     async def test_run_terminated(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 

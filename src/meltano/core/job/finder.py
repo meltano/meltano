@@ -46,7 +46,7 @@ class JobFinder:
         return session.query(Job).filter(
             (Job.job_name == self.state_id)  # noqa: WPS465
             & (Job.state == State.SUCCESS)  # noqa: WPS465
-            & Job.ended_at.isnot(None)
+            & Job.ended_at.isnot(None),
         )
 
     def running(self, session):
@@ -60,7 +60,7 @@ class JobFinder:
         """
         return session.query(Job).filter(
             (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.RUNNING)
+            & (Job.state == State.RUNNING),
         )
 
     def latest_success(self, session):
@@ -103,7 +103,7 @@ class JobFinder:
                 (Job.job_name == self.state_id)  # noqa: WPS465
                 & (Job.payload_flags != 0)  # noqa: WPS465
                 & (Job.payload_flags.op("&")(flags) == flags)  # noqa: WPS465
-                & Job.ended_at.isnot(None)
+                & Job.ended_at.isnot(None),
             )
             .order_by(Job.ended_at.asc())
         )
@@ -156,7 +156,7 @@ class JobFinder:
                     Job.last_heartbeat_at.is_(None)  # noqa: WPS465
                     & (Job.started_at < last_valid_started_at)
                 )
-            )
+            ),
         )
 
     def stale(self, session):

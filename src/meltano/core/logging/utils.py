@@ -213,7 +213,8 @@ async def _write_line_writer(writer, line):
 
 
 async def capture_subprocess_output(
-    reader: asyncio.StreamReader | None, *line_writers: SubprocessOutputWriter
+    reader: asyncio.StreamReader | None,
+    *line_writers: SubprocessOutputWriter,
 ) -> None:
     """Capture in real time the output stream of a suprocess that is run async.
 

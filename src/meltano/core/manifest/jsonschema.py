@@ -98,7 +98,7 @@ class JsonschemaRefLocationParser:
         if location_as_ref.startswith(ref):
             raise RecursionError(
                 "Cannot resolve recursive jsonschema "
-                f"ref {ref!r} at {location_as_ref!r}"
+                f"ref {ref!r} at {location_as_ref!r}",
             )
 
         current_schema = self.root_schema
@@ -112,7 +112,7 @@ class JsonschemaRefLocationParser:
                 current_schema = current_schema[key]
             except KeyError as ex:
                 raise KeyError(
-                    f"Unable to resolve local jsonschema ref {ref!r} at level {key!r}"
+                    f"Unable to resolve local jsonschema ref {ref!r} at level {key!r}",
                 ) from ex
         return current_schema
 

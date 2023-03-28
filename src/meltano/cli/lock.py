@@ -91,7 +91,8 @@ def lock(
             click.secho(f"{descriptor.capitalize()} is a custom plugin", fg="yellow")
         elif plugin.inherit_from is not None:
             click.secho(
-                f"{descriptor.capitalize()} is an inherited plugin", fg="yellow"
+                f"{descriptor.capitalize()} is an inherited plugin",
+                fg="yellow",
             )
         else:
             plugin.parent = None

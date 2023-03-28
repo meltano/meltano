@@ -88,7 +88,9 @@ class TestProjectAddService:
 
         # Inheriting from base plugin
         inherited = subject.add(
-            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from="tap-mock"
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from="tap-mock",
         )
         assert inherited.canonical() == {
             "name": "tap-mock-inherited",

@@ -122,7 +122,8 @@ class UpgradeService:
             self._upgrade_package(pip_url, force)
         except AutomaticPackageUpgradeError as err:
             msg = click.style(
-                "The `meltano` package could not be upgraded automatically", fg="red"
+                "The `meltano` package could not be upgraded automatically",
+                fg="red",
             )
             click.echo(f"{msg} because {err.reason}.")
             if err.instructions:
@@ -176,7 +177,7 @@ class UpgradeService:
             if not package_upgraded:
                 click.echo(
                     "Then, run `meltano upgrade --skip-package` to upgrade "
-                    "your project based on the latest version."
+                    "your project based on the latest version.",
                 )
                 return
 
