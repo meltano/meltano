@@ -51,12 +51,12 @@ repos:
         files: ^src/meltano/core/bundle/discovery.yml$
         args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
 
-  # - repo: https://github.com/shellcheck-py/shellcheck-py
-  #   rev: v0.9.0.2
-  #   hooks:
-  #     - id: shellcheck
-  #       name: shellcheck
-  #       exclude: ^integration/mdsh$
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.2
+    hooks:
+      - id: shellcheck
+        name: shellcheck
+        exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
     rev: v8.36.0 # Keep this in sync with the eslint "additional_dependency" below!
