@@ -61,12 +61,6 @@
 </a>
 </div>
 
----
-
-Welcome to your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love.
-
-If you're a fan, star the repo ⭐️. For every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊.
-
 Integrations
 ------------
 
