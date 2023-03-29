@@ -1,13 +1,14 @@
 ---
-title: "Encrypting Secrets"
+title: "Encrypting Secrets (Deprecated)"
 description: Details the Alpha process for encrypting Meltano Cloud secrets
 layout: doc
 weight: 8
 ---
 
-<div class="notification is-info">
+<div class="notification is-warning">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interesting in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>These Alpha instructions are now obsolete but are maintained for legacy
+  Alpha users.</p>
 </div>
 
 This document covers information on encrypting secrets in your Meltano `secrets.yml` file.
@@ -27,6 +28,7 @@ We have a utility extension for encrypting your secrets:
 https://github.com/meltano/kms-ext
 
 Recommended installation process:
+
 ```
 pip install pipx
 pipx install git+https://github.com/meltano/kms-ext.git@main
@@ -58,6 +60,7 @@ By default, our cloud runners will look for `secrets.yml` in the root of your pr
 If you would like to change the location or name of the secrets file, please inform us during your on-boarding process.
 
 Example `.env` file:
+
 ```
 THESE_ARE_MY_SECRET_VARS=secret_contents
 DATABASE_CREDENTIALS=secret_database_credentials_here
