@@ -57,10 +57,10 @@ To install from scratch using [pipx](https://pypa.github.io/pipx/installation/#i
 pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/cloud-cli'
 ```
 
-To update to the latest version:
+To upgrade to the latest version:
 
 ```console
-pipx uninstall meltano-cloud-cli && pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/cloud-cli'
+pipx reinstall meltano-cloud-cli
 ```
 
 The above commands will install a `meltano-cloud` CLI command into your workstation.
