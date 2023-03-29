@@ -10,8 +10,6 @@ weight: 8
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
-</div>
-
 This document covers information on encrypting secrets in your Meltano `secrets.yml` file.
 
 ## Components for Encryption
