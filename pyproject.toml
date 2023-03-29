@@ -224,6 +224,7 @@ pyflakes = [
   "-WPS300", # Allow local folder imports (import .module)
   "-WPS305", # Allow f-strings
   "-WPS306", # Ignore missing base class, required by pyupgrade: https://github.com/asottile/pyupgrade#rewrites-class-declaration
+  "-WPS309", # Allow reversed compare order
   "-WPS316",
   "-WPS317", # Allow "incorrect multi-line parameters", since Black forces them to be "incorrect"
   "-WPS324", # Allow inconsistent returns - permitted because of too many false positives
@@ -360,7 +361,6 @@ pyflakes = [
 [tool.flakeheaven.exceptions."src/meltano/core/project_init_service.py"]
 "wemake-python-styleguide" = [
   "-WPS226", # Found string constant over-use: blue > 3
-  "-WPS229", # Found too long ``try`` body length: 3 > 1
   "-WPS213", # Found too many expressions: 27 > 9
 ]
 
@@ -566,11 +566,15 @@ ignore = [
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
 ]
 select = [
+  "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
+  "COM", # flake8-commas
   "E",   # pycodestyle (error)
   "F",   # pyflakes
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
+  "RSE", # flake8-raise
+  "SIM", # flake8-simplify
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]

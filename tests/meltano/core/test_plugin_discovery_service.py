@@ -107,21 +107,27 @@ class TestPluginDiscoveryService:
         assert base_plugin.variant == base_plugin.variants[0].name
 
         base_plugin = subject.find_base_plugin(
-            PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="singer-io",
         )
         assert base_plugin.type == PluginType.EXTRACTORS
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "singer-io"
 
         base_plugin = subject.find_base_plugin(
-            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="meltano",
         )
         assert base_plugin.type == PluginType.EXTRACTORS
         assert base_plugin.name == "tap-mock"
         assert base_plugin.variant == "meltano"
 
         base_plugin = subject.find_base_plugin(
-            PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant=Variant.ORIGINAL_NAME,
         )
         assert base_plugin.type == PluginType.EXTRACTORS
         assert base_plugin.name == "tap-mock"
@@ -129,7 +135,9 @@ class TestPluginDiscoveryService:
 
         with pytest.raises(VariantNotFoundError):
             base_plugin = subject.find_base_plugin(
-                PluginType.EXTRACTORS, "tap-mock", variant="unknown"
+                PluginType.EXTRACTORS,
+                "tap-mock",
+                variant="unknown",
             )
 
     @pytest.mark.order(5)
@@ -145,7 +153,9 @@ class TestPluginDiscoveryService:
 
         # First variant
         project_plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="meltano",
         )
         base_plugin = subject.get_base_plugin(project_plugin)
         assert base_plugin.type == PluginType.EXTRACTORS
@@ -154,7 +164,9 @@ class TestPluginDiscoveryService:
 
         # Another variant
         project_plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, "tap-mock", variant="singer-io"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="singer-io",
         )
         base_plugin = subject.get_base_plugin(project_plugin)
         assert base_plugin.type == PluginType.EXTRACTORS
@@ -163,7 +175,9 @@ class TestPluginDiscoveryService:
 
         # Original variant
         project_plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, "tap-mock", variant=Variant.ORIGINAL_NAME
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant=Variant.ORIGINAL_NAME,
         )
         base_plugin = subject.get_base_plugin(project_plugin)
         assert base_plugin.type == PluginType.EXTRACTORS
@@ -172,7 +186,9 @@ class TestPluginDiscoveryService:
 
         # Unknown variant
         project_plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, "tap-mock", variant="unknown"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="unknown",
         )
         with pytest.raises(VariantNotFoundError):
             subject.get_base_plugin(project_plugin)
@@ -253,28 +269,32 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
     @pytest.fixture
     def local_discovery(self, subject):
         with self.use_local_discovery(
-            self.build_discovery_yaml("local"), subject
+            self.build_discovery_yaml("local"),
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
     @pytest.fixture
     def incompatible_local_discovery(self, subject):
         with self.use_local_discovery(
-            self.build_discovery_yaml("local", version=VERSION - 1), subject
+            self.build_discovery_yaml("local", version=VERSION - 1),
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
     @pytest.fixture
     def remote_discovery(self, project, subject):
         with self.use_remote_discovery(
-            self.build_discovery_yaml("remote"), subject
+            self.build_discovery_yaml("remote"),
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
     @pytest.fixture
     def incompatible_remote_discovery(self, subject):
         with self.use_remote_discovery(
-            self.build_discovery_yaml("remote", version=VERSION + 1), subject
+            self.build_discovery_yaml("remote", version=VERSION + 1),
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
@@ -289,14 +309,16 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
     @pytest.fixture
     def cached_discovery(self, subject):
         with self.use_cached_discovery(
-            self.build_discovery_yaml("cached"), subject
+            self.build_discovery_yaml("cached"),
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
     @pytest.fixture
     def invalid_cached_discovery(self, subject):
         with self.use_cached_discovery(
-            {"version": VERSION, "invalid_key": "value"}, subject
+            {"version": VERSION, "invalid_key": "value"},
+            subject,
         ) as discovery_yaml:
             yield discovery_yaml
 
@@ -313,7 +335,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @pytest.mark.order(8)
     def test_incompatible_local_discovery(
-        self, subject, incompatible_local_discovery, remote_discovery
+        self,
+        subject,
+        incompatible_local_discovery,
+        remote_discovery,
     ):
         self.assert_discovery_yaml(subject, remote_discovery)
 
@@ -343,7 +368,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         mock_discovery_request.assert_called_once()
         expected_auth = subject.project.settings.get("discovery_url_auth")
         actual_auth = mock_discovery_request.call_args[1]["headers"].get(
-            "Authorization"
+            "Authorization",
         )
         assert expected_auth == actual_auth
 
@@ -352,7 +377,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
     @pytest.mark.order(11)
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_invalid_auth(
-        self, mock_discovery_request, subject, enabled_remote_discovery_auth
+        self,
+        mock_discovery_request,
+        subject,
+        enabled_remote_discovery_auth,
     ):
         mock_discovery_request.return_value.status_code = 401
         mock_discovery_request.return_value.raise_for_status.side_effect = (
@@ -364,7 +392,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         mock_discovery_request.assert_called_once()
         expected_auth = subject.project.settings.get("discovery_url_auth")
         actual_auth = mock_discovery_request.call_args[1]["headers"].get(
-            "Authorization"
+            "Authorization",
         )
         assert expected_auth == actual_auth
         assert discovery is None
@@ -381,26 +409,35 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
         mock_discovery_request.assert_called_once()
         actual_auth = mock_discovery_request.call_args[1]["headers"].get(
-            "Authorization"
+            "Authorization",
         )
         assert actual_auth is None
         assert discovery is None
 
     @pytest.mark.order(13)
     def test_incompatible_remote_discovery(
-        self, subject, incompatible_remote_discovery, cached_discovery
+        self,
+        subject,
+        incompatible_remote_discovery,
+        cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
     @pytest.mark.order(14)
     def test_disabled_remote_discovery(
-        self, subject, disabled_remote_discovery, cached_discovery
+        self,
+        subject,
+        disabled_remote_discovery,
+        cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
     @pytest.mark.order(15)
     def test_cached_discovery(
-        self, subject, incompatible_remote_discovery, cached_discovery
+        self,
+        subject,
+        incompatible_remote_discovery,
+        cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
@@ -416,7 +453,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
     @pytest.mark.order(17)
     def test_bundled_discovery(
-        self, subject, incompatible_remote_discovery, bundled_discovery
+        self,
+        subject,
+        incompatible_remote_discovery,
+        bundled_discovery,
     ):
         self.assert_discovery_yaml(subject, bundled_discovery)
 

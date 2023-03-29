@@ -23,7 +23,7 @@ BLANK_SUBFILE = CommentedMap(
         ("schedules", []),
         ("jobs", []),
         ("environments", []),
-    ]
+    ],
 )
 MULTI_FILE_KEYS = {
     "plugins",
@@ -90,7 +90,7 @@ class ProjectFiles:  # noqa: WPS214
             return {k: id(v) for k, v in x.items()}
 
         if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
-            self._raw_contents_map
+            self._raw_contents_map,
         ):
             self._cached_loaded = (
                 deep_merge(self.meltano, *included_file_contents)
@@ -178,14 +178,16 @@ class ProjectFiles:  # noqa: WPS214
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
                 f'Plugin with path "{key_path_string}" already added in '
-                f"file {existing_key_file_path}."
+                f"file {existing_key_file_path}.",
             )
             raise Exception("Duplicate plugin name found.")
         else:
             self._plugin_file_map.update({key: str(include_path)})
 
     def _index_file(  # noqa: WPS210
-        self, include_file_path: Path, include_file_contents: CommentedMap
+        self,
+        include_file_path: Path,
+        include_file_contents: CommentedMap,
     ) -> None:
         """Populate map of plugins/schedules to their respective files.
 
@@ -311,7 +313,7 @@ class ProjectFiles:  # noqa: WPS214
 
             # Restore sorting in project files
             sorted_file_dicts[file] = CommentedMap()
-            for key in contents.keys():
+            for key in contents:
                 if key in file_dicts[file]:
                     sorted_file_dicts[file][key] = file_dicts[file][key]
 
@@ -338,7 +340,8 @@ class ProjectFiles:  # noqa: WPS214
             original_contents.copy_attributes(file_dict)
 
             original_environments = original_contents.get(
-                "environments", CommentedSeq()
+                "environments",
+                CommentedSeq(),
             )
             environments = file_dict.get("environments", CommentedSeq())
             original_environments.copy_attributes(environments)
@@ -351,7 +354,8 @@ class ProjectFiles:  # noqa: WPS214
             plugins = file_dict.get("plugins", CommentedMap())
             for plugin_type, plugin_type_plugins in plugins.items():
                 original_plugin_type_plugins = original_plugins.get(
-                    plugin_type, CommentedSeq()
+                    plugin_type,
+                    CommentedSeq(),
                 )
                 original_plugin_type_plugins.copy_attributes(plugin_type_plugins)
 

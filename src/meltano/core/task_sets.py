@@ -23,7 +23,7 @@ TASKS_JSON_SCHEMA = {
                 "oneOf": [
                     {"type": "string"},
                     {"type": "array", "items": {"type": "string"}},
-                ]
+                ],
             },
         },
     ],
@@ -141,12 +141,18 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:
-        raise InvalidTasksError(name, f"Failed to parse yaml '{yaml_str}': {yerr}")
+        raise InvalidTasksError(
+            name,
+            f"Failed to parse yaml '{yaml_str}': {yerr}",
+        ) from yerr
 
     try:
         validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
     except ValidationError as verr:
-        raise InvalidTasksError(name, f"Failed to validate task schema: {verr}")
+        raise InvalidTasksError(
+            name,
+            f"Failed to validate task schema: {verr}",
+        ) from verr
 
     # Handle the special case of a single task
     if isinstance(tasks, str):

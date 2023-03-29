@@ -5,7 +5,7 @@ import json
 import logging
 import subprocess
 import sys
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 import pytest
 from mock import AsyncMock, mock
@@ -86,14 +86,12 @@ class TestSingerTap:
             yield new_job
             new_job.save(session)
             if new_job.payload and not new_job.is_running():
-                try:
+                with suppress(InvalidJobStateError):
                     state_service.add_state(
                         new_job.job_name,
                         json.dumps(new_job.payload),
                         new_job.payload_flags,
                     )
-                except InvalidJobStateError:
-                    pass
 
         async def assert_state(state):
             async with invoker.prepared(session):
@@ -173,7 +171,9 @@ class TestSingerTap:
         custom_state_path.write_text('{"custom": true}')
 
         monkeypatch.setitem(
-            invoker.settings_service.config_override, "_state", custom_state_filename
+            invoker.settings_service.config_override,
+            "_state",
+            custom_state_filename,
         )
 
         await assert_state({"custom": True})
@@ -185,7 +185,10 @@ class TestSingerTap:
     @pytest.mark.order(1)
     @pytest.mark.asyncio
     async def test_discover_catalog(  # noqa: WPS213
-        self, session, plugin_invoker_factory, subject
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -199,7 +202,9 @@ class TestSingerTap:
 
         async with invoker.prepared(session):
             with mock.patch.object(
-                SingerTap, "run_discovery", side_effect=mock_discovery
+                SingerTap,
+                "run_discovery",
+                side_effect=mock_discovery,
             ) as mocked_run_discovery:
                 await subject.discover_catalog(invoker)
 
@@ -237,7 +242,12 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_discover_catalog_custom(
-        self, project, session, plugin_invoker_factory, subject, monkeypatch
+        self,
+        project,
+        session,
+        plugin_invoker_factory,
+        subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -258,7 +268,11 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_apply_select(  # noqa: WPS213
-        self, session, plugin_invoker_factory, subject, monkeypatch
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -277,7 +291,7 @@ class TestSingerTap:
             def visit(catalog):
                 for rule in rules:
                     catalog["rules"].append(
-                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value]
+                        [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value],
                     )
 
             return mock.Mock(visit=visit)
@@ -323,7 +337,9 @@ class TestSingerTap:
 
             # Pretend `select` is set in meltano.yml
             monkeypatch.setitem(
-                invoker.plugin.extras, "select", ["UniqueEntitiesName.code"]
+                invoker.plugin.extras,
+                "select",
+                ["UniqueEntitiesName.code"],
             )
 
             async with invoker.prepared(session):
@@ -339,7 +355,11 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_apply_catalog_rules(  # noqa: WPS213
-        self, session, plugin_invoker_factory, subject, monkeypatch
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -374,7 +394,7 @@ class TestSingerTap:
             def visit(catalog):
                 for rule in rules:
                     catalog["rules"].append(
-                        [rule.tap_stream_id, rule.breadcrumb, rule.payload]
+                        [rule.tap_stream_id, rule.breadcrumb, rule.payload],
                     )
 
             return mock.Mock(visit=visit)
@@ -397,7 +417,7 @@ class TestSingerTap:
                 "metadata.UniqueEntitiesName.properties.payload.properties.hash.custom-metadata": "custom-value",  # noqa: E501
                 "_schema": {
                     "UniqueEntitiesName": {
-                        "code": {"anyOf": [{"type": "string"}, {"type": "null"}]}
+                        "code": {"anyOf": [{"type": "string"}, {"type": "null"}]},
                     },
                     "UniqueEntitiesName.payload.type": "object",
                     "UniqueEntitiesName.payload.properties": {
@@ -502,7 +522,11 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
-        self, session, plugin_invoker_factory, subject, monkeypatch
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -539,7 +563,7 @@ class TestSingerTap:
                 {"tap_stream_id": "three", **stream_data},
                 {"tap_stream_id": "four", **stream_data},
                 {"tap_stream_id": "five", **stream_data},
-            ]
+            ],
         }
 
         async def selected_properties():
@@ -562,7 +586,9 @@ class TestSingerTap:
         config_override = invoker.settings_service.config_override
 
         monkeypatch.setitem(
-            config_override, "_select", ["one.one", "three.three", "five.*"]
+            config_override,
+            "_select",
+            ["one.one", "three.three", "five.*"],
         )
 
         # `one` is always included because it has `inclusion: automatic`
@@ -625,7 +651,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_apply_catalog_rules_invalid(
-        self, session, plugin_invoker_factory, subject
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
     ):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -636,7 +665,11 @@ class TestSingerTap:
 
     @pytest.mark.asyncio
     async def test_catalog_cache_key(  # noqa: WPS217
-        self, session, plugin_invoker_factory, subject, monkeypatch
+        self,
+        session,
+        plugin_invoker_factory,
+        subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
         config_override = invoker.settings_service.config_override
@@ -666,7 +699,9 @@ class TestSingerTap:
 
         # Key changes if _schema changes
         monkeypatch.setitem(
-            config_override, "_schema", {"stream": {"property": {"type": "string"}}}
+            config_override,
+            "_schema",
+            {"stream": {"property": {"type": "string"}}},
         )
 
         new_key = await cache_key()
@@ -778,15 +813,17 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=False
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+            return_value=False,
         ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
             await subject.run_discovery(invoker, catalog_path)
             assert stream_mock.call_count == 2
 
         with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+            return_value=True,
         ), mock.patch(
-            "meltano.core.plugin.singer.tap._stream_redirect"
+            "meltano.core.plugin.singer.tap._stream_redirect",
         ) as stream_mock2:
             await subject.run_discovery(invoker, catalog_path)
             assert stream_mock2.call_count == 2
@@ -796,9 +833,10 @@ class TestSingerTap:
         original_level = discovery_logger.getEffectiveLevel()
         discovery_logger.setLevel(logging.INFO)
         with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+            return_value=True,
         ), mock.patch(
-            "meltano.core.plugin.singer.tap._stream_redirect"
+            "meltano.core.plugin.singer.tap._stream_redirect",
         ) as stream_mock3:
             await subject.run_discovery(invoker, catalog_path)
 
@@ -860,6 +898,7 @@ class TestSingerTap:
         assert sys.getdefaultencoding() == "utf-8"
 
         with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor", return_value=True
+            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+            return_value=True,
         ):
             await subject.run_discovery(invoker, catalog_path)

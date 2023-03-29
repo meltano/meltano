@@ -44,7 +44,7 @@ class TestCanonical:
         subject.nested = nested
 
         assert Canonical.as_canonical(subject)["nested"] == Canonical.as_canonical(
-            nested
+            nested,
         )
 
     def test_nested_empty(self, subject):
@@ -166,7 +166,7 @@ class TestCanonical:
 
     def test_annotations(self):
         original = CommentedMap(
-            {"a": 1, "annotations": {"cloud": {"data": 123}}, "z": -1}
+            {"a": 1, "annotations": {"cloud": {"data": 123}}, "z": -1},
         )
         obj = Canonical.parse(original)
         assert obj.a == 1

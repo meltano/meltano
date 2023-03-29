@@ -19,7 +19,9 @@ if t.TYPE_CHECKING:
 
 @cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
 @click.argument(
-    "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
+    "plugin_type",
+    type=click.Choice(PluginType.cli_arguments()),
+    required=False,
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option(
@@ -74,7 +76,7 @@ def install(
 
     click.echo(f"Installing {len(plugins)} plugins...")
     tracker.add_contexts(
-        PluginsTrackingContext([(candidate, None) for candidate in plugins])
+        PluginsTrackingContext([(candidate, None) for candidate in plugins]),
     )
     tracker.track_command_event(CliEvent.inflight)
 

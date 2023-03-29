@@ -375,10 +375,10 @@ class BaseEnvStoreManager(SettingsStoreManager):
         if len(vals_with_metadata) > 1:
             if reduce(eq, (val for val, _ in vals_with_metadata)):
                 raise MultipleEnvVarsSetException(
-                    [metadata["env_var"] for _, metadata in vals_with_metadata]
+                    [metadata["env_var"] for _, metadata in vals_with_metadata],
                 )
             raise ConflictingSettingValueException(
-                [metadata["env_var"] for _, metadata in vals_with_metadata]
+                [metadata["env_var"] for _, metadata in vals_with_metadata],
             )
 
         value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
@@ -659,7 +659,8 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             vals_with_metadata.append((value, {"key": key, "expandable": True}))
 
         if len(vals_with_metadata) > 1 and not reduce(
-            eq, (val for val, _ in vals_with_metadata)
+            eq,
+            (val for val, _ in vals_with_metadata),
         ):
             raise ConflictingSettingValueException(
                 metadata["key"] for _, metadata in vals_with_metadata
@@ -837,7 +838,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
             raise StoreNotSupportedError(
-                "Project config cannot be stored in an Environment."
+                "Project config cannot be stored in an Environment.",
             )
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
@@ -874,7 +875,11 @@ class DbStoreManager(SettingsStoreManager):
     writable = True
 
     def __init__(
-        self, *args, bulk: bool = False, session: Session | None = None, **kwargs
+        self,
+        *args,
+        bulk: bool = False,
+        session: Session | None = None,
+        **kwargs,
     ):
         """Initialise DbStoreManager.
 
@@ -953,7 +958,10 @@ class DbStoreManager(SettingsStoreManager):
             An empty dictionary.
         """
         setting = Setting(
-            namespace=self.namespace, name=name, value=value, enabled=True
+            namespace=self.namespace,
+            name=name,
+            value=value,
+            enabled=True,
         )
         self.session.merge(setting)
         self.session.commit()
@@ -980,7 +988,8 @@ class DbStoreManager(SettingsStoreManager):
             An empty dictionary.
         """
         self.session.query(Setting).filter_by(
-            namespace=self.namespace, name=name
+            namespace=self.namespace,
+            name=name,
         ).delete()
         self.session.commit()
 
@@ -1035,7 +1044,11 @@ class InheritedStoreManager(SettingsStoreManager):
     label = "inherited"
 
     def __init__(
-        self, settings_service: SettingsService, *args, bulk: bool = False, **kwargs
+        self,
+        settings_service: SettingsService,
+        *args,
+        bulk: bool = False,
+        **kwargs,
     ):
         """Initialize inherited store manager.
 

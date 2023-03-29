@@ -27,7 +27,10 @@ class JobLoggingService:
         return self.project.job_logs_dir(state_id, *joinpaths)
 
     def generate_log_name(
-        self, state_id: str, run_id: str, file_name: str = "elt.log"
+        self,
+        state_id: str,
+        run_id: str,
+        file_name: str = "elt.log",
     ) -> str:
         """Generate an internal etl log path and name."""
         return self.logs_dir(state_id, str(run_id), file_name)
@@ -48,7 +51,8 @@ class JobLoggingService:
             # Don't stop the Job running if you can not open the log file
             # for writting: just return /dev/null
             logging.error(
-                f"Could open log file {log_file_name!r} for writting. Using `/dev/null`"
+                f"Could open log file {log_file_name!r} for writting. "
+                "Using `/dev/null`",
             )
             with open(os.devnull, "w") as log_file:
                 yield log_file
@@ -68,19 +72,19 @@ class JobLoggingService:
 
             if latest_log.stat().st_size > MAX_FILE_SIZE:
                 raise SizeThresholdJobLogException(
-                    f"The log file size exceeds '{MAX_FILE_SIZE}'"
+                    f"The log file size exceeds '{MAX_FILE_SIZE}'",
                 )
 
             with latest_log.open() as f:
                 return f.read()
         except StopIteration:
             raise MissingJobLogException(
-                f"Could not find any log for job with ID '{state_id}'"
-            )
-        except FileNotFoundError:
+                f"Could not find any log for job with ID '{state_id}'",
+            ) from None
+        except FileNotFoundError as ex:
             raise MissingJobLogException(
-                f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing."
-            )
+                f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",
+            ) from ex
 
     def get_downloadable_log(self, state_id):
         """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501, DAR101, DAR201, DAR401
@@ -89,12 +93,12 @@ class JobLoggingService:
             return str(latest_log.resolve())
         except StopIteration:
             raise MissingJobLogException(
-                f"Could not find any log for job with ID '{state_id}'"
-            )
-        except FileNotFoundError:
+                f"Could not find any log for job with ID '{state_id}'",
+            ) from None
+        except FileNotFoundError as ex:
             raise MissingJobLogException(
-                f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing."
-            )
+                f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",
+            ) from ex
 
     def get_all_logs(self, state_id):
         """Get all the log files for any ELT job that ran with the provided `state_id`.

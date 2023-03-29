@@ -39,9 +39,13 @@ def _get_parent_context_uuid_str() -> str | None:
             return str(uuid.UUID(uuid_str))
         except ValueError:
             warn(
-                f"Invalid telemetry parent environment context UUID {uuid_str!r} "
-                "from $MELTANO_PARENT_CONTEXT_UUID - Meltano will continue as if "
-                "$MELTANO_PARENT_CONTEXT_UUID had not been set"
+                (
+                    f"Invalid telemetry parent environment context UUID "
+                    f"{uuid_str!r} from $MELTANO_PARENT_CONTEXT_UUID - "
+                    "Meltano will continue as if $MELTANO_PARENT_CONTEXT_UUID "
+                    "had not been set"
+                ),
+                stacklevel=2,
             )
     return None
 

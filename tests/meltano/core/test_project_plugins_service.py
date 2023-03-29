@@ -45,7 +45,12 @@ class TestProjectPluginsService:
         )
 
     def test_get_plugin(
-        self, project, tap, alternative_tap, inherited_tap, alternative_target
+        self,
+        project,
+        tap,
+        alternative_tap,
+        inherited_tap,
+        alternative_target,
     ):
         # name="tap-mock", variant="meltano"
         plugin = project.plugins.get_plugin(tap)
@@ -150,7 +155,9 @@ class TestProjectPluginsService:
         assert base.type == parent.type
 
         nonexistent_parent = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-foo", inherit_from="tap-bar"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            inherit_from="tap-bar",
         )
         with pytest.raises(PluginParentNotFoundError):
             assert project.plugins.get_parent(nonexistent_parent)
@@ -173,10 +180,10 @@ class TestProjectPluginsService:
 
     def test_find_plugins_by_mapping_name(self, project: Project, mapper):
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
-            mapper
+            mapper,
         ]
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-0") == [
-            mapper
+            mapper,
         ]
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")

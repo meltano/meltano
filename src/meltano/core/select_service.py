@@ -22,7 +22,8 @@ class SelectService:
         """
         self.project = project
         self._extractor = self.project.plugins.find_plugin(
-            extractor, PluginType.EXTRACTORS
+            extractor,
+            PluginType.EXTRACTORS,
         )
 
     @property
@@ -52,7 +53,7 @@ class SelectService:
             raise PluginExecutionError(
                 "Could not find catalog. Verify that the tap supports discovery "
                 "mode and advertises the `discover` capability as well as either "
-                "`catalog` or `properties`"
+                "`catalog` or `properties`",
             ) from err
 
         list_all = ListSelectedExecutor()
@@ -68,11 +69,14 @@ class SelectService:
             plugin = self.extractor
         else:
             plugin = self.project.environment.get_plugin_config(
-                self.extractor.type, self.extractor.name
+                self.extractor.type,
+                self.extractor.name,
             )
 
         this_pattern = self._get_pattern_string(
-            entities_filter, attributes_filter, exclude
+            entities_filter,
+            attributes_filter,
+            exclude,
         )
         patterns = plugin.extras.get("select", [])
         if remove:

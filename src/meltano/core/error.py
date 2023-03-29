@@ -118,7 +118,7 @@ class ProjectNotFound(Error):
             project: the name of the project which cannot be found
         """
         super().__init__(
-            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?",
         )
 
 

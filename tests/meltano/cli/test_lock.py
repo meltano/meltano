@@ -65,7 +65,7 @@ class TestLock:
             {
                 "name": "foo",
                 "value": "bar",
-            }
+            },
         )
 
         result = cli_runner.invoke(cli, ["lock", "--all", "--update"])

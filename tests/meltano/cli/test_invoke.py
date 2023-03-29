@@ -34,7 +34,9 @@ class TestCliInvoke:
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), patch.object(
             asyncio,
             "create_subprocess_exec",
@@ -48,7 +50,9 @@ class TestCliInvoke:
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), mock.patch(
             "aiodocker.Docker",
             autospec=True,
@@ -75,7 +79,9 @@ class TestCliInvoke:
 
     def test_invoke_command(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
-            cli, ["invoke", "utility-mock:cmd"], env={"ENV_VAR_ARG": "arg"}
+            cli,
+            ["invoke", "utility-mock:cmd"],
+            env={"ENV_VAR_ARG": "arg"},
         )
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -93,7 +99,7 @@ class TestCliInvoke:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         async def async_generator(*args, **kwargs):
@@ -132,7 +138,7 @@ class TestCliInvoke:
 
         port_bindings = container_config["HostConfig"]["PortBindings"]
         assert port_bindings == {
-            "5000": [{"HostPort": "5000", "HostIP": "0.0.0.0"}]  # noqa: S104
+            "5000": [{"HostPort": "5000", "HostIP": "0.0.0.0"}],  # noqa: S104
         }
 
         exposed_ports = container_config["ExposedPorts"]
@@ -150,7 +156,9 @@ class TestCliInvoke:
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
-            cli, ["invoke", "utility-mock:cmd", "--verbose"], env={"ENV_VAR_ARG": "arg"}
+            cli,
+            ["invoke", "utility-mock:cmd", "--verbose"],
+            env={"ENV_VAR_ARG": "arg"},
         )
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -169,7 +177,9 @@ class TestCliInvoke:
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), patch.object(
             asyncio,
             "create_subprocess_exec",
@@ -185,11 +195,14 @@ class TestCliInvoke:
         tap: ProjectPlugin,
     ):
         with patch.object(
-            SingerTap, "discover_catalog"
+            SingerTap,
+            "discover_catalog",
         ) as discover_catalog, patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ) as apply_catalog_rules, patch.object(
-            SingerTap, "look_up_state"
+            SingerTap,
+            "look_up_state",
         ) as look_up_state:
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
@@ -222,12 +235,14 @@ class TestCliInvoke:
         settings_service = plugin_settings_service_factory(tap)
 
         with patch.object(SingerTap, "discover_catalog"), patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ):
             result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
 
             assert json.loads(result.stdout) == settings_service.as_dict(
-                extras=False, process=True
+                extras=False,
+                process=True,
             )
 
     def test_list_commands(self, cli_runner, mock_invoke):

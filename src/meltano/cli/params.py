@@ -57,7 +57,7 @@ class pass_project:  # noqa: N801
             if not project:
                 raise CliError(
                     f"`{ctx.command_path}` must be run inside a Meltano project.\n"
-                    "Use `meltano init <project_directory>` to create one."
+                    "Use `meltano init <project_directory>` to create one.",
                 )
 
             # register the system database connection
@@ -71,7 +71,7 @@ class pass_project:  # noqa: N801
                     migration_service.upgrade(silent=True)
                     migration_service.seed(project)
                 except MigrationError as err:
-                    raise CliError(str(err))
+                    raise CliError(str(err)) from err
 
             func(project, *args, **kwargs)
 

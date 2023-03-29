@@ -59,7 +59,7 @@ class TestOutputLogger:
     async def test_stdio_capture(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         stdout_out = subject.out("stdout")
@@ -107,7 +107,7 @@ class TestOutputLogger:
     async def test_out_writers(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         writer_out = subject.out("writer")
@@ -160,7 +160,7 @@ class TestOutputLogger:
     async def test_set_custom_logger(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         logger = structlog.getLogger()
@@ -185,16 +185,19 @@ class TestOutputLogger:
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         logging_out = subject.out("logging")
 
-        with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
-            with logging_out.redirect_logging():
-                logging.info("info")
-                logging.warning("warning")
-                logging.error("error")
+        with mock.patch.object(
+            Out,
+            "redirect_log_handler",
+            redirect_handler,
+        ), logging_out.redirect_logging():
+            logging.info("info")
+            logging.warning("warning")
+            logging.error("error")
 
         with open(subject.file) as logf:
             log_file_contents = [json.loads(line) for line in logf.readlines()]
@@ -213,7 +216,7 @@ class TestOutputLogger:
     def test_logging_exception(self, log, subject, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         logging_out = subject.out("logging")
@@ -221,10 +224,12 @@ class TestOutputLogger:
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
-        with pytest.raises(Exception) as exc:
-            with mock.patch.object(Out, "redirect_log_handler", redirect_handler):
-                with logging_out.redirect_logging():
-                    raise exception
+        with pytest.raises(Exception) as exc, mock.patch.object(
+            Out,
+            "redirect_log_handler",
+            redirect_handler,
+        ), logging_out.redirect_logging():
+            raise exception
 
         # make sure it let the exception through
         # All code below here in this test cannot be reached

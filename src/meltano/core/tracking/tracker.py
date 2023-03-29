@@ -129,7 +129,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     protocol=parsed_url.scheme or "http",
                     port=parsed_url.port,
                     request_timeout=request_timeout,
-                )
+                ),
             )
 
         if emitters:
@@ -188,6 +188,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                         "$MELTANO_CLIENT_ID"
                     ),
                     RuntimeWarning,
+                    stacklevel=2,
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
@@ -208,7 +209,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         return (*self._contexts, ExceptionContext())
 
     def telemetry_state_change_check(
-        self, stored_telemetry_settings: TelemetrySettings
+        self,
+        stored_telemetry_settings: TelemetrySettings,
     ) -> None:
         """Check prior values against current ones, and send a change event if needed.
 
@@ -222,7 +224,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         ):
             # Project ID has changed
             self.track_telemetry_state_change_event(
-                "project_id", stored_telemetry_settings.project_id, self.project_id
+                "project_id",
+                stored_telemetry_settings.project_id,
+                self.project_id,
             )
 
         if (
@@ -319,7 +323,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             event: An member from `meltano.core.tracking.CliEvent`
         """
         self.track_unstruct_event(
-            SelfDescribingJson(CliEventSchema.url, {"event": event.name})
+            SelfDescribingJson(CliEventSchema.url, {"event": event.name}),
         )
 
     def track_telemetry_state_change_event(
@@ -493,7 +497,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             SelfDescribingJson(
                 BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
-            )
+            ),
         )
 
     def setup_exit_event(self):
@@ -539,9 +543,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     "exit_code": cli.exit_code,
                     "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
-                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
+                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND,
                     ),
                 },
-            )
+            ),
         )
         atexit.unregister(self.track_exit_event)

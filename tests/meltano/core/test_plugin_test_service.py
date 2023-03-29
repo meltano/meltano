@@ -54,7 +54,7 @@ class TestExtractorTestService:
         self.mock_invoke.sterr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
-            return_value=b"%b" % MOCK_RECORD_MESSAGE.encode()
+            return_value=b"%b" % MOCK_RECORD_MESSAGE.encode(),
         )
 
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
@@ -67,7 +67,7 @@ class TestExtractorTestService:
         self.mock_invoke.sterr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
-            side_effect=(b"Not JSON", b"%b" % MOCK_RECORD_MESSAGE.encode())
+            side_effect=(b"Not JSON", b"%b" % MOCK_RECORD_MESSAGE.encode()),
         )
 
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
@@ -83,7 +83,7 @@ class TestExtractorTestService:
             side_effect=(
                 b"%b" % json.dumps({"key": "value"}).encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
@@ -100,7 +100,7 @@ class TestExtractorTestService:
                 b"%b" % MOCK_STATE_MESSAGE.encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
                 b"%b" % MOCK_RECORD_MESSAGE.encode(),
-            )
+            ),
         )
 
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
@@ -115,7 +115,7 @@ class TestExtractorTestService:
         self.mock_invoke.sterr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
-            return_value=(b"%b" % MOCK_STATE_MESSAGE.encode())
+            return_value=(b"%b" % MOCK_STATE_MESSAGE.encode()),
         )
 
         self.mock_invoke.wait = AsyncMock(return_value=0)
@@ -134,7 +134,7 @@ class TestExtractorTestService:
             side_effect=(
                 b"%b" % MOCK_STATE_MESSAGE.encode(),
                 b"A subprocess error occurred",
-            )
+            ),
         )
 
         self.mock_invoke.wait = AsyncMock(return_value=1)

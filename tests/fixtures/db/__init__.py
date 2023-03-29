@@ -68,7 +68,9 @@ def connection(engine_sessionmaker):  # noqa: WPS442
         with warnings.catch_warnings():
             # Ignore warnings about rolling back the same transaction twice
             warnings.filterwarnings(
-                "ignore", "transaction already deassociated from connection", SAWarning
+                "ignore",
+                "transaction already deassociated from connection",
+                SAWarning,
             )
             transaction.rollback()
         connection.close()

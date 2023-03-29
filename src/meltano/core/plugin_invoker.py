@@ -70,7 +70,7 @@ class ExecutableNotFoundError(InvokerError):
             f"{plugin_type_descriptor} '{plugin.name}' may not have "
             "been installed yet using "
             f"`meltano install {plugin_type} {plugin.name}`, "
-            "or the executable name may be incorrect."
+            "or the executable name may be incorrect.",
         )
 
 
@@ -109,7 +109,7 @@ class UnknownCommandError(InvokerError):
                 f"Command '{self.command}' could not be found.",
                 f"{plugin_type_descriptor} '{plugin_name}'",
                 desc,
-            ]
+            ],
         )
 
 
@@ -168,7 +168,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         )
 
         self.settings_service = plugin_settings_service or PluginSettingsService(
-            project, plugin
+            project,
+            plugin,
         )
 
         self._prepared = False
@@ -208,13 +209,17 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             session: Database session.
         """
         self.plugin_config = self.settings_service.as_dict(
-            extras=False, session=session
+            extras=False,
+            session=session,
         )
         self.plugin_config_processed = self.settings_service.as_dict(
-            extras=False, process=True, session=session
+            extras=False,
+            process=True,
+            session=session,
         )
         self.plugin_config_extras = self.settings_service.as_dict(
-            extras=True, session=session
+            extras=True,
+            session=session,
         )
         self.plugin_config_env = self.settings_service.as_env(session=session)
         async with self.plugin.trigger_hooks("configure", self, session):
@@ -241,7 +246,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Yields:
             Yields to the caller, then resetting the config.
         """
-        try:  # noqa: WPS229. Allow try body of length > 1.
+        try:
             await self.prepare(session)
             yield
         finally:
@@ -317,7 +322,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             Dictionary of environment variables.
         """
         with self.project.settings.feature_flag(
-            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+            FeatureFlags.STRICT_ENV_VAR_MODE,
+            raise_error=False,
         ) as strict_env_var_mode:
             # Expand root env w/ os.environ
             expanded_project_env = {
@@ -325,7 +331,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     self.project.settings.env,
                     os.environ,
                     if_missing=EnvVarMissingBehavior(  # noqa: WPS204
-                        strict_env_var_mode
+                        strict_env_var_mode,
                     ),
                 ),
                 **expand_env_vars(
@@ -380,7 +386,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         if self.venv_service:
             # Switch to plugin-specific venv
             venv = VirtualEnv(
-                self.project.venvs_dir(self.plugin.type, self.plugin.name)
+                self.project.venvs_dir(self.plugin.type, self.plugin.name),
             )
             venv_dir = str(venv.bin_dir)
             env["VIRTUAL_ENV"] = str(venv.root)
@@ -408,7 +414,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         env = env or {}
 
         if require_preparation and not self._prepared:
-            raise InvokerNotPreparedError()
+            raise InvokerNotPreparedError
 
         async with self.plugin.trigger_hooks("invoke", self, args):
             popen_options = {**self.Popen_options(), **kwargs}
@@ -420,7 +426,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 yield (popen_args, popen_options, popen_env)
             except FileNotFoundError as err:
                 raise ExecutableNotFoundError(
-                    self.plugin, self.plugin.executable
+                    self.plugin,
+                    self.plugin.executable,
                 ) from err
 
     async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:
@@ -445,7 +452,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             )
 
     async def invoke_docker(  # noqa: WPS210
-        self, plugin_command: str, *args, **kwargs
+        self,
+        plugin_command: str,
+        *args,
+        **kwargs,
     ) -> int:
         """Invoke a containerized command.
 
@@ -490,7 +500,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         Raises:
             __cause__: If file is not found.
         """
-        try:  # noqa: WPS229. Allow try body of length > 1.
+        try:
             if file_id != "config":
                 async with self._invoke():
                     return self.files[file_id].read_text()
@@ -498,7 +508,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:  # noqa: WPS329. Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__  # noqa: WPS609. Allow accessing magic attribute.
+            raise err.__cause__ from None  # noqa: WPS469, WPS609
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.

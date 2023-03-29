@@ -94,7 +94,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                 yield reader
         else:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path)
+                self.join_path(remove_suffix(self.uri, self.state_dir), path),
             ) as reader:
                 yield reader
 
@@ -202,7 +202,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             with self.get_reader(lock_path) as reader:
                 locked_at = datetime.fromtimestamp(float(reader.read()))
                 if locked_at and locked_at < datetime.utcnow() - timedelta(
-                    seconds=self.lock_timeout_seconds
+                    seconds=self.lock_timeout_seconds,
                 ):
                     self.delete(lock_path)
                     return False
@@ -299,7 +299,8 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                 try:
                     with self.get_reader(filepath) as current_state_reader:
                         current_state = JobState.from_file(
-                            state.state_id, current_state_reader  # type: ignore
+                            state.state_id,  # type: ignore
+                            current_state_reader,
                         )
                         state_to_write = current_state.merge_partial(state)
                 except Exception as e:
@@ -412,7 +413,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
                     os.path.join(pattern, "state.json")  # noqa: WPS509
                     if pattern
                     else os.path.join("*", "state.json"),
-                )
+                ),
             )
         ]
 
@@ -494,13 +495,11 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             os.path.join(
                 self.state_dir,
                 os.path.join("*", "state.json"),
-            )
+            ),
         ):
             state_id = b64decode(
-                os.path.basename(os.path.dirname(state_file)).encode()
+                os.path.basename(os.path.dirname(state_file)).encode(),
             ).decode()
-            if not pattern:
-                state_ids.add(state_id)
-            elif pattern_re.match(state_id):
+            if (not pattern) or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids

@@ -87,7 +87,7 @@ class MockAdapter(BaseAdapter):
                         "ref": (
                             f"{api_url}/plugins/{plugin_type}/"
                             f"{plugin_name}--{variant_name}"
-                        )
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -108,7 +108,7 @@ class MockAdapter(BaseAdapter):
                         "ref": (
                             f"{api_url}/plugins/{plugin_type}/"
                             f"{plugin_name}--{variant_name}"
-                        )
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -152,8 +152,8 @@ class MockAdapter(BaseAdapter):
             "logo_url": "https://mock.meltano.com/this-returns-500.png",
             "variants": {
                 "original": {
-                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original"
-                }
+                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original",
+                },
             },
         }
 
@@ -209,7 +209,7 @@ def hub_endpoints(project: Project):
 @pytest.fixture
 def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
-        project.hub_service.hub_api_url
+        project.hub_service.hub_api_url,
     ).count
     counter.clear()
     return counter

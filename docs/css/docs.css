@@ -1,21 +1,57 @@
+@font-face {
+  font-family: 'Hanken Grotesk';
+  src: url('../fonts/HankenGrotesk-Regular.woff2') format('woff2'),
+      url('../fonts/HankenGrotesk-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    src: url('../fonts/PlusJakartaSans-Regular.woff2') format('woff2'),
+        url('../fonts/PlusJakartaSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 html,
 body {
   /* IE 10-11 didn't like using min-height */
   height: 100%;
   scroll-behavior: smooth;
+  background-color: #E9E5FB;
 }
 
 body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  font-family: IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI,
+  font-family: Hanken Grotesk, IBM Plex Sans, -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
+  color: #080216;
+}
+
+a, a:hover {
+  color: #3A64FA;
+}
+
+.content a:hover {
+  text-decoration: underline;
+}
+
+hr {
+  background-color: #311772;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Plus Jakarta Sans";
 }
 
 .navbar {
-  background-color: #3438bf;
+  background-color: #311772;
   border-bottom: 1px solid #eaecef;
   margin-bottom: 1rem;
   min-height: 4rem;
@@ -30,10 +66,10 @@ body {
 }
 
 .navbar a {
-  color: #485fc7;
+  color: #311772;
 }
 
-.navbar-burger{
+.navbar-burger {
   height: auto;
   color: #fff !important;
 }
@@ -58,39 +94,52 @@ body {
   max-height: none;
 }
 
-.navbar-item.has-dropdown:hover .navbar-link {
-  color: #485fc7;
+a.navbar-item:hover, .navbar-item.has-dropdown:hover .navbar-link {
+  color: #18c3fa;
+  background-color: inherit;
+}
+
+.navbar-link:not(.is-arrowless)::after {
+  border-color: white;
+}
+
+.navbar-item.has-dropdown:hover .navbar-link:not(.is-arrowless)::after {
+  border-color: #18c3fa;
 }
 
 .navbar-item.has-dropdown:hover .navbar-dropdown .navbar-item {
-  color: #4a4a4a;
+  color: #080216;
 }
 
-.breadcrumb a {
-  color: #c0c0c4;
+.tab > * > a, .menu-list a, .breadcrumb a, .breadcrumb li + li::before {
+  color: rgb(98, 98, 110);
 }
 
 .breadcrumb a:hover {
-  color: #3e3c8e;
+  color: #311772;
 }
 
 .content {
-  flex: 1 0 auto; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  flex: 1 0 auto;
+  /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
   padding: 20px;
 }
 
 .footer {
-  flex-shrink: 0; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  flex-shrink: 0;
+  /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
   padding: 20px;
-  background: #eaecef;
+  background: #201936;
+  color: white;
 }
 
 .footer a {
-  color: #62626e;
+  color: white;
 }
 
 .footer a:hover {
-  color: #3438bf;
+  color: white;
+  text-decoration: underline;
 }
 
 .footer ul {
@@ -99,8 +148,12 @@ body {
   padding: 0;
 }
 
-.title {
-  color: #3e3c8e;
+.footer h1, .footer h2, .footer h3 {
+  color: white;
+}
+
+.title, .content h1 {
+  color: #311772;
 }
 
 .chiclet {
@@ -163,7 +216,7 @@ body {
 }
 
 .menu-list a.is-active {
-  background-color: #3438bf;
+  background-color: #311772;
   color: #fff;
 }
 
@@ -186,16 +239,16 @@ h3 a:hover,
 h4 a:hover,
 h5 a:hover,
 h6 a:hover {
-  color: #3438bf;
+  color: #311772;
 }
 
 h2 {
-  border-bottom: #3438bf solid 4px;
+  border-bottom: #311772 solid 4px;
   padding-bottom: 7px;
 }
 
 code {
-  color: #3438bf;
+  color: #311772;
 }
 
 /* Table of Contents Styles */
@@ -212,11 +265,10 @@ code {
 }
 
 .section-nav {
-  background-color: #fff;
   margin: 5px 0;
   padding: 10px 10px 10px 10px;
   overflow: auto;
-  width:  100%;
+  width: 100%;
 }
 
 .section-nav a {
@@ -227,7 +279,6 @@ code {
 
 .section-nav a:hover,
 .section-nav a:focus {
-  color: #4a4a4a;
   text-decoration: underline;
 }
 
@@ -241,7 +292,7 @@ li .toc-entry {
 }
 
 .announcement p {
-  color:  #ffffff;
+  color: #ffffff;
   font-weight: bold;
   padding-top: 4px;
   padding-bottom: 4px;

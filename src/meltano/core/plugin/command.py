@@ -26,7 +26,7 @@ class UndefinedEnvVarError(Error):
         super().__init__(
             f"Command '{command_name}' referenced unset environment variable "
             f"'{var}' in an argument. Set the environment variable or update "
-            "the command definition."
+            "the command definition.",
         )
 
 

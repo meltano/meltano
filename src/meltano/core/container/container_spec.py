@@ -85,7 +85,7 @@ class ContainerSpec(Canonical):
                 {
                     "HostPort": host_port,
                     "HostIP": "0.0.0.0",  # noqa: S104. Binding to all interfaces is OK.
-                }
+                },
             )
 
         return {

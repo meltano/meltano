@@ -23,7 +23,11 @@ class TestAirflow:
 
     @pytest.mark.asyncio  # noqa:  WPS210
     async def test_before_configure(  # noqa:  WPS210
-        self, subject, project, session, plugin_invoker_factory
+        self,
+        subject,
+        project,
+        session,
+        plugin_invoker_factory,
     ):
         run_dir = project.run_dir("airflow")
 
@@ -60,9 +64,11 @@ class TestAirflow:
             return handle_mock
 
         with mock.patch.object(
-            asyncio, "create_subprocess_exec", side_effect=popen_mock
+            asyncio,
+            "create_subprocess_exec",
+            side_effect=popen_mock,
         ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure"
+            "meltano.core.plugin_invoker.PluginConfigService.configure",
         ) as configure:
             invoker: AirflowInvoker = plugin_invoker_factory(subject)
             # This ends up calling subject.before_configure
