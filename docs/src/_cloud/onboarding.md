@@ -38,30 +38,20 @@ Once you've completed the above, you are ready to onboard your project to Meltan
 
 To onboard your project, Meltano will need the following project information:
 
-1. Company name
+1. Company name: `___________`
    - E.g. "ABC Company Inc."
-1. Primary contact name and email
-1. Preferred Organization ID ("org ID") on Meltano Cloud
-   - Organization ID :
-     - must be globally unique
-     - must be 20 characters or less
-     - can contain a combination of lowercase letters, numbers, and dashes (no other special characters).
-   - E.g. `abc-company`, `abc-company-usa`, `abc-data-team`, `abc-finance-team`, etc.
-1. For each project:
-   1. GitHub repo information:
-      1. Repo URL
-      2. Git branch name and [Meltano Environment](/concepts/environments) to use for onboard and testing purposes. (We recommend `'staging'` for Environment name and `'staging'|'develop'` for branch name.)
-      3. Optionally, a branch name to pair with your `'prod'` environment. (We recommend `'prod'` for Environment name and `'main'` for branch name.)
-1. Per authorized user:
-   1. User's Full Name
-   2. User's Email Address
-   3. User's GitHub ID (used for identity, authentication, and permissioning)
-   4. User's Role: `owner`, `developer`, or `stakeholder`
-      - See [users and roles](/platform/#roles-and-permissions) for more information.
+1. Primary contact name and email: `___________`
+1. GitHub repo information:
+   1. Repo URL: `___________`
+   2. Initial Meltano Environment Name: `___________` (e.g. 'prod' or 'staging')
+   3. Git branch name to use for the above environment: `___________` (e.g. `main`)
+1. List of GitHub User IDs, separated by commas: `___________`
+1. List of Meltano schedule names and intervals: `___________`
+   - This can be copy-pasted from `meltano.yml`.
 
 ### Step 2: Install (or update) the Cloud CLI
 
-To install from scratch:
+To install from scratch using [pipx](https://pypa.github.io/pipx/installation/#install-pipx):
 
 ```console
 pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/cloud-cli'
@@ -73,6 +63,8 @@ To update to the latest version:
 pipx uninstall meltano-cloud-cli && pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/cloud-cli'
 ```
 
+The above commands will install a `meltano-cloud` CLI command into your workstation.
+
 ### Step 3: User creation and authorization
 
 First, create your user account by logging in via: `meltano-cloud login`.
@@ -83,13 +75,15 @@ After you create your account, within one business day, your account will be aut
 
 ### Step 4: Test basic functionality
 
-After login, you can see that operations
+After login, and after your project is onboarded, you can explore the interface with a few different commands:
+
+```console
+meltano-cloud history
+```
 
 ```console
 meltano-cloud schedule list
 ```
-
-_COMING SOON!_
 
 ### Step 5: Initialize secrets
 
@@ -108,7 +102,23 @@ meltano-cloud config env list
 
 ### Step 6: Run and debug your workloads
 
-_COMING SOON!_
+You can invoke a schedule on-demand with the `meltano-cloud run` command:
+
+```console
+meltano-cloud run --deployment=staging SCHEDULE_NAME
+```
+
+Within 1-2 minutes, the running workload will appear in `history`:
+
+```console
+meltano-cloud history
+```
+
+To view logs for any completed or still-running job, you can use:
+
+```console
+meltano-cloud logs print --execution-id=ASDF1234...
+```
 
 ## Additional Resources
 
