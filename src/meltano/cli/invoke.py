@@ -207,7 +207,7 @@ def do_list_commands(plugin):
         f"{plugin.name}:{cmd}": props.description
         for cmd, props in plugin.all_commands.items()
     }
-    column_len = max(len(name) for name in descriptions.keys()) + 2
+    column_len = max(len(name) for name in descriptions) + 2
     for name, desc in descriptions.items():
         click.secho(name.ljust(column_len, " "), fg="blue", nl=False)
         click.echo(desc)

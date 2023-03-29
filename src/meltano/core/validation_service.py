@@ -89,7 +89,7 @@ class ValidationsRunner(metaclass=ABCMeta):
 
     def select_all(self) -> None:
         """Mark all plugin validators as selected."""
-        for name in self.tests_selection.keys():
+        for name in self.tests_selection:
             self.tests_selection[name] = True
 
     async def run_all(self, session: sessionmaker) -> dict[str, int]:

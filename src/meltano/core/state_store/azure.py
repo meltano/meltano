@@ -123,11 +123,8 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
             name_starts_with=self.prefix.lstrip("/"),
         ):
             (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json":
-                if not pattern:
-                    state_ids.add(state_id)
-                elif pattern_re.match(state_id):
-                    state_ids.add(state_id)
+            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
+                state_ids.add(state_id)
         return list(state_ids)
 
     def delete(self, file_path: str):

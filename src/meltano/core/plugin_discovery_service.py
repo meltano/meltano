@@ -233,9 +233,10 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The discovery file.
         """
-        with suppress(FileNotFoundError):
-            with self.project.root_dir("discovery.yml").open() as local_discovery:
-                return self.load_discovery(local_discovery)
+        with suppress(FileNotFoundError), self.project.root_dir(
+            "discovery.yml",
+        ).open() as local_discovery:
+            return self.load_discovery(local_discovery)
 
     def load_remote_discovery(self) -> DiscoveryFile | None:
         """Load the remote `discovery.yml` manifest.
@@ -285,9 +286,10 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The discovery file.
         """
-        with suppress(FileNotFoundError):
-            with self.cached_discovery_file.open() as cached_discovery:
-                return self.load_discovery(cached_discovery)
+        with suppress(
+            FileNotFoundError,
+        ), self.cached_discovery_file.open() as cached_discovery:
+            return self.load_discovery(cached_discovery)
 
     def load_bundled_discovery(self):
         """Load the bundled `discovery.yml` manifest.

@@ -103,13 +103,13 @@ class TestSingerRunner:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         async with tap_invoker.prepared(session):
-            for name in tap.config_files.keys():
+            for name in tap.config_files:
                 assert tap_invoker.files[name].exists()
 
         assert not tap_invoker.files["config"].exists()
 
         async with target_invoker.prepared(session):
-            for name in target.config_files.keys():
+            for name in target.config_files:
                 assert target_invoker.files[name].exists()
 
         assert not target_invoker.files["config"].exists()

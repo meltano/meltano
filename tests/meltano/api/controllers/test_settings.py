@@ -81,12 +81,11 @@ class TestRoles:
         ],
     )
     def test_delete_admin_role(self, user, status_code, api, app, impersonate):
-        with app.test_request_context():
-            with impersonate(users.get_user(user)):
-                res = api.delete(
-                    url_for("settings.roles"),
-                    json={"role": {"name": "admin"}},
-                )
+        with app.test_request_context(), impersonate(users.get_user(user)):
+            res = api.delete(
+                url_for("settings.roles"),
+                json={"role": {"name": "admin"}},
+            )
 
         assert res.status_code == status_code, res.data
 

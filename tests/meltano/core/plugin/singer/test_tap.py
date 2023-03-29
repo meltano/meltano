@@ -5,7 +5,7 @@ import json
 import logging
 import subprocess
 import sys
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 import pytest
 from mock import AsyncMock, mock
@@ -86,14 +86,12 @@ class TestSingerTap:
             yield new_job
             new_job.save(session)
             if new_job.payload and not new_job.is_running():
-                try:
+                with suppress(InvalidJobStateError):
                     state_service.add_state(
                         new_job.job_name,
                         json.dumps(new_job.payload),
                         new_job.payload_flags,
                     )
-                except InvalidJobStateError:
-                    pass
 
         async def assert_state(state):
             async with invoker.prepared(session):
