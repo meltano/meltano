@@ -24,11 +24,38 @@ For onboarding and debugging purposes, we recommend that teams create a [Meltano
 
 For more information, please see our guide: [Creating a Sandbox Environment for Meltano Cloud](/cloud/sandbox_environments)
 
+If you aren't yet declaring 'environments' in `meltano.yml`, you can get started quickly by copy-pasting this snippet into your `meltano.yml` file:
+
+```yml
+environments:
+- dev
+- staging
+- prod
+default_environment: dev
+```
+
 ### Prereq #3: Create schedules if needed
 
 If your project does not yet have schedules defined - for instance, if you are running workloads via an external orchestrator - you'll want to create new schedules for use by Meltano Cloud.
 
 Schedules should be specified in UTC if providing a cron expression.
+
+If you don't yet have an existing schedule, you can get started quickly by copy-pasting this snippet to the bottom of your `meltano.yml` file:
+
+```yml
+schedules:
+- name: daily-refresh
+  job: daily-refresh-job
+  interval: @daily  # Can be @daily, @hourly, etc., or a cron-based interval
+jobs:
+- name: daily-refresh-job
+  tasks:
+  # Update this section to include any EL jobs or other
+  # commands that you'd like to run:
+  - tap-gitlab target-snowflake
+  - dbt-snowflake:run
+  - dbt-snowflake:test
+```
 
 ## Onboarding Steps
 
