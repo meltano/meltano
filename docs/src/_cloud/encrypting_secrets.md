@@ -42,7 +42,6 @@ See the [reserved variables](/platform/#reserved-variables) docs for more detail
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
   <p>These Alpha instructions are now obsolete but are maintained for legacy
   Alpha users.</p>
-</p>
 </div>
 
 ### Public Key
