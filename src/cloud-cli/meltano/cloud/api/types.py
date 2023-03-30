@@ -31,3 +31,21 @@ class CloudProjectSchedule(TypedDict):
     schedule_name: str
     interval: str
     enabled: bool
+
+
+class CloudProject(TypedDict):
+    """Meltano Cloud project details."""
+
+    # Tenant resource key and project ID are included to enable
+    # `meltano cloud project activate`, which sets the default tenant resource
+    # key and project ID to use in internal API requests:
+    tenant_resource_key: str
+    project_id: str
+
+    # Public attributes:
+    project_name: str
+    git_repository: str
+    project_root_path: str
+
+    # Added client-side:
+    active: bool

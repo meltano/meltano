@@ -25,6 +25,41 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 meltano cloud logout
 ```
 
+## `project`
+
+The `project` command provides an interface for Meltano Cloud projects.
+
+The `list` subcommand shows all of the projects you have access to, and can use with other commands:
+
+```sh
+meltano cloud project list
+╭──────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
+│  Active  │ Name                          │ Git Repository                                           │
+├──────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
+│          │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
+│          │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
+╰──────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
+```
+
+When you run the `login` command, if you only have a single project, it will be activated by default. Otherwise, you will need to run `meltano cloud project activate` to specify which Meltano Cloud project the other `meltano cloud` commands should operate on.
+
+```sh
+meltano cloud project activate 'Meltano Squared'
+Activated Meltano Cloud project 'Meltano Squared'
+```
+
+```sh
+meltano cloud project list
+╭──────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
+│  Active  │ Name                          │ Git Repository                                           │
+├──────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
+│    X     │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
+│          │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
+╰──────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
+```
+
+When specifying a project to activate, its name must be exactly as shown when running `meltano cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
+
 ## `history`
 
 Display the history of executions for a project.
