@@ -28,9 +28,10 @@ If you aren't yet declaring 'environments' in `meltano.yml`, you can get started
 
 ```yml
 environments:
+- dev
 - staging
 - prod
-default_environment: staging
+default_environment: dev
 ```
 
 ### Prereq #3: Create schedules if needed
