@@ -226,7 +226,7 @@ class ProjectChoicesQuestionaryOption(click.Option):
             qmark="Use Meltano Cloud project",
             choices=[x["project_name"] for x in context.projects],
             default=default_project_name,
-        ).unsafe_ask()
+        ).unsafe_ask()  # Use Click's Ctrl-C handling instead of Questionary's
 
 
 @project_group.command("use")
