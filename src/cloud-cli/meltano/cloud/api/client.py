@@ -64,7 +64,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
         try:
-            self.version = version("meltano.cloud.cli")
+            self.version = version("meltano-cloud-cli")
         except Exception:
             self.version = version("meltano")
 
