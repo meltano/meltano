@@ -232,8 +232,9 @@ class TestProjectCommand:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            shell=True,
         )
-        assert result.returncode == 0
+        assert result.returncode == 0, result.stdout
         assert (
             "Set 'Stranger in a Strange Org' as the default Meltano Cloud "
             "project for future commands\n"
