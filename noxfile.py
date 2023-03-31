@@ -50,6 +50,7 @@ pytest_deps = (
     "pytest-asyncio",
     "pytest-cov",
     "pytest-docker",
+    "pytest-httpserver",
     "pytest-order",
     "pytest-randomly",
     "pytest-xdist",
