@@ -89,7 +89,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
                     str(
                         Path(sys.prefix) / "Scripts" / "flask.exe"
                         if platform.system() == "Windows"
-                        else Path(sys.prefix) / "bin" / "flask"
+                        else Path(sys.prefix) / "bin" / "flask",
                     ),
                     "run",
                     f"--port={self.config.auth_callback_port}",
