@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import platform
 import typing as t
 from dataclasses import dataclass
 from functools import partial, wraps
@@ -13,6 +14,9 @@ import click
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.api.types import CloudProject
+
+if platform.system() == "Windows":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 
 def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
