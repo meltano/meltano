@@ -176,6 +176,47 @@ class TestHistoryCommand:
         data = json.loads(result.output)
         assert len(data) == 2
 
+    def test_too_many_schedule_filters(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            (
+                "history",
+                "--schedule",
+                "daily",
+                "--schedule-contains",
+                "_el_",
+            ),
+        )
+        assert result.exit_code == 2
+        assert (
+            "Only one of --schedule, --schedule-prefix, or --schedule-contains"
+            in result.output
+        )
+
+    @pytest.mark.parametrize(
+        ("filter_option", "value", "expected_param"),
+        [
+            pytest.param(
+                "--schedule",
+                "daily",
+                "daily",
+                id="exact match",
+            ),
+            pytest.param(
+                "--schedule-contains",
+                "_el_",
+                "*_el_*",
+                id="contains",
+            ),
+            pytest.param(
+                "--schedule-prefix",
+                "dai",
+                "dai*",
+                id="prefix",
+            ),
+        ],
+    )
     def test_filter_schedule(
         self,
         url: str,
@@ -183,6 +224,9 @@ class TestHistoryCommand:
         config: MeltanoCloudConfig,
         logged_in: aioresponses,
         response_body: dict,
+        filter_option: str,
+        value: str,
+        expected_param: str,
     ):
         logged_in.get(url_pattern, status=200, payload=response_body)
         runner = CliRunner()
@@ -192,14 +236,14 @@ class TestHistoryCommand:
                 "--config-path",
                 config.config_path,
                 "history",
-                "--filter=daily",
+                f"{filter_option}={value}",
             ),
         )
 
         assert result.exit_code == 0
         logged_in.assert_called_with(
             url=url,
-            params={"page_size": 10, "schedule": "daily"},
+            params={"page_size": 10, "schedule": expected_param},
         )
 
     @freeze_time(datetime.datetime(2023, 5, 20, tzinfo=UTC))
