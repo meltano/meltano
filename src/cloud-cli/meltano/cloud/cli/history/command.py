@@ -74,9 +74,11 @@ def _schedule_arg_to_glog(
 
     if schedule:
         return schedule
-    elif schedule_prefix:
+
+    if schedule_prefix:
         return f"{schedule_prefix}*"
-    elif schedule_contains:
+
+    if schedule_contains:
         return f"*{schedule_contains}*"
 
     return None
