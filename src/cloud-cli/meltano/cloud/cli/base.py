@@ -12,6 +12,7 @@ import click
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
+from meltano.cloud.api.types import CloudProject
 
 
 def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
@@ -46,6 +47,9 @@ class MeltanoCloudCLIContext:
     # Schedule subcommand:
     deployment: str | None = None
     schedule: str | None = None
+
+    # Project subcommand:
+    projects: list[CloudProject] | None = None
 
 
 pass_context = click.make_pass_decorator(MeltanoCloudCLIContext, ensure=True)

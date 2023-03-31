@@ -61,8 +61,8 @@ class MeltanoCloudProjectAmbiguityError(Exception):
         """Initialize exception with message."""
         super().__init__(
             "Logged in Meltano user has multiple projects. "
-            "Set one as the active project using the "
-            "`meltano cloud project activate` command.",
+            "Set one as the default project using the "
+            "`meltano cloud project use` command.",
         )
 
 
@@ -73,8 +73,8 @@ class NoMeltanoCloudProjectIDError(Exception):
         """Initialize exception with message."""
         super().__init__(
             "Logged in Meltano user has no projects. "
-            "Set one as the active project using the "
-            "`meltano cloud project activate` command.",
+            "Set one as the default project using the "
+            "`meltano cloud project use` command.",
         )
 
 
@@ -93,7 +93,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         id_token: str | None = None,
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
-        active_project_id: str | None = None,
+        default_project_id: str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
@@ -110,7 +110,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             id_token: ID token for use in authentication.
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
-            active_project_id: The ID of the active Meltano Cloud project.
+            default_project_id: The ID of the default Meltano Cloud project.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -121,7 +121,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.config_path = (
             Path(config_path).resolve() if config_path else self.user_config_path()
         )
-        self.active_project_id = active_project_id
+        self.default_project_id = default_project_id
 
     def __getattribute__(self, name: str) -> str | None:
         """Get config attribute.
@@ -184,18 +184,18 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @property
     def internal_project_id(self) -> str:
-        """Get the active Meltano Cloud project ID.
+        """Get the default Meltano Cloud project ID.
 
         Returns:
-            The active Meltano Cloud project ID.
+            The default Meltano Cloud project ID.
 
         Raises:
             NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
             MeltanoCloudProjectAmbiguityError: when ID token includes more
                 than one project ID.
         """
-        if self.active_project_id:
-            return self.active_project_id
+        if self.default_project_id:
+            return self.default_project_id
         if len(self.internal_project_ids) > 1:
             raise MeltanoCloudProjectAmbiguityError
         try:
@@ -207,12 +207,12 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @internal_project_id.setter
     def internal_project_id(self, project_id: str) -> None:
-        """Set the active Meltano Cloud project ID.
+        """Set the default Meltano Cloud project ID.
 
         Args:
             project_id: The Meltano Cloud project ID that should be used.
         """
-        self.active_project_id = project_id
+        self.default_project_id = project_id
         self.write_to_file()
 
     @property

@@ -37,8 +37,8 @@ class CloudProject(TypedDict):
     """Meltano Cloud project details."""
 
     # Tenant resource key and project ID are included to enable
-    # `meltano cloud project activate`, which sets the default tenant resource
-    # key and project ID to use in internal API requests:
+    # `meltano cloud project use`, which sets the default project ID
+    # to use in internal API requests:
     tenant_resource_key: str
     project_id: str
 
@@ -48,4 +48,4 @@ class CloudProject(TypedDict):
     project_root_path: str
 
     # Added client-side:
-    active: bool
+    default: bool

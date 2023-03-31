@@ -33,32 +33,34 @@ The `list` subcommand shows all of the projects you have access to, and can use 
 
 ```sh
 meltano cloud project list
-╭──────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
-│  Active  │ Name                          │ Git Repository                                           │
-├──────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
-│          │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
-│          │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
-╰──────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
+╭───────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
+│  Default  │ Name                          │ Git Repository                                           │
+├───────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
+│           │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
+│           │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
+╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
-When you run the `login` command, if you only have a single project, it will be activated by default. Otherwise, you will need to run `meltano cloud project activate` to specify which Meltano Cloud project the other `meltano cloud` commands should operate on.
+When you run the `login` command, if you only have a single project, it will be set as the default project to use for future commands. Otherwise, you will need to run `meltano cloud project use` to specify which Meltano Cloud project the other `meltano cloud` commands should operate on.
+
+When `meltano cloud project use` is not provided any argument, it will list the available projects, and have you select one interactively using the arrow keys. To select a project as the default non-interactively, use the `--name` argument:
 
 ```sh
-meltano cloud project activate 'Meltano Squared'
-Activated Meltano Cloud project 'Meltano Squared'
+meltano cloud project use --name 'Meltano Squared'
+Set 'Meltano Squared' as the default Meltano Cloud project for future commands
 ```
 
 ```sh
 meltano cloud project list
-╭──────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
-│  Active  │ Name                          │ Git Repository                                           │
-├──────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
-│    X     │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
-│          │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
-╰──────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
+╭───────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
+│  Default  │ Name                          │ Git Repository                                           │
+├───────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
+│     X     │ Meltano Squared               │ https://github.com/meltano/squared.git                   │
+│           │ MDS-in-a-box                  │ https://github.com/aaronsteers/meltano-demo-in-a-box.git │
+╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
-When specifying a project to activate, its name must be exactly as shown when running `meltano cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
+When specifying a project to use as the default for future command, its name must be exactly as shown when running `meltano cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
 
 ## `history`
 

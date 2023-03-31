@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import sys
 import typing as t
-from http import HTTPStatus
 
 import click
+import questionary
 import tabulate
-from ulid import ULID
 
-from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.client import MeltanoCloudClient
 from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
     from meltano.cloud.api.types import CloudProject
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
-DEFAULT_GET_PROJECTS_LIMIT = 10
+DEFAULT_GET_PROJECTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
 
 
@@ -92,7 +92,7 @@ async def _get_projects(
     return [
         {
             **x,  # type: ignore[misc]
-            "active": x["project_id"] == config.internal_project_id,
+            "default": x["project_id"] == config.internal_project_id,
         }
         for x in results[:limit]
     ]
@@ -100,7 +100,7 @@ async def _get_projects(
 
 def _process_table_row(project: CloudProject) -> tuple[str, ...]:
     return (
-        "X" if project["active"] else "",
+        "X" if project["default"] else "",
         project["project_name"],
         project["git_repository"],
     )
@@ -118,7 +118,7 @@ def _format_projects_table(projects: list[CloudProject], table_format: str) -> s
     return tabulate.tabulate(
         [_process_table_row(project) for project in projects],
         headers=(
-            "Active",
+            "Default",
             "Name",
             "Git Repository",
         ),
@@ -176,46 +176,116 @@ async def list_projects(
     )
 
 
-async def _get_project_to_activate(
-    config: MeltanoCloudConfig,
-    identifier: str,
-) -> list[CloudProject]:
-    try:
-        ULID.from_str(identifier)
-    except ValueError:
-        return await _get_projects(config=config, project_name=identifier)
-    try:
-        return await _get_projects(config=config, project_id=identifier)
-    except MeltanoCloudError as ex:
-        if ex.response.status == HTTPStatus.NOT_FOUND:
-            # The provided identifier looks like an ID, but isn't one.
-            return await _get_projects(config=config, project_name=identifier)
-        raise
-
-
-@project_group.command("activate")
-@click.argument("identifier")
-@pass_context
-@run_async
-async def activate_project(
-    context: MeltanoCloudCLIContext,
-    identifier: str,
-) -> None:
-    """Set a project as active within the current Meltano Cloud session."""
-    projects = await _get_project_to_activate(context.config, identifier)
-    if len(projects) > 1:
+def _check_for_duplicate_project_names(projects: list[CloudProject]) -> None:
+    project_names = [x["project_name"] for x in projects]
+    if len(set(project_names)) != len(project_names):
         click.secho(
-            "Unable to uniquely identify a Meltano Cloud project. "
-            "Please specify the project using its internal ID, shown below. "
-            "Note that these IDs may change at any time. "
-            "To avoid this issue, please use unique project names.",
+            "Error: Multiple Meltano Cloud projects have the same name. "
+            "Please specify the project using the `--id` option with its "
+            "internal ID, shown below. Note that these IDs may change at any "
+            "time. To avoid this issue, please use unique project names.",
             fg="red",
         )
         for project in projects:
-            click.echo(f"{project['project_id']}: {project['project_name']}")
+            click.echo(
+                f"{project['project_id']}: {project['project_name']} "
+                f"({project['git_repository']!r})",
+            )
         sys.exit(1)
-    context.config.internal_project_id = projects[0]["project_id"]
+
+
+class ProjectChoicesQuestionaryOption(click.Option):
+    """Click option that provides an interactive prompt for Cloud Project names."""
+
+    def prompt_for_value(self, ctx: click.Context) -> t.Any:
+        """Prompt the user to interactively select a Meltano Cloud project by name.
+
+        Args:
+            ctx: The Click context.
+
+        Returns:
+            The name of the selected project, or `None` if the project was
+            selected using the `--id` option.
+        """
+        if "project_id" in ctx.params:
+            # The project has been specified by ID - don't prompt for a name
+            return None
+        context: MeltanoCloudCLIContext = ctx.obj
+        context.projects = asyncio.run(_get_projects(context.config))
+        _check_for_duplicate_project_names(context.projects)
+        default_project_name = next(
+            (
+                x
+                for x in context.projects
+                if x["project_id"] == context.config.default_project_id
+            ),
+            {"project_name": None},
+        )["project_name"]
+        return questionary.select(
+            message="",
+            qmark="Use Meltano Cloud project",
+            choices=[x["project_name"] for x in context.projects],
+            default=default_project_name,
+        ).unsafe_ask()
+
+
+@project_group.command("use")
+@click.option(
+    "--name",
+    "project_name",
+    cls=ProjectChoicesQuestionaryOption,
+    help=(
+        "The name of a Meltano Cloud project - "
+        "see `meltano cloud project list` for the available options."
+    ),
+    prompt=True,
+)
+@click.option(
+    "--id",
+    "project_id",
+    help=(
+        "The internal ID of a Meltano Cloud project - this ID is unstable and "
+        "should only be used if necessary to disambiguate when multiple "
+        "projects share a name."
+    ),
+    default=None,
+)
+@pass_context
+@run_async
+async def use_project(
+    context: MeltanoCloudCLIContext,
+    project_name: str | None,
+    project_id: str | None,
+) -> None:
+    """Set a project as the default to use for Meltano Cloud CLI commands."""
+    if project_id is not None and project_name is not None:
+        raise click.UsageError("The '--name' and '--id' options are mutually exclusive")
+    if project_id is not None:
+        context.config.internal_project_id = project_id
+        click.secho(
+            (
+                f"Set the project with ID {project_id!r} as the default "
+                "Meltano Cloud project for future commands"
+            ),
+            fg="green",
+        )
+        return
+
+    if context.projects is None:  # Interactive config was not used
+        context.projects = await _get_projects(context.config)
+        _check_for_duplicate_project_names(context.projects)
+        if project_name not in {x["project_name"] for x in context.projects}:
+            raise click.UsageError(
+                f"Unable to use project named {project_name!r} - no available "
+                "project matches name.",
+            )
+    context.config.internal_project_id = next(
+        x for x in context.projects if x["project_name"] == project_name
+    )["project_id"]
     click.secho(
-        f"Activated Meltano Cloud project {projects[0]['project_name']!r}",
+        (
+            f"Set {project_name!r} as the default Meltano Cloud project for "
+            "future commands"
+        ),
         fg="green",
     )
