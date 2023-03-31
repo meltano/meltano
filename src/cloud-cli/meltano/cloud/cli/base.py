@@ -16,7 +16,9 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.api.types import CloudProject
 
 if platform.system() == "Windows":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.set_event_loop_policy(
+        asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
+    )
 
 
 def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
