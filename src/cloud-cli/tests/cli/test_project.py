@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import platform
 import re
 import subprocess
 import sys
@@ -200,6 +201,12 @@ class TestProjectCommand:
             == "01GWQ7520WNMQT0PQ6KHCC4EE1"
         )
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason=(
+            "prompt_toolkit fails when in subprocess on Windows: NoConsoleScreenBuffer"
+        ),
+    )
     def test_project_use_by_name_interactive(
         self,
         tenant_resource_key: str,
@@ -232,7 +239,6 @@ class TestProjectCommand:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-            shell=True,
         )
         assert result.returncode == 0, result.stdout
         assert (
