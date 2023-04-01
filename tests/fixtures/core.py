@@ -410,7 +410,7 @@ def job_schedule(project, tap, target, schedule_service):
         return err.schedule
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def environment_service(project):
     service = EnvironmentService(project)
     try:
@@ -460,7 +460,7 @@ def project(project_init_service, tmp_path_factory: pytest.TempPathFactory):
         yield project
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def project_function(project_init_service, tmp_path: Path):
     with cd(tmp_path), project_directory(project_init_service) as project:
         yield project
@@ -518,12 +518,12 @@ def create_state_id(description: str, env: str = "dev") -> str:
     return f"{env}:tap-{description}-to-target-{description}"
 
 
-@pytest.fixture
+@pytest.fixture()
 def num_params():
     return 10
 
 
-@pytest.fixture
+@pytest.fixture()
 def payloads(num_params):
     mock_payloads_dict = {
         "mock_state_payloads": [
@@ -541,7 +541,7 @@ def payloads(num_params):
     return payloads(**mock_payloads_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids(num_params):
     state_id_dict = {
         "single_incomplete_state_id": create_state_id("single-incomplete"),
@@ -559,7 +559,7 @@ def state_ids(num_params):
     return state_ids(**state_id_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_time():
     def _mock_time():
         for idx in itertools.count():  # noqa: WPS526
@@ -581,7 +581,7 @@ def job_args():
     return job_args(**job_args_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
@@ -652,12 +652,12 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     return jobs
 
 
-@pytest.fixture
+@pytest.fixture()
 def jobs(state_ids_with_jobs):
     return [job for job_list in state_ids_with_jobs.values() for job in job_list]
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids_with_expected_states(  # noqa: WPS210
     state_ids,
     payloads,
@@ -712,7 +712,7 @@ def state_ids_with_expected_states(  # noqa: WPS210
     return list(expectations.items())
 
 
-@pytest.fixture
+@pytest.fixture()
 def job_history_session(jobs, session):
     job: Job
     job_names = set()
@@ -722,15 +722,15 @@ def job_history_session(jobs, session):
     for job_name in job_names:
         job_state = JobState.from_job_history(session, job_name)
         session.add(job_state)
-    yield session
+    return session
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_service(job_history_session, project):
     return StateService(project, session=job_history_session)
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.environment.env["ENVIRONMENT_ENV_VAR"] = "${MELTANO_PROJECT_ROOT}/file.txt"

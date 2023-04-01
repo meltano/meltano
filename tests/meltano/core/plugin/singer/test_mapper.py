@@ -10,7 +10,7 @@ class TestSingerMapper:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.MAPPERS, "mapper-mock")
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):

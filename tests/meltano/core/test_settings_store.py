@@ -157,13 +157,13 @@ class TestAutoStoreManager:
         return _assert_value_source
 
     @pytest.mark.parametrize(
-        "setting_name,preferred_store",
-        [
+        ("setting_name", "preferred_store"),
+        (
             ("unknown", Store.MELTANO_YML),
             ("regular", Store.MELTANO_YML),
             ("password", Store.DOTENV),
             ("env_specific", Store.DOTENV),
-        ],
+        ),
     )
     def test_auto_store(
         self,

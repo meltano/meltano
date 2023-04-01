@@ -13,7 +13,7 @@ from meltano.core.error import ProjectNotFound
 from meltano.core.project import PROJECT_ROOT_ENV, Project
 
 
-@pytest.fixture
+@pytest.fixture()
 def deactivate_project(project):
     Project.deactivate()
     yield
@@ -100,7 +100,7 @@ class TestProject:
         projects = workers.map(Project.find, range(concurrency["cases"]))
         assert all(x is project for x in projects)
 
-    @pytest.mark.concurrent
+    @pytest.mark.concurrent()
     def test_meltano_concurrency(self, project, concurrency):
         if platform.system() == "Windows":
             pytest.xfail(
