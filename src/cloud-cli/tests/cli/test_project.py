@@ -163,7 +163,7 @@ class TestProjectCommand:
             _remove_private_project_attributes(x) for x in projects
         ]
 
-    def test_project_use_by_name(
+    def test_project_select_by_name(
         self,
         url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
@@ -186,7 +186,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "use",
+                    "select",
                     "--name",
                     "Meltano Cubed",
                 ),
@@ -207,7 +207,7 @@ class TestProjectCommand:
             "prompt_toolkit fails when in subprocess on Windows: NoConsoleScreenBuffer"
         ),
     )
-    def test_project_use_by_name_interactive(
+    def test_project_select_by_name_interactive(
         self,
         tenant_resource_key: str,
         config: MeltanoCloudConfig,
@@ -233,7 +233,7 @@ class TestProjectCommand:
                 "--config-path",
                 config.config_path,
                 "project",
-                "use",
+                "select",
             ),
             input="\x1b[B\x1b[B\x0a",  # down, down, enter
             stdout=subprocess.PIPE,
@@ -250,7 +250,7 @@ class TestProjectCommand:
             == "01GWQ788M7TVP9HFVRGQ34BG17"
         )
 
-    def test_project_use_by_name_interactive_duplicate_name(
+    def test_project_select_by_name_interactive_duplicate_name(
         self,
         url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
@@ -273,7 +273,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "use",
+                    "select",
                 ),
             )
         assert result.exit_code == 1
@@ -282,7 +282,7 @@ class TestProjectCommand:
             in result.output
         )
 
-    def test_project_use_by_name_like_id(
+    def test_project_select_by_name_like_id(
         self,
         url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
@@ -305,7 +305,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "use",
+                    "select",
                     "--name",
                     "01GWQRDA1HZNTSW7JK0KNGCYS9",
                 ),
@@ -320,7 +320,7 @@ class TestProjectCommand:
             == "01GWQREZ7G0526JZS9JY5H3BH9"
         )
 
-    def test_project_use_by_id(
+    def test_project_select_by_id(
         self,
         url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
@@ -343,7 +343,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "use",
+                    "select",
                     "--id",
                     "01GWQ7520WNMQT0PQ6KHCC4EE1",
                 ),
@@ -358,7 +358,7 @@ class TestProjectCommand:
             == "01GWQ7520WNMQT0PQ6KHCC4EE1"
         )
 
-    def test_project_use_ambigous_name_error(
+    def test_project_select_ambigous_name_error(
         self,
         url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
@@ -381,7 +381,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "use",
+                    "select",
                     "--name",
                     "Post-Modern Data Stack in a Box",
                 ),
@@ -398,14 +398,14 @@ class TestProjectCommand:
             "('https://github.com/meltano/pmds-in-a-box-2.git')\n"
         )
 
-    def test_project_use_by_name_and_id_error(self, config: MeltanoCloudConfig):
+    def test_project_select_by_name_and_id_error(self, config: MeltanoCloudConfig):
         result = CliRunner().invoke(
             cli,
             (
                 "--config-path",
                 config.config_path,
                 "project",
-                "use",
+                "select",
                 "--name",
                 "a name",
                 "--id",

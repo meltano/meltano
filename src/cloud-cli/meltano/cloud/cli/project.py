@@ -223,13 +223,13 @@ class ProjectChoicesQuestionaryOption(click.Option):
         )["project_name"]
         return questionary.select(
             message="",
-            qmark="Use Meltano Cloud project",
+            qmark="Select a Meltano Cloud project",
             choices=[x["project_name"] for x in context.projects],
             default=default_project_name,
         ).unsafe_ask()  # Use Click's Ctrl-C handling instead of Questionary's
 
 
-@project_group.command("use")
+@project_group.command("select")
 @click.option(
     "--name",
     "project_name",
@@ -252,12 +252,12 @@ class ProjectChoicesQuestionaryOption(click.Option):
 )
 @pass_context
 @run_async
-async def use_project(
+async def select_project(
     context: MeltanoCloudCLIContext,
     project_name: str | None,
     project_id: str | None,
 ) -> None:
-    """Set a project as the default to use for Meltano Cloud CLI commands."""
+    """Select a project as the default to use for Meltano Cloud CLI commands."""
     if project_id is not None and project_name is not None:
         raise click.UsageError("The '--name' and '--id' options are mutually exclusive")
     if project_id is not None:
@@ -276,8 +276,8 @@ async def use_project(
         _check_for_duplicate_project_names(context.projects)
         if project_name not in {x["project_name"] for x in context.projects}:
             raise click.UsageError(
-                f"Unable to use project named {project_name!r} - no available "
-                "project matches name.",
+                f"Unable to select project named {project_name!r} - "
+                "no available project matches name.",
             )
     context.config.internal_project_id = next(
         x for x in context.projects if x["project_name"] == project_name
