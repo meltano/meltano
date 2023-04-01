@@ -5,19 +5,17 @@ from __future__ import annotations
 import json
 import re
 import typing as t
-from urllib.parse import urljoin
 
 import pytest
-from aioresponses import aioresponses
 from click.testing import CliRunner
 from freezegun import freeze_time
 
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
-    from meltano.cloud.api import MeltanoCloudClient
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProjectSchedule
+    from tests.conftest import HTTPServer
 
 
 class TestScheduleCommand:
@@ -27,22 +25,12 @@ class TestScheduleCommand:
         self,
         tenant_resource_key: str,
         internal_project_id: str,
-        client: MeltanoCloudClient,
         config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
     ):
-        url = urljoin(
-            client.api_url,
-            "/".join(
-                (
-                    "schedules",
-                    "v1",
-                    tenant_resource_key,
-                    internal_project_id,
-                    "dev",
-                    "daily",
-                    "enabled",
-                ),
-            ),
+        path = (
+            f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
+            "/dev/daily/enabled"
         )
         runner = CliRunner()
         for cmd in ("enable", "disable"):
@@ -52,19 +40,13 @@ class TestScheduleCommand:
                 (cmd, "--schedule=daily", "--deployment=dev"),
                 ("--schedule=daily", cmd, "--deployment=dev"),
             ):
-                with aioresponses() as m:
-                    m.get(
-                        f"{config.base_auth_url}/oauth2/userInfo",
-                        status=200,
-                        body=json.dumps({"sub": "meltano-cloud-test"}),
-                    )
-                    m.put(url, status=204)
-                    result = runner.invoke(
-                        cli,
-                        ("--config-path", config.config_path, "schedule", *opts),
-                    )
-                    assert result.exit_code == 0, result.output
-                    assert not result.output
+                httpserver.expect_oneshot_request(path).respond_with_data(status=204)
+                result = runner.invoke(
+                    cli,
+                    ("--config-path", config.config_path, "schedule", *opts),
+                )
+                assert result.exit_code == 0, result.output
+                assert not result.output
 
     @pytest.fixture
     def schedules(self) -> list[CloudProjectSchedule]:
@@ -95,24 +77,13 @@ class TestScheduleCommand:
         schedules: list[CloudProjectSchedule],
         tenant_resource_key: str,
         internal_project_id: str,
-        client: MeltanoCloudClient,
-        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
     ) -> None:
-        path = f"schedules/v1/{tenant_resource_key}/{internal_project_id}"
-        url = urljoin(client.api_url, path)
-        pattern = re.compile(f"^{url}(\\?.*)?$")
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                pattern,
-                status=200,
-                payload={"results": schedules, "pagination": None},
-            )
-            yield
+        path = f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
+        pattern = re.compile(f"^{path}(\\?.*)?$")
+        httpserver.expect_oneshot_request(pattern).respond_with_json(
+            {"results": schedules, "pagination": None},
+        )
 
     @freeze_time("2023-03-24 19:30:00")
     @pytest.mark.usefixtures("schedules_get_reponse")
@@ -156,19 +127,17 @@ class TestScheduleCommand:
         self,
         tenant_resource_key: str,
         internal_project_id: str,
-        client: MeltanoCloudClient,
         config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
     ):
         deployment_name = "test deployment name"
         schedule_name = "test schedule name"
         interval = "15,45 */8 * * 1,3,5"
-        path = urljoin(
-            client.api_url,
-            (
-                f"schedules/v1/{tenant_resource_key}/{internal_project_id}/"
-                f"{deployment_name}/{schedule_name}"
-            ),
+        path = (
+            f"/schedules/v1/{tenant_resource_key}/{internal_project_id}/"
+            f"{deployment_name}/{schedule_name}"
         )
+
         runner = CliRunner()
         cli_args = (
             "--config-path",
@@ -192,76 +161,54 @@ class TestScheduleCommand:
             "2023-03-27 16:45\n"
             "2023-03-29 00:15\n"
         )
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                path,
-                status=200,
-                payload={
-                    "deployment_name": deployment_name,
-                    "schedule_name": schedule_name,
-                    "interval": interval,
-                    "enabled": True,
-                },
-            )
-            result = runner.invoke(cli, cli_args)
-            assert result.exit_code == 0, result.output
-            assert (
-                result.output
-                == (
-                    "Deployment name: test deployment name\n"
-                    "Schedule name:   test schedule name\n"
-                    "Interval:        15,45 */8 * * 1,3,5\n"
-                    "Enabled:         True\n"
-                    "\n"
-                    "Approximate starting date and time (UTC) of next 9 scheduled runs:\n"  # noqa: E501
-                )
-                + upcoming_datetimes
-            )
-
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                path,
-                status=200,
-                payload={
-                    "deployment_name": deployment_name,
-                    "schedule_name": schedule_name,
-                    "interval": interval,
-                    "enabled": True,
-                },
-            )
-            result = runner.invoke(cli, (*cli_args, "--only-upcoming"))
-            assert result.exit_code == 0, result.output
-            assert result.output == upcoming_datetimes
-
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                path,
-                status=200,
-                payload={
-                    "deployment_name": deployment_name,
-                    "schedule_name": schedule_name,
-                    "interval": interval,
-                    "enabled": False,
-                },
-            )
-            result = runner.invoke(cli, cli_args)
-            assert result.exit_code == 0, result.output
-            assert result.output == (
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {
+                "deployment_name": deployment_name,
+                "schedule_name": schedule_name,
+                "interval": interval,
+                "enabled": True,
+            },
+        )
+        result = runner.invoke(cli, cli_args)
+        assert result.exit_code == 0, result.output
+        assert (
+            result.output
+            == (
                 "Deployment name: test deployment name\n"
                 "Schedule name:   test schedule name\n"
                 "Interval:        15,45 */8 * * 1,3,5\n"
-                "Enabled:         False\n"
+                "Enabled:         True\n"
+                "\n"
+                "Approximate starting date and time (UTC) of next 9 scheduled runs:\n"  # noqa: E501
             )
+            + upcoming_datetimes
+        )
+
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {
+                "deployment_name": deployment_name,
+                "schedule_name": schedule_name,
+                "interval": interval,
+                "enabled": True,
+            },
+        )
+        result = runner.invoke(cli, (*cli_args, "--only-upcoming"))
+        assert result.exit_code == 0, result.output
+        assert result.output == upcoming_datetimes
+
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {
+                "deployment_name": deployment_name,
+                "schedule_name": schedule_name,
+                "interval": interval,
+                "enabled": False,
+            },
+        )
+        result = runner.invoke(cli, cli_args)
+        assert result.exit_code == 0, result.output
+        assert result.output == (
+            "Deployment name: test deployment name\n"
+            "Schedule name:   test schedule name\n"
+            "Interval:        15,45 */8 * * 1,3,5\n"
+            "Enabled:         False\n"
+        )

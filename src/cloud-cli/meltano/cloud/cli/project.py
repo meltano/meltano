@@ -275,7 +275,7 @@ async def use_project(
         context.projects = await _get_projects(context.config)
         _check_for_duplicate_project_names(context.projects)
         if project_name not in {x["project_name"] for x in context.projects}:
-            raise click.UsageError(
+            raise click.ClickException(
                 f"Unable to use project named {project_name!r} - no available "
                 "project matches name.",
             )

@@ -112,21 +112,6 @@ yarl = ">=1.0,<2.0"
 speedups = ["Brotli", "aiodns", "cchardet"]
 
 [[package]]
-name = "aioresponses"
-version = "0.7.4"
-description = "Mock out requests made by ClientSession from aiohttp package"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "aioresponses-0.7.4-py2.py3-none-any.whl", hash = "sha256:1160486b5ea96fcae6170cf2bdef029b9d3a283b7dbeabb3d7f1182769bfb6b7"},
-    {file = "aioresponses-0.7.4.tar.gz", hash = "sha256:9b8c108b36354c04633bad0ea752b55d956a7602fe3e3234b939fc44af96f1d8"},
-]
-
-[package.dependencies]
-aiohttp = ">=2.0.0,<4.0.0"
-
-[[package]]
 name = "aiosignal"
 version = "1.3.1"
 description = "aiosignal: a list of registered asynchronous callbacks"
@@ -1266,4 +1251,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "eb05434a2770b4abe88f9e56d35f3b236d1f4f4aab7ff108466bd6c7d9342297"
+content-hash = "97f8577533ba4676e52b1550717795c91640151ab04a74a6e9389f60a256f98a"
