@@ -119,9 +119,6 @@ class SchedulesCloudClient(MeltanoCloudClient):
             deployment_name: The name of the deployment the schedule belongs to.
             page_size: The number of items to request per page.
             page_token: The page token.
-
-        Raises:
-            MeltanoCloudError: The Meltano Cloud API responded with an error.
         """
         params: dict[str, t.Any] = {
             "page_size": page_size,
@@ -273,7 +270,9 @@ def _approx_daily_freq(
     return "< 1" if freq < 1 else str(freq)
 
 
-def _process_table_row(schedule: CloudProjectSchedule) -> tuple[str | int | float, ...]:
+def _process_table_row(
+    schedule: CloudProjectSchedule,
+) -> tuple[str, str, str, str, bool]:
     return (
         schedule["deployment_name"],
         schedule["schedule_name"],
@@ -306,7 +305,8 @@ def _format_schedules_table(
         ),
         tablefmt=table_format,
         floatfmt=".1f",
-        colalign=("left", "left", "left", "right", "left"),
+        # To avoid a tabulate bug (IndexError), only set colalign if there are schedules
+        colalign=("left", "left", "left", "right", "left") if schedules else (),
     )
 
 
