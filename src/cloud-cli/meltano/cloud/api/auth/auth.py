@@ -9,6 +9,7 @@ import typing as t
 import webbrowser
 from contextlib import asynccontextmanager
 from http import HTTPStatus
+from pathlib import Path
 from urllib.parse import urlencode, urljoin
 
 import aiohttp
@@ -79,7 +80,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
     @asynccontextmanager
     async def _callback_server(
         self,
-        rendered_template_file: tempfile._TemporaryFileWrapper,  # noqa: WPS437
+        rendered_template_dir: Path,
     ) -> t.AsyncIterator[web.Application]:
         app = web.Application()
         resource_root = importlib_resources.files(__package__)
@@ -87,14 +88,15 @@ class MeltanoCloudAuth:  # noqa: WPS214
         async def callback_page(_):
             with importlib_resources.as_file(
                 resource_root / "callback.jinja2",
-            ) as template_file:
+            ) as template_file, (rendered_template_dir / "callback.html").open(
+                "w",
+            ) as rendered_template_file:
                 rendered_template_file.write(
                     jinja2.Template(template_file.read_text()).render(
                         port=self.config.auth_callback_port,
                     ),
                 )
-                rendered_template_file.flush()
-                return web.FileResponse(rendered_template_file.name)
+            return web.FileResponse(rendered_template_file.name)
 
         async def handle_tokens(request: web.Request):
             self.config.id_token = request.query["id_token"]
@@ -132,8 +134,8 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Yields:
             The aiohttp web application.
         """
-        with tempfile.NamedTemporaryFile("w", suffix=".html") as rendered_template_file:
-            async with self._callback_server(rendered_template_file) as app:
+        with tempfile.TemporaryDirectory(prefix="meltano-cloud-") as tmpdir:
+            async with self._callback_server(Path(tmpdir)) as app:
                 yield app
 
     async def login(self) -> None:
