@@ -124,8 +124,10 @@ class MeltanoCloudAuth:  # noqa: WPS214
         await runner.setup()
         site = web.TCPSite(runner, "localhost", self.config.auth_callback_port)
         await site.start()
-        yield app
-        await runner.cleanup()
+        try:
+            yield app
+        finally:
+            await runner.cleanup()
 
     @asynccontextmanager
     async def callback_server(self) -> t.AsyncIterator[web.Application]:
@@ -189,18 +191,23 @@ class MeltanoCloudAuth:  # noqa: WPS214
         """
         return {"Authorization": f"Bearer {self.config.access_token}"}
 
+    @asynccontextmanager
+    async def _get_user_info_response(self) -> aiohttp.ClientResponse:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                urljoin(self.base_url, "oauth2/userInfo"),
+                headers=self.get_access_token_header(),
+            ) as response:
+                yield response
+
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
 
         Returns:
             User info response
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                return response
+        async with self._get_user_info_response() as response:
+            return response
 
     async def get_user_info_json(self) -> dict:
         """Get user info as dict.
@@ -208,12 +215,8 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Returns:
             User info json
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                return await response.json()
+        async with self._get_user_info_response() as response:
+            return await response.json()
 
     async def logged_in(self) -> bool:
         """Check if this instance is currently logged in.
@@ -221,7 +224,10 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Returns:
             True if logged in, else False
         """
-        user_info_resp = await self.get_user_info_response()
         return bool(
-            self.config.access_token and self.config.id_token and user_info_resp.ok,
+            self.config.access_token
+            and self.config.id_token
+            # Perform this check at the end to avoid
+            # spamming our servers if logout fails
+            and (await self.get_user_info_response()).ok,
         )
