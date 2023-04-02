@@ -494,18 +494,18 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.26.103"
+version = "1.26.104"
 description = "The AWS SDK for Python"
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.103-py3-none-any.whl", hash = "sha256:c02dd0c4bc5adf70f49361141dba61d8795433a1b60d24e0a8a6bee912b267ee"},
-    {file = "boto3-1.26.103.tar.gz", hash = "sha256:7fa84b8ca6fbb544e4093ad8d91729c61e3526040759c7c3dbaaa34f1862e0b0"},
+    {file = "boto3-1.26.104-py3-none-any.whl", hash = "sha256:308c5a8293d9b76e74921f4d945be19cc467b92e5f128df1db76e31c71345bb3"},
+    {file = "boto3-1.26.104.tar.gz", hash = "sha256:bcd09f16bdf3d71ab7d0fab20e97242f09c63f4cea0943329521ab35a950f900"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.103,<1.30.0"
+botocore = ">=1.29.104,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -882,14 +882,14 @@ xray = ["mypy-boto3-xray (>=1.26.0,<1.27.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.103"
+version = "1.29.104"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.103-py3-none-any.whl", hash = "sha256:e020173473b254c913a03c16bef179751095a6331f113d5206ae7d47340abfc2"},
-    {file = "botocore-1.29.103.tar.gz", hash = "sha256:30bd3fffc878cd5724c0e9a18629210da7f1efbcb6e668213a79153cc2dfd474"},
+    {file = "botocore-1.29.104-py3-none-any.whl", hash = "sha256:932bfbf580a2ae53f471df4bfbebce531985ee27468cf7c37d7ccfb3cf8bc9e4"},
+    {file = "botocore-1.29.104.tar.gz", hash = "sha256:7e7a01cef10b1daa9cb01ec25a15e831e7359fc43d1b591359710f203c3620a8"},
 ]
 
 [package.dependencies]
@@ -902,14 +902,14 @@ crt = ["awscrt (==0.16.9)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.29.103.post1"
+version = "1.29.104"
 description = "Type annotations and code completion for botocore"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "botocore_stubs-1.29.103.post1-py3-none-any.whl", hash = "sha256:b686183d452b19fddf9f1a46dcc8a632a55e083fe1eb662ca4710f5c87a00ed7"},
-    {file = "botocore_stubs-1.29.103.post1.tar.gz", hash = "sha256:c8f868d4dc5083c5abf1120bf66e7fcb4338680691d7da55a586f50e95b01c42"},
+    {file = "botocore_stubs-1.29.104-py3-none-any.whl", hash = "sha256:25c2caa7635ca8e35346fe70c09c69924bbf69324447fc0050355e727684e7ce"},
+    {file = "botocore_stubs-1.29.104.tar.gz", hash = "sha256:3aa8c6853eadbd4c98234f89106d8c097794a0967fadc44e7b0f4b8d3595f2bc"},
 ]
 
 [package.dependencies]
@@ -2610,14 +2610,14 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.9\""}
 
 [[package]]
 name = "mypy-boto3-ec2"
-version = "1.26.103"
-description = "Type annotations for boto3.EC2 1.26.103 service generated with mypy-boto3-builder 7.14.4"
+version = "1.26.104"
+description = "Type annotations for boto3.EC2 1.26.104 service generated with mypy-boto3-builder 7.14.5"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mypy-boto3-ec2-1.26.103.tar.gz", hash = "sha256:68f28fd4ee04aa7e1e065ca75eed6edea86637104970493b73d3ffec7a625ded"},
-    {file = "mypy_boto3_ec2-1.26.103-py3-none-any.whl", hash = "sha256:9667bcb01723b907b865e83f2ee5c0ee7a992f282e14203627380943cfbaf5ec"},
+    {file = "mypy-boto3-ec2-1.26.104.tar.gz", hash = "sha256:535586b030edbac2b8c5fd52b7163abfbdabbf4e0be00eb8f164977621b9f321"},
+    {file = "mypy_boto3_ec2-1.26.104-py3-none-any.whl", hash = "sha256:adea74cb3704b5b285c24058b51be3a8dcea04578ff154075dd9ff6c1438b43e"},
 ]
 
 [package.dependencies]
@@ -2655,14 +2655,14 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.9\""}
 
 [[package]]
 name = "mypy-boto3-s3"
-version = "1.26.99"
-description = "Type annotations for boto3.S3 1.26.99 service generated with mypy-boto3-builder 7.14.4"
+version = "1.26.104"
+description = "Type annotations for boto3.S3 1.26.104 service generated with mypy-boto3-builder 7.14.5"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "mypy-boto3-s3-1.26.99.tar.gz", hash = "sha256:8889a4c62aec85906bdb5f2727560bbd4c41cb5874ba067e250f24e09e0d9b24"},
-    {file = "mypy_boto3_s3-1.26.99-py3-none-any.whl", hash = "sha256:1a9c3e758fa255fe48b2f6c3c48004cae7a92c31b457421fe1116989e9ea882d"},
+    {file = "mypy-boto3-s3-1.26.104.tar.gz", hash = "sha256:a58d342d72d58fefa2ecd24d926dbc92ae8b97205c59c3144d186857d5f30814"},
+    {file = "mypy_boto3_s3-1.26.104-py3-none-any.whl", hash = "sha256:24ff5ec193659abb0415925e73787a64631de46e59fd0f261a840e6c0611a38e"},
 ]
 
 [package.dependencies]
@@ -3315,6 +3315,26 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
+
+[[package]]
+name = "pytest-aiohttp"
+version = "1.0.4"
+description = "Pytest plugin for aiohttp support"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-aiohttp-1.0.4.tar.gz", hash = "sha256:39ff3a0d15484c01d1436cbedad575c6eafbf0f57cdf76fb94994c97b5b8c5a4"},
+    {file = "pytest_aiohttp-1.0.4-py3-none-any.whl", hash = "sha256:1d2dc3a304c2be1fd496c0c2fb6b31ab60cd9fc33984f761f951f8ea1eb4ca95"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.8.1"
+pytest = ">=6.1.0"
+pytest-asyncio = ">=0.17.2"
+
+[package.extras]
+testing = ["coverage (==6.2)", "mypy (==0.931)"]
 
 [[package]]
 name = "pytest-asyncio"
@@ -4789,4 +4809,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "f1b4fb3d3c4d3176a83511743792887916105632775447e3fcb15f1ed61640ea"
+content-hash = "0ab2a79b6c2cf5c66442349efb31fac014c421fa1e6bc6ba6a86fff58b3f09ba"
