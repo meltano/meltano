@@ -175,7 +175,7 @@ class PluginType(YAMLEnum):  # noqa: WPS214
             if value in {plugin_type.value, plugin_type.singular}:
                 return plugin_type
 
-        raise ValueError(f"{value} is not a valid {cls.__name__}")
+        raise ValueError(f"{value!r} is not a valid {cls.__name__}")
 
     @classmethod
     def plurals(cls) -> list[str]:

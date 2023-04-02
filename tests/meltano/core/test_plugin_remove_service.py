@@ -12,11 +12,11 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 
 
 class TestPluginRemoveService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return PluginRemoveService(project)
 
-    @pytest.fixture
+    @pytest.fixture()
     def add(self, subject: PluginRemoveService):
         with open(subject.project.meltanofile, "w") as meltano_yml:
             meltano_yml.write(
@@ -40,7 +40,7 @@ class TestPluginRemoveService:
                 ),
             )
 
-    @pytest.fixture
+    @pytest.fixture()
     def install(self, subject: PluginRemoveService):
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
@@ -53,7 +53,7 @@ class TestPluginRemoveService:
         os.makedirs(tap_gitlab_installation, exist_ok=True)
         os.makedirs(target_csv_installation, exist_ok=True)
 
-    @pytest.fixture
+    @pytest.fixture()
     def lock(self, subject: PluginRemoveService):
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",
@@ -89,8 +89,7 @@ class TestPluginRemoveService:
                 meltano_yml = yaml.safe_load(meltanofile)
 
                 with pytest.raises(KeyError):
-                    plugin_data = meltano_yml[plugin.type, plugin.name]
-                    assert not plugin_data
+                    meltano_yml[plugin.type, plugin.name]  # noqa: WPS428
 
             # check removed installation
             assert not os.path.exists(

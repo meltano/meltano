@@ -16,11 +16,11 @@ class TestLock:
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "args",
-        [
+        (
             ["lock"],
             ["lock", "--all", "tap-mock"],
-        ],
-        ids=["noop", "all-and-plugin-name"],
+        ),
+        ids=("noop", "all-and-plugin-name"),
     )
     def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
         result = cli_runner.invoke(cli, args)

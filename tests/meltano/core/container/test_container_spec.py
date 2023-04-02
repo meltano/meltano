@@ -12,8 +12,8 @@ from meltano.core.container.container_spec import ContainerSpec
 
 class TestContainerService:
     @pytest.mark.parametrize(
-        "spec,payload",
-        [
+        ("spec", "payload"),
+        (
             (
                 ContainerSpec(
                     "lightdash/lightdash",
@@ -58,10 +58,10 @@ class TestContainerService:
                     },
                 },
             ),
-        ],
+        ),
         ids=["port-mapping", "custom-entrypoint"],
     )
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_docker_config(self, spec: ContainerSpec, payload: dict):
         """Check Docker container config from container spec."""
         if platform.system() == "Windows":

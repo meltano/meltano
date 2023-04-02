@@ -41,7 +41,7 @@ def encode_if_on_windows(string: str) -> str:
 
 
 class TestLocalFilesystemStateStoreManager:
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def subject(self, function_scoped_test_dir):
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
@@ -54,7 +54,7 @@ class TestLocalFilesystemStateStoreManager:
                 lock_timeout_seconds=10,
             )
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def state_path(
         self,
         function_scoped_test_dir,
@@ -219,7 +219,7 @@ class TestLocalFilesystemStateStoreManager:
 
 
 class TestAZStorageStateStoreManager:
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def subject(self, function_scoped_test_dir):
         return AZStorageStateStoreManager(
             uri="azure://meltano/state/",
@@ -227,7 +227,7 @@ class TestAZStorageStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def mock_client(self):
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
@@ -259,7 +259,7 @@ class TestAZStorageStateStoreManager:
             with subject.get_reader("nonexistent"):
                 got_reader = True
         except Exception as e:
-            assert subject.is_file_not_found_error(e)
+            assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_is_file_not_found_error_false(
@@ -279,7 +279,7 @@ class TestAZStorageStateStoreManager:
             with subject.get_reader("nonexistent"):
                 got_reader = True
         except Exception as e:
-            assert not subject.is_file_not_found_error(e)
+            assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_state_path(self, subject: AZStorageStateStoreManager):
@@ -314,7 +314,7 @@ class TestS3StateStoreManager:
             with Stubber(mock_client.return_value) as stubber:
                 yield stubber
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, function_scoped_test_dir):
         return S3StateStoreManager(
             uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -330,7 +330,7 @@ class TestS3StateStoreManager:
                 with subject.get_reader("does_not_exist"):
                     got_reader = True
             except Exception as e:
-                assert subject.is_file_not_found_error(e)
+                assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_is_file_not_found_error_false(self, subject: S3StateStoreManager):
@@ -341,7 +341,7 @@ class TestS3StateStoreManager:
                 with subject.get_reader("does_not_exist"):
                     got_reader = True
             except Exception as e:
-                assert not subject.is_file_not_found_error(e)
+                assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_client_session(self, subject: S3StateStoreManager):
@@ -479,7 +479,7 @@ class TestS3StateStoreManager:
 
 
 class TestGCSStateStoreManager:
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def subject(self, function_scoped_test_dir):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
@@ -487,7 +487,7 @@ class TestGCSStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def mock_client(self):
         with patch(
             "google.cloud.storage.Client",
@@ -515,7 +515,7 @@ class TestGCSStateStoreManager:
             with subject.get_reader("nonexistent"):
                 got_reader = True
         except Exception as e:
-            assert subject.is_file_not_found_error(e)
+            assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_is_file_not_found_error_false(
@@ -531,7 +531,7 @@ class TestGCSStateStoreManager:
             with subject.get_reader("nonexistent"):
                 got_reader = True
         except Exception as e:
-            assert not subject.is_file_not_found_error(e)
+            assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
     def test_state_path(self, subject: GCSStateStoreManager):

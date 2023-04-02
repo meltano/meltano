@@ -15,7 +15,7 @@ from meltano.core.logging import OutputLogger
 
 
 class TestSingerBlocks:
-    @pytest.fixture
+    @pytest.fixture()
     def log(self, tmp_path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
@@ -77,7 +77,7 @@ class TestSingerBlocks:
         invoker.cleanup = AsyncMock()
         return invoker
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_start(
         self,
         elt_context,
@@ -125,7 +125,7 @@ class TestSingerBlocks:
             == asyncio.subprocess.PIPE
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_stop(self, elt_context, mock_target_plugin_invoker):
         block = SingerBlock(
             block_ctx=elt_context,
@@ -151,7 +151,7 @@ class TestSingerBlocks:
         assert block.process_handle.terminate.called
         assert block.invoker.cleanup.called
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_io(self, elt_context, mock_tap_plugin_invoker, log):
         producer = SingerBlock(
             block_ctx=elt_context,
@@ -194,7 +194,7 @@ class TestSingerBlocks:
 
             assert cap_logs == expected_lines
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_close_stdin(
         self,
         elt_context,

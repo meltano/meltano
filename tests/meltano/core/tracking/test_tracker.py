@@ -12,7 +12,6 @@ from time import sleep
 
 import mock
 import pytest
-from pytest import MonkeyPatch
 from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
@@ -175,13 +174,13 @@ class TestTracker:
 
     @pytest.mark.parametrize(
         "analytics_json_content",
-        [
+        (
             f'{{"clientId":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
             f'{{"client_id":"{str(uuid.uuid4())}","projectId":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
             f'{{"client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anon_usage_stats":true}}',  # noqa: E501
             f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
             f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-        ],
+        ),
         ids=(0, 1, 2, 3, 4),
     )
     def test_invalid_analytics_json_is_overwritten(
@@ -195,7 +194,7 @@ class TestTracker:
             with open(analytics_json_path, "w") as analytics_json_file:
                 analytics_json_file.write(analytics_json_content)
 
-            with pytest.raises(Exception):
+            with pytest.raises((TypeError, KeyError, json.JSONDecodeError)):
                 check_analytics_json(project)
 
             Tracker(project)
@@ -241,7 +240,7 @@ class TestTracker:
                 project.settings.config_override = original_config_override
 
     @pytest.mark.parametrize(
-        "snowplow_endpoints,send_stats,expected",
+        ("snowplow_endpoints", "send_stats", "expected"),
         (
             (["https://example.com"], True, True),
             (["https://example.com"], False, False),
@@ -469,7 +468,11 @@ class TestTracker:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
 
-    def test_client_id_from_env_var(self, project: Project, monkeypatch: MonkeyPatch):
+    def test_client_id_from_env_var(
+        self,
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         with delete_analytics_json(project):
             monkeypatch.setenv("MELTANO_CLIENT_ID", "invalid-context-uuid")
             with pytest.warns(RuntimeWarning, match="Invalid telemetry client UUID"):

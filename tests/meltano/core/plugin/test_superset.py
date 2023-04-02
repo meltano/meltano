@@ -146,7 +146,7 @@ class TestSuperset:
 
             assert not run_dir.joinpath("superset_config.py").exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_before_cleanup(self, subject, plugin_invoker_factory):
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 

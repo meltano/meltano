@@ -20,11 +20,11 @@ def assert_lines(output, *lines):
 
 
 class TestOutputLogger:
-    @pytest.fixture
+    @pytest.fixture()
     def log(self, tmp_path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, log):
         return OutputLogger(log.name)
 
@@ -55,7 +55,7 @@ class TestOutputLogger:
         handler.setFormatter(formatter)
         return handler
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_stdio_capture(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -103,7 +103,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_out_writers(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -156,7 +156,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_set_custom_logger(self, log, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -181,7 +181,7 @@ class TestOutputLogger:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -224,7 +224,7 @@ class TestOutputLogger:
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
-        with pytest.raises(Exception) as exc, mock.patch.object(
+        with pytest.raises(Exception) as exc, mock.patch.object(  # noqa: PT011
             Out,
             "redirect_log_handler",
             redirect_handler,
