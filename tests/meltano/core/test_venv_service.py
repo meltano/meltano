@@ -13,19 +13,20 @@ from meltano.core.venv_service import PLATFORM_SPECS, VenvService, VirtualEnv
 
 
 class TestVenvService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return VenvService(project, "namespace", "name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
         file = project.run_dir("name", "test.file.txt")
         file.touch()
-        assert file.exists() and file.is_file()
+        assert file.exists()
+        assert file.is_file()
 
         subject.clean_run_files()
         assert not file.exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_clean_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -78,7 +79,7 @@ class TestVenvService:
                 == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
             )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_install(self, project, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -113,7 +114,7 @@ class TestVenvService:
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_requires_clean_install(self, project, subject: VenvService):
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
@@ -138,7 +139,7 @@ class TestVenvService:
 
 
 class TestVirtualEnv:
-    @pytest.mark.parametrize("system", ["Linux", "Darwin", "Windows"])
+    @pytest.mark.parametrize("system", ("Linux", "Darwin", "Windows"))
     def test_cross_platform(self, system, project):
         with mock.patch("platform.system", return_value=system):
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))

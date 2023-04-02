@@ -20,7 +20,7 @@ from meltano.core.project_init_service import ProjectInitService
 
 
 class TestCliAdd:
-    @pytest.fixture
+    @pytest.fixture()
     def reset_project_context(
         self,
         project: Project,
@@ -31,8 +31,8 @@ class TestCliAdd:
 
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,default_variant,required_plugin_refs",
-        [
+        ("plugin_type", "plugin_name", "default_variant", "required_plugin_refs"),
+        (
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
             (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
             (PluginType.TRANSFORMS, "tap-carbon-intensity", "meltano", []),
@@ -42,7 +42,7 @@ class TestCliAdd:
                 Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
-        ],
+        ),
         ids=[
             "single-extractor",
             "single-loader",
@@ -508,7 +508,8 @@ class TestCliAdd:
 
             assert plugin_variant.name is None
 
-            assert plugin.pip_url is None and plugin_variant.pip_url is None
+            assert plugin.pip_url is None
+            assert plugin_variant.pip_url is None
             assert plugin.executable == plugin_variant.executable == executable
 
             install_plugin_mock.assert_called_once_with(
@@ -543,8 +544,8 @@ class TestCliAdd:
             assert plugin.variant == plugin_variant.name == "personal"
 
     @pytest.mark.parametrize(
-        "plugin_type,plugin_name,default_variant,required_plugin_refs",
-        [
+        ("plugin_type", "plugin_name", "default_variant", "required_plugin_refs"),
+        (
             (PluginType.EXTRACTORS, "tap-carbon-intensity", "meltano", []),
             (PluginType.LOADERS, "target-sqlite", "meltanolabs", []),
             (PluginType.TRANSFORMS, "tap-carbon-intensity", "meltano", []),
@@ -554,7 +555,7 @@ class TestCliAdd:
                 Variant.ORIGINAL_NAME,
                 [PluginRef(PluginType.FILES, "airflow")],
             ),
-        ],
+        ),
         ids=[
             "single-extractor",
             "single-loader",

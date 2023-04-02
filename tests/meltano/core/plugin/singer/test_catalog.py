@@ -444,18 +444,18 @@ CATALOG_PROPERTIES = {
 }
 
 
-@pytest.fixture
+@pytest.fixture()
 def select_all_executor():
     return SelectExecutor(["*.*"])
 
 
 @pytest.mark.parametrize(
-    "path,prop",
-    [
+    ("path", "prop"),
+    (
         ("stream[0].properties.master.properties.details", "master.details"),
         ("stream[2].properties.name", "name"),
         ("stream[10].properties.list[2].properties.name", "list[2].name"),
-    ],
+    ),
 )
 def test_path_property(path, prop):
     assert path_property(path) == prop
@@ -584,7 +584,7 @@ class TestCatalogRule:
 
 
 class TestLegacyCatalogSelectVisitor:
-    @pytest.fixture
+    @pytest.fixture()
     def catalog(self):
         return json.loads(LEGACY_CATALOG)
 
@@ -633,7 +633,7 @@ class TestLegacyCatalogSelectVisitor:
 
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
-    @pytest.fixture
+    @pytest.fixture()
     def catalog(self, request):
         return json.loads(globals()[request.param])  # noqa: WPS421
 
@@ -652,7 +652,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
     @pytest.mark.parametrize(
         "catalog",
-        ["CATALOG", "JSON_SCHEMA"],
+        ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
     def test_visit(self, catalog, select_all_executor):
@@ -660,7 +660,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
     @pytest.mark.parametrize(
         "catalog",
-        ["CATALOG", "JSON_SCHEMA"],
+        ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
     def test_select_all(self, catalog, select_all_executor):
@@ -680,8 +680,8 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert stream_metadata == 1, "Extraneous stream metadata"
 
     @pytest.mark.parametrize(
-        "catalog,attrs",
-        [
+        ("catalog", "attrs"),
+        (
             (
                 "CATALOG",
                 {
@@ -694,7 +694,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 },
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
-        ],
+        ),
         indirect=["catalog"],
     )
     def test_select(self, catalog, attrs):
@@ -709,14 +709,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
     @pytest.mark.parametrize(
-        "catalog,attrs",
-        [
+        ("catalog", "attrs"),
+        (
             (
                 "CATALOG",
                 {"id", "balance", "created_at", "active", "payload", "payload.content"},
             ),
             ("JSON_SCHEMA", CATALOG_PROPERTIES),
-        ],
+        ),
         indirect=["catalog"],
     )
     def test_select_negated(self, catalog, attrs):
@@ -737,8 +737,8 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
     @pytest.mark.parametrize(
-        "node,selection_type",
-        [
+        ("node", "selection_type"),
+        (
             (
                 {"breadcrumb": ["properties", "a"], "metadata": {"selected": True}},
                 SelectionType.SELECTED,
@@ -793,7 +793,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 {"breadcrumb": ["properties", "a"]},
                 SelectionType.EXCLUDED,
             ),
-        ],
+        ),
         ids=[
             "selected: true",
             "selected: false",
@@ -812,13 +812,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
 
 class TestMetadataExecutor:
-    @pytest.fixture
+    @pytest.fixture()
     def catalog(self, request):
         return json.loads(globals()[request.param])  # noqa: WPS421
 
     @pytest.mark.parametrize(
         "catalog",
-        ["CATALOG", "JSON_SCHEMA"],
+        ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
     def test_visit(self, catalog):
@@ -869,13 +869,13 @@ class TestMetadataExecutor:
 
 
 class TestSchemaExecutor:
-    @pytest.fixture
+    @pytest.fixture()
     def catalog(self, request):
         return json.loads(globals()[request.param])  # noqa: WPS421
 
     @pytest.mark.parametrize(
         "catalog",
-        ["CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"],
+        ("CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"),
         indirect=["catalog"],
     )
     def test_visit(self, catalog):
@@ -940,7 +940,7 @@ class TestSchemaExecutor:
 
 
 class TestListExecutor:
-    @pytest.fixture
+    @pytest.fixture()
     def catalog(self):
         return json.loads(CATALOG)
 

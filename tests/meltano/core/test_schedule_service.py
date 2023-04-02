@@ -140,8 +140,8 @@ class TestScheduleService:
         assert schedule is not subject.schedules()[0]
 
         # it must exists
+        schedule.name = "llamasareverynice"
         with pytest.raises(ScheduleDoesNotExistError):
-            schedule.name = "llamasareverynice"
             subject.update_schedule(schedule)
 
     def test_schedule_start_date(

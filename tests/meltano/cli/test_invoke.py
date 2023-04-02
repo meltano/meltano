@@ -24,7 +24,7 @@ def project_tap_mock(project_add_service):
 
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
-    @pytest.fixture
+    @pytest.fixture()
     def mock_invoke(self, utility, plugin_invoker_factory):
         process_mock = Mock()
         process_mock.name = "utility-mock"
@@ -44,7 +44,7 @@ class TestCliInvoke:
         ) as invoke_async:
             yield invoke_async
 
-    @pytest.fixture
+    @pytest.fixture()
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
         with patch(
             "meltano.core.plugin_invoker.invoker_factory",

@@ -27,7 +27,7 @@ def compatible_copy_tree():
     return _compatible_copy_tree
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def function_scoped_test_dir(tmp_path_factory) -> Path:
     tmp_path = tmp_path_factory.mktemp("meltano_root")
     cwd = os.getcwd()
@@ -38,14 +38,14 @@ def function_scoped_test_dir(tmp_path_factory) -> Path:
         os.chdir(cwd)
 
 
-@pytest.fixture
+@pytest.fixture()
 def empty_meltano_yml_dir(tmp_path):
     with cd(tmp_path):
         (tmp_path / "meltano.yml").touch()
         return tmp_path
 
 
-@pytest.fixture
+@pytest.fixture()
 def pushd(request):
     def _pushd(path):
         popd = partial(os.chdir, os.getcwd())
@@ -57,7 +57,7 @@ def pushd(request):
     return _pushd
 
 
-@pytest.mark.meta
+@pytest.mark.meta()
 def test_pushd(tmp_path, pushd):
     os.makedirs(tmp_path / "a")
     os.makedirs(tmp_path / "a" / "b")
