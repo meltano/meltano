@@ -41,8 +41,8 @@ def test_lookback_pattern(lookback: str):
 
 
 @pytest.mark.parametrize(
-    "execution, expected",
-    [
+    ("execution", "expected"),
+    (
         pytest.param(
             {
                 "execution_id": "123",
@@ -85,7 +85,7 @@ def test_lookback_pattern(lookback: str):
             ),
             id="running",
         ),
-    ],
+    ),
 )
 def test_table_rows(execution: dict, expected: tuple):
     assert process_table_row(execution) == expected
@@ -94,11 +94,11 @@ def test_table_rows(execution: dict, expected: tuple):
 class TestHistoryCommand:
     """Test the history command."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def auth_url(self, config: MeltanoCloudConfig) -> str:
         return f"{config.base_auth_url}/oauth2/userInfo"
 
-    @pytest.fixture
+    @pytest.fixture()
     def logged_in(self, auth_url: str) -> t.Generator[aioresponses, None, None]:
         with aioresponses() as m:
             m.get(
@@ -108,7 +108,7 @@ class TestHistoryCommand:
             )
             yield m
 
-    @pytest.fixture
+    @pytest.fixture()
     def url(
         self,
         tenant_resource_key: str,
@@ -118,11 +118,11 @@ class TestHistoryCommand:
         path = f"history/v1/{tenant_resource_key}/{internal_project_id}"
         return urljoin(client.api_url, path)
 
-    @pytest.fixture
+    @pytest.fixture()
     def url_pattern(self, url: str) -> re.Pattern:
         return re.compile(f"^{url}(\\?.*)?$")
 
-    @pytest.fixture
+    @pytest.fixture()
     def response_body(self) -> dict:
         return {
             "results": [
@@ -204,8 +204,8 @@ class TestHistoryCommand:
 
     @freeze_time(datetime.datetime(2023, 5, 20, tzinfo=UTC))
     @pytest.mark.parametrize(
-        "lookback,expected_start_time",
-        [
+        ("lookback", "expected_start_time"),
+        (
             pytest.param("1w", "2023-05-13T00:00:00+00:00", id="1w"),
             pytest.param("1d", "2023-05-19T00:00:00+00:00", id="1d"),
             pytest.param("1h", "2023-05-19T23:00:00+00:00", id="1h"),
@@ -213,7 +213,7 @@ class TestHistoryCommand:
             pytest.param("1w2d", "2023-05-11T00:00:00+00:00", id="1w2d"),
             pytest.param("1w2d3h", "2023-05-10T21:00:00+00:00", id="1w2d3h"),
             pytest.param("1w2d3h4m", "2023-05-10T20:56:00+00:00", id="1w2d3h4m"),
-        ],
+        ),
     )
     def test_lookback(
         self,

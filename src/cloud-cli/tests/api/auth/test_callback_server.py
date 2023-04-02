@@ -15,11 +15,11 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 class TestMeltanoCloudAuthCallbackServer:
     """Test the Meltano Cloud Auth Callback Server."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def config(self, tmp_path: Path):
         return MeltanoCloudConfig(config_path=tmp_path / "meltano-cloud.json")
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(
         self,
         monkeypatch: pytest.MonkeyPatch,
@@ -29,7 +29,7 @@ class TestMeltanoCloudAuthCallbackServer:
         monkeypatch.setenv("MELTANO_CLOUD_CONFIG_PATH", str(config.config_path))
         return callback_server.APP
 
-    @pytest.fixture
+    @pytest.fixture()
     def client(self, subject: Flask):
         return subject.test_client()
 
