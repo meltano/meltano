@@ -29,7 +29,7 @@ if t.TYPE_CHECKING:
 class TestProjectCommand:
     """Test the logs command."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def url_pattern(
         self,
         tenant_resource_key: str,
@@ -38,7 +38,7 @@ class TestProjectCommand:
         path = f"projects/v1/{tenant_resource_key}"
         return re.compile(f"^{urljoin(client.api_url, path)}(\\?.*)?$")
 
-    @pytest.fixture
+    @pytest.fixture()
     def projects(self, tenant_resource_key: str) -> list[CloudProject]:
         return [
             {
@@ -83,7 +83,7 @@ class TestProjectCommand:
             },
         ]
 
-    @pytest.fixture
+    @pytest.fixture()
     def projects_get_reponse(
         self,
         url_pattern: re.Pattern,

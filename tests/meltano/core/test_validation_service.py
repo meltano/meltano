@@ -14,7 +14,7 @@ class MockValidationsRunner(ValidationsRunner):
 
 
 class TestValidationsRunner:
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_all(self, session, dbt, plugin_invoker_factory):
         invoker = plugin_invoker_factory(dbt)
         runner = MockValidationsRunner(

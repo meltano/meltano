@@ -228,8 +228,7 @@ class TestCliRunScratchpadOne:
         ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(Exception, match="Found no end in block set!"):
-                result = cli_runner.invoke(cli, args, catch_exceptions=False)
-                assert result.exit_code == 1
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, tap.name, target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -244,8 +243,7 @@ class TestCliRunScratchpadOne:
                     "starting block 'tap-mock'"
                 ),
             ):
-                result = cli_runner.invoke(cli, args, catch_exceptions=False)
-                assert result.exit_code == 1
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, target.name, target.name]
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
@@ -260,8 +258,7 @@ class TestCliRunScratchpadOne:
                     "starting block 'target-mock'"
                 ),
             ):
-                result = cli_runner.invoke(cli, args, catch_exceptions=False)
-                assert result.exit_code == 1
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
         # Verify that a vanilla ELB run works
         args = ["run", tap.name, target.name]
@@ -389,7 +386,7 @@ class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
     @pytest.mark.parametrize(
         "suffix_args",
-        [
+        (
             (
                 "test-suffix",
                 "test-suffix",
@@ -410,7 +407,7 @@ class TestCliRunScratchpadOne:
                     ("TEST_SUFFIX_1", "env"),
                 ],
             ),
-        ],
+        ),
         ids=[
             "static",
             "dynamic (single env)",
@@ -1102,8 +1099,7 @@ class TestCliRunScratchpadOne:
                     "name not the mapper plugin name: mapper-collision-01"
                 ),
             ):
-                result = cli_runner.invoke(cli, args, catch_exceptions=False)
-                assert result.exit_code == 1
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
         # Test mapper/mapping name collision detection - mappings name same a
         # mapper plugin name
@@ -1139,8 +1135,7 @@ class TestCliRunScratchpadOne:
                     "name not the mapper plugin name: mapper-collision-02"
                 ),
             ):
-                result = cli_runner.invoke(cli, args, catch_exceptions=False)
-                assert result.exit_code == 1
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
         # create duplicate mapping name - should also fail
         project_add_service.add(
@@ -1327,10 +1322,7 @@ class TestCliRunScratchpadOne:
             assert asyncio_mock.call_count == 0
 
     @pytest.mark.backend("sqlite")
-    @pytest.mark.parametrize(
-        "colors",
-        [True, False],
-    )
+    @pytest.mark.parametrize("colors", (True, False))
     def test_color_console_exception_handler(
         self,
         colors,

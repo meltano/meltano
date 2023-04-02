@@ -193,7 +193,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mount_meltano_hub_mock_adapter(project: Project, discovery):
+def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
     project.hub_service.session.mount(
         project.hub_service.hub_api_url,
         MockAdapter(project.hub_service.hub_api_url, discovery),
@@ -206,7 +206,7 @@ def hub_endpoints(project: Project):
     return adapter._mapping
 
 
-@pytest.fixture
+@pytest.fixture()
 def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
         project.hub_service.hub_api_url,

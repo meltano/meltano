@@ -196,18 +196,18 @@ class TestPluginDefinition:
 
 
 class TestBasePlugin:
-    @pytest.fixture
+    @pytest.fixture()
     def plugin_def(self):
         return PluginDefinition(
             PluginType.EXTRACTORS,
             **TestPluginDefinition.ATTRS["variants"],
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def variant(self, plugin_def):
         return plugin_def.find_variant()
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, plugin_def, variant):
         return BasePlugin(plugin_def, variant)
 
@@ -606,5 +606,8 @@ class TestPluginType:
             assert PluginType.from_cli_argument(plugin_type.value) == plugin_type
             assert PluginType.from_cli_argument(plugin_type.singular) == plugin_type
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match="'unknown type' is not a valid PluginType",
+        ):
             PluginType.from_cli_argument("unknown type")

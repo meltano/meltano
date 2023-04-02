@@ -13,13 +13,13 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 class TestMeltanoCloudAuth:
     """Test the Meltano Cloud API Authentication."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def config(self, tmp_path: Path):
         path = tmp_path / "meltano-cloud.json"
         path.touch()
         return MeltanoCloudConfig(config_path=path)
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, monkeypatch: pytest.MonkeyPatch, config: MeltanoCloudConfig):
         monkeypatch.setenv("MELTANO_CLOUD_AUTH_CALLBACK_PORT", "8080")
         monkeypatch.setenv("MELTANO_CLOUD_BASE_AUTH_URL", "http://meltano-cloud-test")

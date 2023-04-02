@@ -66,12 +66,12 @@ def custom_tap(project_add_service):
         return err.plugin
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
-@pytest.fixture
+@pytest.fixture()
 def environment(project: Project) -> Environment:
     project.activate_environment("dev")
     try:

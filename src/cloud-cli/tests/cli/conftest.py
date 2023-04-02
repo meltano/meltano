@@ -9,24 +9,24 @@ from meltano.cloud.api import MeltanoCloudClient
 from meltano.cloud.api.config import MeltanoCloudConfig
 
 
-@pytest.fixture
+@pytest.fixture()
 def tenant_resource_key():
     """Return a fake tenant resource key."""
     return "meltano-cloud-test"
 
 
-@pytest.fixture
+@pytest.fixture()
 def internal_project_id():
     """Return a fake Cloud/internal project ID."""
     return "pytest-123"
 
 
-@pytest.fixture
+@pytest.fixture()
 def auth_token():
     return "meltano-cloud-test"
 
 
-@pytest.fixture
+@pytest.fixture()
 def id_token(tenant_resource_key: str, internal_project_id: str, auth_token: str):
     """Return a fake ID token.
 
@@ -41,7 +41,7 @@ def id_token(tenant_resource_key: str, internal_project_id: str, auth_token: str
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def config(config_path: Path, id_token: str) -> MeltanoCloudConfig:
     """Return a MeltanoCloudConfig instance with fake credentials."""
     config = MeltanoCloudConfig(  # noqa: S106
@@ -56,7 +56,7 @@ def config(config_path: Path, id_token: str) -> MeltanoCloudConfig:
     return config
 
 
-@pytest.fixture
+@pytest.fixture()
 def client(config: MeltanoCloudConfig) -> MeltanoCloudClient:
     """Return a MeltanoCloudClient instance with fake credentials."""
     return MeltanoCloudClient(config=config)

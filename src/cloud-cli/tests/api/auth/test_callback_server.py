@@ -14,11 +14,11 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 class TestMeltanoCloudAuthCallbackServer:
     """Test the Meltano Cloud Auth Callback Server."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def config(self, tmp_path: Path):
         return MeltanoCloudConfig(config_path=tmp_path / "meltano-cloud.json")
 
-    @pytest.fixture
+    @pytest.fixture()
     async def client(
         self,
         config: MeltanoCloudConfig,
