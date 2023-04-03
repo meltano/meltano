@@ -143,7 +143,5 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         try:
             blob_client.delete_blob()
         except Exception as e:
-            if self.is_file_not_found_error(e):
-                ...
-            else:
+            if not self.is_file_not_found_error(e):
                 raise e

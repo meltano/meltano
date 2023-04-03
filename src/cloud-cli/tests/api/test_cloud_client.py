@@ -12,7 +12,7 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 class TestMeltanoCloudClient:
     """Test the Meltano Cloud API client."""
 
-    @pytest.fixture(scope="function")
+    @pytest.fixture()
     def config(self, tmp_path: Path):
         path = tmp_path / "meltano-cloud.json"
         path.touch()

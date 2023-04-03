@@ -24,7 +24,7 @@ class TestSingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.order(0)
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -50,7 +50,7 @@ class TestSingerTap:
                 invoker.files["state"],
             ]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_cleanup(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -58,7 +58,7 @@ class TestSingerTap:
 
         assert not invoker.files["config"].exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_look_up_state(  # noqa: WPS213, WPS217
         self,
         subject,
@@ -183,7 +183,7 @@ class TestSingerTap:
         await assert_state(None)
 
     @pytest.mark.order(1)
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_discover_catalog(  # noqa: WPS213
         self,
         session,
@@ -240,7 +240,7 @@ class TestSingerTap:
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_discover_catalog_custom(
         self,
         project,
@@ -266,7 +266,7 @@ class TestSingerTap:
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_apply_select(  # noqa: WPS213
         self,
         session,
@@ -353,7 +353,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_apply_catalog_rules(  # noqa: WPS213
         self,
         session,
@@ -520,7 +520,7 @@ class TestSingerTap:
             assert not catalog_cache_key_path.exists()
             assert cache_key is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
         self,
         session,
@@ -649,7 +649,7 @@ class TestSingerTap:
             "five": {"one", "two", "three"},
         }
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_apply_catalog_rules_invalid(
         self,
         session,
@@ -663,7 +663,7 @@ class TestSingerTap:
             with pytest.raises(PluginExecutionError, match=r"invalid"):  # noqa: WPS360
                 subject.apply_catalog_rules(invoker, [])
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_catalog_cache_key(  # noqa: WPS217
         self,
         session,
@@ -731,7 +731,7 @@ class TestSingerTap:
         monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
         assert await cache_key() is None
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_discovery(
         self,
         plugin_invoker_factory,
@@ -764,7 +764,7 @@ class TestSingerTap:
             resp = json.load(catalog_file)
             assert resp["discovered"]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_discovery_failure(
         self,
         plugin_invoker_factory,
@@ -790,7 +790,7 @@ class TestSingerTap:
 
         assert not catalog_path.exists(), "Catalog should not be present."
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_discovery_stderr_output(
         self,
         plugin_invoker_factory,
@@ -846,7 +846,7 @@ class TestSingerTap:
 
         discovery_logger.setLevel(original_level)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_discovery_handle_io_exceptions(
         self,
         plugin_invoker_factory,
@@ -872,7 +872,7 @@ class TestSingerTap:
 
         assert not catalog_path.exists(), "Catalog should not be present."
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_discovery_utf8_output(
         self,
         plugin_invoker_factory,

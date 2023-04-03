@@ -17,7 +17,7 @@ from meltano.core.state_store import (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_path(tmp_path: Path):
     path = tmp_path / ".meltano" / "state"
     try:

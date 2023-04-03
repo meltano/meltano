@@ -75,7 +75,7 @@ def snowplow_session(request) -> SnowplowMicro | None:
         yield None
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow_optional(
     snowplow_session: SnowplowMicro | None,
     monkeypatch,
@@ -108,16 +108,16 @@ def snowplow_optional(
             snowplow_session.reset()
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
     `send_anonymous_usage_stats` setting.
 
-    Yields:
+    Returns:
         A freshly reset `SnowplowMicro` instance.
     """
     if snowplow_optional is None:  # pragma: no cover
         pytest.skip("Unable to start Snowplow Micro")
-    yield snowplow_optional
+    return snowplow_optional

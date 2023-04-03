@@ -21,7 +21,7 @@ class TestMeltanoCloudConfig:
     def _no_config_path_env(self, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.delenv("MELTANO_CLOUD_CONFIG_PATH", raising=False)
 
-    @pytest.fixture
+    @pytest.fixture()
     def config_dict(self):
         return {
             "auth_callback_port": 9999,
@@ -32,14 +32,14 @@ class TestMeltanoCloudConfig:
             "access_token": f"{self._val_prefix}access-token",
         }
 
-    @pytest.fixture
+    @pytest.fixture()
     def config_path(self, tmp_path: Path, config_dict: dict):
         config_file_path = tmp_path / "meltano-cloud.json"
         with Path(config_file_path).open("w") as config_file:
             json.dump(config_dict, config_file)
         return config_file_path
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, config_path: Path):
         return MeltanoCloudConfig.from_config_file(config_path)
 

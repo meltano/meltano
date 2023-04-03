@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import platform
 import typing as t
 from dataclasses import dataclass
 from functools import partial, wraps
@@ -12,6 +13,7 @@ import click
 
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
+from meltano.cloud.api.types import CloudProject
 
 
 def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
@@ -26,6 +28,10 @@ def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
 
     @wraps(f)
     def wrapper(*args, **kwargs):
+        if platform.system() == "Windows":
+            asyncio.set_event_loop_policy(
+                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
+            )
         return asyncio.run(f(*args, **kwargs))
 
     return wrapper
@@ -46,6 +52,9 @@ class MeltanoCloudCLIContext:
     # Schedule subcommand:
     deployment: str | None = None
     schedule: str | None = None
+
+    # Project subcommand:
+    projects: list[CloudProject] | None = None
 
 
 pass_context = click.make_pass_decorator(MeltanoCloudCLIContext, ensure=True)

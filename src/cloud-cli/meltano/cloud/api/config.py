@@ -25,15 +25,15 @@ USER_RW_FILE_MODE = 0o600
 
 
 class InvalidMeltanoCloudConfigError(Exception):
-    """Raised when provided configuration is invalid."""
+    """Provided configuration is invalid."""
 
 
 class MeltanoCloudConfigFileNotFoundError(Exception):
-    """Raised when Meltano Cloud config file is missing."""
+    """Meltano Cloud config file is missing."""
 
 
 class MeltanoCloudTenantAmbiguityError(Exception):
-    """Raised when currently logged in user belongs to multiple tenants."""
+    """Logged in user has access to multiple tenants."""
 
     def __init__(self) -> None:
         """Initialize exception with message."""
@@ -44,7 +44,7 @@ class MeltanoCloudTenantAmbiguityError(Exception):
 
 
 class NoMeltanoCloudTenantResourceKeyError(Exception):
-    """Raised when currently logged in user does not belong to any tenants."""
+    """Logged in user does not have access to any tenants."""
 
     def __init__(self) -> None:
         """Initialize exception with message."""
@@ -55,22 +55,27 @@ class NoMeltanoCloudTenantResourceKeyError(Exception):
 
 
 class MeltanoCloudProjectAmbiguityError(Exception):
-    """Raised when currently logged in user belongs to multiple projects."""
+    """Logged in user has access to multiple projects."""
 
     def __init__(self) -> None:
         """Initialize exception with message."""
         super().__init__(
             "Logged in Meltano user has multiple projects. "
-            "Set MELTANO_CLOUD_INTERNAL_PROJECT_ID env var to select project.",
+            "Set one as the default project using the "
+            "`meltano cloud project use` command.",
         )
 
 
 class NoMeltanoCloudProjectIDError(Exception):
-    """Raised when currently logged in user does not have any projects."""
+    """Logged in user does not have any projects."""
 
     def __init__(self) -> None:
         """Initialize exception with message."""
-        super().__init__("Logged in Meltano user has no projects.")
+        super().__init__(
+            "Logged in Meltano user has no projects. "
+            "Set one as the default project using the "
+            "`meltano cloud project use` command.",
+        )
 
 
 class MeltanoCloudConfig:  # noqa: WPS214 WPS230
@@ -88,6 +93,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         id_token: str | None = None,
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
+        default_project_id: str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
@@ -104,6 +110,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             id_token: ID token for use in authentication.
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
+            default_project_id: The ID of the default Meltano Cloud project.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -114,6 +121,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.config_path = (
             Path(config_path).resolve() if config_path else self.user_config_path()
         )
+        self.default_project_id = default_project_id
 
     def __getattribute__(self, name: str) -> str | None:
         """Get config attribute.
@@ -171,28 +179,41 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         Returns:
             The internal project IDs found in the ID token.
-
         """
         return {perm.split("::")[1] for perm in self._trks_and_pids}
 
     @property
     def internal_project_id(self) -> str:
-        """Get the internal project ID.
+        """Get the default Meltano Cloud project ID.
 
         Returns:
-            Internal project ID.
+            The default Meltano Cloud project ID.
 
         Raises:
             NoMeltanoCloudProjectIDError: when ID token includes no project IDs.
             MeltanoCloudProjectAmbiguityError: when ID token includes more
                 than one project ID.
         """
+        if self.default_project_id:
+            return self.default_project_id
         if len(self.internal_project_ids) > 1:
             raise MeltanoCloudProjectAmbiguityError
         try:
-            return next(iter(self.internal_project_ids))
+            pid = next(iter(self.internal_project_ids))
+            self.internal_project_id = pid
+            return pid
         except StopIteration:  # noqa: WPS329
             raise NoMeltanoCloudProjectIDError from None
+
+    @internal_project_id.setter
+    def internal_project_id(self, project_id: str) -> None:
+        """Set the default Meltano Cloud project ID.
+
+        Args:
+            project_id: The Meltano Cloud project ID that should be used.
+        """
+        self.default_project_id = project_id
+        self.write_to_file()
 
     @property
     def tenant_resource_key(self) -> str:

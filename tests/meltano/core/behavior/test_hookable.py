@@ -47,7 +47,7 @@ class Hooked2(HookObject):
 
 
 class TestHookable:
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_trigger_hook(self):
         subject = Hooked()
         process = mock.MagicMock()
@@ -62,16 +62,16 @@ class TestHookable:
         ]
         assert process.called_once
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_trigger_hook_raise(self):
         subject = Hooked()
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: PT012, PT011
             async with subject.trigger_hooks("test"):
                 raise Exception
 
         assert subject.calls == ["before_test", "before_test_2"]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_trigger_derived_hook(self):
         subject = DerivedHooked()
 

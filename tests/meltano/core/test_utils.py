@@ -35,7 +35,8 @@ def test_nest():
     assert subject["a"]["b"]["c"] is two_deep
     assert isinstance(arr, list)
     # make sure it is a copy
-    assert val == start_value and val is not start_value
+    assert val == start_value
+    assert val is not start_value
 
     new_b = nest(subject, "a.b", "not_a_dict", force=True)
     assert new_b == "not_a_dict"

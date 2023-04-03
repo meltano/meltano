@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import platform
 import subprocess
 import sys
 import typing as t
@@ -85,7 +86,11 @@ class MeltanoCloudAuth:  # noqa: WPS214
         try:
             server = subprocess.Popen(  # noqa: S607
                 (
-                    str(Path(sys.prefix) / "bin" / "flask"),
+                    str(
+                        Path(sys.prefix) / "Scripts" / "flask.exe"
+                        if platform.system() == "Windows"
+                        else Path(sys.prefix) / "bin" / "flask",
+                    ),
                     "run",
                     f"--port={self.config.auth_callback_port}",
                 ),
