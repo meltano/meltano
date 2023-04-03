@@ -12,7 +12,7 @@ from meltano.api.security.identity import create_dev_user
 from meltano.core.project import Project
 
 
-@pytest.fixture
+@pytest.fixture()
 def impersonate(app):
     @contextmanager
     def factory(user):
@@ -65,5 +65,5 @@ def api(app, project: Project):
 
 
 @pytest.fixture()
-def seed_users(app, session):
+def seed_users(app, session) -> None:
     create_dev_user()

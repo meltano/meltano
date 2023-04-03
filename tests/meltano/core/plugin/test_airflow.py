@@ -95,7 +95,7 @@ class TestAirflow:
 
             assert not run_dir.joinpath("airflow.cfg").exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_before_cleanup(self, subject, plugin_invoker_factory):
         invoker: AirflowInvoker = plugin_invoker_factory(subject)
 

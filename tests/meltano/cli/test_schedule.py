@@ -129,7 +129,7 @@ class TestCliSchedule:
 
         assert res.exit_code == 1
 
-    @pytest.mark.parametrize("exit_code", [0, 1, 143])
+    @pytest.mark.parametrize("exit_code", (0, 1, 143))
     def test_schedule_run(self, exit_code, cli_runner, elt_schedule, job_schedule):
         process_mock = mock.Mock(returncode=exit_code)
         with mock.patch(

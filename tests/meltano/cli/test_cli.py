@@ -28,7 +28,7 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
-    @pytest.fixture
+    @pytest.fixture()
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
@@ -43,11 +43,11 @@ class TestCli:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture
+    @pytest.fixture()
     def deactivate_project(self):
         Project.deactivate()
 
-    @pytest.fixture
+    @pytest.fixture()
     def empty_project(self, empty_meltano_yml_dir, pushd):
         project = Project(empty_meltano_yml_dir)
         try:
@@ -352,8 +352,8 @@ class TestCliColors:
     TEST_TEXT = "This is a test"
 
     @pytest.mark.parametrize(
-        "env,log_config,cli_colors_expected,log_colors_expected",
-        [
+        ("env", "log_config", "cli_colors_expected", "log_colors_expected"),
+        (
             pytest.param(
                 {},
                 None,
@@ -431,7 +431,7 @@ class TestCliColors:
                 True,
                 id="colors-not-disabled-by-invalid-no-color-env",
             ),
-        ],
+        ),
     )
     def test_no_color(
         self,

@@ -12,13 +12,13 @@ from meltano.core.plugin_discovery_service import LockedDefinitionService
 HTTP_STATUS_TEAPOT = 418
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(project):
-    yield LockedDefinitionService(project)
+    return LockedDefinitionService(project)
 
 
 class TestLockedDefinitionService:
-    @pytest.fixture
+    @pytest.fixture()
     def locked_plugin(self, subject: LockedDefinitionService):
         """Locked plugin definition.
 

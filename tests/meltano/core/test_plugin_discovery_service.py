@@ -29,13 +29,13 @@ def project(project):
     return project
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(plugin_discovery_service: PluginDiscoveryService):
     yield plugin_discovery_service
     plugin_discovery_service.project.settings.reset()
 
 
-@pytest.fixture
+@pytest.fixture()
 def discovery_url_mock(subject):
     with requests_mock.Mocker() as mocker:
         mocker.get(subject.discovery_url, status_code=HTTP_STATUS_TEAPOT)
@@ -60,14 +60,14 @@ def tap_covid_19(project_add_service):
 @pytest.mark.usefixtures("discovery_url_mock")
 class TestPluginDiscoveryService:
     @pytest.mark.order(0)
-    @pytest.mark.meta
+    @pytest.mark.meta()
     def test_discovery_url_mock(self, subject):
         assert (
             requests.get(subject.discovery_url, timeout=30.0).status_code
             == HTTP_STATUS_TEAPOT
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def discovery_yaml(self, subject):
         """Disable the discovery mock."""
         with subject.project.root_dir("discovery.yml").open("w") as discovery_yaml:
@@ -266,7 +266,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
 
         subject.cached_discovery_file.unlink()
 
-    @pytest.fixture
+    @pytest.fixture()
     def local_discovery(self, subject):
         with self.use_local_discovery(
             self.build_discovery_yaml("local"),
@@ -274,7 +274,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def incompatible_local_discovery(self, subject):
         with self.use_local_discovery(
             self.build_discovery_yaml("local", version=VERSION - 1),
@@ -282,7 +282,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def remote_discovery(self, project, subject):
         with self.use_remote_discovery(
             self.build_discovery_yaml("remote"),
@@ -290,7 +290,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def incompatible_remote_discovery(self, subject):
         with self.use_remote_discovery(
             self.build_discovery_yaml("remote", version=VERSION + 1),
@@ -298,15 +298,15 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def disabled_remote_discovery(self, subject):
         subject.project.settings.set("discovery_url", "false")
 
-    @pytest.fixture
+    @pytest.fixture()
     def enabled_remote_discovery_auth(self, subject):
         subject.project.settings.set("discovery_url_auth", "test")
 
-    @pytest.fixture
+    @pytest.fixture()
     def cached_discovery(self, subject):
         with self.use_cached_discovery(
             self.build_discovery_yaml("cached"),
@@ -314,7 +314,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def invalid_cached_discovery(self, subject):
         with self.use_cached_discovery(
             {"version": VERSION, "invalid_key": "value"},
@@ -322,7 +322,7 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         ) as discovery_yaml:
             yield discovery_yaml
 
-    @pytest.fixture
+    @pytest.fixture()
     def bundled_discovery(self):
         with open(bundle.root / "discovery.yml") as bundled_discovery:
             return yaml.load(bundled_discovery)
