@@ -47,7 +47,7 @@ class LookbackExpressionType(click.ParamType):
         return value
 
 
-def _schedule_arg_to_glog(
+def _schedule_arg_to_glob(
     schedule: str | None,
     schedule_prefix: str | None,
     schedule_contains: str | None,
@@ -141,7 +141,7 @@ async def history(
     lookback: datetime.timedelta | None,
 ) -> None:
     """Get a Meltano project execution history in Meltano Cloud."""
-    schedule_filter = _schedule_arg_to_glog(
+    schedule_filter = _schedule_arg_to_glob(
         schedule,
         schedule_prefix,
         schedule_contains,
