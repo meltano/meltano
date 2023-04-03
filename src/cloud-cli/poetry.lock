@@ -112,21 +112,6 @@ yarl = ">=1.0,<2.0"
 speedups = ["Brotli", "aiodns", "cchardet"]
 
 [[package]]
-name = "aioresponses"
-version = "0.7.4"
-description = "Mock out requests made by ClientSession from aiohttp package"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "aioresponses-0.7.4-py2.py3-none-any.whl", hash = "sha256:1160486b5ea96fcae6170cf2bdef029b9d3a283b7dbeabb3d7f1182769bfb6b7"},
-    {file = "aioresponses-0.7.4.tar.gz", hash = "sha256:9b8c108b36354c04633bad0ea752b55d956a7602fe3e3234b939fc44af96f1d8"},
-]
-
-[package.dependencies]
-aiohttp = ">=2.0.0,<4.0.0"
-
-[[package]]
 name = "aiosignal"
 version = "1.3.1"
 description = "aiosignal: a list of registered asynchronous callbacks"
@@ -455,14 +440,14 @@ files = [
 
 [[package]]
 name = "hypothesis"
-version = "6.70.1"
+version = "6.70.2"
 description = "A library for property-based testing"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "hypothesis-6.70.1-py3-none-any.whl", hash = "sha256:839d26f4ed0e95b62b2fd9a4830e58fa71f7d0ec7a637e69b8cc65f5e7af6f22"},
-    {file = "hypothesis-6.70.1.tar.gz", hash = "sha256:8d6c56350867d353488b8f90fc5f322e10a156cdab94fafa1ec8e149e4b24a0e"},
+    {file = "hypothesis-6.70.2-py3-none-any.whl", hash = "sha256:91869c4a29a04e812f677ded7e692c7e37514239e9137d21e3567fa4e1348c02"},
+    {file = "hypothesis-6.70.2.tar.gz", hash = "sha256:a8d1d96ae2214f8ca4b8109d555df08e1eb5c31dd7e3995e53413c7094f74dcc"},
 ]
 
 [package.dependencies]
@@ -471,7 +456,7 @@ exceptiongroup = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "importlib-metadata (>=3.6)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=1.0)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.2)"]
+all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "importlib-metadata (>=3.6)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.9.0)", "pandas (>=1.0)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.3)"]
 cli = ["black (>=19.10b0)", "click (>=7.0)", "rich (>=9.0.0)"]
 codemods = ["libcst (>=0.3.16)"]
 dateutil = ["python-dateutil (>=1.4)"]
@@ -484,7 +469,7 @@ pandas = ["pandas (>=1.0)"]
 pytest = ["pytest (>=4.6)"]
 pytz = ["pytz (>=2014.1)"]
 redis = ["redis (>=3.0.0)"]
-zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.2)"]
+zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.3)"]
 
 [[package]]
 name = "idna"
@@ -1270,4 +1255,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "bea595b4a333f6b024355060e5c169637c9e088f4563d787156441ca0f4dcf08"
+content-hash = "33084400f362e4a6171122672181a8107b6b4961aaf0587420ea96d4f055e478"

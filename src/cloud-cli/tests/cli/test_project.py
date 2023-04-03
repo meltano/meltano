@@ -4,15 +4,12 @@ from __future__ import annotations
 
 import json
 import platform
-import re
 import subprocess
 import sys
 import typing as t
 from pathlib import Path
-from urllib.parse import urljoin
 
 import pytest
-from aioresponses import aioresponses
 from click.testing import CliRunner
 
 from meltano.cloud.cli import cloud as cli
@@ -21,22 +18,12 @@ from meltano.cloud.cli.project import _remove_private_project_attributes  # noqa
 if t.TYPE_CHECKING:
     from pytest_httpserver import HTTPServer
 
-    from meltano.cloud.api import MeltanoCloudClient
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProject
 
 
 class TestProjectCommand:
     """Test the logs command."""
-
-    @pytest.fixture()
-    def url_pattern(
-        self,
-        tenant_resource_key: str,
-        client: MeltanoCloudClient,
-    ) -> re.Pattern:
-        path = f"projects/v1/{tenant_resource_key}"
-        return re.compile(f"^{urljoin(client.api_url, path)}(\\?.*)?$")
 
     @pytest.fixture()
     def projects(self, tenant_resource_key: str) -> list[CloudProject]:
@@ -84,27 +71,19 @@ class TestProjectCommand:
         ]
 
     @pytest.fixture()
-    def projects_get_reponse(
-        self,
-        url_pattern: re.Pattern,
-        projects: list[CloudProject],
-        config: MeltanoCloudConfig,
-    ) -> None:
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": projects, "pagination": None},
-            )
-            yield
+    def path(self, tenant_resource_key: str) -> str:
+        return f"/projects/v1/{tenant_resource_key}"
 
-    @pytest.mark.usefixtures("projects_get_reponse")
-    def test_project_list_table(self, config: MeltanoCloudConfig):
+    def test_project_list_table(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        projects: list[CloudProject],
+    ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects, "pagination": None},
+        )
         result = CliRunner().invoke(
             cli,
             ("--config-path", config.config_path, "project", "list"),
@@ -122,8 +101,16 @@ class TestProjectCommand:
             "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
         )  # noqa: E501
 
-    @pytest.mark.usefixtures("projects_get_reponse")
-    def test_project_list_table_with_default_project(self, config: MeltanoCloudConfig):
+    def test_project_list_table_with_default_project(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        projects: list[CloudProject],
+    ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects, "pagination": None},
+        )
         config.internal_project_id = "01GWQ76M7EN1GKYGKV8P6BFKNV"  # Set default project
         result = CliRunner().invoke(
             cli,
@@ -142,12 +129,16 @@ class TestProjectCommand:
             "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
         )  # noqa: E501
 
-    @pytest.mark.usefixtures("projects_get_reponse")
     def test_project_list_json(
         self,
-        projects: list[CloudProject],
         config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        projects: list[CloudProject],
     ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects, "pagination": None},
+        )
         result = CliRunner().invoke(
             cli,
             (
@@ -165,32 +156,25 @@ class TestProjectCommand:
 
     def test_project_use_by_name(
         self,
-        url_pattern: re.Pattern,
+        path: str,
+        httpserver: HTTPServer,
         config: MeltanoCloudConfig,
         projects: list[CloudProject],
     ):
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": [projects[0]], "pagination": None},
-            )
-            result = CliRunner().invoke(
-                cli,
-                (
-                    "--config-path",
-                    config.config_path,
-                    "project",
-                    "use",
-                    "--name",
-                    "Meltano Cubed",
-                ),
-            )
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": [projects[0]], "pagination": None},
+        )
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+                "--name",
+                "Meltano Cubed",
+            ),
+        )
         assert result.exit_code == 0, result.output
         assert result.output == (
             "Set 'Meltano Cubed' as the default Meltano Cloud project for "
@@ -209,22 +193,14 @@ class TestProjectCommand:
     )
     def test_project_use_by_name_interactive(
         self,
-        tenant_resource_key: str,
+        path: str,
+        httpserver: HTTPServer,
         config: MeltanoCloudConfig,
         projects: list[CloudProject],
-        httpserver: HTTPServer,
     ):
-        httpserver.expect_request("/oauth2/userInfo").respond_with_json(
-            {"sub": "meltano-cloud-test"},
-        )
-        httpserver.expect_request(
-            f"/projects/v1/{tenant_resource_key}",
-        ).respond_with_json(
+        httpserver.expect_oneshot_request(path).respond_with_json(
             {"results": [*projects[:2], *projects[3:]], "pagination": None},
         )
-        config.base_auth_url = f"http://localhost:{httpserver.port}"
-        config.base_url = f"http://localhost:{httpserver.port}"
-        config.write_to_file()
         result = subprocess.run(
             (
                 sys.executable,
@@ -252,30 +228,23 @@ class TestProjectCommand:
 
     def test_project_use_by_name_interactive_duplicate_name(
         self,
-        url_pattern: re.Pattern,
         config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
         projects: list[CloudProject],
     ):
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": projects, "pagination": None},
-            )
-            result = CliRunner().invoke(
-                cli,
-                (
-                    "--config-path",
-                    config.config_path,
-                    "project",
-                    "use",
-                ),
-            )
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects, "pagination": None},
+        )
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+            ),
+        )
         assert result.exit_code == 1
         assert (
             "Error: Multiple Meltano Cloud projects have the same name."
@@ -284,32 +253,25 @@ class TestProjectCommand:
 
     def test_project_use_by_name_like_id(
         self,
-        url_pattern: re.Pattern,
+        path: str,
+        httpserver: HTTPServer,
         config: MeltanoCloudConfig,
         projects: list[CloudProject],
     ):
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": [projects[4]], "pagination": None},
-            )
-            result = CliRunner().invoke(
-                cli,
-                (
-                    "--config-path",
-                    config.config_path,
-                    "project",
-                    "use",
-                    "--name",
-                    "01GWQRDA1HZNTSW7JK0KNGCYS9",
-                ),
-            )
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": [*projects[:2], *projects[3:]], "pagination": None},
+        )
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+                "--name",
+                "01GWQRDA1HZNTSW7JK0KNGCYS9",
+            ),
+        )
         assert result.exit_code == 0, result.output
         assert result.output == (
             "Set '01GWQRDA1HZNTSW7JK0KNGCYS9' as the default Meltano Cloud "
@@ -320,34 +282,18 @@ class TestProjectCommand:
             == "01GWQREZ7G0526JZS9JY5H3BH9"
         )
 
-    def test_project_use_by_id(
-        self,
-        url_pattern: re.Pattern,
-        config: MeltanoCloudConfig,
-        projects: list[CloudProject],
-    ):
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": [projects[0]], "pagination": None},
-            )
-            result = CliRunner().invoke(
-                cli,
-                (
-                    "--config-path",
-                    config.config_path,
-                    "project",
-                    "use",
-                    "--id",
-                    "01GWQ7520WNMQT0PQ6KHCC4EE1",
-                ),
-            )
+    def test_project_use_by_id(self, config: MeltanoCloudConfig):
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+                "--id",
+                "01GWQ7520WNMQT0PQ6KHCC4EE1",
+            ),
+        )
         assert result.exit_code == 0, result.output
         assert result.output == (
             "Set the project with ID '01GWQ7520WNMQT0PQ6KHCC4EE1' as the "
@@ -360,32 +306,25 @@ class TestProjectCommand:
 
     def test_project_use_ambigous_name_error(
         self,
-        url_pattern: re.Pattern,
+        path: str,
+        httpserver: HTTPServer,
         config: MeltanoCloudConfig,
         projects: list[CloudProject],
     ):
-        with aioresponses() as m:
-            m.get(
-                f"{config.base_auth_url}/oauth2/userInfo",
-                status=200,
-                body=json.dumps({"sub": "meltano-cloud-test"}),
-            )
-            m.get(
-                url_pattern,
-                status=200,
-                payload={"results": projects[1:3], "pagination": None},
-            )
-            result = CliRunner().invoke(
-                cli,
-                (
-                    "--config-path",
-                    config.config_path,
-                    "project",
-                    "use",
-                    "--name",
-                    "Post-Modern Data Stack in a Box",
-                ),
-            )
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects[1:3], "pagination": None},
+        )
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+                "--name",
+                "Post-Modern Data Stack in a Box",
+            ),
+        )
         assert result.exit_code == 1
         assert result.output == (
             "Error: Multiple Meltano Cloud projects have the same name. "
