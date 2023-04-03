@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import json
+from http import HTTPStatus
 from pathlib import Path
 
 import pytest
-from flask import Flask
-from flask.testing import FlaskClient
-from werkzeug.test import TestResponse
+from aiohttp import web
 
-from meltano.cloud.api.auth import callback_server
+from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 
 
@@ -20,36 +19,31 @@ class TestMeltanoCloudAuthCallbackServer:
         return MeltanoCloudConfig(config_path=tmp_path / "meltano-cloud.json")
 
     @pytest.fixture()
-    def subject(
+    async def client(
         self,
-        monkeypatch: pytest.MonkeyPatch,
-        tmp_path: Path,
         config: MeltanoCloudConfig,
-    ):
-        monkeypatch.setenv("MELTANO_CLOUD_CONFIG_PATH", str(config.config_path))
-        return callback_server.APP
+        aiohttp_client,
+    ) -> web.Application:
+        async with MeltanoCloudAuth(config).callback_server() as app:
+            yield await aiohttp_client(app)
 
-    @pytest.fixture()
-    def client(self, subject: Flask):
-        return subject.test_client()
-
-    def test_callback_page(self, client: FlaskClient):
-        response = client.get("/")
+    async def test_callback_page(self, client: web.Application):
+        response = await client.get("/")
         assert (
-            b'<p id="start-message">Logging in to Meltano Cloud...</p>' in response.data
+            '<p id="start-message">Logging in to Meltano Cloud...</p>'
+            in await response.text()
         )
 
-    def test_handle_tokens(
+    async def test_handle_tokens(
         self,
-        subject: Flask,
-        client: FlaskClient,
+        client: web.Application,
         config: MeltanoCloudConfig,
     ):
-        response: TestResponse = client.get(
+        response = await client.get(
             "/tokens?id_token=meltano-cloud-testing&access_token=meltano-cloud-testing",
         )
         config.refresh()
-        assert response.status_code == 204
+        assert response.status == HTTPStatus.NO_CONTENT
         assert config.access_token == "meltano-cloud-testing"  # noqa: S105
         assert config.id_token == "meltano-cloud-testing"  # noqa: S105
         with Path(config.config_path).open() as config_file:
@@ -57,17 +51,16 @@ class TestMeltanoCloudAuthCallbackServer:
         assert config_on_disk["access_token"] == "meltano-cloud-testing"
         assert config_on_disk["id_token"] == "meltano-cloud-testing"
 
-    def test_handle_logout(
+    async def test_handle_logout(
         self,
-        subject: Flask,
-        client: FlaskClient,
+        client: web.Application,
         config: MeltanoCloudConfig,
     ):
         config.access_token = "meltano-cloud-testing"  # noqa: S105
         config.id_token = "meltano-cloud-testing"  # noqa: S105
         config.write_to_file()
-        response: TestResponse = client.get("/logout")
-        assert response.status_code == 200
+        response = await client.get("/logout")
+        assert response.status == HTTPStatus.OK
         config.refresh()
         assert config.id_token is None
         assert config.access_token is None

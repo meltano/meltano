@@ -27,9 +27,7 @@
       }
       function sendTokens() {
         fetch(
-          `http://localhost:{{ port }}/tokens?${window.location.hash.substring(
-            1
-          )}`
+          `http://localhost:{{ port }}/tokens?${window.location.hash.substring(1)}`
         ).then((response) => handleResponse(response));
       }
       window.onload = sendTokens;

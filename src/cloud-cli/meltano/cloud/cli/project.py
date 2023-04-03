@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import platform
 import sys
 import typing as t
 
@@ -210,6 +211,12 @@ class ProjectChoicesQuestionaryOption(click.Option):
         if "project_id" in ctx.params:
             # The project has been specified by ID - don't prompt for a name
             return None
+
+        if platform.system() == "Windows":
+            asyncio.set_event_loop_policy(
+                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
+            )
+
         context: MeltanoCloudCLIContext = ctx.obj
         context.projects = asyncio.run(_get_projects(context.config))
         _check_for_duplicate_project_names(context.projects)

@@ -3,18 +3,19 @@
 from __future__ import annotations
 
 import asyncio
-import os
-import platform
-import subprocess
 import sys
+import tempfile
 import typing as t
 import webbrowser
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
+from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
 
 import aiohttp
 import click
+import jinja2
+from aiohttp import web
 
 from meltano.cloud.api.config import MeltanoCloudConfig
 
@@ -22,6 +23,11 @@ if sys.version_info <= (3, 8):
     from cached_property import cached_property
 else:
     from functools import cached_property
+
+if sys.version_info < (3, 9):
+    import importlib_resources
+else:
+    from importlib import resources as importlib_resources
 
 LOGIN_STATUS_CHECK_DELAY_SECONDS = 0.2
 
@@ -75,44 +81,74 @@ class MeltanoCloudAuth:  # noqa: WPS214
         )
         return urljoin(self.base_url, f"logout?{params}")
 
-    @contextmanager
-    def callback_server(self) -> t.Iterator[None]:
+    @asynccontextmanager
+    async def _callback_server(
+        self,
+        rendered_template_dir: Path,
+    ) -> t.AsyncIterator[web.Application]:
+        app = web.Application()
+        resource_root = importlib_resources.files(__package__)
+
+        async def callback_page(_):
+            with importlib_resources.as_file(
+                resource_root / "callback.jinja2",
+            ) as template_file, (rendered_template_dir / "callback.html").open(
+                "w",
+            ) as rendered_template_file:
+                rendered_template_file.write(
+                    jinja2.Template(template_file.read_text()).render(
+                        port=self.config.auth_callback_port,
+                    ),
+                )
+            return web.FileResponse(rendered_template_file.name)
+
+        async def handle_tokens(request: web.Request):
+            self.config.id_token = request.query["id_token"]
+            self.config.access_token = request.query["access_token"]
+            self.config.write_to_file()
+            return web.Response(status=HTTPStatus.NO_CONTENT)
+
+        async def handle_logout(_):
+            self.config.id_token = None
+            self.config.access_token = None
+            self.config.write_to_file()
+            with importlib_resources.as_file(
+                resource_root / "logout.html",
+            ) as html_file:
+                return web.FileResponse(html_file)
+
+        app.add_routes(
+            (
+                web.get("/", callback_page),
+                web.get("/tokens", handle_tokens),
+                web.get("/logout", handle_logout),
+            ),
+        )
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "localhost", self.config.auth_callback_port)
+        await site.start()
+        try:
+            yield app
+        finally:
+            await runner.cleanup()
+
+    @asynccontextmanager
+    async def callback_server(self) -> t.AsyncIterator[web.Application]:
         """Context manager to run callback server locally.
 
         Yields:
-            None
+            The aiohttp web application.
         """
-        server = None
-        try:
-            server = subprocess.Popen(  # noqa: S607
-                (
-                    str(
-                        Path(sys.prefix) / "Scripts" / "flask.exe"
-                        if platform.system() == "Windows"
-                        else Path(sys.prefix) / "bin" / "flask",
-                    ),
-                    "run",
-                    f"--port={self.config.auth_callback_port}",
-                ),
-                env={
-                    **os.environ,
-                    "FLASK_APP": "callback_server.py",
-                    "MELTANO_CLOUD_CONFIG_PATH": str(self.config.config_path),
-                },
-                cwd=Path(__file__).parent,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
-            yield
-        finally:
-            if server:
-                server.kill()
+        with tempfile.TemporaryDirectory(prefix="meltano-cloud-") as tmpdir:
+            async with self._callback_server(Path(tmpdir)) as app:
+                yield app
 
     async def login(self) -> None:
         """Take user through login flow and get auth and id tokens."""
         if await self.logged_in():
             return
-        with self.callback_server():
+        async with self.callback_server():
             click.echo("Logging in to Meltano Cloud.")
             click.echo("You will be directed to a web browser to complete login.")
             click.echo("If a web browser does not open, open the following link:")
@@ -127,7 +163,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
         if not await self.logged_in():
             click.secho("Not logged in.", fg="green")
             return
-        with self.callback_server():
+        async with self.callback_server():
             click.echo("Logging out of Meltano Cloud.")
             click.echo("You will be directed to a web browser to complete logout.")
             click.echo("If a web browser does not open, open the following link:")
@@ -159,18 +195,23 @@ class MeltanoCloudAuth:  # noqa: WPS214
         """
         return {"Authorization": f"Bearer {self.config.access_token}"}
 
+    @asynccontextmanager
+    async def _get_user_info_response(self) -> t.AsyncIterator[aiohttp.ClientResponse]:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                urljoin(self.base_url, "oauth2/userInfo"),
+                headers=self.get_access_token_header(),
+            ) as response:
+                yield response
+
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
 
         Returns:
             User info response
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                return response
+        async with self._get_user_info_response() as response:
+            return response
 
     async def get_user_info_json(self) -> dict:
         """Get user info as dict.
@@ -178,12 +219,8 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Returns:
             User info json
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                return await response.json()
+        async with self._get_user_info_response() as response:
+            return await response.json()
 
     async def logged_in(self) -> bool:
         """Check if this instance is currently logged in.
@@ -191,7 +228,10 @@ class MeltanoCloudAuth:  # noqa: WPS214
         Returns:
             True if logged in, else False
         """
-        user_info_resp = await self.get_user_info_response()
         return bool(
-            self.config.access_token and self.config.id_token and user_info_resp.ok,
+            self.config.access_token
+            and self.config.id_token
+            # Perform this check at the end to avoid
+            # spamming our servers if logout fails
+            and (await self.get_user_info_response()).ok,
         )
