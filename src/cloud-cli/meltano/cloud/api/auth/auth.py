@@ -14,7 +14,6 @@ from urllib.parse import urlencode, urljoin
 
 import aiohttp
 import click
-import importlib_resources
 import jinja2
 from aiohttp import web
 
@@ -24,6 +23,11 @@ if sys.version_info <= (3, 8):
     from cached_property import cached_property
 else:
     from functools import cached_property
+
+if sys.version_info < (3, 9):
+    import importlib_resources
+else:
+    from importlib import resources as importlib_resources
 
 LOGIN_STATUS_CHECK_DELAY_SECONDS = 0.2
 
