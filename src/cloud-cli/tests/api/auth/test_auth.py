@@ -16,13 +16,13 @@ if t.TYPE_CHECKING:
 class TestMeltanoCloudAuth:
     """Test the Meltano Cloud API Authentication."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def config(self, tmp_path: Path):
         path = tmp_path / "meltano-cloud.json"
         path.touch()
         return MeltanoCloudConfig(config_path=path)
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(
         self,
         monkeypatch: pytest.MonkeyPatch,

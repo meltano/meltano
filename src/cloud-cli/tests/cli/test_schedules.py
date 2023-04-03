@@ -48,7 +48,7 @@ class TestScheduleCommand:
                 assert result.exit_code == 0, result.output
                 assert not result.output
 
-    @pytest.fixture
+    @pytest.fixture()
     def schedules(self) -> list[CloudProjectSchedule]:
         return [
             {
@@ -71,7 +71,7 @@ class TestScheduleCommand:
             },
         ]
 
-    @pytest.fixture
+    @pytest.fixture()
     def schedules_get_reponse(
         self,
         schedules: list[CloudProjectSchedule],

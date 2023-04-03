@@ -8,8 +8,8 @@ from flask import json
 
 class TestJSON:
     @pytest.mark.parametrize(
-        "scheme,payload,expected",
-        [
+        ("scheme", "payload", "expected"),
+        (
             (
                 "camel",
                 {
@@ -53,7 +53,7 @@ class TestJSON:
                     "a_val-test": "none_value",
                 },
             ),
-        ],
+        ),
     )
     def test_json_scheme_encoder(self, app, scheme, payload, expected):
         with app.test_request_context(
@@ -67,8 +67,8 @@ class TestJSON:
             assert decoded == expected
 
     @pytest.mark.parametrize(
-        "payload,expected",
-        [
+        ("payload", "expected"),
+        (
             (
                 {
                     "aDict": {"camelCase": 1},
@@ -85,7 +85,7 @@ class TestJSON:
                     "_aVal": "simpleValue",
                 },
             ),
-        ],
+        ),
     )
     def test_json_scheme_decoder(self, app, payload, expected):
         with app.test_request_context():

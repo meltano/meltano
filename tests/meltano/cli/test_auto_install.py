@@ -7,7 +7,7 @@ from meltano.cli import cli
 
 
 class TestAutoInstall:
-    @pytest.mark.slow
+    @pytest.mark.slow()
     @pytest.mark.skip(reason="Deadlock on docker, have to investigate further.")
     def test_carbon_intensity_sqlite(self, cli_runner, monkeypatch, project):
         # Directly run `meltano add loader target-sqlite` in a new project

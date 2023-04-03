@@ -72,12 +72,12 @@ def clear_httpserver_tmp_hanlders(httpserver: HTTPServer) -> None:
     httpserver.ordered_handlers.clear()
 
 
-@pytest.fixture
+@pytest.fixture()
 def auth_token():
     return "meltano-cloud-test"
 
 
-@pytest.fixture
+@pytest.fixture()
 def id_token(tenant_resource_key: str, internal_project_id: str, auth_token: str):
     """Return a fake ID token.
 
@@ -97,7 +97,7 @@ def httpserver_base_url(httpserver: HTTPServer) -> str:
     return httpserver.url_for("")
 
 
-@pytest.fixture
+@pytest.fixture()
 def config(
     config_path: Path,
     id_token: str,

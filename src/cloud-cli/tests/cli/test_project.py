@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 class TestProjectCommand:
     """Test the logs command."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def projects(self, tenant_resource_key: str) -> list[CloudProject]:
         return [
             {
@@ -69,7 +69,7 @@ class TestProjectCommand:
             },
         ]
 
-    @pytest.fixture
+    @pytest.fixture()
     def path(self, tenant_resource_key: str) -> str:
         return f"/projects/v1/{tenant_resource_key}"
 

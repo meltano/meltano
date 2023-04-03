@@ -14,7 +14,7 @@ from meltano.core.project import Project
 from meltano.core.project_plugins_service import DefinitionSource
 
 
-@pytest.fixture
+@pytest.fixture()
 def modified_lockfile(project: Project):
     lockfile_path = project.plugin_lock_path(
         PluginType.EXTRACTORS,

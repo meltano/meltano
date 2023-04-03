@@ -8,7 +8,6 @@ from pathlib import Path
 
 import mock
 import pytest
-from pytest import MonkeyPatch
 
 import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
@@ -17,7 +16,7 @@ from meltano.core.tracking.contexts import environment_context
 
 
 class TestMeltanoInvoker:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return MeltanoInvoker(project)
 
@@ -30,7 +29,7 @@ class TestMeltanoInvoker:
         assert process.returncode == 0
         assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
 
-    def test_env(self, subject: MeltanoInvoker, monkeypatch: MonkeyPatch):
+    def test_env(self, subject: MeltanoInvoker, monkeypatch: pytest.MonkeyPatch):
         # Process env vars are injected
         monkeypatch.setenv("ENV_VAR_KEY", "ENV_VAR_VALUE_1")
         assert subject._executable_env()["ENV_VAR_KEY"] == "ENV_VAR_VALUE_1"

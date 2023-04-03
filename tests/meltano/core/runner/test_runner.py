@@ -47,12 +47,12 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
-    @pytest.fixture
+    @pytest.fixture()
     def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
@@ -88,7 +88,7 @@ class TestSingerRunner:
     def target_process(self, process_mock_factory, target):
         return process_mock_factory(target)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_prepare_job(
         self,
         session,
@@ -114,7 +114,7 @@ class TestSingerRunner:
 
         assert not target_invoker.files["config"].exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_invoke(
         self,
         session,
@@ -148,15 +148,15 @@ class TestSingerRunner:
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     @pytest.mark.parametrize(
-        "full_refresh,select_filter,payload_flag",
-        [
+        ("full_refresh", "select_filter", "payload_flag"),
+        (
             (False, [], Payload.STATE),
             (True, [], Payload.STATE),
             (False, ["entity"], Payload.STATE),
             (True, ["entity"], Payload.INCOMPLETE_STATE),
-        ],
+        ),
     )
     async def test_bookmark(
         self,
@@ -212,7 +212,7 @@ class TestSingerRunner:
             assert job.payload["singer_state"] == {"line": 3}
             assert job.payload_flags == payload_flag
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run(self, subject):
         async def invoke_mock(*args, **kwargs):
             pass
