@@ -53,7 +53,6 @@ typing-extensions = "^4.5.0"
 meltano-cloud = "meltano.cloud.cli:main"
 
 [tool.poetry.group.dev.dependencies]
-aioresponses = "^0.7.4"
 freezegun = "^1.2.2"
 hypothesis = "^6.70.0"
 pytest = "^7.2.2"
