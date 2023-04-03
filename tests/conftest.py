@@ -84,7 +84,10 @@ class MockAdapter(BaseAdapter):
                         default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -102,7 +105,10 @@ class MockAdapter(BaseAdapter):
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -146,8 +152,8 @@ class MockAdapter(BaseAdapter):
             "logo_url": "https://mock.meltano.com/this-returns-500.png",
             "variants": {
                 "original": {
-                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original"
-                }
+                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original",
+                },
             },
         }
 
@@ -187,7 +193,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mount_meltano_hub_mock_adapter(project: Project, discovery):
+def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
     project.hub_service.session.mount(
         project.hub_service.hub_api_url,
         MockAdapter(project.hub_service.hub_api_url, discovery),
@@ -200,10 +206,10 @@ def hub_endpoints(project: Project):
     return adapter._mapping
 
 
-@pytest.fixture
+@pytest.fixture()
 def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
-        project.hub_service.hub_api_url
+        project.hub_service.hub_api_url,
     ).count
     counter.clear()
     return counter

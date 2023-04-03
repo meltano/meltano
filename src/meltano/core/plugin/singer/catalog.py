@@ -44,7 +44,7 @@ class CatalogRule:
             breadcrumb: JSON property breadcrumb.
 
         Returns:
-            A boolean representing whether the stream ID or breadcrumb matches the rules.
+            Whether the stream ID or breadcrumb matches the rules.
         """
         patterns = (
             self.tap_stream_id
@@ -61,7 +61,8 @@ class CatalogRule:
         # If provided, the breadcrumb should still match, even on negated rules
         if breadcrumb is not None:
             result = result and fnmatch.fnmatch(
-                ".".join(breadcrumb), ".".join(self.breadcrumb)
+                ".".join(breadcrumb),
+                ".".join(self.breadcrumb),
             )
 
         return result
@@ -116,7 +117,12 @@ class SelectPattern(t.NamedTuple):
         Example:
 
         >>> SelectPattern.parse("!a.b.c")
-        SelectedPattern(stream_pattern='a', property_pattern='b.c', negated=True, raw='!a.b.c')
+        SelectedPattern(
+            stream_pattern='a',
+            property_pattern='b.c',
+            negated=True,
+            raw='!a.b.c'
+        )
         """
         raw = pattern
 
@@ -166,7 +172,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=[],
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
         if prop_pattern:
@@ -178,7 +184,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=property_breadcrumb(props),
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
     return include_rules + exclude_rules
@@ -196,11 +202,18 @@ def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
     include_rule = MetadataRule(
-        negated=True, tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        negated=True,
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
     # Or if it matches one of the exclusion patterns
     exclude_rule = MetadataRule(
-        tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
 
     for pattern in patterns:
@@ -424,14 +437,17 @@ class MetadataExecutor(CatalogExecutor):
         breadcrumb = node["breadcrumb"]
 
         logging.debug(
-            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323
+            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323, E501
             tap_stream_id,
             breadcrumb,
         )
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
-                node["metadata"], f"{path}.metadata", rule.key, rule.value
+                node["metadata"],
+                f"{path}.metadata",
+                rule.key,
+                rule.value,
             )
 
     def set_metadata(self, node: Node, path: str, key: str, value: t.Any):
@@ -577,19 +593,13 @@ class ListSelectedExecutor(CatalogExecutor):
         except KeyError:
             return SelectionType.EXCLUDED
 
-        inclusion: str = metadata.get("inclusion")
-        selected: bool | None = metadata.get("selected")
-        selected_by_default: bool = metadata.get("selected-by-default", False)
-
-        if inclusion == "automatic":
+        if metadata.get("inclusion") == "automatic":
             return SelectionType.AUTOMATIC
-
-        if selected is True:
+        if metadata.get("selected") is True or (
+            metadata.get("selected") is None
+            and metadata.get("selected-by-default", False)
+        ):
             return SelectionType.SELECTED
-
-        if selected is None and selected_by_default:
-            return SelectionType.SELECTED
-
         return SelectionType.EXCLUDED
 
     def stream_node(self, node: Node, path: str):

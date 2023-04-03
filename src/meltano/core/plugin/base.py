@@ -38,16 +38,15 @@ class VariantNotFoundError(Exception):
         Returns:
             The string representation of the error.
         """
-        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
-            type=self.plugin.type.descriptor.capitalize(),
-            name=self.plugin.name,
-            variant=self.variant_name,
-            variant_labels=self.plugin.variant_labels,
+        return (
+            f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}' "
+            f"variant '{self.variant_name}' is not known to Meltano. "
+            f"Variants: {self.plugin.variant_labels}"
         )
 
 
 class PluginRefNameContainsStateIdDelimiterError(Exception):
-    """Occurs when a name in reference to a plugin contains the state ID component delimiter string."""
+    """A name in reference to a plugin contains the state ID component delimiter."""
 
     def __init__(self, name: str):
         """Create a new exception.
@@ -56,7 +55,8 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
             name: The name of the plugin.
         """
         super().__init__(
-            f"The plugin name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"The plugin name '{name}' cannot contain the state ID component "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
 
@@ -175,7 +175,7 @@ class PluginType(YAMLEnum):  # noqa: WPS214
             if value in {plugin_type.value, plugin_type.singular}:
                 return plugin_type
 
-        raise ValueError(f"{value} is not a valid {cls.__name__}")
+        raise ValueError(f"{value!r} is not a valid {cls.__name__}")
 
     @classmethod
     def plurals(cls) -> list[str]:
@@ -199,7 +199,8 @@ class PluginRef(Canonical):
             kwargs: Additional keyword arguments.
 
         Raises:
-            PluginRefNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
+            PluginRefNameContainsStateIdDelimiterError: If the name contains
+                the state ID component delimiter string.
         """
         if STATE_ID_COMPONENT_DELIMITER in name:
             raise PluginRefNameContainsStateIdDelimiterError(name)
@@ -639,8 +640,11 @@ class BasePlugin(HookObject):  # noqa: WPS214
         # including flattened keys of default nested object items
         existing_settings.extend(
             SettingDefinition.from_missing(
-                existing_settings, defaults, custom=False, default=True
-            )
+                existing_settings,
+                defaults,
+                custom=False,
+                default=True,
+            ),
         )
 
         return existing_settings

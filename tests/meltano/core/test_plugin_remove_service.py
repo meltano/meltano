@@ -12,11 +12,11 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 
 
 class TestPluginRemoveService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return PluginRemoveService(project)
 
-    @pytest.fixture
+    @pytest.fixture()
     def add(self, subject: PluginRemoveService):
         with open(subject.project.meltanofile, "w") as meltano_yml:
             meltano_yml.write(
@@ -26,38 +26,44 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
-                                }
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                },
                             ],
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
-                                }
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                },
                             ],
-                        }
-                    }
-                )
+                        },
+                    },
+                ),
             )
 
-    @pytest.fixture
+    @pytest.fixture()
     def install(self, subject: PluginRemoveService):
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
-            "extractors", "tap-gitlab"
+            "extractors",
+            "tap-gitlab",
         )
         target_csv_installation = subject.project.meltano_dir().joinpath(
-            "loaders", "target-csv"
+            "loaders",
+            "target-csv",
         )
         os.makedirs(tap_gitlab_installation, exist_ok=True)
         os.makedirs(target_csv_installation, exist_ok=True)
 
-    @pytest.fixture
+    @pytest.fixture()
     def lock(self, subject: PluginRemoveService):
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
-            "extractors", "tap-gitlab", "meltanolabs"
+            "extractors",
+            "tap-gitlab",
+            "meltanolabs",
         )
         target_csv_lockfile = subject.project.plugin_lock_path(
-            "loaders", "target-csv", "hotgluexyz"
+            "loaders",
+            "target-csv",
+            "hotgluexyz",
         )
         tap_gitlab_lockfile.touch()
         target_csv_lockfile.touch()
@@ -83,19 +89,18 @@ class TestPluginRemoveService:
                 meltano_yml = yaml.safe_load(meltanofile)
 
                 with pytest.raises(KeyError):
-                    plugin_data = meltano_yml[plugin.type, plugin.name]
-                    assert not plugin_data
+                    meltano_yml[plugin.type, plugin.name]  # noqa: WPS428
 
             # check removed installation
             assert not os.path.exists(
-                subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
+                subject.project.meltano_dir().joinpath(plugin.type, plugin.name),
             )
 
             # check removed lock files
             lock_file_paths = list(
                 subject.project.root_plugins_dir(plugin.type).glob(
-                    f"{plugin.name}*.lock"
-                )
+                    f"{plugin.name}*.lock",
+                ),
             )
             assert all(not path.exists() for path in lock_file_paths)
 
@@ -115,7 +120,7 @@ class TestPluginRemoveService:
         plugins = list(subject.project.plugins.plugins())
 
         with mock.patch(
-            "meltano.core.plugin_location_remove.PluginSettingsService.reset"
+            "meltano.core.plugin_location_remove.PluginSettingsService.reset",
         ) as reset:
             reset.side_effect = OperationalError(
                 "DELETE FROM plugin_settings WHERE plugin_settings.namespace = ?",

@@ -33,7 +33,7 @@ class SnowplowMicro:
             return json.load(response)
 
     def all(self) -> dict[str, int]:
-        """Get a dict counting the number of good/bad events, and the total number of events."""
+        """Get a dict counting the # of good/bad events, and the total # of events."""
         return self.get("all")
 
     def good(self) -> list[dict[str, t.Any]]:
@@ -51,18 +51,20 @@ class SnowplowMicro:
 
 @pytest.fixture(scope="session")
 def snowplow_session(request) -> SnowplowMicro | None:
-    """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance for it.
+    """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance.
 
-    The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to a list containing
-    only the collector endpoint exposed by Snowplow Micro in Docker.
+    The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to
+    a list containing only the collector endpoint exposed by Snowplow Micro in
+    Docker.
 
     Yields:
-        A `SnowplowMicro` instance which will collect events fired within tests, and can be queried
-        to obtain info about the fired events, or `None` if the creation of a `SnowplowMicro`
-        instance failed.
+        A `SnowplowMicro` instance which will collect events fired within
+        tests, and can be queried to obtain info about the fired events, or
+        `None` if the creation of a `SnowplowMicro` instance failed.
     """
     try:
-        # Getting the `docker_services` fixture essentially causes `docker-compose up` to be run
+        # Getting the `docker_services` fixture essentially causes
+        # `docker-compose up` to be run
         request.getfixturevalue("docker_services")
         args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
         proc = subprocess.run(args, capture_output=True, text=True)
@@ -73,9 +75,10 @@ def snowplow_session(request) -> SnowplowMicro | None:
         yield None
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow_optional(
-    snowplow_session: SnowplowMicro | None, monkeypatch
+    snowplow_session: SnowplowMicro | None,
+    monkeypatch,
 ) -> SnowplowMicro | None:
     """Provide a clean `SnowplowMicro` instance.
 
@@ -105,16 +108,16 @@ def snowplow_optional(
             snowplow_session.reset()
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
     `send_anonymous_usage_stats` setting.
 
-    Yields:
+    Returns:
         A freshly reset `SnowplowMicro` instance.
     """
     if snowplow_optional is None:  # pragma: no cover
         pytest.skip("Unable to start Snowplow Micro")
-    yield snowplow_optional
+    return snowplow_optional

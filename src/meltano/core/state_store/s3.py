@@ -42,7 +42,7 @@ def requires_boto3():
         None
     """
     if not boto3:
-        raise MissingBoto3Error()
+        raise MissingBoto3Error
     yield
 
 
@@ -101,7 +101,8 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
             A boto3.Client.
 
         Raises:
-            InvalidStateBackendConfigurationException: when configured AWS settings are invalid.
+            InvalidStateBackendConfigurationException: when configured AWS
+                settings are invalid.
         """
         with requires_boto3():
             if self.aws_secret_access_key and self.aws_access_key_id:
@@ -110,13 +111,13 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
                     aws_secret_access_key=self.aws_secret_access_key,
                 )
                 return session.client("s3", endpoint_url=self.endpoint_url)
-            elif self.aws_secret_access_key and not self.aws_access_key_id:
+            elif self.aws_secret_access_key:
                 raise InvalidStateBackendConfigurationException(
-                    "AWS secret access key configured, but not AWS access key ID."
+                    "AWS secret access key configured, but not AWS access key ID.",
                 )
-            elif self.aws_access_key_id and not self.aws_secret_access_key:
+            elif self.aws_access_key_id:
                 raise InvalidStateBackendConfigurationException(
-                    "AWS access key ID configured, but no AWS secret access key."
+                    "AWS access key ID configured, but no AWS secret access key.",
                 )
             session = boto3.Session()
             return session.client("s3")
@@ -143,13 +144,14 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
             pattern_re = re.compile(pattern.replace("*", ".*"))
         state_ids = set()
         for state_obj in self.client.list_objects_v2(
-            Bucket=self.bucket, Prefix=self.prefix
+            Bucket=self.bucket,
+            Prefix=self.prefix,
         ).get("Contents", []):
             (state_id, filename) = state_obj["Key"].split("/")[-2:]
             if filename == "state.json":
                 if not pattern:
                     state_ids.add(
-                        state_id.replace(self.prefix, "").replace("/state.json", "")
+                        state_id.replace(self.prefix, "").replace("/state.json", ""),
                     )
                 elif pattern_re.match(state_id):
                     state_ids.add(state_id)

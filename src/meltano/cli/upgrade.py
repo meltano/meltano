@@ -44,7 +44,10 @@ def upgrade(ctx, project):
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
 @click.option(
-    "--pip_url", type=str, envvar="MELTANO_UPGRADE_PIP_URL", help="Meltano pip URL."
+    "--pip_url",
+    type=str,
+    envvar="MELTANO_UPGRADE_PIP_URL",
+    help="Meltano pip URL.",
 )
 @click.option(
     "--force",
@@ -105,13 +108,17 @@ def all(ctx, pip_url, force, skip_package):
                 )
         else:
             click.echo(
-                "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
+                "Then, run `meltano upgrade --skip-package` to upgrade your "
+                "project based on the latest version.",
             )
 
 
 @upgrade.command(cls=InstrumentedCmd, short_help="Upgrade the Meltano package only.")
 @click.option(
-    "--pip_url", type=str, envvar="MELTANO_UPGRADE_PIP_URL", help="Meltano pip URL."
+    "--pip_url",
+    type=str,
+    envvar="MELTANO_UPGRADE_PIP_URL",
+    help="Meltano pip URL.",
 )
 @click.option(
     "--force",
@@ -127,7 +134,8 @@ def package(ctx, **kwargs):
 
 
 @upgrade.command(
-    cls=InstrumentedCmd, short_help="Update files managed by file bundles only."
+    cls=InstrumentedCmd,
+    short_help="Update files managed by file bundles only.",
 )
 @click.pass_context
 def files(ctx):
@@ -136,7 +144,8 @@ def files(ctx):
 
 
 @upgrade.command(
-    cls=InstrumentedCmd, short_help="Apply migrations to system database only."
+    cls=InstrumentedCmd,
+    short_help="Apply migrations to system database only.",
 )
 @click.pass_context
 def database(ctx):

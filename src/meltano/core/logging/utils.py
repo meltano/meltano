@@ -33,7 +33,7 @@ LEVELS = {  # noqa: WPS407
     "critical": logging.CRITICAL,
 }
 DEFAULT_LEVEL = "info"
-FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323
+FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
 
 
 def parse_log_level(log_level: dict[str, int]) -> int:
@@ -169,11 +169,12 @@ def setup_logging(  # noqa: WPS210
 
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:
-    """Change the log level for the current root logger, but only on the 'console' handler.
+    """Change the log level for the root logger, but only on the 'console' handler.
 
-    Most useful when you want change the log level on the fly for console output, but want to respect other aspects
-    of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
-    is used, this will not override the log level.
+    Most useful when you want change the log level on the fly for console
+    output, but want to respect other aspects of any potential `logging.yaml`
+    sourced configs. Note that if a `logging.yaml` config without a 'console'
+    handler is used, this will not override the log level.
 
     Args:
         log_level: set log levels to provided level.
@@ -186,20 +187,20 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
 
 
 class SubprocessOutputWriter(Protocol):
-    """SubprocessOutputWriter is a basic interface definition suitable for use with capture_subprocess_output."""
+    """A basic interface suitable for use with `capture_subprocess_output`."""
 
     def writelines(self, lines: str):
-        """Any type with a writelines method accepting a string could be used as an output writer.
+        """Write the provided lines to an output.
 
         Args:
-            lines: string to write
+            lines: String to write
         """
 
 
 async def _write_line_writer(writer, line):
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
-        try:  # noqa: WPS229
+        try:
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):
@@ -212,7 +213,8 @@ async def _write_line_writer(writer, line):
 
 
 async def capture_subprocess_output(
-    reader: asyncio.StreamReader | None, *line_writers: SubprocessOutputWriter
+    reader: asyncio.StreamReader | None,
+    *line_writers: SubprocessOutputWriter,
 ) -> None:
     """Capture in real time the output stream of a suprocess that is run async.
 
@@ -224,8 +226,9 @@ async def capture_subprocess_output(
     for the subprocess to end.
 
     Args:
-        reader: asyncio.StreamReader object that is the output stream of the subprocess.
-        line_writers: any object thats a StreamWriter or has a writelines method accepting a string.
+        reader: `asyncio.StreamReader` object that is the output stream of the
+            subprocess.
+        line_writers: A `StreamWriter`, or object has a compatible writelines method.
     """
     while not reader.at_eof():
         line = await reader.readline()

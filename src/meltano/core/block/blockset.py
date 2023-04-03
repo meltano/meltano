@@ -1,4 +1,5 @@
-"""This holds the actual BlockSet meta class as well as related components such as exceptions."""
+"""`BlockSet` metaclass and related components."""
+
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -18,10 +19,12 @@ class BlockSetValidationError(Exception):
 
 
 class BlockSet(metaclass=ABCMeta):
-    """Currently the only complex block set is our ExtractLoadBlocks type.
+    """Currently the only complex block set is our `ExtractLoadBlocks` type.
 
-    Theoretically, this is the bare minimum that we need to run and terminate (i.e. early abort) a block set. So anything
-    implementing a run(), terminate(), and validate_set() method currently satisfies the BlockSet interface.
+    Theoretically, this is the bare minimum that we need to run and terminate
+    (i.e. early abort) a block set. So anything implementing a `run`,
+    `terminate`, and `validate_set` method currently satisfies the `BlockSet`
+    interface.
     """
 
     @abstractmethod

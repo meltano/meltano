@@ -58,10 +58,14 @@ collections:
     output: true
     name: "Reference"
     weight: 5
+  cloud:
+    output: true
+    name: "Cloud"
+    weight: 6
   contribute:
     output: true
     name: "Contribute"
-    weight: 6
+    weight: 7
   posts:
     output: false
 
@@ -87,7 +91,7 @@ algolia:
 
 # Set display to true/false to toggle announcements on/off
 announcement:
-  display: true
+  display: false
   text: For every star on GitHub, we'll donate $2 to clean up our waterways.
   cta: Star us now!
   cta-link: https://github.com/meltano/meltano/

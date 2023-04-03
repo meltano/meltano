@@ -28,12 +28,13 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
-    @pytest.fixture
+    @pytest.fixture()
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
         project = project_init_service.init(  # noqa: DAR301
-            activate=False, add_discovery=True
+            activate=False,
+            add_discovery=True,
         )
         Project._default = None
         try:
@@ -42,11 +43,11 @@ class TestCli:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture
+    @pytest.fixture()
     def deactivate_project(self):
         Project.deactivate()
 
-    @pytest.fixture
+    @pytest.fixture()
     def empty_project(self, empty_meltano_yml_dir, pushd):
         project = Project(empty_meltano_yml_dir)
         try:
@@ -73,7 +74,11 @@ class TestCli:
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
-        self, test_cli_project, cli_runner, pushd, monkeypatch
+        self,
+        test_cli_project,
+        cli_runner,
+        pushd,
+        monkeypatch,
     ):
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
         assert Project._default is None
@@ -83,7 +88,10 @@ class TestCli:
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_dotenv(
-        self, test_cli_project, cli_runner, pushd
+        self,
+        test_cli_project,
+        cli_runner,
+        pushd,
     ):
         test_cli_project.settings.set("project_readonly", True)
         assert Project._default is None
@@ -134,7 +142,11 @@ class TestCli:
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
 
     def test_default_environment_is_activated(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -144,7 +156,11 @@ class TestCli:
         assert Project._default.environment.name == "test-meltano-environment"
 
     def test_environment_flag_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -155,7 +171,12 @@ class TestCli:
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     def test_environment_variable_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd, monkeypatch
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
+        monkeypatch,
     ):
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
         pushd(project_files_cli.root)
@@ -166,7 +187,11 @@ class TestCli:
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     def test_lower_null_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -176,7 +201,11 @@ class TestCli:
         assert Project._default.environment is None
 
     def test_upper_null_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -186,7 +215,11 @@ class TestCli:
         assert Project._default.environment is None
 
     def test_no_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -196,7 +229,11 @@ class TestCli:
         assert Project._default.environment is None
 
     def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        deactivate_project,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -218,7 +255,7 @@ class TestCli:
 
         with cd(project.root_dir()):
             assert_cli_runner(
-                cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon"))
+                cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon")),
             )
             assert Path().resolve() == tmp_path
 
@@ -227,14 +264,16 @@ class TestCli:
             filepath.touch()
             with pytest.raises(click.BadParameter, match="is a file"):
                 raise cli_runner.invoke(
-                    cli, ("--cwd", str(filepath), "dragon")
+                    cli,
+                    ("--cwd", str(filepath), "dragon"),
                 ).exception.__context__
 
         with cd(project.root_dir()):
             dirpath = tmp_path / "subdir"
             with pytest.raises(click.BadParameter, match="does not exist"):
                 raise cli_runner.invoke(
-                    cli, ("--cwd", str(dirpath), "dragon")
+                    cli,
+                    ("--cwd", str(dirpath), "dragon"),
                 ).exception.__context__
 
         with cd(project.root_dir()):
@@ -313,8 +352,8 @@ class TestCliColors:
     TEST_TEXT = "This is a test"
 
     @pytest.mark.parametrize(
-        "env,log_config,cli_colors_expected,log_colors_expected",
-        [
+        ("env", "log_config", "cli_colors_expected", "log_colors_expected"),
+        (
             pytest.param(
                 {},
                 None,
@@ -392,7 +431,7 @@ class TestCliColors:
                 True,
                 id="colors-not-disabled-by-invalid-no-color-env",
             ),
-        ],
+        ),
     )
     def test_no_color(
         self,
@@ -434,7 +473,8 @@ class TestLargeConfigProject:
         start = perf_counter_ns()
         assert (
             cli_runner.invoke(
-                cli, ["--no-environment", "config", "target-with-large-config", "list"]
+                cli,
+                ["--no-environment", "config", "target-with-large-config", "list"],
             ).exit_code
             == 0
         )

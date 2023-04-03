@@ -29,7 +29,10 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 @pytest.mark.order(0)
 def test_create(session):
     setting = Setting(
-        name="api_key.test.test", namespace="gitlab", value="C4F3C4F3", enabled=True
+        name="api_key.test.test",
+        namespace="gitlab",
+        value="C4F3C4F3",
+        enabled=True,
     )
 
     session.add(setting)
@@ -63,12 +66,12 @@ def custom_tap(project_add_service):
         return err.plugin
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
-@pytest.fixture
+@pytest.fixture()
 def environment(project: Project) -> Environment:
     project.activate_environment("dev")
     try:
@@ -106,7 +109,10 @@ class TestPluginSettingsService:
 
         # overriden by an Setting db value when set
         subject.set(
-            "test", "THIS_IS_FROM_DB", store=SettingValueStore.DB, session=session
+            "test",
+            "THIS_IS_FROM_DB",
+            store=SettingValueStore.DB,
+            session=session,
         )
 
         assert subject.get_with_source("test", session=session) == (
@@ -117,7 +123,10 @@ class TestPluginSettingsService:
         # overriden via the `meltano.yml` configuration
         test_value = 42
         subject.set(
-            "test", test_value, store=SettingValueStore.MELTANO_YML, session=session
+            "test",
+            test_value,
+            store=SettingValueStore.MELTANO_YML,
+            session=session,
         )
 
         assert subject.get_with_source("test", session=session) == (
@@ -267,7 +276,11 @@ class TestPluginSettingsService:
         assert "auth.password" not in config
 
     def test_as_dict_custom(
-        self, session, project, custom_tap, plugin_settings_service_factory
+        self,
+        session,
+        project,
+        custom_tap,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(custom_tap)
         assert subject.as_dict(extras=False, session=session) == custom_tap.config
@@ -311,7 +324,12 @@ class TestPluginSettingsService:
         assert config["MELTANO_EXTRACT_BOOLEAN"] == "true"
 
     def test_as_env_custom(
-        self, project, session, custom_tap, env_var, plugin_settings_service_factory
+        self,
+        project,
+        session,
+        custom_tap,
+        env_var,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(custom_tap)
         config = subject.as_env(session=session)
@@ -320,7 +338,12 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(4)
     def test_namespace_as_env_prefix(
-        self, project, session, target, env_var, plugin_settings_service_factory
+        self,
+        project,
+        session,
+        target,
+        env_var,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(target)
 
@@ -356,13 +379,18 @@ class TestPluginSettingsService:
         )  # Generic prefix, read-only
 
     def test_setting_env_vars(
-        self, tap, inherited_tap, alternative_target, plugin_settings_service_factory
+        self,
+        tap,
+        inherited_tap,
+        alternative_target,
+        plugin_settings_service_factory,
     ):
         def env_vars(service, setting_name, **kwargs):
             return [
                 setting.definition
                 for setting in service.setting_env_vars(
-                    service.find_setting(setting_name), **kwargs
+                    service.find_setting(setting_name),
+                    **kwargs,
                 )
             ]
 
@@ -382,13 +410,13 @@ class TestPluginSettingsService:
         service = plugin_settings_service_factory(alternative_target)
         # For reading setting values from environment
         assert env_vars(service, "schema") == [
-            "TARGET_MOCK_ALTERNATIVE_SCHEMA"  # Name and namespace prefix
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
         ]
         # For writing values into the execution environment
         assert env_vars(service, "schema", for_writing=True) == [
             "MOCKED_SCHEMA",  # Custom `env`
             "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
-            "TARGET_MOCK_SCHEMA",  # Parent name  prefix
+            "TARGET_MOCK_SCHEMA",  # Parent name prefix
             "MOCK_SCHEMA",  # Parent namespace prefix
             "MELTANO_LOAD_SCHEMA",  # Generic prefix
         ]
@@ -397,7 +425,7 @@ class TestPluginSettingsService:
         service = plugin_settings_service_factory(inherited_tap)
         # For reading setting values from environment
         assert env_vars(service, "boolean") == [
-            "TAP_MOCK_INHERITED_BOOLEAN"  # Name and namespace prefix
+            "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
         ]
         # For writing values into the execution environment
         assert env_vars(service, "boolean", for_writing=True) == [
@@ -507,11 +535,17 @@ class TestPluginSettingsService:
         assert not project.dotenv.exists()
 
     def test_env_var_expansion(
-        self, session, subject, project, tap, monkeypatch, env_var
+        self,
+        session,
+        subject,
+        project,
+        tap,
+        monkeypatch,
+        env_var,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
@@ -668,7 +702,11 @@ class TestPluginSettingsService:
         assert subject.get("start_date") == now.isoformat()
 
     def test_kind_object(
-        self, subject: PluginSettingsService, tap, monkeypatch, env_var
+        self,
+        subject: PluginSettingsService,
+        tap,
+        monkeypatch,
+        env_var,
     ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
@@ -758,7 +796,9 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin.parent._variant.extras, "select", ["from_default"]
+            subject.plugin.parent._variant.extras,
+            "select",
+            ["from_default"],
         )
         subject._setting_defs = None
 
@@ -768,7 +808,9 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin.config, "_select", ["from_meltano_yml_config"]
+            subject.plugin.config,
+            "_select",
+            ["from_meltano_yml_config"],
         )
 
         assert subject.get_with_source("_select") == (
@@ -815,7 +857,8 @@ class TestPluginSettingsService:
     ):
         try:
             transform = project_add_service.add(
-                PluginType.TRANSFORMS, "tap-mock-transform"
+                PluginType.TRANSFORMS,
+                "tap-mock-transform",
             )
         except PluginAlreadyAddedException as err:
             transform = err.plugin
@@ -904,7 +947,10 @@ class TestPluginSettingsService:
         )
 
     def test_find_setting_raises_with_conflicting(
-        self, tap, plugin_settings_service_factory, monkeypatch
+        self,
+        tap,
+        plugin_settings_service_factory,
+        monkeypatch,
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -913,7 +959,10 @@ class TestPluginSettingsService:
             subject.get("aliased")
 
     def test_find_setting_raises_with_multiple(
-        self, tap, plugin_settings_service_factory, monkeypatch
+        self,
+        tap,
+        plugin_settings_service_factory,
+        monkeypatch,
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -929,7 +978,8 @@ class TestPluginSettingsService:
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_on_raises_error(self, subject):
         subject.project_settings_service.set(
-            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            True,
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
@@ -938,7 +988,8 @@ class TestPluginSettingsService:
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
         subject.project_settings_service.set(
-            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            False,
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None

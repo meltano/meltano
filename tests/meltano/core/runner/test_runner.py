@@ -47,12 +47,12 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
-    @pytest.fixture
+    @pytest.fixture()
     def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
@@ -88,7 +88,7 @@ class TestSingerRunner:
     def target_process(self, process_mock_factory, target):
         return process_mock_factory(target)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_prepare_job(
         self,
         session,
@@ -103,18 +103,18 @@ class TestSingerRunner:
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
         async with tap_invoker.prepared(session):
-            for name in tap.config_files.keys():
+            for name in tap.config_files:
                 assert tap_invoker.files[name].exists()
 
         assert not tap_invoker.files["config"].exists()
 
         async with target_invoker.prepared(session):
-            for name in target.config_files.keys():
+            for name in target.config_files:
                 assert target_invoker.files[name].exists()
 
         assert not target_invoker.files["config"].exists()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_invoke(
         self,
         session,
@@ -130,11 +130,13 @@ class TestSingerRunner:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
         async with tap_invoker.prepared(  # noqa: WPS316
-            session
+            session,
         ), target_invoker.prepared(session):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
-                PluginInvoker, "invoke_async", new=invoke_async
+                PluginInvoker,
+                "invoke_async",
+                new=invoke_async,
             ) as invoke_async:
                 # async method
                 await subject.invoke(tap_invoker, target_invoker, session)
@@ -146,15 +148,15 @@ class TestSingerRunner:
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     @pytest.mark.parametrize(
-        "full_refresh,select_filter,payload_flag",
-        [
+        ("full_refresh", "select_filter", "payload_flag"),
+        (
             (False, [], Payload.STATE),
             (True, [], Payload.STATE),
             (False, ["entity"], Payload.STATE),
             (True, ["entity"], Payload.INCOMPLETE_STATE),
-        ],
+        ),
     )
     async def test_bookmark(
         self,
@@ -181,18 +183,24 @@ class TestSingerRunner:
         subject.context.select_filter = select_filter
 
         target_invoker = plugin_invoker_factory(
-            target, config_dir=target_config_dir, context=elt_context
+            target,
+            config_dir=target_config_dir,
+            context=elt_context,
         )
 
         async with subject.context.job.run(session):
             with mock.patch.object(
-                session, "add", side_effect=session.add
+                session,
+                "add",
+                side_effect=session.add,
             ) as add_mock, mock.patch.object(
-                session, "commit", side_effect=session.commit
+                session,
+                "commit",
+                side_effect=session.commit,
             ) as commit_mock:
                 target.setup_bookmark_writer(target_invoker)
                 bookmark_writer = target_invoker.output_handlers.get(
-                    target_invoker.StdioSource.STDOUT
+                    target_invoker.StdioSource.STDOUT,
                 )
                 await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 
@@ -204,13 +212,15 @@ class TestSingerRunner:
             assert job.payload["singer_state"] == {"line": 3}
             assert job.payload_flags == payload_flag
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run(self, subject):
         async def invoke_mock(*args, **kwargs):
             pass
 
         with mock.patch.object(
-            SingerRunner, "invoke", side_effect=invoke_mock
+            SingerRunner,
+            "invoke",
+            side_effect=invoke_mock,
         ) as invoke:
             subject.context.dry_run = True
             await subject.run()

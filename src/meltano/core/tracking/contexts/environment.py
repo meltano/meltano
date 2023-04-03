@@ -39,9 +39,13 @@ def _get_parent_context_uuid_str() -> str | None:
             return str(uuid.UUID(uuid_str))
         except ValueError:
             warn(
-                f"Invalid telemetry parent environment context UUID {uuid_str!r} "
-                "from $MELTANO_PARENT_CONTEXT_UUID - Meltano will continue as if "
-                "$MELTANO_PARENT_CONTEXT_UUID had not been set"
+                (
+                    f"Invalid telemetry parent environment context UUID "
+                    f"{uuid_str!r} from $MELTANO_PARENT_CONTEXT_UUID - "
+                    "Meltano will continue as if $MELTANO_PARENT_CONTEXT_UUID "
+                    "had not been set"
+                ),
+                stacklevel=2,
             )
     return None
 
@@ -49,8 +53,26 @@ def _get_parent_context_uuid_str() -> str | None:
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
-    ci_markers = {"GITHUB_ACTIONS", "CI"}
-    notable_flag_env_vars = {"CODESPACES", *ci_markers}
+    ci_markers = {
+        "GITHUB_ACTIONS",
+        "CI",
+    }
+    notable_flag_env_vars = {
+        "CODESPACES",
+        *ci_markers,
+    }
+    notable_hashed_env_vars = {
+        "CODESPACE_NAME",
+        "GITHUB_REPOSITORY",
+        "GITHUB_USER",
+    }
+
+    @classmethod
+    def _notable_hashed_env_vars(cls) -> t.Iterable[str]:
+        for env_var_name in cls.notable_hashed_env_vars:
+            with suppress(KeyError):  # Skip unset env vars
+                env_var_value = os.environ[env_var_name]
+                yield env_var_name, hash_sha256(env_var_value)
 
     @classmethod
     def _notable_flag_env_vars(cls) -> t.Iterable[str]:
@@ -75,6 +97,7 @@ class EnvironmentContext(SelfDescribingJson):
                     get_boolean_env_var(marker) for marker in self.ci_markers
                 ),
                 "notable_flag_env_vars": dict(self._notable_flag_env_vars()),
+                "notable_hashed_env_vars": dict(self._notable_hashed_env_vars()),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
                 **self.system_info,

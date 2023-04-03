@@ -35,7 +35,8 @@ def test_nest():
     assert subject["a"]["b"]["c"] is two_deep
     assert isinstance(arr, list)
     # make sure it is a copy
-    assert val == start_value and val is not start_value
+    assert val == start_value
+    assert val is not start_value
 
     new_b = nest(subject, "a.b", "not_a_dict", force=True)
     assert new_b == "not_a_dict"
@@ -44,12 +45,12 @@ def test_nest():
     # make sure existing values aren't cleared when `value=None` and `force=True`
     _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)  # noqa: WPS122
     assert subject == {
-        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}}
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
     }
     similar_b = nest(subject, "a.b", force=True)
     assert similar_b == OrderedDict({"d": "d_value"})
     assert subject == {
-        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}}
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
     }
 
 
@@ -127,7 +128,9 @@ def test_expand_env_vars():
     )
     assert (
         expand_env_vars(
-            "prefix-${ENV_VAR}-suffix", {}, if_missing=EnvVarMissingBehavior.ignore
+            "prefix-${ENV_VAR}-suffix",
+            {},
+            if_missing=EnvVarMissingBehavior.ignore,
         )
         == "prefix-${ENV_VAR}-suffix"
     )

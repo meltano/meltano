@@ -91,7 +91,7 @@ class Project(Versioned):  # noqa: WPS214
         self.environment: Environment | None = environment
         self.readonly = readonly
         self.sys_dir_root = Path(
-            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano")
+            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
     def refresh(self, **kwargs) -> None:
@@ -212,12 +212,12 @@ class Project(Versioned):  # noqa: WPS214
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "
-                            f"present in {str(Path(sys.executable).parent)}"
+                            f"present in {str(Path(sys.executable).parent)}",
                         )
                 else:
                     logger.warning(
                         "Failed to create symlink to 'meltano.exe': "
-                        "administrator privilege required"
+                        "administrator privilege required",
                     )
             else:
                 executable = Path(sys.executable).parent / "meltano"
@@ -228,7 +228,8 @@ class Project(Versioned):  # noqa: WPS214
         except OSError as error:
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
-                    f"Could not create symlink: {error}\nPlease make sure that the underlying filesystem supports symlinks."
+                    f"Could not create symlink: {error}\nPlease make sure "
+                    "that the underlying filesystem supports symlinks.",
                 )
             else:
                 raise
@@ -258,17 +259,19 @@ class Project(Versioned):  # noqa: WPS214
         """Find a Project.
 
         Args:
-            project_root: The path to the root directory of the project. If not supplied,
-                infer from PROJECT_ROOT_ENV or the current working directory and it's parents.
-            activate: Save the found project so that future calls to `find` will
-                continue to use this project.
+            project_root: The path to the root directory of the project. If not
+                supplied, infer from PROJECT_ROOT_ENV or the current working
+                directory and it's parents.
+            activate: Save the found project so that future calls to `find`
+                will continue to use this project.
 
         Returns:
             the found project
 
         Raises:
-            ProjectNotFound: if the provided `project_root` is not a Meltano project, or
-                the current working directory is not a Meltano project or a subfolder of one.
+            ProjectNotFound: if the provided `project_root` is not a Meltano
+                project, or the current working directory is not a Meltano
+                project or a subfolder of one.
         """
         if cls._default:
             return cls._default
@@ -312,7 +315,7 @@ class Project(Versioned):  # noqa: WPS214
 
         conf: dict[str, t.Any] = yaml.load(self.meltanofile)
         if conf is None:
-            raise EmptyMeltanoFileException()
+            raise EmptyMeltanoFileException
 
         lock = (
             self._meltano_rw_lock.write_lock
@@ -515,7 +518,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.run_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            sanitize_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs
@@ -531,7 +537,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to `elt` dir optionally joined to given paths.
         """
         return self.logs_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
+            "elt",
+            sanitize_filename(state_id),
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs
@@ -547,7 +556,10 @@ class Project(Versioned):  # noqa: WPS214
             Resolved path to plugin installation dir optionally joined to given paths.
         """
         return self.meltano_dir(
-            plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
+            plugin.type,
+            plugin.name,
+            *joinpaths,
+            make_dirs=make_dirs,
         )
 
     @makedirs

@@ -76,22 +76,17 @@ repos:
           - "eslint-plugin-vue@9.8.0"
           - "prettier@2.8.1"
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.259
+    hooks:
+    - id: ruff
+      args: [--fix, --exit-non-zero-on-fix]
+
   - repo: https://github.com/psf/black
     rev: 23.1.0
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)
-
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py3-plus", "--py37-plus", "--keep-mock"]
 
   - repo: https://github.com/flakeheaven/flakeheaven
     rev: 3.2.1
@@ -110,7 +105,6 @@ repos:
           - flake8-debugger==4.1.2
           - flake8-docstrings==1.6.0
           - flake8-eradicate==1.4.0
-          - flake8-isort==4.2.0
           - flake8-polyfill==1.0.2
           - flake8-quotes==3.3.1
           - flake8-rst-docstrings==0.2.7

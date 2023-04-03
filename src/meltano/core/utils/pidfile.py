@@ -41,8 +41,8 @@ class PIDFile:
 
         try:
             return psutil.Process(self.pid)
-        except psutil.NoSuchProcess:
-            raise UnknownProcessError(self)
+        except psutil.NoSuchProcess as ex:
+            raise UnknownProcessError(self) from ex
 
     def unlink(self):
         return self.path.unlink()
@@ -52,7 +52,7 @@ class PIDFile:
 
 
 class UnknownProcessError(Exception):
-    """Occurs when the PIDFile doesn't yield a readable PID."""
+    """The PIDFile doesn't yield a readable PID."""
 
     def __init__(self, pid_file: PIDFile):
         self.pid_file = pid_file

@@ -1,4 +1,5 @@
 """State management in CLI."""
+
 from __future__ import annotations
 
 import json
@@ -28,7 +29,7 @@ logger = structlog.getLogger(__name__)
 
 
 class MutuallyExclusiveOptionsError(Exception):
-    """Occurs when mutually exclusive options are provided incorrectly."""
+    """Mutually exclusive options are provided incorrectly."""
 
     def __init__(self, *options: str) -> None:
         """Instantiate the error.
@@ -49,7 +50,9 @@ def _prompt_for_confirmation(prompt):
 
     def wrapper(func):
         fun = click.option(
-            "--force", is_flag=True, help="Don't prompt for confirmation."
+            "--force",
+            is_flag=True,
+            help="Don't prompt for confirmation.",
         )(func)
 
         @wraps(func)
@@ -65,14 +68,15 @@ def _prompt_for_confirmation(prompt):
 
 
 prompt_for_confirmation = partial(
-    _prompt_for_confirmation, prompt="This is a destructive command. Continue?"
+    _prompt_for_confirmation,
+    prompt="This is a destructive command. Continue?",
 )
 
 
 def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
     state_id_re = re.compile(
-        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$"
+        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$",
     )
     match = state_id_re.match(state_id)
     if match:
@@ -84,13 +88,13 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             if not project.environment:
                 logger.warn(
                     "Running state operation for environment "
-                    f"'{match['env']}' outside of an environment"
+                    f"'{match['env']}' outside of an environment",
                 )
 
             elif project.environment.name != match["env"]:
                 logger.warn(
                     f"Environment '{match['env']}' used in state operation does "
-                    f"not match current environment '{project.environment.name}'."
+                    f"not match current environment '{project.environment.name}'.",
                 )
 
             project.activate_environment(match["env"])
@@ -150,7 +154,7 @@ def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
 
 @meltano_state.command(cls=InstrumentedCmd, name="copy")
 @prompt_for_confirmation(
-    prompt="This will overwrite state for the destination. Continue?"
+    prompt="This will overwrite state for the destination. Continue?",
 )
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
@@ -163,7 +167,7 @@ def copy_state(
     dst_state_id: str,
     force: bool,
 ):
-    """Copy state to another job id."""
+    """Copy state to another job ID."""
     # Retrieve state for copying
     state_service: StateService = (
         state_service_from_state_id(project, src_state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -172,13 +176,16 @@ def copy_state(
     state_service.copy_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {dst_state_id} was successfully copied from {src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {dst_state_id} was successfully copied from "
+        f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="move")
 @prompt_for_confirmation(
-    prompt="This will clear the source state and overwrite destination state. Continue?"
+    prompt=(
+        "This will clear the source state and overwrite destination state. Continue?"
+    ),
 )
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
@@ -191,7 +198,7 @@ def move_state(
     dst_state_id: str,
     force: bool,
 ):
-    """Move state to another job id, clearing the original."""
+    """Move state to another job ID, clearing the original."""
     # Retrieve state for moveing
     state_service: StateService = (
         state_service_from_state_id(project, dst_state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -200,7 +207,8 @@ def move_state(
     state_service.move_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {src_state_id} was successfully moved to {dst_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {src_state_id} was successfully moved to {dst_state_id} "
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
@@ -241,20 +249,23 @@ def merge_state(
     elif input_file:
         with open(input_file) as state_f:
             state_service.add_state(
-                state_id, state_f.read(), payload_flags=Payload.INCOMPLETE_STATE
+                state_id,
+                state_f.read(),
+                payload_flags=Payload.INCOMPLETE_STATE,
             )
     elif state:
         state_service.add_state(state_id, state, payload_flags=Payload.INCOMPLETE_STATE)
     elif from_state_id:
         state_service.merge_state(from_state_id, state_id)
     logger.info(
-        f"State for {state_id} was successfully merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {state_id} was successfully "
+        f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="set")
 @prompt_for_confirmation(
-    prompt="This will overwrite the state's current value. Continue?"
+    prompt="This will overwrite the state's current value. Continue?",
 )
 @click.option(
     "--input-file",
@@ -289,7 +300,8 @@ def set_state(
     elif state:
         state_service.set_state(state_id, state)
     logger.info(
-        f"State for {state_id} was successfully set at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"State for {state_id} was successfully set "
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 

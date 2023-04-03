@@ -22,7 +22,7 @@ logger = structlog.getLogger(__name__)
 
 
 class InvalidJobStateError(Exception):
-    """Occurs when invalid job state is parsed."""
+    """Invalid job state is parsed."""
 
 
 class StateService:  # noqa: WPS214
@@ -71,7 +71,10 @@ class StateService:  # noqa: WPS214
         if isinstance(job, str):
             now = datetime.datetime.utcnow()
             return Job(
-                job_name=job, state=State.STATE_EDIT, started_at=now, ended_at=now
+                job_name=job,
+                state=State.STATE_EDIT,
+                started_at=now,
+                ended_at=now,
             )
         elif isinstance(job, Job):
             return job
@@ -86,7 +89,8 @@ class StateService:  # noqa: WPS214
         """
         if not self._state_store_manager:
             self._state_store_manager = state_store_manager_from_project_settings(
-                self.project.settings, self.session
+                self.project.settings,
+                self.session,
             )
         return self._state_store_manager
 
@@ -102,7 +106,7 @@ class StateService:  # noqa: WPS214
         """
         if SINGER_STATE_KEY not in state:
             raise InvalidJobStateError(
-                f"{SINGER_STATE_KEY} not found in top level of provided state"
+                f"{SINGER_STATE_KEY} not found in top level of provided state",
             )
 
     def add_state(
@@ -115,7 +119,8 @@ class StateService:  # noqa: WPS214
         """Add state for the given Job.
 
         Args:
-            job: either an existing Job or a state_id that future runs may look up state for.
+            job: either an existing Job or a state_id that future runs may look
+                up state for.
             new_state: the state to add for the given job.
             payload_flags: the payload_flags to set for the job
             validate: whether to validate the supplied state
@@ -128,7 +133,7 @@ class StateService:  # noqa: WPS214
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",
         )
         partial_state = (
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
@@ -161,7 +166,7 @@ class StateService:  # noqa: WPS214
         Args:
             state_id: the state_id to set state for
             new_state: the state to update to
-            validate: whether or not to validate the supplied state.
+            validate: Whether to validate the supplied state.
         """
         self.add_state(
             state_id,
@@ -175,7 +180,7 @@ class StateService:  # noqa: WPS214
 
         Args:
             state_id: the state_id to clear state for
-            save: whether or not to immediately save the state
+            save: Whether to immediately save the state
         """
         self.state_store_manager.clear(state_id)
 

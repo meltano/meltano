@@ -38,12 +38,9 @@ class CyclicInheritanceError(Exception):
             A formatted error message string.
         """
         return (
-            "{type} '{name}' cannot inherit from '{ancestor}', "
-            "which itself inherits from '{name}'"
-        ).format(
-            type=self.plugin.type.descriptor.capitalize(),
-            name=self.plugin.name,
-            ancestor=self.ancestor.name,
+            f"{self.plugin.type.descriptor.capitalize()} '{self.plugin.name}' "
+            f"cannot inherit from '{self.ancestor.name}', which itself "
+            f"inherits from '{self.plugin.name}'"
         )
 
 
@@ -98,13 +95,15 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             inherit_from if inherit_from and inherit_from != name else None
         )
 
-        # If a custom definition is provided, its properties will come before all others in meltano.yml
+        # If a custom definition is provided, its properties will come before
+        # all others in meltano.yml
         self.custom_definition = None
         self._flattened.add("custom_definition")
 
         self._parent = None
         if not self.inherit_from and namespace:
-            # When not explicitly inheriting, a namespace indicates an embedded custom plugin definition
+            # When not explicitly inheriting, a namespace indicates an
+            # embedded custom plugin definition
             self.custom_definition = PluginDefinition(
                 plugin_type,
                 name,
@@ -125,7 +124,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             extras = self.custom_definition.extras
             self.custom_definition.extras = {}
 
-            # Typically, the parent is set from ProjectPluginsService.current_plugins,
+            # Typically, the parent is set from `ProjectPluginsService.current_plugins`,
             # where we have access to the discoverable plugin definitions coming from
             # PluginDiscoveryService, but here we can set the parent directly.
             self.parent = base_plugin_factory(self.custom_definition, variant)
@@ -152,15 +151,15 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 "executable",
                 "capabilities",
                 "settings_group_validation",
-            ]
+            ],
         )
 
         # If no variant is set, we fall back on the default
         self._defaults[self.VARIANT_ATTR] = lambda _: default_variant
 
         if self.inherit_from:
-            # When explicitly inheriting from a project plugin or discoverable definition,
-            # derive default values from our own name
+            # When explicitly inheriting from a project plugin or discoverable
+            # definition, derive default values from our own name
             self._defaults["namespace"] = lambda plugin: plugin.name.replace("-", "_")
             self._defaults["label"] = lambda plugin: (
                 f"{plugin.parent.label}: {plugin.name}"
@@ -168,9 +167,10 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 else plugin.name
             )
         else:
-            # When shadowing a discoverable definition with the same name (no `inherit_from`),
-            # or an embedded custom definition (with `namespace`), fall back on parent's
-            # values derived from its name instead
+            # When shadowing a discoverable definition with the same name (no
+            # `inherit_from`), or an embedded custom definition (with
+            # `namespace`), fall back on parent's values derived from its name
+            # instead
             self._fallbacks.update(["namespace", "label"])
 
         self.config = copy.deepcopy(config or {})
@@ -179,7 +179,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         if "profiles" in extras:
             logger.warning(
                 "Plugin configuration profiles are no longer supported, ignoring "
-                f"`profiles` in '{name}' {plugin_type.descriptor} definition."
+                f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
             )
 
     @property
@@ -236,7 +236,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """Return all commands for this plugin.
 
         Returns:
-            Dictionary of supported commands, including those inherited from the parent plugin.
+            Dictionary of supported commands, including those inherited from
+            the parent plugin.
         """
         return {**self._parent.all_commands, **self.commands}
 
@@ -245,7 +246,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """Return the test commands for this plugin.
 
         Returns:
-            Dictionary of supported test commands, including those inherited from the parent plugin.
+            Dictionary of supported test commands, including those inherited
+            from the parent plugin.
         """
         return {
             name: command
@@ -373,7 +375,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """Return the venv name this plugin should use.
 
         Returns:
-            The name of this plugins parent if both pip urls are the same, else this plugins name.
+            The name of this plugins parent if both pip urls are the same, else
+            this plugins name.
         """
         if not self.inherit_from:
             return self.name
@@ -410,7 +413,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """Return all requires for this plugin.
 
         Returns:
-            List of supported requires, including those inherited from the parent plugin.
+            List of supported requires, including those inherited from the
+            parent plugin.
         """
         return self.get_requirements(plugin_types=None)
 

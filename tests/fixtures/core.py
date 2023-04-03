@@ -106,7 +106,7 @@ def discovery():  # noqa: WPS213
                     "pip_url": "singer-tap-mock",
                 },
             ],
-        }
+        },
     )
 
     discovery[PluginType.EXTRACTORS].append(
@@ -125,7 +125,7 @@ def discovery():  # noqa: WPS213
                     ],
                 },
             ],
-        }
+        },
     )
     discovery[PluginType.LOADERS].append(
         {
@@ -136,9 +136,9 @@ def discovery():  # noqa: WPS213
                 {
                     "name": "schema",
                     "env": "MOCKED_SCHEMA",
-                }
+                },
             ],
-        }
+        },
     )
 
     discovery[PluginType.TRANSFORMS].append(
@@ -147,7 +147,7 @@ def discovery():  # noqa: WPS213
             "namespace": "tap_mock",
             "pip_url": "tap-mock-transform",
             "package_name": "dbt_mock",
-        }
+        },
     )
 
     discovery[PluginType.ORCHESTRATORS].append(
@@ -155,7 +155,7 @@ def discovery():  # noqa: WPS213
             "name": "orchestrator-mock",
             "namespace": "pytest",
             "pip_url": "orchestrator-mock",
-        }
+        },
     )
 
     discovery[PluginType.TRANSFORMERS].append(
@@ -171,7 +171,7 @@ def discovery():  # noqa: WPS213
                     },
                 ],
             },
-        }
+        },
     )
 
     discovery[PluginType.UTILITIES].append(
@@ -200,7 +200,7 @@ def discovery():  # noqa: WPS213
                     },
                 },
             },
-        }
+        },
     )
 
     discovery[PluginType.MAPPERS].append(
@@ -221,7 +221,7 @@ def discovery():  # noqa: WPS213
                     "package_name": "mapper-mock-alt",
                 },
             ],
-        }
+        },
     )
 
     return discovery
@@ -277,7 +277,9 @@ def plugin_invoker_factory(project, plugin_settings_service_factory):
 def tap(project_add_service):
     try:
         return project_add_service.add(
-            PluginType.EXTRACTORS, "tap-mock", variant="meltano"
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            variant="meltano",
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
@@ -338,7 +340,9 @@ def alternative_target(project_add_service):
     # have a BasePlugin parent, not the `target` ProjectPlugin
     try:
         return project_add_service.add(
-            PluginType.LOADERS, "target-mock-alternative", inherit_from="target-mock"
+            PluginType.LOADERS,
+            "target-mock-alternative",
+            inherit_from="target-mock",
         )
     except PluginAlreadyAddedException as err:
         return err.plugin
@@ -406,7 +410,7 @@ def job_schedule(project, tap, target, schedule_service):
         return err.schedule
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def environment_service(project):
     service = EnvironmentService(project)
     try:
@@ -450,16 +454,16 @@ def project_directory(project_init_service):
 
 @pytest.fixture(scope="class")
 def project(project_init_service, tmp_path_factory: pytest.TempPathFactory):
-    with cd(tmp_path_factory.mktemp("meltano-project-dir")):
-        with project_directory(project_init_service) as project:
-            yield project
+    with cd(tmp_path_factory.mktemp("meltano-project-dir")), project_directory(
+        project_init_service,
+    ) as project:
+        yield project
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def project_function(project_init_service, tmp_path: Path):
-    with cd(tmp_path):
-        with project_directory(project_init_service) as project:
-            yield project
+    with cd(tmp_path), project_directory(project_init_service) as project:
+        yield project
 
 
 @pytest.fixture(scope="class")
@@ -488,8 +492,8 @@ def mapper(project_add_service):
                                 "field_id": "author_email",
                                 "tap_stream_name": "commits",
                                 "type": "MASK-HIDDEN",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
                 {
@@ -500,8 +504,8 @@ def mapper(project_add_service):
                                 "field_id": "given_name",
                                 "tap_stream_name": "users",
                                 "type": "lowercase",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
             ],
@@ -514,19 +518,19 @@ def create_state_id(description: str, env: str = "dev") -> str:
     return f"{env}:tap-{description}-to-target-{description}"
 
 
-@pytest.fixture
+@pytest.fixture()
 def num_params():
     return 10
 
 
-@pytest.fixture
+@pytest.fixture()
 def payloads(num_params):
     mock_payloads_dict = {
         "mock_state_payloads": [
             {
                 "singer_state": {
                     f"bookmark-{idx_i}": idx_i + idx_j for idx_j in range(num_params)
-                }
+                },
             }
             for idx_i in range(num_params)
         ],
@@ -537,7 +541,7 @@ def payloads(num_params):
     return payloads(**mock_payloads_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids(num_params):
     state_id_dict = {
         "single_incomplete_state_id": create_state_id("single-incomplete"),
@@ -545,17 +549,17 @@ def state_ids(num_params):
         "multiple_incompletes_state_id": create_state_id("multiple-incompletes"),
         "multiple_completes_state_id": create_state_id("multiple-completes"),
         "single_complete_then_multiple_incompletes_state_id": create_state_id(
-            "single-complete-then-multiple-incompletes"
+            "single-complete-then-multiple-incompletes",
         ),
         "single_incomplete_then_multiple_completes_state_id": create_state_id(
-            "single-incomplete-then-multiple-completes"
+            "single-incomplete-then-multiple-completes",
         ),
     }
     state_ids = namedtuple("state_ids", state_id_dict)
     return state_ids(**state_id_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def mock_time():
     def _mock_time():
         for idx in itertools.count():  # noqa: WPS526
@@ -577,7 +581,7 @@ def job_args():
     return job_args(**job_args_dict)
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
@@ -585,14 +589,14 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
                 job_name=state_ids.single_incomplete_state_id,
                 **job_args.incomplete_job_args,
                 payload=payloads.mock_state_payloads[0],
-            )
+            ),
         ],
         state_ids.single_complete_state_id: [
             Job(
                 job_name=state_ids.single_complete_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
-            )
+            ),
         ],
         state_ids.multiple_incompletes_state_id: [
             Job(
@@ -615,7 +619,7 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
                 job_name=state_ids.single_complete_then_multiple_incompletes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.complete_job_args,
-            )
+            ),
         ]
         + [
             Job(
@@ -630,7 +634,7 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
                 job_name=state_ids.single_incomplete_then_multiple_completes_state_id,
                 payload=payloads.mock_state_payloads[0],
                 **job_args.incomplete_job_args,
-            )
+            ),
         ]
         + [
             Job(
@@ -648,14 +652,16 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     return jobs
 
 
-@pytest.fixture
+@pytest.fixture()
 def jobs(state_ids_with_jobs):
     return [job for job_list in state_ids_with_jobs.values() for job in job_list]
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_ids_with_expected_states(  # noqa: WPS210
-    state_ids, payloads, state_ids_with_jobs
+    state_ids,
+    payloads,
+    state_ids_with_jobs,
 ):
     final_state = {}
     for state in payloads.mock_state_payloads:
@@ -684,7 +690,8 @@ def state_ids_with_expected_states(  # noqa: WPS210
         }
         if latest_job["complete"]:
             expectations[state_id] = merge(
-                expectations[state_id], latest_job["complete"].payload
+                expectations[state_id],
+                latest_job["complete"].payload,
             )
 
         for job in jobs["incomplete"]:
@@ -705,7 +712,7 @@ def state_ids_with_expected_states(  # noqa: WPS210
     return list(expectations.items())
 
 
-@pytest.fixture
+@pytest.fixture()
 def job_history_session(jobs, session):
     job: Job
     job_names = set()
@@ -715,15 +722,15 @@ def job_history_session(jobs, session):
     for job_name in job_names:
         job_state = JobState.from_job_history(session, job_name)
         session.add(job_state)
-    yield session
+    return session
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_service(job_history_session, project):
     return StateService(project, session=job_history_session)
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.environment.env["ENVIRONMENT_ENV_VAR"] = "${MELTANO_PROJECT_ROOT}/file.txt"

@@ -34,12 +34,18 @@ logger = structlog.getLogger(__name__)
 )
 @click.option(
     "--dry-run",
-    help="Do not run, just parse the invocation, validate it, and explain what would be executed.",
+    help=(
+        "Do not run, just parse the invocation, validate it, and explain what "
+        "would be executed."
+    ),
     is_flag=True,
 )
 @click.option(
     "--full-refresh",
-    help="Perform a full refresh (ignore state left behind by any previous runs). Applies to all pipelines.",
+    help=(
+        "Perform a full refresh (ignore state left behind by any previous "
+        "runs). Applies to all pipelines."
+    ),
     is_flag=True,
 )
 @click.option(
@@ -50,7 +56,10 @@ logger = structlog.getLogger(__name__)
 @click.option(
     "--force",
     "-f",
-    help="Force a new run even if a pipeline with the same State ID is already present. Applies to all pipelines.",
+    help=(
+        "Force a new run even if a pipeline with the same State ID is already "
+        "present. Applies to all pipelines."
+    ),
     is_flag=True,
 )
 @click.option(
@@ -145,15 +154,16 @@ async def _run_blocks(
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.initialized)
         if dry_run:
+            msg = f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}."
             if isinstance(blk, BlockSet):
                 logger.info(
-                    f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
+                    msg,
                     block_type=blk_name,
                     comprised_of=[plugin.string_id for plugin in blk.blocks],
                 )
             elif isinstance(blk, PluginCommandBlock):
                 logger.info(
-                    f"Dry run, but would have run block {idx + 1}/{len(parsed_blocks)}.",
+                    msg,
                     block_type=blk_name,
                     comprised_of=f"{blk.string_id}:{blk.command}",
                 )
@@ -173,7 +183,7 @@ async def _run_blocks(
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise CliError(
-                f"Run invocation could not be completed as block failed: {err}"
+                f"Run invocation could not be completed as block failed: {err}",
             ) from err
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions

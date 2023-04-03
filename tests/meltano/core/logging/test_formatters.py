@@ -48,7 +48,7 @@ class FakeTraceback:  # pragma: no cover
 
 
 class TestLogFormatters:
-    @pytest.fixture
+    @pytest.fixture()
     def record(self):
         return logging.LogRecord(
             name="test",
@@ -60,7 +60,7 @@ class TestLogFormatters:
             exc_info=None,
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def record_with_exception(self, tmp_path: Path):
         path = tmp_path / "my_module.py"
         path.write_text("cause_an_error()\n")

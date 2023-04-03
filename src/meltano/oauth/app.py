@@ -14,7 +14,9 @@ def create_app():
     project = Project.find()
 
     app = Flask(
-        __name__, instance_path=str(project.root), instance_relative_config=True
+        __name__,
+        instance_path=str(project.root),
+        instance_relative_config=True,
     )
 
     app.config.from_object("meltano.oauth.config")

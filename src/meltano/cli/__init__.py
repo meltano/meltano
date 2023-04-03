@@ -46,8 +46,8 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 
-# Holds the exit code for error reporting during process exiting. In particular, a function
-# registered by the `atexit` module uses this value.
+# Holds the exit code for error reporting during process exiting. In
+# particular, a function registered by the `atexit` module uses this value.
 exit_code: None | int = None
 
 atexit_handler_registered = False
@@ -87,7 +87,7 @@ def _run_cli():
             cli(obj={"project": None})
         except ProjectReadonly as err:
             raise CliError(
-                f"The requested action could not be completed: {err}"
+                f"The requested action could not be completed: {err}",
             ) from err
         except KeyboardInterrupt:  # noqa: WPS329
             raise

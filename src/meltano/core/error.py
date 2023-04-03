@@ -109,7 +109,7 @@ class MeltanoConfigurationError(MeltanoError):
 
 
 class ProjectNotFound(Error):
-    """Occurs when a Project is instantiated outside of a meltano project structure."""
+    """A Project is instantiated outside of a meltano project structure."""
 
     def __init__(self, project: Project):
         """Instantiate the error.
@@ -118,12 +118,12 @@ class ProjectNotFound(Error):
             project: the name of the project which cannot be found
         """
         super().__init__(
-            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?",
         )
 
 
 class ProjectReadonly(Error):
-    """Occurs when attempting to update a readonly project."""
+    """Attempting to update a readonly project."""
 
     def __init__(self):
         """Instantiate the error."""

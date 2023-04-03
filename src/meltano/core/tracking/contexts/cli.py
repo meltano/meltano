@@ -13,11 +13,13 @@ from meltano.core.utils import hash_sha256
 class CliEvent(Enum):
     """The kind of event that is occurring in the command-line interface."""
 
-    # The cli command has started, this is fired automatically in most cases when the command is called.
+    # The cli command has started, this is fired automatically in most cases
+    # when the command is called.
     started = auto()
-    # Optionally, a command may fire a `inflight` event to signal that its execution is in progress. This is useful for
-    # commands that are long-running and may take a long time to finish, and allows them to emit an event with collected
-    # contexts.
+    # Optionally, a command may fire a `inflight` event to signal that its
+    # execution is in progress. This is useful for commands that are
+    # long-running and may take a long time to finish, and allows them to
+    # emit an event with collected contexts.
     inflight = auto()
     # The cli command has completed without errors.
     completed = auto()
