@@ -130,7 +130,10 @@ class TestHistoryCommand:
         httpserver: HTTPServer,
         response_body: dict,
     ):
-        httpserver.expect_oneshot_request(path).respond_with_json(response_body)
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_size": "10"},
+        ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
             (
@@ -141,7 +144,6 @@ class TestHistoryCommand:
             ),
         )
         assert result.exit_code == 0
-        httpserver.assert_called_with(path=path, query={"page_size": ["10"]})
         data = json.loads(result.output)
         assert len(data) == 2
 
@@ -152,7 +154,10 @@ class TestHistoryCommand:
         response_body: dict,
         httpserver: HTTPServer,
     ):
-        httpserver.expect_oneshot_request(path).respond_with_json(response_body)
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_size": "10", "schedule": "daily"},
+        ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
             (
@@ -164,22 +169,18 @@ class TestHistoryCommand:
         )
 
         assert result.exit_code == 0
-        httpserver.assert_called_with(
-            path=path,
-            query={"page_size": ["10"], "schedule": ["daily"]},
-        )
 
     @freeze_time(datetime.datetime(2023, 5, 20, tzinfo=UTC))
     @pytest.mark.parametrize(
         ("lookback", "expected_start_time"),
         (
-            pytest.param("1w", "2023-05-13T00:00:00 00:00", id="1w"),
-            pytest.param("1d", "2023-05-19T00:00:00 00:00", id="1d"),
-            pytest.param("1h", "2023-05-19T23:00:00 00:00", id="1h"),
-            pytest.param("1m", "2023-05-19T23:59:00 00:00", id="1m"),
-            pytest.param("1w2d", "2023-05-11T00:00:00 00:00", id="1w2d"),
-            pytest.param("1w2d3h", "2023-05-10T21:00:00 00:00", id="1w2d3h"),
-            pytest.param("1w2d3h4m", "2023-05-10T20:56:00 00:00", id="1w2d3h4m"),
+            pytest.param("1w", "2023-05-13T00:00:00+00:00", id="1w"),
+            pytest.param("1d", "2023-05-19T00:00:00+00:00", id="1d"),
+            pytest.param("1h", "2023-05-19T23:00:00+00:00", id="1h"),
+            pytest.param("1m", "2023-05-19T23:59:00+00:00", id="1m"),
+            pytest.param("1w2d", "2023-05-11T00:00:00+00:00", id="1w2d"),
+            pytest.param("1w2d3h", "2023-05-10T21:00:00+00:00", id="1w2d3h"),
+            pytest.param("1w2d3h4m", "2023-05-10T20:56:00+00:00", id="1w2d3h4m"),
         ),
     )
     def test_lookback(
@@ -191,7 +192,13 @@ class TestHistoryCommand:
         response_body: dict,
         httpserver: HTTPServer,
     ):
-        httpserver.expect_oneshot_request(path).respond_with_json(response_body)
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={
+                "page_size": "10",
+                "start_time": expected_start_time,
+            },
+        ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
             (
@@ -202,10 +209,7 @@ class TestHistoryCommand:
             ),
         )
         assert result.exit_code == 0
-        httpserver.assert_called_with(
-            path=path,
-            query={"page_size": ["10"], "start_time": [expected_start_time]},
-        )
+        httpserver.check_assertions()
 
     def test_invalid_lookback(self):
         runner = CliRunner()

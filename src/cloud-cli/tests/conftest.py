@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
 
 import jwt
 import pytest
@@ -13,25 +12,7 @@ from meltano.cloud.api.config import MeltanoCloudConfig
 
 
 class HTTPServer(BaseHTTPServer):
-    def assert_called_with(
-        self,
-        *,
-        url: str | None = None,
-        path: str | None = None,
-        query: dict[str, str] | None = None,
-        method: str | None = None,
-    ) -> None:
-        assert any(
-            all(
-                (
-                    (method is None) or (method == request.method),
-                    (url is None) or (url == request.url),
-                    (path is None) or (path == urlparse(request.url).path),
-                    (query is None) or (query == parse_qs(urlparse(request.url).query)),
-                ),
-            )
-            for request, _ in reversed(self.log)
-        ), [request.url for request, _ in self.log]
+    """A test HTTP server."""
 
 
 @pytest.fixture(scope="session", autouse=True)
