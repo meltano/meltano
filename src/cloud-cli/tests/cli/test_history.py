@@ -22,8 +22,9 @@ from meltano.cloud.cli.history.utils import (
 )
 
 if t.TYPE_CHECKING:
+    from pytest_httpserver import HTTPServer
+
     from meltano.cloud.api.config import MeltanoCloudConfig
-    from tests.conftest import HTTPServer
 
 
 @given(st.from_regex(LOOKBACK_PATTERN, fullmatch=True))

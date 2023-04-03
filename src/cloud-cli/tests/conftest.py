@@ -5,14 +5,10 @@ from pathlib import Path
 
 import jwt
 import pytest
-from pytest_httpserver import HTTPServer as BaseHTTPServer
+from pytest_httpserver import HTTPServer
 from pytest_structlog import StructuredLogCapture
 
 from meltano.cloud.api.config import MeltanoCloudConfig
-
-
-class HTTPServer(BaseHTTPServer):
-    """A test HTTP server."""
 
 
 @pytest.fixture(scope="session", autouse=True)

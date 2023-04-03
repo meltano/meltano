@@ -9,8 +9,9 @@ from click.testing import CliRunner
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
+    from pytest_httpserver import HTTPServer
+
     from meltano.cloud.api.config import MeltanoCloudConfig
-    from tests.conftest import HTTPServer
 
 
 class TestCloudRun:

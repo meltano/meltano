@@ -13,9 +13,10 @@ from freezegun import freeze_time
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
+    from pytest_httpserver import HTTPServer
+
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProjectSchedule
-    from tests.conftest import HTTPServer
 
 
 class TestScheduleCommand:
