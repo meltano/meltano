@@ -46,6 +46,7 @@ pytest_deps = (
     "hypothesis",
     "mock",
     "pytest",
+    "pytest-aiohttp",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-docker",
