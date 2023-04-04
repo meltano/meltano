@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.17.1 (2023-04-04)
+
+### 🐛 Fixes
+
+- [#7403](https://github.com/meltano/meltano/issues/7403) Print right variant name in instructions to switch a plugin variant
+- [#7399](https://github.com/meltano/meltano/issues/7399) Display the right message when adding a new variant of an existing plugin
+
+### 📚 Documentation Improvements
+
+- [#7469](https://github.com/meltano/meltano/issues/7469) Add Cloud Fees stub
+- [#7466](https://github.com/meltano/meltano/issues/7466) Yaml snippets for Cloud quickstart
+- [#7462](https://github.com/meltano/meltano/issues/7462) Update Cloud onboarding docs
+- [#7457](https://github.com/meltano/meltano/issues/7457) Change link color from pink to blue
+- [#7452](https://github.com/meltano/meltano/issues/7452) Fix two broken links to example repo
+- [#7450](https://github.com/meltano/meltano/issues/7450) Update branding
+- [#7433](https://github.com/meltano/meltano/issues/7433) Document incremental replication support
+- [#7428](https://github.com/meltano/meltano/issues/7428) Add Cloud Docs
+- [#7394](https://github.com/meltano/meltano/issues/7394) Add mappers docs guide
+- [#7385](https://github.com/meltano/meltano/issues/7385) Redirect for dbt migration guide
+
 ## v2.17.0 (2023-03-14)
 
 ### ✨ New
