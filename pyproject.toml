@@ -105,7 +105,6 @@ werkzeug = ">=2.1,<=2.1.3"
 [tool.poetry.extras]
 azure = ["azure-storage-blob", "azure-common", "azure-core"]
 gcs = ["google-cloud-storage"]
-infra = ["ansible"]
 mssql = ["pymssql"]
 repl = ["ipython"]
 s3 = ["boto3"]
