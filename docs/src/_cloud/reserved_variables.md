@@ -2,7 +2,7 @@
 title: "Reserved Variables"
 description: Reserved variables for use in Meltano Cloud
 layout: doc
-weight: 2
+weight: 4
 ---
 
 <div class="notification is-info">

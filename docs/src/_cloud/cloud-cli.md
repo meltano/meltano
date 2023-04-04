@@ -2,7 +2,7 @@
 title: Meltano Cloud Command Line
 description: Interact with Meltano Cloud projects from the command line.
 layout: doc
-weight: 6
+weight: 3
 ---
 
 ## `login`
