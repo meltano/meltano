@@ -124,7 +124,7 @@ class MeltanoCloudAuth:  # noqa: WPS214
                 web.get("/logout", handle_logout),
             ),
         )
-        runner = web.AppRunner(app)
+        runner = web.AppRunner(app, access_log=None)
         await runner.setup()
         site = web.TCPSite(runner, "localhost", self.config.auth_callback_port)
         await site.start()
