@@ -9,7 +9,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -37,7 +36,7 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",

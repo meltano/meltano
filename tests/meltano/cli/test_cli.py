@@ -450,13 +450,15 @@ class TestCliColors:
         else:
             log_config_path = None
 
-        @cli.command("dummy")
+        @click.command("dummy")
         @click.pass_context
-        def _dummy_command(ctx):
+        def dummy_command(ctx):
             setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
             logger.info(self.TEST_TEXT)
             click.echo(styled_text)
+
+        cli.add_command(dummy_command)
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
