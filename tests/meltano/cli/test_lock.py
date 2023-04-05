@@ -5,7 +5,8 @@ from __future__ import annotations
 import pytest
 from click.testing import CliRunner
 
-from meltano.cli import CliError, cli
+from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLock

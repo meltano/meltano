@@ -7,18 +7,8 @@ import os
 import sys
 import typing as t
 
-from meltano.cli.utils import CliError
-from meltano.core.error import MeltanoError, ProjectReadonly
-from meltano.core.logging import setup_logging
-
-# TODO: Importing the cli.cli module breaks other cli module imports
-# This suggests a cyclic dependency or a poorly structured interface.
-# This should be investigated and resolved to avoid implicit behavior
-# based solely on import order.
-from meltano.cli.cli import cli  # isort:skip
-from meltano.cli import (  # isort:skip # noqa: WPS235
+from meltano.cli import (  # noqa: WPS235
     add,
-    compile,
     config,
     discovery,
     dragon,
@@ -27,8 +17,10 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     initialize,
     install,
     invoke,
+    job,
     lock,
     remove,
+    run,
     schedule,
     schema,
     select,
@@ -36,14 +28,39 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     ui,
     upgrade,
     user,
-    run,
     validate,
-    job,
 )
+from meltano.cli import compile as compile_module
+from meltano.cli.cli import cli
+from meltano.cli.utils import CliError
+from meltano.core.error import MeltanoError, ProjectReadonly
+from meltano.core.logging import setup_logging
 
 if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
+cli.add_command(add.add)
+cli.add_command(compile_module.compile_command)
+cli.add_command(config.config)
+cli.add_command(discovery.discover)
+cli.add_command(dragon.dragon)
+cli.add_command(elt.elt)
+cli.add_command(environment.meltano_environment)
+cli.add_command(initialize.init)
+cli.add_command(install.install)
+cli.add_command(invoke.invoke)
+cli.add_command(lock.lock)
+cli.add_command(remove.remove)
+cli.add_command(schedule.schedule)
+cli.add_command(schema.schema)
+cli.add_command(select.select)
+cli.add_command(state.meltano_state)
+cli.add_command(ui.ui)
+cli.add_command(upgrade.upgrade)
+cli.add_command(user.user)
+cli.add_command(run.run)
+cli.add_command(validate.test)
+cli.add_command(job.job)
 
 # Holds the exit code for error reporting during process exiting. In
 # particular, a function registered by the `atexit` module uses this value.

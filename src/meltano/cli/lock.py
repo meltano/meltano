@@ -7,9 +7,8 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import PartialInstrumentedCmd
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
@@ -27,7 +26,7 @@ __all__ = ["lock"]
 logger = structlog.get_logger(__name__)
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
+@click.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
 @click.option(
     "--all",
     "all_plugins",
