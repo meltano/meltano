@@ -9,7 +9,8 @@ import structlog
 from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
-from meltano.cli import CliError, cli
+from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.job import Job, State
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType

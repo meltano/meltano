@@ -5,13 +5,11 @@ from __future__ import annotations
 import click
 
 from meltano.api.app import create_app
-
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedCmd, InstrumentedGroup
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd, InstrumentedGroup
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Manage Meltano user accounts.",

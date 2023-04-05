@@ -11,7 +11,6 @@ import typing as t
 import click
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.project_settings_service import (
@@ -76,7 +75,7 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="start",
     default_if_no_args=True,
