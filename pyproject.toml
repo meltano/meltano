@@ -577,6 +577,7 @@ select = [
   "PT",  # flake8-pytest-style
   "RSE", # flake8-raise
   "SIM", # flake8-simplify
+  "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
 ]
@@ -600,3 +601,7 @@ required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.ruff.flake8-tidy-imports.banned-api]
+"meltano.cli.cli.command".msg = "Use `click.command` and `cloud.add_command` instead"
+"meltano.cli.cli.group".msg = "Use `click.group` and `cloud.add_command` instead"
