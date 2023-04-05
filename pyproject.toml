@@ -603,5 +603,5 @@ required-imports = ["from __future__ import annotations"]
 convention = "google"
 
 [tool.ruff.flake8-tidy-imports.banned-api]
-"meltano.cli.cli.command".msg = "Use `click.command` and `cloud.add_command` instead"
-"meltano.cli.cli.group".msg = "Use `click.group` and `cloud.add_command` instead"
+"meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
+"meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
