@@ -29,7 +29,6 @@ from meltano.cli import (  # isort:skip # noqa: WPS235
     invoke,
     lock,
     remove,
-    repl,
     schedule,
     schema,
     select,
