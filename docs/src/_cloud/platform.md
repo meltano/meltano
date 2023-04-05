@@ -1,7 +1,7 @@
 ---
 title: "Platform Information"
 layout: doc
-weight: 3
+weight: 5
 ---
 
 <div class="notification is-info">
