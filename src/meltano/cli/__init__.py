@@ -20,7 +20,6 @@ from meltano.cli import (  # noqa: WPS235
     job,
     lock,
     remove,
-    repl,
     run,
     schedule,
     schema,
@@ -52,7 +51,6 @@ cli.add_command(install.install)
 cli.add_command(invoke.invoke)
 cli.add_command(lock.lock)
 cli.add_command(remove.remove)
-cli.add_command(repl.repl)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
 cli.add_command(select.select)
