@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
@@ -18,7 +17,11 @@ if t.TYPE_CHECKING:
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
 
-@cli.group(cls=InstrumentedGroup, name="environment", short_help="Manage environments.")
+@click.group(
+    cls=InstrumentedGroup,
+    name="environment",
+    short_help="Manage environments.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_environment(project: Project, ctx: click.Context):
