@@ -100,6 +100,10 @@ The login command will open a browser window which you can use to create your ac
 
 After you create your account, within one business day, your account will be authorized according to the onboarding information you'll see be able to access your project within the CLI.
 
+<div class="notification is-info">
+  <p>As of now, installing the Meltano Cloud <a href="#prereq-1-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
+</div>
+
 ### Step 4: Test basic functionality
 
 After login, and after your project is onboarded, you can explore the interface with a few different commands:
