@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
@@ -15,7 +14,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@cli.command(
+@click.command(
     cls=InstrumentedCmd,
     short_help="List the available plugins in Meltano Hub and their variants.",
 )

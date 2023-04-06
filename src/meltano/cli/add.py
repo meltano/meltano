@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliError,
@@ -27,7 +26,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-@cli.command(  # noqa: WPS238
+@click.command(  # noqa: WPS238
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )

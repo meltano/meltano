@@ -12,7 +12,6 @@ from operator import xor
 import click
 import structlog
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
@@ -108,7 +107,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
     return None
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     name="state",
     short_help="Manage Singer state.",

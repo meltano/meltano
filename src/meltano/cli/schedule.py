@@ -8,7 +8,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -29,7 +28,7 @@ if t.TYPE_CHECKING:
     from meltano.core.task_sets import TaskSets
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="add",
     short_help="Manage pipeline schedules.",

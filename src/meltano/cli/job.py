@@ -8,10 +8,10 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
+    CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
@@ -93,7 +93,7 @@ def _list_all_jobs(
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     short_help="Manage jobs.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
