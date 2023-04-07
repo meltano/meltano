@@ -30,12 +30,6 @@ pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/
 
 This only provides the `meltano-cloud` command, which is a lightweight interface for Meltano Cloud. It should be equivalent to running `meltano cloud` with a full Meltano installation.
 
-### Disabled UI
-
-Because we are going to be suggesting users install `meltano` directly from git, they will have to build the Meltano wheel themselves. Because of the Meltano UI, this requires Node v16, Yarn, and likely some other system dependencies. It is also somewhat slow. For these reasons, and because the `meltano ui` command is deprecated and pending removal, the `meltano ui` command will be disabled on the `cloud` branch, and the UI will not be built as part of the Meltano wheel build process.
-
-Once the `cloud` branch merges into `main` we can re-enable the UI because Meltano with the Cloud CLI will be available through pre-built wheels on PyPI.
-
 ## Upgrading
 
 For the duration of the `cloud` feature branch, `meltano upgrade` will be disabled. This is because it tries to upgrade using PyPI, which won't have the Meltano Cloud CLI until Meltano Cloud is generally available.

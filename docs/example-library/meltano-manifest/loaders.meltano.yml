@@ -48,5 +48,5 @@ plugins:
       add_metadata_columns: true
       password: ${SNOWFLAKE_PASSWORD}
   - name: target-apprise
-    variant: AutoIDM
+    variant: autoidm
     pip_url: target-apprise==0.0.2

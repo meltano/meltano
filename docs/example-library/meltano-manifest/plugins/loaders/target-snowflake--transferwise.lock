@@ -7,6 +7,8 @@
   "docs": "https://hub.meltano.com/loaders/target-snowflake--transferwise",
   "repo": "https://github.com/transferwise/pipelinewise-target-snowflake",
   "pip_url": "pipelinewise-target-snowflake",
+  "description": "Snowflake database loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/snowflake.png",
   "settings_group_validation": [
     [
       "account",

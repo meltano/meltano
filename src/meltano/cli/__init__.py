@@ -25,9 +25,7 @@ from meltano.cli import (  # noqa: WPS235
     schema,
     select,
     state,
-    ui,
     upgrade,
-    user,
     validate,
 )
 from meltano.cli import compile as compile_module
@@ -57,9 +55,7 @@ cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
 cli.add_command(select.select)
 cli.add_command(state.meltano_state)
-cli.add_command(ui.ui)
 cli.add_command(upgrade.upgrade)
-cli.add_command(user.user)
 cli.add_command(run.run)
 cli.add_command(validate.test)
 cli.add_command(job.job)

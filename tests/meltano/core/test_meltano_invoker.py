@@ -58,12 +58,12 @@ class TestMeltanoInvoker:
             assert run_mock.call_args[0][0][0] == str(symlink_path)
 
             # If a different command is used...
-            subject.invoke(["--version"], command="gunicorn")
+            subject.invoke(["--version"], command="pip")
 
             # ...the symlink is not relevant and we find the executable next
             # to the `python` executable
-            gunicorn_path = Path(os.path.dirname(sys.executable), "gunicorn")
-            assert run_mock.call_args[0][0][0] == str(gunicorn_path)
+            pip_path = Path(os.path.dirname(sys.executable), "pip")
+            assert run_mock.call_args[0][0][0] == str(pip_path)
 
             # If the `meltano` symlink does not exist...
             symlink_path.unlink()

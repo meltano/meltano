@@ -7,6 +7,8 @@
   "docs": "https://hub.meltano.com/extractors/tap-snowflake--transferwise",
   "repo": "https://github.com/transferwise/pipelinewise-tap-snowflake",
   "pip_url": "pipelinewise-tap-snowflake",
+  "description": "For extracting data from Snowflake",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/snowflake.png",
   "capabilities": [
     "catalog",
     "discover",

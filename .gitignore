@@ -133,12 +133,6 @@ venv.bak/
 meltano.log.*
 *.m5oc
 
-# packaged webapp
-src/meltano/api/templates/webapp.html
-src/meltano/api/templates/embed.html
-src/meltano/api/static/css
-src/meltano/api/static/js
-
 # sqlite
 *.db
 

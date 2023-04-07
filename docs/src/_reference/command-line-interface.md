@@ -1024,7 +1024,7 @@ Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passe
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
-`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or `@once` (for schedules to be triggered manually through the UI).
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), or `@yearly` (`0 0 1 1 *`).
 
 ```bash
 # Add a schedule
@@ -1424,37 +1424,6 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 ### Using `test` with Environments
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
-
-## `ui` (deprecated)
-
-The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
-## `user`
-
-<div class="notification is-info">
-  <p>This command is only relevant when Meltano is run with authentication enabled.</p>
-</div>
-
-### `add`
-
-Create a Meltano user account, active and ready to be used.
-
-#### --overwrite, -f
-
-Update the user instead of creating a new one.
-
-#### --role, -G
-
-Add the user to the role. Meltano ships with two built-in roles: `admin` and `regular`.
-
-#### How to use
-
-```bash
-meltano user add admin securepassword --role admin
-```
-
-### Using `user` with Environments
-
-The `user` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ## `upgrade`
 

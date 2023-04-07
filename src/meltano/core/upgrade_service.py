@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import os
-import signal
 import subprocess
 import sys
 
 import click
-import psutil
 from sqlalchemy.engine import Engine
 
 import meltano
@@ -48,22 +45,6 @@ class UpgradeService:
         """
         self.project = project
         self.engine = engine
-
-    def reload_ui(self):
-        """Reload the Meltano UI."""
-        click.secho("Reloading UI...", fg="blue")
-
-        pid_file_path = self.project.run_dir("gunicorn.pid")
-        try:
-            with pid_file_path.open("r") as pid_file:
-                pid = int(pid_file.read())
-
-                process = psutil.Process(pid)
-                process.send_signal(signal.SIGHUP)
-        except FileNotFoundError:
-            click.echo("UI is not running")
-        except Exception as ex:
-            logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
     def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
         fail_reason = None
@@ -132,7 +113,6 @@ class UpgradeService:
 
         click.echo("The `meltano` package has been upgraded.")
         click.echo()
-        self.reload_ui()
         return True
 
     def update_files(self):
@@ -159,7 +139,6 @@ class UpgradeService:
         try:
             migration_service = MigrationService(self.engine)
             migration_service.upgrade()
-            migration_service.seed(self.project)
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 

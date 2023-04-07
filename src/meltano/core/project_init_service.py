@@ -165,7 +165,6 @@ class ProjectInitService:
         try:
             migration_service = MigrationService(engine)
             migration_service.upgrade(silent=True)
-            migration_service.seed(project)
             click.secho("  Done!", fg="blue")
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err

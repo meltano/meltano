@@ -216,15 +216,11 @@ export MELTANO_DATABASE_RETRY_TIMEOUT=5
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_READONLY`
 - Default: `false`
 
-Enable this setting to indicate that your Meltano project is deployed as read-only,
-and to block all modifications to project files through the [CLI](/reference/command-line-interface) and [UI](/reference/command-line-interface#ui)
-in this environment.
+Enable this setting to indicate that your Meltano project is deployed as read-only, and to block all modifications to project files through the [CLI](/reference/command-line-interface) in this environment.
 
 Specifically, this prevents [adding plugins](/reference/command-line-interface#add) or [pipeline schedules](/reference/command-line-interface#schedule) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), as well as [modifying plugin configuration](/reference/command-line-interface#config) stored in [`meltano.yml`](/concepts/project#meltano-yml-project-file) or [`.env`](/concepts/project#env).
 
-Note that [`meltano config <plugin> set`](/reference/command-line-interface#config)
-can still be used to store configuration in the [system database](/concepts/project#system-database),
-but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
+Note that [`meltano config <plugin> set`](/reference/command-line-interface#config) can still be used to store configuration in the [system database](/concepts/project#system-database), but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 #### How to use
 
@@ -584,12 +580,6 @@ export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
 
 ## Feature Flags
-
-
-### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
-- Default: `False`
 
 ### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 

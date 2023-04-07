@@ -67,24 +67,6 @@ repos:
         name: shellcheck
         exclude: ^integration/mdsh$
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.37.0 # Keep this in sync with the eslint "additional_dependency" below!
-    hooks:
-      - id: eslint
-        files: \.([jt]sx?|vue)$
-        entry: bash -c 'cd src/webapp && ARGS=("$@") && eslint --fix --config=.eslintrc.js "../../$0" "${ARGS[@]/#/../../}"'
-        types: [file]
-        require_serial: true
-        additional_dependencies:
-          - "@vue/eslint-config-prettier@7.0.0"
-          - "@vue/babel-preset-app@5.0.8"
-          - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.37.0" # Keep this in sync with the rev above!
-          - "eslint-config-prettier@8.5.0"
-          - "eslint-plugin-prettier@4.2.1"
-          - "eslint-plugin-vue@9.8.0"
-          - "prettier@2.8.1"
-
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.260
     hooks:

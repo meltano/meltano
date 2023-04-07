@@ -7,34 +7,49 @@
   "docs": "https://hub.meltano.com/extractors/tap-google-analytics--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/tap-google-analytics",
   "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git",
+  "description": "App and website analytics platform hosted by Google",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/google-analytics.png",
   "capabilities": [
+    "about",
     "catalog",
     "discover",
     "state",
-    "about",
     "stream-maps"
   ],
   "settings_group_validation": [
     [
       "key_file_location",
-      "view_id",
-      "start_date"
+      "start_date",
+      "view_id"
     ],
     [
       "client_secrets",
-      "view_id",
-      "start_date"
+      "start_date",
+      "view_id"
     ],
     [
+      "oauth_credentials.access_token",
       "oauth_credentials.client_id",
       "oauth_credentials.client_secret",
-      "oauth_credentials.access_token",
       "oauth_credentials.refresh_token",
-      "view_id",
-      "start_date"
+      "start_date",
+      "view_id"
     ]
   ],
   "settings": [
+    {
+      "name": "client_secrets",
+      "kind": "object",
+      "label": "Client Secrets JSON",
+      "description": "Follow the above steps for [Key File Location](#key-file-location) but instead of providing a path you can provide the serialized json directly. This can be useful for ephemeral runtime environments where its easier to provide an environment variable instead of a file.\n",
+      "placeholder": "Ex. client_secrets.json"
+    },
+    {
+      "name": "end_date",
+      "kind": "date_iso8601",
+      "label": "End Date",
+      "description": "Date up to when historical data will be extracted."
+    },
     {
       "name": "key_file_location",
       "kind": "file",
@@ -43,11 +58,10 @@
       "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json"
     },
     {
-      "name": "client_secrets",
-      "kind": "object",
-      "label": "Client Secrets JSON",
-      "description": "Follow the above steps for [Key File Location](#key-file-location) but instead of providing a path you can provide the serialized json directly. This can be useful for ephemeral runtime environments where its easier to provide an environment variable instead of a file.\n",
-      "placeholder": "Ex. client_secrets.json"
+      "name": "oauth_credentials.access_token",
+      "kind": "password",
+      "label": "OAuth Access Token",
+      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
     },
     {
       "name": "oauth_credentials.client_id",
@@ -62,22 +76,10 @@
       "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
     },
     {
-      "name": "oauth_credentials.access_token",
-      "kind": "password",
-      "label": "OAuth Access Token",
-      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
-    },
-    {
       "name": "oauth_credentials.refresh_token",
       "kind": "password",
       "label": "OAuth Refresh Token",
       "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
-    },
-    {
-      "name": "view_id",
-      "label": "View ID",
-      "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
-      "placeholder": "Ex. 198343027"
     },
     {
       "name": "reports",
@@ -92,10 +94,10 @@
       "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take."
     },
     {
-      "name": "end_date",
-      "kind": "date_iso8601",
-      "label": "End Date",
-      "description": "Date up to when historical data will be extracted."
+      "name": "view_id",
+      "label": "View ID",
+      "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
+      "placeholder": "Ex. 198343027"
     }
   ]
 }

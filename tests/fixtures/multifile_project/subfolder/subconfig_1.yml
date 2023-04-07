@@ -11,7 +11,7 @@ schedules:
     loader: target-subconfig-1-yml
     transform: skip
     start_date: 2020-08-06 00:00:00
-    interval: '@once'
+    interval: '@daily' # Run daily
 
 environments:
   - name: test-subconfig-1-yml

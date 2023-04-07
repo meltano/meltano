@@ -7,6 +7,8 @@
   "docs": "https://hub.meltano.com/extractors/tap-gitlab--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/tap-gitlab",
   "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
+  "description": "Single application for the entire DevOps lifecycle",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/gitlab.png",
   "capabilities": [
     "catalog",
     "discover",
@@ -29,8 +31,7 @@
       "name": "api_url",
       "value": "https://gitlab.com",
       "label": "GitLab Instance",
-      "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.",
-      "protected": true
+      "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed."
     },
     {
       "name": "private_token",

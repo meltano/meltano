@@ -962,7 +962,6 @@ extractors:
           label: GitLab Instance
           value: 'https://gitlab.com'
           description: GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
-          protected: true
         - name: private_token
           kind: password
           value: ""
@@ -1010,7 +1009,6 @@ extractors:
           label: GitLab Instance
           value: 'https://gitlab.com'
           description: GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.
-          protected: true
         - name: private_token
           kind: password
           value: ""
