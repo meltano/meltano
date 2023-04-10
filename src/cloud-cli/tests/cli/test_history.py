@@ -148,16 +148,60 @@ class TestHistoryCommand:
         data = json.loads(result.output)
         assert len(data) == 2
 
+    def test_too_many_schedule_filters(self):
+        runner = CliRunner()
+        result = runner.invoke(
+            cli,
+            (
+                "history",
+                "--schedule",
+                "daily",
+                "--schedule-contains",
+                "_el_",
+            ),
+        )
+        assert result.exit_code == 2
+        assert (
+            "Only one of --schedule, --schedule-prefix, or --schedule-contains"
+            in result.output
+        )
+
+    @pytest.mark.parametrize(
+        ("filter_option", "value", "expected_param"),
+        (
+            pytest.param(
+                "--schedule",
+                "daily",
+                "daily",
+                id="exact match",
+            ),
+            pytest.param(
+                "--schedule-contains",
+                "_el_",
+                "*_el_*",
+                id="contains",
+            ),
+            pytest.param(
+                "--schedule-prefix",
+                "dai",
+                "dai*",
+                id="prefix",
+            ),
+        ),
+    )
     def test_filter_schedule(
         self,
         path: str,
         config: MeltanoCloudConfig,
         response_body: dict,
         httpserver: HTTPServer,
+        filter_option: str,
+        value: str,
+        expected_param: str,
     ):
         httpserver.expect_oneshot_request(
             path,
-            query_string={"page_size": "10", "schedule": "daily"},
+            query_string={"page_size": "10", "schedule": expected_param},
         ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
@@ -165,7 +209,7 @@ class TestHistoryCommand:
                 "--config-path",
                 config.config_path,
                 "history",
-                "--filter=daily",
+                f"{filter_option}={value}",
             ),
         )
 

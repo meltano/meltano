@@ -47,12 +47,60 @@ class LookbackExpressionType(click.ParamType):
         return value
 
 
+def _schedule_arg_to_glob(
+    schedule: str | None,
+    schedule_prefix: str | None,
+    schedule_contains: str | None,
+) -> str | None:
+    """Convert the schedule filter arguments to a glog expression.
+
+    Args:
+        schedule: The schedule name to match.
+        schedule_prefix: The schedule name prefix to match.
+        schedule_contains: The schedule name substring to match.
+
+    Returns:
+        The glog expression to use for filtering.
+
+    Raises:
+        click.UsageError: More than one filter was specified.
+    """
+    # If more than one filter is specified, fail.
+    if sum(1 for f in (schedule, schedule_prefix, schedule_contains) if f) > 1:
+        raise click.UsageError(
+            "Only one of --schedule, --schedule-prefix, or "
+            "--schedule-contains can be specified.",
+        )
+
+    if schedule:
+        return schedule
+
+    if schedule_prefix:
+        return f"{schedule_prefix}*"
+
+    if schedule_contains:
+        return f"*{schedule_contains}*"
+
+    return None
+
+
 @click.command()
 @click.option(
-    "--filter",
-    "schedule_filter",
+    "--schedule",
     required=False,
-    help="The name or part of the name of a schedule to filter by.",
+    help="Match schedules by this exact name.",
+)
+@click.option(
+    "--schedule-prefix",
+    required=False,
+    help="Match schedules that start with the specified string.",
+)
+@click.option(
+    "--schedule-contains",
+    "--filter",
+    "schedule_contains",
+    required=False,
+    help="Match schedules that contain the specified string.",
 )
 @click.option(
     "--limit",
@@ -85,12 +133,20 @@ class LookbackExpressionType(click.ParamType):
 async def history(
     context: MeltanoCloudCLIContext,
     *,
-    schedule_filter: str | None,
+    schedule: str | None,
+    schedule_prefix: str | None,
+    schedule_contains: str | None,
     limit: int,
     output_format: str,
     lookback: datetime.timedelta | None,
 ) -> None:
     """Get a Meltano project execution history in Meltano Cloud."""
+    schedule_filter = _schedule_arg_to_glob(
+        schedule,
+        schedule_prefix,
+        schedule_contains,
+    )
+
     now = datetime.datetime.now(tz=utils.UTC)
     items = await HistoryClient.get_history_list(
         context.config,
