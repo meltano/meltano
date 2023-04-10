@@ -6,7 +6,6 @@ from contextlib import closing
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
@@ -42,7 +41,7 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command(
+@click.command(
     cls=InstrumentedCmd,
     short_help="Manage extractor selection patterns.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,

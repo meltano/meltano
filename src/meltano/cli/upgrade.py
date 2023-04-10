@@ -6,15 +6,14 @@ import os
 
 import click
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
+from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="all",
     default_if_no_args=True,
@@ -82,7 +81,6 @@ def all(ctx, pip_url, force, skip_package):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
 
     if skip_package:
@@ -97,6 +95,7 @@ def all(ctx, pip_url, force, skip_package):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")
     else:
+        project = ctx.obj["project"]
         package_upgraded = upgrade_service.upgrade_package(pip_url=pip_url, force=force)
         if package_upgraded:
             # Shell out instead of calling `upgrade_service` methods to

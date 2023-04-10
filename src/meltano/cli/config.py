@@ -13,7 +13,6 @@ from pathlib import Path
 import click
 import dotenv
 
-from meltano.cli import cli
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -113,7 +112,7 @@ def get_label(metadata) -> str:
         return f"from {source.label}"
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Display Meltano or plugin configuration.",
