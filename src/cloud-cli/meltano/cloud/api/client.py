@@ -12,13 +12,9 @@ from urllib.parse import urljoin
 from aiohttp import ClientResponse, ClientResponseError, ClientSession
 from structlog import get_logger
 
+from meltano.cloud import __version__ as version
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
-
-if sys.version_info >= (3, 8):
-    from importlib.metadata import version
-else:
-    from importlib_metadata import version
 
 if t.TYPE_CHECKING:
     import types
@@ -63,10 +59,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self.config = config or MeltanoCloudConfig()
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
-        try:
-            self.version = version("meltano-cloud-cli")
-        except Exception:
-            self.version = version("meltano")
+        self.version = version
 
     async def __aenter__(self) -> Self:
         """Enter the client context.
