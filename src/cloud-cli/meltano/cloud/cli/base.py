@@ -11,6 +11,7 @@ from pathlib import Path
 
 import click
 
+from meltano.cloud import __version__ as version
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.api.types import CloudProject
@@ -73,7 +74,7 @@ shared_option = partial(click.option, expose_value=False, callback=_set_shared_o
 
 
 @click.group(invoke_without_command=True, no_args_is_help=True)
-@click.version_option()
+@click.version_option(version=version)
 @click.option(
     "--config-path",
     required=False,
