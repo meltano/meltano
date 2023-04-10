@@ -385,7 +385,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-        enabled = kwargs.get("make_dirs", True)
+        enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs)
 

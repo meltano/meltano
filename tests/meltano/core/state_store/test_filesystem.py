@@ -122,7 +122,8 @@ class TestLocalFilesystemStateStoreManager:
         with subject.acquire_lock("acquire_lock"):
             assert os.path.exists(os.path.join(dir_path, "lock"))
 
-    def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager, state_path):
+    @pytest.mark.usefixtures("state_path")
+    def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager):
         dev_ids = [f"dev:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         prod_ids = [f"prod:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         for state_id in dev_ids + prod_ids:
@@ -220,7 +221,10 @@ class TestLocalFilesystemStateStoreManager:
 
 class TestAZStorageStateStoreManager:
     @pytest.fixture()
-    def subject(self, function_scoped_test_dir):
+    def subject(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ):
         return AZStorageStateStoreManager(
             uri="azure://meltano/state/",
             connection_string="UseDevelopmentStorage=true",
@@ -242,10 +246,10 @@ class TestAZStorageStateStoreManager:
             "UseDevelopmentStorage=true",
         )
 
+    @pytest.mark.usefixtures("mock_client")
     def test_is_file_not_found_error_true(
         self,
         subject: AZStorageStateStoreManager,
-        mock_client,
     ):
         got_reader = False
         mock_container_client = MagicMock()
@@ -262,10 +266,10 @@ class TestAZStorageStateStoreManager:
             assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
+    @pytest.mark.usefixtures("mock_client")
     def test_is_file_not_found_error_false(
         self,
         subject: AZStorageStateStoreManager,
-        mock_client,
     ):
         got_reader = False
         mock_container_client = MagicMock()
@@ -285,13 +289,15 @@ class TestAZStorageStateStoreManager:
     def test_state_path(self, subject: AZStorageStateStoreManager):
         assert subject.state_dir == "state"
 
-    def test_delete(self, subject, mock_client):
+    @pytest.mark.usefixtures("mock_client")
+    def test_delete(self, subject):
         mock_blob_client = MagicMock()
         subject.client.get_blob_client.return_value = mock_blob_client
         subject.delete("some_path")
         mock_blob_client.delete_blob.assert_called_once()
 
-    def test_get_state_ids(self, subject, mock_client):
+    @pytest.mark.usefixtures("mock_client")
+    def test_get_state_ids(self, subject):
         mock_container_client = MagicMock()
         mock_container_client.list_blobs.return_value = (
             BlobProperties(name=f"state/state_id_{i}/state.json") for i in range(10)
@@ -315,7 +321,10 @@ class TestS3StateStoreManager:
                 yield stubber
 
     @pytest.fixture()
-    def subject(self, function_scoped_test_dir):
+    def subject(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ):
         return S3StateStoreManager(
             uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
             container_name="testing",
@@ -480,7 +489,10 @@ class TestS3StateStoreManager:
 
 class TestGCSStateStoreManager:
     @pytest.fixture()
-    def subject(self, function_scoped_test_dir):
+    def subject(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
             application_credentials="path/to/creds/file",
@@ -502,10 +514,10 @@ class TestGCSStateStoreManager:
             subject.application_credentials,
         )
 
+    @pytest.mark.usefixtures("mock_client")
     def test_is_file_not_found_error_true(
         self,
         subject: GCSStateStoreManager,
-        mock_client,
     ):
         got_reader = False
         mock_bucket = MagicMock()
@@ -518,10 +530,10 @@ class TestGCSStateStoreManager:
             assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
+    @pytest.mark.usefixtures("mock_client")
     def test_is_file_not_found_error_false(
         self,
         subject: GCSStateStoreManager,
-        mock_client,
     ):
         got_reader = False
         mock_bucket = MagicMock()
@@ -537,7 +549,8 @@ class TestGCSStateStoreManager:
     def test_state_path(self, subject: GCSStateStoreManager):
         assert subject.state_dir == "state"
 
-    def test_delete(self, subject: GCSStateStoreManager, mock_client):
+    @pytest.mark.usefixtures("mock_client")
+    def test_delete(self, subject: GCSStateStoreManager):
         mock_blob = MagicMock()
         mock_bucket = MagicMock()
         mock_bucket.blob.return_value = mock_blob
@@ -545,7 +558,8 @@ class TestGCSStateStoreManager:
         subject.delete("some_path")
         mock_blob.delete.assert_called_once()
 
-    def test_get_state_ids(self, subject: GCSStateStoreManager, mock_client):
+    @pytest.mark.usefixtures("mock_client")
+    def test_get_state_ids(self, subject: GCSStateStoreManager):
         subject.client.list_blobs.return_value = (
             Blob(bucket=Bucket("meltano"), name=f"state/state_id_{i}/state.json")
             for i in range(10)

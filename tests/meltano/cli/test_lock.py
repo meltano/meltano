@@ -31,12 +31,11 @@ class TestLock:
         assert exception_message == str(result.exception)
 
     @pytest.mark.order(1)
+    @pytest.mark.usefixtures("tap", "target")
     def test_lockfile_exists(
         self,
         cli_runner: CliRunner,
         project: Project,
-        tap: ProjectPlugin,
-        target: ProjectPlugin,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         assert len(lockfiles) == 2
@@ -84,13 +83,11 @@ class TestLock:
         assert new_setting.value == "bar"
 
     @pytest.mark.order(3)
+    @pytest.mark.usefixtures("tap", "inherited_tap", "hub_endpoints")
     def test_lockfile_update_extractors(
         self,
         cli_runner: CliRunner,
         project: Project,
-        tap: ProjectPlugin,
-        inherited_tap: ProjectPlugin,
-        hub_endpoints: MeltanoHubService,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         # 1 tap, 1 target

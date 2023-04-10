@@ -82,7 +82,8 @@ class TestELBContextBuilder:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    def test_builder_returns_elb_context(self, project, session, tap, target):
+    @pytest.mark.usefixtures("target")
+    def test_builder_returns_elb_context(self, project, session, tap):
         """Ensure that builder is returning ELBContext and not itself."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -235,10 +236,9 @@ class TestExtractLoadBlocks:
         return target
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
     async def test_link_io(  # noqa: WPS210
         self,
-        session,
-        subject,
         tap_config_dir,
         target_config_dir,
         mapper_config_dir,
@@ -250,8 +250,6 @@ class TestExtractLoadBlocks:
         mapper_process,
         plugin_invoker_factory,
         elb_context,
-        log,
-        log_level_debug,
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -324,10 +322,9 @@ class TestExtractLoadBlocks:
             assert len(elb.blocks[2].outputs) == 1
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "subject", "log")
     async def test_extract_load_block(
         self,
-        session,
-        subject,
         tap_config_dir,
         target_config_dir,
         mapper_config_dir,
@@ -339,7 +336,6 @@ class TestExtractLoadBlocks:
         mapper_process,
         plugin_invoker_factory,
         elb_context,
-        log,
     ):
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -407,10 +403,9 @@ class TestExtractLoadBlocks:
             assert "mapper" in first_write[0][0]
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "subject")
     async def test_elb_validation(
         self,
-        session,
-        subject,
         tap_config_dir,
         target_config_dir,
         tap,
@@ -500,10 +495,9 @@ class TestExtractLoadBlocks:
                 elb.validate_set()
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "subject")
     async def test_elb_with_job_context(
         self,
-        session,
-        subject,
         tap_config_dir,
         mapper_config_dir,
         target_config_dir,

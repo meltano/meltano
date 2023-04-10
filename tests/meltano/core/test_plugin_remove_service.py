@@ -71,13 +71,8 @@ class TestPluginRemoveService:
     def test_default_init_should_not_fail(self, subject):
         assert subject
 
-    def test_remove(
-        self,
-        subject: PluginRemoveService,
-        add,
-        install,
-        lock,
-    ):
+    @pytest.mark.usefixtures("add", "install", "lock")
+    def test_remove(self, subject: PluginRemoveService):
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
@@ -110,13 +105,8 @@ class TestPluginRemoveService:
 
         assert removed_plugins == 0
 
-    def test_remove_db_error(
-        self,
-        subject: PluginRemoveService,
-        add,
-        install,
-        lock,
-    ):
+    @pytest.mark.usefixtures("add", "install", "lock")
+    def test_remove_db_error(self, subject: PluginRemoveService):
         plugins = list(subject.project.plugins.plugins())
 
         with mock.patch(
@@ -127,17 +117,12 @@ class TestPluginRemoveService:
                 ("extractors.tap-csv.default"),
                 "attempt to write a readonly database",
             )
-            removed_plugins, total_plugins = subject.remove_plugins(plugins)
+            removed_plugins, _ = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
 
-    def test_remove_meltano_yml_error(
-        self,
-        subject: PluginRemoveService,
-        add,
-        install,
-        lock,
-    ):
+    @pytest.mark.usefixtures("add", "install", "lock")
+    def test_remove_meltano_yml_error(self, subject: PluginRemoveService):
         def raise_permissionerror(filename):
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
@@ -151,13 +136,8 @@ class TestPluginRemoveService:
 
         assert removed_plugins == 0
 
-    def test_remove_installation_error(
-        self,
-        subject: PluginRemoveService,
-        add,
-        install,
-        lock,
-    ):
+    @pytest.mark.usefixtures("add", "install", "lock")
+    def test_remove_installation_error(self, subject: PluginRemoveService):
         def raise_permissionerror(filename):
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
@@ -169,12 +149,8 @@ class TestPluginRemoveService:
 
         assert removed_plugins == 0
 
-    def test_remove_lockfile_not_found(
-        self,
-        subject: PluginRemoveService,
-        add,
-        install,
-    ):
+    @pytest.mark.usefixtures("add", "install")
+    def test_remove_lockfile_not_found(self, subject: PluginRemoveService):
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, _ = subject.remove_plugins(plugins)
 

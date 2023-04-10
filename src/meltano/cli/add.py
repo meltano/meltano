@@ -119,7 +119,6 @@ def add(  # noqa: WPS238
         try:
             plugins.append(
                 add_plugin(
-                    project,
                     plugin_type,
                     plugin,
                     inherit_from=inherit_from,
@@ -137,7 +136,6 @@ def add(  # noqa: WPS238
             raise
 
         required_plugins = add_required_plugins(
-            project,
             plugins,
             add_service=add_service,
         )

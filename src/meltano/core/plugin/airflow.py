@@ -92,7 +92,7 @@ class Airflow(BasePlugin):
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
     @hook("before_install")
-    async def setup_env(self, *args, **kwargs):
+    async def setup_env(self, *args, **kwargs):  # noqa: ARG002
         """Configure the env to make airflow installable without GPL deps.
 
         Args:

@@ -48,7 +48,11 @@ class TestCli:
         Project.deactivate()
 
     @pytest.fixture()
-    def empty_project(self, empty_meltano_yml_dir, pushd):
+    def empty_project(
+        self,
+        empty_meltano_yml_dir,
+        pushd,  # noqa: ARG002
+    ):
         project = Project(empty_meltano_yml_dir)
         try:
             yield project
@@ -141,9 +145,9 @@ class TestCli:
 
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -155,9 +159,9 @@ class TestCli:
         )
         assert Project._default.environment.name == "test-meltano-environment"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_environment_flag_overrides_default(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -170,9 +174,9 @@ class TestCli:
 
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_environment_variable_overrides_default(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -186,9 +190,9 @@ class TestCli:
         )
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_lower_null_environment_overrides_default(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -200,9 +204,9 @@ class TestCli:
         )
         assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_upper_null_environment_overrides_default(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -214,9 +218,9 @@ class TestCli:
         )
         assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_no_environment_overrides_default(
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -228,9 +232,9 @@ class TestCli:
         )
         assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
         self,
-        deactivate_project,
         project_files_cli,
         cli_runner,
         pushd,
@@ -247,7 +251,8 @@ class TestCli:
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
 
-    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path, pushd):
+    @pytest.mark.usefixtures("pushd")
+    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path):
         project = test_cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
@@ -451,8 +456,7 @@ class TestCliColors:
             log_config_path = None
 
         @click.command("dummy")
-        @click.pass_context
-        def dummy_command(ctx):
+        def dummy_command():
             setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
             logger.info(self.TEST_TEXT)
@@ -471,7 +475,8 @@ class TestCliColors:
 
 
 class TestLargeConfigProject:
-    def test_list_config_performance(self, large_config_project: Project, cli_runner):
+    @pytest.mark.usefixtures("large_config_project")
+    def test_list_config_performance(self, cli_runner):
         start = perf_counter_ns()
         assert (
             cli_runner.invoke(

@@ -228,7 +228,8 @@ class TestScheduleService:
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
             )
 
-    def test_run_job_schedule(self, subject, session, tap, target):
+    @pytest.mark.usefixtures("session", "tap", "target")
+    def test_run_job_schedule(self, subject):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -274,10 +275,10 @@ class TestScheduleService:
         found_schedule = subject.find_namespace_schedule(tap.namespace)
         assert found_schedule.extractor == tap.name
 
+    @pytest.mark.usefixtures("create_elt_schedule")
     def test_find_namespace_schedule_custom_extractor(
         self,
         subject,
-        create_elt_schedule,
         custom_tap,
     ):
         schedule = Schedule(name="tap-custom", extractor="tap-custom")

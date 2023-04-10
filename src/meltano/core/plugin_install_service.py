@@ -485,7 +485,7 @@ async def install_pip_plugin(
     force: bool = False,
     venv_service: VenvService | None = None,
     env: t.Mapping[str, str] | None = None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """Install the plugin with pip.
 
