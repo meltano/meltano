@@ -10,7 +10,6 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -68,7 +67,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(
+@click.command(
     cls=InstrumentedCmd,
     short_help="Run validations using plugins' tests.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,

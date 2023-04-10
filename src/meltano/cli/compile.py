@@ -8,7 +8,6 @@ from pathlib import Path
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.environment import Environment
@@ -21,7 +20,11 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (beta)")
+@click.command(
+    "compile",
+    cls=InstrumentedCmd,
+    short_help="Compile a Meltano manifest. (beta)",
+)
 @click.option(
     "--directory",
     default=".meltano/manifests",
@@ -49,7 +52,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def compile(  # noqa: WPS125
+def compile_command(
     project: Project,
     ctx: click.Context,
     directory: Path,

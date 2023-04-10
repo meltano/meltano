@@ -7,7 +7,6 @@ from pathlib import Path
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import database_uri_option
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.project_init_service import ProjectInitService
@@ -23,7 +22,7 @@ logger = logging.getLogger(__name__)
 path_type = click.Path(file_okay=False, path_type=Path)
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
+@click.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
 @click.pass_context
 @click.argument("project_directory", required=False, type=path_type)
 @click.option(

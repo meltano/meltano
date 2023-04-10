@@ -11,7 +11,6 @@ from contextlib import asynccontextmanager, nullcontext, suppress
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
@@ -43,7 +42,7 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
