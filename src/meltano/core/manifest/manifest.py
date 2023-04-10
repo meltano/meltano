@@ -185,10 +185,13 @@ class Manifest:  # noqa: WPS214
             deep_merge(
                 yaml.load(  # noqa: S506
                     self._meltano_file,
-                    YamlNoTimestampSafeLoader,
+                    t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
                 ),
                 *(
-                    yaml.load(x.read_text(), YamlNoTimestampSafeLoader)  # noqa: S506
+                    yaml.load(  # noqa: S506
+                        x.read_text(),
+                        t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                    )
                     for x in self.project.project_files.include_paths
                 ),
             ),
