@@ -84,12 +84,7 @@ class TestMeltanoCloudConfig:
         subject.refresh()
         self.config_assertions(subject, suffix="-changed")
 
-    def test_write_to_file(
-        self,
-        monkeypatch: pytest.MonkeyPatch,
-        subject: MeltanoCloudConfig,
-        config_path: Path,
-    ):
+    def test_write_to_file(self, subject: MeltanoCloudConfig):
         self.config_assertions(subject)
         subject.id_token = "id-token-changed"  # noqa: S105
         subject.write_to_file()

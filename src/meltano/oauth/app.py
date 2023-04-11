@@ -23,7 +23,7 @@ def create_app():
     app.config.from_mapping(**oauth_config.ProjectSettings(project).as_dict())
 
     @app.errorhandler(Exception)
-    def _handle(e):
+    def _handle(_):
         logging.exception("An error occurred")
         return error()
 

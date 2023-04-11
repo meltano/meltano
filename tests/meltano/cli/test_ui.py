@@ -13,7 +13,8 @@ from meltano.core.project_settings_service import (
 
 @pytest.mark.skip(reason="The UI is disabled on the 'cloud' feature branch")
 class TestCliUi:
-    def test_ui(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_ui(self, cli_runner):
         with mock.patch(
             "meltano.cli.ui.APIWorker.start",
         ) as start_api_worker, mock.patch(

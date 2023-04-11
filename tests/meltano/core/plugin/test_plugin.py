@@ -468,7 +468,8 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
+    @pytest.mark.usefixtures("plugin_discovery_service")
+    def test_command_inheritance(self, tap, inherited_tap):
         # variants
         assert tap.all_commands["cmd"].args == "cmd meltano"
         assert tap.all_commands["cmd"].description == "a description of cmd"

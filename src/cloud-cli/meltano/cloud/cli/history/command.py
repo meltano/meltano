@@ -31,8 +31,8 @@ class LookbackExpressionType(click.ParamType):
     def convert(
         self,
         value: str | datetime.timedelta,
-        param: click.Parameter | None,
-        ctx: click.Context | None,
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
     ) -> datetime.timedelta:
         """Convert the lookback expression to a timedelta."""
         if isinstance(value, datetime.timedelta):

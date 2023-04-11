@@ -83,7 +83,7 @@ class TestELTContext:
         tap,
         target_postgres,
         tap_mock_transform,
-        dbt,
+        dbt,  # noqa: ARG002
     ):
         return (
             elt_context_builder.with_session(session)
@@ -120,11 +120,11 @@ class TestELTContext:
         assert_loader_env(loader, env)
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("target_postgres")
     async def test_transformer(
         self,
         elt_context,
         session,
-        target_postgres,
         tap_mock_transform,
         dbt,
     ):

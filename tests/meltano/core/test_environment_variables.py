@@ -223,12 +223,12 @@ class TestEnvVarResolution:
         [tuple(x) for x in _env_var_resolution_expectations.values()],
         ids=_env_var_resolution_expectations.keys(),
     )
+    @pytest.mark.usefixtures("cli_runner")
     def test_env_var_resolution(
         self,
         expected_env_values,
         meltanofile_updates,
         terminal_env,
-        cli_runner,
         project,
         monkeypatch,
     ):

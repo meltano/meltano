@@ -10,12 +10,12 @@ from meltano.core.utils import iso8601_datetime
 
 class TestCliSchedule:
     @pytest.mark.order(0)
-    @pytest.mark.usefixtures("tap", "target")
+    @pytest.mark.usefixtures("project", "session", "tap", "target")
     @mock.patch(
         "meltano.core.schedule_service.PluginSettingsService.get",
         autospec=True,
     )
-    def test_schedule_add(self, get, session, project, cli_runner, schedule_service):
+    def test_schedule_add(self, get, cli_runner, schedule_service):
         test_date = "2010-01-01"
         get.return_value = test_date
 

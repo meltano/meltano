@@ -518,7 +518,8 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
             )
 
-    def test_add_custom_variant(self, project, cli_runner, plugin_discovery_service):
+    @pytest.mark.usefixtures("plugin_discovery_service")
+    def test_add_custom_variant(self, project, cli_runner):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
@@ -563,6 +564,7 @@ class TestCliAdd:
             "orchestrator-and-required",
         ],
     )
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_no_install(
         self,
         plugin_type,
@@ -571,7 +573,6 @@ class TestCliAdd:
         required_plugin_refs,
         project,
         cli_runner,
-        reset_project_context,
     ):
         project.refresh()
         # ensure the plugin is not present

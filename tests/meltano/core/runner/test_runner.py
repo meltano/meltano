@@ -36,7 +36,14 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 
 class TestSingerRunner:
     @pytest.fixture()
-    def elt_context(self, project, session, tap, target, elt_context_builder):
+    def elt_context(
+        self,
+        project,  # noqa: ARG002
+        session,
+        tap,
+        target,
+        elt_context_builder,
+    ):
         job = Job(job_name="pytest_test_runner")
 
         return (
@@ -89,10 +96,10 @@ class TestSingerRunner:
         return process_mock_factory(target)
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("subject")
     async def test_prepare_job(
         self,
         session,
-        subject,
         tap_config_dir,
         target_config_dir,
         tap,
@@ -214,7 +221,7 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio()
     async def test_run(self, subject):
-        async def invoke_mock(*args, **kwargs):
+        async def invoke_mock(*args, **kwargs):  # noqa: ARG001
             pass
 
         with mock.patch.object(

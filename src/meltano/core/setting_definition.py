@@ -115,7 +115,11 @@ class YAMLEnum(str, Enum):
         return representer.represent_scalar("tag:yaml.org,2002:str", str(node))
 
     @classmethod
-    def from_yaml(cls, constructor, node):
+    def from_yaml(
+        cls,
+        constructor,  # noqa: ARG003
+        node,
+    ):
         """Construct from yaml.
 
         Args:

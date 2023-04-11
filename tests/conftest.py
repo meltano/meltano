@@ -160,11 +160,14 @@ class MockAdapter(BaseAdapter):
     def send(
         self,
         request: requests.PreparedRequest,
-        stream: bool = False,
-        timeout: float | tuple[float, float] | tuple[float, None] | None = None,
-        verify: bool | str = True,
-        cert: t.Any | None = None,
-        proxies: abc.Mapping[str, str] | None = None,
+        stream: bool = False,  # noqa: ARG002
+        timeout: float  # noqa: ARG002, WPS320
+        | tuple[float, float]
+        | tuple[float, None]
+        | None = None,
+        verify: bool | str = True,  # noqa: ARG002
+        cert: t.Any | None = None,  # noqa: ARG002
+        proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
 

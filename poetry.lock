@@ -482,18 +482,18 @@ typing-extensions = ">=4.2"
 
 [[package]]
 name = "boto3"
-version = "1.26.110"
+version = "1.26.111"
 description = "The AWS SDK for Python"
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.110-py3-none-any.whl", hash = "sha256:8972a5e0a04ea6f477c41e390765a46ec7bcffb62f99d4a0774ce70fb87bea59"},
-    {file = "boto3-1.26.110.tar.gz", hash = "sha256:97d942d958cac28687187b89ee88ac760e0fa3007094cb1d6b16e241144306f3"},
+    {file = "boto3-1.26.111-py3-none-any.whl", hash = "sha256:6cb601c4232537aca2dd216282ff4383a7277f6a150b2c8947eda0c3933d0223"},
+    {file = "boto3-1.26.111.tar.gz", hash = "sha256:db8733f0a723c4548b6565d8665b876e93f28837d8d6bae40cc03a6e597cd6a6"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.110,<1.30.0"
+botocore = ">=1.29.111,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -870,14 +870,14 @@ xray = ["mypy-boto3-xray (>=1.26.0,<1.27.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.110"
+version = "1.29.111"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.110-py3-none-any.whl", hash = "sha256:39879fcc3d263513f9ba92cc5060b5a4dbe54f758a917be29c7a71132e34f399"},
-    {file = "botocore-1.29.110.tar.gz", hash = "sha256:9d5054159782b19f27bff3e5a65bc494dc323255e889ea3abec002711a1fb0c0"},
+    {file = "botocore-1.29.111-py3-none-any.whl", hash = "sha256:baa6442df9b539c5c4e622bd22b47bc3594a0428f280587a359a9298e73a6e48"},
+    {file = "botocore-1.29.111.tar.gz", hash = "sha256:c3a51d80ceac0945969f94894651c4728525c7cf2df7d7838063c3516f5ee9e3"},
 ]
 
 [package.dependencies]
@@ -890,14 +890,14 @@ crt = ["awscrt (==0.16.9)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.29.110"
+version = "1.29.111"
 description = "Type annotations and code completion for botocore"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "botocore_stubs-1.29.110-py3-none-any.whl", hash = "sha256:5462521d186b8ea7e9fd77dbd63a300fb321a440461d539ec57804ab6cdd92eb"},
-    {file = "botocore_stubs-1.29.110.tar.gz", hash = "sha256:0d2b24c3943b079055615a16d36c04215b98d662e6c5e66dd87b2efef3ce540d"},
+    {file = "botocore_stubs-1.29.111-py3-none-any.whl", hash = "sha256:8f68c71ad0f349a19dabae9d2695c927553bfbd29cc7af2f22b50b0db117f394"},
+    {file = "botocore_stubs-1.29.111.tar.gz", hash = "sha256:adecd9c4ac936896ba23d205b0339c36889b6c0793bf846b3b4d1b1cb6f9b1bb"},
 ]
 
 [package.dependencies]
@@ -3316,23 +3316,23 @@ testing = ["coverage (==6.2)", "mypy (==0.931)"]
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.18.3"
+version = "0.21.0"
 description = "Pytest support for asyncio"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-asyncio-0.18.3.tar.gz", hash = "sha256:7659bdb0a9eb9c6e3ef992eef11a2b3e69697800ad02fb06374a210d85b29f91"},
-    {file = "pytest_asyncio-0.18.3-1-py3-none-any.whl", hash = "sha256:16cf40bdf2b4fb7fc8e4b82bd05ce3fbcd454cbf7b92afc445fe299dabb88213"},
-    {file = "pytest_asyncio-0.18.3-py3-none-any.whl", hash = "sha256:8fafa6c52161addfd41ee7ab35f11836c5a16ec208f93ee388f752bea3493a84"},
+    {file = "pytest-asyncio-0.21.0.tar.gz", hash = "sha256:2b38a496aef56f56b0e87557ec313e11e1ab9276fc3863f6a7be0f1d0e415e1b"},
+    {file = "pytest_asyncio-0.21.0-py3-none-any.whl", hash = "sha256:f2b3366b7cd501a4056858bd39349d5af19742aed2d81660b7998b6341c7eb9c"},
 ]
 
 [package.dependencies]
-pytest = ">=6.1.0"
+pytest = ">=7.0.0"
 typing-extensions = {version = ">=3.7.2", markers = "python_version < \"3.8\""}
 
 [package.extras]
-testing = ["coverage (==6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (==0.931)", "pytest-trio (>=0.7.0)"]
+docs = ["sphinx (>=5.3)", "sphinx-rtd-theme (>=1.0)"]
+testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (>=0.931)", "pytest-trio (>=0.7.0)"]
 
 [[package]]
 name = "pytest-cov"
@@ -4787,4 +4787,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "9a2a37e427ee62e9fa7198a45a9eeb6c11612e0249a1ccd1d1f5abe001fc6697"
+content-hash = "0193f92324c1b0423141241275e53d0ee1dfc378a2cca8d54bbcba4464e9b67d"
