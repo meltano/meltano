@@ -89,6 +89,15 @@ $ meltano cloud history --lookback 1w
 
 # Display the last hour and a half of executions
 $ meltano cloud history --lookback 1h30m
+
+# Display executions exactly matching a schedule name
+$ meltano cloud history --schedule daily_github_to_snowflake
+
+# Display executions matching a schedule name prefix
+$ meltano cloud history --schedule-prefix daily_
+
+# Display executions matching a schedule name infix
+$ meltano cloud history --schedule-contains _github_to_
 ```
 
 ## `logs`
