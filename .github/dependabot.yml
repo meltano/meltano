@@ -17,6 +17,7 @@ updates:
     reviewers: [meltano/engineering]
     labels: [deps]
   - package-ecosystem: pip
+    versioning-strategy: increase
     directory: "/"
     schedule:
       interval: daily

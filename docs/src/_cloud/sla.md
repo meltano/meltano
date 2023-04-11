@@ -19,7 +19,7 @@ Unless specified otherwise in the applicable Order Form, the following terms and
     - Consecutive Successful Runs: 5 consecutive Successful Runs over at least 5 consecutive days since the last time the Pipeline’s configuration, or that of any of its tasks, was changed.
     - Credit: A unit consumed by Pipeline Runs across the Organization. Credits can be purchased in bulk, or be acquired as set forth in this Service Level Agreement. Credits are shared by all Projects in an Organization, and may not be redeemed for cash.
     - Deployment: A deployment on Meltano Cloud of a specific Environment and Project Git repository branch combination.
-    - Downtime: Time that Schedules were not running as expected. Calculated as “Missed Ticks / Monthly Ticks” during a calendar month. The inverse of Uptime.
+    - Downtime: Calculated as “Missed Ticks / Monthly Ticks” during a calendar month. The inverse of Uptime.
     - Emergency Maintenance: Downtime outside of Scheduled Downtime hours due to the application of urgent patches or fixes, or other urgent maintenance, recommended by Meltano’s vendors to be applied as soon as possible.
     - Environment: An environment defined in the Project. An Environment may have multiple Schedules and Deployments.
     - Meltano Cloud: The Cloud Service for hosting Projects created using Meltano Core.
@@ -36,7 +36,7 @@ Unless specified otherwise in the applicable Order Form, the following terms and
     - Successful Run: A Run that completed successfully, or that failed for a reason unrelated to the Meltano Cloud platform (e.g., misconfiguration or a source API issue).
     - Tick: Each time a Run of a Schedule’s Pipeline is to be executed in a specific Deployment based on its cron schedule expression, with a maximum of one Tick (and Run) every 15 minutes.
     - Trial Period: The period of time that Customer first has access to and uses Meltano Cloud for evaluation or trial without a paid contract in place as specified in the applicable agreement.
-    - Uptime: Time that Schedules were not running as expected. Calculated as “(Monthly Ticks - Missed Ticks) / Monthly Ticks” during a past calendar month.
+    - Uptime: Calculated as “(Monthly Ticks - Missed Ticks) / Monthly Ticks” during a past calendar month.
     - Working Schedule: A Schedule that has had Consecutive Successful Runs.
 
 2. <u>Service Level Commitment and Credits</u>. If Uptime of a given Working Schedule falls below 99.9%, then for every Missed Tick of that Schedule, Customer’s Account shall be credited 2 times the Average Run Credits, which may be used solely for future Pipeline Runs. Credits given for Downtime may not exceed 50% of the Average Run Credits multiplied by the Schedule’s Monthly Ticks for the month in question and may not be redeemed for cash.
