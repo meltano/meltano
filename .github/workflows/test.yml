@@ -6,6 +6,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
@@ -15,6 +16,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
