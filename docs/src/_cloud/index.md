@@ -1,8 +1,7 @@
 ---
 title: Meltano Cloud
-description: Information about Meltano Concepts.
+description: Information about Meltano Cloud Concepts.
 layout: doc
-hidden: true
 toc: false
 ---
 
@@ -15,6 +14,8 @@ toc: false
 
 <ul>
   {% for doc in site.cloud %}
-    <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
+    {% unless doc.hidden %}
+      <li><a href="{{ doc.url }}">{{ doc.title }}</a></li>
+    {% endunless %}
   {% endfor %}
 </ul>
