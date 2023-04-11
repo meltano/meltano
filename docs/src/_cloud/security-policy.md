@@ -1,5 +1,6 @@
 ---
-title: "Security Policy"
+title: "Meltano Cloud Security Policy"
+layout: doc
 hidden: true
 ---
 
@@ -10,4 +11,7 @@ hidden: true
 
 ## Meltano Cloud Security Policy
 
-Todo
+Provider (Meltano) will use commercially reasonable efforts to secure the Cloud Service from unauthorized access, alteration, or use and other unlawful tampering.
+
+Provider will maintain annually updated reports or annual certifications of compliance with the following:
+- SOC2 Type I
