@@ -1,5 +1,6 @@
 ---
-title: "Support"
+title: "Meltano Cloud Technical Support"
+layout: doc
 hidden: true
 ---
 
@@ -10,4 +11,5 @@ hidden: true
 
 ## Meltano Cloud Technical Support
 
-Todo
+Customers can receive professional support from the Meltano team via <https://help.meltano.com> and a dedicated private channel in the Meltano Slack community available at <https://meltano.com/slack>.
+The Meltano team strives to respond within 12 hours during weekdays, excluding United States federal holidays. In addition, customers can receive community support via public channels in the Meltano Slack community.
