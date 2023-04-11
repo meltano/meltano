@@ -2913,19 +2913,20 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-gitlab"
-version = "3.13.0"
+version = "3.14.0"
 description = "Interact with GitLab API"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "python-gitlab-3.13.0.tar.gz", hash = "sha256:ad502b72b5d1137f4af37d4a68ae20fe7d6c9778f67cbe2aec566f7995053c7d"},
-    {file = "python_gitlab-3.13.0-py3-none-any.whl", hash = "sha256:85ae778d8953aba87ad4b78aef7fbb5dae053980d2c20ff200bea29799685743"},
+    {file = "python-gitlab-3.14.0.tar.gz", hash = "sha256:ef3b8960faeee9880f82b0872d807e3fab94ace12b0d2a8418a97875c8812d3c"},
+    {file = "python_gitlab-3.14.0-py3-none-any.whl", hash = "sha256:da614c014c6860147783dde8c216218d8fc6bd83a8bd2e3929dcdf11b211aa58"},
 ]
 
 [package.dependencies]
 requests = ">=2.25.0"
 requests-toolbelt = ">=0.10.1"
+typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.8\""}
 
 [package.extras]
 autocompletion = ["argcomplete (>=1.10.0,<3)"]
@@ -4077,4 +4078,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "0c51cdaddd4904eb1ca2b97dbc843553a8cb8a078d29c566c1ec0aba0fdb575d"
+content-hash = "6d15a481eda642865cf40b28dc92ba26dcf1e98fa541be1465384713d3409032"
