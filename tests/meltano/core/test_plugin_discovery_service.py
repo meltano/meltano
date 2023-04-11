@@ -283,7 +283,11 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             yield discovery_yaml
 
     @pytest.fixture()
-    def remote_discovery(self, project, subject):
+    def remote_discovery(
+        self,
+        project,  # noqa: ARG002
+        subject,
+    ):
         with self.use_remote_discovery(
             self.build_discovery_yaml("remote"),
             subject,
@@ -334,10 +338,10 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         assert not subject.cached_discovery_file.exists()
 
     @pytest.mark.order(8)
+    @pytest.mark.usefixtures("incompatible_local_discovery")
     def test_incompatible_local_discovery(
         self,
         subject,
-        incompatible_local_discovery,
         remote_discovery,
     ):
         self.assert_discovery_yaml(subject, remote_discovery)
@@ -352,12 +356,12 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
             assert cached_discovery_yaml["version"] == remote_discovery["version"]
 
     @pytest.mark.order(10)
+    @pytest.mark.usefixtures("enabled_remote_discovery_auth")
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_valid_auth(
         self,
         mock_discovery_request,
         subject,
-        enabled_remote_discovery_auth,
         remote_discovery,
     ):
         mock_discovery_request.return_value.status_code = 200
@@ -375,12 +379,12 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         self.assert_discovery_yaml(subject, discovery)
 
     @pytest.mark.order(11)
+    @pytest.mark.usefixtures("enabled_remote_discovery_auth")
     @mock.patch("meltano.core.plugin_discovery_service.requests.get")
     def test_remote_discovery_with_invalid_auth(
         self,
         mock_discovery_request,
         subject,
-        enabled_remote_discovery_auth,
     ):
         mock_discovery_request.return_value.status_code = 401
         mock_discovery_request.return_value.raise_for_status.side_effect = (
@@ -415,47 +419,49 @@ class TestPluginDiscoveryServiceDiscoveryManifest:
         assert discovery is None
 
     @pytest.mark.order(13)
+    @pytest.mark.usefixtures("incompatible_remote_discovery")
     def test_incompatible_remote_discovery(
         self,
         subject,
-        incompatible_remote_discovery,
         cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
     @pytest.mark.order(14)
+    @pytest.mark.usefixtures("disabled_remote_discovery")
     def test_disabled_remote_discovery(
         self,
         subject,
-        disabled_remote_discovery,
         cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
     @pytest.mark.order(15)
+    @pytest.mark.usefixtures("incompatible_remote_discovery")
     def test_cached_discovery(
         self,
         subject,
-        incompatible_remote_discovery,
         cached_discovery,
     ):
         self.assert_discovery_yaml(subject, cached_discovery)
 
     @pytest.mark.order(16)
+    @pytest.mark.usefixtures(
+        "incompatible_remote_discovery",
+        "invalid_cached_discovery",
+    )
     def test_invalid_cached_discovery(
         self,
         subject,
-        incompatible_remote_discovery,
-        invalid_cached_discovery,
         bundled_discovery,
     ):
         self.assert_discovery_yaml(subject, bundled_discovery)
 
     @pytest.mark.order(17)
+    @pytest.mark.usefixtures("incompatible_remote_discovery")
     def test_bundled_discovery(
         self,
         subject,
-        incompatible_remote_discovery,
         bundled_discovery,
     ):
         self.assert_discovery_yaml(subject, bundled_discovery)

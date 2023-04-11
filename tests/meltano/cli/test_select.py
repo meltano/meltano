@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 
+import pytest
+
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
 
 class TestCliSelect:
-    def test_update_select_pattern(self, project, cli_runner, tap):
+    @pytest.mark.usefixtures("project")
+    def test_update_select_pattern(self, cli_runner, tap):
         # add select pattern
         result = cli_runner.invoke(
             cli,

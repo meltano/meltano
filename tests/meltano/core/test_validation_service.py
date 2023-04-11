@@ -9,7 +9,7 @@ from meltano.core.validation_service import ValidationsRunner
 
 
 class MockValidationsRunner(ValidationsRunner):
-    async def run_test(self, name: str):
+    async def run_test(self, name: str):  # noqa: ARG002
         return 1
 
 

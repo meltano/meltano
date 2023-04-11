@@ -12,7 +12,8 @@ from meltano.cli import cli
 
 
 class TestCliUpgrade:
-    def test_upgrade(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_upgrade(self, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -37,13 +38,15 @@ class TestCliUpgrade:
                 "Meltano and your Meltano project have been upgraded!" in result.stdout
             )
 
-    def test_upgrade_skip_package(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_upgrade_skip_package(self, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
         assert "Your Meltano project has been upgraded!" in result.stdout
 
-    def test_upgrade_package(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_upgrade_package(self, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -57,7 +60,8 @@ class TestCliUpgrade:
         assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")
-    def test_upgrade_files(self, session, project, cli_runner):
+    @pytest.mark.usefixtures("session")
+    def test_upgrade_files(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -151,7 +155,8 @@ class TestCliUpgrade:
         assert_cli_runner(result)
         assert "Updated orchestrate/dags/meltano.py" in output
 
-    def test_upgrade_files_glob_path(self, session, project, cli_runner):
+    @pytest.mark.usefixtures("session")
+    def test_upgrade_files_glob_path(self, project, cli_runner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -188,6 +193,7 @@ class TestCliUpgrade:
         assert_cli_runner(result)
         assert "Updated orchestrate/dags/meltano.py" in output
 
-    def test_upgrade_database(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_upgrade_database(self, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)

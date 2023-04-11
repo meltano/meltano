@@ -102,7 +102,7 @@ class TestCliInvoke:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        async def async_generator(*args, **kwargs):
+        async def async_generator(*args, **kwargs):  # noqa: ARG001
             yield "Line 1"
             yield "Line 2"  # noqa: WPS354
 

@@ -286,7 +286,8 @@ class TestTracker:
     def test_default_send_anonymous_usage_stats(self, project: Project):
         assert Tracker(project).send_anonymous_usage_stats
 
-    def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
+    @pytest.mark.usefixtures("project")
+    def test_exit_event_is_fired(self, snowplow: SnowplowMicro):
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
         event_summary = snowplow.all()
@@ -382,7 +383,7 @@ class TestTracker:
             f'["http://localhost:{server.server_port}"]',
         )
 
-        def emitter_failure_callback(_, failure_events: list):
+        def emitter_failure_callback(_, failure_events: list):  # noqa: ARG001
             nonlocal timeout_occured
             # `timeout_occured` is technically a misnomer here, since there are
             # multiple reasons for failure, but this callback doesn't let us

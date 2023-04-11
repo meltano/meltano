@@ -68,10 +68,8 @@ def selection_mark(selection):
     help="Exclude all attributes that match specified pattern.",
 )
 @pass_project(migrate=True)
-@click.pass_context
 @click_run_async
 async def select(
-    ctx: click.Context,
     project: Project,
     extractor: str,
     entities_filter: str,

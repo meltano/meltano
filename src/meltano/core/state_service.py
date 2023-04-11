@@ -175,7 +175,7 @@ class StateService:  # noqa: WPS214
             validate=validate,
         )
 
-    def clear_state(self, state_id, save: bool = True):
+    def clear_state(self, state_id, save: bool = True):  # noqa: ARG002
         """Clear the state for the state_id.
 
         Args:

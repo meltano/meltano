@@ -139,7 +139,8 @@ class TestProjectReadonlyEnabled:
             assert b"deployed as read-only" in res.data
 
     @pytest.mark.xfail(reason="UI/API is deprecated")
-    def test_pipeline_schedules_save(self, app, api, tap, target):
+    @pytest.mark.usefixtures("tap", "target")
+    def test_pipeline_schedules_save(self, app, api):
         with app.test_request_context():
             res = api.post(
                 url_for("orchestrations.save_pipeline_schedule"),
@@ -227,7 +228,7 @@ class TestAuthenticationEnabled:
             yield create_app()
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
-    def test_gitlab_token_identity_creates_user(self, gitlab, app):
+    def test_gitlab_token_identity_creates_user(self, gitlab, app):  # noqa: ARG002
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",
@@ -236,8 +237,7 @@ class TestAuthenticationEnabled:
 
         # test automatic user creation
         with app.test_request_context("/oauth/authorize"):
-            identity = gitlab_token_identity(token)  # noqa: F841
-
+            gitlab_token_identity(token)
             assert (
                 db.session.query(OAuth)
                 .options(joinedload(OAuth.user))
@@ -252,7 +252,7 @@ class TestAuthenticationEnabled:
             )
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
-    def test_gitlab_token_identity_maps_user(self, gitlab, app):
+    def test_gitlab_token_identity_maps_user(self, gitlab, app):  # noqa: ARG002
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",

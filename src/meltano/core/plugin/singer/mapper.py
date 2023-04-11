@@ -45,8 +45,12 @@ class SingerMapper(SingerPlugin):
         return {"config": f"mapper.{self.instance_uuid}.config.json"}
 
     @hook("before_configure")
-    async def before_configure(self, invoker: PluginInvoker, session):
-        """Create configuration file."""
+    async def before_configure(
+        self,
+        invoker: PluginInvoker,
+        session,  # noqa: ARG002
+    ):
+        """Create configuration file."""  # noqa: DAR101
         config_path = invoker.files["config"]
 
         config_payload: dict = {}

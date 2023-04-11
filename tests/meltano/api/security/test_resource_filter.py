@@ -11,7 +11,7 @@ from meltano.api.security.auth import ResourcePermission
 def identity(app):
     identity = Identity("test")
 
-    def handler(sender):
+    def handler(_):
         g.identity = identity
 
     with appcontext_pushed.connected_to(handler, app):

@@ -123,8 +123,6 @@ def invoke(
         exit_code = asyncio.run(
             _invoke(
                 invoker,
-                project,
-                plugin_name,
                 plugin_args,
                 session,
                 dump,
@@ -146,8 +144,6 @@ def invoke(
 
 async def _invoke(
     invoker: PluginInvoker,
-    project: Project,
-    plugin_name: str,
     plugin_args: str,
     session: sessionmaker,
     dump: str,

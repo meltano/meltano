@@ -255,7 +255,6 @@ def _prompt_plugin_settings(plugin_type):
 
 
 def add_plugin(
-    project: Project,
     plugin_type: PluginType,
     plugin_name: str,
     add_service: ProjectAddService,
@@ -355,7 +354,6 @@ def add_plugin(
 
 
 def add_required_plugins(
-    project: Project,
     plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
     lock: bool = True,

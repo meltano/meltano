@@ -12,7 +12,8 @@ class TestApp:
         # the `db.session`
         pass
 
-    def test_core_registered(self, engine_sessionmaker, app):
+    @pytest.mark.usefixtures("app")
+    def test_core_registered(self, engine_sessionmaker):
         engine, _ = engine_sessionmaker
 
         # ensure both the API and the meltano.core

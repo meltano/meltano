@@ -85,9 +85,7 @@ class CommandLineRunner(ValidationsRunner):
     nargs=-1,
 )
 @pass_project(migrate=True)
-@click.pass_context
 def test(
-    ctx: click.Context,
     project: Project,
     all_tests: bool,
     plugin_tests: tuple[str] = (),

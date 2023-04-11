@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mock
+import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -11,7 +12,8 @@ from meltano.core.project_settings_service import (
 
 
 class TestCliUi:
-    def test_ui(self, project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_ui(self, cli_runner):
         with mock.patch(
             "meltano.cli.ui.APIWorker.start",
         ) as start_api_worker, mock.patch(

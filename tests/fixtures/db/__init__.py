@@ -77,7 +77,11 @@ def connection(engine_sessionmaker):  # noqa: WPS442
 
 
 @pytest.fixture()
-def session(project: Project, engine_sessionmaker, connection):  # noqa: WPS442
+def session(
+    project: Project,  # noqa: ARG001
+    engine_sessionmaker,
+    connection,
+):  # noqa: WPS442
     """Create a new database session for a test.
 
     Args:

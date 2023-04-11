@@ -373,7 +373,10 @@ class Job(SystemModel):  # noqa: WPS214
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(self, session):
+    def _handling_sigterm(
+        self,
+        session,  # noqa: ARG002
+    ):
         def handler(*_):  # noqa: WPS430
             sigterm_status = 143
             raise SystemExit(sigterm_status)
