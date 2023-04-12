@@ -1148,18 +1148,21 @@ Six = "*"
 
 [[package]]
 name = "flask-executor"
-version = "0.10.0"
+version = "1.0.0"
 description = "An easy to use Flask wrapper for concurrent.futures"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "Flask-Executor-0.10.0.tar.gz", hash = "sha256:ddb51b9e10f0fbfcff6c2386a5d92957402b7c81b7614eb1f3c77be64bcfd684"},
-    {file = "Flask_Executor-0.10.0-py3-none-any.whl", hash = "sha256:074885fc6d04764c86ab7f070818ea87dd08ee54767a216a8e7a00c39550bea2"},
+    {file = "Flask-Executor-1.0.0.tar.gz", hash = "sha256:4bc113def5d9f1c7ff272ff7ba09f843468eab80469bdbd21625a111b2c8ae7b"},
+    {file = "Flask_Executor-1.0.0-py3-none-any.whl", hash = "sha256:c044dc6393326a83351e69e4ddf3686270abffeac2b599260cebf0ea5d1e93de"},
 ]
 
 [package.dependencies]
 Flask = "*"
+
+[package.extras]
+test = ["flask-sqlalchemy", "pytest"]
 
 [[package]]
 name = "flask-login"
@@ -4101,4 +4104,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "1758400372a76c9aae00204eda6ce45af931aa147dfd43a5dd1ddd8ffc1967a8"
+content-hash = "39afa2128606ebcb277454eab2a37d5cd53f8f656bc8e28b3ff1d4014ba27402"

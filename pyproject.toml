@@ -70,7 +70,7 @@ email-validator = "^1.1.2"
 fasteners = "^0.17.3"
 flask = "^2.1"
 flask-cors = "^3.0.7"
-flask-executor = "^0.10"
+flask-executor = "^1.0"
 flask-login = "==0.6.1" # https://github.com/meltano/meltano/issues/6548
 flask-restful = "^0.3.7"
 flask-sqlalchemy = "^2.4.4"
