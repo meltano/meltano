@@ -88,12 +88,12 @@ class TestProjectPluginsService:
         assert project.plugins.get_plugin(tap) is not plugin
 
     @pytest.mark.order(2)
+    @pytest.mark.usefixtures("modified_lockfile")
     def test_get_parent_from_lockfile(
         self,
         project: Project,
         tap: ProjectPlugin,
         locked_definition_service: LockedDefinitionService,
-        modified_lockfile,
     ):
         expected = locked_definition_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,

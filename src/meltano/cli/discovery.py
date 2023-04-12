@@ -24,8 +24,10 @@ if t.TYPE_CHECKING:
     default="all",
 )
 @pass_project()
-@click.pass_context
-def discover(ctx: click.Context, project: Project, plugin_type: str):
+def discover(  # noqa: C901
+    project: Project,
+    plugin_type: str,
+):
     """
     List the available discoverable plugins and their variants.
 

@@ -42,7 +42,7 @@ async def install_dbt_plugin(
     project: Project,
     plugin: ProjectPlugin,
     reason: PluginInstallReason,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ) -> None:
     """Install the transform into the project.
 

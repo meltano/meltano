@@ -47,8 +47,7 @@ def user(ctx, project):
         "admin and regular."
     ),
 )
-@click.pass_context
-def add(ctx, username, password, role, **flags):
+def add(username, password, role, **flags):
     """
     Create a Meltano user account.
 

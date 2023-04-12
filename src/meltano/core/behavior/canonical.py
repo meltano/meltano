@@ -192,7 +192,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         Returns:
             A new instance with the given attributes set.
         """
-        return type(self)(**{**self.canonical(), **kwargs})
+        return type(self)(*args, **{**self.canonical(), **kwargs})
 
     @classmethod
     def parse(cls: type[T], obj: t.Any) -> T:

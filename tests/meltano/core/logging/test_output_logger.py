@@ -56,7 +56,8 @@ class TestOutputLogger:
         return handler
 
     @pytest.mark.asyncio()
-    async def test_stdio_capture(self, log, subject, log_output):
+    @pytest.mark.usefixtures("log")
+    async def test_stdio_capture(self, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -104,7 +105,8 @@ class TestOutputLogger:
         )
 
     @pytest.mark.asyncio()
-    async def test_out_writers(self, log, subject, log_output):
+    @pytest.mark.usefixtures("log")
+    async def test_out_writers(self, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -157,7 +159,8 @@ class TestOutputLogger:
         )
 
     @pytest.mark.asyncio()
-    async def test_set_custom_logger(self, log, subject, log_output):
+    @pytest.mark.usefixtures("log")
+    async def test_set_custom_logger(self, subject, log_output):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -182,7 +185,8 @@ class TestOutputLogger:
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
     @pytest.mark.asyncio()
-    async def test_logging_redirect(self, log, subject, log_output, redirect_handler):
+    @pytest.mark.usefixtures("log", "log_output")
+    async def test_logging_redirect(self, subject, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",

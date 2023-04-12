@@ -157,9 +157,9 @@ class TestPluginInvoker:
     @pytest.mark.parametrize(
         ("executable_str", "assert_fn"),
         (
-            ("tap-test", lambda exe, name: exe == "tap-test"),
+            ("tap-test", lambda exe, _: exe == "tap-test"),
             ("./tap-test", lambda exe, name: exe.endswith(f"{name}/tap-test")),
-            ("/apps/tap-test", lambda exe, name: exe == "/apps/tap-test"),
+            ("/apps/tap-test", lambda exe, _: exe == "/apps/tap-test"),
         ),
     )
     @pytest.mark.asyncio()

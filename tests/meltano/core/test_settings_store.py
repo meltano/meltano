@@ -214,13 +214,13 @@ class TestAutoStoreManager:
 
         assert subject.auto_store(setting_name) == Store.DB
 
+    @pytest.mark.usefixtures("assert_value_source")
     def test_get(  # noqa: WPS213
         self,
         subject,
         project,
         dummy_settings_service,
         set_value_store,
-        assert_value_source,
         monkeypatch,
         environment,
     ):
@@ -302,12 +302,12 @@ class TestAutoStoreManager:
         assert metadata["auto_store"] == Store.DB
         assert metadata["overwritable"] is False
 
+    @pytest.mark.usefixtures("set_value_store")
     def test_set(
         self,
         subject: SettingsStoreManager,
         project,
         unsupported,
-        set_value_store,
         assert_value_source,
         monkeypatch,
         environment,

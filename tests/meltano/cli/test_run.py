@@ -5,12 +5,10 @@ import json
 import re
 
 import pytest
-import structlog
 from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
@@ -22,34 +20,6 @@ from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 class MockIOBlock(IOBlock):
     string_id = "mock-io-block"
-
-
-test_log_config = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "test": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "test",
-            "stream": "ext://sys.stderr",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
-}
 
 
 @pytest.fixture(scope="class")
@@ -196,20 +166,14 @@ class EventMatcher:
 
 class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project", "job_logging_service")
     def test_run_parsing_failures(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
         target_process,
-        job_logging_service,
     ):
         result = cli_runner.invoke(cli, ["run"])
         assert result.exit_code == 0
@@ -278,24 +242,22 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0]["success"]
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "mapper",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_basic_invocations(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        mapper,
-        dbt,
         tap_process,
         target_process,
         mapper_process,
         dbt_process,
-        job_logging_service,
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -346,15 +308,10 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[0]["success"]
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_run_custom_suffix_command_option(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -384,6 +341,7 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config")
     @pytest.mark.parametrize(
         "suffix_args",
         (
@@ -414,13 +372,8 @@ class TestCliRunScratchpadOne:
             "dynamic (multiple env)",
         ],
     )
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
-    )
     def test_run_custom_suffix_active_environment(
         self,
-        default_config,
         suffix_args,
         cli_runner,
         project: Project,
@@ -464,19 +417,13 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
-    def test_run_multiple_commands(
-        self,
-        default_config,
-        cli_runner,
-        project,
-        dbt,
-        dbt_process,
-        job_logging_service,
-    ):
+    def test_run_multiple_commands(self, cli_runner, dbt_process):
         # Verify that requesting the same command plugin multiple time with
         # different args works
         invoke_async = AsyncMock(
@@ -515,24 +462,22 @@ class TestCliRunScratchpadOne:
             assert matcher.find_by_event("Block run completed.")[1]["success"]
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "mapper",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_complex_invocations(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        mapper,
-        dbt,
         tap_process,
         target_process,
         mapper_process,
         dbt_process,
-        job_logging_service,
     ):
         invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process),
@@ -581,22 +526,20 @@ class TestCliRunScratchpadOne:
             assert dbt_done_event[0]["stdio"] == "stderr"
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_plugin_command_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         dbt_process,
-        job_logging_service,
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -650,22 +593,20 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches("dbt failure")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_elb_tap_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         dbt_process,
-        job_logging_service,
     ):
         # In this scenario, the tap fails on the third read. Target should still
         # complete, but dbt should not.
@@ -722,22 +663,20 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         dbt_process,
-        job_logging_service,
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -820,22 +759,20 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         dbt_process,
-        job_logging_service,
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -892,22 +829,20 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_elb_tap_and_target_failed(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         dbt_process,
-        job_logging_service,
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -973,22 +908,20 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "dbt_process",
+        "job_logging_service",
     )
     def test_run_elb_tap_line_length_limit_error(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
-        dbt_process,
-        job_logging_service,
     ):
         args = ["run", tap.name, target.name]
 
@@ -1043,24 +976,22 @@ class TestCliRunScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "dbt_process",
+        "job_logging_service",
     )
     def test_run_mapper_config(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         mapper,
-        dbt,
         tap_process,
         target_process,
         mapper_process,
-        dbt_process,
-        job_logging_service,
         project_add_service,
     ):
         # exit cleanly when everything is fine
@@ -1192,24 +1123,22 @@ class TestCliRunScratchpadOne:
             ) in result.stderr
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "job_logging_service",
     )
     def test_run_elb_mapper_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         mapper,
-        dbt,
         tap_process,
         target_process,
         mapper_process,
         dbt_process,
-        job_logging_service,
     ):
         # In this scenario, the map fails on the second read. Target should
         # still complete, but dbt should not.
@@ -1271,24 +1200,22 @@ class TestCliRunScratchpadOne:
             assert not matcher.event_matches("dbt done")
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config",
-        return_value=test_log_config,
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "mapper",
+        "dbt",
+        "dbt_process",
+        "job_logging_service",
     )
     def test_run_dry_run(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        mapper,
-        dbt,
         tap_process,
         target_process,
         mapper_process,
-        dbt_process,
-        job_logging_service,
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -1322,12 +1249,12 @@ class TestCliRunScratchpadOne:
             assert asyncio_mock.call_count == 0
 
     @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("colors", (True, False))
     def test_color_console_exception_handler(
         self,
         colors,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,

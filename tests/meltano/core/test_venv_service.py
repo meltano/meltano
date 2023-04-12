@@ -27,7 +27,8 @@ class TestVenvService:
         assert not file.exists()
 
     @pytest.mark.asyncio()
-    async def test_clean_install(self, project, subject: VenvService):
+    @pytest.mark.usefixtures("project")
+    async def test_clean_install(self, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -80,7 +81,8 @@ class TestVenvService:
             )
 
     @pytest.mark.asyncio()
-    async def test_install(self, project, subject: VenvService):
+    @pytest.mark.usefixtures("project")
+    async def test_install(self, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -115,7 +117,8 @@ class TestVenvService:
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
     @pytest.mark.asyncio()
-    async def test_requires_clean_install(self, project, subject: VenvService):
+    @pytest.mark.usefixtures("project")
+    async def test_requires_clean_install(self, subject: VenvService):
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
 

@@ -62,7 +62,8 @@ class TestCliState:
         result_set.remove("")
         return result_set
 
-    def test_list(self, project, state_ids, state_service, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_list(self, state_ids, state_service, cli_runner):
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             result = cli_runner.invoke(cli, ["state", "list"])
         assert_cli_runner(result)
@@ -165,12 +166,12 @@ class TestCliState:
                     job_dst_state,
                 )
 
+    @pytest.mark.usefixtures("payloads")
     def test_merge_from_file(
         self,
         tmp_path,
         state_service,
         state_ids,
-        payloads,
         cli_runner,
     ):
         if platform.system() == "Windows":
