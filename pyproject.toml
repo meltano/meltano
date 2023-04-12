@@ -116,7 +116,7 @@ commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-
 coverage = {extras = ["toml"], version = "^7.2.3"}
 freezegun = "^0.3.12"
 mock = "^5.0.1"
-mypy = "^0.960"
+mypy = "^1.2"
 pre-commit = "^2.9.2"
 pytest = "^7.1.2"
 pytest-asyncio = "^0.21.0"
