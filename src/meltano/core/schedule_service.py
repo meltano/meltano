@@ -21,7 +21,7 @@ from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_da
 
 
 class ScheduleAlreadyExistsError(MeltanoError):
-    """Occurs when a schedule already exists."""
+    """A schedule already exists."""
 
     def __init__(self, schedule: Schedule):
         """Initialize the exception.
@@ -34,7 +34,7 @@ class ScheduleAlreadyExistsError(MeltanoError):
 
 
 class ScheduleDoesNotExistError(MeltanoError):
-    """Occurs when a schedule does not exist."""
+    """A schedule does not exist."""
 
     def __init__(self, name: str):
         """Initialize the exception.
@@ -52,7 +52,7 @@ class ScheduleDoesNotExistError(MeltanoError):
 
 
 class ScheduleNotFoundError(MeltanoError):
-    """Occurs when a schedule for a namespace cannot be found."""
+    """A schedule for a namespace cannot be found."""
 
     def __init__(self, namespace: str):
         """Initialize the exception.
@@ -68,7 +68,7 @@ class ScheduleNotFoundError(MeltanoError):
 
 
 class BadCronError(MeltanoError):
-    """Occurs when a cron expression is invalid."""
+    """A cron expression is invalid."""
 
     def __init__(self, cron: str):
         """Initialize the exception.
@@ -122,11 +122,18 @@ class ScheduleService:  # noqa: WPS214
             The added schedule.
         """
         start_date = coerce_datetime(start_date) or self.default_start_date(  # TODO
-            session, extractor
+            session,
+            extractor,
         )
 
         schedule = Schedule(
-            name, extractor, loader, transform, interval, start_date, env=env
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date,
+            env=env,
         )
         return self.add_schedule(schedule)
 
@@ -168,7 +175,8 @@ class ScheduleService:  # noqa: WPS214
             The start_date of the extractor, or now.
         """
         extractor_plugin = self.project.plugins.find_plugin(
-            extractor, plugin_type=PluginType.EXTRACTORS
+            extractor,
+            plugin_type=PluginType.EXTRACTORS,
         )
         start_date: str | datetime | date | None = None
         try:
@@ -232,8 +240,8 @@ class ScheduleService:  # noqa: WPS214
             try:
                 # guard if it doesn't exist
                 schedule = find_named(self.schedules(), name)
-            except NotFound:
-                raise ScheduleDoesNotExistError(name)
+            except NotFound as ex:
+                raise ScheduleDoesNotExistError(name) from ex
 
             # find the schedules plugin config
             meltano.schedules.remove(schedule)
@@ -252,15 +260,17 @@ class ScheduleService:  # noqa: WPS214
         with self.project.meltano_update() as meltano:
             try:
                 idx = meltano.schedules.index(schedule)
-                meltano.schedules[idx] = schedule
             except ValueError:
-                raise ScheduleDoesNotExistError(schedule.name)
+                raise ScheduleDoesNotExistError(schedule.name) from None
+            else:
+                meltano.schedules[idx] = schedule
 
     def find_namespace_schedule(self, namespace: str) -> Schedule:
         """Search for a Schedule that runs for a certain plugin namespace.
 
         Example:
-            `tap_carbon` would yield the first schedule that runs for the `tap-carbon` extractor.
+            `tap_carbon` would yield the first schedule that runs for the
+            `tap-carbon` extractor.
 
         Args:
             namespace: The plugin namespace to search.
@@ -273,7 +283,8 @@ class ScheduleService:  # noqa: WPS214
         """
         try:
             extractor = self.project.plugins.find_plugin_by_namespace(
-                PluginType.EXTRACTORS, namespace
+                PluginType.EXTRACTORS,
+                namespace,
             )
 
             return next(
@@ -310,7 +321,11 @@ class ScheduleService:  # noqa: WPS214
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: dict | None = None, **kwargs
+        self,
+        schedule: Schedule,
+        *args,
+        env: dict | None = None,
+        **kwargs,
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 
@@ -334,5 +349,7 @@ class ScheduleService:  # noqa: WPS214
             )
 
         return MeltanoInvoker(self.project).invoke(
-            ["elt", *schedule.elt_args, *args], env={**schedule.env, **env}, **kwargs
+            ["elt", *schedule.elt_args, *args],
+            env={**schedule.env, **env},
+            **kwargs,
         )

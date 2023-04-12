@@ -18,7 +18,7 @@ class TestCliDiscover:
         hub_request_counter: Counter,
     ):
         adapter = project.hub_service.session.get_adapter(
-            project.hub_service.hub_api_url
+            project.hub_service.hub_api_url,
         )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):
@@ -46,7 +46,7 @@ class TestCliDiscover:
         hub_request_counter: Counter,
     ):
         adapter = project.hub_service.session.get_adapter(
-            project.hub_service.hub_api_url
+            project.hub_service.hub_api_url,
         )
 
         with mock.patch("requests.adapters.HTTPAdapter.send", adapter.send):

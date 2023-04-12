@@ -59,7 +59,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.36.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.38.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -70,31 +70,26 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.35.0" # Keep this in sync with the rev above!
+          - "eslint@8.38.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
           - "prettier@2.8.1"
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.261
+    hooks:
+    - id: ruff
+      args: [--fix, --exit-non-zero-on-fix]
+
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.3.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py3-plus", "--py37-plus", "--keep-mock"]
-
   - repo: https://github.com/flakeheaven/flakeheaven
-    rev: 3.2.1
+    rev: 3.3.0
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)
@@ -110,7 +105,6 @@ repos:
           - flake8-debugger==4.1.2
           - flake8-docstrings==1.6.0
           - flake8-eradicate==1.4.0
-          - flake8-isort==4.2.0
           - flake8-polyfill==1.0.2
           - flake8-quotes==3.3.1
           - flake8-rst-docstrings==0.2.7

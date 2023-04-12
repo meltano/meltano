@@ -14,12 +14,9 @@ from meltano.core.cli_messages import (
     MELTY,
 )
 
-from . import cli
 
-
-@cli.command(short_help="Summon a dragon!")
-@click.pass_context
-def dragon(ctx):
+@click.command(short_help="Summon a dragon!")
+def dragon():
     """Summon a dragon."""
     dragon_list = [
         MELTY,

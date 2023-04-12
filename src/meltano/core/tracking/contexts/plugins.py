@@ -19,11 +19,13 @@ logger = get_logger(__name__)
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
     if not plugin or not safe_hasattr(plugin, "info"):
-        # don't try to snag any info for this plugin, we're somehow badly malformed (unittest?), or where passed None.
-        # this event will be routed to the "bad" bucket on the snowplow side. That makes it detectable on our end,
-        # unlike if we had just filtered it out completely.
+        # Don't try to snag any info for this plugin, we're somehow badly
+        # malformed (unittest?), or where passed None. This event will be
+        # routed to the "bad" bucket on the snowplow side. That makes it
+        # detectable on our end, unlike if we had just filtered it out
+        # completely.
         logger.debug(
-            "Plugin tracker context some how encountered plugin without info attr."
+            "Plugin tracker context some how encountered plugin without info attr.",
         )
         return {}
 
@@ -75,7 +77,7 @@ class PluginsTrackingContext(SelfDescribingJson):
                 (
                     (elt_context.extractor.plugin, None),
                     (elt_context.loader.plugin, None),
-                )
+                ),
             )
         if elt_context.transformer:
             plugins.append((elt_context.transformer.plugin, None))
@@ -104,21 +106,22 @@ class PluginsTrackingContext(SelfDescribingJson):
         if isinstance(blk, PluginCommandBlock):
             return cls([(blk.context.plugin, blk.command)])
         raise TypeError(
-            "Parameter 'blk' must be an instance of 'BlockSet' or 'PluginCommandBlock', "
-            + f"not {type(blk)!r}"
+            "Parameter 'blk' must be an instance of 'BlockSet' or "
+            f"'PluginCommandBlock', not {type(blk)!r}",
         )
 
     @classmethod
     def from_blocks(
-        cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
+        cls,
+        parsed_blocks: list[BlockSet | PluginCommandBlock],
     ) -> PluginsTrackingContext:
-        """Create a PluginsTrackingContext from a list of BlockSets or PluginCommandBlocks.
+        """Create a `PluginsTrackingContext` from blocks.
 
         Args:
             parsed_blocks: The blocks to create the context from.
 
         Returns:
-            The PluginsTrackingContext for the given blocks.
+            The `PluginsTrackingContext` for the given blocks.
         """
         plugins: list[tuple[ProjectPlugin, str]] = []
         for blk in parsed_blocks:

@@ -16,9 +16,8 @@ from meltano.core.setting_definition import (
     SettingMissingError,
 )
 from meltano.core.settings_store import SettingValueStore
-from meltano.core.utils import EnvVarMissingBehavior
+from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
-from meltano.core.utils import flatten
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -61,7 +60,7 @@ class FeatureFlags(Enum):
 
 
 class FeatureNotAllowedException(Exception):
-    """Occurs when a disallowed code path is run."""
+    """A disallowed code path is run."""
 
     def __init__(self, feature):
         """Instantiate the error.
@@ -154,9 +153,10 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     def setting_definitions(self) -> list[SettingDefinition]:
         """Return definitions of supported settings."""
 
-    @property  # noqa: B027
+    @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
+        return None  # noqa: DAR201
 
     @property
     @abstractmethod
@@ -221,7 +221,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             extras: extra setting definitions to include
             source: the SettingsStore to use
             source_manager: the SettingsStoreManager to use
-            kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            kwargs: additional keyword args to pass during SettingsStoreManager
+                instantiation
 
         Returns:
             dict of config with metadata
@@ -256,7 +257,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         Args:
             *args: args to pass to config_with_metadata
-            process: whether or not to process the config
+            process: Whether to process the config
             **kwargs: additional kwargs to pass to config_with_metadata
 
         Returns:
@@ -318,12 +319,13 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         Args:
             name: the name of the setting to get
-            redacted: whether or not the setting is redacted
-            source: the SettingsStore to use
-            source_manager: the SettingsStoreManager to use
-            setting_def: get this SettingDefinition instead of name
-            expand_env_vars: whether or not to expand nested environment variables
-            **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            redacted: Whether the setting is redacted
+            source: the `SettingsStore` to use
+            source_manager: the `SettingsStoreManager` to use
+            setting_def: get this `SettingDefinition` instead of name
+            expand_env_vars: Whether to expand nested environment variables
+            **kwargs: additional keyword args to pass during
+                `SettingsStoreManager` instantiation
 
         Returns:
             a tuple of the setting value and metadata
@@ -345,7 +347,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
                     redacted=redacted,
                     source=source,
                     source_manager=source_manager,
-                )
+                ),
             )
 
         manager = source_manager or source.manager(self, **kwargs)
@@ -420,8 +422,12 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         if setting_def is None and metadata["source"] is SettingValueStore.DEFAULT:
             warnings.warn(
-                f"Unknown setting {name!r} - the default value `{value!r}` will be used",
+                (
+                    f"Unknown setting {name!r} - the default value "
+                    f"`{value!r}` will be used"
+                ),
                 RuntimeWarning,
+                stacklevel=2,
             )
 
         return value, metadata
@@ -453,7 +459,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         return value
 
     def set_with_metadata(  # noqa: WPS615, WPS210
-        self, path: str | list[str], value, store=SettingValueStore.AUTO, **kwargs
+        self,
+        path: str | list[str],
+        value,
+        store=SettingValueStore.AUTO,
+        **kwargs,
     ):
         """Set the value and metadata for a setting.
 
@@ -461,7 +471,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             path: the key for the setting
             value: the value to set the setting to
             store: the store to set the value in
-            **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            **kwargs: additional keyword args to pass during
+                `SettingsStoreManager` instantiation
 
         Returns:
             the new value and metadata for the setting
@@ -476,7 +487,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         try:
             setting_def = self.find_setting(name)
         except SettingMissingError:
-            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning)
+            warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
             setting_def = None
 
         metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
@@ -493,8 +504,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         metadata.update(
             store.manager(self, **kwargs).set(
-                name, path, value, setting_def=setting_def
-            )
+                name,
+                path,
+                value,
+                setting_def=setting_def,
+            ),
         )
 
         self.log(f"Set setting {name!r} with metadata: {metadata}")
@@ -519,7 +533,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         Args:
             path: the key for the setting
             store: the store to set the value in
-            **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            **kwargs: additional keyword args to pass during
+                SettingsStoreManager instantiation
 
         Returns:
             the metadata for the setting
@@ -552,7 +567,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         Args:
             store: the store to set the value in
-            **kwargs: additional keyword args to pass during SettingsStoreManager instantiation
+            **kwargs: additional keyword args to pass during
+                `SettingsStoreManager` instantiation
 
         Returns:
             the metadata for the setting
@@ -609,15 +625,21 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    def setting_env_vars(self, setting_def, for_writing=False):
+    # TODO: The `for_writing` parameter is unsued, but referenced elsewhere.
+    # Callers should be updated to not use it, and then it should be removed.
+    def setting_env_vars(
+        self,
+        setting_def,
+        for_writing=False,  # noqa: ARG002
+    ):
         """Get environment variables for the given setting definition.
 
         Args:
-            setting_def: the setting definition to get env vars for
-            for_writing: unused but referenced elsewhere # TODO: clean up refs at some point
+            setting_def: The setting definition to get env vars for.
+            for_writing: Unused parameter.
 
         Returns:
-            environment variables for given setting
+            Environment variables for given setting
         """
         return setting_def.env_vars(self.env_prefixes)
 
@@ -643,7 +665,9 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     @contextmanager
     def feature_flag(
-        self, feature: str, raise_error: bool = True
+        self,
+        feature: str,
+        raise_error: bool = True,
     ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
@@ -655,7 +679,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             true if the feature flag is enabled, else false
 
         Raises:
-            FeatureNotAllowedException: if raise_error is True and feature flag is disallowed
+            FeatureNotAllowedException: if `raise_error` is `True` and feature
+                flag is disallowed
         """
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", "Unknown setting", RuntimeWarning)

@@ -174,7 +174,9 @@ class TestPluginDefinition:
 
     def test_label(self):
         plugin_def = PluginDefinition(
-            PluginType.EXTRACTORS, name="tap-foo", namespace="tap_foo"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            namespace="tap_foo",
         )
         assert plugin_def.label == "tap-foo"
 
@@ -183,7 +185,9 @@ class TestPluginDefinition:
 
     def test_logo_url(self):
         plugin_def = PluginDefinition(
-            PluginType.EXTRACTORS, name="tap-foo", namespace="tap_foo"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            namespace="tap_foo",
         )
         assert plugin_def.logo_url == "/static/logos/foo-logo.png"
 
@@ -192,17 +196,18 @@ class TestPluginDefinition:
 
 
 class TestBasePlugin:
-    @pytest.fixture
+    @pytest.fixture()
     def plugin_def(self):
         return PluginDefinition(
-            PluginType.EXTRACTORS, **TestPluginDefinition.ATTRS["variants"]
+            PluginType.EXTRACTORS,
+            **TestPluginDefinition.ATTRS["variants"],
         )
 
-    @pytest.fixture
+    @pytest.fixture()
     def variant(self, plugin_def):
         return plugin_def.find_variant()
 
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, plugin_def, variant):
         return BasePlugin(plugin_def, variant)
 
@@ -397,7 +402,8 @@ class TestProjectPlugin:
         inherited_tap.namespace = None
         inherited_tap.label = None
 
-        # Shadowing plugins (with the same name as their parent) inherit namespace and label
+        # Shadowing plugins (with the same name as their parent) inherit
+        # namespace and label
         assert tap.namespace == base_plugin.namespace == "tap_mock"
         assert tap.label == base_plugin.label == "Mock"
 
@@ -415,13 +421,19 @@ class TestProjectPlugin:
 
     def test_set_parent(self):
         plugin_one = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-one", inherit_from="tap-two"
+            PluginType.EXTRACTORS,
+            name="tap-one",
+            inherit_from="tap-two",
         )
         plugin_two = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-two", inherit_from="tap-three"
+            PluginType.EXTRACTORS,
+            name="tap-two",
+            inherit_from="tap-three",
         )
         plugin_three = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-three", inherit_from="tap-one"
+            PluginType.EXTRACTORS,
+            name="tap-three",
+            inherit_from="tap-one",
         )
 
         plugin_one.parent = plugin_two
@@ -445,7 +457,9 @@ class TestProjectPlugin:
 
         # With a variant set, that variant is used
         plugin = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-mock", variant="meltano"
+            PluginType.EXTRACTORS,
+            name="tap-mock",
+            variant="meltano",
         )
         assert plugin.variant == "meltano"
 
@@ -454,7 +468,8 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_command_inheritance(self, tap, inherited_tap, plugin_discovery_service):
+    @pytest.mark.usefixtures("plugin_discovery_service")
+    def test_command_inheritance(self, tap, inherited_tap):
         # variants
         assert tap.all_commands["cmd"].args == "cmd meltano"
         assert tap.all_commands["cmd"].description == "a description of cmd"
@@ -592,5 +607,8 @@ class TestPluginType:
             assert PluginType.from_cli_argument(plugin_type.value) == plugin_type
             assert PluginType.from_cli_argument(plugin_type.singular) == plugin_type
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError,
+            match="'unknown type' is not a valid PluginType",
+        ):
             PluginType.from_cli_argument("unknown type")

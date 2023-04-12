@@ -19,11 +19,11 @@ from meltano.core.project_plugins_service import PluginType
 
 
 class UpgradeError(Exception):
-    """Occurs when the Meltano upgrade fails."""
+    """The Meltano upgrade fails."""
 
 
 class AutomaticPackageUpgradeError(Exception):
-    """Occurs when an automatic upgrade of Meltano fails."""
+    """An automatic upgrade of Meltano fails."""
 
     def __init__(self, reason: str, instructions: str):
         """Initialize the `AutomaticPackageUpgradeError`.
@@ -78,7 +78,11 @@ class UpgradeService:
 
         elif os.path.exists("/.dockerenv"):
             fail_reason = "it is installed inside Docker"
-            instructions = "pull the latest Docker image using `docker pull meltano/meltano` and recreate any containers you may have created"
+            instructions = (
+                "pull the latest Docker image using "
+                "`docker pull meltano/meltano` and recreate any containers "
+                "you may have created"
+            )
 
         elif os.getenv("NOX_CURRENT_SESSION") == "tests":
             fail_reason = "it is installed inside a Nox test session"
@@ -117,9 +121,11 @@ class UpgradeService:
         try:
             self._upgrade_package(pip_url, force)
         except AutomaticPackageUpgradeError as err:
-            click.echo(
-                f"{click.style('The `meltano` package could not be upgraded automatically', fg='red')} because {err.reason}."
+            msg = click.style(
+                "The `meltano` package could not be upgraded automatically",
+                fg="red",
             )
+            click.echo(f"{msg} because {err.reason}.")
             if err.instructions:
                 click.echo(f"To upgrade manually, {err.instructions}.")
             return False
@@ -170,7 +176,8 @@ class UpgradeService:
 
             if not package_upgraded:
                 click.echo(
-                    "Then, run `meltano upgrade --skip-package` to upgrade your project based on the latest version."
+                    "Then, run `meltano upgrade --skip-package` to upgrade "
+                    "your project based on the latest version.",
                 )
                 return
 

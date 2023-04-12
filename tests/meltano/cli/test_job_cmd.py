@@ -10,10 +10,12 @@ from meltano.cli import cli
 
 
 class TestCliJob:
-    def test_job_add(self, session, project, cli_runner, task_sets_service):
+    @pytest.mark.usefixtures("session", "project")
+    def test_job_add(self, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -92,10 +94,12 @@ class TestCliJob:
             assert res.exit_code == 1
             assert "Failed to parse yaml" in str(res.exception)
 
-    def test_job_set(self, session, project, cli_runner, task_sets_service):
+    @pytest.mark.usefixtures("session", "project")
+    def test_job_set(self, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -126,10 +130,12 @@ class TestCliJob:
             assert task_sets.tasks == ["tap2-mock target2-mock"]
 
     @pytest.mark.order(after="test_job_add")
-    def test_job_remove(self, session, project, cli_runner, task_sets_service):
+    @pytest.mark.usefixtures("session", "project")
+    def test_job_remove(self, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             res = cli_runner.invoke(
                 cli,
@@ -148,10 +154,12 @@ class TestCliJob:
             assert_cli_runner(res)
             assert not task_sets_service.exists("job-remove-mock")
 
-    def test_job_list(self, session, project, cli_runner, task_sets_service):
+    @pytest.mark.usefixtures("session", "project")
+    def test_job_list(self, cli_runner, task_sets_service):
         # singular task with job
         with mock.patch(
-            "meltano.cli.job.TaskSetsService", return_value=task_sets_service
+            "meltano.cli.job.TaskSetsService",
+            return_value=task_sets_service,
         ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
             cli_args = [
                 "job",
@@ -183,7 +191,8 @@ class TestCliJob:
 
             # test singular json list
             res = cli_runner.invoke(
-                cli, ["job", "list", "--format=json", "job-list-mock"]
+                cli,
+                ["job", "list", "--format=json", "job-list-mock"],
             )
             assert_cli_runner(res)
             output = json.loads(res.output)

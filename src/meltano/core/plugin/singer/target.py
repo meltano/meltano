@@ -1,7 +1,4 @@
-"""SingerTarget and supporting classes.
-
-This module contains the SingerTarget class as well as a supporting BookmarkWriter class.
-"""
+"""SingerTarget and supporting classes."""
 from __future__ import annotations
 
 import json
@@ -20,7 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 class BookmarkWriter:
-    """A basic bookmark writer suitable for use as an output handler."""
+    """A basic bookmark writer suitable for use as an output handler.
+
+    Has a writelines method to support ingesting and persisting state messages.
+    """
 
     def __init__(
         self,
@@ -29,13 +29,14 @@ class BookmarkWriter:
         payload_flag: int = Payload.STATE,
         state_service: StateService | None = None,
     ):
-        """Bookmark writer with a writelines implementation to support ingesting and persisting state messages.
+        """Initialize the `BookmarkWriter`.
 
         Args:
-            job: meltano elt job associated with this invocation and who's state will be updated.
+            job: meltano elt job associated with this invocation and whose
+                state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
-            payload_flag: a valid payload flag, one of Payload.STATE or Payload.INCOMPLETE_STATE.
-            state_service: StateService to use for bookmarking state.
+            payload_flag: A payload flag.
+            state_service: `StateService` to use for bookmarking state.
         """
         self.job = job
         self.session = session
@@ -50,7 +51,8 @@ class BookmarkWriter:
         """
         if self.job is None:
             logger.info(
-                "Running outside a Job context: incremental state could not be updated."
+                "Running outside a Job context: "
+                "incremental state could not be updated.",
             )
             return
 
@@ -59,7 +61,7 @@ class BookmarkWriter:
             new_state = json.loads(line)
         except Exception:
             logger.warning(
-                "Received state is invalid, incremental state has not been updated"
+                "Received state is invalid, incremental state has not been updated",
             )
 
         job = self.job
@@ -68,11 +70,14 @@ class BookmarkWriter:
         try:
             job.save(self.session)
             self.state_service.add_state(
-                job, json.dumps(job.payload), job.payload_flags
+                job,
+                json.dumps(job.payload),
+                job.payload_flags,
             )
         except Exception:
             logger.warning(
-                "Unable to persist state, or received state is invalid, incremental state has not been updated"
+                "Unable to persist state, or received state is invalid, "
+                "incremental state has not been updated",
             )
         else:
             logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")
@@ -120,7 +125,9 @@ class SingerTarget(SingerPlugin):
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(
-        self, plugin_invoker: PluginInvoker, exec_args: list[str]
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: list[str],
     ):
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
@@ -137,10 +144,14 @@ class SingerTarget(SingerPlugin):
         self.setup_bookmark_writer(plugin_invoker)
 
     def setup_bookmark_writer(self, plugin_invoker: PluginInvoker):
-        """Configure the bookmark writer as an additional output handler on the invoker if running in a pipeline context.
+        """Configure the bookmark writer.
 
-        This leverages calling back to PluginInvokers.add_output_handler to attach an additional
-        output handler (the BookmarkWriter) to handle persisting state messages.
+        If running in a pipeline context, we configure the bookmark writer as
+        an additional output handler on the invoker.
+
+        This leverages calling back to `PluginInvokers.add_output_handler` to
+        attach an additional output handler (the `BookmarkWriter`) to handle
+        persisting state messages.
 
         Args:
             plugin_invoker: The invocation handler whose `add_out_handler` method

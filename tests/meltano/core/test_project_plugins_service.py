@@ -19,7 +19,7 @@ from meltano.core.project_plugins_service import (
 from meltano.core.settings_service import FeatureFlags
 
 
-@pytest.fixture
+@pytest.fixture()
 def modified_lockfile(project: Project):
     lockfile_path = project.plugin_lock_path(
         PluginType.EXTRACTORS,
@@ -42,7 +42,7 @@ def modified_lockfile(project: Project):
 
 
 class TestProjectPluginsService:
-    @pytest.fixture(autouse=True, scope="function")
+    @pytest.fixture(autouse=True)
     def setup(self, project: Project, tap):
         project.plugins.lock_service.save(tap, exists_ok=True)
         project.plugins._prefer_source = DefinitionSource.ANY
@@ -56,7 +56,7 @@ class TestProjectPluginsService:
 
     def test_get_plugin(
         self,
-        project: Project,
+        project,
         tap,
         alternative_tap,
         inherited_tap,
@@ -98,12 +98,12 @@ class TestProjectPluginsService:
         assert project.plugins.get_plugin(tap) is not plugin
 
     @pytest.mark.order(2)
+    @pytest.mark.usefixtures("modified_lockfile")
     def test_get_parent_from_lockfile(
         self,
         project: Project,
         tap: ProjectPlugin,
         locked_definition_service: LockedDefinitionService,
-        modified_lockfile,
     ):
         expected = locked_definition_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
@@ -123,14 +123,14 @@ class TestProjectPluginsService:
         project: Project,
         tap: ProjectPlugin,
     ):
-        with project.plugins.use_preferred_source(DefinitionSource.NONE):
-            with pytest.raises(PluginDefinitionNotFoundError):
-                project.plugins.get_parent(tap)
+        with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
+            PluginDefinitionNotFoundError,
+        ):
+            project.plugins.get_parent(tap)
 
     def test_ff_plugins_lock_required(
         self,
         project: Project,
-        tap: ProjectPlugin,
         monkeypatch,
     ):
         assert project.plugins._prefer_source == DefinitionSource.ANY
@@ -193,7 +193,9 @@ class TestProjectPluginsService:
         assert base.type == parent.type
 
         nonexistent_parent = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-foo", inherit_from="tap-bar"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            inherit_from="tap-bar",
         )
         with pytest.raises(PluginDefinitionNotFoundError) as excinfo:
             assert project.plugins.get_parent(nonexistent_parent)
@@ -218,10 +220,10 @@ class TestProjectPluginsService:
 
     def test_find_plugins_by_mapping_name(self, project: Project, mapper):
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
-            mapper
+            mapper,
         ]
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-0") == [
-            mapper
+            mapper,
         ]
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")

@@ -51,13 +51,15 @@ class DefinitionSource(enum.Flag):
 class PluginAlreadyAddedException(Exception):
     """Raised when a plugin is already added to the project."""
 
-    def __init__(self, plugin: PluginRef):
+    def __init__(self, plugin: PluginRef, new_plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
 
         Args:
             plugin: The plugin that was already added.
+            new_plugin: The plugin that was attempted to be added.
         """
         self.plugin = plugin
+        self.new_plugin = new_plugin
         super().__init__()
 
 
@@ -161,7 +163,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin)
+            raise PluginAlreadyAddedException(existing_plugin, plugin)
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
@@ -228,7 +230,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
-                f"Plugin configuration profiles are no longer supported, ignoring `@{profile_name}` in plugin name."
+                "Plugin configuration profiles are no longer supported, "
+                f"ignoring `@{profile_name}` in plugin name.",
             )
 
         try:
@@ -252,11 +255,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             return self.ensure_parent(plugin)
         except StopIteration as stop:
             raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name
+                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
             ) from stop
 
     def find_plugin_by_namespace(
-        self, plugin_type: PluginType, namespace: str
+        self,
+        plugin_type: PluginType,
+        namespace: str,
     ) -> ProjectPlugin:
         """
         Find a plugin based on its PluginType and namespace.
@@ -328,7 +333,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             raise PluginNotFoundError(plugin_ref) from stop
 
     def get_plugins_of_type(
-        self, plugin_type: PluginType, ensure_parent=True
+        self,
+        plugin_type: PluginType,
+        ensure_parent=True,
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -358,7 +365,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         """
         return {
             plugin_type: self.get_plugins_of_type(
-                plugin_type, ensure_parent=ensure_parent
+                plugin_type,
+                ensure_parent=ensure_parent,
             )
             for plugin_type in PluginType
         }
@@ -370,7 +378,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Yields:
-            A generator of all plugins.
+            Plugins.
         """
         yield from (
             plugin
@@ -457,7 +465,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         """
         try:
             return self.project.hub_service.get_base_plugin(
-                plugin, variant_name=plugin.variant
+                plugin,
+                variant_name=plugin.variant,
             )
         except PluginNotFoundError as err:
             if plugin.inherit_from:
@@ -488,7 +497,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             try:
                 return (
                     self.find_plugin(
-                        plugin_type=plugin.type, plugin_name=plugin.inherit_from
+                        plugin_type=plugin.type,
+                        plugin_name=plugin.inherit_from,
                     ),
                     DefinitionSource.INHERITED,
                 )
@@ -523,7 +533,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 error = hub_exc
 
         raise PluginDefinitionNotFoundError(
-            plugin, error, self._prefer_source
+            plugin,
+            error,
+            self._prefer_source,
         ) from error
 
     def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
@@ -569,7 +581,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             First available transformer plugin.
         """
         transformer = next(
-            iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)), None
+            iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)),
+            None,
         )
         if not transformer:
             raise PluginNotFoundError("No Plugin of type Transformer found.")

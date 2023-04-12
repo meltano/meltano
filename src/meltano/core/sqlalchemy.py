@@ -17,13 +17,21 @@ class JSONEncodedDict(TypeDecorator):
     impl = VARCHAR
     cache_ok = True
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(  # noqa: D102
+        self,
+        value,
+        dialect,  # noqa: ARG002
+    ):
         if value is not None:
             value = json.dumps(value)
 
         return value
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(  # noqa: D102
+        self,
+        value,
+        dialect,  # noqa: ARG002
+    ):
         if value is not None:
             value = json.loads(value)
         return value
@@ -34,7 +42,11 @@ class IntFlag(TypeDecorator):
     cache_ok = True
 
     # force the cast to INTEGER
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(  # noqa: D102
+        self,
+        value,
+        dialect,  # noqa: ARG002
+    ):
         return int(value)
 
 
@@ -44,7 +56,8 @@ class GUID(TypeDecorator):
     Uses PostgreSQL's UUID type, otherwise uses
     CHAR(32), storing as stringified hex values.
 
-    Reference: https://docs.sqlalchemy.org/en/13/core/custom_types.html#backend-agnostic-guid-type
+    Reference:
+    https://docs.sqlalchemy.org/en/13/core/custom_types.html#backend-agnostic-guid-type
     """
 
     impl = CHAR
@@ -65,7 +78,11 @@ class GUID(TypeDecorator):
             value = uuid.UUID(value)
         return value.hex
 
-    def process_result_value(self, value, dialect):
+    def process_result_value(  # noqa: D102
+        self,
+        value,
+        dialect,  # noqa: ARG002
+    ):
         if value is None:
             return value
         if not isinstance(value, uuid.UUID):

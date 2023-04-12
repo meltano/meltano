@@ -42,7 +42,7 @@ async def install_dbt_plugin(
     project: Project,
     plugin: ProjectPlugin,
     reason: PluginInstallReason,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ) -> None:
     """Install the transform into the project.
 
@@ -58,7 +58,7 @@ async def install_dbt_plugin(
     if reason not in {PluginInstallReason.ADD, PluginInstallReason.UPGRADE}:
         logger.info(
             f"Run `meltano add transform {plugin.name}` "
-            "to re-add this transform to your dbt project."
+            "to re-add this transform to your dbt project.",
         )
         return
 
@@ -72,20 +72,20 @@ async def install_dbt_plugin(
 
         # Add model and vars to my-test-project/transform/dbt_project.yml
         dbt_project_path = transform_add_service.dbt_project_file.relative_to(
-            project.root
+            project.root,
         )
         logger.info(f"Adding dbt model to '{dbt_project_path}'...")
         transform_add_service.update_dbt_project(plugin)
     except PluginNotFoundError as ex:
         raise PluginInstallError(
             "Transformer 'dbt' is not installed. "
-            "Run `meltano add transformer dbt` to add it to your project."
+            "Run `meltano add transformer dbt` to add it to your project.",
         ) from ex
     except FileNotFoundError as ex:
         relative_path = Path(ex.filename).relative_to(project.root)
         raise PluginInstallError(
             f"File '{relative_path}' could not be found. "
-            "Run `meltano add files files-dbt` to set up a dbt project."
+            "Run `meltano add files files-dbt` to set up a dbt project.",
         ) from ex
 
 

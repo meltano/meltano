@@ -10,7 +10,6 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -68,7 +67,7 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(
+@click.command(
     cls=InstrumentedCmd,
     short_help="Run validations using plugins' tests.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
@@ -86,9 +85,7 @@ class CommandLineRunner(ValidationsRunner):
     nargs=-1,
 )
 @pass_project(migrate=True)
-@click.pass_context
 def test(
-    ctx: click.Context,
     project: Project,
     all_tests: bool,
     plugin_tests: tuple[str] = (),
@@ -146,7 +143,7 @@ def _report_and_exit(results: dict[str, dict[str, int]]):
     status = "successfully" if failed_count == 0 else "with failures"
     message = (
         f"Testing completed {status}. "
-        + f"{passed_count} test(s) successful. {failed_count} test(s) failed."
+        f"{passed_count} test(s) successful. {failed_count} test(s) failed."
     )
 
     write_sep_line(message, "=", fg=("red" if exit_code else "green"))

@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
@@ -17,9 +16,11 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
+@click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
 @click.argument(
-    "plugin_type", type=click.Choice(PluginType.cli_arguments()), required=False
+    "plugin_type",
+    type=click.Choice(PluginType.cli_arguments()),
+    required=False,
 )
 @click.argument("plugin_name", nargs=-1, required=False)
 @click.option(
@@ -32,7 +33,10 @@ if t.TYPE_CHECKING:
     "-p",
     type=click.INT,
     default=None,
-    help="Limit the number of plugins to install in parallel. Defaults to the number of cores.",
+    help=(
+        "Limit the number of plugins to install in parallel. "
+        "Defaults to the number of cores."
+    ),
 )
 @click.option(
     "--force",
@@ -71,7 +75,7 @@ def install(
 
     click.echo(f"Installing {len(plugins)} plugins...")
     tracker.add_contexts(
-        PluginsTrackingContext([(candidate, None) for candidate in plugins])
+        PluginsTrackingContext([(candidate, None) for candidate in plugins]),
     )
     tracker.track_command_event(CliEvent.inflight)
 

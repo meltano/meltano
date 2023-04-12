@@ -1,4 +1,7 @@
-"""Utilities for turning a string list of plugins into a usable list of `BlockSet` and `PluginCommand` objects."""
+"""Utilities for parsing string lists of plugins.
+
+Turns string lists of plugins into `BlockSet` and `PluginCommand` instances.
+"""
 
 from __future__ import annotations
 
@@ -35,7 +38,8 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
 
 def validate_block_sets(
-    log: structlog.BoundLogger, blocks: list[BlockSet | PluginCommandBlock]
+    log: structlog.BoundLogger,
+    blocks: list[BlockSet | PluginCommandBlock],
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
@@ -75,9 +79,11 @@ class BlockParser:  # noqa: D101
             log: Logger to use.
             project: Project to use.
             blocks: List of block names to parse.
-            full_refresh: Whether to perform a full refresh (applies to all found sets).
+            full_refresh: Whether to perform a full refresh (applies to all
+                found sets).
             no_state_update: Whether to run with or without state updates.
-            force: Whether to force a run if a job is already running (applies to all found sets).
+            force: Whether to force a run if a job is already running (applies
+                to all found sets).
             state_id_suffix: State ID suffix to use.
 
         Raises:
@@ -111,7 +117,8 @@ class BlockParser:  # noqa: D101
 
             if plugin and task_sets_service.exists(name):
                 raise click.ClickException(
-                    f"Ambiguous reference to '{name}' which matches a job name AND a plugin name."
+                    f"Ambiguous reference to '{name}' which matches a job "
+                    "name AND a plugin name.",
                 )
 
             if plugin.type == PluginType.MAPPERS:
@@ -157,19 +164,20 @@ class BlockParser:  # noqa: D101
         return expanded_blocks
 
     def find_blocks(
-        self, offset: int = 0
+        self,
+        offset: int = 0,
     ) -> t.Generator[BlockSet | PluginCommandBlock, None, None]:
-        """
-        Find all blocks in the invocation.
+        """Find all blocks in the invocation.
 
         Args:
             offset: Offset to start from.
 
         Yields:
-            Generator of blocks (either BlockSet or PluginCommandBlock).
+            Blocks (either BlockSet or PluginCommandBlock).
 
         Raises:
-            BlockSetValidationError: If unknown command is found or if a unexpected block sequence is found.
+            BlockSetValidationError: If unknown command is found or if a
+                unexpected block sequence is found.
         """
         cur = offset
         while cur < len(self._plugins):
@@ -193,7 +201,8 @@ class BlockParser:  # noqa: D101
                 cur += 1
             else:
                 raise BlockSetValidationError(
-                    f"Unknown command type or bad block sequence at index {cur + 1}, starting block '{plugin.name}'"  # noqa: WPS237
+                    "Unknown command type or bad block sequence at index "
+                    f"{cur + 1}, starting block '{plugin.name}'",  # noqa: WPS237
                 )
 
     def _find_plugin_or_mapping(self, name: str) -> ProjectPlugin | None:
@@ -221,7 +230,7 @@ class BlockParser:  # noqa: D101
 
         if len(mapper) > 1:
             raise click.ClickException(
-                f"Ambiguous mapping name {name}, found multiple matches."
+                f"Ambiguous mapping name {name}, found multiple matches.",
             )
         return mapper[0] if mapper else None
 
@@ -229,15 +238,13 @@ class BlockParser:  # noqa: D101
         self,
         offset: int = 0,
     ) -> tuple[ExtractLoadBlocks | None, int]:  # noqa: WPS231, WPS213
-        """
-        Search a list of project plugins trying to find an extract ExtractLoad block set.
+        """Search plugins to find an extract EL block set.
 
         Args:
             offset: Optional starting offset for search.
 
         Returns:
-            The ExtractLoad object.
-            Offset for remaining plugins.
+            The `ExtractLoadBlocks` object, and offset for remaining plugins.
 
         Raises:
             BlockSetValidationError: If the block set is not valid.
@@ -261,7 +268,8 @@ class BlockParser:  # noqa: D101
             return None, offset
 
         self.log.debug(
-            "head of set is extractor as expected", block=self._plugins[offset]
+            "head of set is extractor as expected",
+            block=self._plugins[offset],
         )
 
         blocks.append(builder.make_block(self._plugins[offset]))
@@ -287,18 +295,20 @@ class BlockParser:  # noqa: D101
                     mapping=self._mappings_ref.get(next_block),
                     idx=next_block,
                 )
-                # Checks to see if the mapper plugin name is the same as the mappings name
-                # If they both match then a validation error is raised because the
-                # meltano run command needs the mappings name to obtain the settings to
-                # pass to the parent mapper plugin.  We also want to fail if the user names them
-                # the same to stop errors due to ambiguous commands.
+                # Checks to see if the mapper plugin name is the same as the
+                # mappings name. If they both match then a validation error is
+                # raised because the meltano run command needs the mappings
+                # name to obtain the settings to pass to the parent mapper
+                # plugin. We also want to fail if the user names them the same
+                # to stop errors due to ambiguous commands.
                 if plugin.name == self._mappings_ref.get(next_block):
                     self.log.warning(
                         "Found unexpected mapper plugin name. ",
                         plugin_name=plugin.name,
                     )
                     raise BlockSetValidationError(
-                        f"Expected unique mappings name not the mapper plugin name: {plugin.name}."
+                        f"Expected unique mappings name not the mapper plugin "
+                        f"name: {plugin.name}.",
                     )
                 else:
                     blocks.append(builder.make_block(plugin))
@@ -314,6 +324,6 @@ class BlockParser:  # noqa: D101
                     plugin_name=plugin.name,
                 )
                 raise BlockSetValidationError(
-                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
+                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",
                 )
         raise BlockSetValidationError("Found no end in block set!")

@@ -5,6 +5,7 @@ import configparser
 import logging
 import os
 import subprocess
+from contextlib import suppress
 
 from packaging.version import Version
 
@@ -91,7 +92,7 @@ class Airflow(BasePlugin):
             logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
     @hook("before_install")
-    async def setup_env(self, *args, **kwargs):
+    async def setup_env(self, *args, **kwargs):  # noqa: ARG002
         """Configure the env to make airflow installable without GPL deps.
 
         Args:
@@ -122,7 +123,8 @@ class Airflow(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Command `airflow --help` failed", process=handle
+                "Command `airflow --help` failed",
+                process=handle,
             )
 
         # Read and update airflow.cfg
@@ -144,7 +146,8 @@ class Airflow(BasePlugin):
 
         if handle.returncode:
             raise AsyncSubprocessError(
-                "Command `airflow version` failed", process=handle
+                "Command `airflow version` failed",
+                process=handle,
             )
 
         version = stdout.decode()
@@ -161,7 +164,10 @@ class Airflow(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Airflow metadata database could not be initialized: `airflow initdb` failed",
+                (
+                    "Airflow metadata database could not be initialized: "
+                    "`airflow initdb` failed"
+                ),
                 handle,
             )
 
@@ -175,8 +181,6 @@ class Airflow(BasePlugin):
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]
-        try:
+        with suppress(FileNotFoundError):
             config_file.unlink()
             logging.debug(f"Deleted configuration at {config_file}")
-        except FileNotFoundError:
-            pass

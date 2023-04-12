@@ -63,7 +63,7 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 {%- endfor %}
 
 {% if plugin_url %}To learn more about {{ plugin_name | safe }} and its settings, visit [link={{ plugin_url }}]{{ plugin_url }}[/link]{% endif %}
-"""
+"""  # noqa: E501
 
 
 class InteractiveConfig:  # noqa: WPS230, WPS214
@@ -86,7 +86,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
     def configurable_settings(self):
         """Return settings available for interactive configuration."""
         return self.settings.config_with_metadata(
-            session=self.session, extras=self.extras, redacted=True
+            session=self.session,
+            extras=self.extras,
+            redacted=True,
         )
 
     @property
@@ -94,7 +96,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         """Return simplified setting choices, for easy printing."""
         setting_choices = []
         for index, (name, config_metadata) in enumerate(
-            self.configurable_settings.items()
+            self.configurable_settings.items(),
         ):
             description = config_metadata["setting"].description
             description = "" if description is None else description
@@ -110,7 +112,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
     def _print_home_screen(self):
         """Print screen for this interactive."""
         markdown_template = Environment(loader=BaseLoader, autoescape=True).from_string(
-            HOME_SCREEN_TEMPLATE
+            HOME_SCREEN_TEMPLATE,
         )
         markdown_text = markdown_template.render(
             {
@@ -129,7 +131,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     }
                     for _, name, description in self.setting_choices
                 ],
-            }
+            },
         )
         self.console.print(Panel(Text.from_markup(markdown_text)))
 
@@ -144,26 +146,31 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         pre = [
             Text.from_markup(
-                f"[bold underline][{PLUGIN_COLOR}]{self.settings.label.capitalize()}[/{PLUGIN_COLOR}][/bold underline] Setting {index} of {last_index}"
-            )
+                f"[bold underline][{PLUGIN_COLOR}]"
+                f"{self.settings.label.capitalize()}[/{PLUGIN_COLOR}]"
+                f"[/bold underline] Setting {index} of {last_index}",
+            ),
         ]
 
         if setting_def.is_extra:
             pre.append(
                 Text.from_markup(
-                    "[yellow1]Custom Extra: plugin-specific options handled by Meltano[/yellow1]"
-                )
+                    "[yellow1]Custom Extra: plugin-specific options handled "
+                    "by Meltano[/yellow1]",
+                ),
             )
 
         elif setting_def.is_custom:
             pre.append(
                 Text.from_markup(
-                    "[yellow1]Custom Setting: possibly unsupported by the plugin[/yellow1]"
-                )
+                    "[yellow1]Custom Setting: possibly unsupported by the "
+                    "plugin[/yellow1]",
+                ),
             )
 
         details.add_row(
-            Text("Name"), Text.from_markup(f"[{SETTING_COLOR}]{name}[/{SETTING_COLOR}]")
+            Text("Name"),
+            Text.from_markup(f"[{SETTING_COLOR}]{name}[/{SETTING_COLOR}]"),
         )
 
         if source is SettingValueStore.DEFAULT:
@@ -204,15 +211,16 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 Group(
                     Text(" Description:"),
                     Panel(Markdown(setting_def.description, justify="left")),
-                )
+                ),
             )
 
         docs_url = self.settings.docs_url
         if docs_url:
             post.append(
                 Text.from_markup(
-                    f" To learn more about {self.settings.label} and its settings, visit [link={docs_url}]{docs_url}[/link]"
-                )
+                    f" To learn more about {self.settings.label} and its "
+                    f"settings, visit [link={docs_url}]{docs_url}[/link]",
+                ),
             )
 
         self.console.print(Panel(Group(*pre, details, *post)))
@@ -258,7 +266,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 config_metadata
                 for nme, config_metadata in self.configurable_settings.items()
                 if nme == name
-            )
+            ),
         )
         self._print_setting(
             name=name,
@@ -380,7 +388,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         path = list(setting_name)
         try:
             value, metadata = settings.set_with_metadata(
-                path, value, store=store, session=self.session
+                path,
+                value,
+                store=store,
+                session=self.session,
             )
         except StoreNotSupportedError as err:
             if interactive:
@@ -388,7 +399,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             else:
                 self.tracker.track_command_event(CliEvent.aborted)
             raise CliError(
-                f"{settings.label.capitalize()} setting '{path}' could not be set in {store.label}: {err}"
+                f"{settings.label.capitalize()} setting '{path}' could not be "
+                f"set in {store.label}: {err}",
             ) from err
 
         name = metadata["name"]
@@ -397,7 +409,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if is_redacted:
             value = REDACTED_VALUE
         click.secho(
-            f"{settings.label.capitalize()} setting '{name}' was set in {store.label}: {value!r}",
+            (
+                f"{settings.label.capitalize()} setting '{name}' was set in "
+                f"{store.label}: {value!r}"
+            ),
             fg=VALUE_COLOR,
         )
 

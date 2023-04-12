@@ -39,7 +39,7 @@ def requires_gcs():
         None
     """
     if not google:
-        raise MissingGoogleError()
+        raise MissingGoogleError
     yield
 
 
@@ -60,7 +60,8 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         Args:
             bucket: the bucket to store state in
             prefix: the prefix to store state at
-            application_credentials: application credentials to  use in authenticating to GCS
+            application_credentials: application credentials to use in
+                authenticating to GCS
             kwargs: additional keyword args to pass to parent
         """
         super().__init__(**kwargs)
@@ -93,7 +94,7 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         with requires_gcs():
             if self.application_credentials:
                 return google.cloud.storage.Client.from_service_account_json(
-                    self.application_credentials
+                    self.application_credentials,
                 )
             # Use default authentication in environment
             return google.cloud.storage.Client()
@@ -121,11 +122,8 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
         state_ids = set()
         for blob in self.client.list_blobs(bucket_or_name=self.bucket):
             (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json":
-                if not pattern:
-                    state_ids.add(state_id)
-                elif pattern_re.match(state_id):
-                    state_ids.add(state_id)
+            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
+                state_ids.add(state_id)
         return list(state_ids)
 
     def delete(self, file_path: str):

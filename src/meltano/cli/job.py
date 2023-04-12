@@ -8,10 +8,10 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
+    CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
@@ -57,7 +57,7 @@ def _list_single_job(
         click.echo(f"{task_set.name}: {task_set.tasks}")
     elif list_format == "json":
         click.echo(
-            json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2)
+            json.dumps({"job_name": task_set.name, "tasks": task_set.tasks}, indent=2),
         )
     tracker.track_command_event(CliEvent.completed)
 
@@ -81,10 +81,10 @@ def _list_all_jobs(
                     "jobs": [
                         {"job_name": tset.name, "tasks": tset.tasks}
                         for tset in task_sets_service.list()
-                    ]
+                    ],
                 },
                 indent=2,
-            )
+            ),
         )
     elif list_format == "text":
         for task_set in task_sets_service.list():
@@ -93,7 +93,7 @@ def _list_all_jobs(
     tracker.track_command_event(CliEvent.completed)
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     short_help="Manage jobs.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
@@ -126,7 +126,7 @@ def job(project, ctx):
     \tmeltano job remove <job_name>
 
     \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
-    """
+    """  # noqa: E501
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
@@ -151,7 +151,9 @@ def list_jobs(ctx, list_format: str, job_name: str):
 
 
 @job.command(
-    cls=PartialInstrumentedCmd, name="add", short_help="Add a new job with tasks."
+    cls=PartialInstrumentedCmd,
+    name="add",
+    short_help="Add a new job with tasks.",
 )
 @click.argument(
     "job_name",
@@ -179,7 +181,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
     \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """
+    """  # noqa: E501
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
@@ -188,13 +190,13 @@ def add(ctx, job_name: str, raw_tasks: str):
         task_sets = tasks_from_yaml_str(job_name, raw_tasks)
     except InvalidTasksError as yerr:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(yerr)
+        raise CliError(yerr) from yerr
 
     try:
         _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(err)
+        raise CliError(err) from err
 
     try:
         task_sets_service.add(task_sets)
@@ -208,7 +210,9 @@ def add(ctx, job_name: str, raw_tasks: str):
 
 
 @job.command(
-    cls=PartialInstrumentedCmd, name="set", short_help="Update an existing jobs tasks"
+    cls=PartialInstrumentedCmd,
+    name="set",
+    short_help="Update an existing jobs tasks",
 )
 @click.argument(
     "job_name",
@@ -236,7 +240,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list string lists, or mix of both.
     \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """
+    """  # noqa: E501
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
@@ -247,7 +251,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
         _validate_tasks(project, task_sets, ctx)
     except InvalidTasksError as err:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(err)
+        raise CliError(err) from err
 
     try:
         task_sets_service.update(task_sets)
@@ -277,7 +281,10 @@ def remove(ctx, job_name: str):  # noqa: WPS442
 
 
 def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:
-    """Validate the job's tasks by attempting to parse them into valid Blocks and using the Block's validation logic.
+    """Validate a job's tasks.
+
+    Validates the tasks by attempting to parse them into valid `Blocks`, and by
+    using the `Block` validation logic.
 
     Args:
         project: Project to use.
@@ -305,7 +312,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
             tracker.add_contexts(PluginsTrackingContext.from_blocks(parsed_blocks))
         except Exception as err:
             tracker.track_command_event(CliEvent.aborted)
-            raise InvalidTasksError(task_set.name, err)
+            raise InvalidTasksError(task_set.name, err) from err
         if not validate_block_sets(logger, parsed_blocks):
             tracker.track_command_event(CliEvent.aborted)
             raise InvalidTasksError(

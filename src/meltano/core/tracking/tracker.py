@@ -129,7 +129,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     protocol=parsed_url.scheme or "http",
                     port=parsed_url.port,
                     request_timeout=request_timeout,
-                )
+                ),
             )
 
         if emitters:
@@ -183,8 +183,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 return uuid.UUID(uuid_str)
             except ValueError:
                 warn(
-                    f"Invalid telemetry client UUID {uuid_str!r} from $MELTANO_CLIENT_ID",
+                    (
+                        f"Invalid telemetry client UUID {uuid_str!r} from "
+                        "$MELTANO_CLIENT_ID"
+                    ),
                     RuntimeWarning,
+                    stacklevel=2,
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
@@ -199,12 +203,14 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         """
         from meltano.core.tracking.contexts import ExceptionContext
 
-        # The `ExceptionContext` is re-created every time this is accessed because it details the
-        # exceptions that are being processed when it is created.
+        # The `ExceptionContext` is re-created every time this is accessed
+        # because it details the exceptions that are being processed when it
+        # is created.
         return (*self._contexts, ExceptionContext())
 
     def telemetry_state_change_check(
-        self, stored_telemetry_settings: TelemetrySettings
+        self,
+        stored_telemetry_settings: TelemetrySettings,
     ) -> None:
         """Check prior values against current ones, and send a change event if needed.
 
@@ -218,7 +224,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         ):
             # Project ID has changed
             self.track_telemetry_state_change_event(
-                "project_id", stored_telemetry_settings.project_id, self.project_id
+                "project_id",
+                stored_telemetry_settings.project_id,
+                self.project_id,
             )
 
         if (
@@ -243,14 +251,16 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 >>> Tracker(project).timezone_name
                 'Europe/Berlin'
 
-            The timezone name as an IANA timezone abbreviation because the full name was not found:
+            The timezone name as an IANA timezone abbreviation because the full
+            name was not found:
 
                 >>> Tracker(project).timezone_name
                 'CET'
 
         Returns:
-            The local timezone as an IANA TZ database name if possible, or abbreviation otherwise.
-        """
+            The local timezone as an IANA TZ database name if possible, or
+            abbreviation otherwise.
+        """  # noqa: F821
         try:
             return tzlocal.get_localzone_name()
         except Exception:
@@ -293,7 +303,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         """Fire an unstructured tracking event.
 
         Args:
-            event_json: The SelfDescribingJson event to track. See the Snowplow documentation for more information.
+            event_json: The SelfDescribingJson event to track. See the Snowplow
+                documentation for more information.
         """
         if not self.can_track():
             return
@@ -312,7 +323,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             event: An member from `meltano.core.tracking.CliEvent`
         """
         self.track_unstruct_event(
-            SelfDescribingJson(CliEventSchema.url, {"event": event.name})
+            SelfDescribingJson(CliEventSchema.url, {"event": event.name}),
         )
 
     def track_telemetry_state_change_event(
@@ -338,11 +349,14 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         self.save_telemetry_settings()
 
         if self.snowplow_tracker is None:
-            return  # The Snowplow tracker is not available (e.g. because no endpoints are set)
+            # The Snowplow tracker is not available (e.g. because no endpoints are set)
+            return
 
         logger.debug(
-            "Telemetry state change detected. A one-time "
-            + "'telemetry_state_change' event will now be sent.",
+            (
+                "Telemetry state change detected. A one-time "
+                "'telemetry_state_change' event will now be sent."
+            ),
             setting_name=setting_name,
         )
         if isinstance(from_value, uuid.UUID):
@@ -360,7 +374,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         try:
             self.snowplow_tracker.track_unstruct_event(
                 event_json,
-                # If tracking is disabled, then include only the minimal Snowplow contexts required
+                # If tracking is disabled, then include only the minimal
+                # Snowplow contexts required
                 self.contexts
                 if self.send_anonymous_usage_stats
                 else tuple(
@@ -371,7 +386,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
         except Exception as err:
             logger.debug(
-                "Failed to submit 'telemetry_state_change' unstruct event to Snowplow, error",
+                (
+                    "Failed to submit 'telemetry_state_change' unstruct event "
+                    "to Snowplow, error"
+                ),
                 err=format_exception(err),
             )
 
@@ -404,7 +422,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         if missing_keys:
             logger.debug(
-                "'analytics.json' has missing keys, and will be overwritten with new 'analytics.json'",
+                (
+                    "'analytics.json' has missing keys, and will be "
+                    "overwritten with new 'analytics.json'"
+                ),
                 missing_keys=missing_keys,
             )
             return TelemetrySettings(None, None, None)
@@ -476,7 +497,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             SelfDescribingJson(
                 BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
-            )
+            ),
         )
 
     def setup_exit_event(self):
@@ -493,7 +514,8 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         cli.atexit_handler_registered = True
 
-        # Provide `meltano.cli` with this tracker to track the exit event with more context.
+        # Provide `meltano.cli` with this tracker to track the exit event with
+        # more context.
         cli.exit_event_tracker = self
 
         # As a fallback, use atexit to help ensure the exit event is sent.
@@ -509,8 +531,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         start_time = datetime.utcfromtimestamp(Process().create_time())
 
-        # This is the reported "end time" for this process, though in reality the process will end
-        # a short time after this time as it takes time to emit the event.
+        # This is the reported "end time" for this process, though in reality
+        # the process will end a short time after this time as it takes time
+        # to emit the event.
         now = datetime.utcnow()
 
         self.track_unstruct_event(
@@ -520,9 +543,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     "exit_code": cli.exit_code,
                     "exit_timestamp": f"{now.isoformat()}Z",
                     "process_duration_microseconds": int(
-                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND
+                        (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND,
                     ),
                 },
-            )
+            ),
         )
         atexit.unregister(self.track_exit_event)

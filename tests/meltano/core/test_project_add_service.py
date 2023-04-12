@@ -15,7 +15,7 @@ from meltano.core.project_plugins_service import PluginDefinitionNotFoundError
 
 
 class TestProjectAddService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project_add_service):
         return project_add_service
 
@@ -29,13 +29,13 @@ class TestProjectAddService:
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "variant", "default_variant"),
-        [
+        (
             (PluginType.EXTRACTORS, "tap-mock", "meltano", "meltano"),
             (PluginType.LOADERS, "target-mock", None, "original"),
             (PluginType.TRANSFORMERS, "transformer-mock", None, "original"),
             (PluginType.TRANSFORMS, "tap-mock-transform", None, "original"),
             (PluginType.UTILITIES, "utility-mock", None, "original"),
-        ],
+        ),
     )
     def test_add(
         self,
@@ -88,7 +88,9 @@ class TestProjectAddService:
 
         # Inheriting from base plugin
         inherited = subject.add(
-            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from="tap-mock"
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from="tap-mock",
         )
         assert inherited.canonical() == {
             "name": "tap-mock-inherited",

@@ -6,6 +6,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
@@ -15,6 +16,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
@@ -85,7 +87,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.0
 
     - name: Install Poetry
       env:
@@ -230,7 +232,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.0
 
     - name: Install Poetry
       env:
@@ -270,7 +272,7 @@ jobs:
         nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.1
+      uses: codecov/codecov-action@v3.1.2
 
   mypy:
     name: "Static type checking"
@@ -280,7 +282,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.3.0
+      uses: actions/checkout@v3.5.0
 
     - name: Install Poetry
       env:

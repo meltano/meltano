@@ -11,7 +11,6 @@ import typing as t
 import click
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.project_settings_service import (
@@ -76,7 +75,7 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="start",
     default_if_no_args=True,
@@ -163,7 +162,8 @@ def setup(ctx, server_name, **flags):
     ui_cfg_path = project.root_dir("ui.cfg")
     if ui_cfg_path.exists():
         raise CliError(
-            f"Found existing secrets in file '{ui_cfg_path}'. Please delete this file and rerun this command to regenerate the secrets."
+            f"Found existing secrets in file '{ui_cfg_path}'. Please delete "
+            "this file and rerun this command to regenerate the secrets."
         )
 
     def generate_secret():
@@ -174,14 +174,18 @@ def setup(ctx, server_name, **flags):
         value, source = project.settings.get_with_source(setting_name)
         if source is not SettingValueStore.DEFAULT:
             click.echo(
-                f"Setting '{setting_name}' has already been set in {source.label}. Please unset it manually and rerun this command to regenerate this secret."
+                f"Setting '{setting_name}' has already been set in "
+                f"{source.label}. Please unset it manually and rerun this "
+                "command to regenerate this secret."
             )
         else:
             set_setting_env(setting_name, generate_secret())
 
     click.echo(
-        "The server name and generated secrets have been stored in your project's `.env` file."
+        "The server name and generated secrets have been stored in your "
+        "project's `.env` file."
     )
     click.echo(
-        "In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default."
+        "In production, you will likely want to move these settings to actual "
+        "environment variables, since `.env` is in `.gitignore` by default."
     )

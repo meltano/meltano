@@ -78,7 +78,11 @@ class YamlLimitedSafeLoader(type):
     """Meta YAML loader that skips the resolution of the specified YAML tags."""
 
     def __new__(
-        cls, name, bases, namespace, do_not_resolve: Iterable[str]
+        cls,
+        name,
+        bases,
+        namespace,
+        do_not_resolve: Iterable[str],
     ) -> YamlLimitedSafeLoader:
         """Generate a new instance of this metaclass.
 
@@ -108,7 +112,8 @@ class YamlLimitedSafeLoader(type):
 
 
 class YamlNoTimestampSafeLoader(
-    metaclass=YamlLimitedSafeLoader, do_not_resolve={"tag:yaml.org,2002:timestamp"}
+    metaclass=YamlLimitedSafeLoader,
+    do_not_resolve={"tag:yaml.org,2002:timestamp"},
 ):
     """A safe YAML loader that leaves timestamps as strings."""
 
@@ -166,11 +171,12 @@ class Manifest:  # noqa: WPS214
             )
             if proc.returncode:
                 jsonschema_checker_message = proc.stdout.strip().replace(
-                    schema_instance_file.name, str(instance_path)
+                    schema_instance_file.name,
+                    str(instance_path),
                 )
                 logger.warning(
                     f"Failed to validate {instance_name} against Meltano manifest "
-                    f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}"
+                    f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}",
                 )
 
     @cached_property
@@ -179,10 +185,13 @@ class Manifest:  # noqa: WPS214
             deep_merge(
                 yaml.load(  # noqa: S506
                     self._meltano_file,
-                    YamlNoTimestampSafeLoader,
+                    t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
                 ),
                 *(
-                    yaml.load(x.read_text(), YamlNoTimestampSafeLoader)  # noqa: S506
+                    yaml.load(  # noqa: S506
+                        x.read_text(),
+                        t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                    )
                     for x in self.project.project_files.include_paths
                 ),
             ),
@@ -190,12 +199,16 @@ class Manifest:  # noqa: WPS214
         )
         if self.check_schema:
             self._validate_against_manifest_schema(
-                "project files", self.project.meltanofile, project_files
+                "project files",
+                self.project.meltanofile,
+                project_files,
             )
         return project_files
 
     def _merge_plugin_lockfiles(
-        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, t.Any]
+        self,
+        plugins: dict[PluginType, list[ProjectPlugin]],
+        manifest: dict[str, t.Any],
     ) -> None:
         locked_plugins = t.cast(
             t.Dict[str, t.List[t.Mapping[str, t.Any]]],
@@ -256,16 +269,22 @@ class Manifest:  # noqa: WPS214
         data[key] = self.sanitize_env_vars(
             {
                 **expand_env_vars(
-                    data[key], value, if_missing=EnvVarMissingBehavior.ignore
+                    data[key],
+                    value,
+                    if_missing=EnvVarMissingBehavior.ignore,
                 ),
                 **expand_env_vars(
-                    value, data[key], if_missing=EnvVarMissingBehavior.ignore
+                    value,
+                    data[key],
+                    if_missing=EnvVarMissingBehavior.ignore,
                 ),
-            }
+            },
         )
 
     def _merge_env_vars(
-        self, plugins: dict[PluginType, list[ProjectPlugin]], manifest: dict[str, t.Any]
+        self,
+        plugins: dict[PluginType, list[ProjectPlugin]],
+        manifest: dict[str, t.Any],
     ) -> None:
         # Merge env vars derived from project settings:
         self.env_aware_merge_mappings(manifest, "env", self.project.settings.as_env())
@@ -273,7 +292,8 @@ class Manifest:  # noqa: WPS214
         # Ensure the environment-level plugin config is mergable:
         environment = next(iter(manifest["environments"]))
         environment_plugins = environment.setdefault("config", {}).setdefault(
-            "plugins", {}
+            "plugins",
+            {},
         )
         environment["config"]["plugins"] = _plugins_by_name_by_type(environment_plugins)
 
@@ -396,7 +416,9 @@ class Manifest:  # noqa: WPS214
 
         if self.check_schema:
             self._validate_against_manifest_schema(
-                "newly compiled manifest", self.path, manifest
+                "newly compiled manifest",
+                self.path,
+                manifest,
             )
 
         return manifest
@@ -422,14 +444,15 @@ def _locations_trie(paths: Iterable[Iterable[str]]) -> Trie:
 
 
 def _apply_scaffold(
-    trie: Trie, manifest_component: dict[str, t.Any] | list[t.Any]
+    trie: Trie,
+    manifest_component: dict[str, t.Any] | list[t.Any],
 ) -> None:
     for key, sub_trie in trie.items():
         if key == "[]":
             if not isinstance(manifest_component, list):
                 raise TypeError(
                     "Expected list during manifest scaffolding, "
-                    f"got {type(manifest_component)}"
+                    f"got {type(manifest_component)}",
                 )
             for element in manifest_component:
                 _apply_scaffold(sub_trie, element)
@@ -441,7 +464,7 @@ def _apply_scaffold(
         else:
             raise TypeError(
                 "Expected dict during manifest scaffolding, "
-                f"got {type(manifest_component)}"
+                f"got {type(manifest_component)}",
             )
 
 

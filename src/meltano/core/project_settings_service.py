@@ -53,11 +53,14 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             config_override=config_override,
         )
 
+        # terminal env vars are already present from `SettingService.env`
         self.env_override = {
-            # terminal environment variables already present from SettingService.env
-            **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
-            **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
-            **self.env_override,  # overrides
+            # static, project-level env vars (e.g. MELTANO_ENVIRONMENT)
+            **self.project.env,
+            # env vars stored in the base `meltano.yml` `env:` key
+            **self.project.meltano.env,
+            # overrides
+            **self.env_override,
         }
 
         self.config_override = {  # noqa: WPS601
@@ -69,7 +72,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             self.ensure_project_id()
         except ProjectReadonly:
             logger.debug(
-                "Cannot update `project_id` in `meltano.yml`: project is read-only."
+                "Cannot update `project_id` in `meltano.yml`: project is read-only.",
             )
 
     @property
@@ -86,8 +89,9 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.
 
-        Every `meltano.yml` file should contain the `project_id` key-value pair. It should be
-        present in the top-level config, rather than in any environment-level configs.
+        Every `meltano.yml` file should contain the `project_id`
+        key-value pair. It should be present in the top-level config, rather
+        than in any environment-level configs.
 
         If it is not present, it will be restored from `analytics.json` if possible.
         """
@@ -99,12 +103,13 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         if project_id is None:
             try:
                 with open(
-                    self.project.meltano_dir() / "analytics.json"
+                    self.project.meltano_dir() / "analytics.json",
                 ) as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]
             except (OSError, KeyError, json.JSONDecodeError) as err:
                 logger.debug(
-                    "Unable to restore 'project_id' from 'analytics.json'", err=err
+                    "Unable to restore 'project_id' from 'analytics.json'",
+                    err=err,
                 )
             else:
                 self.set("project_id", project_id, store=SettingValueStore.MELTANO_YML)
@@ -164,13 +169,13 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         self.project.config_service.update_config(config)
 
     def process_config(self, config) -> dict:
-        """Process configuration dictionary for presentation in `meltano config meltano`.
+        """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:
             config: Config to process.
 
         Returns:
-            Processed configuration dictionary for presentation in `meltano config meltano`.
+            Processed configuration dict for presentation in `meltano config meltano`.
         """
         return nest_object(config)
 

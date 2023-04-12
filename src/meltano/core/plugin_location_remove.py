@@ -1,4 +1,4 @@
-"""Defines PluginLocationRemoveStatus, PluginLocationRemoveManager, DbRemoveManager, MeltanoYmlRemoveManager and InstallationRemoveManager."""
+"""Defines plugin removers."""
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ class PluginLocationRemoveManager(ABC):
 
 
 class DbRemoveManager(PluginLocationRemoveManager):
-    """Handle removal of a plugin's settings from the system database `plugin_settings` table."""
+    """Handle removal from the system db `plugin_settings` table."""
 
     def __init__(self, plugin, project):
         """Construct a DbRemoveManager instance.
@@ -88,7 +88,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
         self.session = project_engine(project)[1]
 
     def remove(self):
-        """Remove the plugin's settings from the system database `plugin_settings` table.
+        """Remove the plugin's settings from the system db `plugin_settings` table.
 
         Returns:
             The remove status.
@@ -96,7 +96,8 @@ class DbRemoveManager(PluginLocationRemoveManager):
         session = self.session()
         try:
             self.plugins_settings_service.reset(
-                store=SettingValueStore.DB, session=session
+                store=SettingValueStore.DB,
+                session=session,
             )
         except sqlalchemy.exc.OperationalError as err:
             self.remove_status = PluginLocationRemoveStatus.ERROR

@@ -8,7 +8,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -29,7 +28,7 @@ if t.TYPE_CHECKING:
     from meltano.core.task_sets import TaskSets
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="add",
     short_help="Manage pipeline schedules.",
@@ -65,10 +64,16 @@ def _add_elt(
     session = session_maker()
     try:
         added_schedule = schedule_service.add_elt(
-            session, name, extractor, loader, transform, interval, start_date
+            session,
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date,
         )
         click.echo(
-            f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}"
+            f"Scheduled elt '{added_schedule.name}' at {added_schedule.interval}",
         )
     except ScheduleAlreadyExistsError:
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
@@ -86,7 +91,7 @@ def _add_job(ctx, name: str, job: str, interval: str):
     try:
         added_schedule = schedule_service.add(name, job, interval)
         click.echo(
-            f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}"
+            f"Scheduled job '{added_schedule.name}' at {added_schedule.interval}",
         )
     except ScheduleAlreadyExistsError:
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
@@ -95,7 +100,8 @@ def _add_job(ctx, name: str, job: str, interval: str):
 
 
 @schedule.command(
-    cls=PartialInstrumentedCmd, short_help="[default] Add a new schedule."
+    cls=PartialInstrumentedCmd,
+    short_help="[default] Add a new schedule.",
 )
 @click.argument("name")
 @click.option("--interval", required=True, help="Interval of the schedule.")
@@ -125,10 +131,10 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """
+    """  # noqa: E501
     if job and (extractor or loader):
         raise click.ClickException(
-            "Cannot mix --job with --extractor/--loader/--transform"
+            "Cannot mix --job with --extractor/--loader/--transform",
         )
 
     if not job:
@@ -180,7 +186,8 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
 
 
 @schedule.command(  # noqa: WPS125
-    cls=PartialInstrumentedCmd, short_help="List available schedules."
+    cls=PartialInstrumentedCmd,
+    short_help="List available schedules.",
 )
 @click.option("--format", type=click.Choice(("json", "text")), default="text")
 @click.pass_context
@@ -205,12 +212,16 @@ def list(ctx, format):  # noqa: WPS125
             for txt_schedule in schedule_service.schedules():
                 if txt_schedule.job:
                     click.echo(
-                        f"[{txt_schedule.interval}] job {txt_schedule.name}: {txt_schedule.job} → {task_sets_service.get(txt_schedule.job).tasks}"
+                        f"[{txt_schedule.interval}] job {txt_schedule.name}: "
+                        f"{txt_schedule.job} → "
+                        f"{task_sets_service.get(txt_schedule.job).tasks}",
                     )
                 else:
                     markers = transform_elt_markers[txt_schedule.transform]
                     click.echo(
-                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: {txt_schedule.extractor} {markers[0]} {txt_schedule.loader} {markers[1]} transforms"
+                        f"[{txt_schedule.interval}] elt {txt_schedule.name}: "
+                        f"{txt_schedule.extractor} {markers[0]} "
+                        f"{txt_schedule.loader} {markers[1]} transforms",
                     )
 
         elif format == "json":
@@ -220,18 +231,19 @@ def list(ctx, format):  # noqa: WPS125
                 if json_schedule.job:
                     job_schedules.append(
                         _format_job_list_output(
-                            json_schedule, task_sets_service.get(json_schedule.job)
-                        )
+                            json_schedule,
+                            task_sets_service.get(json_schedule.job),
+                        ),
                     )
                 else:
                     elt_schedules.append(
-                        _format_elt_list_output(json_schedule, session)
+                        _format_elt_list_output(json_schedule, session),
                     )
             click.echo(
                 json.dumps(
                     {"schedules": {"job": job_schedules, "elt": elt_schedules}},
                     indent=2,
-                )
+                ),
             )
     finally:
         session.close()
@@ -254,7 +266,9 @@ def run(ctx, name, elt_options):
 
 
 @schedule.command(
-    cls=PartialInstrumentedCmd, name="remove", short_help="Remove a schedule."
+    cls=PartialInstrumentedCmd,
+    name="remove",
+    short_help="Remove a schedule.",
 )
 @click.argument("name", required=True)
 @click.pass_context
@@ -287,7 +301,8 @@ def _update_job_schedule(
     """
     if not candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with job only flags as its a elt schedule"
+            f"Cannot update schedule {candidate.name} with job only flags as "
+            "its a elt schedule",
         )
     if job:
         candidate.job = job
@@ -320,7 +335,8 @@ def _update_elt_schedule(
     """
     if candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with elt only flags as its a scheduled job"
+            f"Cannot update schedule {candidate.name} with elt only flags as "
+            "its a scheduled job",
         )
 
     if extractor:
@@ -335,7 +351,9 @@ def _update_elt_schedule(
 
 
 @schedule.command(
-    cls=PartialInstrumentedCmd, name="set", short_help="Update a schedule."
+    cls=PartialInstrumentedCmd,
+    name="set",
+    short_help="Update a schedule.",
 )
 @click.argument("name", required=True)
 @click.option("--interval", help="Update the interval of the schedule.")
@@ -354,23 +372,27 @@ def set_cmd(ctx, name, interval, job, extractor, loader, transform):
 
     Usage:
         meltano schedule set <name> [--interval <interval>] [--job <job>] [--extractor <extractor>] [--loader <loader>] [--transform <transform>]
-    """
+    """  # noqa: E501
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     candidate = schedule_service.find_schedule(name)
 
     if candidate.job:
         if extractor or loader or transform:
             raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform"
+                "Cannot mix --job with --extractor/--loader/--transform",
             )
         updated = _update_job_schedule(candidate, job, interval)
     else:
         if job:
             raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform"
+                "Cannot mix --job with --extractor/--loader/--transform",
             )
         updated = _update_elt_schedule(
-            candidate, extractor, loader, transform, interval
+            candidate,
+            extractor,
+            loader,
+            transform,
+            interval,
         )
 
     schedule_service.update_schedule(updated)

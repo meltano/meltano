@@ -14,14 +14,16 @@ def create_app():
     project = Project.find()
 
     app = Flask(
-        __name__, instance_path=str(project.root), instance_relative_config=True
+        __name__,
+        instance_path=str(project.root),
+        instance_relative_config=True,
     )
 
     app.config.from_object("meltano.oauth.config")
     app.config.from_mapping(**oauth_config.ProjectSettings(project).as_dict())
 
     @app.errorhandler(Exception)
-    def _handle(e):
+    def _handle(_):
         logging.exception("An error occurred")
         return error()
 

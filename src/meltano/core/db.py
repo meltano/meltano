@@ -105,13 +105,13 @@ def connect(
             if attempt >= max_retries:
                 logging.error(
                     f"Could not connect to the database after {attempt} "
-                    "attempts. Max retries exceeded."
+                    "attempts. Max retries exceeded.",
                 )
                 raise
             attempt += 1
             logging.info(
                 f"DB connection failed. Will retry after {retry_timeout}s. "
-                f"Attempt {attempt}/{max_retries}"
+                f"Attempt {attempt}/{max_retries}",
             )
             time.sleep(retry_timeout)
 
@@ -157,15 +157,15 @@ def ensure_schema_exists(
         schema_name: The name of the schema.
         grant_roles: Roles to grant to the specified schema.
     """
-    schema_identifier = schema_name
     group_identifiers = ",".join(grant_roles)
 
-    create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_identifier}")
+    create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
     grant_select_schema = text(
-        f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_identifier} GRANT SELECT ON TABLES TO {group_identifiers}"
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_name} GRANT SELECT ON "
+        f"TABLES TO {group_identifiers}",
     )
     grant_usage_schema = text(
-        f"GRANT USAGE ON SCHEMA {schema_identifier} TO {group_identifiers}"
+        f"GRANT USAGE ON SCHEMA {schema_name} TO {group_identifiers}",
     )
 
     with engine.connect() as conn, conn.begin():

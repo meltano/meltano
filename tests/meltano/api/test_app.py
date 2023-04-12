@@ -6,13 +6,14 @@ from meltano.api.models import db
 
 
 class TestApp:
-    @pytest.fixture
+    @pytest.fixture()
     def session(self):
         # disable the `session` fixture not to override
         # the `db.session`
         pass
 
-    def test_core_registered(self, engine_sessionmaker, app):
+    @pytest.mark.usefixtures("app")
+    def test_core_registered(self, engine_sessionmaker):
         engine, _ = engine_sessionmaker
 
         # ensure both the API and the meltano.core
@@ -57,7 +58,7 @@ class TestAppSMTP:
         "MAIL_DEBUG": False,
     }
 
-    @pytest.fixture
+    @pytest.fixture()
     def app(self, create_app, monkeypatch):
         # ensure the environment is properly loaded
         for env, value in self.ENV.items():

@@ -39,7 +39,8 @@ class TestMeltanoHubService:
         hub_request_counter: Counter,
     ):
         definition = project.hub_service.find_definition(
-            PluginType.EXTRACTORS, "tap-mock"
+            PluginType.EXTRACTORS,
+            "tap-mock",
         )
         assert definition.name == "tap-mock"
         assert definition.variants[0].name == "meltano"
@@ -81,7 +82,9 @@ class TestMeltanoHubService:
     ):
         with pytest.raises(HubPluginVariantNotFoundError):
             project.hub_service.find_definition(
-                PluginType.EXTRACTORS, "tap-mock", "not-found"
+                PluginType.EXTRACTORS,
+                "tap-mock",
+                "not-found",
             )
 
         assert hub_request_counter["/extractors/index"] == 1
@@ -111,7 +114,8 @@ class TestMeltanoHubService:
             match="Could not connect to Meltano Hub. 500 Server Error",
         ) as exc_info:
             project.hub_service.find_definition(
-                PluginType.EXTRACTORS, "this-returns-500"
+                PluginType.EXTRACTORS,
+                "this-returns-500",
             )
 
         assert isinstance(exc_info.value.__cause__, HTTPError)
@@ -142,7 +146,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(self, request, **kwargs):
+            def send(
+                self,
+                request,  # noqa: ARG002
+                **kwargs,
+            ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
 
@@ -163,7 +171,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(self, request, **kwargs):
+            def send(
+                self,
+                request,  # noqa: ARG002
+                **kwargs,
+            ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
 

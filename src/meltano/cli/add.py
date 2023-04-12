@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliError,
@@ -27,7 +26,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-@cli.command(  # noqa: WPS238
+@click.command(  # noqa: WPS238
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )
@@ -37,7 +36,7 @@ if t.TYPE_CHECKING:
     "--inherit-from",
     help=(
         "Add a plugin inheriting from an existing plugin in the project"
-        + " or a discoverable plugin identified, by name."
+        " or a discoverable plugin identified, by name."
     ),
 )
 @click.option(
@@ -48,15 +47,18 @@ if t.TYPE_CHECKING:
     "--as",
     "as_name",
     help=(
-        "Shorthand for '--inherit-from', that can be used to add a discoverable "
-        + "plugin to your project with a different name. "
-        + "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
+        "Shorthand for '--inherit-from', that can be used to add a "
+        "discoverable plugin to your project with a different name. "
+        "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
     ),
 )
 @click.option(
     "--custom",
     is_flag=True,
-    help="Add a custom plugin. The command will prompt you for the package's base plugin description metadata.",
+    help=(
+        "Add a custom plugin. The command will prompt you for the package's "
+        "base plugin description metadata."
+    ),
 )
 @click.option(
     "--no-install",
@@ -103,7 +105,8 @@ def add(  # noqa: WPS238
         PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
     ]
     dependencies_met, err = check_dependencies_met(
-        plugin_refs=plugin_refs, plugins_service=project.plugins
+        plugin_refs=plugin_refs,
+        plugins_service=project.plugins,
     )
     if not dependencies_met:
         tracker.track_command_event(CliEvent.aborted)
@@ -116,29 +119,29 @@ def add(  # noqa: WPS238
         try:
             plugins.append(
                 add_plugin(
-                    project,
                     plugin_type,
                     plugin,
                     inherit_from=inherit_from,
                     variant=variant,
                     custom=flags["custom"],
                     add_service=add_service,
-                )
+                ),
             )
         except Exception:
             # if the plugin is not known to meltano send what information we do have
             tracker.add_contexts(
-                PluginsTrackingContext([(plugin, None) for plugin in plugins])
+                PluginsTrackingContext([(plugin, None) for plugin in plugins]),
             )
             tracker.track_command_event(CliEvent.aborted)
             raise
 
         required_plugins = add_required_plugins(
-            project, plugins, add_service=add_service
+            plugins,
+            add_service=add_service,
         )
     plugins.extend(required_plugins)
     tracker.add_contexts(
-        PluginsTrackingContext([(candidate, None) for candidate in plugins])
+        PluginsTrackingContext([(candidate, None) for candidate in plugins]),
     )
     tracker.track_command_event(CliEvent.inflight)
 
@@ -165,5 +168,6 @@ def _print_plugins(plugins):
             printed_empty_line = True
 
         click.echo(
-            f"To learn more about {plugin.type.descriptor} '{plugin.name}', visit {docs_url}"
+            f"To learn more about {plugin.type.descriptor} '{plugin.name}', "
+            f"visit {docs_url}",
         )

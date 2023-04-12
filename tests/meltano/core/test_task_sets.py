@@ -11,12 +11,14 @@ class TestTaskSets:
         assert tset._as_args() == ["tap", "target", "tap2", "target2"]
 
         tset = TaskSets(
-            name="test", tasks=[["tap target"], ["some:cmd"], ["tap2 target2"]]
+            name="test",
+            tasks=[["tap target"], ["some:cmd"], ["tap2 target2"]],
         )
         assert tset._as_args() == ["tap", "target", "some:cmd", "tap2", "target2"]
 
         tset = TaskSets(
-            name="test", tasks=[["tap target", "some:cmd"], ["tap2 target2"]]
+            name="test",
+            tasks=[["tap target", "some:cmd"], ["tap2 target2"]],
         )
         assert tset._as_args(preserve_top_level=True) == [
             ["tap", "target", "some:cmd"],

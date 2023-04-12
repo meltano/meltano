@@ -61,7 +61,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
 
     @property
     def command(self) -> str | None:
-        """Command is the specific plugin command to use when invoking the plugin (if any).
+        """Get the command to use when invoking the plugin.
 
         Returns:
             The command to use when invoking the plugin.
@@ -128,7 +128,8 @@ class InvokerBase:  # noqa: WPS230, WPS214
             The stdout proxy future.
 
         Raises:
-            IOLinkError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so there is no IO
+                to proxy.
         """
         if self.process_handle is None:
             raise IOLinkError("No IO to proxy, process not running")
@@ -137,7 +138,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
             outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
             self._stdout_future = asyncio.ensure_future(
                 # forward subproc stdout to downstream (i.e. targets stdin, loggers)
-                capture_subprocess_output(self.process_handle.stdout, *outputs)
+                capture_subprocess_output(self.process_handle.stdout, *outputs),
             )
         return self._stdout_future
 
@@ -148,17 +149,19 @@ class InvokerBase:  # noqa: WPS230, WPS214
             The stderr proxy future.
 
         Raises:
-            IOLinkError: If the processes is not running and so - there is no IO to proxy.
+            IOLinkError: If the processes is not running and so there is no IO
+                to proxy.
         """
         if self.process_handle is None:
             raise IOLinkError("No IO to proxy, process not running")
 
         if self._stderr_future is None:
             err_outputs = self._merge_outputs(
-                self.invoker.StdioSource.STDERR, self.err_outputs
+                self.invoker.StdioSource.STDERR,
+                self.err_outputs,
             )
             self._stderr_future = asyncio.ensure_future(
-                capture_subprocess_output(self.process_handle.stderr, *err_outputs)
+                capture_subprocess_output(self.process_handle.stderr, *err_outputs),
             )
         return self._stderr_future
 
@@ -183,7 +186,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self._process_future is None:
             if self.process_handle is None:
                 raise ProcessWaitError(
-                    "No process to wait, process not running running"
+                    "No process to wait, process not running running",
                 )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
@@ -203,7 +206,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         """Close the underlying process stdin if the block is a consumer."""
         if self.consumer:
             self.process_handle.stdin.close()
-            with suppress(AttributeError):  # `wait_closed` is Python 3.8+ (see #3347
+            with suppress(AttributeError):  # `wait_closed` is Python 3.8+ (see #3347)
                 await self.process_handle.stdin.wait_closed()
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
@@ -245,12 +248,10 @@ class InvokerBase:  # noqa: WPS230, WPS214
 
     async def post(self) -> None:
         """Post triggers resetting the underlying plugin config."""
-        try:
+        with suppress(FileNotFoundError):
+            # TODO: should we preserve these on a failure?
+            # The invoker prepared context manager was able to clean up the configs
             await self.invoker.cleanup()
-        except FileNotFoundError:
-            # TODO: should we preserve these on a failure ?
-            # the invoker prepared context manager was able to clean up the configs
-            pass
 
     def _merge_outputs(self, source: str, outputs: list) -> list:
         if not self.invoker.output_handlers:
@@ -289,7 +290,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def producer(self) -> bool:
-        """Whether or not this plugin is a producer.
+        """Whether this plugin is a producer.
 
         Currently if the underlying plugin is of type extractor, it is a producer.
 
@@ -300,7 +301,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def consumer(self) -> bool:
-        """Whether or not this plugin is a consumer.
+        """Whether this plugin is a consumer.
 
         Currently if the underlying plugin is of type loader, it is a consumer.
 
@@ -311,7 +312,7 @@ class SingerBlock(InvokerBase, IOBlock):
 
     @property
     def has_state(self) -> bool:
-        """Whether or not this plugin has state.
+        """Whether this plugin has state.
 
         Returns:
             bool indicating whether this plugin has state
@@ -345,7 +346,7 @@ class SingerBlock(InvokerBase, IOBlock):
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
-            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+            kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
         """
         if self.process_handle is None:
             return
@@ -364,8 +365,6 @@ class SingerBlock(InvokerBase, IOBlock):
             self._stdout_future.cancel()
         if self._stderr_future is not None:
             self._stderr_future.cancel()
-        try:
-            await self.invoker.cleanup()
-        except FileNotFoundError:
+        with suppress(FileNotFoundError):
             # the invoker prepared context manager was able to clean up the configs
-            pass
+            await self.invoker.cleanup()

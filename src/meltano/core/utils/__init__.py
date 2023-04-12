@@ -49,7 +49,7 @@ except AttributeError:
 
 
 class NotFound(Exception):
-    """Occurs when an element is not found."""
+    """An element is not found."""
 
     def __init__(self, name, obj_type=None):
         """Create a new exception.
@@ -65,13 +65,13 @@ class NotFound(Exception):
 
 
 def click_run_async(func):
-    """Small decorator to allow click invoked functions to leverage `asyncio.run` and be declared as async.
+    """Run decorated Click commands with `asyncio.run`.
 
     Args:
-        func: the function to run async
+        func: The function to run asynchronously.
 
     Returns:
-        A function which runs the given function async
+        A function which runs the given function asynchronously.
     """
 
     @functools.wraps(func)
@@ -94,7 +94,8 @@ def compose(*fs: t.Callable[[t.Any], t.Any]):
         ```
 
     Returns:
-        The composition of the provided unary functions, which itself is a unary function.
+        The composition of the provided unary functions, which itself is a
+        unary function.
     """
     return functools.reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
 
@@ -157,9 +158,9 @@ def merge(src, dest):
             `src` at depth.
 
     Examples:
-        >>> a = { 'first' : { 'all_rows' : { 'pass' : 'dog', 'number' : '1' } } }
-        >>> b = { 'first' : { 'all_rows' : { 'fail' : 'cat', 'number' : '5' } } }
-        >>> merge(b, a) == { 'first' : { 'all_rows' : { 'pass' : 'dog', 'fail' : 'cat', 'number' : '5' } } }
+        >>> a = {'f' :{'all_rows': {'pass': 'dog', 'n': '1'}}}
+        >>> b = {'f' :{'all_rows': {'fail': 'cat', 'n': '5'}}}
+        >>> merge(b, a) == {'f': {'all_rows': {'pass': 'dog', 'fail': 'cat', 'n': '5'}}}
         True
 
     Returns:
@@ -399,7 +400,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-        enabled = kwargs.get("make_dirs", True)
+        enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs)
 
@@ -454,7 +455,7 @@ def set_at_path(d, path, value):
 
 
 class EnvironmentVariableNotSetError(MeltanoError):
-    """Occurs when a referenced environment variable is not set."""
+    """A referenced environment variable is not set."""
 
     def __init__(self, env_var: str):
         """Initialize the error.
@@ -537,7 +538,7 @@ def expand_env_vars(
             val = str(env[var])
         except KeyError as ex:
             logger.debug(
-                f"Variable '${var}' is not set in the provided env dictionary."
+                f"Variable '${var}' is not set in the provided env dictionary.",
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
@@ -629,17 +630,17 @@ def hash_sha256(value: str | bytes) -> str:
 
 
 def format_exception(exception: BaseException) -> str:
-    """Get the exception with its traceback in the standard format it would have been printed with.
+    """Get the exception with its traceback formatted as it would have been printed.
 
     Args:
         exception: The exception value to be turned into a string.
 
     Returns:
-        A string that shows the exception object as it would have been printed had it been raised
-        and not caught.
+        A string that shows the exception object as it would have been printed
+        had it been raised and not caught.
     """
     return "".join(
-        traceback.format_exception(type(exception), exception, exception.__traceback__)
+        traceback.format_exception(type(exception), exception, exception.__traceback__),
     )
 
 
@@ -708,10 +709,10 @@ def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
 
 
 def get_no_color_flag() -> bool:
-    """Get the value of the NO_COLOR environment variable.
+    """Get the truth value of the `NO_COLOR` environment variable.
 
     Returns:
-        True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
+        Whether the `NO_COLOR` environment variable is set to a truthy value.
     """
     return get_boolean_env_var("NO_COLOR")
 
@@ -758,11 +759,14 @@ default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
     MergeStrategy(
         t.Mapping,
         lambda x, k, v, s: setitem(
-            x, k, _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s)
+            x,
+            k,
+            _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s),
         ),
     ),
     MergeStrategy(
-        Extendable, lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v)
+        Extendable,
+        lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v),
     ),
     MergeStrategy(object, lambda x, k, v, _: setitem(x, k, v)),
 )
@@ -828,7 +832,19 @@ def remove_suffix(string: str, suffix: str) -> str:
 
 _filename_restriction_pattern = re.compile(r"[^\w.-]")
 _reserved_windows_filenames = frozenset(
-    ("AUX", "COM1", "COM2", "COM3", "COM4", "CON", "LPT1", "LPT2", "LPT3", "NUL", "PRN")
+    (
+        "AUX",
+        "COM1",
+        "COM2",
+        "COM3",
+        "COM4",
+        "CON",
+        "LPT1",
+        "LPT2",
+        "LPT3",
+        "NUL",
+        "PRN",
+    ),
 )
 _sanitize_filename_transformations = (
     # Normalize unicode data in the string:
