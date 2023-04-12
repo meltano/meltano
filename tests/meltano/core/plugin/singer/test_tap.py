@@ -757,7 +757,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         await subject.run_discovery(invoker, catalog_path)
-        invoke_async.assert_called_with(["--discover"])
+        assert invoke_async.call_args[0] == ("--discover",)
 
         with catalog_path.open("r") as catalog_file:
             resp = json.load(catalog_file)
