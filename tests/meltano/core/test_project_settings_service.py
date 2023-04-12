@@ -66,7 +66,8 @@ class TestProjectSettingsService:
 
             assert_value_source("from_env", SettingValueStore.ENV)
 
-    def test_get_with_source_config_override(self, config_override, subject):
+    @pytest.mark.usefixtures("config_override")
+    def test_get_with_source_config_override(self, subject):
         assert subject.get_with_source("project_id") == (
             "from_config_override",
             SettingValueStore.CONFIG_OVERRIDE,
@@ -79,7 +80,7 @@ class TestProjectSettingsService:
             changed.append(True)
         assert changed
 
-    def test_experimental_off_by_default(self, subject, monkeypatch):
+    def test_experimental_off_by_default(self, subject):
         changed = []
         with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
             EXPERIMENTAL,

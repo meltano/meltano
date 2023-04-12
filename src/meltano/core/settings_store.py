@@ -212,7 +212,11 @@ class SettingsStoreManager(ABC):
     readable = True
     writable = False
 
-    def __init__(self, settings_service: SettingsService, **kwargs):
+    def __init__(
+        self,
+        settings_service: SettingsService,
+        **kwargs,  # noqa: ARG002
+    ):
         """Initialise settings store manager.
 
         Args:
@@ -312,8 +316,8 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
     def get(
         self,
         name: str,
-        setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
@@ -343,7 +347,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
     def get(
         self,
-        name: str,
+        name: str,  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
         cast_value: bool = False,
     ) -> tuple[str, dict]:
@@ -494,7 +498,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
         return value, metadata
 
-    def set(self, name: str, path: list[str], value, setting_def=None):
+    def set(self, name: str, path: list[str], value, setting_def=None):  # noqa: ARG002
         """Set value by name in the .env file.
 
         Args:
@@ -531,8 +535,8 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
     def unset(
         self,
-        name: str,
-        path: list[str],
+        name: str,  # noqa: ARG002
+        path: list[str],  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Unset value by SettingDefinition in the .env file.
@@ -895,7 +899,10 @@ class DbStoreManager(SettingsStoreManager):
         self.bulk = bulk
         self._all_settings = None
 
-    def ensure_supported(self, method: str = "get") -> None:
+    def ensure_supported(
+        self,
+        method: str = "get",  # noqa: ARG002
+    ) -> None:
         """Return True if passed method is supported by this store.
 
         Args:
@@ -910,8 +917,8 @@ class DbStoreManager(SettingsStoreManager):
     def get(
         self,
         name: str,
-        setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
@@ -942,9 +949,9 @@ class DbStoreManager(SettingsStoreManager):
     def set(
         self,
         name: str,
-        path: list[str],
+        path: list[str],  # noqa: ARG002
         value: t.Any,
-        setting_def: SettingDefinition | None = None,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
     ) -> dict:
         """Set value by name in the system database.
 
@@ -974,8 +981,8 @@ class DbStoreManager(SettingsStoreManager):
     def unset(
         self,
         name: str,
-        path: list[str],
-        setting_def: SettingDefinition | None = None,
+        path: list[str],  # noqa: ARG002
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
     ) -> dict:
         """Unset value by name in the system database store.
 
@@ -1067,7 +1074,7 @@ class InheritedStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
@@ -1145,7 +1152,7 @@ class DefaultStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 

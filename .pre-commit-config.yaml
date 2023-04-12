@@ -68,7 +68,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.260
+    rev: v0.0.261
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]
@@ -80,7 +80,7 @@ repos:
         exclude: ^(src/meltano/migrations/)
 
   - repo: https://github.com/flakeheaven/flakeheaven
-    rev: 3.2.1
+    rev: 3.3.0
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)

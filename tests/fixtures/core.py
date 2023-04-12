@@ -9,7 +9,9 @@ from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 
+import mock
 import pytest
+import structlog
 import yaml
 
 from fixtures.utils import cd, tmp_project
@@ -19,6 +21,7 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import JobState
+from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -382,7 +385,12 @@ def task_sets_service(project):
 
 
 @pytest.fixture(scope="class")
-def elt_schedule(project, tap, target, schedule_service):
+def elt_schedule(
+    project,  # noqa: ARG001
+    tap,
+    target,
+    schedule_service,
+):
     try:
         return schedule_service.add_elt(
             None,
@@ -398,7 +406,12 @@ def elt_schedule(project, tap, target, schedule_service):
 
 
 @pytest.fixture(scope="class")
-def job_schedule(project, tap, target, schedule_service):
+def job_schedule(
+    project,  # noqa: ARG001
+    tap,  # noqa: ARG001
+    target,  # noqa: ARG001
+    schedule_service,
+):
     try:
         return schedule_service.add(
             "job-schedule-mock",
@@ -541,7 +554,9 @@ def payloads(num_params):
 
 
 @pytest.fixture()
-def state_ids(num_params):
+def state_ids(
+    num_params,  # noqa: ARG001
+):
     state_id_dict = {
         "single_incomplete_state_id": create_state_id("single-incomplete"),
         "single_complete_state_id": create_state_id("single-complete"),
@@ -737,3 +752,40 @@ def project_with_environment(project: Project):
         yield project
     finally:
         project.deactivate_environment()
+
+
+test_log_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "test": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "test",
+            "stream": "ext://sys.stderr",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
+}
+
+
+@pytest.fixture()
+def use_test_log_config():
+    with mock.patch(
+        "meltano.core.logging.utils.default_config",
+        return_value=test_log_config,
+    ) as patched_default_config:
+        yield patched_default_config

@@ -624,7 +624,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     # TODO: The `for_writing` parameter is unsued, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
-    def setting_env_vars(self, setting_def, for_writing=False):
+    def setting_env_vars(
+        self,
+        setting_def,
+        for_writing=False,  # noqa: ARG002
+    ):
         """Get environment variables for the given setting definition.
 
         Args:

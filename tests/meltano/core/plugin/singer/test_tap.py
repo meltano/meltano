@@ -195,7 +195,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
-        def mock_discovery(*args, **kwargs):
+        def mock_discovery(*args, **kwargs):  # noqa: ARG001
             future = asyncio.Future()
             future.set_result(catalog_path.open("w").write('{"discovered": true}'))
             return future
@@ -732,12 +732,11 @@ class TestSingerTap:
         assert await cache_key() is None
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery(
         self,
         plugin_invoker_factory,
-        session,
         subject,
-        elt_context_builder,
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -765,12 +764,11 @@ class TestSingerTap:
             assert resp["discovered"]
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_failure(
         self,
         plugin_invoker_factory,
-        session,
         subject,
-        elt_context_builder,
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -791,12 +789,11 @@ class TestSingerTap:
         assert not catalog_path.exists(), "Catalog should not be present."
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_stderr_output(
         self,
         plugin_invoker_factory,
-        session,
         subject,
-        elt_context_builder,
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -847,12 +844,11 @@ class TestSingerTap:
         discovery_logger.setLevel(original_level)
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_handle_io_exceptions(
         self,
         plugin_invoker_factory,
-        session,
         subject,
-        elt_context_builder,
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -873,12 +869,11 @@ class TestSingerTap:
         assert not catalog_path.exists(), "Catalog should not be present."
 
     @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_utf8_output(
         self,
         plugin_invoker_factory,
-        session,
         subject,
-        elt_context_builder,
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name

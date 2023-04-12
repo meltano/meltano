@@ -20,7 +20,14 @@ class TestSingerBlocks:
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture()
-    def elt_context(self, project, session, tap, target, elt_context_builder):
+    def elt_context(
+        self,
+        project,  # noqa: ARG002
+        session,
+        tap,
+        target,
+        elt_context_builder,
+    ):
         job = Job(job_name="pytest_test_runner")
 
         return (

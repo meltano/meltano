@@ -658,7 +658,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.requires
 
-    def env_prefixes(self, for_writing=False) -> list[str]:
+    def env_prefixes(
+        self,
+        for_writing=False,  # noqa: ARG002
+    ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
         Args:
@@ -701,7 +704,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return True
 
-    def exec_args(self, files: dict):
+    def exec_args(
+        self,
+        files: dict,  # noqa: ARG002
+    ):
         """Return the arguments to pass to the plugin runner.
 
         Args:

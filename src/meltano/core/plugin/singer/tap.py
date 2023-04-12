@@ -503,7 +503,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS 214
     def apply_catalog_rules(  # noqa: WPS213, WPS231, WPS210
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),  # noqa: ARG002
     ):
         """Apply Singer catalog and schema rules to discovered catalog.
 

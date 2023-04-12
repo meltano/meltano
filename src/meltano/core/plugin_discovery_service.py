@@ -385,7 +385,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         self,
         plugin_type: PluginType,
         plugin_name: str,
-        variant_name: str | None = None,
+        variant_name: str | None = None,  # noqa: ARG002
     ) -> PluginDefinition:
         """Find a plugin definition by type and name.
 

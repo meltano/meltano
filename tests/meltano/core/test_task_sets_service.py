@@ -48,7 +48,8 @@ class TestTaskSetsService:
         with pytest.raises(JobNotFoundError):
             subject.update(nonexistent)
 
-    def test_remove(self, subject: TaskSetsService, create_task_set):
+    @pytest.mark.usefixtures("create_task_set")
+    def test_remove(self, subject: TaskSetsService):
         jobs = subject.list()
         subject.remove(jobs[0].name)
         assert subject.list() == jobs[1:]
@@ -58,7 +59,8 @@ class TestTaskSetsService:
         with pytest.raises(JobNotFoundError):
             subject.remove(jobs[0].name)
 
-    def test_get(self, subject: TaskSetsService, create_task_set):
+    @pytest.mark.usefixtures("create_task_set")
+    def test_get(self, subject: TaskSetsService):
         jobs = subject.list()
 
         assert subject.get(jobs[0].name) == jobs[0]
@@ -67,7 +69,8 @@ class TestTaskSetsService:
         with pytest.raises(JobNotFoundError):
             subject.get("non-existent")
 
-    def test_exists(self, subject: TaskSetsService, create_task_set):
+    @pytest.mark.usefixtures("create_task_set")
+    def test_exists(self, subject: TaskSetsService):
         job = subject.list()[0]
         assert subject.exists(job.name)
         assert not subject.exists("non-existent")

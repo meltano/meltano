@@ -18,8 +18,7 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
-@click.pass_context
-def remove(ctx, project, plugin_type, plugin_names):
+def remove(project, plugin_type, plugin_names):
     """
     Remove plugins from your project.
 

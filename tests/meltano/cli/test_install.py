@@ -36,13 +36,13 @@ class TestCliInstall:
                 force=False,
             )
 
+    @pytest.mark.usefixtures("dbt")
     def test_install_type(
         self,
         project,
         tap,
         tap_gitlab,
         target,
-        dbt,
         mapper,
         cli_runner,
     ):
@@ -91,13 +91,12 @@ class TestCliInstall:
                     mappings_seen += 1
             assert mappings_seen == 2
 
+    @pytest.mark.usefixtures("tap_gitlab", "dbt")
     def test_install_type_name(
         self,
         project,
         tap,
-        tap_gitlab,
         target,
-        dbt,
         mapper,
         cli_runner,
     ):
@@ -146,7 +145,8 @@ class TestCliInstall:
                     mappings_seen += 1
             assert mappings_seen == 2
 
-    def test_install_multiple(self, project, tap, tap_gitlab, target, dbt, cli_runner):
+    @pytest.mark.usefixtures("target", "dbt")
+    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner):
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -242,11 +242,8 @@ class TestCliInstall:
 # https://github.com/meltano/meltano/pull/6407#issuecomment-1200516464
 # For more details
 @pytest.mark.order(-1)
-def test_new_folder_should_autocreate_on_install(
-    un_engine_uri,
-    project_function,
-    cli_runner,
-):
+@pytest.mark.usefixtures("un_engine_uri", "project_function")
+def test_new_folder_should_autocreate_on_install(cli_runner):
     """Be sure .meltano auto creates a db on install by default.
 
     We had a case https://github.com/meltano/meltano/issues/6383

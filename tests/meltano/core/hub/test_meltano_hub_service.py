@@ -146,7 +146,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(self, request, **kwargs):
+            def send(
+                self,
+                request,  # noqa: ARG002
+                **kwargs,
+            ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
 
@@ -167,7 +171,11 @@ class TestMeltanoHubService:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(self, request, **kwargs):
+            def send(
+                self,
+                request,  # noqa: ARG002
+                **kwargs,
+            ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
 
