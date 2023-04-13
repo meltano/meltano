@@ -1075,14 +1075,14 @@ testing = ["pre-commit"]
 
 [[package]]
 name = "fasteners"
-version = "0.17.3"
+version = "0.18"
 description = "A python package that provides useful locks"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "fasteners-0.17.3-py3-none-any.whl", hash = "sha256:cae0772df265923e71435cc5057840138f4e8b6302f888a567d06ed8e1cbca03"},
-    {file = "fasteners-0.17.3.tar.gz", hash = "sha256:a9a42a208573d4074c77d041447336cf4e3c1389a256fd3e113ef59cf29b7980"},
+    {file = "fasteners-0.18-py3-none-any.whl", hash = "sha256:1d4caf5f8db57b0e4107d94fd5a1d02510a450dced6ca77d1839064c1bacf20c"},
+    {file = "fasteners-0.18.tar.gz", hash = "sha256:cb7c13ef91e0c7e4fe4af38ecaf6b904ec3f5ce0dda06d34924b6b74b869d953"},
 ]
 
 [[package]]
@@ -4068,4 +4068,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "ffcdc9144cab29710b457010392f789fd1f0bd454d82ebbfa25dae99fb9ed43a"
+content-hash = "8082ce9e60997028c054153c25b188aee7aa13bde1f3d74d1a4cd22e3e78a4e8"
