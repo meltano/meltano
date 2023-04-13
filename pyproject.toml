@@ -109,7 +109,7 @@ mssql = ["pymssql"]
 s3 = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.3.0"
+black = "^23.3.0"
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
