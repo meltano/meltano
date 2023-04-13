@@ -770,20 +770,20 @@ files = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.21.0"
+version = "0.22.0"
 description = "A jsonschema CLI and pre-commit hook"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "check-jsonschema-0.21.0.tar.gz", hash = "sha256:691579e3c849af01e7a15e17c0ef39b85c68395a214dffa3bd92a8be99021744"},
-    {file = "check_jsonschema-0.21.0-py3-none-any.whl", hash = "sha256:f7b232ddfaced917dc75b932b8ed9e52ab603fd455c8af72e0cd04586f7b968a"},
+    {file = "check-jsonschema-0.22.0.tar.gz", hash = "sha256:3485965e13b0c665f86f307915eab52ace5740dcec30e1a82d79f639938a9474"},
+    {file = "check_jsonschema-0.22.0-py3-none-any.whl", hash = "sha256:f5556647829a29b4367a061803e015f6d4e60b930265906913279a639ab29c44"},
 ]
 
 [package.dependencies]
 click = ">=8,<9"
 importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""}
-jsonschema = ">=4,<5.0"
+jsonschema = ">=4.5.1,<5.0"
 requests = "<3.0"
 "ruamel.yaml" = "0.17.21"
 
@@ -4068,4 +4068,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "8082ce9e60997028c054153c25b188aee7aa13bde1f3d74d1a4cd22e3e78a4e8"
+content-hash = "9795db1fa3a5ea9c20b039625b81dfde5752544e348eafdcdc0f4d4bb688963a"
