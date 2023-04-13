@@ -1,4 +1,3 @@
-
 # If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!
 
 settings:
@@ -45,10 +44,12 @@ settings:
 
 ## Filesystem state backends
 - name: state_backend.lock_timeout_seconds
-  value: 120
+  value: 10
+  kind: integer
   env_specific: true
-- name: state_backend.lock_rety_seconds
+- name: state_backend.lock_retry_seconds
   value: 1
+  kind: integer
   env_specific: true
 
 ## Azure state backend
