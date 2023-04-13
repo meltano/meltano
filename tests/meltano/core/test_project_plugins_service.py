@@ -6,12 +6,17 @@ from copy import deepcopy
 
 import pytest
 
+from meltano.core import utils
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import DefinitionSource
+from meltano.core.project_plugins_service import (
+    DefinitionSource,
+    PluginDefinitionNotFoundError,
+)
+from meltano.core.settings_service import FeatureFlags
 
 
 @pytest.fixture()
@@ -37,6 +42,11 @@ def modified_lockfile(project: Project):
 
 
 class TestProjectPluginsService:
+    @pytest.fixture(autouse=True)
+    def setup(self, project: Project, tap):
+        project.plugins.lock_service.save(tap, exists_ok=True)
+        project.plugins._prefer_source = DefinitionSource.ANY
+
     @pytest.mark.order(0)
     def test_plugins(self, project):
         assert all(
@@ -107,6 +117,34 @@ class TestProjectPluginsService:
         assert result.settings == expected.settings
         assert result.settings[-1].name == "foo"
 
+    @pytest.mark.order(2)
+    def test_get_parent_no_source_enabled(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+    ):
+        with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
+            PluginDefinitionNotFoundError,
+        ):
+            project.plugins.get_parent(tap)
+
+    def test_ff_plugins_lock_required(
+        self,
+        project: Project,
+        monkeypatch,
+    ):
+        assert project.plugins._prefer_source == DefinitionSource.ANY
+
+        monkeypatch.setenv(
+            utils.to_env_var(
+                "meltano",
+                FeatureFlags.PLUGIN_LOCKS_REQUIRED.setting_name,
+            ),
+            "1",
+        )
+        project.refresh()
+        assert project.plugins._prefer_source == DefinitionSource.LOCAL
+
     def test_get_parent_no_lockfiles(
         self,
         project: Project,
@@ -159,8 +197,10 @@ class TestProjectPluginsService:
             name="tap-foo",
             inherit_from="tap-bar",
         )
-        with pytest.raises(PluginParentNotFoundError):
+        with pytest.raises(PluginDefinitionNotFoundError) as excinfo:
             assert project.plugins.get_parent(nonexistent_parent)
+
+        assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
 
     def test_update_plugin(self, project: Project, tap):
         # update a tap with a random value

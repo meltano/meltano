@@ -267,12 +267,15 @@ class TestCliAdd:
         assert "Created transform/dbt_project (dbt).yml" in output
         assert project.root_dir("transform/dbt_project (dbt).yml").is_file()
 
-    def test_add_missing(self, project, cli_runner):
+    def test_add_missing(self, project: Project, cli_runner):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
 
         assert res.exit_code == 1
         assert res.exception
-        assert str(res.exception) == "Extractor 'tap-unknown' is not known to Meltano"
+        assert str(res.exception) == (
+            "Extractor 'tap-unknown' is not known to Meltano. "
+            "Run `meltano discover extractor` to explore available plugins."
+        )
 
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
