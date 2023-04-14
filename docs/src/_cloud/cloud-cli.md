@@ -10,6 +10,10 @@ weight: 3
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
+## `docs`
+
+Open the Meltano Cloud documentation site in the default browser.
+
 ## `login`
 
 Logging into Meltano Cloud via the CLI stores a token locally which is used by the CLI to take actions that require authentication.
