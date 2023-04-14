@@ -181,7 +181,7 @@ To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.js
 
 ## `cloud`
 
-See the full [Cloud CLI reference](/reference/cloud-cli).
+See the full [Cloud CLI reference](/cloud/cloud-cli).
 
 ## `config`
 
