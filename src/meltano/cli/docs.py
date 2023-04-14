@@ -13,3 +13,4 @@ from meltano.cli.utils import InstrumentedCmd
 def docs():
     """Open the Meltano docs in the system browser."""
     click.launch("https://docs.meltano.com/")
+    click.secho("Opening the docs...", fg="green")
