@@ -2069,14 +2069,14 @@ tests = ["Flask-CLI (>=0.4.0)", "Flask-Mongoengine (>=0.7.0)", "Flask-Peewee (>=
 
 [[package]]
 name = "mock"
-version = "5.0.1"
+version = "5.0.2"
 description = "Rolling backport of unittest.mock for all Pythons"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "mock-5.0.1-py3-none-any.whl", hash = "sha256:c41cfb1e99ba5d341fbcc5308836e7d7c9786d302f995b2c271ce2144dece9eb"},
-    {file = "mock-5.0.1.tar.gz", hash = "sha256:e3ea505c03babf7977fd21674a69ad328053d414f05e6433c30d8fa14a534a6b"},
+    {file = "mock-5.0.2-py3-none-any.whl", hash = "sha256:0e0bc5ba78b8db3667ad636d964eb963dc97a59f04c6f6214c5f0e4a8f726c56"},
+    {file = "mock-5.0.2.tar.gz", hash = "sha256:06f18d7d65b44428202b145a9a36e99c2ee00d1eb992df0caf881d4664377891"},
 ]
 
 [package.extras]
@@ -4068,4 +4068,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "eca8897e55c97458639305aa37ef4769a411424b792c6e04fe685e79409510b8"
+content-hash = "4997669ea934659088f65a6c6c800c17981db34478e81769dffa49ee8155708b"
