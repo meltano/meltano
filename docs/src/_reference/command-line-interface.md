@@ -382,6 +382,9 @@ meltano discover loaders
 
 The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `docs`
+
+Open the Meltano documentation site in the default browser.
 
 ## `elt`
 

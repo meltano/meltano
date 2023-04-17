@@ -11,6 +11,7 @@ from meltano.cli import (  # noqa: WPS235
     add,
     config,
     discovery,
+    docs,
     dragon,
     elt,
     environment,
@@ -43,6 +44,7 @@ cli.add_command(add.add)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
 cli.add_command(discovery.discover)
+cli.add_command(docs.docs)
 cli.add_command(dragon.dragon)
 cli.add_command(elt.elt)
 cli.add_command(environment.meltano_environment)
