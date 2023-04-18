@@ -48,7 +48,7 @@ class LogsClient(MeltanoCloudClient):
         self,
         execution_id: str,
         page_token: str | None = None,
-    ) -> dict:
+    ):
         """Get a page of logs.
 
         Args:
