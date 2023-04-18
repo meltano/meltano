@@ -95,7 +95,7 @@ rich = "^13.3.3"
 smart-open = {version = "^6.2.0"}
 smtpapi = "^0.4.1"
 snowplow-tracker = "^0.10.0"
-sqlalchemy = "^1.3.19"
+sqlalchemy = "^2.0.9"
 structlog = "^23.1.0"
 tzlocal = "^4.2.0"
 uvicorn = {extras = ["standard"], version = "^0.17.6"}
