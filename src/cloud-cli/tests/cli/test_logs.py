@@ -26,9 +26,24 @@ class TestLogsCommand:
     ):
         """Test the `logs print` subcommand."""
         execution_id = "12345"
-        path = f"/logs/v1/{tenant_resource_key}/{internal_project_id}/{execution_id}"
-        httpserver.expect_oneshot_request(path).respond_with_data(
-            b"[2023-05-01 00:00:00] Starting Job...",
+        path = (
+            f"/logs/v1/{tenant_resource_key}/{internal_project_id}/tail/{execution_id}"
+        )
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {
+                "results": [
+                    {
+                        "timestamp": 1620000000,
+                        "ingestion_time": 1620000000,
+                        "message": "[2023-05-01 00:00:00] Starting Job...",
+                    },
+                    {
+                        "timestamp": 1620000000,
+                        "ingestion_time": 1620000000,
+                        "message": "[2023-05-01 00:00:01] Running Job...",
+                    },
+                ],
+            },
         )
         result = CliRunner().invoke(
             cli,
@@ -43,3 +58,4 @@ class TestLogsCommand:
         )
         assert result.exit_code == 0
         assert "[2023-05-01 00:00:00] Starting Job..." in result.output
+        assert "[2023-05-01 00:00:01] Running Job..." in result.output
