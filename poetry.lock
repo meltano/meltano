@@ -3337,14 +3337,14 @@ files = [
 
 [[package]]
 name = "snowplow-tracker"
-version = "0.10.0"
+version = "0.15.0"
 description = "Snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "snowplow-tracker-0.10.0.tar.gz", hash = "sha256:f1889a5b1f8e3c62e70d80c8e7816ff8a3e13d0ca13ab05df374fcf4305fc98d"},
-    {file = "snowplow_tracker-0.10.0-py3-none-any.whl", hash = "sha256:d447a9ce4f45c716b16e4a8e0f9d7f34565df42f052ed9efbefa4bb1717a5c6d"},
+    {file = "snowplow-tracker-0.15.0.tar.gz", hash = "sha256:9cc74d29abacfaa3faad2db22e1bd3027a6f98c5b9b73e39e447b75b0086ba19"},
+    {file = "snowplow_tracker-0.15.0-py3-none-any.whl", hash = "sha256:b71c90d5e210e1c100e067918795dd2db63c23170472bf0bda8d3640cbef4b49"},
 ]
 
 [package.dependencies]
@@ -4068,4 +4068,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "132b3d09637ccf9022bfe96258df2c09845b96c7a3c7917875cc0948ddbb469f"
+content-hash = "96869c7d913fe0f3e5e72760119ab7501cb2b65d311509afa0f21e6347d1359d"
