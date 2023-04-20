@@ -12,7 +12,7 @@ weight: 6
 ## Security Whitepaper
 
 <div class="notification is-info">
-  <p>Meltano Cloud is currently in Alpha. Features and implementation details may change between Alpha and GA.</p>
+  <p>Meltano Cloud is currently in Beta. Features and implementation details may change between Beta and GA.</p>
 </div>
 
 ## Securing Project Secrets
@@ -27,12 +27,36 @@ weight: 6
 1. Meltano will never store your secrets in clear text.
 1. Meltano engineers do not have access to directly decrypt your secrets.
 1. The decryption key for project secrets will never leave AWS servers.
-1. Our IAM policies only allow the `decrypt` action within containers that are running project workloads.
+1. Our IAM policies only allow the `decrypt` action within containers that are running project workloads or for webhook sending services that require decrypting of your `MELTANO_CLOUD_WEBHOOK_URL` secret.
 
 ##### What encryption algorithms are used?
 
-The algorithm for encrypting secrets is an RSA assymetric encryption, using 4096-bit keys.
+The algorithm for encrypting secrets is an RSA symmetric encryption, which is a 256-bit AES-GCM encryption key.
 
 More information is available on the AWS website:
 
-- [https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html#key-spec-rsa-encryption](https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html#key-spec-rsa-encryption)
+- [Symmetric Encryption Keys](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#symmetric-cmks)
+
+## Meltano Cloud GitHub App Permissions
+
+### Meltano Cloud Login
+
+When performing login to Meltano Cloud, either via the CLI or the web UI, the Meltano Cloud GitHub App will request only the following permissions:
+
+- Read-only access to your email addresses
+
+### Meltano Cloud Project Permissions
+
+When adding a project to Meltano Cloud, you will need to install the GitHub App to your Organization in GitHub.
+You may grant the GitHub App read-only permissions to only the repositories you require it to access.
+The following permissions are provided to the Meltano Cloud GitHub App:
+
+Repository Permissions
+- Repository contents, commits, branches, downloads, releases, and merges (read-only)
+- Search repositories, list collaborators, and access repository metadata (read-only)
+
+Organization Permissions
+- Organization members and teams (read-only)
+
+Account Permissions
+- Manage a user's email addresses (read-only)
