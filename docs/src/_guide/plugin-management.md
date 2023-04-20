@@ -482,14 +482,14 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 
       Depending on your git provider (such as Azure Repos), some `git+ssh` URLs may contain a colon. This colon can cause errors with `pip`. In this case this can be fixed by replacing the colon with a forward slash.
 
-For example, instead of this:
-```
-git+ssh://git@ssh.dev.azure.com:v3/my_org/
-```
-Use this:
-```
-git+ssh://git@ssh.dev.azure.com/v3/my_org/
-```
+      For example, instead of this:
+      ```
+      git+ssh://git@ssh.dev.azure.com:v3/my_org/
+      ```
+      Use this:
+      ```
+      git+ssh://git@ssh.dev.azure.com/v3/my_org/
+      ```
 
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
