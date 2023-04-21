@@ -75,6 +75,7 @@ To onboard your project, Meltano will need the following project information:
 1. List of GitHub User IDs, separated by commas: `___________`
 1. List of Meltano schedule names and intervals: `___________`
    - This can be copy-pasted from `meltano.yml`.
+   - During Beta, you'll need to reach out to Meltano support in order to create additional schedules.
 
 ### Step 2: Install (or update) the Cloud CLI
 
