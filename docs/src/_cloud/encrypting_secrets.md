@@ -16,18 +16,18 @@ This document covers information on encrypting secrets in your Meltano `secrets.
 
 ### Encryption Method
 
-Use the `meltano cloud config env set --key <SECRET_NAME> --value <SECRET_VALUE>` CLI command to set configuration secrets.
+Use the `meltano-cloud config env set --key <SECRET_NAME> --value <SECRET_VALUE>` CLI command to set configuration secrets.
 
 Note: The value can be passed in directly or via an environment variable.
-If you have an environment variable set locally called `TEST_SECRET`, the example to set it would be `meltano cloud config env set --key TEST_SECRET --value $TEST_SECRET`.
+If you have an environment variable set locally called `TEST_SECRET`, the example to set it would be `meltano-cloud config env set --key TEST_SECRET --value $TEST_SECRET`.
 
 This will set secrets via the `.env` file at runtime for a job or schedule.
 
 You can list and delete secrets configured as well.
 
 ```
-meltano cloud config env list
-meltano cloud config env delete <SECRET_NAME>
+meltano-cloud config env list
+meltano-cloud config env delete <SECRET_NAME>
 ```
 
 Secrets cannot be decrypted after they are set. If you need to change a secret, you can set the secret again.
