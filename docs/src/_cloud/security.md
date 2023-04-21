@@ -32,7 +32,7 @@ weight: 6
 
 ##### What encryption algorithms are used?
 
-The algorithm for encrypting secrets is an RSA symmetric encryption, which is a 256-bit AES-GCM encryption key.
+The algorithm for encrypting secrets is an AES symmetric encryption, using 256-bit AES-GCM encryption keys.
 
 More information is available on the AWS website:
 
