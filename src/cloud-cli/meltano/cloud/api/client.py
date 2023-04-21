@@ -263,26 +263,3 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
                     )
                     raise MeltanoCloudError(ex.response) from ex
                 raise
-
-    @asynccontextmanager
-    async def stream_logs(
-        self,
-        execution_id: str,
-    ) -> t.AsyncGenerator[ClientResponse, None]:
-        """Stream logs from a Meltano Cloud execution.
-
-        Args:
-            execution_id: The execution identifier.
-
-        Yields:
-            The response object.
-        """
-        url = (
-            "/logs/v1/"
-            f"{self.config.tenant_resource_key}"
-            f"/{self.config.internal_project_id}/{execution_id}"
-        )
-
-        async with self.authenticated():
-            async with self._raw_request("GET", url) as response:
-                yield response

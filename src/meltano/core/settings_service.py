@@ -37,6 +37,7 @@ class FeatureFlags(Enum):
     """Available Meltano Feature Flags."""
 
     STRICT_ENV_VAR_MODE = "strict_env_var_mode"
+    PLUGIN_LOCKS_REQUIRED = "plugin_locks_required"
 
     def __str__(self):
         """Return feature name.

@@ -10,6 +10,10 @@ weight: 3
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
+## `docs`
+
+Open the Meltano Cloud documentation site in the default browser.
+
 ## `login`
 
 Logging into Meltano Cloud via the CLI stores a token locally which is used by the CLI to take actions that require authentication.
@@ -18,7 +22,7 @@ Logging in will open a browser tab where you may be asked to authenticate yourse
 
 ```sh
 # Login to Meltano Cloud
-meltano cloud login
+meltano-cloud login
 ```
 
 ## `logout`
@@ -27,7 +31,7 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 
 ```sh
 # Logout from Meltano Cloud
-meltano cloud logout
+meltano-cloud logout
 ```
 
 ## `project`
@@ -37,7 +41,7 @@ The `project` command provides an interface for Meltano Cloud projects.
 The `list` subcommand shows all of the projects you have access to, and can use with other commands:
 
 ```sh
-meltano cloud project list
+meltano-cloud project list
 ╭───────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
 │  Default  │ Name                          │ Git Repository                                           │
 ├───────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
@@ -46,17 +50,17 @@ meltano cloud project list
 ╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
-When you run the `login` command, if you only have a single project, it will be set as the default project to use for future commands. Otherwise, you will need to run `meltano cloud project use` to specify which Meltano Cloud project the other `meltano cloud` commands should operate on.
+When you run the `login` command, if you only have a single project, it will be set as the default project to use for future commands. Otherwise, you will need to run `meltano-cloud project use` to specify which Meltano Cloud project the other `meltano-cloud` commands should operate on.
 
-When `meltano cloud project use` is not provided any argument, it will list the available projects, and have you select one interactively using the arrow keys. To select a project as the default non-interactively, use the `--name` argument:
+When `meltano-cloud project use` is not provided any argument, it will list the available projects, and have you select one interactively using the arrow keys. To select a project as the default non-interactively, use the `--name` argument:
 
 ```sh
-meltano cloud project use --name 'Meltano Squared'
+meltano-cloud project use --name 'Meltano Squared'
 Set 'Meltano Squared' as the default Meltano Cloud project for future commands
 ```
 
 ```sh
-meltano cloud project list
+meltano-cloud project list
 ╭───────────┬───────────────────────────────┬──────────────────────────────────────────────────────────╮
 │  Default  │ Name                          │ Git Repository                                           │
 ├───────────┼───────────────────────────────┼──────────────────────────────────────────────────────────┤
@@ -65,14 +69,14 @@ meltano cloud project list
 ╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
-When specifying a project to use as the default for future command, its name must be exactly as shown when running `meltano cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
+When specifying a project to use as the default for future command, its name must be exactly as shown when running `meltano-cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
 
 ## `history`
 
 Display the history of executions for a project.
 
 ```sh
-$ meltano cloud history --limit 3
+$ meltano-cloud history --limit 3
 ╭──────────────────────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮
 │ Execution ID                     │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │
 ├──────────────────────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤
@@ -82,10 +86,10 @@ $ meltano cloud history --limit 3
 ╰──────────────────────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯
 
 # Display the last 12 hours of executions
-$ meltano cloud history --lookback 12h
+$ meltano-cloud history --lookback 12h
 
 # Display the last week of executions
-$ meltano cloud history --lookback 1w
+$ meltano-cloud history --lookback 1w
 
 # Display the last hour and a half of executions
 $ meltano cloud history --lookback 1h30m
@@ -104,7 +108,7 @@ $ meltano cloud history --schedule-contains _github_to_
 
 ```sh
 # Print logs for an execution
-meltano cloud logs print --execution-id <execution_id>
+meltano-cloud logs print --execution-id <execution_id>
 ```
 
 ## `schedule`
@@ -117,16 +121,16 @@ Currently, updating a schedule requires a redeployment. In the future it will be
 
 ```sh
 # Enable a schedule
-meltano cloud schedule enable --deployment <deployment name> --schedule <schedule name>
+meltano-cloud schedule enable --deployment <deployment name> --schedule <schedule name>
 
 # Disable a schedule
-meltano cloud schedule disable --deployment <deployment name> --schedule <schedule name>
+meltano-cloud schedule disable --deployment <deployment name> --schedule <schedule name>
 ```
 
 Schedules can be listed using the `list` command:
 
 ```sh
-meltano cloud schedule list
+meltano-cloud schedule list
 ╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
 │ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
 ├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
@@ -138,7 +142,7 @@ meltano cloud schedule list
 ```
 
 ```sh
-meltano cloud schedule list --deployment prod
+meltano-cloud schedule list --deployment prod
 ╭──────────────┬────────────┬──────────────────────┬──────────────┬───────────╮
 │ Deployment   │ Schedule   │ Interval             │   Runs / Day │ Enabled   │
 ├──────────────┼────────────┼──────────────────────┼──────────────┼───────────┤
@@ -150,7 +154,7 @@ meltano cloud schedule list --deployment prod
 Individual schedules can be more thoroughly described using the `describe` command:
 
 ```sh
-meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5
+meltano-cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5
 Deployment name: prod
 Schedule name:   schedule_4
 Interval:        15,45 */2 * * 1,3,5
@@ -167,7 +171,7 @@ Approximate starting date and time (UTC) of next 5 schedule runs:
 The `--only-upcoming` option can be used to have the command only output the upcoming scheduled run start dates and times:
 
 ```sh
-meltano cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5 --only-upcoming
+meltano-cloud schedule describe --deployment staging --schedule schedule_4 --num-upcoming 5 --only-upcoming
 2023-03-24 20:45
 2023-03-24 22:15
 2023-03-24 22:45

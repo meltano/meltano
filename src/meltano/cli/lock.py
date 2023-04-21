@@ -63,8 +63,9 @@ def lock(
         raise CliError("Exactly one of --all or plugin name must be specified.")
 
     try:
-        # Make it a list so source preference is not lazily evaluated.
-        plugins = list(project.plugins.plugins())
+        with project.plugins.use_preferred_source(DefinitionSource.ANY):
+            # Make it a list so source preference is not lazily evaluated.
+            plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise

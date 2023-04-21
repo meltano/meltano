@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.0
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.0
+      uses: actions/checkout@v3.5.2
 
     - name: Download artifacts
       uses: actions/download-artifact@v3.0.2
