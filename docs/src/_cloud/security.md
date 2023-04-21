@@ -27,7 +27,7 @@ weight: 6
 1. Meltano will never store your secrets in clear text.
 1. Meltano engineers do not have access to directly decrypt your secrets.
 1. The decryption key for project secrets will never leave AWS servers.
-1. Our IAM policies only allow the `decrypt` action within containers that are running project workloads or for webhook sending services that require decrypting of your `MELTANO_CLOUD_WEBHOOK_URL` secret.
+1. Our IAM policies only allow the `decrypt` action within containers that are running project workloads or for services that require specific secrets to perform tasks such as sending notifications to your webhook urls.
 
 ##### What encryption algorithms are used?
 
