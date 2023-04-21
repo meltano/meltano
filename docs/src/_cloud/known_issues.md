@@ -1,6 +1,6 @@
 ---
 title: "Known Limitations"
-description: Details the Alpha limitations for  Meltano Cloud
+description: Details Beta limitations for  Meltano Cloud
 layout: doc
 hidden: true
 ---
@@ -10,17 +10,13 @@ hidden: true
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
-## Limitations during Alpha
-
-### Limited secrets management features
-
-Within the Alpha phase, there will only be limited support for secrets management. Future Meltano Core and Meltano Cloud features will enable additional secrets management options.
+## Limitations during Beta
 
 ### Manually-submitted schedules lists
 
-During the Alpha, Meltano Cloud will only run schedules which you have explicitly declared and requested.
+During Beta, Meltano Cloud will only run schedules which you have explicitly declared and requested.
 
-In future, Meltano Cloud will automatically run any schedules you have configured to run within the named environment.
+In the future, Meltano Cloud will automatically run any schedules you have configured to run within the named environment.
 
 See related issue: [#6853](https://github.com/meltano/meltano/issues/6853).
 
