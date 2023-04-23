@@ -9,6 +9,7 @@ import click
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
+from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
@@ -44,6 +45,11 @@ if t.TYPE_CHECKING:
     is_flag=True,
     help="Ignore the required Python version declared by the plugins.",
 )
+@click.option(
+    "--schedule_name",
+    "-s",
+    help="Install all plugins from the given schedule.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 def install(
@@ -54,6 +60,7 @@ def install(
     clean: bool,
     parallelism: int,
     force: bool,
+    schedule_name: str,
 ):
     """
     Install all the dependencies of your project based on the meltano.yml file.
@@ -67,7 +74,18 @@ def install(
             plugins = project.plugins.get_plugins_of_type(plugin_type)
             if plugin_name:
                 plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
-        else:
+
+        if schedule_name:
+            schedule_service = ScheduleService(ctx.obj["project"])
+            schedule_obj = schedule_service.find_schedule(schedule_name)
+            task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
+            schedule_plugins = []
+            for plugin_command in task_sets.flat_args:
+                plugin_name = plugin_command.split(":")[0]
+                schedule_plugins.append(project.plugins.find_plugin(plugin_name))
+            plugins = list(set(plugins) & set(schedule_plugins))
+
+        if not plugins:
             plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
