@@ -74,6 +74,8 @@ def install(
             plugins = project.plugins.get_plugins_of_type(plugin_type)
             if plugin_name:
                 plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
+        else:
+            plugins = list(project.plugins.plugins())
 
         if schedule_name:
             schedule_service = ScheduleService(ctx.obj["project"])
@@ -83,10 +85,7 @@ def install(
             for plugin_command in task_sets.flat_args:
                 plugin_name = plugin_command.split(":")[0]
                 schedule_plugins.append(project.plugins.find_plugin(plugin_name))
-            plugins = list(set(plugins) & set(schedule_plugins))
-
-        if not plugins:
-            plugins = list(project.plugins.plugins())
+            plugins = list(set(plugins) & set(schedule_plugins))     
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
