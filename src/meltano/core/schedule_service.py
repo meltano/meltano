@@ -127,12 +127,12 @@ class ScheduleService:  # noqa: WPS214
         )
 
         schedule = Schedule(
-            name,
-            extractor,
-            loader,
-            transform,
-            interval,
-            start_date,
+            name=name,
+            extractor=extractor,
+            loader=loader,
+            transform=transform,
+            interval=interval,
+            start_date=start_date,
             env=env,
         )
         return self.add_schedule(schedule)
@@ -149,9 +149,14 @@ class ScheduleService:  # noqa: WPS214
         Returns:
             The added schedule.
         """
-        schedule = Schedule(name=name, job=job, interval=interval, env=env)
-        self.add_schedule(schedule)
-        return schedule
+        return self.add_schedule(
+            Schedule(
+                name=name,
+                job=job,
+                interval=interval,
+                env=env,
+            ),
+        )
 
     def remove(self, name) -> str:
         """Remove a schedule from the project.
@@ -208,11 +213,7 @@ class ScheduleService:  # noqa: WPS214
             BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
-        if (
-            schedule.interval is not None
-            and schedule.interval != "@once"
-            and not croniter.is_valid(schedule.interval)
-        ):
+        if schedule.interval is not None and not croniter.is_valid(schedule.interval):
             raise BadCronError(schedule.interval)
 
         with self.project.meltano_update() as meltano:

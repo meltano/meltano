@@ -3,7 +3,7 @@
   "name": "dbt-snowflake",
   "namespace": "dbt_snowflake",
   "variant": "dbt-labs",
-  "label": "dbt Snowflake (EDK preview)",
+  "label": "dbt Snowflake",
   "docs": "https://hub.meltano.com/utilities/dbt-snowflake--dbt-labs",
   "repo": "https://github.com/dbt-labs/dbt-snowflake",
   "pip_url": "dbt-core~=1.3.0 dbt-snowflake~=1.3.0 git+https://github.com/meltano/dbt-ext.git@main",
@@ -26,6 +26,7 @@
     },
     {
       "name": "project_dir",
+      "env": "DBT_PROJECT_DIR",
       "value": "$MELTANO_PROJECT_ROOT/transform",
       "label": "Projects Directory"
     },

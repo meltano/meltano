@@ -19,7 +19,6 @@ body:
         - API
         - CLI (options, error messages, logging, etc.)
         - Configuration (settings parsing, validation, etc.)
-        - Web UI
         - Other
     validations:
       required: true

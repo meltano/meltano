@@ -8,6 +8,7 @@
   "repo": "https://github.com/great-expectations/great_expectations",
   "pip_url": "great_expectations",
   "executable": "great_expectations",
+  "logo_url": "https://hub.meltano.com/assets/logos/utilities/great_expectations.png",
   "settings": [
     {
       "name": "ge_home",

@@ -10,7 +10,7 @@ where your [project](/concepts/project) and pipelines are composed of [plugins](
 
 Your project's plugins are defined in your [`meltano.yml` project file](/concepts/project#plugins),
 and are [installed](#installing-your-projects-plugins) inside the [`.meltano` directory](/concepts/project#meltano-directory).
-They can be managed using various [CLI commands](/reference/command-line-interface) as well as the [UI](/reference/ui).
+They can be managed using various [CLI commands](/reference/command-line-interface).
 
 ## Adding a plugin to your project
 

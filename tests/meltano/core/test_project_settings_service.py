@@ -73,28 +73,6 @@ class TestProjectSettingsService:
             SettingValueStore.CONFIG_OVERRIDE,
         )
 
-    def test_get_with_source_ui_cfg(self, project, subject, monkeypatch):
-        def assert_value_source(value, source):
-            assert subject.get_with_source("ui.server_name") == (value, source)
-
-        assert_value_source(None, SettingValueStore.DEFAULT)
-
-        project.root_dir("ui.cfg").write_text("SERVER_NAME = None")
-
-        assert_value_source(None, SettingValueStore.DEFAULT)
-
-        project.root_dir("ui.cfg").write_text("SERVER_NAME = 'from_ui_cfg'")
-
-        assert_value_source("from_ui_cfg", SettingValueStore.ENV)
-
-        with monkeypatch.context() as ctx:
-            ctx.setenv(
-                subject.setting_env(subject.find_setting("ui.server_name")),
-                "from_env",
-            )
-
-            assert_value_source("from_env", SettingValueStore.ENV)
-
     def test_experimental_on(self, subject, monkeypatch):
         changed = []
         monkeypatch.setenv("MELTANO_EXPERIMENTAL", "true")

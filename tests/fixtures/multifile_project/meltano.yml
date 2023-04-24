@@ -16,7 +16,7 @@ schedules:
   loader: target-meltano-yml
   transform: skip
   start_date: 2020-08-05 00:00:00
-  interval: '@once' # Run only once
+  interval: '@daily' # Run daily
 
 jobs:  # My jobs
 # An EL job with mapping

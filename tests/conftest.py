@@ -23,7 +23,6 @@ pytest_plugins = [
     "fixtures.db",
     "fixtures.fs",
     "fixtures.core",
-    "fixtures.api",
     "fixtures.cli",
     "fixtures.docker",
 ]

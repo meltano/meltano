@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob._models import BlobProperties
+from azure.storage.blob._models import BlobProperties  # noqa: WPS436
 from boto3 import client
 from botocore.stub import Stubber
 from dateutil.tz import tzutc

@@ -7,11 +7,13 @@
   "docs": "https://hub.meltano.com/extractors/tap-slack--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/tap-slack",
   "pip_url": "git+https://github.com/MeltanoLabs/tap-slack.git",
+  "description": "Team communication tool",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/slack.png",
   "capabilities": [
-    "catalog",
-    "state",
-    "discover",
     "about",
+    "catalog",
+    "discover",
+    "state",
     "stream-maps"
   ],
   "settings_group_validation": [
@@ -23,7 +25,38 @@
     {
       "name": "api_key",
       "kind": "password",
-      "label": "API Key"
+      "label": "API Key",
+      "description": "Your Slack App API key. See the Prerequisites section above for more details on obtaining it."
+    },
+    {
+      "name": "auto_join_channels",
+      "kind": "boolean",
+      "label": "Auto Join Channels",
+      "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages."
+    },
+    {
+      "name": "channel_types",
+      "kind": "array",
+      "label": "Channel Types",
+      "description": "An array of the types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages."
+    },
+    {
+      "name": "excluded_channels",
+      "kind": "array",
+      "label": "Excluded Channels",
+      "description": "A list of channel IDs that should not be retrieved. Excluding overrides a selected setting, so if a channel is included in both selected and excluded, it will be excluded."
+    },
+    {
+      "name": "include_admin_streams",
+      "kind": "boolean",
+      "label": "Include Admin Streams",
+      "description": "Whether to include streams that require admin privileges or not. If the user does not have the proper scopes then the tap will throw and exception."
+    },
+    {
+      "name": "selected_channels",
+      "kind": "array",
+      "label": "Selected Channels",
+      "description": "A list of channel IDs that should be retrieved. If not defined then all are selected."
     },
     {
       "name": "start_date",
@@ -36,30 +69,6 @@
       "kind": "integer",
       "label": "Thread Lookback Days",
       "description": "The number of days to look in the past for new thread replies to existing messages"
-    },
-    {
-      "name": "channel_types",
-      "kind": "array",
-      "label": "Channel Types",
-      "description": "The types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages."
-    },
-    {
-      "name": "auto_join_channels",
-      "kind": "boolean",
-      "label": "Auto Join Channels",
-      "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages."
-    },
-    {
-      "name": "selected_channels",
-      "kind": "array",
-      "label": "Selected Channels",
-      "description": "A list of channel IDs that should be retrieved. If not defined then all are selected."
-    },
-    {
-      "name": "excluded_channels",
-      "kind": "array",
-      "label": "Excluded Channels",
-      "description": "A list of channel IDs that should not be retrieved. Excluding overrides a selected setting, so if a channel is included in both selected and excluded, it will be excluded."
     }
   ]
 }

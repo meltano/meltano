@@ -10,8 +10,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
 
-CRON_INTERVALS: dict[str, str | None] = {
-    "@once": None,
+CRON_INTERVALS: dict[str, str] = {
     "@hourly": "0 * * * *",
     "@daily": "0 0 * * *",
     "@weekly": "0 0 * * 0",
@@ -25,11 +24,12 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
 
     def __init__(
         self,
+        *,
         name: str,
         extractor: str | None = None,
         loader: str | None = None,
         transform: str | None = None,
-        interval: str | None = None,
+        interval: str,
         start_date: datetime.datetime | None = None,
         job: str | None = None,
         env: dict[str, str] | None = None,
@@ -76,10 +76,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         Returns:
             The cron expression.
         """
-        if self.interval:
-            return CRON_INTERVALS.get(self.interval, self.interval)
-
-        return None
+        return CRON_INTERVALS.get(self.interval, self.interval)
 
     @property
     def elt_schedule(self) -> bool:

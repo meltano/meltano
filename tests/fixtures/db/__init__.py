@@ -6,7 +6,6 @@ import warnings
 from contextlib import closing
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
@@ -19,7 +18,7 @@ from meltano.core.project import Project
 def engine_uri_env(engine_uri: str) -> t.Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
-    monkeypatch = MonkeyPatch()
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
     try:
         yield

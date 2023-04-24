@@ -64,7 +64,6 @@ def discovery():  # noqa: WPS213
                     "settings": [
                         {"name": "test", "value": "mock"},
                         {"name": "start_date"},
-                        {"name": "protected", "protected": True},
                         {"name": "secure", "kind": "password"},
                         {"name": "port", "kind": "integer", "value": 5000},
                         {"name": "list", "kind": "array", "value": []},
@@ -399,7 +398,7 @@ def elt_schedule(
             extractor=tap.name,
             loader=target.name,
             transform="skip",
-            interval="@once",
+            interval="@daily",
             start_date=datetime.datetime.now(),
         )
     except ScheduleAlreadyExistsError as err:
@@ -417,7 +416,7 @@ def job_schedule(
         return schedule_service.add(
             "job-schedule-mock",
             "mock-job",
-            interval="@once",
+            interval="@daily",
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule

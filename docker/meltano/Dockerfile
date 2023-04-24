@@ -24,7 +24,4 @@ ENV PATH="/venv/bin:${PATH}"
 RUN pip install --upgrade pip wheel && \
     pip install "meltano[azure,gcs,mssql,s3]==${MELTANO_VERSION}"
 
-# Run the Meltano UI by default
-EXPOSE 5000
 ENTRYPOINT ["meltano"]
-CMD ["ui"]

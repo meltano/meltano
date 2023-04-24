@@ -2,9 +2,6 @@
 title: Troubleshooting
 description: Learn what you can do if you need to troubleshoot
 layout: doc
-redirect_from:
- - /reference/ui
- - /guide/ui/
 weight: 25
 ---
 
@@ -163,31 +160,6 @@ meltano elt tap-gitlab target-postgres --exclude project_members
 
 meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
-
-## Meltano UI
-
-Early versions of Meltano promoted a simple UI feature that was used for setting up basic pipelines and viewing basic logs. Due to a refocusing of the product on the command line interface, the UI was deprioritized for continued feature enhancements. For [interactive plugin configuration](/reference/command-line-interface#how-to-use-interactive-config), we now recommend our `--interactive` config option in the CLI.
-
-Meltano will eventually have a UI again as the company and community grows. Please let us know your thoughts on what you would like to see in a future Meltano UI in [this GitHub discussion](https://github.com/meltano/meltano/discussions/6957).
-
-To view the previous documentation on the UI, review [this pull request](https://github.com/meltano/meltano/pull/6955) where they were removed.
-
-### Limitations & Capabilities of the Deprecated UI
-
-If you are still using the UI, please note that it is not compatible with many newer Meltano features.
-
-The UI **does** work with:
-- Schedules based on [the `elt` command](https://docs.meltano.com/reference/command-line-interface#elt) (`meltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform ...`)
-
-The UI does **not** work with:
-- Schedules based on [jobs](https://docs.meltano.com/reference/command-line-interface#job) (`meltano schedule add <schedule_name> --job <job>`)
-- [Environments](https://docs.meltano.com/concepts/environments)
-
-### Replacing UI functionality
-
-If you're using [Airflow](https://hub.meltano.com/utilities/airflow) or [Dagster](https://hub.meltano.com/utilities/dagster) as your orchestrator, the Airflow or Dagster webserver UI should be able to serve as a replacement for many Meltano UI use cases.
-
-If using Airflow as orchestrator, see the ["Airflow orchestrator" section of the "Deployment in Production" guide](/guide/production#airflow-orchestrator) for more details on how to get the webserver running. From the webserver, you can [view all DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#dags-view). You can also access the Meltano logs for a specific task instance by going to the [task instance context menu](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#task-instance-context-menu) and clicking "Log" or "View logs".
 
 ## No Plugin Settings Defined
 

@@ -36,8 +36,6 @@ FEATURE_FLAG_PREFIX = "ff"
 class FeatureFlags(Enum):
     """Available Meltano Feature Flags."""
 
-    ENABLE_UVICORN = "enable_uvicorn"
-    ENABLE_API_SCHEDULED_JOB_LIST = "enable_api_scheduled_job_list"
     STRICT_ENV_VAR_MODE = "strict_env_var_mode"
     PLUGIN_LOCKS_REQUIRED = "plugin_locks_required"
 

@@ -281,7 +281,11 @@ class TestScheduleService:
         subject,
         custom_tap,
     ):
-        schedule = Schedule(name="tap-custom", extractor="tap-custom")
+        schedule = Schedule(
+            name="tap-custom",
+            extractor="tap-custom",
+            interval="@daily",
+        )
         subject.add_schedule(schedule)
         found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
         assert found_schedule.extractor == custom_tap.name

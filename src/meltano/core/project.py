@@ -311,18 +311,12 @@ class Project(Versioned):  # noqa: WPS214
             The current meltano config.
         """
         from meltano.core.meltano_file import MeltanoFile
-        from meltano.core.settings_service import FEATURE_FLAG_PREFIX, FeatureFlags
 
         conf: dict[str, t.Any] = yaml.load(self.meltanofile)
         if conf is None:
             raise EmptyMeltanoFileException
 
-        lock = (
-            self._meltano_rw_lock.write_lock
-            if conf.get(f"{FEATURE_FLAG_PREFIX}.{FeatureFlags.ENABLE_UVICORN}", False)
-            else self._meltano_rw_lock.read_lock
-        )
-        with lock():
+        with self._meltano_rw_lock.read_lock():
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
