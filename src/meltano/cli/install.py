@@ -85,7 +85,7 @@ def install(
             for plugin_command in task_sets.flat_args:
                 plugin_name = plugin_command.split(":")[0]
                 schedule_plugins.append(project.plugins.find_plugin(plugin_name))
-            plugins = list(set(plugins) & set(schedule_plugins))     
+            plugins = list(set(plugins) & set(schedule_plugins))
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
