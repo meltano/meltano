@@ -256,7 +256,7 @@ class TestCliInstall:
             from meltano.core.task_sets import TaskSets
 
             task_sets_service.add(
-                TaskSets(job_schedule.job, [tap_gitlab.name, target.name])
+                TaskSets(job_schedule.job, [tap_gitlab.name, target.name]),
             )
             result = cli_runner.invoke(
                 cli,
@@ -271,6 +271,7 @@ class TestCliInstall:
                 clean=False,
                 force=False,
             )
+
 
 # un_engine_uri forces us to create a new project, we must do this before the
 # project fixture creates the project see
