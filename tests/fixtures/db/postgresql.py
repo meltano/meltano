@@ -11,11 +11,11 @@ from sqlalchemy.pool import NullPool
 
 def recreate_database(engine, db_name):
     """Drop & Create a new database, PostgreSQL only."""
-    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
-        engine.execute(text(f"DROP DATABASE {db_name}"))
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError), engine.begin() as conn:
+        conn.execute(text(f"DROP DATABASE {db_name}"))
 
-    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
-        engine.execute(text(f"CREATE DATABASE {db_name}"))
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError), engine.begin() as conn:
+        conn.execute(text(f"CREATE DATABASE {db_name}"))
 
 
 @pytest.fixture(scope="session")
@@ -35,4 +35,4 @@ def engine_uri(worker_id: str):
     )
     recreate_database(engine, database)
 
-    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
+    return f"postgresql+psycopg://{user}:{password}@{host}:{port}/{database}"
