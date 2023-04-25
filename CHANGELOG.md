@@ -19,20 +19,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#7585](https://github.com/meltano/meltano/issues/7585) Updates for Meltano Cloud GitHub App permissions and remove Alpha references
 - [#7582](https://github.com/meltano/meltano/issues/7582) Include fix for git+ssh urls with colons -- _**Thanks @acarter24!**_
-- [#7580](https://github.com/meltano/meltano/issues/7580) Add note about schedule creation
 - [#7579](https://github.com/meltano/meltano/issues/7579) Change "meltano cloud" to "meltano-cloud" during Beta
 - [#7571](https://github.com/meltano/meltano/issues/7571) Remove dead link to GitLab container registry -- _**Thanks @longtomjr!**_
 - [#7566](https://github.com/meltano/meltano/issues/7566) Remove references to --include-related -- _**Thanks @msardana94!**_
 - [#7545](https://github.com/meltano/meltano/issues/7545) Update link to Meltano dbt Jaffle shop example -- _**Thanks @flexponsive!**_
-- [#7553](https://github.com/meltano/meltano/issues/7553) Use small SVG for 404 image
-- [#7550](https://github.com/meltano/meltano/issues/7550) Fix link to Cloud CLI
-- [#7498](https://github.com/meltano/meltano/issues/7498) Add note about GitHub App vs SSO login
-- [#7513](https://github.com/meltano/meltano/issues/7513) Remove ambiguous wording from Cloud SLA
-- [#7504](https://github.com/meltano/meltano/issues/7504) Tweak Cloud legalese
-- [#7502](https://github.com/meltano/meltano/issues/7502) Add copy for Cloud legal docs
-- [#7485](https://github.com/meltano/meltano/issues/7485) Move Cloud CLI docs to Cloud Section
-- [#7484](https://github.com/meltano/meltano/issues/7484) Add Cloud CLI docs
-- [#7381](https://github.com/meltano/meltano/issues/7381) Move replicate troubleshooting to guide
 - [#7482](https://github.com/meltano/meltano/issues/7482) Add the Matatika GitHub Analytics project to the example projects page -- _**Thanks @DanielPDWalker!**_
 
 ## v2.17.1 (2023-04-04)
