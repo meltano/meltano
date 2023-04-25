@@ -42,7 +42,7 @@ runs:
       run: |
         echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
 
-    - name: Build the image
+    - name: Build the image for all supported architectures
       uses: docker/build-push-action@v4
       with:
         context: docker/meltano
@@ -51,8 +51,24 @@ runs:
           MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64,linux/arm64
-        load: true
+        # Can't load multi-arch images; use workaround instead:
+        # https://github.com/docker/buildx/issues/59#issuecomment-1168619521
+        # We build both images first to ensure they can be built, and to
+        # store them in the build cache. Then we load one of them, and scan
+        # it. Then we optionally push both of them to the registry.
+        load: false
         push: false
+
+    - name: Load the amd64 image for scanning
+      uses: docker/build-push-action@v4
+      with:
+        context: docker/meltano
+        build-args: |
+          PYTHON_VERSION=${{ inputs.python-version }}
+          MELTANO_VERSION=${{ inputs.meltano-version }}
+        tags: ${{ steps.prepare-tags.outputs.tags }}
+        platforms: linux/amd64
+        load: true
 
     - name: Get the ID of the image
       id: get-image-id
@@ -97,5 +113,12 @@ runs:
 
     - name: Push the scanned image to the registry
       if: ${{ inputs.push == 'true' }}
-      shell: bash
-      run: docker image push --all-tags ${{ inputs.registry }}/meltano/meltano
+      uses: docker/build-push-action@v4
+      with:
+        context: docker/meltano
+        build-args: |
+          PYTHON_VERSION=${{ inputs.python-version }}
+          MELTANO_VERSION=${{ inputs.meltano-version }}
+        tags: ${{ steps.prepare-tags.outputs.tags }}
+        platforms: linux/amd64,linux/arm64
+        push: true
