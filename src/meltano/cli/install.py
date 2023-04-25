@@ -53,7 +53,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def install(
+def install(  # noqa: C901
     project: Project,
     ctx: click.Context,
     plugin_type: str,
