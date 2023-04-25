@@ -30,20 +30,28 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    # Per: https://github.com/marketplace/actions/build-and-push-docker-images
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
-    - name: Build the image
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Prepare the tags
+      id: prepare-tags
       shell: bash
       run: |
-        BUILD_CMD="docker build \
-          --build-arg PYTHON_VERSION=${{ inputs.python-version }} \
-          --build-arg MELTANO_VERSION=${{ inputs.meltano-version }} \
-          $(echo "${{ inputs.tags }}" | sed "s/^/-t ${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ' ') \
-          docker/meltano"
-        echo "${BUILD_CMD}"
-        eval "${BUILD_CMD}"
+        echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/-t ${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+    - name: Build the image
+      uses: docker/build-push-action@v4
+      with:
+        context: docker/meltano
+        build-args:
+          - PYTHON_VERSION=${{ inputs.python-version }}
+          - MELTANO_VERSION=${{ inputs.meltano-version }}
+        tags: ${{ steps.prepare-tags.outputs.tags }}
+        platforms: linux/amd64,linux/arm64
+        push: false
 
     - name: Get the ID of the image
       id: get-image-id
