@@ -79,13 +79,10 @@ def install(
             plugins = list(project.plugins.plugins())
 
         if schedule_name:
-            schedule_service = ScheduleService(ctx.obj["project"])
-            schedule_obj = schedule_service.find_schedule(schedule_name)
-            task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
-            schedule_plugins = []
-            for plugin_command in task_sets.flat_args:
-                plugin_name = plugin_command.split(":")[0]
-                schedule_plugins.append(project.plugins.find_plugin(plugin_name))
+            schedule_plugins = _get_schedule_plugins(
+                ctx.obj["project"],
+                schedule_name,
+            )
             plugins = list(set(plugins) & set(schedule_plugins))
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
@@ -108,3 +105,14 @@ def install(
         tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")
     tracker.track_command_event(CliEvent.completed)
+
+
+def _get_schedule_plugins(project: Project, schedule_name: str):
+    schedule_service = ScheduleService(project)
+    schedule_obj = schedule_service.find_schedule(schedule_name)
+    task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
+    schedule_plugins = []
+    for plugin_command in task_sets.flat_args:
+        plugin_name = plugin_command.split(":")[0]
+        schedule_plugins.append(project.plugins.find_plugin(plugin_name))
+    return schedule_plugins
