@@ -628,7 +628,7 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-To only install plugins for a particular schedule specify the `--schedule_name` argument.
+To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
 
 Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
@@ -668,7 +668,7 @@ meltano install
 meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
-meltano install --schedule_name=<schedule_name>
+meltano install --schedule=<schedule_name>
 
 meltano install --parallelism=16
 meltano install --clean

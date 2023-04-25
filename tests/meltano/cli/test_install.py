@@ -260,7 +260,7 @@ class TestCliInstall:
             )
             result = cli_runner.invoke(
                 cli,
-                ["install", "--schedule_name", job_schedule.name],
+                ["install", "--schedule", job_schedule.name],
             )
             assert_cli_runner(result)
 

@@ -46,8 +46,9 @@ if t.TYPE_CHECKING:
     help="Ignore the required Python version declared by the plugins.",
 )
 @click.option(
-    "--schedule_name",
+    "--schedule",
     "-s",
+    "schedule_name",
     help="Install all plugins from the given schedule.",
 )
 @click.pass_context
