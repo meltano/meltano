@@ -1,0 +1,31 @@
+# Number of days of inactivity before an issue becomes stale
+daysUntilStale: 120
+
+# Number of days of inactivity before a stale issue is closed
+daysUntilClose: 21
+
+# Set to true to ignore issues in a project
+exemptProjects: false
+
+# Set to true to ignore issues in a milestone
+exemptMilestones: true
+
+# Set to true to ignore issues with an assignee
+exemptAssignees: true
+
+# Issues/PRs with these labels will never be considered stale
+exemptLabels:
+  - evergreen
+
+# Label to use when marking an issue as stale
+staleLabel: stale
+
+# Comment to post when marking an issue as stale
+markComment: >
+  This has been marked as stale because it is unassigned, and has not had
+  recent activity. It will be closed after 21 days if no further activity
+  occurs. If this should never go stale, please add the `evergreen` label, or
+  request that it be added.
+
+# Comment to post when closing a stale issue. Set to `false` to disable
+closeComment: false
