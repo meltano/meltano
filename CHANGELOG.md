@@ -13,7 +13,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### 🐛 Fixes
 
 - [#7537](https://github.com/meltano/meltano/issues/7537) Add correct type for state_backend lock settings
-- [#7490](https://github.com/meltano/meltano/issues/7490) Install Meltano extras in Docker image
 
 ### 📚 Documentation Improvements
 
