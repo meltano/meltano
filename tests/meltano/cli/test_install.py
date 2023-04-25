@@ -236,12 +236,11 @@ class TestCliInstall:
             mappers = [m for m in commands[0][1] if m == mapper]
             assert len(mappers) == 3
 
-    @pytest.mark.usefixtures("dbt")
+    @pytest.mark.usefixtures("tap_gitlab", "target")
     def test_install_schedule(
         self,
         project,
-        tap_gitlab,
-        target,
+        dbt,
         cli_runner,
         schedule_service,
         job_schedule,
@@ -256,7 +255,7 @@ class TestCliInstall:
             from meltano.core.task_sets import TaskSets
 
             task_sets_service.add(
-                TaskSets(job_schedule.job, [tap_gitlab.name, target.name]),
+                TaskSets(job_schedule.job, [dbt.name]),
             )
             result = cli_runner.invoke(
                 cli,
@@ -266,7 +265,7 @@ class TestCliInstall:
 
             install_plugin_mock.assert_called_once_with(
                 project,
-                [tap_gitlab, target],
+                [dbt],
                 parallelism=None,
                 clean=False,
                 force=False,
