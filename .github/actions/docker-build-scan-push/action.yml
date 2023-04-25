@@ -40,7 +40,7 @@ runs:
       id: prepare-tags
       shell: bash
       run: |
-        echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/-t ${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ' ')" >> $GITHUB_OUTPUT
+        echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
 
     - name: Build the image
       uses: docker/build-push-action@v4
