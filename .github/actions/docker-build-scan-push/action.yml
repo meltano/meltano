@@ -51,6 +51,7 @@ runs:
           MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64,linux/arm64
+        load: true
         push: false
 
     - name: Get the ID of the image
