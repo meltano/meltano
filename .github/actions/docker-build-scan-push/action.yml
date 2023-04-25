@@ -46,9 +46,9 @@ runs:
       uses: docker/build-push-action@v4
       with:
         context: docker/meltano
-        build-args:
-          - PYTHON_VERSION=${{ inputs.python-version }}
-          - MELTANO_VERSION=${{ inputs.meltano-version }}
+        build-args: |
+          PYTHON_VERSION=${{ inputs.python-version }}
+          MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64,linux/arm64
         push: false
