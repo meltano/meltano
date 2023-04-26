@@ -151,9 +151,3 @@ To view logs for any completed or still-running job, you can use:
 ```console
 meltano-cloud logs print --execution-id=ASDF1234...
 ```
-
-## Additional Resources
-
-- [Known Issues and Feature Limitations](/known_issues)
-- [Security Whitepaper (Latest)](/security)
-- [Roles and Permissions](/platform/#roles-and-permissions)
