@@ -168,3 +168,14 @@ meltano-cloud schedule describe --deployment staging --schedule schedule_4 --num
 ```
 
 If a schedule is disabled, it will never have any upcoming scheduled runs.
+
+## `run`
+
+Run a schedule immediately specifying the schedule name and deployment.
+
+```sh
+meltano-cloud run daily --deployment sandbox
+Running a Meltano project in Meltano Cloud.
+```
+
+The running workload will appear in the `history` within 1-2 minutes.
