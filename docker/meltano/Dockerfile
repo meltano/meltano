@@ -12,6 +12,7 @@ ENV PIP_NO_CACHE_DIR=1
 RUN mkdir "${WORKDIR}" && \
     apt-get update && \
     apt-get install -y build-essential git && \
+    apt-get install unixodbc unixodbc-dev freetds-dev freetds-bin tdsodbc libkrb5-dev libssl-dev -y &&\
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 WORKDIR "${WORKDIR}"
