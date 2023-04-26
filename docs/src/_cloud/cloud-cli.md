@@ -171,7 +171,7 @@ If a schedule is disabled, it will never have any upcoming scheduled runs.
 
 ## `run`
 
-Run a schedule immediately.
+Run a schedule immediately specifying the scheudle name and deployment.
 
 ```sh
 meltano-cloud run daily --deployment sandbox
