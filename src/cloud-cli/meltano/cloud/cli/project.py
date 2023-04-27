@@ -330,7 +330,7 @@ async def add_project(
 ):
     """Add a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
-        response = client.add_project(
+        response = await client.add_project(
             project_name=project_name,
             git_repository=git_repository,
             project_root_path=project_root_path,
