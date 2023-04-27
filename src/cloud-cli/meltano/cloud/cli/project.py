@@ -57,6 +57,9 @@ class ProjectsCloudClient(MeltanoCloudClient):
                 ),
             )
 
+    async def add_project(self):
+        """Use POST to add new Meltano Cloud project."""
+
 
 @click.group("project")
 def project_group() -> None:
@@ -296,3 +299,11 @@ async def use_project(
         ),
         fg="green",
     )
+
+
+@project_group.command("add")
+@pass_context
+@run_async
+async def add_project(context: MeltanoCloudCLIContext):
+    """Add a project to your Meltano Cloud."""
+    return context
