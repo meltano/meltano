@@ -57,8 +57,23 @@ class ProjectsCloudClient(MeltanoCloudClient):
                 ),
             )
 
-    async def add_project(self):
+    async def add_project(
+        self,
+        project_name: str,
+        git_repository: str,
+        project_root_path: str | None = None,
+    ):
         """Use POST to add new Meltano Cloud project."""
+        async with self.authenticated():
+            payload = {"project_name": project_name, "git_repository": git_repository}
+            if project_root_path:
+                payload["project_root_path"] = project_root_path
+
+            return await self._json_request(
+                "POST",
+                f"/projects/v1/{self.config.tenant_resource_key}",
+                json=payload,
+            )
 
 
 @click.group("project")
@@ -302,8 +317,24 @@ async def use_project(
 
 
 @project_group.command("add")
+@click.argument("project_name", type=str, required=True)
+@click.argument("git_repository", type=str, required=True)
+@click.option("--project_root_path", type=str, required=False)
 @pass_context
 @run_async
-async def add_project(context: MeltanoCloudCLIContext):
+async def add_project(
+    context: MeltanoCloudCLIContext,
+    project_name: str,
+    git_repository: str,
+    project_root_path: str | None = None,
+):
     """Add a project to your Meltano Cloud."""
-    return context
+    async with ProjectsCloudClient(config=context.config) as client:
+        response = client.add_project(
+            project_name=project_name,
+            git_repository=git_repository,
+            project_root_path=project_root_path,
+        )
+        response.raise_for_status()
+        click.echo(f"Project {project_name} created successfully.")
+        click.echo(response.json())
