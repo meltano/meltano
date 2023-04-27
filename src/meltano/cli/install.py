@@ -9,6 +9,7 @@ import click
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
 from meltano.core.plugin import PluginType
+from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
@@ -44,9 +45,15 @@ if t.TYPE_CHECKING:
     is_flag=True,
     help="Ignore the required Python version declared by the plugins.",
 )
+@click.option(
+    "--schedule",
+    "-s",
+    "schedule_name",
+    help="Install all plugins from the given schedule.",
+)
 @click.pass_context
 @pass_project(migrate=True)
-def install(
+def install(  # noqa: C901
     project: Project,
     ctx: click.Context,
     plugin_type: str,
@@ -54,6 +61,7 @@ def install(
     clean: bool,
     parallelism: int,
     force: bool,
+    schedule_name: str,
 ):
     """
     Install all the dependencies of your project based on the meltano.yml file.
@@ -69,6 +77,13 @@ def install(
                 plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
         else:
             plugins = list(project.plugins.plugins())
+
+        if schedule_name:
+            schedule_plugins = _get_schedule_plugins(
+                ctx.obj["project"],
+                schedule_name,
+            )
+            plugins = list(set(plugins) & set(schedule_plugins))
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -90,3 +105,14 @@ def install(
         tracker.track_command_event(CliEvent.failed)
         raise CliError("Failed to install plugin(s)")
     tracker.track_command_event(CliEvent.completed)
+
+
+def _get_schedule_plugins(project: Project, schedule_name: str):
+    schedule_service = ScheduleService(project)
+    schedule_obj = schedule_service.find_schedule(schedule_name)
+    task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
+    schedule_plugins = []
+    for plugin_command in task_sets.flat_args:
+        plugin_name = plugin_command.split(":")[0]
+        schedule_plugins.append(project.plugins.find_plugin(plugin_name))
+    return schedule_plugins
