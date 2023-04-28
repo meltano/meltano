@@ -34,6 +34,38 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 meltano-cloud logout
 ```
 
+## `config`
+
+The `config` command provides an interface for managing project configuration and secrets.
+The `config` command supports the setting of environment variables via the `env` command group.
+
+### `env`
+
+Values set via this interface will be injected as Environment Variables into tasks run within the associated project.
+Once `set`, values cannot be viewed.
+If you are unsure of the current value of an env var, use the `set` command to set a known value.
+
+The `list` subcommand provides an interface to see existing set env var keys:
+
+```sh
+meltano-cloud config env list --limit 5
+
+TAP_GITHUB_AUTH_TOKEN
+TAP_GITHUB_USER_AGENT
+```
+
+The `set` subcommand provides an interface to set new, or override existing, env var values.
+
+```sh
+meltano-cloud config env set --key TAP_GITHUB_AUTH_TOKEN --value 'my_super_secret_auth_token'
+```
+
+The `delete` subcommand provides an interface to delete env vars:
+
+```sh
+meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
+```
+
 ## `project`
 
 The `project` command provides an interface for Meltano Cloud projects.
@@ -180,3 +212,14 @@ meltano-cloud schedule describe --deployment staging --schedule schedule_4 --num
 ```
 
 If a schedule is disabled, it will never have any upcoming scheduled runs.
+
+## `run`
+
+Run a schedule immediately specifying the schedule name and deployment.
+
+```sh
+meltano-cloud run daily --deployment sandbox
+Running a Meltano project in Meltano Cloud.
+```
+
+The running workload will appear in the `history` within 1-2 minutes.
