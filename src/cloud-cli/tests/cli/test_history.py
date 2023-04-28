@@ -215,6 +215,36 @@ class TestHistoryCommand:
 
         assert result.exit_code == 0
 
+    def test_multiple_filters(
+        self,
+        path: str,
+        config: MeltanoCloudConfig,
+        response_body: dict,
+        httpserver: HTTPServer,
+    ):
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={
+                "page_size": "10",
+                "schedule": "gitlab*",
+                "environment": "prod",
+                "result": "failed",
+            },
+        ).respond_with_json(response_body)
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "history",
+                "--schedule-prefix=gitlab",
+                "--deployment=prod",
+                "--result=failed",
+            ),
+        )
+
+        assert result.exit_code == 0
+
     @freeze_time(datetime.datetime(2023, 5, 20, tzinfo=UTC))
     @pytest.mark.parametrize(
         ("lookback", "expected_start_time"),
