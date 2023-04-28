@@ -43,7 +43,7 @@ TAP_GITHUB_AUTH_TOKEN
 TAP_GITHUB_USER_AGENT
 ```
 
-The `set` command provides and interface to set new, or override existing, env var values.
+The `set` command provides an interface to set new, or override existing, env var values.
 Values set via this interface will be injected as Environment Variables into tasks run within the associated project.
 Once `set`, values cannot be viewed.
 If you are unsure of the current value of an env var, use the `set` command to set a known value.
