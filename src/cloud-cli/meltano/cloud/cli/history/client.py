@@ -51,7 +51,7 @@ class HistoryClient(MeltanoCloudClient):
 
         async with self.authenticated():
             url = (
-                "/history/v1/"
+                "/jobs/v1/"
                 f"{self.config.tenant_resource_key}/"
                 f"{self.config.internal_project_id}"
             )

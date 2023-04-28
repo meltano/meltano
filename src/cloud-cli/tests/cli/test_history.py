@@ -94,7 +94,7 @@ class TestHistoryCommand:
 
     @pytest.fixture()
     def path(self, tenant_resource_key: str, internal_project_id: str) -> str:
-        return f"/history/v1/{tenant_resource_key}/{internal_project_id}"
+        return f"/jobs/v1/{tenant_resource_key}/{internal_project_id}"
 
     @pytest.fixture()
     def response_body(self) -> dict:
