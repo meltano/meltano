@@ -33,7 +33,7 @@ meltano-cloud logout
 ## `config`
 
 The `config` command provides an interface for managing project configuration and secrets.
-Config supports the setting of Environment Variables via the `env` command group.
+The `config` command supports the setting of environment variables via the `env` command group.
 
 ### `env`
 
