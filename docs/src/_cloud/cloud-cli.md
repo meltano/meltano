@@ -33,29 +33,33 @@ meltano-cloud logout
 ## `config`
 
 The `config` command provides an interface for managing project configuration and secrets.
+Config supports the setting of Environment Variables via the `env` command group.
 
-The `list` subcommand allows you to see existing set env var keys:
+### `env`
+
+Values set via this interface will be injected as Environment Variables into tasks run within the associated project.
+Once `set`, values cannot be viewed.
+If you are unsure of the current value of an env var, use the `set` command to set a known value.
+
+The `list` subcommand provides an interface to see existing set env var keys:
 
 ```sh
-meltano-cloud config list --limit 5
+meltano-cloud config env list --limit 5
 
 TAP_GITHUB_AUTH_TOKEN
 TAP_GITHUB_USER_AGENT
 ```
 
-The `set` command provides an interface to set new, or override existing, env var values.
-Values set via this interface will be injected as Environment Variables into tasks run within the associated project.
-Once `set`, values cannot be viewed.
-If you are unsure of the current value of an env var, use the `set` command to set a known value.
+The `set` subcommand provides an interface to set new, or override existing, env var values.
 
 ```sh
-meltano-cloud config set --key TAP_GITHUB_AUTH_TOKEN --value 'my_super_secret_auth_token'
+meltano-cloud config env set --key TAP_GITHUB_AUTH_TOKEN --value 'my_super_secret_auth_token'
 ```
 
-The `delete` command allows you to delete env vars:
+The `delete` subcommand provides an interface to delete env vars:
 
 ```sh
-meltano-cloud config delete TAP_GITHUB_AUTH_TOKEN
+meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 ```
 
 ## `project`
