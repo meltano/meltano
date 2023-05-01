@@ -107,7 +107,7 @@ azure = ["azure-storage-blob", "azure-common", "azure-core"]
 gcs = ["google-cloud-storage"]
 mssql = ["pymssql"]
 s3 = ["boto3"]
-ui = ["flask", "flask-cors", "flask-executor", "flask-login", "flask-restful", "flask-sqlalchemy", "meltano-flask-security", "werkzeug"]
+ui = ["flask", "flask-cors", "flask-executor", "flask-login", "flask-restful", "flask-sqlalchemy", "gunicorn", "meltano-flask-security", "werkzeug"]
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
