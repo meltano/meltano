@@ -10,12 +10,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#7609](https://github.com/meltano/meltano/issues/7609) Support arm64 Meltano Docker image -- _**Thanks @space192!**_
 - [#7594](https://github.com/meltano/meltano/issues/7594) Install plugins using schedule name
 
-### 📚 Documentation Improvements
-
-- [#7625](https://github.com/meltano/meltano/issues/7625) Document config command
-- [#7616](https://github.com/meltano/meltano/issues/7616) Update Cloud CLI with `run` command
-- [#7612](https://github.com/meltano/meltano/issues/7612) Update out of date Cloud information
-
 ## v2.18.0 (2023-04-25)
 
 ### ✨ New
