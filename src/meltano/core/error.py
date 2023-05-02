@@ -105,8 +105,8 @@ class EmptyMeltanoFileException(MeltanoError):
 
     def __init__(self) -> None:
         """Instantiate the error."""
-        reason = "Your meltano.yml file is empty."
-        instruction = "Please update your meltano file with a valid configuration."
+        reason = "Your meltano.yml file is empty"
+        instruction = "Please update your meltano file with a valid configuration"
         super().__init__(reason, instruction)
 
 
