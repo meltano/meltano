@@ -100,8 +100,12 @@ class PluginInstallWarning(Exception):
     """Exception for when a plugin optional optional step fails to install."""
 
 
-class EmptyMeltanoFileException(Exception):
+class EmptyMeltanoFileException(MeltanoError):
     """Exception for empty meltano.yml file."""
+    def __init__(self, *args, **kwargs) -> None:
+        reason = "Your meltano.yml file is empty."
+        instruction = "Please update your meltano file with a valid configuration."
+        super().__init__(reason, instruction, *args, **kwargs)
 
 
 class MeltanoConfigurationError(MeltanoError):
