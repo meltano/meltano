@@ -78,6 +78,7 @@ Each Platinum Connector will have the following guarantees:
 * Open Source License
 * Semantic Versioning used in all releases
 * Daily integration testing
+* Priority bug fixes
 * Proactive API and changelog monitoring
 
 For our Cloud Customers, we offer additional SLAs around our responsiveness and notifications for any problems with the connectors.
