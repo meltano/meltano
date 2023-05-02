@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.19.0 (2023-05-02)
+
+### ✨ New
+
+- [#7609](https://github.com/meltano/meltano/issues/7609) Support arm64 Meltano Docker image -- _**Thanks @space192!**_
+- [#7594](https://github.com/meltano/meltano/issues/7594) Install plugins using schedule name
+
 ## v2.18.0 (2023-04-25)
 
 ### ✨ New

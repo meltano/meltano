@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.18.0"
+version = "2.19.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -60,7 +60,7 @@ azure-core = {version = "^1.26.4", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
 backoff = "^2.1.2"
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
-boto3 = {version = "^1.26.121", optional = true}
+boto3 = {version = "^1.26.124", optional = true}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 check-jsonschema = "^0.22.0"
 click = "^8.1"
@@ -114,7 +114,7 @@ black = "^23.3.0"
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
-coverage = {extras = ["toml"], version = "^7.2.4"}
+coverage = {extras = ["toml"], version = "^7.2.5"}
 freezegun = "^1.2.2"
 mock = "^5.0.2"
 mypy = "^1.2"
@@ -480,7 +480,7 @@ skip_covered = true
 [tool.commitizen]
 name = "cz_version_bump"
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "2.18.0"
+version = "2.19.0"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
