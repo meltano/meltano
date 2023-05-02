@@ -65,7 +65,7 @@ class TestHookable:
     @pytest.mark.asyncio()
     async def test_trigger_hook_raise(self):
         subject = Hooked()
-        with pytest.raises(Exception):  # noqa: PT012, PT011
+        with pytest.raises(Exception):  # noqa: B017, PT012, PT011
             async with subject.trigger_hooks("test"):
                 raise Exception
 
