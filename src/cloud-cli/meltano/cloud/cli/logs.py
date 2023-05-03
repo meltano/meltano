@@ -87,7 +87,7 @@ class LogsClient(MeltanoCloudClient):
                 pagination = response.get("pagination") or {}
                 new_page_token = pagination.get("next_page_token")
 
-                if not new_page_token or new_page_token == page_token:
+                if new_page_token == page_token:
                     break
 
                 page_token = new_page_token
