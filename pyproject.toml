@@ -48,7 +48,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.26.4", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.26.119", optional = true}
+boto3 = {version = "^1.26.124", optional = true}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 check-jsonschema = "^0.22.0"
 click = "^8.1"
@@ -72,8 +72,8 @@ python-dotenv = "^0.21.1"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.0"
 questionary = "^1.10.0"
-requests = "^2.28.0"
-rich = "^13.3.3"
+requests = "^2.29.0"
+rich = "^13.3.5"
 "ruamel.yaml" = "^0.17.21"
 smart-open = "^6.2.0"
 snowplow-tracker = "^0.10.0"
@@ -82,7 +82,7 @@ structlog = "^22.3.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.5.0"
 tzlocal = "^4.2.0"
-virtualenv = "^20.22.0"
+virtualenv = "^20.23.0"
 
 [tool.poetry.extras]
 azure = ["azure-storage-blob", "azure-common", "azure-core"]
@@ -96,7 +96,7 @@ black = "^23.3.0"
 boto3-stubs = {extras = ["essential"], version = "1.26.61"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
-coverage = {extras = ["toml"], version = "^7.2.3"}
+coverage = {extras = ["toml"], version = "^7.2.5"}
 freezegun = "^1.2.2"
 hypothesis = "^6.70.0"
 mock = "^5.0.2"
@@ -119,7 +119,7 @@ types-croniter = "^1.3.2"
 types-jsonschema = "^4.17.0.3"
 types-psutil = "^5.9.5.5"
 types-pyyaml = "^6.0.12.3"
-types-requests = "^2.28.9"
+types-requests = "^2.29.0"
 types-tabulate = "^0.9.0.1"
 
 [tool.poetry.scripts]
