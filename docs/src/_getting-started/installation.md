@@ -24,11 +24,11 @@ Meltano supports all versions of Python that have not yet reached their end-of-l
 
 {% tabs log %}
 
-{% tab log Using `pipx` %}
+{% tab log Using pipx %}
 
 Since Meltano is an application, it should always be installed into a clean virtual environment without any other packages installed alongside it.
 
-To simplify installing Meltano into a clean virtual environment, `pipx` can be used to install Meltano instead of `pip`. `pip` is a package installer that comes automatically with Python. [`pipx`](https://pypa.github.io/pipx/) is a wrapper around pip which cleanly installs executable Python applications (such as Meltano) into their own virtual environments.
+To simplify installing Meltano into a clean virtual environment, [`pipx`](https://pypa.github.io/pipx/) can be used to install Meltano instead of `pip`. `pip` is a package installer that comes automatically with Python. `pipx` is a wrapper around pip which cleanly installs executable Python applications (such as Meltano) into their own virtual environments.
 
 <div class="termy">
 
@@ -64,7 +64,7 @@ meltano, version 2.19.0
 
 {% endtab %}
 
-{% tab log Using `pip` %}
+{% tab log Using pip %}
 
 Meltano provides a Python package that can be installed using `pip`.
 
