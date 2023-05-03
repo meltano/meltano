@@ -226,8 +226,8 @@ class TestHistoryCommand:
             path,
             query_string={
                 "page_size": "10",
-                "schedule": "gitlab*",
-                "environment": "prod",
+                "schedule": "gitlab_el",
+                "deployment": "ci*",
                 "result": "failed",
             },
         ).respond_with_json(response_body)
@@ -237,8 +237,8 @@ class TestHistoryCommand:
                 "--config-path",
                 config.config_path,
                 "history",
-                "--schedule-prefix=gitlab",
-                "--deployment=prod",
+                "--schedule=gitlab_el",
+                "--deployment-prefix=ci",
                 "--result=failed",
             ),
         )

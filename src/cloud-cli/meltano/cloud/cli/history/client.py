@@ -24,7 +24,7 @@ class HistoryClient(MeltanoCloudClient):
         self,
         *,
         schedule: str | None = None,
-        environment: str | None = None,
+        deployment: str | None = None,
         result: str | None = None,
         page_size: int | None = None,
         page_token: str | None = None,
@@ -34,7 +34,7 @@ class HistoryClient(MeltanoCloudClient):
 
         Args:
             schedule: The name of the schedule to get the history for.
-            environment: The name of the environment to get the history for.
+            deployment: The name of the deployment to get the history for.
             result: The result to filter on.
             page_size: The number of executions to return.
             page_token: The page token to use for pagination.
@@ -50,7 +50,7 @@ class HistoryClient(MeltanoCloudClient):
             "page_size": page_size,
             "page_token": page_token,
             "schedule": schedule,
-            "environment": environment,
+            "deployment": deployment,
             "result": result,
             "start_time": start_time.isoformat() if start_time else None,
         }
@@ -79,7 +79,7 @@ class HistoryClient(MeltanoCloudClient):
         config: MeltanoCloudConfig,
         *,
         schedule_filter: str | None,
-        environment_filter: str | None,
+        deployment_filter: str | None,
         result_filter: str | None,
         start_time: datetime.datetime | None,
         limit: int,
@@ -105,7 +105,7 @@ class HistoryClient(MeltanoCloudClient):
             while True:
                 response = await client.get_execution_history(
                     schedule=schedule_filter,
-                    environment=environment_filter,
+                    deployment=deployment_filter,
                     result=result_filter,
                     page_size=page_size,
                     page_token=page_token,

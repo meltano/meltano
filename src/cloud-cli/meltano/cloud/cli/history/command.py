@@ -181,7 +181,7 @@ async def history(
     items = await HistoryClient.get_history_list(
         context.config,
         schedule_filter=schedule_filter,
-        environment_filter=deployment_filter,
+        deployment_filter=deployment_filter,
         result_filter=result,
         limit=limit,
         start_time=now - lookback if lookback else None,
