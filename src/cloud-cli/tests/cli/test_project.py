@@ -353,3 +353,36 @@ class TestProjectCommand:
         )
         assert result.exit_code == 2
         assert "The '--name' and '--id' options are mutually exclusive" in result.output
+
+    def test_project_add(
+        self,
+        projects: list[CloudProject],
+        httpserver: HTTPServer,
+        config: MeltanoCloudConfig,
+    ):
+        for project in projects[:3]:
+            httpserver.expect_oneshot_request(
+                f"/projects/v1/{project['tenant_resource_key']}",
+                method="POST",
+            ).respond_with_json(project)
+            result = CliRunner().invoke(
+                cli,
+                (
+                    "--config-path",
+                    config.config_path,
+                    "project",
+                    "add",
+                    "--project_name",
+                    project["project_name"],
+                    "--git_repository",
+                    project["git_repository"],
+                    "--project_root_path",
+                    project["project_root_path"],
+                ),
+            )
+            assert result.exit_code == 0, result.output
+            assert result.output == (
+                f"Project {project['project_name']} created successfully.\n"
+                + json.dumps(project)
+                + "\n"
+            )

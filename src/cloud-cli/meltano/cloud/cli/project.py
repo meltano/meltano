@@ -317,8 +317,8 @@ async def use_project(
 
 
 @project_group.command("add")
-@click.argument("project_name", type=str, required=True)
-@click.argument("git_repository", type=str, required=True)
+@click.option("--project_name", type=str, required=True)
+@click.option("--git_repository", type=str, required=True)
 @click.option("--project_root_path", type=str, required=False)
 @pass_context
 @run_async
@@ -335,6 +335,6 @@ async def add_project(
             git_repository=git_repository,
             project_root_path=project_root_path,
         )
-        response.raise_for_status()
+
         click.echo(f"Project {project_name} created successfully.")
-        click.echo(response.json())
+        click.echo(json.dumps(response))
