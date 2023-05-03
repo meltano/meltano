@@ -61,7 +61,22 @@ class TestLogsCommand:
                         "message": "[2023-05-01 00:00:02] Finishing Job...",
                     },
                 ],
-                "pagination": None,
+                "pagination": {
+                    "next_page_token": "def123",
+                    "page_size": 2,
+                },
+            },
+        )
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_token": "def123"},
+        ).respond_with_json(
+            {
+                "results": [],
+                "pagination": {
+                    "next_page_token": "def123",
+                    "page_size": 2,
+                },
             },
         )
 
