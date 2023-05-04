@@ -24,6 +24,8 @@ class HistoryClient(MeltanoCloudClient):
         self,
         *,
         schedule: str | None = None,
+        deployment: str | None = None,
+        result: str | None = None,
         page_size: int | None = None,
         page_token: str | None = None,
         start_time: datetime.datetime | None = None,
@@ -32,6 +34,8 @@ class HistoryClient(MeltanoCloudClient):
 
         Args:
             schedule: The name of the schedule to get the history for.
+            deployment: The name of the deployment to get the history for.
+            result: The result to filter on.
             page_size: The number of executions to return.
             page_token: The page token to use for pagination.
             start_time: The start time to use for filtering.
@@ -46,12 +50,14 @@ class HistoryClient(MeltanoCloudClient):
             "page_size": page_size,
             "page_token": page_token,
             "schedule": schedule,
+            "deployment": deployment,
+            "result": result,
             "start_time": start_time.isoformat() if start_time else None,
         }
 
         async with self.authenticated():
             url = (
-                "/history/v1/"
+                "/jobs/v1/"
                 f"{self.config.tenant_resource_key}/"
                 f"{self.config.internal_project_id}"
             )
@@ -73,6 +79,8 @@ class HistoryClient(MeltanoCloudClient):
         config: MeltanoCloudConfig,
         *,
         schedule_filter: str | None,
+        deployment_filter: str | None,
+        result_filter: str | None,
         start_time: datetime.datetime | None,
         limit: int,
     ) -> list[CloudExecution]:
@@ -81,6 +89,8 @@ class HistoryClient(MeltanoCloudClient):
         Args:
             config: The meltano config to use
             schedule_filter: Used to filter the history by schedule name.
+            environment_filter: Used to filter the history by environment name.
+            result_filter: Used to filter the history by result.
             start_time: Used to filter the history by start time.
             limit: The maximum number of history items to return.
 
@@ -95,6 +105,8 @@ class HistoryClient(MeltanoCloudClient):
             while True:
                 response = await client.get_execution_history(
                     schedule=schedule_filter,
+                    deployment=deployment_filter,
+                    result=result_filter,
                     page_size=page_size,
                     page_token=page_token,
                     start_time=start_time,

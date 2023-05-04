@@ -47,7 +47,7 @@ class LookbackExpressionType(click.ParamType):
         return value
 
 
-def _schedule_arg_to_glob(
+def _arg_to_glob_filter(
     schedule: str | None,
     schedule_prefix: str | None,
     schedule_contains: str | None,
@@ -103,6 +103,27 @@ def _schedule_arg_to_glob(
     help="Match schedules that contain the specified string.",
 )
 @click.option(
+    "--deployment",
+    required=False,
+    help="Match deployments by this exact name.",
+)
+@click.option(
+    "--deployment-prefix",
+    required=False,
+    help="Match deployments that start with the specified string.",
+)
+@click.option(
+    "--deployment-contains",
+    required=False,
+    help="Match deployments that contain the specified string.",
+)
+@click.option(
+    "--result",
+    required=False,
+    type=click.Choice(["success", "failed", "running"]),
+    help="Match executions by result.",
+)
+@click.option(
     "--limit",
     required=False,
     type=int,
@@ -136,21 +157,32 @@ async def history(
     schedule: str | None,
     schedule_prefix: str | None,
     schedule_contains: str | None,
+    deployment: str | None,
+    deployment_prefix: str | None,
+    deployment_contains: str | None,
+    result: str | None,
     limit: int,
     output_format: str,
     lookback: datetime.timedelta | None,
 ) -> None:
     """Get a Meltano project execution history in Meltano Cloud."""
-    schedule_filter = _schedule_arg_to_glob(
+    schedule_filter = _arg_to_glob_filter(
         schedule,
         schedule_prefix,
         schedule_contains,
+    )
+    deployment_filter = _arg_to_glob_filter(
+        deployment,
+        deployment_prefix,
+        deployment_contains,
     )
 
     now = datetime.datetime.now(tz=utils.UTC)
     items = await HistoryClient.get_history_list(
         context.config,
         schedule_filter=schedule_filter,
+        deployment_filter=deployment_filter,
+        result_filter=result,
         limit=limit,
         start_time=now - lookback if lookback else None,
     )

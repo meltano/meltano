@@ -371,18 +371,18 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.26.124"
+version = "1.26.125"
 description = "The AWS SDK for Python"
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.26.124-py3-none-any.whl", hash = "sha256:ec53175eaf818dfe1eec33f7e165eca957744c1d8a82047a9efbcce9547e5cc9"},
-    {file = "boto3-1.26.124.tar.gz", hash = "sha256:4847855cfa4ff272eb66cf1fc9542068ada6d4816d56573cc9cafde51962d0ef"},
+    {file = "boto3-1.26.125-py3-none-any.whl", hash = "sha256:6648aff15d19927cd26db47eb56362ccd313a1ddbd7aaa3235ef05d05d398252"},
+    {file = "boto3-1.26.125.tar.gz", hash = "sha256:fe8248b80c4f0fdaed8b8779467c4431a5e52177e02ccd137d51ec51194ebb00"},
 ]
 
 [package.dependencies]
-botocore = ">=1.29.124,<1.30.0"
+botocore = ">=1.29.125,<1.30.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -759,14 +759,14 @@ xray = ["mypy-boto3-xray (>=1.26.0,<1.27.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.29.124"
+version = "1.29.125"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.29.124-py3-none-any.whl", hash = "sha256:cbcbd5b084952d332d7b8170577f10509e3e7b3b6abbc2920b1c27e93ad2ab25"},
-    {file = "botocore-1.29.124.tar.gz", hash = "sha256:ebe8a83dd1db18180774ce45b1911959c60bb1843ea0db610231495527a3518a"},
+    {file = "botocore-1.29.125-py3-none-any.whl", hash = "sha256:ac87b63e9aa4231cd28941945024a0c4470c184c60334ebe5e1cae3544c785ed"},
+    {file = "botocore-1.29.125.tar.gz", hash = "sha256:3005a7ffee083315e69938acdf1bfeaf9e21fe1fe1643d6573ee817721f4ffcd"},
 ]
 
 [package.dependencies]
@@ -779,14 +779,14 @@ crt = ["awscrt (==0.16.9)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.29.124"
+version = "1.29.125"
 description = "Type annotations and code completion for botocore"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "botocore_stubs-1.29.124-py3-none-any.whl", hash = "sha256:01671dd064c49638d10c54f7fe8431b681b0e83f717e3d397a7dcabfdd154a23"},
-    {file = "botocore_stubs-1.29.124.tar.gz", hash = "sha256:52331b0ba854d27d418d1ed498298c9e16a8b3f100212e343f398cb6b4338f67"},
+    {file = "botocore_stubs-1.29.125-py3-none-any.whl", hash = "sha256:04229dca6f277c7e69a7a289a65c73c45261bab777c9b5fd26a6d21c820d17a0"},
+    {file = "botocore_stubs-1.29.125.tar.gz", hash = "sha256:e8c79aaf09928d96ce8a878236f24f54fb689232ba85dbf72abe4eac592e06ba"},
 ]
 
 [package.dependencies]
@@ -1720,14 +1720,14 @@ zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.3)"]
 
 [[package]]
 name = "identify"
-version = "2.5.23"
+version = "2.5.24"
 description = "File identification library for Python"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "identify-2.5.23-py2.py3-none-any.whl", hash = "sha256:17d9351c028a781456965e781ed2a435755cac655df1ebd930f7186b54399312"},
-    {file = "identify-2.5.23.tar.gz", hash = "sha256:50b01b9d5f73c6b53e5fa2caf9f543d3e657a9d0bbdeb203ebb8d45960ba7433"},
+    {file = "identify-2.5.24-py2.py3-none-any.whl", hash = "sha256:986dbfb38b1140e763e413e6feb44cd731faf72d1909543178aa79b0e258265d"},
+    {file = "identify-2.5.24.tar.gz", hash = "sha256:0aac67d5b4812498056d28a9a512a483f5085cc28640b02b258a59dac34301d4"},
 ]
 
 [package.extras]
@@ -2997,21 +2997,21 @@ docs = ["Sphinx (>=3.3,<4.0)", "sphinx-autobuild (>=2020.9.1,<2021.0.0)", "sphin
 
 [[package]]
 name = "requests"
-version = "2.29.0"
+version = "2.30.0"
 description = "Python HTTP for Humans."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "requests-2.29.0-py3-none-any.whl", hash = "sha256:e8f3c9be120d3333921d213eef078af392fba3933ab7ed2d1cba3b56f2568c3b"},
-    {file = "requests-2.29.0.tar.gz", hash = "sha256:f2e34a75f4749019bb0e3effb66683630e4ffeaf75819fb51bebef1bf5aef059"},
+    {file = "requests-2.30.0-py3-none-any.whl", hash = "sha256:10e94cc4f3121ee6da529d358cdaeaff2f1c409cd377dbc72b825852f2f7e294"},
+    {file = "requests-2.30.0.tar.gz", hash = "sha256:239d7d4458afcb28a692cdd298d87542235f4ca8d36d03a15bfc128a6559a2f4"},
 ]
 
 [package.dependencies]
 certifi = ">=2017.4.17"
 charset-normalizer = ">=2,<4"
 idna = ">=2.5,<4"
-urllib3 = ">=1.21.1,<1.27"
+urllib3 = ">=1.21.1,<3"
 
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
@@ -3838,4 +3838,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "7198f3e9c8faa1c9767c79a6d9bdec1282e3d69cabf4de0e16a26f6735f5c631"
+content-hash = "2d807a1a5dba2936103b1c600887e2ff39029fdd01a993fb86486bec01378cd3"

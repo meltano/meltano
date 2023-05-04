@@ -380,7 +380,7 @@ async def describe_schedule(
     only_upcoming: bool,
     num_upcoming: int,
 ) -> None:
-    """List Meltano Cloud schedules."""
+    """Describe a Meltano Cloud schedules & list upcoming scheduled runs."""
     schedule = await _get_schedule(
         config=context.config,
         deployment_name=context.deployment,

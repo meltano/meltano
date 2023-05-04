@@ -84,10 +84,13 @@ class LogsClient(MeltanoCloudClient):
                 response = await self._get_logs_page(execution_id, page_token)
                 yield response
 
-                pagination = response.get("pagination")
-                page_token = pagination.get("next_page_token") if pagination else None
-                if not page_token:
+                pagination = response.get("pagination") or {}
+                new_page_token = pagination.get("next_page_token")
+
+                if new_page_token == page_token:
                     break
+
+                page_token = new_page_token
 
 
 @click.group()

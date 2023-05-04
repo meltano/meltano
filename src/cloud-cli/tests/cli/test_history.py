@@ -94,7 +94,7 @@ class TestHistoryCommand:
 
     @pytest.fixture()
     def path(self, tenant_resource_key: str, internal_project_id: str) -> str:
-        return f"/history/v1/{tenant_resource_key}/{internal_project_id}"
+        return f"/jobs/v1/{tenant_resource_key}/{internal_project_id}"
 
     @pytest.fixture()
     def response_body(self) -> dict:
@@ -210,6 +210,36 @@ class TestHistoryCommand:
                 config.config_path,
                 "history",
                 f"{filter_option}={value}",
+            ),
+        )
+
+        assert result.exit_code == 0
+
+    def test_multiple_filters(
+        self,
+        path: str,
+        config: MeltanoCloudConfig,
+        response_body: dict,
+        httpserver: HTTPServer,
+    ):
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={
+                "page_size": "10",
+                "schedule": "gitlab_el",
+                "deployment": "ci*",
+                "result": "failed",
+            },
+        ).respond_with_json(response_body)
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "history",
+                "--schedule=gitlab_el",
+                "--deployment-prefix=ci",
+                "--result=failed",
             ),
         )
 
