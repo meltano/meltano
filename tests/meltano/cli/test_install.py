@@ -5,8 +5,8 @@ import shutil
 
 import mock
 import pytest
-from asserts import assert_cli_runner
 
+from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import PluginAlreadyAddedException
@@ -256,9 +256,13 @@ class TestCliInstall:
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
             from meltano.core.task_sets import TaskSets
+
             mapping = mapper.extra_config.get("_mappings")[0].get("name")
             task_sets_service.add(
-                TaskSets(job_schedule.job, [tap_gitlab.name, mapping, target.name, dbt.name]),
+                TaskSets(
+                    job_schedule.job,
+                    [tap_gitlab.name, mapping, target.name, dbt.name],
+                ),
             )
             result = cli_runner.invoke(
                 cli,
@@ -269,18 +273,14 @@ class TestCliInstall:
             install_plugin_mock.assert_called_once()
             assert install_plugin_mock.mock_calls[0].args[0] == project
 
-            plugins_installed = [plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]]
-            plugins_expected = [
-                tap_gitlab.name,
-                mapper.name,
-                target.name,
-                dbt.name
+            plugins_installed = [
+                plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]
             ]
+            plugins_expected = [tap_gitlab.name, mapper.name, target.name, dbt.name]
             assert sorted(plugins_installed) == sorted(plugins_expected)
-            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] == None
-            assert install_plugin_mock.mock_calls[0].kwargs["clean"] == False
-            assert install_plugin_mock.mock_calls[0].kwargs["force"] == False
-
+            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] is None
+            assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
+            assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
 
     def test_install_schedule_elt(
         self,
@@ -298,7 +298,6 @@ class TestCliInstall:
         ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
-            from meltano.core.task_sets import TaskSets
 
             result = cli_runner.invoke(
                 cli,
@@ -309,15 +308,18 @@ class TestCliInstall:
             install_plugin_mock.assert_called_once()
             assert install_plugin_mock.mock_calls[0].args[0] == project
 
-            plugins_installed = [plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]]
+            plugins_installed = [
+                plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]
+            ]
             plugins_expected = [
                 tap.name,
                 target.name,
             ]
             assert sorted(plugins_installed) == sorted(plugins_expected)
-            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] == None
-            assert install_plugin_mock.mock_calls[0].kwargs["clean"] == False
-            assert install_plugin_mock.mock_calls[0].kwargs["force"] == False
+            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] is None
+            assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
+            assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
+
 
 # un_engine_uri forces us to create a new project, we must do this before the
 # project fixture creates the project see
