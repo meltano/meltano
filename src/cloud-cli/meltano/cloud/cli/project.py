@@ -335,6 +335,5 @@ async def add_project(
             git_repository=git_repository,
             project_root_path=project_root_path,
         )
-
         click.echo(f"Project {project_name} created successfully.")
         click.echo(json.dumps(response))
