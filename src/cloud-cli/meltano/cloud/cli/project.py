@@ -317,9 +317,9 @@ async def use_project(
 
 
 @project_group.command("add")
-@click.option("--project_name", type=str, required=True)
-@click.option("--git_repository", type=str, required=True)
-@click.option("--project_root_path", type=str, required=False)
+@click.option("--project-name", type=str, required=True)
+@click.option("--git-repository", type=str, required=True)
+@click.option("--project-root-path", type=str, required=False)
 @pass_context
 @run_async
 async def add_project(
