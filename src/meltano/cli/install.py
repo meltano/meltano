@@ -5,9 +5,11 @@ from __future__ import annotations
 import typing as t
 
 import click
+import structlog
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
+from meltano.core.block.parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
@@ -15,6 +17,8 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
+
+logger = structlog.getLogger(__name__)
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
@@ -106,13 +110,24 @@ def install(  # noqa: C901
         raise CliError("Failed to install plugin(s)")
     tracker.track_command_event(CliEvent.completed)
 
-
 def _get_schedule_plugins(project: Project, schedule_name: str):
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
-    task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
-    schedule_plugins = []
-    for plugin_command in task_sets.flat_args:
-        plugin_name = plugin_command.split(":")[0]
-        schedule_plugins.append(project.plugins.find_plugin(plugin_name))
+    schedule_plugins = set()
+    if schedule_obj.elt_schedule:
+        for plugin_name in schedule_obj.elt_args[:2]:
+            schedule_plugins.add(
+                project.plugins.find_plugin(plugin_name)
+            )
+    else:
+        task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
+        for blocks in task_sets.flat_args_per_set:
+            parser = BlockParser(logger, project, blocks)
+            for plugin in parser.plugins:
+                if plugin.type == PluginType.MAPPERS:
+                    schedule_plugins.add(
+                        project.plugins.find_plugin(plugin.info.get("name"))
+                    )
+                else:
+                    schedule_plugins.add(plugin)
     return schedule_plugins
