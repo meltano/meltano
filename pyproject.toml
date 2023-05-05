@@ -48,7 +48,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.26.4", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.26.125", optional = true}
+boto3 = {version = "^1.26.127", optional = true}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 check-jsonschema = "^0.22.0"
 click = "^8.1"
@@ -72,7 +72,7 @@ python-dotenv = "^0.21.1"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.0"
 questionary = "^1.10.0"
-requests = "^2.29.0"
+requests = "^2.30.0"
 rich = "^13.3.5"
 "ruamel.yaml" = "^0.17.21"
 smart-open = "^6.2.0"
