@@ -89,7 +89,7 @@ python = ">=3.7,<3.12"
 python-dotenv = "^0.21.1"
 python-gitlab = "^3.14.0"
 pyyaml = "^6.0.0"
-requests = "^2.29.0"
+requests = "^2.30.0"
 rich = "^13.3.5"
 "ruamel.yaml" = "^0.17.21"
 smart-open = {version = "^6.2.0"}
