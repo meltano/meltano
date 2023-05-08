@@ -123,10 +123,9 @@ def _get_schedule_plugins(project: Project, schedule_name: str):
         for blocks in task_sets.flat_args_per_set:
             parser = BlockParser(logger, project, blocks)
             for plugin in parser.plugins:
-                if plugin.type == PluginType.MAPPERS:
-                    schedule_plugins.add(
-                        project.plugins.find_plugin(plugin.info.get("name")),
-                    )
-                else:
-                    schedule_plugins.add(plugin)
+                schedule_plugins.add(
+                    project.plugins.find_plugin(plugin.info.get("name"))
+                    if plugin.type == PluginType.MAPPERS
+                    else plugin
+                )
     return schedule_plugins
