@@ -126,6 +126,6 @@ def _get_schedule_plugins(project: Project, schedule_name: str):
                 schedule_plugins.add(
                     project.plugins.find_plugin(plugin.info.get("name"))
                     if plugin.type == PluginType.MAPPERS
-                    else plugin
+                    else plugin,
                 )
     return schedule_plugins
