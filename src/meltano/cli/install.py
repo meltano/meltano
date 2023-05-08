@@ -116,7 +116,7 @@ def _get_schedule_plugins(project: Project, schedule_name: str):
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()
     if schedule_obj.elt_schedule:
-        for plugin_name in schedule_obj.elt_args[:2]:
+        for plugin_name in (schedule_obj.extractor, schedule_obj.loader):
             schedule_plugins.add(project.plugins.find_plugin(plugin_name))
     else:
         task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
