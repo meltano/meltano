@@ -62,3 +62,30 @@ There are multiple ways to improve a connector's quality. Please [review this pa
 **Can I request a connector to be built or improved if it doesn’t meet my needs?**
 
 Yes. Please [reach out to us](https://meltano.com/contact/) with your request.
+
+## Platinum Connector Support
+
+Meltano offers Platinum Connectors Support for many connectors when run on Meltano Cloud.
+Platinum support is included with all tiers of Meltano Cloud.
+
+To learn more about which connectors are Platinum Certified, please [reach out to the team](https://meltano.com/contact/) or contact your account representative if you're a current Cloud customer.
+
+### Platinum Certified Connector - Guarantees
+
+Each Platinum Connector will have the following guarantees:
+
+* Built with the Meltano SDK
+* Open Source License
+* Semantic Versioning used in all releases
+* Daily integration testing
+* Priority bug fixes
+* Proactive API and changelog monitoring
+
+For our Cloud Customers, we offer additional SLAs around our responsiveness and notifications for any problems with the connectors.
+[Reach out to the team](https://meltano.com/contact/) to learn more.
+
+### Platinum Certified Connector - Release Stages
+
+* **Alpha** - Meltano Platinum Alpha Connectors are in the process of being built. The connector likely is functional but may not support all data sources or features we would want. There is also no testing in place.
+* **Beta** - Meltano Platinum Beta Connectors are complete from a data and feature perspective. When a connector is in beta we are in the process of adding our full suite of testing and monitoring around it. We are also working with open source and Cloud users to test it in production. We offer some support and SLAs for Platinum Beta Connectors on Meltano Cloud.
+* **Certified (GA)** - Meltano Platinum Certified Connectors have the full set of guarantees. Our Official GA Support SLA applies for Cloud customers.
