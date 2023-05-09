@@ -151,6 +151,23 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         """
         return {k: v for k, v in params.items() if v is not None}
 
+    def validate_response(
+        self,
+        response: ClientResponse,
+    ) -> None:
+        """Handle a response status error.
+
+        Args:
+            response: The response.
+
+        Raises:
+            MeltanoCloudError: If the response status is not OK.
+        """
+        try:
+            response.raise_for_status()
+        except ClientResponseError as e:
+            raise MeltanoCloudError(response) from e
+
     @asynccontextmanager
     async def _raw_request(
         self,
@@ -169,17 +186,11 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
 
         Yields:
             The response object.
-
-        Raises:
-            MeltanoCloudError: If the response status is not OK.
         """
         url = urljoin(base_url if base_url else self.api_url, path)
         logger.debug("Making Cloud CLI HTTP request", method=method, url=url)
         async with self.session.request(method, url, **kwargs) as response:
-            try:
-                response.raise_for_status()
-            except ClientResponseError as e:
-                raise MeltanoCloudError(response) from e
+            self.validate_response(response)
             yield response
 
     async def _json_request(
