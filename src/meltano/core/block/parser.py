@@ -136,6 +136,15 @@ class BlockParser:  # noqa: D101
 
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
 
+    @property
+    def plugins(self) -> list[ProjectPlugin]:
+        """Return the list of plugins in the block.
+
+        Returns:
+            A list of ProjectPlugin.
+        """
+        return self._plugins
+
     def _expand_jobs(self, blocks: list[str], task_sets: TaskSetsService) -> list[str]:
         """Expand any jobs present in a list of blocks into their raw block names.
 
