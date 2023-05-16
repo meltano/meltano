@@ -130,6 +130,13 @@ $ meltano-cloud history --lookback 1h30m
 meltano-cloud logs print --execution-id <execution_id>
 ```
 
+## `job`
+
+```sh
+# Stop a job
+meltano-cloud job stop --execution-id 15e1cbbde6b2424f86c04b237291d652
+```
+
 ## `schedule`
 
 Prior to enabling or disabling a schedule, the project that schedule belongs to must be deployed.
