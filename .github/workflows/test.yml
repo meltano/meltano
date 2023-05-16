@@ -272,7 +272,7 @@ jobs:
         nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.3
+      uses: codecov/codecov-action@v3.1.4
 
   mypy:
     name: "Static type checking"
