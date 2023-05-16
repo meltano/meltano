@@ -144,14 +144,14 @@ frozenlist = ">=1.1.0"
 
 [[package]]
 name = "alembic"
-version = "1.10.4"
+version = "1.11.0"
 description = "A database migration tool for SQLAlchemy."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "alembic-1.10.4-py3-none-any.whl", hash = "sha256:43942c3d4bf2620c466b91c0f4fca136fe51ae972394a0cc8b90810d664e4f5c"},
-    {file = "alembic-1.10.4.tar.gz", hash = "sha256:295b54bbb92c4008ab6a7dcd1e227e668416d6f84b98b3c4446a2bc6214a556b"},
+    {file = "alembic-1.11.0-py3-none-any.whl", hash = "sha256:f0e74af5a6ade86b72770790188aaf64122c9cba64efd1d7ff3323ac3fdb75e0"},
+    {file = "alembic-1.11.0.tar.gz", hash = "sha256:d8bf706124e96e526889ac9c87a0d50debd9ef325ef32ae5391cf0315bdab4e1"},
 ]
 
 [package.dependencies]
@@ -4054,4 +4054,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "d996f5ff51fd83a19540b535c6b7418827fe6e410eb5c99fd526a23d72064655"
+content-hash = "4652cacf7e5dc35ec45675f648f70e067bee88f96ebfdc7629a0db476b9272f9"
