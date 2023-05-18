@@ -10,7 +10,7 @@ hidden: true
 
 ## Meltano Cloud Fees
 
-_Last updated: April 10, 2023_
+_Last updated: May 18, 2023_
 
 Unless specified otherwise in the applicable Order Form, the following terms and fees shall apply to the Cloud Service:
 
