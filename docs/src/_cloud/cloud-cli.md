@@ -94,6 +94,13 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 meltano-cloud logout
 ```
 
+## `logs`
+
+```sh
+# Print logs for an execution
+meltano-cloud logs print --execution-id <execution_id>
+```
+
 ## `project`
 
 The `project` command provides an interface for Meltano Cloud projects.
@@ -130,13 +137,6 @@ meltano-cloud project list
 ```
 
 When specifying a project to use as the default for future command, its name must be exactly as shown when running `meltano-cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
-
-## `logs`
-
-```sh
-# Print logs for an execution
-meltano-cloud logs print --execution-id <execution_id>
-```
 
 ## `run`
 
