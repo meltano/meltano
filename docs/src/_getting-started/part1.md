@@ -21,7 +21,7 @@ We'll assume you have [Meltano installed](/getting-started/installation) already
 
 ```console
 $ meltano --version
-meltano, version 2.6.0
+meltano, version 2.19.0
 </div>
 <br />
 This tutorial is written using meltano >= v2.0.0.
