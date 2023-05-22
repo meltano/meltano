@@ -20,7 +20,7 @@ In  [part 1](/getting-started/part1), we extracted data from GitHub and are now 
 We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local PostgreSQL container, you just need to run:
 
 ```bash
-$ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
+docker run --name meltano_postgres -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
 ```
 <br />
 <div class="termy">
@@ -155,11 +155,13 @@ You can use `meltano config target-postgres` to check the configuration, includi
 ```console
 $ meltano config target-postgres
 {
-&ensp;&ensp;&ensp;&ensp;"host": "localhost",
-&ensp;&ensp;&ensp;&ensp;"user": "meltano",
-&ensp;&ensp;&ensp;&ensp;"password": "password",
+&ensp;&ensp;&ensp;&ensp;"add_record_metadata": true,
 &ensp;&ensp;&ensp;&ensp;"database": "postgres",
-&ensp;&ensp;&ensp;&ensp;"add_record_metadata": true
+&ensp;&ensp;&ensp;&ensp;"dialect+driver": "postgresql+psycopg2",
+&ensp;&ensp;&ensp;&ensp;"host": "localhost",
+&ensp;&ensp;&ensp;&ensp;"password": "password",
+&ensp;&ensp;&ensp;&ensp;"port": 5432,
+&ensp;&ensp;&ensp;&ensp;"user": "meltano"
 }
 ```
 </div>
@@ -190,6 +192,7 @@ $ meltano run tap-github target-postgres
 </div>
 <br />
 If everything was configured correctly, you should now see your data flow from your source into your destination!
+The postgres database should now have a schema `tap_github` with the table `commits` containing your data.
 
 ## Next Steps
 
