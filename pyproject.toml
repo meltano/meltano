@@ -131,7 +131,7 @@ setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource inten
 types-croniter = "^1.3.2"
 types-jsonschema = "^4.17.0.8"
 types-psutil = "^5.9.5.5"
-types-pyyaml = "^6.0.12.3"
+types-pyyaml = "^6.0.12.10"
 types-requests = "^2.30.0"
 
 [tool.poetry.scripts]
