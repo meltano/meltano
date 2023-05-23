@@ -59,7 +59,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.40.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.41.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -77,7 +77,7 @@ repos:
           - "prettier@2.8.1"
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.267
+    rev: v0.0.269
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]
