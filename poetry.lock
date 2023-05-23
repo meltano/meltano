@@ -1224,14 +1224,14 @@ Flask = "*"
 
 [[package]]
 name = "flask-restful"
-version = "0.3.9"
+version = "0.3.10"
 description = "Simple framework for creating REST APIs"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "Flask-RESTful-0.3.9.tar.gz", hash = "sha256:ccec650b835d48192138c85329ae03735e6ced58e9b2d9c2146d6c84c06fa53e"},
-    {file = "Flask_RESTful-0.3.9-py2.py3-none-any.whl", hash = "sha256:4970c49b6488e46c520b325f54833374dc2b98e211f1b272bd4b0c516232afe2"},
+    {file = "Flask-RESTful-0.3.10.tar.gz", hash = "sha256:fe4af2ef0027df8f9b4f797aba20c5566801b6ade995ac63b588abf1a59cec37"},
+    {file = "Flask_RESTful-0.3.10-py2.py3-none-any.whl", hash = "sha256:1cf93c535172f112e080b0d4503a8d15f93a48c88bdd36dd87269bdaf405051b"},
 ]
 
 [package.dependencies]
@@ -4054,4 +4054,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "c788f0b69e255406bbf32628881190c51ecfad9dd893be29623c1c86363e9217"
+content-hash = "f79d82779c5a1047871c91d5092c126159f0854eb4b602b507eab11fab4692f6"
