@@ -1,4 +1,4 @@
-"""Meltano Cloud `project` command."""
+"""Meltano Cloud `job` command."""
 
 from __future__ import annotations
 
@@ -56,7 +56,7 @@ class JobsClient(MeltanoCloudClient):
 
 @click.group("job", help="Interact with Meltano Cloud jobs.")
 def job_group() -> None:
-    """Interact with Meltano Cloud projects."""
+    """Interact with Meltano Cloud job executions."""
 
 
 async def _stop_execution(
@@ -76,11 +76,11 @@ async def _stop_execution(
 )
 @pass_context
 @run_async
-async def list_projects(
+async def stop_execution(
     context: MeltanoCloudCLIContext,
     execution_id: str,
 ) -> None:
-    """List Meltano Cloud projects."""
+    """Stop a job execution."""
     result = await _stop_execution(
         context.config,
         execution_id=execution_id,
