@@ -72,7 +72,7 @@ flask = "^2.1"
 flask-cors = "^3.0.7"
 flask-executor = "^0.10"
 flask-login = "==0.6.1" # https://github.com/meltano/meltano/issues/6548
-flask-restful = "^0.3.7"
+flask-restful = "^0.3.10"
 flask-sqlalchemy = "^2.4.4"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
