@@ -1,4 +1,4 @@
-"""Defines PluginLocationRemoveStatus, PluginLocationRemoveManager, DbRemoveManager, MeltanoYmlRemoveManager and InstallationRemoveManager."""
+"""Defines plugin removers."""
 
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 from .project import Project
 from .settings_store import SettingValueStore
@@ -75,7 +74,7 @@ class PluginLocationRemoveManager(ABC):
 
 
 class DbRemoveManager(PluginLocationRemoveManager):
-    """Handle removal of a plugin's settings from the system database `plugin_settings` table."""
+    """Handle removal from the system db `plugin_settings` table."""
 
     def __init__(self, plugin, project):
         """Construct a DbRemoveManager instance.
@@ -89,7 +88,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
         self.session = project_engine(project)[1]
 
     def remove(self):
-        """Remove the plugin's settings from the system database `plugin_settings` table.
+        """Remove the plugin's settings from the system db `plugin_settings` table.
 
         Returns:
             The remove status.
@@ -97,7 +96,8 @@ class DbRemoveManager(PluginLocationRemoveManager):
         session = self.session()
         try:
             self.plugins_settings_service.reset(
-                store=SettingValueStore.DB, session=session
+                store=SettingValueStore.DB,
+                session=session,
             )
         except sqlalchemy.exc.OperationalError as err:
             self.remove_status = PluginLocationRemoveStatus.ERROR
@@ -118,12 +118,12 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
             project: The Meltano project.
         """
         super().__init__(plugin, str(project.meltanofile.relative_to(project.root)))
-        self.project_plugins_service = ProjectPluginsService(project)
+        self.project = project
 
     def remove(self):
         """Remove the plugin from `meltano.yml`."""
         try:
-            self.project_plugins_service.remove_from_file(self.plugin)
+            self.project.plugins.remove_from_file(self.plugin)
         except PluginNotFoundError:
             self.remove_status = PluginLocationRemoveStatus.NOT_FOUND
             return

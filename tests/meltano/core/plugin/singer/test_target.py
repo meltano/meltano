@@ -4,28 +4,32 @@ import pytest
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
+from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
 class TestSingerTarget:
-    @pytest.fixture
-    def subject(self, project_add_service):
+    @pytest.fixture()
+    def subject(self, project_add_service: ProjectAddService):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-mock")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_exec_args(self, subject, session, plugin_invoker_factory):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_setup_bookmark_writer(
-        self, subject, session, plugin_invoker_factory, elt_context_builder
+        self,
+        subject,
+        session,
+        plugin_invoker_factory,
+        elt_context_builder,
     ):
-
         job = Job(job_name="pytest_test_runner")
 
         # test noop run outside of pipeline context

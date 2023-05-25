@@ -6,29 +6,94 @@ import asyncio
 import json
 import logging
 import tempfile
+import typing as t
+from functools import wraps
 from pathlib import Path
 
 import click
 import dotenv
 
-from meltano.cli import activate_explicitly_provided_environment, cli
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedGroup, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    CliError,
+    InstrumentedGroup,
+    PartialInstrumentedCmd,
+)
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_test_service import PluginTestServiceFactory
-from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking import CliEvent, PluginsTrackingContext
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
+
+
+def _get_ctx_arg(*args: t.Any) -> click.core.Context:
+    """Get the click.core.Context arg from a set of args.
+
+    Args:
+        args: the args to get Context from
+
+    Returns:
+        The click.core.Context arg.
+
+    Raises:
+        ValueError: if there is no click.core.Context in the given args.
+    """
+    for arg in args:
+        if isinstance(arg, click.core.Context):
+            return arg
+    raise ValueError("No click.core.Context provided in *args")
+
+
+def _get_store_choices() -> list[SettingValueStore]:
+    """Get a list of valid choices for the --store flag.
+
+    Returns:
+        SettingValueStore.writables(), without meltano_env
+    """
+    writables = SettingValueStore.writables()
+    writables.remove(SettingValueStore.MELTANO_ENV)
+    return writables
+
+
+def _use_meltano_env(func):
+    """Override the 'meltano_yml' choice for a config command's 'store' argument.
+
+    If an --environment flag is passed, the decorated command will use
+    the MELTANO_ENV store instead of MELTANO_YML but _will not_ use MELTANO_ENV
+    store if the active environment is set via the default environment.
+
+    Args:
+       func: the command to override
+
+    Returns:
+       A wrapped function with overridden store argument
+    """
+
+    @wraps(func)
+    def _wrapper(*args, **kwargs):
+        store = kwargs.pop("store")
+        if store not in {SettingValueStore.MELTANO_YML, SettingValueStore.MELTANO_ENV}:
+            return func(*args, **kwargs, store=store)
+        ctx = _get_ctx_arg(*args)
+        store = (
+            SettingValueStore.MELTANO_YML
+            if ctx.obj["is_default_environment"]
+            else SettingValueStore.MELTANO_ENV
+        )
+        return func(*args, **kwargs, store=store)
+
+    return _wrapper
 
 
 def get_label(metadata) -> str:
@@ -47,13 +112,16 @@ def get_label(metadata) -> str:
         return f"from {source.label}"
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Display Meltano or plugin configuration.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.option(
-    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+    "--plugin-type",
+    type=click.Choice(PluginType.cli_arguments()),
+    default=None,
 )
 @click.argument("plugin_name")
 @click.option(
@@ -78,8 +146,6 @@ def config(  # noqa: WPS231
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
     """
-    activate_explicitly_provided_environment(ctx, project)
-
     tracker = ctx.obj["tracker"]
     try:
         plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
@@ -87,11 +153,11 @@ def config(  # noqa: WPS231
         tracker.track_command_event(CliEvent.aborted)
         raise
 
-    plugins_service = ProjectPluginsService(project)
-
     try:
-        plugin = plugins_service.find_plugin(
-            plugin_name, plugin_type=plugin_type, configurable=True
+        plugin = project.plugins.find_plugin(
+            plugin_name,
+            plugin_type=plugin_type,
+            configurable=True,
         )
     except PluginNotFoundError:
         if plugin_name == "meltano":
@@ -108,16 +174,10 @@ def config(  # noqa: WPS231
     session = Session()
     try:
         if plugin:
-            settings = PluginSettingsService(
-                project,
-                plugin,
-                plugins_service=plugins_service,
-            )
+            settings = PluginSettingsService(project, plugin)
             invoker = PluginInvoker(project, plugin)
         else:
-            settings = ProjectSettingsService(
-                project, config_service=plugins_service.config_service
-            )
+            settings = project.settings
             invoker = None
 
         ctx.obj["settings"] = settings
@@ -128,7 +188,9 @@ def config(  # noqa: WPS231
             if config_format == "json":
                 process = extras is not True
                 json_config = settings.as_dict(
-                    extras=extras, process=process, session=session
+                    extras=extras,
+                    process=process,
+                    session=session,
                 )
                 click.echo(json.dumps(json_config, indent=2))
             elif config_format == "env":
@@ -149,17 +211,19 @@ def config(  # noqa: WPS231
         session.close()
 
 
+@_use_meltano_env
 @config.command(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help=(
-        "List all settings for the specified plugin with their names, environment variables, and current values."
+        "List all settings for the specified plugin with their names, "
+        "environment variables, and current values."
     ),
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
 def list_settings(ctx, extras: bool):
-    """List all settings for the specified plugin with their names, environment variables, and current values."""
+    """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
@@ -234,7 +298,7 @@ def list_settings(ctx, extras: bool):
     if docs_url:
         click.echo()
         click.echo(
-            f"To learn more about {settings.label} and its settings, visit {docs_url}"
+            f"To learn more about {settings.label} and its settings, visit {docs_url}",
         )
     tracker.track_command_event(CliEvent.completed)
 
@@ -242,10 +306,11 @@ def list_settings(ctx, extras: bool):
 @config.command(cls=PartialInstrumentedCmd)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
+@_use_meltano_env
 def reset(ctx, store):
     """Clear the configuration (back to defaults)."""
     store = SettingValueStore(store)
@@ -259,7 +324,8 @@ def reset(ctx, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} settings in {store.label} could not be reset: {err}"
+            f"{settings.label.capitalize()} settings in {store.label} could "
+            f"not be reset: {err}",
         ) from err
 
     store = metadata["store"]
@@ -276,12 +342,22 @@ def reset(ctx, store):
 @click.argument("value", required=False)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
-def set_(ctx, setting_name, value, store, interactive):
+@_use_meltano_env
+def set_(
+    ctx: click.core.Context,
+    setting_name: tuple[str, ...],
+    value: t.Any,
+    store: str,
+    interactive: bool,
+):
     """Set the configurations' setting `<name>` to `<value>`."""
+    if len(setting_name) == 1:
+        setting_name = tuple(setting_name[0].split("."))
+
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
     if interactive:
         interaction.configure_all()
@@ -324,10 +400,11 @@ def test(ctx):
 @click.argument("setting_name", nargs=-1, required=True)
 @click.option(
     "--store",
-    type=click.Choice(SettingValueStore.writables()),
+    type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
 @click.pass_context
+@_use_meltano_env
 def unset(ctx, setting_name, store):
     """Unset the configurations' setting called `<name>`."""
     store = SettingValueStore(store)
@@ -342,7 +419,8 @@ def unset(ctx, setting_name, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} could not be unset: {err}"
+            f"{settings.label.capitalize()} setting '{path}' in {store.label} "
+            f"could not be unset: {err}",
         ) from err
 
     name = metadata["name"]

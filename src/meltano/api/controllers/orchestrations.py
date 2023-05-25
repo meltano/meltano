@@ -30,8 +30,6 @@ from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.schedule_service import (
     ScheduleAlreadyExistsError,
     ScheduleDoesNotExistError,
@@ -106,7 +104,8 @@ def validate_plugin_config(
         resolved_file_path = project.root_dir(value).resolve()
         if not str(resolved_file_path).startswith(f"{uploads_directory}/"):
             logging.warning(
-                "Cannot set a file configuration to a path outside the project directory"
+                "Cannot set a file configuration to a path outside the "
+                "project directory"
             )
             return False
 
@@ -142,7 +141,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"A pipeline with the name '{ex.schedule.name}' already exists. Try renaming the pipeline.",
+                "code": (
+                    f"A pipeline with the name '{ex.schedule.name}' "
+                    "already exists. Try renaming the pipeline."
+                ),
             }
         ),
         409,
@@ -173,7 +175,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"The file '{ex.file.filename}' must be one of the following types: {ex.extensions}",
+                "code": (
+                    f"The file '{ex.file.filename}' must be one of the "
+                    f"following types: {ex.extensions}"
+                ),
             }
         ),
         400,
@@ -186,7 +191,10 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"The file '{ex.file.filename}' is empty or exceeds the {ex.max_file_size} size limit.",
+                "code": (
+                    f"The file '{ex.file.filename}' is empty or exceeds the "
+                    f"{ex.max_file_size} size limit."
+                ),
             }
         ),
         400,
@@ -365,13 +373,8 @@ def get_plugin_configuration(plugin_ref) -> Response:
         JSON contain the plugin configuration.
     """
     project = Project.find()
-
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
 
     try:
         settings_group_validation = plugin.settings_group_validation
@@ -400,13 +403,8 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
-
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
     config = payload.get("config", {})
     for name, value in config.items():
         if not validate_plugin_config(plugin, name, value, project, settings):
@@ -434,13 +432,8 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
         JSON with the job sucess status.
     """
     project = Project.find()
-    plugins_service = ProjectPluginsService(project)
-    plugin = plugins_service.get_plugin(plugin_ref)
-
-    settings = PluginSettingsService(
-        project, plugin, plugins_service=plugins_service, show_hidden=False
-    )
-
+    plugin = project.plugins.get_plugin(plugin_ref)
+    settings = PluginSettingsService(project, plugin, show_hidden=False)
     settings.config_override = PluginSettingsService.unredact(
         {
             name: value
@@ -450,12 +443,7 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
     )
 
     async def test_extractor():
-        invoker = invoker_factory(
-            project,
-            plugin,
-            plugins_service=plugins_service,
-            plugin_settings_service=settings,
-        )
+        invoker = invoker_factory(project, plugin, plugin_settings_service=settings)
         async with invoker.prepared(db.session):
             plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
             success, _ = await plugin_test_service.validate()
@@ -476,7 +464,8 @@ def test_plugin_configuration(plugin_ref) -> Response:  # noqa: WPS210
 def get_pipeline_schedules():
     """Endpoint for getting the pipeline schedules.
 
-    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this endpoint will filter out scheduled jobs.
+    Note that unless the ff ENABLE_API_SCHEDULED_JOB_LIST is enabled this
+    endpoint will filter out scheduled jobs.
 
     Returns:
         JSON containing the pipline schedules.
@@ -486,7 +475,7 @@ def get_pipeline_schedules():
     schedules = list(map(dict, schedule_service.schedules()))
 
     jobs_in_list = False
-    with ProjectSettingsService(project).feature_flag(
+    with project.settings.feature_flag(
         FeatureFlags.ENABLE_API_SCHEDULED_JOB_LIST, raise_error=False
     ) as allow:
         if allow:
@@ -496,8 +485,8 @@ def get_pipeline_schedules():
 
     for schedule in schedules:
         if schedule.get("job") and jobs_in_list:
-            # we only return API results for scheduled jobs if the feature flag is explicitly enabled
-            # as the UI is not job aware yet.
+            # We only return API results for scheduled jobs if the feature flag
+            # is explicitly enabled as the UI is not job aware yet.
             formatted_schedules.append(schedule)
         elif not schedule.get("job"):  # a legacy elt task
             finder = JobFinder(schedule["name"])

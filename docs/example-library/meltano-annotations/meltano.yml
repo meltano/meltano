@@ -1,0 +1,56 @@
+version: 1
+default_environment: dev
+project_id: abd310b5-698b-4244-a109-9490047fa2ec
+send_anonymous_usage_stats: false
+annotations:
+  example-annotation:
+    a_key: a value
+  another-annotation-category:
+    best_season: Autumn
+    the_purpose_of_this_annotation: Nothing much
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+    annotations:
+      example-annotation-plugins-extractors-tap-gitlab: {}
+    config:
+      projects: meltano/meltano
+    select:
+    - commits.*
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+    annotations:
+      example-annotation-plugins-loaders-target-jsonl: {}
+    config:
+      do_timestamp_file: false
+environments:
+- name: dev
+  annotations:
+    example-annotation-environments-dev: {}
+  config:
+    plugins:
+      extractors:
+      - name: tap-gitlab
+        env:
+          EXAMPLE_ENVIRONMENT_ENV: value
+- name: staging
+  annotations:
+    example-annotation-environments-staging: {}
+- name: prod
+  annotations:
+    example-annotation-environments-prod: {}
+jobs:
+- name: gitlab-to-jsonl
+  annotations:
+    example-annotation-jobs-gitlab-to-jsonl: {}
+  tasks: []
+schedules:
+- name: daily-gitlab-to-jsonl
+  interval: 9 8 * * *
+  job: gitlab-to-jsonl
+  annotations:
+    example-annotation-schedules-daily-gitlab-to-jsonl: {}

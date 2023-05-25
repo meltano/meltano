@@ -13,7 +13,9 @@ class TestConnectionRetries:
 
         # check if OperationalError is raised if a connection can't be made
         engine_mock.connect.side_effect = OperationalError(
-            "test_error", "test_error", "test_error"
+            "test_error",
+            "test_error",
+            "test_error",
         )
         with pytest.raises(OperationalError):
             connect(engine=engine_mock, max_retries=3, retry_timeout=0.1)

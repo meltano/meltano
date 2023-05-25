@@ -1,19 +1,21 @@
 """Extractor selection management CLI."""
 from __future__ import annotations
 
+import typing as t
 from contextlib import closing
 
 import click
 
-from meltano.cli import activate_explicitly_provided_environment, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
-from meltano.core.project import Project
 from meltano.core.select_service import SelectService
 from meltano.core.utils import click_run_async
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 def selection_color(selection):
@@ -39,7 +41,11 @@ def selection_mark(selection):
     return f"[{selection:<{colwidth}}]"
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Manage extractor selection patterns.")
+@click.command(
+    cls=InstrumentedCmd,
+    short_help="Manage extractor selection patterns.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
+)
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
@@ -62,10 +68,8 @@ def selection_mark(selection):
     help="Exclude all attributes that match specified pattern.",
 )
 @pass_project(migrate=True)
-@click.pass_context
 @click_run_async
 async def select(
-    ctx: click.Context,
     project: Project,
     extractor: str,
     entities_filter: str,
@@ -77,7 +81,6 @@ async def select(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
     """
-    activate_explicitly_provided_environment(ctx, project)
     try:
         if flags["list"]:
             await show(project, extractor, show_all=flags["all"])
@@ -95,7 +98,12 @@ async def select(
 
 
 def update(
-    project, extractor, entities_filter, attributes_filter, exclude=False, remove=False
+    project,
+    extractor,
+    entities_filter,
+    attributes_filter,
+    exclude=False,
+    remove=False,
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)

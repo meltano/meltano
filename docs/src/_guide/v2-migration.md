@@ -15,18 +15,18 @@ The following list includes all recommended migration tasks as well as breaking 
 
 ### Migrate to an Adapter-Specific `dbt` Transformer
 
-If you previously used the `dbt` Transformer, we recommend migrating to an adapter-specific installation as per the `dbt` [available adapters documentation](https://docs.getdbt.com/docs/available-adapters).
+If you previously used `dbt` or `dbt-<adapter>` ([available adapters documentation](https://docs.getdbt.com/docs/available-adapters)) Transformer, we recommend migrating to an adapter specific [utility plugin](https://hub.meltano.com/utilities/).
 
 #### Install `dbt`
 
 This is easy to do! Following the instructions from above to discover and install your chosen adapter:
 
 ```bash
-# list available transformer plugins
-meltano discover transformers
+# list available utilities plugins
+meltano discover utilities
 
 # install adapter-specific dbt, e.g. for snowflake
-meltano add transformer dbt-snowflake
+meltano add utility dbt-snowflake
 ```
 
 #### Update your `dbt_project.yml`
@@ -133,10 +133,22 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
    </td>
   </tr>
   <tr>
-   <td rowspan="16" >meltano
+   <td rowspan="18" >meltano
    </td>
-   <td rowspan="16" >
+   <td rowspan="18" >
    </td>
+   <td>MELTANO_LOG_LEVEL
+   </td>
+   <td>MELTANO_CLI_LOG_LEVEL
+   </td>
+  </tr>
+  <tr>
+   <td>MELTANO_LOG_CONFIG
+   </td>
+   <td>MELTANO_CLI_LOG_CONFIG
+   </td>
+  </tr>
+  <tr>
    <td>MELTANO_API_HOSTNAME
    </td>
    <td>MELTANO_UI_BIND_HOST

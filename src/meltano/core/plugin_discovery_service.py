@@ -5,8 +5,9 @@ from __future__ import annotations
 import io
 import logging
 import re
+import typing as t
 from abc import ABCMeta, abstractmethod
-from typing import Iterable
+from contextlib import suppress
 
 import requests
 from ruamel.yaml import YAMLError
@@ -20,22 +21,26 @@ from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import NotFound, find_named
 from meltano.core.yaml import yaml
 
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
+REQUEST_TIMEOUT_SECONDS = 30.0
+
 
 class DiscoveryInvalidError(Exception):
-    """Occurs when the discovery.yml fails to be parsed."""
+    """The discovery.yml fails to be parsed."""
 
 
 class DiscoveryUnavailableError(Exception):
-    """Occurs when the discovery.yml cannot be found or downloaded."""
+    """The discovery.yml cannot be found or downloaded."""
 
 
 # Increment this version number whenever the schema of discovery.yml is changed.
-# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for more information.
+# See https://docs.meltano.com/contribute/plugins#discoveryyml-version for
+# more information.
 VERSION = 22
 
 
@@ -105,13 +110,14 @@ class PluginRepository(metaclass=ABCMeta):
 
 
 class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
-    PluginRepository, Versioned
+    PluginRepository,
+    Versioned,
 ):
     """Discover plugin definitions."""
 
     __version__ = VERSION
 
-    def __init__(self, project, discovery: dict | None = None):
+    def __init__(self, project: Project, discovery: dict | None = None):
         """Create a new PluginDiscoveryService.
 
         Args:
@@ -125,8 +131,6 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         if discovery:
             self._discovery_version = DiscoveryFile.file_version(discovery)
             self._discovery = DiscoveryFile.parse(discovery)
-
-        self.settings_service = ProjectSettingsService(self.project)
 
     @property
     def file_version(self):
@@ -144,11 +148,9 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The URL of the discovery file.
         """
-        discovery_url = self.settings_service.get("discovery_url")
+        discovery_url = self.project.settings.get("discovery_url")
 
-        if not discovery_url or not re.match(
-            r"^https?://", discovery_url  # noqa: WPS360
-        ):
+        if not discovery_url or not re.match("^https?://", discovery_url):
             return None
 
         return discovery_url
@@ -160,7 +162,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         Returns:
             The `discovery_url_auth` setting.
         """
-        return self.settings_service.get("discovery_url_auth")
+        return self.project.settings.get("discovery_url_auth")
 
     @property
     def discovery(self):
@@ -206,11 +208,14 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
                 errored = True
 
                 logging.warning(
-                    f"{description.capitalize()} has version {err.file_version}, while this version of Meltano requires version {err.version}."
+                    f"{description.capitalize()} has version "
+                    f"{err.file_version}, while this version of Meltano "
+                    f"requires version {err.version}.",
                 )
                 if err.file_version > err.version:
                     logging.warning(
-                        "Please install the latest compatible version of Meltano using `meltano upgrade`."
+                        "Please install the latest compatible version of "
+                        "Meltano using `meltano upgrade`.",
                     )
             except DiscoveryInvalidError as err:
                 errored = True
@@ -222,17 +227,16 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         raise DiscoveryInvalidError("No valid `discovery.yml` manifest could be found")
 
-    def load_local_discovery(self):
+    def load_local_discovery(self) -> DiscoveryFile | None:
         """Load the local `discovery.yml` manifest.
 
         Returns:
             The discovery file.
         """
-        try:
-            with self.project.root_dir("discovery.yml").open() as local_discovery:
-                return self.load_discovery(local_discovery)
-        except FileNotFoundError:
-            pass
+        with suppress(FileNotFoundError), self.project.root_dir(
+            "discovery.yml",
+        ).open() as local_discovery:
+            return self.load_discovery(local_discovery)
 
     def load_remote_discovery(self) -> DiscoveryFile | None:
         """Load the remote `discovery.yml` manifest.
@@ -250,14 +254,19 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         if self.discovery_url_auth:
             headers["Authorization"] = self.discovery_url_auth
 
-        if self.settings_service.get("send_anonymous_usage_stats"):
-            project_id = self.settings_service.get("project_id")
+        if self.project.settings.get("send_anonymous_usage_stats"):
+            project_id = self.project.settings.get("project_id")
 
             headers["X-Project-ID"] = project_id
             params["project_id"] = project_id
 
         try:
-            response = requests.get(discovery_url, headers=headers, params=params)
+            response = requests.get(
+                discovery_url,
+                headers=headers,
+                params=params,
+                timeout=REQUEST_TIMEOUT_SECONDS,
+            )
             response.raise_for_status()
         except (
             requests.exceptions.ConnectionError,
@@ -271,17 +280,16 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
         return self.load_discovery(remote_discovery, cache=True)
 
-    def load_cached_discovery(self):
+    def load_cached_discovery(self) -> DiscoveryFile | None:
         """Load the cached `discovery.yml` manifest.
 
         Returns:
             The discovery file.
         """
-        try:
-            with self.cached_discovery_file.open() as cached_discovery:
-                return self.load_discovery(cached_discovery)
-        except FileNotFoundError:
-            pass
+        with suppress(
+            FileNotFoundError,
+        ), self.cached_discovery_file.open() as cached_discovery:
+            return self.load_discovery(cached_discovery)
 
     def load_bundled_discovery(self):
         """Load the bundled `discovery.yml` manifest.
@@ -320,7 +328,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
 
             return self._discovery
         except (YAMLError, Exception) as err:
-            raise DiscoveryInvalidError(str(err))
+            raise DiscoveryInvalidError(str(err)) from err
 
     def cache_discovery(self):
         """Cache the `discovery.yml` manifest."""
@@ -361,7 +369,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             for plugin_type in PluginType
         }
 
-    def plugins(self) -> Iterable[PluginDefinition]:
+    def plugins(self) -> t.Iterable[PluginDefinition]:
         """Generate all plugins.
 
         Yields:
@@ -377,7 +385,7 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         self,
         plugin_type: PluginType,
         plugin_name: str,
-        variant_name: str | None = None,
+        variant_name: str | None = None,  # noqa: ARG002
     ) -> PluginDefinition:
         """Find a plugin definition by type and name.
 
@@ -398,7 +406,9 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
             raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from err
 
     def find_definition_by_namespace(
-        self, plugin_type: PluginType, namespace: str
+        self,
+        plugin_type: PluginType,
+        namespace: str,
     ) -> PluginDefinition:
         """Find a plugin definition by type and namespace.
 
@@ -437,21 +447,15 @@ class PluginDiscoveryService(  # noqa: WPS214 (too many public methods)
         """
         plugin_types = plugin_types or list(PluginType)
 
-        try:
+        with suppress(ValueError):
             plugin_types.remove(target_plugin.type)
-        except ValueError:
-            pass
 
-        related_plugin_refs = []
-
-        related_plugin_refs.extend(
+        return [
             related_plugin_def
             for plugin_type in plugin_types
             for related_plugin_def in self.get_plugins_of_type(plugin_type)
             if related_plugin_def.namespace == target_plugin.namespace
-        )
-
-        return related_plugin_refs
+        ]
 
 
 class LockedDefinitionService(PluginRepository):

@@ -1,29 +1,40 @@
 """Defines helpers for the core codebase."""
 
+
 from __future__ import annotations
 
 import asyncio
+import collections
 import functools
 import hashlib
 import logging
 import math
 import os
+import platform
 import re
 import sys
 import traceback
-from collections import OrderedDict
-from copy import deepcopy
+import typing as t
+import unicodedata
+from contextlib import suppress
+from copy import copy, deepcopy
 from datetime import date, datetime, time
+from enum import IntEnum
+from functools import reduce
+from operator import setitem
 from pathlib import Path
-from typing import Any, Callable, Iterable, TypeVar, overload
 
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
+if sys.version_info >= (3, 8):
+    from typing import Protocol, runtime_checkable
+else:
+    from typing_extensions import Protocol, runtime_checkable
+
 from meltano.core.error import MeltanoError
 
 logger = logging.getLogger(__name__)
-T = TypeVar("T")
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -36,14 +47,9 @@ try:
 except AttributeError:
     asyncio_all_tasks = asyncio.Task.all_tasks
 
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
-
 
 class NotFound(Exception):
-    """Occurs when an element is not found."""
+    """An element is not found."""
 
     def __init__(self, name, obj_type=None):
         """Create a new exception.
@@ -59,13 +65,13 @@ class NotFound(Exception):
 
 
 def click_run_async(func):
-    """Small decorator to allow click invoked functions to leverage `asyncio.run` and be declared as async.
+    """Run decorated Click commands with `asyncio.run`.
 
     Args:
-        func: the function to run async
+        func: The function to run asynchronously.
 
     Returns:
-        A function which runs the given function async
+        A function which runs the given function asynchronously.
     """
 
     @functools.wraps(func)
@@ -76,7 +82,7 @@ def click_run_async(func):
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: Callable[[Any], Any]):
+def compose(*fs: t.Callable[[t.Any], t.Any]):
     """Create a composition of unary functions.
 
     Args:
@@ -88,7 +94,8 @@ def compose(*fs: Callable[[Any], Any]):
         ```
 
     Returns:
-        The composition of the provided unary functions, which itself is a unary function.
+        The composition of the provided unary functions, which itself is a
+        unary function.
     """
     return functools.reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
 
@@ -151,9 +158,9 @@ def merge(src, dest):
             `src` at depth.
 
     Examples:
-        >>> a = { 'first' : { 'all_rows' : { 'pass' : 'dog', 'number' : '1' } } }
-        >>> b = { 'first' : { 'all_rows' : { 'fail' : 'cat', 'number' : '5' } } }
-        >>> merge(b, a) == { 'first' : { 'all_rows' : { 'pass' : 'dog', 'fail' : 'cat', 'number' : '5' } } }
+        >>> a = {'f' :{'all_rows': {'pass': 'dog', 'n': '1'}}}
+        >>> b = {'f' :{'all_rows': {'fail': 'cat', 'n': '5'}}}
+        >>> merge(b, a) == {'f': {'all_rows': {'pass': 'dog', 'fail': 'cat', 'n': '5'}}}
         True
 
     Returns:
@@ -168,6 +175,10 @@ def merge(src, dest):
             dest[key] = value
 
     return dest
+
+
+def are_similar_types(left, right):
+    return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
 def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
@@ -215,7 +226,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         cursor = cursor[key]
 
     if tail not in cursor or (
-        type(cursor[tail]) is not type(value) and force  # noqa: WPS516
+        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
     ):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
@@ -231,12 +242,27 @@ def nest_object(flat_object):
     return obj
 
 
-def to_env_var(*xs):
-    xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
-    return "_".join(xs)
+def to_env_var(*xs: str) -> str:
+    """Convert a list of strings to an environment variable name.
+
+    Args:
+        *xs: the strings to convert
+
+    Returns:
+        The environment variable name.
+
+    Examples:
+        >>> to_env_var("foo", "bar")
+        'FOO_BAR'
+        >>> to_env_var("foo", "bar", "baz")
+        'FOO_BAR_BAZ'
+        >>> to_env_var("foo.bar")
+        'FOO_BAR'
+    """
+    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
+def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper arround `flatten_dict.flatten`.
@@ -249,21 +275,15 @@ def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):
     Returns:
         the flattened dict
     """
-
-    def dot_reducer(*xs):
-        if xs[0] is None:
-            return xs[1]
-        return ".".join(xs)
-
     if reducer == "dot":
-        reducer = dot_reducer
+        reducer = lambda *xs: xs[1] if xs[0] is None else ".".join(xs)  # noqa: E731
     if reducer == "env_var":
         reducer = to_env_var
 
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def compact(xs: Iterable) -> Iterable:
+def compact(xs: t.Iterable) -> t.Iterable:
     """Remove None values from an iterable.
 
     Args:
@@ -288,25 +308,21 @@ def noop(*_args, **_kwargs):
     pass
 
 
-def map_dict(f: Callable, d: dict):
-    yield from ((k, f(v)) for k, v in d.items())
-
-
 def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-@overload
+@t.overload
 def coerce_datetime(d: None) -> None:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def coerce_datetime(d: datetime) -> datetime:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def coerce_datetime(d: date) -> datetime:
     ...  # noqa: WPS428
 
@@ -323,18 +339,15 @@ def coerce_datetime(d):
     if d is None:
         return None
 
-    if isinstance(d, datetime):
-        return d
-
-    return datetime.combine(d, time())
+    return d if isinstance(d, datetime) else datetime.combine(d, time())
 
 
-@overload
+@t.overload
 def iso8601_datetime(d: None) -> None:
     ...  # noqa: WPS428
 
 
-@overload
+@t.overload
 def iso8601_datetime(d: str) -> datetime:
     ...  # noqa: WPS428
 
@@ -351,11 +364,8 @@ def iso8601_datetime(d):
     ]
 
     for format_string in isoformats:
-        try:
+        with suppress(ValueError):
             return coerce_datetime(datetime.strptime(d, format_string))
-        except ValueError:
-            pass
-
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
@@ -364,10 +374,10 @@ class _GetItemProtocol(Protocol):
         ...  # noqa: WPS428
 
 
-_G = TypeVar("_G", bound=_GetItemProtocol)
+_G = t.TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: Iterable[_G], name: str, obj_type: type = None) -> _G:
+def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -390,8 +400,7 @@ def find_named(xs: Iterable[_G], name: str, obj_type: type = None) -> _G:
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-
-        enabled = kwargs.get("make_dirs", True)
+        enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs)
 
@@ -400,12 +409,7 @@ def makedirs(func):
 
         # if there is an extension, only create the base dir
         _, ext = os.path.splitext(path)
-        if ext:
-            directory = os.path.dirname(path)
-        else:
-            directory = path
-
-        os.makedirs(directory, exist_ok=True)
+        os.makedirs(os.path.dirname(path) if ext else path, exist_ok=True)
         return path
 
     return decorate
@@ -433,7 +437,7 @@ def pop_at_path(d, path, default=None):  # noqa: WPS210
 
     popped = cursor.pop(tail, default)
 
-    for (cursor, key) in reversed(cursors):
+    for cursor, key in reversed(cursors):
         if len(cursor[key]) == 0:
             cursor.pop(key, None)
 
@@ -451,7 +455,7 @@ def set_at_path(d, path, value):
 
 
 class EnvironmentVariableNotSetError(MeltanoError):
-    """Occurs when a referenced environment variable is not set."""
+    """A referenced environment variable is not set."""
 
     def __init__(self, env_var: str):
         """Initialize the error.
@@ -466,55 +470,121 @@ class EnvironmentVariableNotSetError(MeltanoError):
         super().__init__(reason, instruction)
 
 
-def expand_env_vars(raw_value, env: dict, raise_if_missing: bool = False):
-    if isinstance(raw_value, dict):
-        return {
-            key: expand_env_vars(val, env, raise_if_missing)
-            for key, val in raw_value.items()
-        }
-    elif not isinstance(raw_value, str):
+ENV_VAR_PATTERN = re.compile(
+    r"""
+    \$  # starts with a '$'
+    (?:
+        {(\w+)} # ${VAR}
+        |
+        ([A-Z][A-Z0-9_]*) # $VAR
+    )
+    """,
+    re.VERBOSE,
+)
+
+Expandable = t.TypeVar("Expandable", str, t.Mapping[str, "Expandable"])
+
+
+class EnvVarMissingBehavior(IntEnum):
+    """The behavior that should be employed when expanding a missing env var."""
+
+    use_empty_str = 0
+    raise_exception = 1
+    ignore = 2
+
+
+def expand_env_vars(
+    raw_value: Expandable,
+    env: t.Mapping[str, str],
+    *,
+    if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
+    flat: bool = False,
+) -> Expandable:
+    """Expand/interpolate provided env vars into a string or env mapping.
+
+    By default, attempting to expand an env var which is not defined in the
+    provided env dict will result in it being replaced with the empty string.
+
+    Args:
+        raw_value: A string or env mapping in which env vars will be expanded.
+        env: The env vars to use for the expansion of `raw_value`.
+        if_missing: The behavior to employ if an env var in `raw_value` is not
+            set in `env`.
+        flat: Whether the `raw_value` has a flat structure. Ignored if
+            `raw_value` is not a mapping. Otherwise it controls whether this
+            function will process nested levels within `raw_value`. Defaults to
+            `False` for backwards-compatibility. Setting to `True` is recommend
+            for performance, safety, and cleanliness reasons.
+
+    Raises:
+        EnvironmentVariableNotSetError: Attempted to expand an env var that was not
+            defined in the provided env dict, and `if_missing` was
+            `EnvVarMissingBehavior.raise_exception`.
+
+    Returns:
+        The string or env dict with env vars expanded. For backwards
+        compatibility, if anything other than an `str` or mapping is provided
+        as the `raw_value`, it is returned unchanged.
+    """  # noqa: DAR402
+    if_missing = EnvVarMissingBehavior(if_missing)
+
+    if not isinstance(raw_value, (str, t.Mapping)):
         return raw_value
 
-    # find viable substitutions
-    var_matcher = re.compile(
-        r"""
-        \$  # starts with a '$'
-        (?:
-            {(\w+)} # ${VAR}
-            |
-            ([A-Z][A-Z0-9_]*) # $VAR
-        )
-        """,
-        re.VERBOSE,
-    )
-
-    def subst(match) -> str:
+    def replacer(match: re.Match) -> str:
+        # The variable can be in either group
+        var = next(var for var in match.groups() if var)
         try:
-            # the variable can be in either group
-            var = next(var for var in match.groups() if var)
             val = str(env[var])
+        except KeyError as ex:
+            logger.debug(
+                f"Variable '${var}' is not set in the provided env dictionary.",
+            )
+            if if_missing == EnvVarMissingBehavior.raise_exception:
+                raise EnvironmentVariableNotSetError(var) from ex
+            elif if_missing == EnvVarMissingBehavior.ignore:
+                return f"${{{var}}}"
+            return ""
+        if not val:
+            logger.debug(f"Variable '${var}' is empty.")
+        return val
 
-            if not val:
-                logger.debug(f"Variable '${var}' is empty.")
-                if raise_if_missing:
-                    raise EnvironmentVariableNotSetError(var)
-            return val
-        except KeyError as e:
-            if raise_if_missing:
-                raise EnvironmentVariableNotSetError(e.args[0])
-            logger.debug(f"Variable '${var}' is missing from the environment.")
-            return None
-
-    fullmatch = re.fullmatch(var_matcher, raw_value)
-    if fullmatch:
-        # If the entire value is an env var reference, return None if it isn't set
-        return subst(fullmatch)
-
-    return re.sub(var_matcher, subst, raw_value)
+    return _expand_env_vars(raw_value, replacer, flat)
 
 
-def uniques_in(original):
-    return list(OrderedDict.fromkeys(original))
+# Separate inner-function for `expand_env_vars` for performance reasons. Like
+# this the `replacer` function closure only needs to be created once when
+# `raw_value` is a dict, as opposed to once per key-value pair.
+def _expand_env_vars(
+    raw_value: Expandable,
+    replacer: t.Callable[[re.Match], str],
+    flat: bool,
+) -> Expandable:
+    if isinstance(raw_value, t.Mapping):
+        if flat:
+            return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
+        return {
+            k: _expand_env_vars(v, replacer, flat)
+            if isinstance(v, (str, t.Mapping))
+            else v
+            for k, v in raw_value.items()
+        }
+    return ENV_VAR_PATTERN.sub(replacer, raw_value)
+
+
+T = t.TypeVar("T")
+
+
+def uniques_in(original: t.Sequence[T]) -> list[T]:
+    """Get unique elements from an iterable while preserving order.
+
+    Args:
+        original: A sequence from which only the unique values will be returned.
+
+    Returns:
+        A list of unique values from the provided sequence in the order they appeared.
+    """
+    return list(collections.OrderedDict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
@@ -560,21 +630,21 @@ def hash_sha256(value: str | bytes) -> str:
 
 
 def format_exception(exception: BaseException) -> str:
-    """Get the exception with its traceback in the standard format it would have been printed with.
+    """Get the exception with its traceback formatted as it would have been printed.
 
     Args:
         exception: The exception value to be turned into a string.
 
     Returns:
-        A string that shows the exception object as it would have been printed had it been raised
-        and not caught.
+        A string that shows the exception object as it would have been printed
+        had it been raised and not caught.
     """
     return "".join(
-        traceback.format_exception(type(exception), exception, exception.__traceback__)
+        traceback.format_exception(type(exception), exception, exception.__traceback__),
     )
 
 
-def safe_hasattr(obj: Any, name: str) -> bool:
+def safe_hasattr(obj: t.Any, name: str) -> bool:
     """Safely checks if an object has a given attribute.
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
@@ -639,9 +709,180 @@ def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
 
 
 def get_no_color_flag() -> bool:
-    """Get the value of the NO_COLOR environment variable.
+    """Get the truth value of the `NO_COLOR` environment variable.
 
     Returns:
-        True if the NO_COLOR environment variable is set to a truthy value, False otherwise.
+        Whether the `NO_COLOR` environment variable is set to a truthy value.
     """
     return get_boolean_env_var("NO_COLOR")
+
+
+class MergeStrategy(t.NamedTuple):
+    """Strategy to be used when merging instances of a type.
+
+    The first value of this tuple, `applicable_for_instance_of`, is a type or
+    tuple of types for which the behavior (see below) should apply. An
+    `isinstance` check is performed on each yet-unprocessed value using these
+    types.
+
+    The second value of this tuple, `behavior`, is a function which is provided
+    the dictionary being merged into, the key into that dictionary that is
+    being affected, the value for which
+    `isinstance(value, applicable_for_instance_of)` was true, and the tuple of
+    merge strategies in use (provided to enable recursion by calling
+    `deep_merge`).
+
+    If the behavior function returns `NotImplemented` then it will be skipped,
+    and later items in the tuple of merge strategies will be tried instead.
+    """
+
+    applicable_for_instance_of: type | tuple[type, ...]
+    behavior: t.Callable[
+        [t.MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
+        None,
+    ]
+
+
+@runtime_checkable
+class Extendable(Protocol):
+    """A type protocol for types which have an `extend` method."""
+
+    def extend(self, x: t.Any) -> None:
+        """Extend the current instance with another value.
+
+        Args:
+            x: A value to extend this instance with.
+        """
+
+
+default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
+    MergeStrategy(
+        t.Mapping,
+        lambda x, k, v, s: setitem(
+            x,
+            k,
+            _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s),
+        ),
+    ),
+    MergeStrategy(
+        Extendable,
+        lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v),
+    ),
+    MergeStrategy(object, lambda x, k, v, _: setitem(x, k, v)),
+)
+
+
+TMapping = t.TypeVar("TMapping", bound=t.Mapping)
+
+
+def deep_merge(
+    *data: TMapping,
+    strategies: tuple[MergeStrategy, ...] = default_deep_merge_strategies,
+) -> TMapping:
+    """Merge multiple mappings at depth.
+
+    Args:
+        data: The mappings.
+        strategies: A tuple of merge strategies, which are pairs of
+            `(applicable type, behavior function)`. Each type will be tried in
+            order until one passes an `isinstance` check for the value being
+            merged, then the associated behavior function will be called to
+            perform the merge. Refer to the documentation for `MergeStrategy`
+            for more details. By default, the merge strategies will merge
+            mappings with a recursive deep merge, objects with an `extend`
+            method (e.g. `lists`) using the `extend` method, and all other
+            objects with `setitem(dict_being_merged_into, key, value)`.
+
+    Returns:
+        The merged mapping.
+    """
+    return reduce(lambda a, b: _deep_merge(a, b, strategies), data)
+
+
+def _deep_merge(a, b, strategies):
+    base: TMapping = copy(a)
+    for key, value in b.items():
+        for applicable_types, behavior in strategies:
+            if (
+                isinstance(value, applicable_types)
+                and behavior(base, key, value, strategies) is not NotImplemented
+            ):
+                break
+    return base
+
+
+def remove_suffix(string: str, suffix: str) -> str:
+    """Remove suffix from string.
+
+    Compatible with Python 3.8
+
+    Args:
+        string: the string to remove suffix from
+        suffix: the suffix to remove
+
+    Returns:
+        The changed string
+    """
+    if sys.version_info >= (3, 9):
+        return string.removesuffix(suffix)
+    elif string.endswith(suffix):
+        return string[: -len(suffix)]
+    return string
+
+
+_filename_restriction_pattern = re.compile(r"[^\w.-]")
+_reserved_windows_filenames = frozenset(
+    (
+        "AUX",
+        "COM1",
+        "COM2",
+        "COM3",
+        "COM4",
+        "CON",
+        "LPT1",
+        "LPT2",
+        "LPT3",
+        "NUL",
+        "PRN",
+    ),
+)
+_sanitize_filename_transformations = (
+    # Normalize unicode data in the string:
+    lambda x: unicodedata.normalize("NFKD", x),
+    # Limit the string to ASCII characters:
+    lambda x: x.encode("ascii", "ignore").decode("ascii"),
+    # Replace each path separator with a space:
+    lambda x: x.replace(os.path.sep, " "),
+    lambda x: x.replace(os.path.altsep, " ") if os.path.altsep else x,
+    # Replace each whitespace character with an underscore:
+    lambda x: "_".join(x.split()),
+    # Limit the string to alphanumeric characters, underscores, hyphens, and dots:
+    lambda x: _filename_restriction_pattern.sub("", x),
+    # Remove Remove illegal character combination `._` from front and back:
+    lambda x: x.strip("._"),
+    # Add a leading `_` if necessary to avoid conflict with reserved Windows filenames:
+    lambda x: f"_{x}"
+    if platform.system() == "Windows"
+    and x
+    and x.split(".")[0].upper() in _reserved_windows_filenames
+    else x,
+)
+
+
+def sanitize_filename(filename: str) -> str:
+    """Sanitize `filename` in a consistent cross-platform way.
+
+    Args:
+        filename: The name of the file to sanitize - not the full path.
+
+    Returns:
+        The provided filename after a series of santitization steps. It will
+        only contain ASCII characters. If necessary on Windows, the filename
+        will be prefixed by an underscore to avoid conflict with reserved
+        Windows file names.
+    """
+    return functools.reduce(
+        lambda x, y: y(x),  # noqa: WPS442
+        _sanitize_filename_transformations,
+        filename,
+    )

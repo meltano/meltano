@@ -63,6 +63,7 @@ MANIFEST
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
+!/src/meltano/core/manifest/
 *.spec
 
 # Installer logs
@@ -72,6 +73,7 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
@@ -124,7 +126,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.env.dev
+.env.*
 
 # Spyder project settings
 .spyderproject
@@ -153,5 +155,17 @@ src/meltano/api/static/js
 
 # sqlite
 *.db
-# allow integration tests to ship/store/use sqlite
-!docs/example-library/**/.meltano/meltano.db
+
+# Poetry build artifact
+setup.py
+
+# Integration test generated files
+*.jsonl
+**/.meltano/**
+!docs/example-library/meltano-migrations/.meltano/meltano.db
+
+# Ruff
+.ruff_cache/
+
+# Flakeheaven
+.flakeheaven_cache/

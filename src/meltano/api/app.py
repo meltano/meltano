@@ -14,9 +14,9 @@ from meltano.api import config as api_config
 from meltano.api.headers import VERSION_HEADER
 from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
+from meltano.core.error import ProjectReadonly
 from meltano.core.logging.utils import FORMAT, setup_logging
-from meltano.core.project import Project, ProjectReadonly
-from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.project import Project
 from meltano.oauth.app import create_app as create_oauth_service
 
 STATUS_SERVER_ERROR = 500
@@ -38,8 +38,6 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     """
     project = Project.find()
     setup_logging(project)
-
-    settings_service = ProjectSettingsService(project)
 
     project_engine(project, default=True)
 
@@ -105,7 +103,7 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         init(app)
 
     # Notifications
-    if settings_service.get("ui.notification"):
+    if project.settings.get("ui.notification"):
         from .events import notifications
 
         notifications.init_app(app)
@@ -134,9 +132,9 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
         }
 
         for context_key, setting_name in setting_map.items():
-            g.jsContext[context_key] = settings_service.get(setting_name)
+            g.jsContext[context_key] = project.settings.get(setting_name)
 
-        providers = settings_service.get("oauth_service.providers")
+        providers = project.settings.get("oauth_service.providers")
         g.jsContext["oauthServiceProviders"] = [
             provider for provider in providers.split(",") if provider
         ]

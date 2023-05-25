@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import sys
+import typing as t
 import uuid
+from contextlib import suppress
 from pathlib import Path
 from types import TracebackType
-from typing import Dict, List, Union
 
 from snowplow_tracker import SelfDescribingJson
 
@@ -15,9 +16,10 @@ from meltano.core.utils import hash_sha256
 
 BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix)
 
-TracebackLevelsJSON = List[Dict[str, Union[str, int]]]
-ExceptionContextJSON = Dict[
-    str, Union[str, TracebackLevelsJSON, "ExceptionContextJSON"]
+TracebackLevelsJSON = t.List[t.Dict[str, t.Union[str, int]]]
+ExceptionContextJSON = t.Dict[
+    str,
+    t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"],
 ]
 
 
@@ -25,7 +27,7 @@ class ExceptionContext(SelfDescribingJson):
     """Exception context for the Snowplow tracker."""
 
     def __init__(self):
-        """Initialize the exceptions context with the exceptions currently being handled."""
+        """Init the exceptions context with the exceptions currently being handled."""
         ex = sys.exc_info()[1]
         super().__init__(
             ExceptionContextSchema.url,
@@ -43,8 +45,8 @@ def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
         ex: The exception from which data will be extracted.
 
     Returns:
-        A JSON-compatible dictionary of anonymized telemetry data compliant with the exception
-        context schema for an exception.
+        A JSON-compatible dictionary of anonymized telemetry data compliant
+        with the exception context schema for an exception.
     """
     cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__  # noqa: WPS609
     return {
@@ -72,7 +74,7 @@ def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
             {
                 "file": get_relative_traceback_path(tb),
                 "line_number": tb.tb_lineno,
-            }
+            },
         )
         tb = tb.tb_next
     return levels
@@ -81,7 +83,8 @@ def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
 def get_relative_traceback_path(tb: TracebackType) -> str | None:
     """Get an anonymous path from a traceback by making it relative if possible.
 
-    The path is made relative to the first element in `BASE_PATHS` it can be made relative to.
+    The path is made relative to the first element in `BASE_PATHS` it can be
+    made relative to.
 
     Args:
         tb: The traceback from which to extract the path info.
@@ -90,7 +93,8 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
         The first valid option of the following is returned:
         - If the path is `'<stdin>'`: `'<stdin>'`
         - If possible: the path made relative to a path in `BASE_PATHS`
-        - If the file name is `__init__.py` or `__main__.py`: `'.../<module name>/<file name>.py'`.
+        - If the file name is `__init__.py` or `__main__.py`:
+            `'.../<module name>/<file name>.py'`.
         - Otherwise: `'.../<filename>.py'`.
     """
     try:
@@ -104,10 +108,9 @@ def get_relative_traceback_path(tb: TracebackType) -> str | None:
     path = Path(str_path)
 
     for base_path in BASE_PATHS:
-        try:
+        with suppress(ValueError):
+            # Try to make the path relative to each base path until one works
             return path.relative_to(base_path).as_posix()
-        except ValueError:  # Path could not be made relative to `base_path`
-            pass  # Try making it relative to the next base path
 
     if path.parts[-1] in {"__init__.py", "__main__.py"}:
         # Include the module directory if the file is `__init__.py` or `__main__.py`

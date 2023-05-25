@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import typing as t
 from contextlib import asynccontextmanager, closing
-from typing import AsyncIterator
+from pathlib import Path
 
 import structlog
 from sqlalchemy.orm import Session
@@ -14,16 +15,15 @@ from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER, StateService
+from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -34,7 +34,7 @@ logger = structlog.getLogger(__name__)
 
 
 class BlockSetHasNoStateError(Exception):
-    """Occurs when state_service is accessed for ExtractLoadBlocks instance for which no block has state."""
+    """Block has no state."""
 
 
 class ELBContext:  # noqa: WPS230
@@ -43,8 +43,7 @@ class ELBContext:  # noqa: WPS230
     def __init__(
         self,
         project: Project,
-        plugins_service: ProjectPluginsService = None,
-        session: Session = None,
+        session: Session | None = None,
         job: Job | None = None,
         full_refresh: bool | None = False,
         force: bool | None = False,
@@ -56,7 +55,6 @@ class ELBContext:  # noqa: WPS230
 
         Args:
             project: The project to use.
-            plugins_service: The plugins service to use.
             session: The session to use.
             job: The job within this context should run.
             full_refresh: Whether this is a full refresh.
@@ -66,11 +64,8 @@ class ELBContext:  # noqa: WPS230
             base_output_logger: The base logger to use.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
-
         self.session = session
         self.job = job
-
         self.full_refresh = full_refresh
         self.force = force
         self.update_state = update_state
@@ -85,7 +80,7 @@ class ELBContext:  # noqa: WPS230
         self.base_output_logger = base_output_logger
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Obtain the run directory for the current job.
 
         Returns:
@@ -95,24 +90,18 @@ class ELBContext:  # noqa: WPS230
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
-class ELBContextBuilder:
+class ELBContextBuilder:  # noqa: WPS214
     """Build up ELBContexts for ExtractLoadBlocks."""
 
-    def __init__(
-        self,
-        project: Project,
-        plugins_service: ProjectPluginsService = None,
-        job: Job | None = None,
-    ):
-        """Initialize a new `ELBContextBuilder` that can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
+    def __init__(self, project: Project):
+        """Initialize a `ELBContextBuilder` instance.
+
+        It can be used to upgrade plugins to blocks for use in a ExtractLoadBlock.
 
         Args:
-            project: the meltano project for the context.
-            plugins_service: the plugins service for the context.
-            job: the job for this ELT run.
+            project: The meltano project for the context.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
         _, session_maker = project_engine(project)
         self.session = session_maker()
@@ -154,8 +143,8 @@ class ELBContextBuilder:
     def with_no_state_update(self, no_state_update: bool):
         """Set whether this run should not update state.
 
-        By default we typically attempt to track state. This allows avoiding state management.
-
+        By default we typically attempt to track state. This allows avoiding
+        state management.
 
         Args:
             no_state_update: whether this run should update state.
@@ -209,7 +198,6 @@ class ELBContextBuilder:
         block = SingerBlock(
             block_ctx=ctx,
             project=self.project,
-            plugins_service=self.plugins_service,
             plugin_invoker=self.invoker_for(ctx),
             plugin_args=plugin_args,
         )
@@ -236,7 +224,6 @@ class ELBContextBuilder:
             settings_service=PluginSettingsService(
                 self.project,
                 plugin,
-                plugins_service=self.plugins_service,
                 env_override=env,
             ),
             session=self.session,
@@ -259,12 +246,11 @@ class ELBContextBuilder:
             plugin_context.plugin,
             context=self.context(),
             run_dir=self.elt_run_dir,
-            plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
         )
 
     @property
-    def elt_run_dir(self) -> str:
+    def elt_run_dir(self) -> Path | None:
         """Get the run directory for the current job.
 
         Returns:
@@ -281,7 +267,6 @@ class ELBContextBuilder:
         """
         return ELBContext(
             project=self.project,
-            plugins_service=self.plugins_service,
             session=self.session,
             job=self._job,
             full_refresh=self._full_refresh,
@@ -293,7 +278,7 @@ class ELBContextBuilder:
 
 
 class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
-    """A basic BlockSet interface implementation that supports running basic EL (extract, load) patterns."""
+    """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
         self,
@@ -308,24 +293,24 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         self.context = context
         self.blocks = blocks
-        self.project_settings_service = ProjectSettingsService(
-            self.context.project,
-            config_service=self.context.plugins_service.config_service,
-        )
 
         self.output_logger = OutputLogger(None)
 
-        if not self.context.project.active_environment:
+        if not self.context.project.environment:
             self.context.job = None
 
         elif self.context.update_state:
             state_id = generate_state_id(
-                self.context.project, self.context.state_id_suffix, self.head, self.tail
+                self.context.project,
+                self.context.state_id_suffix,
+                self.head,
+                self.tail,
             )
             self.context.job = Job(job_name=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
-                self.context.job.job_name, self.context.job.run_id
+                self.context.job.job_name,
+                self.context.job.run_id,
             )
             self.output_logger = OutputLogger(log_file)
 
@@ -341,10 +326,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             bool indicating whether BlockSet has 'state' capability
         """
-        for block in self.blocks:
-            if block.has_state:
-                return True
-        return False
+        return any(block.has_state for block in self.blocks)
 
     @property
     def state_service(self) -> StateService:
@@ -358,22 +340,25 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         if not self._state_service:
             if self.has_state():
-                self._state_service = StateService(self.context.session)
+                self._state_service = StateService(
+                    project=self.context.project,
+                    session=self.context.session,
+                )
             else:
-                raise BlockSetHasNoStateError()
+                raise BlockSetHasNoStateError
         return self._state_service
 
-    def index_last_input_done(self) -> int:
+    def index_last_input_done(self) -> int | None:
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
             The index of the block furthest from the start that has exited and required input.
-        """
+        """  # noqa: E501
         for idx, block in reversed(list(enumerate(self.blocks))):
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
-    def upstream_complete(self, index: int) -> bool:
+    def upstream_complete(self, index: int) -> bool | None:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -399,7 +384,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: asyncio.Task | None, subset: int = None
+        self,
+        output_exception_future: asyncio.Task | None,
+        subset: int | None = None,
     ) -> set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
@@ -438,7 +425,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         for block in self.intermediate:
             if not block.consumer or not block.producer:
                 raise BlockSetValidationError(
-                    "intermediate blocks must be producers AND consumers"
+                    "intermediate blocks must be producers AND consumers",
                 )
 
     async def execute(self) -> None:
@@ -458,7 +445,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 return
         else:
             logger.warning(
-                "No active environment, proceeding with stateless run! See https://docs.meltano.com/reference/command-line-interface#run for details."
+                "No active environment, proceeding with stateless run! See "
+                "https://docs.meltano.com/reference/command-line-interface#run "
+                "for details.",
             )
         await self.execute()
 
@@ -466,7 +455,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """Run the ELT task within the context of a job.
 
         Raises:
-            RunnerError: if failures are encountered during execution or if the underlying pipeline/job is already running.
+            RunnerError: if failures are encountered during execution or if the
+                underlying pipeline/job is already running.
         """
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
@@ -474,8 +464,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             existing = JobFinder(job.job_name).latest_running(self.context.session)
             if existing:
                 raise RunnerError(
-                    f"Another '{job.job_name}' pipeline is already running which started at {existing.started_at}. "
-                    + "To ignore this check use the '--force' option."
+                    f"Another '{job.job_name}' pipeline is already running "
+                    f"which started at {existing.started_at}. To ignore this "
+                    "check use the '--force' option.",
                 )
 
         with closing(self.context.session) as session:
@@ -488,7 +479,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Not actually implemented yet.
 
         Args:
-            graceful: Whether or not the BlockSet should try to gracefully quit.
+            graceful: Whether the BlockSet should try to gracefully quit.
 
         Raises:
             NotImplementedError: if graceful termination is not implemented.
@@ -556,17 +547,17 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         Returns:
             The intermediate blocks in the block set.
-        """
+        """  # noqa: E501
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> AsyncIterator[None]:
+    async def _start_blocks(self) -> t.AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:
             None
         """
-        try:  # noqa:  WPS229
+        try:
             for block in self.blocks:
                 await block.pre(self.context)
                 await block.start()
@@ -581,7 +572,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     async def _link_io(self) -> None:  # noqa: WPS231
         """Link the blocks in the set together.
 
-        This method does one last validation check to ensure that a consumer has a producer upstream.
+        This method does one last validation check to ensure that a consumer
+        has a producer upstream.
 
         Raises:
             BlockSetValidationError: if consumer does not have an upstream producer.
@@ -598,22 +590,22 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     self.output_logger.out(
                         block.string_id,
                         logger_base.bind(stdio="stdout"),
-                    )
+                    ),
                 )
             block.stderr_link(
                 self.output_logger.out(
                     block.string_id,
                     logger_base.bind(stdio="stderr"),
-                )
+                ),
             )
             if block.consumer:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
-                        block.stdin
+                        block.stdin,
                     )  # link previous blocks stdout with current blocks stdin
                 else:
                     raise BlockSetValidationError(
-                        "run step requires input but has no upstream"
+                        "run step requires input but has no upstream",
                     )
 
 
@@ -621,14 +613,14 @@ class ELBExecutionManager:
     """Execution manager for ExtractLoadBlock sets."""
 
     def __init__(self, elb: ExtractLoadBlocks) -> None:
-        """Initialize the ELBExecutionManager which will handle the actual runtime management of the block set.
+        """Initialize the `ELBExecutionManager`.
 
         Args:
-            elb: The ExtractLoadBlocks to manage.
+            elb: The `ExtractLoadBlocks` to manage.
         """
         self.elb = elb
-        self.stream_buffer_size = self.elb.project_settings_service.get(
-            "elt.buffer_size"
+        self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
+            "elt.buffer_size",
         )
         self.line_length_limit = self.stream_buffer_size // 2
 
@@ -639,13 +631,16 @@ class ELBExecutionManager:
     async def run(self) -> None:
         """Run is used to actually perform the execution of the ExtractLoadBlock set.
 
-        That entails starting the blocks, waiting for them to complete, ensuring that exceptions are handled, and
-        stopping blocks or waiting for IO to complete as appropriate. Expect a RunnerError to be raised if any of
-        the blocks exit with a non 0 exit code.
+        That entails starting the blocks, waiting for them to complete,
+        ensuring that exceptions are handled, and stopping blocks or waiting
+        for IO to complete as appropriate. Expect a RunnerError to be raised if
+        any of the blocks exit with a non 0 exit code.
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(
-            self._producer_code, self._consumer_code, self._intermediate_codes
+            self._producer_code,
+            self._consumer_code,
+            self._intermediate_codes,
         )
 
     async def _complete_upstream(self) -> None:
@@ -656,17 +651,20 @@ class ELBExecutionManager:
         if self.elb.upstream_complete(len(self.elb.blocks) - 1):
             self._producer_code = producer.process_future.result()
         else:
-            # If the last consumer (target) completes before the upstream producers, it failed before processing all
-            # output. So we should kill the upstream producers and cancel output processing since there's no final
-            # destination to forward output to.
+            # If the last consumer (target) completes before the upstream
+            # producers, it failed before processing all output. So we should
+            # kill the upstream producers and cancel output processing since
+            # there's no final destination to forward output to.
             await self.elb.upstream_stop(len(self.elb.blocks) - 1)
-            # Pretend the producer (tap) finished successfully since it didn't itself fail
+            # Pretend the producer (tap) finished successfully since it didn't
+            # itself fail
             self._producer_code = 0
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
-    async def _wait_for_process_completion(  # noqa: WPS213 WPS217
-        self, current_head: IOBlock
+    async def _wait_for_process_completion(  # noqa: WPS213 WPS217 WPS210
+        self,
+        current_head: IOBlock,
     ) -> tuple[int, int] | None:
         """Wait for the current head block to complete or for an error to occur.
 
@@ -693,7 +691,7 @@ class ELBExecutionManager:
             asyncio.wait(
                 [*stdout_futures, *stderr_futures],
                 return_when=asyncio.FIRST_EXCEPTION,
-            )
+            ),
         )
 
         logger.debug("waiting for process completion or exception")
@@ -701,18 +699,20 @@ class ELBExecutionManager:
 
         output_futures_failed = first_failed_future(output_exception_future, done)
         if output_futures_failed:
-            # Special behavior for a producer stdout handler raising a line length limit error.
+            # Special behavior for a producer stdout handler raising a line
+            # length limit error.
             if self.elb.head.proxy_stdout() == output_futures_failed:
                 handle_producer_line_length_limit_error(
                     output_futures_failed.exception(),
                     line_length_limit=self.line_length_limit,
                     stream_buffer_size=self.stream_buffer_size,
                 )
-            raise output_futures_failed.exception()
+            raise output_futures_failed.exception()  # noqa: RSE102
         else:
-            # If all the output handlers completed without raising an exception,
-            # we still need to wait for all the underlying block processes to complete.
-            # note that since all output handlers completed we DO NOT need to wait for any output futures!
+            # If all the output handlers completed without raising an
+            # exception, we still need to wait for all the underlying block
+            # processes to complete. Note that since all output handlers
+            # completed we DO NOT need to wait for any output futures!
             done = await self.elb.process_wait(None, start_idx)
         if self.elb.tail.process_future.done():
             logger.debug("tail consumer completed first")
@@ -720,14 +720,18 @@ class ELBExecutionManager:
             await self._complete_upstream()
         elif current_head.process_future.done():
             logger.debug(
-                "head producer completed first as expected", name=current_head.string_id
+                "head producer completed first as expected",
+                name=current_head.string_id,
             )
             await self._handle_head_completed(current_head, start_idx)
         else:
             logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
             raise RunnerError(
-                "Unexpected completion sequence in ExtractLoadBlock set. Intermediate block (likely a mapper) failed.",
+                (
+                    "Unexpected completion sequence in ExtractLoadBlock set. "
+                    "Intermediate block (likely a mapper) failed."
+                ),
                 {
                     PluginType.EXTRACTORS: 1,
                     PluginType.LOADERS: 1,
@@ -735,7 +739,9 @@ class ELBExecutionManager:
             )
 
     async def _handle_head_completed(
-        self, current_head: IOBlock, start_idx: int
+        self,
+        current_head: IOBlock,
+        start_idx: int,
     ) -> None:
         next_head: IOBlock = self.elb.blocks[start_idx + 1]
 
@@ -774,7 +780,9 @@ class ELBExecutionManager:
 
 
 def _check_exit_codes(  # noqa: WPS238
-    producer_code: int, consumer_code: int, intermediate_codes: dict[str, int]
+    producer_code: int,
+    consumer_code: int,
+    intermediate_codes: dict[str, int],
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
 
@@ -786,31 +794,36 @@ def _check_exit_codes(  # noqa: WPS238
     Raises:
         RunnerError: if the producer, consumer, or mapper exit codes are non-zero
     """
-    if producer_code and consumer_code:
-        raise RunnerError(
-            "Extractor and loader failed",
-            {PluginType.EXTRACTORS: producer_code, PluginType.LOADERS: consumer_code},
-        )
-
     if producer_code:
+        if consumer_code:
+            raise RunnerError(
+                "Extractor and loader failed",
+                {
+                    PluginType.EXTRACTORS: producer_code,
+                    PluginType.LOADERS: consumer_code,
+                },
+            )
         raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})
 
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
 
-    failed_mappers = []
-    for mapper_id in intermediate_codes.keys():
-        if intermediate_codes[mapper_id]:
-            failed_mappers.append({mapper_id: intermediate_codes[mapper_id]})
-
+    failed_mappers = [
+        {mapper_id: exit_code}
+        for mapper_id, exit_code in intermediate_codes.items()
+        if exit_code
+    ]
     if failed_mappers:
         raise RunnerError("Mappers failed", failed_mappers)
 
 
 def generate_state_id(
-    project: Project, state_id_suffix: str | None, consumer: IOBlock, producer: IOBlock
+    project: Project,
+    state_id_suffix: str | None,
+    consumer: IOBlock,
+    producer: IOBlock,
 ) -> str:
-    """Generate a state id based on a project active environment and consumer and producer names.
+    """Generate a state ID from the active environment and consumer & producer names.
 
     Args:
         project: Project to retrieve active environment from.
@@ -824,20 +837,21 @@ def generate_state_id(
     Raises:
         RunnerError: if the project does not have an active environment.
     """
-    if not project.active_environment:
+    if not project.environment:
         raise RunnerError(
-            "No active environment for invocation, but requested state id"
+            "No active environment for invocation, but requested state ID",
         )
 
     state_id_components = [
-        project.active_environment.name,
+        project.environment.name,
         f"{consumer.string_id}-to-{producer.string_id}",
-        state_id_suffix or project.active_environment.state_id_suffix,
+        state_id_suffix or project.environment.state_id_suffix,
     ]
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
         raise RunnerError(
-            f"Cannot generate a state ID from components containing the delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            "Cannot generate a state ID from components containing the "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
     return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)

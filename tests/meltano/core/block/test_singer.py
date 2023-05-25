@@ -15,12 +15,19 @@ from meltano.core.logging import OutputLogger
 
 
 class TestSingerBlocks:
-    @pytest.fixture
+    @pytest.fixture()
     def log(self, tmp_path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture()
-    def elt_context(self, project, session, tap, target, elt_context_builder):
+    def elt_context(
+        self,
+        project,  # noqa: ARG002
+        session,
+        tap,
+        target,
+        elt_context_builder,
+    ):
         job = Job(job_name="pytest_test_runner")
 
         return (
@@ -77,15 +84,16 @@ class TestSingerBlocks:
         invoker.cleanup = AsyncMock()
         return invoker
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_start(
-        self, elt_context, mock_tap_plugin_invoker, mock_target_plugin_invoker
+        self,
+        elt_context,
+        mock_tap_plugin_invoker,
+        mock_target_plugin_invoker,
     ):
-
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -105,7 +113,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -125,12 +132,11 @@ class TestSingerBlocks:
             == asyncio.subprocess.PIPE
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_stop(self, elt_context, mock_target_plugin_invoker):
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -143,7 +149,6 @@ class TestSingerBlocks:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -153,12 +158,11 @@ class TestSingerBlocks:
         assert block.process_handle.terminate.called
         assert block.invoker.cleanup.called
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_io(self, elt_context, mock_tap_plugin_invoker, log):
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -174,7 +178,8 @@ class TestSingerBlocks:
 
         # This test is a great proxy for general io tests
         # if you link the output logger, you can use structlog's capture method
-        # to capture the output and check output was actually consumed AND linked correctly.
+        # to capture the output and check output was actually consumed AND
+        # linked correctly.
         with capture_logs() as cap_logs:
             await producer.start()
 
@@ -196,15 +201,16 @@ class TestSingerBlocks:
 
             assert cap_logs == expected_lines
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_singer_block_close_stdin(
-        self, elt_context, mock_tap_plugin_invoker, mock_target_plugin_invoker
+        self,
+        elt_context,
+        mock_tap_plugin_invoker,
+        mock_target_plugin_invoker,
     ):
-
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_tap_plugin_invoker,
             plugin_args={"foo": "bar"},
         )
@@ -217,7 +223,6 @@ class TestSingerBlocks:
         consumer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
-            plugins_service=elt_context.plugins_service,
             plugin_invoker=mock_target_plugin_invoker,
             plugin_args={"foo": "bar"},
         )

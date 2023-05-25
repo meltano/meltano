@@ -15,8 +15,9 @@ import meltano
 from meltano.api.api_blueprint import APIBlueprint
 from meltano.api.security.auth import block_if_readonly, passes_authentication_checks
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import truthy
+
+REQUEST_TIMEOUT_SECONDS = 30.0
 
 logger = logging.getLogger(__name__)
 root = Blueprint("root", __name__)
@@ -77,8 +78,9 @@ def version():
 
     if truthy(request.args.get("include_latest")):
         try:
-            res = requests.get("https://pypi.org/pypi/meltano/json")
-            pypi_payload = res.json()
+            pypi_payload = requests.get(
+                "https://pypi.org/pypi/meltano/json", timeout=REQUEST_TIMEOUT_SECONDS
+            ).json()
             response_payload["latest_version"] = pypi_payload["info"]["version"]
         except requests.exceptions.ConnectionError as e:
             logger.warning(
@@ -101,15 +103,12 @@ def upgrade():
 
 @api_root.route("/identity")
 def identity():
-    project = Project.find()
-    settings_service = ProjectSettingsService(project)
-
     if current_user.is_anonymous:
         return jsonify(
             {
                 "username": "Anonymous",
                 "anonymous": True,
-                "can_sign_in": settings_service.get("ui.authentication"),
+                "can_sign_in": Project.find().settings.get("ui.authentication"),
             }
         )
 

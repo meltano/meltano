@@ -52,13 +52,11 @@ docker build --tag meltano-demo-project:dev .
 
 Files added to your project include a `Dockerfile` inheriting `FROM` the public [`meltano/meltano:latest`](https://hub.docker.com/r/meltano/meltano/tags) image available on [Docker Hub](https://hub.docker.com).
 
-This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v1.55.0`), or Python 3.8 or 3.9 (e.g. `meltano/meltano:latest-python3.8` or `meltano/meltano:v1.55.0-python3.9`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish images to Docker Hub and [Gitlab Registry](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
-
-> Note: Until [#3191](https://github.com/meltano/meltano/issues/3191) is resolved, we recommend caution in depending on the [registry.gitlab.com/meltano/meltano](https://gitlab.com/groups/meltano/-/container_registries/189256?orderBy=NAME&sort=asc&search[]=latest&search[]=) images as they are regularly rebuilt during CI/CD and may not be suitable for production use cases.
+This can be customized to use another public mirror, a private mirror (e.g. `your-company/meltano:latest`), a specific version of Meltano (e.g. `meltano/meltano:v2.15-python3.10`), or Python 3.9 or 3.10 (e.g. `meltano/meltano:latest-python3.10` or `meltano/meltano:v2.15-python3.10`) by modifying the `Dockerfile` or overriding the `MELTANO_IMAGE` [`--build-arg`](https://docs.docker.com/engine/reference/commandline/build/#set-build-time-variables---build-arg). We currently publish release images to [Docker Hub](https://hub.docker.com/r/meltano/meltano). Using an alternative public mirror, or creating a private one, can avoid issues during your Docker build stage relating to registry rate limits.
 
 The built image's [entrypoint](https://docs.docker.com/engine/reference/builder/#entrypoint)
 will be [the `meltano` command](/reference/command-line-interface),
-meaning that you can provide `meltano` subcommands and arguments like `elt ...` and `invoke airflow ...` directly to
+meaning that you can provide `meltano` subcommands and arguments like `run ...` and `invoke airflow ...` directly to
 [`docker run <image-name> ...`](https://docs.docker.com/engine/reference/commandline/run/)
 as trailing arguments:
 
@@ -71,7 +69,7 @@ docker run meltano-demo-project:dev --version
 docker run \
   --volume $(pwd)/output:/project/output \
   meltano-demo-project:dev \
-  elt tap-gitlab target-jsonl --state-id=gitlab-to-jsonl
+  run tap-gitlab target-jsonl
 ```
 
 ## Docker Compose
@@ -92,8 +90,6 @@ meltano add files files-docker-compose
 # Start the `meltano-ui` and `meltano-system-db` services in the background
 docker-compose -f docker-compose.prod.yml up -d
 ```
-
-Meltano UI will now be available at <http://localhost:5000>.
 
 For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.
 

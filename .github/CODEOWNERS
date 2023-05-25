@@ -6,7 +6,7 @@
 
 # Default owners
 
-- @pandemicsyn @edgarrmondragon
+- @edgarrmondragon @WillDaSilva
 
 # CI
 
@@ -15,21 +15,21 @@
 
 # Discovery (End-of-Life)
 
-/src/meltano/core/bundle/discovery.yml @aaronsteers
+/src/meltano/core/bundle/discovery.yml @meltano/engineering
 
 # Web App and API owners
 
-/src/webapp/ @pandemicsyn @rwfeather @cjohnhanson
-/src/meltano/api/ @pandemicsyn @rwfeather @cjohnhanson
+/src/webapp/ @cjohnhanson
+/src/meltano/api/ @cjohnhanson
 
 # Docs (General)
 
-/docs/ @afolson @tayloramurphy @meltano/engineering @meltano/marketing
-/README.md @afolson @tayloramurphy @meltano/engineering @meltano/marketing
+/docs/ @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
+/README.md @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
 
-/CONTRIBUTING.md @afolson @tayloramurphy @meltano/engineering
+/CONTRIBUTING.md @sbalnojan @tayloramurphy @meltano/engineering
 
 # Integration tests
 
@@ -39,7 +39,6 @@
 
 /CHANGELOG.md @meltano/engineering
 /docs/package.json @meltano/engineering
-/package.json @meltano/engineering
 /pyproject.toml @meltano/engineering
 /src/meltano/__init__.py @meltano/engineering
 /src/webapp/package.json @meltano/engineering

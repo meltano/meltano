@@ -1,4 +1,4 @@
-"""The actual `IOBlock` interface is one of the lower level blocks for use with various `BlockSet` implementations."""
+"""A low-level block type for use with `BlockSet` implementations."""
 
 from __future__ import annotations
 
@@ -9,34 +9,35 @@ from meltano.core.logging.utils import SubprocessOutputWriter
 
 
 class IOBlock(metaclass=ABCMeta):
-    """The IOBlock interface is a basic block that Consumes, Produces, or Consume and Produces (Transforms) output.
+    """A block that consumes, produces, or both (i.e. transforms) output.
 
-    Underlying implementation could be subprocesses (ala Singer Plugins), or stream transformers, basically,
-    any class that satisfies the IOBlock interface.
+    Underlying implementation could be subprocesses (e.g. Singer Plugins), or
+    stream transformers, or any class that satisfies the `IOBlock` interface.
     """
 
     @property
     @abstractmethod
     def stdin(self) -> StreamWriter | None:
-        """If a block requires input, return the StreamWriter that should be used for writes.
+        """Get the `StreamWriter` that should be used for writes, if any.
+
+        Raises:
+            NotImplementedError
 
         Returns:
             StreamWriter
-        Raises:
-            NotImplementedError
         """
         raise NotImplementedError
 
     @property
     @abstractmethod
     def consumer(self) -> bool:
-        """Consumer indicates whether or not this block is a consumer and requires input."""
+        """Indicate whether this block is a consumer and requires input."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def producer(self) -> bool:
-        """Indicate whether or not this block is a producer of output."""
+        """Indicate whether this block is a producer of output."""
         raise NotImplementedError
 
     @property
@@ -79,7 +80,8 @@ class IOBlock(metaclass=ABCMeta):
     async def start(self) -> None:
         """Start the block.
 
-        Whatever that might entail (spwaning a process, spinning up a async task that will handle transforms, etc)
+        Whatever that might entail (spwaning a process, spinning up a async
+        task that will handle transforms, etc).
 
         Raises:
             NotImplementedError
@@ -91,7 +93,7 @@ class IOBlock(metaclass=ABCMeta):
         """Stop a block.
 
         Args:
-            kill: whether or not to send a SIGKILL. If false, a SIGTERM is sent.
+            kill: Whether to send a SIGKILL. If false, a SIGTERM is sent.
 
         Raises:
             NotImplementedError

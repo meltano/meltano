@@ -10,7 +10,6 @@ from meltano.api.models.subscription import Subscription, SubscriptionEventType
 from meltano.api.signals import PipelineSignals
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 SUCCESS = True
 FAILURE = False
@@ -19,16 +18,15 @@ logger = logging.getLogger(__name__)
 
 
 class NotificationEvents:
-    def __init__(
-        self,
-        project: Project,
-        mail_service: MailService = None,
-        plugins_service: ProjectPluginsService = None,
-    ):
-        self.project = project
+    def __init__(self, project: Project, mail_service: MailService | None = None):
+        """Initialize a `NotificationEvents` instance.
 
+        Args:
+            project: The Meltano project being operated on.
+            mail_service: The mail service to send notifications with.
+        """
+        self.project = project
         self.mail_service = mail_service or MailService(project)
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
     def init_app(self, app):
         # wire the signal handlers
@@ -36,13 +34,13 @@ class NotificationEvents:
 
     def pipeline_data_source(self, schedule) -> str:
         """Return the Data Source name for a Pipeline."""
-        return self.plugins_service.find_plugin(
+        return self.project.plugins.find_plugin(
             schedule.extractor, plugin_type=PluginType.EXTRACTORS
         ).label
 
     def pipeline_urls(self, schedule) -> str:
         """Return external URLs to different point of interests for a Pipeline."""
-        plugin = self.plugins_service.find_plugin(
+        plugin = self.project.plugins.find_plugin(
             schedule.extractor, plugin_type=PluginType.EXTRACTORS
         )
         return {
@@ -57,7 +55,9 @@ class NotificationEvents:
             "docs": plugin.docs,
         }
 
-    def handle_pipeline_completed(self, schedule, success: bool = None):  # noqa: WPS210
+    def handle_pipeline_completed(
+        self, schedule, success: bool | None = None
+    ):  # noqa: WPS210
         """Handle the `Manual Run` pipeline email notification."""
         if success is None:
             raise ValueError("'success' must be set.")
@@ -94,7 +94,8 @@ class NotificationEvents:
             # ensure it is not a duplicate mail
             if subscription.recipient in sent_recipients:
                 logger.debug(
-                    f"Skipping duplicate notification for recipient '{subscription.recipient}'."
+                    "Skipping duplicate notification for "
+                    f"recipient '{subscription.recipient}'."
                 )
                 continue
 

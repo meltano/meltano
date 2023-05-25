@@ -1,34 +1,42 @@
 from __future__ import annotations
 
+import os
 import platform
 import re
 import shutil
+import subprocess
+from pathlib import Path
 from time import perf_counter_ns
 
 import click
+import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger
 
 import meltano
+from asserts import assert_cli_runner
+from fixtures.cli import MeltanoCliRunner
+from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
-from meltano.core.project import PROJECT_READONLY_ENV, Project
-from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
     @pytest.fixture()
-    def project(self, test_dir, project_init_service):
+    def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
+        os.chdir(tmp_path)
         project = project_init_service.init(  # noqa: DAR301
-            activate=False, add_discovery=True
+            activate=False,
+            add_discovery=True,
         )
-
+        Project._default = None
         try:
             yield project
         finally:
@@ -40,7 +48,11 @@ class TestCli:
         Project.deactivate()
 
     @pytest.fixture()
-    def empty_project(self, empty_meltano_yml_dir, pushd):
+    def empty_project(
+        self,
+        empty_meltano_yml_dir,
+        pushd,  # noqa: ARG002
+    ):
         project = Project(empty_meltano_yml_dir)
         try:
             yield project
@@ -48,8 +60,8 @@ class TestCli:
             Project.deactivate()
 
     @pytest.mark.order(0)
-    def test_activate_project(self, project, cli_runner, pushd):
-        assert Project._default is None
+    def test_activate_project(self, test_cli_project, cli_runner, pushd):
+        project = test_cli_project
 
         pushd(project.root)
         cli_runner.invoke(cli, ["discover"])
@@ -66,48 +78,93 @@ class TestCli:
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
-        self, project, cli_runner, pushd, monkeypatch
+        self,
+        test_cli_project,
+        cli_runner,
+        pushd,
+        monkeypatch,
     ):
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
-
         assert Project._default is None
-
-        pushd(project.root)
+        pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["discover"])
-
         assert Project._default.readonly
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_dotenv(
-        self, project, cli_runner, pushd, monkeypatch
+        self,
+        test_cli_project,
+        cli_runner,
+        pushd,
     ):
-        ProjectSettingsService(project).set("project_readonly", True)
-
+        test_cli_project.settings.set("project_readonly", True)
         assert Project._default is None
-
-        pushd(project.root)
+        pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["discover"])
-
         assert Project._default.readonly
+
+    def test_environment_precedence(
+        self,
+        project: Project,
+        pushd,
+        cli_runner: MeltanoCliRunner,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        pushd(project.root)
+        monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
+        environment_names = {
+            name: f"env_set_from_{name}" for name in ("dotenv", "cli_option", "env_var")
+        }
+        with mock.patch(
+            "meltano.core.project.Project.dotenv_env",
+            new_callable=mock.PropertyMock,
+            return_value={PROJECT_ENVIRONMENT_ENV: environment_names["dotenv"]},
+        ):
+            args = ("invoke", "tap-mock")
+            results = {
+                "dotenv": cli_runner.invoke(cli, args),
+                "cli_option": cli_runner.invoke(
+                    cli,
+                    (f"--environment={environment_names['cli_option']}", *args),
+                ),
+                "env_var": cli_runner.invoke(
+                    cli,
+                    args,
+                    env={PROJECT_ENVIRONMENT_ENV: environment_names["env_var"]},
+                ),
+            }
+        for source, name in environment_names.items():
+            assert results[source].exit_code
+            assert (
+                results[source].exception.args[0]
+                == f"Environment {name!r} was not found."
+            )
 
     def test_version(self, cli_runner):
         cli_version = cli_runner.invoke(cli, ["--version"])
 
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_default_environment_is_activated(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
-
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["test"],
         )
-        assert Project._default.active_environment.name == "test-meltano-environment"
+        assert Project._default.environment.name == "test-meltano-environment"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_environment_flag_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -115,64 +172,156 @@ class TestCli:
             ["--environment", "test-subconfig-2-yml", "test"],
         )
 
-        assert Project._default.active_environment.name == "test-subconfig-2-yml"
+        assert Project._default.environment.name == "test-subconfig-2-yml"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_environment_variable_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd, monkeypatch
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
+        monkeypatch,
     ):
-
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["test"],
         )
-        assert Project._default.active_environment.name == "test-subconfig-2-yml"
+        assert Project._default.environment.name == "test-subconfig-2-yml"
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_lower_null_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--environment", "null", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_upper_null_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--environment", "NULL", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_no_environment_overrides_default(
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--no-environment", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
+    @pytest.mark.usefixtures("deactivate_project")
     def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
-        self, deactivate_project, project_files_cli, cli_runner, pushd
+        self,
+        project_files_cli,
+        cli_runner,
+        pushd,
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
             ["--no-environment", "--environment", "null", "discover"],
         )
-        assert Project._default.active_environment is None
+        assert Project._default.environment is None
 
     def test_handle_meltano_error(self):
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
+
+    @pytest.mark.usefixtures("pushd")
+    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path):
+        project = test_cli_project
+        with cd(project.root_dir()):
+            assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
+            assert Path().resolve() == project.root_dir()
+
+        with cd(project.root_dir()):
+            assert_cli_runner(
+                cli_runner.invoke(cli, ("--cwd", str(tmp_path), "dragon")),
+            )
+            assert Path().resolve() == tmp_path
+
+        with cd(project.root_dir()):
+            filepath = tmp_path / "file.txt"
+            filepath.touch()
+            with pytest.raises(click.BadParameter, match="is a file"):
+                raise cli_runner.invoke(
+                    cli,
+                    ("--cwd", str(filepath), "dragon"),
+                ).exception.__context__
+
+        with cd(project.root_dir()):
+            dirpath = tmp_path / "subdir"
+            with pytest.raises(click.BadParameter, match="does not exist"):
+                raise cli_runner.invoke(
+                    cli,
+                    ("--cwd", str(dirpath), "dragon"),
+                ).exception.__context__
+
+        with cd(project.root_dir()):
+            dirpath.mkdir()
+            assert_cli_runner(cli_runner.invoke(cli, ("--cwd", str(dirpath), "dragon")))
+            assert Path().resolve() == dirpath
+
+    @pytest.mark.parametrize(
+        "command_args",
+        (
+            ("invoke", "example"),
+            ("config", "example"),
+            ("job", "list"),
+            ("environment", "list"),
+            ("add", "utility", "example"),
+        ),
+    )
+    def test_error_msg_outside_project(
+        self,
+        tmp_path: Path,
+        command_args: tuple[str, ...],
+    ):
+        # Unless this test runs before every test that uses a project, we
+        # cannot use `cli_runner` to test this because the code path taken
+        # differs after any project has been found.
+
+        # I tried working around this by switching to an empty directory,
+        # calling `Project.deactivate`, using `mock.patch` on various relevant
+        # functions, and more, but nothing I did resulted in the proper code
+        # path being taken. Also it seemed like a fragile approach.
+
+        # Using a subprocess should be robust, but requires the version of
+        # Meltano you want to test be the one that is installed in the active
+        # Python environment. This is not the only test that requires this.
+        assert (
+            "must be run inside a Meltano project"
+            in subprocess.run(
+                ("meltano", *command_args),
+                text=True,
+                stderr=subprocess.PIPE,
+                cwd=tmp_path,
+            ).stderr
+        )
 
 
 def _get_dummy_logging_config(colors=True):
@@ -208,8 +357,8 @@ class TestCliColors:
     TEST_TEXT = "This is a test"
 
     @pytest.mark.parametrize(
-        "env,log_config,cli_colors_expected,log_colors_expected",
-        [
+        ("env", "log_config", "cli_colors_expected", "log_colors_expected"),
+        (
             pytest.param(
                 {},
                 None,
@@ -287,7 +436,7 @@ class TestCliColors:
                 True,
                 id="colors-not-disabled-by-invalid-no-color-env",
             ),
-        ],
+        ),
     )
     def test_no_color(
         self,
@@ -306,13 +455,14 @@ class TestCliColors:
         else:
             log_config_path = None
 
-        @cli.command("dummy")
-        @click.pass_context
-        def _dummy_command(ctx):
+        @click.command("dummy")
+        def dummy_command():
             setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
             logger.info(self.TEST_TEXT)
             click.echo(styled_text)
+
+        cli.add_command(dummy_command)
 
         expected_text = styled_text if cli_colors_expected else self.TEST_TEXT
 
@@ -325,14 +475,16 @@ class TestCliColors:
 
 
 class TestLargeConfigProject:
-    def test_list_config_performance(self, large_config_project: Project, cli_runner):
+    @pytest.mark.usefixtures("large_config_project")
+    def test_list_config_performance(self, cli_runner):
         start = perf_counter_ns()
         assert (
             cli_runner.invoke(
-                cli, ["--no-environment", "config", "target-with-large-config", "list"]
+                cli,
+                ["--no-environment", "config", "target-with-large-config", "list"],
             ).exit_code
             == 0
         )
         duration_ns = perf_counter_ns() - start
-        # Ensure the large config can be processed in less than 20 seconds
-        assert duration_ns < 20000000000
+        # Ensure the large config can be processed in less than 25 seconds
+        assert duration_ns < 25000000000

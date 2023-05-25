@@ -27,7 +27,8 @@ class TestCliRemove:
     def test_remove_multiple(self, project, tap, tap_gitlab, cli_runner):
         with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
             result = cli_runner.invoke(
-                cli, ["remove", "extractors", tap.name, tap_gitlab.name]
+                cli,
+                ["remove", "extractors", tap.name, tap_gitlab.name],
             )
             assert_cli_runner(result)
 

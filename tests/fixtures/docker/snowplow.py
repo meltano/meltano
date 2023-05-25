@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-from typing import Any
+import typing as t
 from urllib.request import urlopen
 
 import backoff
@@ -28,19 +28,19 @@ class SnowplowMicro:
         self.all()  # Wait until a connection is established
 
     @backoff.on_exception(backoff.expo, ConnectionError, max_tries=5)
-    def get(self, endpoint: str) -> Any:
+    def get(self, endpoint: str) -> t.Any:
         with urlopen(f"{self.url}/{endpoint}") as response:
             return json.load(response)
 
     def all(self) -> dict[str, int]:
-        """Get a dict counting the number of good/bad events, and the total number of events."""
+        """Get a dict counting the # of good/bad events, and the total # of events."""
         return self.get("all")
 
-    def good(self) -> list[dict[str, Any]]:
+    def good(self) -> list[dict[str, t.Any]]:
         """Get a list of good events."""
         return self.get("good")
 
-    def bad(self) -> list[dict[str, Any]]:
+    def bad(self) -> list[dict[str, t.Any]]:
         """Get a list of bad events (e.g. those which failed schema validation)."""
         return self.get("bad")
 
@@ -51,35 +51,34 @@ class SnowplowMicro:
 
 @pytest.fixture(scope="session")
 def snowplow_session(request) -> SnowplowMicro | None:
-    """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance for it.
+    """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance.
 
-    The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to a list containing
-    only the collector endpoint exposed by Snowplow Micro in Docker.
+    The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to
+    a list containing only the collector endpoint exposed by Snowplow Micro in
+    Docker.
 
     Yields:
-        A `SnowplowMicro` instance which will collect events fired within tests, and can be queried
-        to obtain info about the fired events, or `None` if the creation of a `SnowplowMicro`
-        instance failed.
+        A `SnowplowMicro` instance which will collect events fired within
+        tests, and can be queried to obtain info about the fired events, or
+        `None` if the creation of a `SnowplowMicro` instance failed.
     """
     try:
-        # Getting the `docker_services` fixture essentially causes `docker-compose up` to be run
+        # Getting the `docker_services` fixture essentially causes
+        # `docker-compose up` to be run
         request.getfixturevalue("docker_services")
-    except Exception:  # pragma: no cover
-        yield None
-    else:
         args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
         proc = subprocess.run(args, capture_output=True, text=True)
         address_and_port = proc.stdout.strip().split(" -> ")[1]
         collector_endpoint = f"http://{address_and_port}"
-        try:  # noqa: WPS505
-            yield SnowplowMicro(collector_endpoint)
-        except Exception:  # pragma: no cover
-            yield None
+        yield SnowplowMicro(collector_endpoint)
+    except Exception:  # pragma: no cover
+        yield None
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow_optional(
-    snowplow_session: SnowplowMicro | None, monkeypatch
+    snowplow_session: SnowplowMicro | None,
+    monkeypatch,
 ) -> SnowplowMicro | None:
     """Provide a clean `SnowplowMicro` instance.
 
@@ -109,16 +108,16 @@ def snowplow_optional(
             snowplow_session.reset()
 
 
-@pytest.fixture
+@pytest.fixture()
 def snowplow(snowplow_optional: SnowplowMicro | None) -> SnowplowMicro:
     """Provide a clean `SnowplowMicro` instance.
 
     This fixture resets the `SnowplowMicro` instance, and enables the
     `send_anonymous_usage_stats` setting.
 
-    Yields:
+    Returns:
         A freshly reset `SnowplowMicro` instance.
     """
     if snowplow_optional is None:  # pragma: no cover
         pytest.skip("Unable to start Snowplow Micro")
-    yield snowplow_optional
+    return snowplow_optional

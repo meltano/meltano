@@ -1,17 +1,21 @@
 """New Project Initialization Service."""
+
 from __future__ import annotations
 
+import contextlib
 import os
 import uuid
 from pathlib import Path
 
 import click
 
-from .cli_messages import GREETING
-from .db import project_engine
-from .plugin.meltano_file import MeltanoFilePlugin
-from .project import Project
-from .project_settings_service import ProjectSettingsService, SettingValueStore
+from meltano.core.cli_messages import GREETING
+from meltano.core.db import project_engine
+from meltano.core.plugin.meltano_file import MeltanoFilePlugin
+from meltano.core.project import Project
+from meltano.core.project_settings_service import SettingValueStore
+
+PROJECT_FILENAME = "meltano.yml"
 
 
 class ProjectInitServiceError(Exception):
@@ -29,17 +33,23 @@ class ProjectInitService:
         """
         self.project_directory = Path(project_directory)
 
-        try:
+        with contextlib.suppress(ValueError):
             self.project_directory = self.project_directory.relative_to(Path.cwd())
-        except ValueError:
-            pass
 
-    def init(self, activate: bool = True, add_discovery: bool = False) -> Project:
+    def init(  # noqa: C901
+        self,
+        *,
+        activate: bool = True,
+        add_discovery: bool = False,
+        force: bool = False,
+    ) -> Project:
         """Initialise Meltano Project.
 
         Args:
             activate: Activate newly created project
             add_discovery: Add discovery.yml file to created project
+            force: Whether to overwrite `meltano.yml` in the existing
+                directory.
 
         Returns:
             A new Project instance
@@ -50,17 +60,22 @@ class ProjectInitService:
         try:
             self.project_directory.mkdir()
         except FileExistsError as ex:
-            if any(self.project_directory.iterdir()):
-                raise ProjectInitServiceError(
-                    f"Directory '{self.project_directory}' not empty."
-                ) from ex
+            if (
+                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))
+                and not force
+            ):
+                msg = (
+                    "A `meltano.yml` file already exists in the target directory. "
+                    "Use `--force` to overwrite it."
+                )
+                raise ProjectInitServiceError(msg) from ex
         except PermissionError as ex:
             raise ProjectInitServiceError(
-                f"Permission denied to create '{self.project_directory}'."
+                f"Permission denied to create '{self.project_directory}'.",
             ) from ex
         except Exception as ex:
             raise ProjectInitServiceError(
-                f"Could not create directory '{self.project_directory}'. {ex}"
+                f"Could not create directory '{self.project_directory}'. {ex}",
             ) from ex
 
         project = Project(self.project_directory)
@@ -68,13 +83,12 @@ class ProjectInitService:
         self.create_dot_meltano_dir(project)
         self.create_files(project, add_discovery=add_discovery)
 
-        self.settings_service = ProjectSettingsService(project)
-        self.settings_service.set(
+        project.settings.set(
             "project_id",
             str(uuid.uuid4()),
             store=SettingValueStore.MELTANO_YML,
         )
-        self.set_send_anonymous_usage_stats()
+        self.set_send_anonymous_usage_stats(project)
         if activate:
             Project.activate(project)
 
@@ -107,17 +121,28 @@ class ProjectInitService:
             click.echo(f"  {self.project_directory}/")
 
         plugin = MeltanoFilePlugin(discovery=add_discovery)
-        for path in plugin.create_files(project):
-            click.secho("   |--", fg="blue", nl=False)
-            click.echo(f" {path}")
 
-    def set_send_anonymous_usage_stats(self):
-        """Set Anonymous Usage Stats flag."""
+        expected_files = plugin.files_to_create(project, [])
+        created_files = plugin.create_files(project)
+        for path in expected_files:
+            if path in created_files:
+                click.secho("   |--", fg="blue", nl=False)
+                click.echo(f" {path}")
+            else:
+                click.secho("   |--", fg="yellow", nl=False)
+                click.echo(f" {path} (skipped)")
+
+    def set_send_anonymous_usage_stats(self, project: Project):
+        """Set Anonymous Usage Stats flag.
+
+        Args:
+            project: The Meltano project the setting is being set on.
+        """
         # If set to false store explicitly in `meltano.yml`
-        if not self.settings_service.get("send_anonymous_usage_stats"):
-            self.settings_service.set(
+        if not project.settings.get("send_anonymous_usage_stats"):
+            project.settings.set(
                 "send_anonymous_usage_stats",
-                self.settings_service.get("send_anonymous_usage_stats"),
+                project.settings.get("send_anonymous_usage_stats"),
                 store=SettingValueStore.MELTANO_YML,
             )
 

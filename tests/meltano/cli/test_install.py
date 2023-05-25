@@ -21,63 +21,60 @@ class TestCliInstall:
             return err.plugin
 
     @pytest.mark.order(0)
-    def test_install(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
-    ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner):
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
             result = cli_runner.invoke(cli, ["install"])
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab, target, dbt], parallelism=None, clean=False
+                project,
+                [tap, tap_gitlab, target, dbt],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
+    @pytest.mark.usefixtures("dbt")
     def test_install_type(
         self,
         project,
         tap,
         tap_gitlab,
         target,
-        dbt,
         mapper,
         cli_runner,
-        project_plugins_service,
     ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "extractors"])
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project,
+                [tap, tap_gitlab],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
             install_plugin_mock_l.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "loaders"])
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project,
+                [target],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
             install_plugin_mock_m.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "mappers"])
@@ -94,47 +91,44 @@ class TestCliInstall:
                     mappings_seen += 1
             assert mappings_seen == 2
 
+    @pytest.mark.usefixtures("tap_gitlab", "dbt")
     def test_install_type_name(
         self,
         project,
         tap,
-        tap_gitlab,
         target,
-        dbt,
         mapper,
         cli_runner,
-        project_plugins_service,
     ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "extractor", tap.name])
             assert_cli_runner(result)
 
             install_plugin_mock_e.assert_called_once_with(
-                project, [tap], parallelism=None, clean=False
+                project,
+                [tap],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_l:
             install_plugin_mock_l.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "loader", target.name])
             assert_cli_runner(result)
 
             install_plugin_mock_l.assert_called_once_with(
-                project, [target], parallelism=None, clean=False
+                project,
+                [target],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_m:
             install_plugin_mock_m.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "mapper", mapper.name])
@@ -151,22 +145,23 @@ class TestCliInstall:
                     mappings_seen += 1
             assert mappings_seen == 2
 
-    def test_install_multiple(
-        self, project, tap, tap_gitlab, target, dbt, cli_runner, project_plugins_service
-    ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+    @pytest.mark.usefixtures("target", "dbt")
+    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner):
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
             result = cli_runner.invoke(
-                cli, ["install", "extractors", tap.name, tap_gitlab.name]
+                cli,
+                ["install", "extractors", tap.name, tap_gitlab.name],
             )
             assert_cli_runner(result)
 
             install_plugin_mock.assert_called_once_with(
-                project, [tap, tap_gitlab], parallelism=None, clean=False
+                project,
+                [tap, tap_gitlab],
+                parallelism=None,
+                clean=False,
+                force=False,
             )
 
     def test_install_parallel(
@@ -178,12 +173,8 @@ class TestCliInstall:
         dbt,
         mapper,
         cli_runner,
-        project_plugins_service,
     ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "--parallelism=10"])
@@ -218,12 +209,8 @@ class TestCliInstall:
         dbt,
         mapper,
         cli_runner,
-        project_plugins_service,
     ):
-        with mock.patch(
-            "meltano.cli.install.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
             result = cli_runner.invoke(cli, ["install", "--clean"])
@@ -249,15 +236,98 @@ class TestCliInstall:
             mappers = [m for m in commands[0][1] if m == mapper]
             assert len(mappers) == 3
 
+    @pytest.mark.usefixtures("tap_gitlab", "target")
+    def test_install_schedule(
+        self,
+        project,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        schedule_service,
+        job_schedule,
+        task_sets_service,
+    ):
+        with mock.patch(
+            "meltano.cli.install.ScheduleService",
+            return_value=schedule_service,
+        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            schedule_service.task_sets_service = task_sets_service
+            from meltano.core.task_sets import TaskSets
+
+            mapping = mapper.extra_config.get("_mappings")[0].get("name")
+            task_sets_service.add(
+                TaskSets(
+                    job_schedule.job,
+                    [tap_gitlab.name, mapping, target.name, dbt.name],
+                ),
+            )
+            result = cli_runner.invoke(
+                cli,
+                ["install", "--schedule", job_schedule.name],
+            )
+            assert_cli_runner(result)
+
+            install_plugin_mock.assert_called_once()
+            assert install_plugin_mock.mock_calls[0].args[0] == project
+
+            plugins_installed = [
+                plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]
+            ]
+            plugins_expected = [tap_gitlab.name, mapper.name, target.name, dbt.name]
+            assert sorted(plugins_installed) == sorted(plugins_expected)
+            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] is None
+            assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
+            assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
+
+    def test_install_schedule_elt(
+        self,
+        project,
+        tap,
+        target,
+        cli_runner,
+        schedule_service,
+        elt_schedule,
+        task_sets_service,
+    ):
+        with mock.patch(
+            "meltano.cli.install.ScheduleService",
+            return_value=schedule_service,
+        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            schedule_service.task_sets_service = task_sets_service
+
+            result = cli_runner.invoke(
+                cli,
+                ["install", "--schedule", elt_schedule.name],
+            )
+            assert_cli_runner(result)
+
+            install_plugin_mock.assert_called_once()
+            assert install_plugin_mock.mock_calls[0].args[0] == project
+
+            plugins_installed = [
+                plugin.name for plugin in install_plugin_mock.mock_calls[0].args[1]
+            ]
+            plugins_expected = [
+                tap.name,
+                target.name,
+            ]
+            assert sorted(plugins_installed) == sorted(plugins_expected)
+            assert install_plugin_mock.mock_calls[0].kwargs["parallelism"] is None
+            assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
+            assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
+
 
 # un_engine_uri forces us to create a new project, we must do this before the
 # project fixture creates the project see
 # https://github.com/meltano/meltano/pull/6407#issuecomment-1200516464
 # For more details
 @pytest.mark.order(-1)
-def test_new_folder_should_autocreate_on_install(
-    un_engine_uri, project_function, cli_runner
-):
+@pytest.mark.usefixtures("un_engine_uri", "project_function")
+def test_new_folder_should_autocreate_on_install(cli_runner):
     """Be sure .meltano auto creates a db on install by default.
 
     We had a case https://github.com/meltano/meltano/issues/6383

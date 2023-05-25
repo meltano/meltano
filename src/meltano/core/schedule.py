@@ -1,14 +1,16 @@
 """Meltano schedule definition."""
+
 from __future__ import annotations
 
 import datetime
+import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
 
-CRON_INTERVALS = {
+CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,
     "@hourly": "0 * * * *",
     "@daily": "0 0 * * *",
@@ -68,13 +70,16 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             self.start_date = start_date
 
     @property
-    def cron_interval(self) -> str:
+    def cron_interval(self) -> str | None:
         """Return the explicit cron interval expression for a cron alias.
 
         Returns:
             The cron expression.
         """
-        return CRON_INTERVALS.get(self.interval, self.interval)
+        if self.interval:
+            return CRON_INTERVALS.get(self.interval, self.interval)
+
+        return None
 
     @property
     def elt_schedule(self) -> bool:
@@ -87,7 +92,9 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
 
     @property
     def elt_args(self) -> list[str]:
-        """Return the list of arguments to pass to the elt command, if the schedule is an elt schedule.
+        """Return the list of arguments to pass to the elt command.
+
+        Only valid if the schedule is an elt schedule.
 
         Returns:
             The list of arguments to pass to the elt command.
@@ -98,8 +105,8 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         if self.job:
             raise NotImplementedError
         return [
-            self.extractor,
-            self.loader,
+            t.cast(str, self.extractor),
+            t.cast(str, self.loader),
             f"--transform={self.transform}",
             f"--state-id={self.name}",
         ]
@@ -118,6 +125,6 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         """
         if self.job:
             raise NotImplementedError(
-                "Can't obtain last successful State(Job) for schedule job."
+                "Can't obtain last successful State(Job) for schedule job.",
             )
         return StateJobFinder(self.name).latest_success(session)

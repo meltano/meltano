@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from meltano.core.environment import Environment
 from meltano.core.project import Project
-
-from .utils import find_named
+from meltano.core.utils import find_named
 
 
 class EnvironmentAlreadyExistsError(Exception):
-    """Occurs when an environment already exists."""
+    """An environment already exists."""
 
     def __init__(self, environment: Environment):
         """Create a new exception.
@@ -43,17 +42,18 @@ class EnvironmentService:
         """
         return self.add_environment(Environment(name=name))
 
-    def add_environment(self, environment: Environment):
+    def add_environment(self, environment: Environment) -> Environment:
         """Add an Environment object to `meltano.yml`.
 
         Args:
-            environment: An instance of meltano.core.environment.Environment to add.
+            environment: An environment to add.
 
         Raises:
-            EnvironmentAlreadyExistsError: If an Environment with the same name already exists.
+            EnvironmentAlreadyExistsError: If an environment with the same name
+                already exists.
 
         Returns:
-            The newly added Environment.
+            The newly added environment.
         """
         with self.project.meltano_update() as meltano:
             # guard if it already exists
@@ -84,7 +84,9 @@ class EnvironmentService:
         """
         with self.project.meltano_update() as meltano:
             environment = find_named(
-                self.list_environments(), name, obj_type=Environment
+                self.list_environments(),
+                name,
+                obj_type=Environment,
             )
 
             # find the schedules plugin config

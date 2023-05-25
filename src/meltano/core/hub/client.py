@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Any
+import typing as t
+from http import HTTPStatus
 
+import click
 import requests
+from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
+from urllib3 import Retry
 
 import meltano
+from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import (
     BasePlugin,
     PluginDefinition,
@@ -18,10 +23,9 @@ from meltano.core.plugin import (
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_discovery_service import PluginRepository
-from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 
-from .schema import IndexedPlugin, VariantRef
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 
@@ -43,10 +47,23 @@ class HubPluginTypeNotFoundError(Exception):
         Returns:
             The string representation of the error.
         """
-        return "{type} is not supported in Meltano Hub. Available plugin types: {types}".format(
-            type=self.plugin_type.descriptor.capitalize(),
-            types=list(PluginType),
+        return (
+            f"{self.plugin_type.descriptor.capitalize()} is not supported in "
+            f"Meltano Hub. Available plugin types: {PluginType.plurals()}"
         )
+
+
+class HubConnectionError(Exception):
+    """Raised when a Hub connection error occurs."""
+
+    def __init__(self, reason: str):
+        """Create a new HubConnectionError.
+
+        Args:
+            reason: The reason for the error.
+        """
+        message = f"Could not connect to Meltano Hub. {reason}"
+        super().__init__(message)
 
 
 class HubPluginVariantNotFoundError(Exception):
@@ -75,16 +92,17 @@ class HubPluginVariantNotFoundError(Exception):
         Returns:
             The string representation of the error.
         """
-        return "{type} '{name}' variant '{variant}' is not known to Meltano. Variants: {variant_labels}".format(
-            type=self.plugin_type.descriptor.capitalize(),
-            name=self.plugin.name,
-            variant=self.variant_name,
-            variant_labels=self.plugin.variant_labels,
+        return (
+            f"{self.plugin_type.descriptor.capitalize()} '{self.plugin.name}' "
+            f"variant '{self.variant_name}' is not known to Meltano. "
+            f"Variants: {self.plugin.variant_labels}"
         )
 
 
-class MeltanoHubService(PluginRepository):
+class MeltanoHubService(PluginRepository):  # noqa: WPS214
     """PluginRepository implementation for the Meltano Hub."""
+
+    session = requests.Session()
 
     def __init__(self, project: Project) -> None:
         """Initialize the service.
@@ -93,33 +111,47 @@ class MeltanoHubService(PluginRepository):
             project: The Meltano project.
         """
         self.project = project
-        self.session = requests.Session()
         self.session.headers.update(
             {
                 "Accept": "application/json",
                 "User-Agent": f"Meltano/{meltano.__version__}",
-            }
+            },
         )
 
-        self.settings_service = ProjectSettingsService(self.project)
-
-        if self.settings_service.get("send_anonymous_usage_stats"):
-            project_id = self.settings_service.get("project_id")
+        if self.project.settings.get("send_anonymous_usage_stats"):
+            project_id = self.project.settings.get("project_id")
 
             self.session.headers["X-Project-ID"] = project_id
 
         if self.hub_url_auth:
             self.session.headers.update({"Authorization": self.hub_url_auth})
 
+        adapter = HTTPAdapter(
+            max_retries=Retry(
+                total=3,
+                backoff_factor=0,
+                status_forcelist=[
+                    HTTPStatus.TOO_MANY_REQUESTS,
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                    HTTPStatus.BAD_GATEWAY,
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    HTTPStatus.GATEWAY_TIMEOUT,
+                ],
+                raise_on_status=False,
+            ),
+        )
+        self.session.mount("http://", adapter)
+        self.session.mount("https://", adapter)
+
     @property
-    def hub_api_url(self):
+    def hub_api_url(self) -> str:
         """Return the URL of the Hub API.
 
         Returns:
             The URL of the Hub API.
         """
-        hub_api_root = self.settings_service.get("hub_api_root")
-        hub_url = self.settings_service.get("hub_url")
+        hub_api_root = self.project.settings.get("hub_api_root")
+        hub_url = self.project.settings.get("hub_url")
 
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
@@ -130,7 +162,7 @@ class MeltanoHubService(PluginRepository):
         Returns:
             The `hub_url_auth` setting.
         """
-        return self.settings_service.get("hub_url_auth")
+        return self.project.settings.get("hub_url_auth")
 
     def plugin_type_endpoint(self, plugin_type: PluginType) -> str:
         """Return the list endpoint for the given plugin type.
@@ -165,6 +197,50 @@ class MeltanoHubService(PluginRepository):
 
         return url
 
+    def _build_request(self, method: str, url: str) -> requests.PreparedRequest:
+        """Build a request to the Hub API.
+
+        Args:
+            method: The HTTP method.
+            url: The URL to request.
+
+        Returns:
+            The prepared request.
+        """
+        request = requests.Request(method, url)
+        click_context = click.get_current_context(silent=True)
+
+        if click_context:
+            request.headers["X-Meltano-Command"] = click_context.command_path
+
+        return self.session.prepare_request(request)
+
+    def _get(self, url: str) -> requests.Response:
+        """Make a GET request to the Hub API.
+
+        Args:
+            url: The URL to request.
+
+        Returns:
+            The response.
+
+        Raises:
+            HubConnectionError: If the Hub API could not be reached.
+        """
+        prep = self._build_request("GET", url)
+        settings = self.session.merge_environment_settings(
+            prep.url,
+            {},
+            None,
+            None,
+            None,
+        )
+
+        try:
+            return self.session.send(prep, **settings)
+        except requests.exceptions.ConnectionError as connection_err:
+            raise HubConnectionError("Could not reach Meltano Hub.") from connection_err
+
     def find_definition(
         self,
         plugin_type: PluginType,
@@ -184,6 +260,7 @@ class MeltanoHubService(PluginRepository):
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
             HubPluginVariantNotFoundError: If the plugin variant could not be found.
+            HubConnectionError: If the Hub API could not be reached.
         """
         plugins = self.get_plugins_of_type(plugin_type)
 
@@ -191,7 +268,7 @@ class MeltanoHubService(PluginRepository):
             plugin = plugins[plugin_name]
         except KeyError as plugins_key_err:
             raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name)
+                PluginRef(plugin_type, plugin_name),
             ) from plugins_key_err
 
         if variant_name is None or variant_name in {
@@ -204,22 +281,28 @@ class MeltanoHubService(PluginRepository):
             url = plugin.variants[variant_name].ref
         except KeyError as variant_key_err:
             raise HubPluginVariantNotFoundError(
-                plugin_type, plugin, variant_name
+                plugin_type,
+                plugin,
+                variant_name,
             ) from variant_key_err
 
-        response = self.session.get(url)
+        response = self._get(url)
 
         try:
             response.raise_for_status()
         except requests.HTTPError as http_err:
-            logger.error(
+            logger.exception(
                 "Can not retrieve plugin",
                 status_code=http_err.response.status_code,
                 error=http_err,
             )
-            raise PluginNotFoundError(PluginRef(plugin_type, plugin_name)) from http_err
+            raise HubConnectionError(str(http_err)) from http_err
 
-        return PluginDefinition(**response.json(), plugin_type=plugin_type)
+        return PluginDefinition(
+            **response.json(),
+            plugin_type=plugin_type,
+            is_default_variant=variant_name == plugin.default_variant,
+        )
 
     def find_base_plugin(
         self,
@@ -245,7 +328,10 @@ class MeltanoHubService(PluginRepository):
 
         return base_plugin_factory(plugin, plugin.variants[0])
 
-    def get_plugins_of_type(self, plugin_type: PluginType) -> dict[str, IndexedPlugin]:
+    def get_plugins_of_type(  # noqa: WPS210
+        self,
+        plugin_type: PluginType,
+    ) -> dict[str, IndexedPlugin]:
         """Get all plugins of a given type.
 
         Args:
@@ -256,24 +342,27 @@ class MeltanoHubService(PluginRepository):
 
         Raises:
             HubPluginTypeNotFoundError: If the plugin type is not supported.
+            HubConnectionError: If the Hub API could not be reached.
         """
         if not plugin_type.discoverable:
             return {}
 
         url = self.plugin_type_endpoint(plugin_type)
-        response = self.session.get(url)
+        response = self._get(url)
 
         try:
             response.raise_for_status()
         except requests.HTTPError as err:
-            logger.error(
+            logger.exception(
                 "Can not retrieve plugin type",
                 status_code=err.response.status_code,
                 error=err,
             )
-            raise HubPluginTypeNotFoundError(plugin_type) from err
+            if err.response.status_code < HTTPStatus.TOO_MANY_REQUESTS:
+                raise HubPluginTypeNotFoundError(plugin_type) from err
+            raise HubConnectionError(err.response.reason) from err
 
-        plugins: dict[str, dict[str, Any]] = response.json()
+        plugins: dict[str, dict[str, t.Any]] = response.json()
         return {
             name: IndexedPlugin(
                 name,

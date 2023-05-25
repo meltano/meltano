@@ -8,6 +8,7 @@ import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
+from enum import IntFlag as EnumIntFlag
 
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -80,7 +81,7 @@ def current_trigger():
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
-class Payload(IntFlag):
+class Payload(EnumIntFlag):
     """Flag indicating whether a Job has state in its payload field."""
 
     STATE = 1
@@ -161,8 +162,10 @@ class Job(SystemModel):  # noqa: WPS214
     def is_stale(self):
         """Return whether Job has gone stale.
 
-        Running jobs with a heartbeat are considered stale after no heartbeat is recorded for 5 minutes.
-        Legacy jobs without a heartbeat are considered stale after being in the running state for 24 hours.
+        Running jobs with a heartbeat are considered stale after no heartbeat
+        is recorded for 5 minutes.
+        Legacy jobs without a heartbeat are considered stale after being in
+        the running state for 24 hours.
 
         Returns:
             bool indicating whether this Job is stale
@@ -212,22 +215,20 @@ class Job(SystemModel):  # noqa: WPS214
         Returns:
             bool indicating whether the given state is transitable from this job's state
         """
-        if self.state is state:
-            return True
+        return True if self.state is state else state.name in self.state.transitions()
 
-        return state.name in self.state.transitions()
-
-    def transit(self, state: State) -> (State, State):
+    def transit(self, state: State) -> tuple[State, State]:
         """Transition this job into the given state.
 
         Args:
-            state: the state to transition this job to
+            state: The state to transition this job to
 
         Returns:
-            a tuple with the original state and the new state
+            A tuple with the original state and the new state
 
         Raises:
-            ImpossibleTransitionError: when this job cannot transition into the given state
+            ImpossibleTransitionError: when this job cannot transition into the
+                given state
         """
         transition = (self.state, state)
 
@@ -245,13 +246,15 @@ class Job(SystemModel):  # noqa: WPS214
     async def run(self, session):
         """Run wrapped code in context of a job.
 
-        Transitions state to RUNNING and SUCCESS/FAIL as appropriate and records heartbeat every second.
+        Transitions state to RUNNING and SUCCESS/FAIL as appropriate and
+        records heartbeat every second.
 
         Args:
             session: the session to use for writing to the db
 
         Raises:
-            BaseException: re-raises an exception occurring in the job running in this context
+            BaseException: re-raises an exception occurring in the job running
+                in this context
         """  # noqa: DAR301
         try:
             self.start()
@@ -269,7 +272,6 @@ class Job(SystemModel):  # noqa: WPS214
 
             self.fail(error=self._error_message(err))
             self.save(session)
-
             raise
 
     def start(self):
@@ -315,9 +317,13 @@ class Job(SystemModel):  # noqa: WPS214
         """Represent as a string.
 
         Returns:
-            a string representation of the job
+            A string representation of the job.
         """
-        return f"<Job(id='{self.id}', job_name='{self.job_name}', state='{self.state}', started_at='{self.started_at}', ended_at='{self.ended_at}')>"
+        return (
+            f"<Job(id='{self.id}', job_name='{self.job_name}', "
+            f"state='{self.state}', started_at='{self.started_at}', "
+            f"ended_at='{self.ended_at}')>"
+        )
 
     def save(self, session):
         """Save the job in the db.
@@ -367,7 +373,10 @@ class Job(SystemModel):  # noqa: WPS214
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(self, session):
+    def _handling_sigterm(
+        self,
+        session,  # noqa: ARG002
+    ):
         def handler(*_):  # noqa: WPS430
             sigterm_status = 143
             raise SystemExit(sigterm_status)

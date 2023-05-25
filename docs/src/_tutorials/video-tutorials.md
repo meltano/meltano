@@ -14,7 +14,6 @@ Below is a list video tutorials & demos on specific Meltano-related topics. Most
 - **[Tap a thon - tap-shopify](https://youtu.be/41RGHQ49U_M?t=2210)** - Intro to the tap for Shopify.
 - **[ReleaseParty - Meltano default environments](https://www.youtube.com/watch?v=p_uBJjxDfxA&t=139s)** - Putting in default environments into the meltano project YAML.
 - **[DemoDay - Meltano Incremental Runs](https://www.youtube.com/watch?v=RXo-lIQtwB8&t=98s)** - Introduction to the incremental runs feature in the meltano run command and it's differences to the meltano elt command.
-- **[DemoDay - Meltano UI Cron Intervals](https://youtu.be/RXo-lIQtwB8?t=719)** - Using the UI to define custom cron schedules.
 - **[DemoDay - Superset import datasources](https://www.youtube.com/watch?v=RXo-lIQtwB8&t=944s)** - Introduction to automatic import of dbt database connections and sources into superset via meltano.
 - **[DemoDay - Meltano, AD and dbt audit tables](https://youtu.be/RXo-lIQtwB8?t=1789)** - Using Meltano to update AD accounts
 - **[DemoDay - Meltano Plugin Inheritance Optimization](https://youtu.be/BmubPgBkjG8?t=71)** - How to optimize plugin inheritance, sharing and unsharing venvs.

@@ -10,7 +10,7 @@ It knows what settings are supported by each plugin, and how and when different 
 
 Since this also goes for [extractors](/concepts/plugins#extractors) and [loaders](/concepts/plugins#loaders), you do not need to manually craft the
 [`config.json` files](https://hub.meltano.com/singer/spec#config-files) expected by Singer taps and targets,
-because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/reference/command-line-interface#discover)), Meltano already knows what settings it supports.
 If you're adding a [custom plugin](/concepts/plugins#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
@@ -25,13 +25,13 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 To determine the values of settings, Meltano will look in 4 main places (and one optional one), with each taking precedence over the next:
 
-1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano elt` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
+1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano run` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
 2. **Your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file)**, under the plugin's `config` key.
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
-3. **Your project's [**system database**](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
@@ -132,10 +132,10 @@ Environment levels within `meltano.yml` resolve in order of precedence (within a
 ```
 
 <div class="notification is-info">
-	<p>
-	We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
-	We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
-	</p>
+  <p>
+  We are considering adding support for the <code>env</code> key to <a href="/concepts/project#jobs">jobs</a> as well as updating the precedence order when we do.
+  We'd love to hear your thoughts in the <a href="https://github.com/meltano/meltano/issues/6386">GitHub issue</a> about this possible change!
+  </p>
 </div>
 
 This allows you to override environment variables per plugin and per environment, as needed for your use case.
@@ -166,7 +166,7 @@ Environment variables are inherited across layers in the following order, where 
 
 The following example illustrates how values are expanded:
 
-```
+```yaml
 env:
   # Level 2: top-level `env:`
   # Inherits from terminal context
@@ -174,7 +174,7 @@ env:
   STACKED: "${STACKED}2"          # '12'
 plugins:
   extractors:
-    tap-foobar:
+    - name: tap-foobar
       env:
         # Level 4: plugin-level `env:`
         # Inherits from a environment-level `env:` if an environment is active
@@ -182,24 +182,43 @@ plugins:
         LEVEL_NUM: "4"            #    '4'
         STACKED: "${STACKED}4"    # '1234'
 environments:
-  prod:
+  - name: prod
     env:
       # Level 3: environment-level `env:`
       # Inherits from top-level `env:`
       LEVEL_NUM: "3"              #   '3'
       STACKED: "${STACKED}3"      # '123'
-    plugins:
-      extractors:
-        tap-foobar:
-          env:
-            # Level 5: environment-level plugin `env:`
-            # Inherits from (global) plugin-level `env:`
-            LEVEL_NUM: "5"          #     '5'
-            STACKED: "${STACKED}5"  # '12345'
+    config:
+      plugins:
+        extractors:
+          - name: tap-foobar
+            env:
+              # Level 5: environment-level plugin `env:`
+              # Inherits from (global) plugin-level `env:`
+              LEVEL_NUM: "5"          #     '5'
+              STACKED: "${STACKED}5"  # '12345'
+
 ```
 
 Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
+
 Because settings and environment variable behavior can become complex when set in multiple places, the [`meltano invoke` command](/reference/command-line-interface#invoke) provides a `--print-var` option which allows you to easily inspect what value is being supplied for a given environment variable within your plugin's invocation environment at runtime.
+
+##### Environment variable expansion within `pip_url`
+
+In addition to affecting the environment variables at runtime, and the `config`/`settings` values, environment variables can be expanded within the value of a plugin's `pip_url`. The environment variable inheritance shown above applies to environment variables expanded within the value of `pip_url`.
+
+This can be useful for using a different `pip_url` for different environments (e.g. to change which git branch of a plugin repository is used):
+
+```yaml
+pip_url: "git+https://github.com/MeltanoLabs/tap-github.git@${TAP_GITHUB_GIT_REV}"
+```
+
+Another use for this is to supply credentials for a private Python package index:
+
+```yaml
+pip_url: "https://${NEXUS_USERNAME}:${NEXUS_PASSWORD}@nexus.example.com/simple"
+```
 
 ### Configuring settings
 
@@ -220,7 +239,7 @@ Plugins can also specify alternative variables ([aliases](#aliases) for their se
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
-To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+To verify that any environment variables you've set will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 To learn how to use environment variables to specify pipeline-specific configuration, refer to the [Data Integration (EL) guide](/guide/integration#pipeline-specific-configuration).
 
@@ -339,7 +358,7 @@ extractors:
 
 ### Accessing from plugins
 
-When Meltano invokes a plugin's executable as part of [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).
+When Meltano invokes a plugin's executable as part of [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).
 
 These can then be accessed from inside the plugin using the mechanism provided by the standard library, e.g. Python's [`os.environ`](https://docs.python.org/3/library/os.html#os.environ).
 
@@ -495,9 +514,3 @@ The configuration of a plugin can be tested using [`meltano config <plugin> test
 <div class="notification is-danger">
   <p>Configuration testing is only supported for <a href="/concepts/plugins#extractors">extractor</a> plugins currently.</p>
 </div>
-
-## Meltano UI
-
-While Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
-and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file),
-basic plugin configuration functionality is also available in [the UI](/reference/ui#extractor-configuration).

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import subprocess
+from contextlib import suppress
 
 import structlog
 
@@ -54,7 +55,11 @@ class Superset(BasePlugin):
         return {"config": "superset_config.py"}
 
     @hook("before_configure")
-    async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
+    async def before_configure(
+        self,
+        invoker: SupersetInvoker,
+        session,  # noqa: ARG002
+    ):  # noqa: WPS217
         """Write plugin configuration to superset_config.py.
 
         Args:
@@ -82,21 +87,21 @@ class Superset(BasePlugin):
             if custom_config_path.exists():
                 config_script_lines.extend(
                     [
-                        "from importlib.util import module_from_spec, spec_from_file_location",
-                        f'spec = spec_from_file_location("superset_config", {str(custom_config_path)!r})',
+                        "from importlib.util import module_from_spec, spec_from_file_location",  # noqa: E501
+                        f'spec = spec_from_file_location("superset_config", {str(custom_config_path)!r})',  # noqa: E501
                         "custom_config = module_from_spec(spec)",
                         'sys.modules["superset_config"] = custom_config',
                         "spec.loader.exec_module(custom_config)",
                         "for key in dir(custom_config):",
                         "    if key.isupper():",
                         "        setattr(module, key, getattr(custom_config, key))",
-                    ]
+                    ],
                 )
 
                 logger.info(f"Merged in config from {custom_config_path}")
             else:
                 raise PluginExecutionError(
-                    f"Could not find config file {custom_config_path}"
+                    f"Could not find config file {custom_config_path}",
                 )
 
         config_path = invoker.files["config"]
@@ -105,7 +110,11 @@ class Superset(BasePlugin):
         logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_invoke")
-    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: list[str]):
+    async def db_upgrade_hook(
+        self,
+        invoker: PluginInvoker,
+        exec_args: list[str],  # noqa: ARG002
+    ):
         """Create or upgrade metadata database.
 
         Args:
@@ -125,14 +134,21 @@ class Superset(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Superset metadata database could not be initialized: `superset db upgrade` failed",
+                (
+                    "Superset metadata database could not be initialized: "
+                    "`superset db upgrade` failed"
+                ),
                 handle,
             )
 
         logging.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
-    async def init_hook(self, invoker: PluginInvoker, exec_args: list[str]):
+    async def init_hook(
+        self,
+        invoker: PluginInvoker,
+        exec_args: list[str],  # noqa: ARG002
+    ):
         """Create default roles and permissions.
 
         Args:
@@ -151,7 +167,10 @@ class Superset(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Superset default roles and permissions could not be created: `superset init` failed",
+                (
+                    "Superset default roles and permissions could not be "
+                    "created: `superset init` failed"
+                ),
                 handle,
             )
 
@@ -165,8 +184,6 @@ class Superset(BasePlugin):
             invoker: the active PluginInvoker
         """
         config_file = invoker.files["config"]
-        try:
+        with suppress(FileNotFoundError):
             config_file.unlink()
             logging.debug(f"Deleted configuration at {config_file}")
-        except FileNotFoundError:
-            pass

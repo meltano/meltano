@@ -9,21 +9,19 @@ from datetime import date, datetime
 from croniter import croniter
 
 from meltano.core.error import MeltanoError
+from meltano.core.meltano_invoker import MeltanoInvoker
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_discovery_service import PluginNotFoundError
+from meltano.core.project import Project
+from meltano.core.schedule import Schedule
 from meltano.core.setting_definition import SettingMissingError
-
-from .meltano_invoker import MeltanoInvoker
-from .plugin import PluginType
-from .plugin.settings_service import PluginSettingsService
-from .plugin_discovery_service import PluginNotFoundError
-from .project import Project
-from .project_plugins_service import ProjectPluginsService
-from .schedule import Schedule
-from .task_sets_service import TaskSetsService
-from .utils import NotFound, coerce_datetime, find_named, iso8601_datetime
+from meltano.core.task_sets_service import TaskSetsService
+from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
 
 
 class ScheduleAlreadyExistsError(MeltanoError):
-    """Occurs when a schedule already exists."""
+    """A schedule already exists."""
 
     def __init__(self, schedule: Schedule):
         """Initialize the exception.
@@ -36,7 +34,7 @@ class ScheduleAlreadyExistsError(MeltanoError):
 
 
 class ScheduleDoesNotExistError(MeltanoError):
-    """Occurs when a schedule does not exist."""
+    """A schedule does not exist."""
 
     def __init__(self, name: str):
         """Initialize the exception.
@@ -54,7 +52,7 @@ class ScheduleDoesNotExistError(MeltanoError):
 
 
 class ScheduleNotFoundError(MeltanoError):
-    """Occurs when a schedule for a namespace cannot be found."""
+    """A schedule for a namespace cannot be found."""
 
     def __init__(self, namespace: str):
         """Initialize the exception.
@@ -70,7 +68,7 @@ class ScheduleNotFoundError(MeltanoError):
 
 
 class BadCronError(MeltanoError):
-    """Occurs when a cron expression is invalid."""
+    """A cron expression is invalid."""
 
     def __init__(self, cron: str):
         """Initialize the exception.
@@ -85,18 +83,16 @@ class BadCronError(MeltanoError):
         super().__init__(reason, instruction)
 
 
-class ScheduleService:
+class ScheduleService:  # noqa: WPS214
     """Service for managing schedules."""
 
-    def __init__(self, project: Project, plugins_service: ProjectPluginsService = None):
+    def __init__(self, project: Project):
         """Initialize a ScheduleService for a project to manage a projects schedules.
 
         Args:
-            project: The project whos schedules you wish to interact with.
-            plugins_service: The project plugins service.
+            project: The project whose schedules you wish to interact with.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.task_sets_service = TaskSetsService(project)
 
     def add_elt(
@@ -126,11 +122,18 @@ class ScheduleService:
             The added schedule.
         """
         start_date = coerce_datetime(start_date) or self.default_start_date(  # TODO
-            session, extractor
+            session,
+            extractor,
         )
 
         schedule = Schedule(
-            name, extractor, loader, transform, interval, start_date, env=env
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date,
+            env=env,
         )
         return self.add_schedule(schedule)
 
@@ -171,14 +174,13 @@ class ScheduleService:
         Returns:
             The start_date of the extractor, or now.
         """
-        extractor_plugin = self.plugins_service.find_plugin(
-            extractor, plugin_type=PluginType.EXTRACTORS
+        extractor_plugin = self.project.plugins.find_plugin(
+            extractor,
+            plugin_type=PluginType.EXTRACTORS,
         )
         start_date: str | datetime | date | None = None
         try:
-            settings_service = PluginSettingsService(
-                self.project, extractor_plugin, plugins_service=self.plugins_service
-            )
+            settings_service = PluginSettingsService(self.project, extractor_plugin)
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
             logging.debug(f"`start_date` not found in {extractor_plugin}.")
@@ -238,8 +240,8 @@ class ScheduleService:
             try:
                 # guard if it doesn't exist
                 schedule = find_named(self.schedules(), name)
-            except NotFound:
-                raise ScheduleDoesNotExistError(name)
+            except NotFound as ex:
+                raise ScheduleDoesNotExistError(name) from ex
 
             # find the schedules plugin config
             meltano.schedules.remove(schedule)
@@ -258,15 +260,17 @@ class ScheduleService:
         with self.project.meltano_update() as meltano:
             try:
                 idx = meltano.schedules.index(schedule)
-                meltano.schedules[idx] = schedule
             except ValueError:
-                raise ScheduleDoesNotExistError(schedule.name)
+                raise ScheduleDoesNotExistError(schedule.name) from None
+            else:
+                meltano.schedules[idx] = schedule
 
     def find_namespace_schedule(self, namespace: str) -> Schedule:
         """Search for a Schedule that runs for a certain plugin namespace.
 
         Example:
-            `tap_carbon` would yield the first schedule that runs for the `tap-carbon` extractor.
+            `tap_carbon` would yield the first schedule that runs for the
+            `tap-carbon` extractor.
 
         Args:
             namespace: The plugin namespace to search.
@@ -278,8 +282,9 @@ class ScheduleService:
             ScheduleNotFoundError: If no schedule is found.
         """
         try:
-            extractor = self.plugins_service.find_plugin_by_namespace(
-                PluginType.EXTRACTORS, namespace
+            extractor = self.project.plugins.find_plugin_by_namespace(
+                PluginType.EXTRACTORS,
+                namespace,
             )
 
             return next(
@@ -316,7 +321,11 @@ class ScheduleService:
             raise ScheduleNotFoundError(name) from err
 
     def run(
-        self, schedule: Schedule, *args, env: dict = None, **kwargs
+        self,
+        schedule: Schedule,
+        *args,
+        env: dict | None = None,
+        **kwargs,
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 
@@ -340,5 +349,7 @@ class ScheduleService:
             )
 
         return MeltanoInvoker(self.project).invoke(
-            ["elt", *schedule.elt_args, *args], env={**schedule.env, **env}, **kwargs
+            ["elt", *schedule.elt_args, *args],
+            env={**schedule.env, **env},
+            **kwargs,
         )

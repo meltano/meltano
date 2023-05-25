@@ -3,17 +3,17 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Iterable, TypeVar
+import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
-TEnv = TypeVar("TEnv")
+TEnv = t.TypeVar("TEnv", bound="Environment")
 
 
 class NoActiveEnvironment(Exception):  # noqa: N818
@@ -21,7 +21,7 @@ class NoActiveEnvironment(Exception):  # noqa: N818
 
 
 class EnvironmentNameContainsStateIdDelimiterError(Exception):
-    """Occurs when an environment name contains the state ID component delimiter string."""
+    """An environment name contains the state ID component delimiter."""
 
     def __init__(self, name: str):
         """Create a new exception.
@@ -30,7 +30,8 @@ class EnvironmentNameContainsStateIdDelimiterError(Exception):
             name: The name of the environment.
         """
         super().__init__(
-            f"The environment name '{name}' cannot contain the state ID component delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"The environment name '{name}' cannot contain the state ID component "
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
 
@@ -78,7 +79,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
-    def config_with_extras(self, new_config_with_extras: dict[str, Any]):
+    def config_with_extras(self, new_config_with_extras: dict[str, t.Any]):
         """Set plugin configuration values from the Meltano environment.
 
         Args:
@@ -94,7 +95,8 @@ class EnvironmentPluginConfig(PluginRef):
                 self.config[key] = value
 
     def get_orphan_settings(
-        self, existing: Iterable[SettingDefinition]
+        self,
+        existing: t.Iterable[SettingDefinition],
     ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 
@@ -113,7 +115,7 @@ class EnvironmentPluginConfig(PluginRef):
 class EnvironmentConfig(Canonical):
     """Meltano environment configuration."""
 
-    def __init__(self, plugins: dict[str, list[dict]] = None, **extras):
+    def __init__(self, plugins: dict[str, list[dict]] | None = None, **extras):
         """Create a new environment configuration.
 
         Args:
@@ -165,7 +167,8 @@ class Environment(NameEq, Canonical):
             state_id_suffix: State ID suffix to use.
 
         Raises:
-            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state ID component delimiter string.
+            EnvironmentNameContainsStateIdDelimiterError: If the name contains the state
+                ID component delimiter string.
         """
         if STATE_ID_COMPONENT_DELIMITER in name:
             raise EnvironmentNameContainsStateIdDelimiterError(name)
@@ -178,7 +181,7 @@ class Environment(NameEq, Canonical):
         self.state_id_suffix = state_id_suffix
 
     @classmethod
-    def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
+    def find(cls: type[TEnv], objects: t.Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
         Args:
@@ -192,7 +195,11 @@ class Environment(NameEq, Canonical):
             NotFound: If an environment is not found.
         """
         try:
-            return next(env for env in objects if env.name == name)
+            return next(
+                env if isinstance(env, cls) else cls.parse(env)
+                for env in objects
+                if getattr(env, "name", env["name"]) == name
+            )
         except StopIteration as stop:
             raise NotFound(name, cls) from stop
 

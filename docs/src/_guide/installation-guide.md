@@ -35,7 +35,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
+Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 
@@ -104,7 +104,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, and 3.10 are supported. Some plugins do not yet support Python 3.10.
+Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 
@@ -190,17 +190,6 @@ Then you can `cd` into your new project:
 cd yourprojectname
 ```
 
-We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
-
-```bash
-docker run -v "$(pwd)":/project \
-             -w /project \
-             -p 5000:5000 \
-             meltano/meltano
-```
-
-You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
-
 Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
@@ -223,15 +212,3 @@ You can update Meltano to the latest version by running the following command in
 ```
 meltano upgrade
 ```
-
-## Using Meltano UI
-
-When an update is available, you will be informed of this automatically through a shiny blue button in the top right corner of Meltano UI:
-
-![Update Available Message](images/installation/update-available.png)
-
-Clicking this button will show more information and give you the option to install the update right away:
-
-![Update Available Popup](images/installation/update-available-popup.png)
-
-The Meltano UI will refresh automatically once installation is complete.

@@ -4,7 +4,7 @@ Let's build together! Please see our [Contributor Guide](https://docs.meltano.co
 for more information on contributing to Meltano.
 
 We believe that everyone can contribute and we welcome all contributions.
-If you're not sure what to work on, here are some [ideas to get you started](https://gitlab.com/groups/meltano/-/issues?label_name%5B%5D=Accepting%20Merge%20Requests).
+If you're not sure what to work on, here are some [ideas to get you started](https://github.com/meltano/meltano/labels/Accepting%20Pull%20Requests).
 
 Chat with us in [#contributing](https://meltano.slack.com/archives/C013Z450LCD) on [Slack](https://meltano.com/slack).
 

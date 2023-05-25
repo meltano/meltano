@@ -1,9 +1,25 @@
 name: Tests
 
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - src/**
+      - tests/**
+      - noxfile.py
+      - poetry.lock
+      - pyproject.toml
+      - .github/workflows/test.yml
+      - .github/workflows/resources/constraints.txt
   push:
     branches: [main]
+    paths:
+      - src/**
+      - tests/**
+      - noxfile.py
+      - poetry.lock
+      - pyproject.toml
+      - .github/workflows/test.yml
+      - .github/workflows/resources/constraints.txt
   workflow_dispatch:
     inputs: {}
 
@@ -20,20 +36,24 @@ jobs:
         - { id: '02', python-version: '3.8',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '03', python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '04', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '05', python-version: '3.7',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '06', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '07', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '08', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '09', python-version: '3.7',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '10', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '11', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '12', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
+        - { id: '05', python-version: '3.11', os: ubuntu-latest, backend-db: sqlite }
+        - { id: '06', python-version: '3.7',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '07', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '08', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '09', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '10', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '11', python-version: '3.7',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '12', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '13', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '14', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
+        - { id: '15', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         # Windows tests for Python 3.7 is temporarily disabled - see https://github.com/meltano/meltano/issues/6479
-        # - { id: '13', python-version: '3.7',  os: windows-2022,  backend-db: sqlite }
-        - { id: '14', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
-        - { id: '15', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
-        - { id: '16', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
+        # - { id: '16', python-version: '3.7',  os: windows-2022,  backend-db: sqlite }
+        - { id: '17', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
+        - { id: '18', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
+        - { id: '19', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
+        - { id: '20', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -50,10 +70,14 @@ jobs:
       pytest-results-row-10: ${{ steps.append-results.outputs.pytest-results-row-10 }}
       pytest-results-row-11: ${{ steps.append-results.outputs.pytest-results-row-11 }}
       pytest-results-row-12: ${{ steps.append-results.outputs.pytest-results-row-12 }}
-      # pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
+      pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
       pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
       pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
-      pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
+      # pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
+      pytest-results-row-17: ${{ steps.append-results.outputs.pytest-results-row-17 }}
+      pytest-results-row-18: ${{ steps.append-results.outputs.pytest-results-row-18 }}
+      pytest-results-row-19: ${{ steps.append-results.outputs.pytest-results-row-19 }}
+      pytest-results-row-20: ${{ steps.append-results.outputs.pytest-results-row-20 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
@@ -63,15 +87,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
-
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.3.0
-      with:
-        python-version: ${{ matrix.python-version }}
-        architecture: x64
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -80,17 +96,14 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Upgrade pip
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pip install pip
-        pip --version
-
-    - name: Configure Poetry
-      run: |
-        poetry env use "${{ matrix.python-version }}"
-        poetry debug info
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4.6.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql')
@@ -160,7 +173,7 @@ jobs:
       shell: bash
       run: |
         pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
-        echo "::set-output name=pytest-results-row-${{ matrix.id }}::| \
+        echo "pytest-results-row-${{ matrix.id }}=| \
         ${{ matrix.python-version }} | \
         ${RUNNER_OS} ${RUNNER_ARCH,,} | \
         ${{ matrix.backend-db }} | \
@@ -172,11 +185,11 @@ jobs:
         $( pytest_results_count deselected ) | \
         $( pytest_results_count warning ) | \
         $( pytest_results_count error ) | \
-        $( pattern='in ([0-9]+)\.[0-9]+s' && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" )s |"
+        $( pattern='in ([0-9]+)\.[0-9]+s' && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" )s |" >> $GITHUB_OUTPUT
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@v3.1.1
+      uses: actions/upload-artifact@v3.1.2
       with:
         name: coverage-data
         path: ".coverage.${{ matrix.id }}"
@@ -203,10 +216,14 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-10 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
-        # echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-14 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-15 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
+        # echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-17 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-18 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-19 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-20 }}" >> ${GITHUB_STEP_SUMMARY}
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
 
@@ -215,45 +232,47 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/resources/constraints.txt poetry
+        pipx install poetry
         poetry --version
 
-    - name: Set up Python
-      uses: actions/setup-python@v4.3.0
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4.6.0
       with:
-        python-version: '3.9'
-        cache: 'poetry'
-
-    - name: Upgrade pip
-      run: |
-        pip install --constraint=.github/workflows/resources/constraints.txt pip
-        pip --version
+        python-version: '3.10'
+        architecture: x64
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Download coverage data
-      uses: actions/download-artifact@v3.0.1
+      uses: actions/download-artifact@v3.0.2
       with:
         name: coverage-data
 
-    - name: Install Dependencies
+    - name: Install Nox
+      env:
+        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
       run: |
-        poetry env use "3.9"
-        poetry install
+        pipx install nox
+        pipx inject nox nox-poetry
 
     - name: Combine coverage data and display human readable report
       run: |
-        poetry run coverage combine
-        poetry run coverage report --show-missing --ignore-errors
+        nox -rs coverage -- combine
+        nox -rs coverage -- report --show-missing --ignore-errors
 
     - name: Create coverage report
       run: |
-        poetry run coverage xml --ignore-errors
+        nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.1
+      uses: codecov/codecov-action@v3.1.4
 
   mypy:
     name: "Static type checking"
@@ -263,15 +282,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.0.2
-
-    - name: Setup Python 3.9
-      uses: actions/setup-python@v4.3.0
-      with:
-        python-version: '3.9'
-        architecture: x64
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -280,12 +291,14 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Upgrade pip
-      env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
-      run: |
-        pip install pip
-        pip --version
+    - name: Setup Python 3.10
+      uses: actions/setup-python@v4.6.0
+      with:
+        python-version: '3.10'
+        architecture: x64
+        # Nox uses pip, so we cache with pip
+        cache: 'pip'
+        cache-dependency-path: 'poetry.lock'
 
     - name: Install Nox
       env:

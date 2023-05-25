@@ -3,17 +3,17 @@ from __future__ import annotations
 import inspect
 import json
 import platform
+import typing as t
 import uuid
 import warnings
 from pathlib import Path
 from platform import python_version_tuple
-from typing import Any
 
 import pytest
 from jsonschema import ValidationError, validate
 
-from meltano.core.tracking import ExceptionContext
 from meltano.core.tracking import __file__ as tracking_module_path
+from meltano.core.tracking.contexts import ExceptionContext
 from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
@@ -25,7 +25,7 @@ with open(
     / "com.meltano"
     / "exception_context"
     / "jsonschema"
-    / "1-0-0"
+    / "1-0-0",
 ) as exception_context_schema_file:
     EXCEPTION_CONTEXT_SCHEMA = json.load(exception_context_schema_file)
 
@@ -34,12 +34,13 @@ class CustomException(Exception):
     """A custom exception type to be used in `test_complex_exception_context`."""
 
 
-def is_valid_exception_context(instance: dict[str, Any]) -> bool:
+def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     try:
         with warnings.catch_warnings():
             # Ignore the misleading warning thrown by `jsonschema`:
-            #     The metaschema specified by `$schema` was not found. Using the latest draft to
-            #     validate, but this will raise an error in the future.
+            #     The metaschema specified by `$schema` was not found. Using
+            #     the latest draft to validate, but this will raise an error
+            #     in the future.
             # This is a bug in `jsonschema`, as our value for `$schema` is fine.
             warnings.filterwarnings("ignore", category=DeprecationWarning)
             validate(instance, EXCEPTION_CONTEXT_SCHEMA)
@@ -94,17 +95,18 @@ def test_simple_exception_context():
 
 def test_complex_exception_context():
     if platform.system() == "Windows":
-        pytest.xfail(
-            "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
-        )
+        pytest.xfail("Fails on Windows: https://github.com/meltano/meltano/issues/3444")
 
     line_nums: list[int] = []
+    file_not_found_error = None
 
     def _function_to_deepen_traceback() -> None:
         try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             Path("/tmp/fake/path/will/not/resolve").resolve(strict=True)  # noqa: S108
         except Exception as ex:
+            nonlocal file_not_found_error
+            file_not_found_error = ex
             line_nums.append(1 + inspect.currentframe().f_lineno)
             raise ValueError("that path was a bad value") from ex
 
@@ -114,7 +116,7 @@ def test_complex_exception_context():
             _function_to_deepen_traceback()
         except Exception:
             line_nums.append(1 + inspect.currentframe().f_lineno)
-            raise CustomException
+            raise CustomException from None
     except Exception:
         ctx = ExceptionContext()
 
@@ -127,14 +129,8 @@ def test_complex_exception_context():
 
     assert cause == context
     assert cause["type"] == "FileNotFoundError"
-    assert (
-        cause["str_hash"]
-        == "8604732e6dd06fbcccf2f97979f6ec308a21b6b253fd42de5cf79a0b758155d0"
-    )
-    assert (
-        cause["repr_hash"]
-        == "b4f0f46612e4904b5c3861b2596331b62edf2b82ba33aba8d8a3bc19741e587e"
-    )
+    assert cause["str_hash"] == hash_sha256(str(file_not_found_error))
+    assert cause["repr_hash"] == hash_sha256(repr(file_not_found_error))
     assert cause["traceback"][0] == {
         "file": f".../{THIS_FILE_BASENAME}",
         "line_number": line_nums[1],
@@ -147,19 +143,19 @@ def test_complex_exception_context():
         "context_uuid": ctx.data["context_uuid"],
         "exception": {
             "type": "CustomException",
-            "str_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "repr_hash": "ad9443d77d731da456747bd47282a51afe86be7058533f44dcc979320ad62c73",
+            "str_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",  # noqa: E501
+            "repr_hash": "ad9443d77d731da456747bd47282a51afe86be7058533f44dcc979320ad62c73",  # noqa: E501
             "traceback": [
                 {
                     "file": f".../{THIS_FILE_BASENAME}",
                     "line_number": line_nums[3],
-                }
+                },
             ],
             "cause": None,
             "context": {
                 "type": "ValueError",
-                "str_hash": "1009263b7f48917b8f0edafcfc8a06d22156122fbcbfbb7c9139f420b8472e0c",
-                "repr_hash": "0015450e35aed13f4802973752ee45d02c8f8eaa5d57417962986f4b8ef1bf88",
+                "str_hash": "1009263b7f48917b8f0edafcfc8a06d22156122fbcbfbb7c9139f420b8472e0c",  # noqa: E501
+                "repr_hash": "0015450e35aed13f4802973752ee45d02c8f8eaa5d57417962986f4b8ef1bf88",  # noqa: E501
                 "traceback": [
                     {
                         "file": f".../{THIS_FILE_BASENAME}",

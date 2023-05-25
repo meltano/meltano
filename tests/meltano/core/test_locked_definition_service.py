@@ -12,13 +12,13 @@ from meltano.core.plugin_discovery_service import LockedDefinitionService
 HTTP_STATUS_TEAPOT = 418
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(project):
-    yield LockedDefinitionService(project)
+    return LockedDefinitionService(project)
 
 
 class TestLockedDefinitionService:
-    @pytest.fixture
+    @pytest.fixture()
     def locked_plugin(self, subject: LockedDefinitionService):
         """Locked plugin definition.
 
@@ -43,11 +43,8 @@ class TestLockedDefinitionService:
 
         path.unlink()
 
-    def test_definition(
-        self,
-        subject: LockedDefinitionService,
-        locked_plugin: StandalonePlugin,
-    ):
+    @pytest.mark.usefixtures("locked_plugin")
+    def test_definition(self, subject: LockedDefinitionService):
         with pytest.raises(PluginNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "unknown")
 
@@ -62,11 +59,8 @@ class TestLockedDefinitionService:
         assert plugin_def.extras["foo"] == "bar"
         assert len(plugin_def.variants) == 1
 
-    def test_find_base_plugin(
-        self,
-        subject: LockedDefinitionService,
-        locked_plugin: StandalonePlugin,
-    ):
+    @pytest.mark.usefixtures("locked_plugin")
+    def test_find_base_plugin(self, subject: LockedDefinitionService):
         base_plugin = subject.find_base_plugin(
             PluginType.EXTRACTORS,
             "tap-locked",

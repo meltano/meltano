@@ -1,4 +1,4 @@
-"""A `CommandBlock` pattern supporting Meltano plugin's command like `dbt:run`, `dbt:docs` or `dbt:test`."""
+"""Classes & functions for plugin commands like `dbt:run`, `dbt:docs` or `dbt:test`."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 
 import structlog
 
+from meltano.core.block.singer import InvokerBase
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
@@ -15,10 +16,7 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.runner import RunnerError
-
-from .singer import InvokerBase
 
 logger = structlog.getLogger(__name__)
 
@@ -39,7 +37,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
     @property
     @abstractmethod
     def command(self) -> str | None:
-        """Command is the specific plugin command to use when invoking the plugin (if any)."""
+        """Get the plugin command to use when invoking the plugin (if any)."""
         raise NotImplementedError
 
     @abstractmethod
@@ -49,7 +47,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
 
 
 class InvokerCommand(InvokerBase, PluginCommandBlock):
-    """A basic PluginCommandBlock interface implementation that supports running plugin commands."""
+    """`PluginCommandBlock` that supports invoking plugin commands."""
 
     def __init__(
         self,
@@ -57,7 +55,6 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         log: SubprocessOutputWriter,
         block_ctx: dict,
         project: Project,
-        plugins_service: ProjectPluginsService,
         plugin_invoker: PluginInvoker,
         command: str | None,
         command_args: tuple[str],
@@ -69,7 +66,6 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
             log: the OutputLogger instance to proxy output too.
             block_ctx: the block context.
             project: the project instance.
-            plugins_service: the project plugins service.
             plugin_invoker: the plugin invoker.
             command: the command to invoke.
             command_args: any additional plugin args that should be used.
@@ -77,7 +73,6 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         super().__init__(
             block_ctx=block_ctx,
             project=project,
-            plugins_service=plugins_service,
             plugin_invoker=plugin_invoker,
             command=command,
         )
@@ -106,7 +101,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
 
     @property
     def command_args(self) -> str | None:
-        """Command args are the specific plugin command args to use when invoking the plugin (if any).
+        """Get the command args to use when invoking the plugin.
 
         Returns:
             The command args if any.
@@ -140,7 +135,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         if exitcode:
             command = self.command or self.command_args[0]
             raise RunnerError(
-                f"`{self.name} {command}` failed with exit code: {exitcode}"
+                f"`{self.name} {command}` failed with exit code: {exitcode}",
             )
 
 
@@ -149,7 +144,7 @@ def plugin_command_invoker(
     project: Project,
     command: str | None,
     command_args: list[str] | None = None,
-    run_dir: str = None,
+    run_dir: str | None = None,
 ) -> InvokerCommand:
     """
     Make an InvokerCommand from a plugin.
@@ -158,7 +153,8 @@ def plugin_command_invoker(
         plugin: Plugin to make command from.
         project: Project to use.
         command: the command to invoke on the plugin i.e. `run` in dbt run.
-        command_args: any additional command args that should be passed in during invocation.
+        command_args: any additional command args that should be passed in
+            during invocation.
         run_dir: Optional directory to run commands in.
 
     Returns:
@@ -175,15 +171,9 @@ def plugin_command_invoker(
     output_logger = OutputLogger("run.log")
     invoker_log = output_logger.out(plugin.name, stderr_log)
 
-    plugins_service = ProjectPluginsService(project)
-
     ctx = PluginContext(
         plugin=plugin,
-        settings_service=PluginSettingsService(
-            project,
-            plugin,
-            plugins_service=plugins_service,
-        ),
+        settings_service=PluginSettingsService(project, plugin),
         session=session,
     )
 
@@ -192,7 +182,6 @@ def plugin_command_invoker(
         ctx.plugin,
         context=ctx,
         run_dir=run_dir,
-        plugins_service=plugins_service,
         plugin_settings_service=ctx.settings_service,
     )
     return InvokerCommand(
@@ -200,7 +189,6 @@ def plugin_command_invoker(
         log=invoker_log,
         block_ctx=ctx,
         project=project,
-        plugins_service=plugins_service,
         plugin_invoker=invoker,
         command=command,
         command_args=command_args,

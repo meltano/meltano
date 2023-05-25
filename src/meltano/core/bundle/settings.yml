@@ -1,3 +1,5 @@
+# If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!
+
 settings:
 # Project
 - name: default_environment
@@ -34,6 +36,41 @@ settings:
 - name: elt.buffer_size
   kind: integer
   value: 10485760 # 10 MiB
+
+# State backend settings
+- name: state_backend.uri
+  value: systemdb
+  env_specific: true
+
+## Filesystem state backends
+- name: state_backend.lock_timeout_seconds
+  value: 10
+  kind: integer
+  env_specific: true
+- name: state_backend.lock_retry_seconds
+  value: 1
+  kind: integer
+  env_specific: true
+
+## Azure state backend
+- name: state_backend.azure.connection_string
+  kind: password
+  env_specific: true
+
+## AWS S3 state backend
+- name: state_backend.s3.aws_access_key_id
+  kind: password
+  env_specific: true
+- name: state_backend.s3.aws_secret_access_key
+  kind: password
+  env_specific: true
+- name: state_backend.s3.endpoint_url
+  env_specific: true
+
+## GCS state backend
+- name: state_backend.gcs.application_credentials
+  kind: password
+  env_specific: true
 
 # CLI
 - name: cli.log_level
@@ -198,3 +235,9 @@ settings:
 - name: ff.strict_env_var_mode
   kind: boolean
   value: False
+# Whether invoke, and run operations if a plugin is not custom or it is not locked.
+- name: ff.plugin_locks_required
+  kind: boolean
+  value: false
+
+# If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!

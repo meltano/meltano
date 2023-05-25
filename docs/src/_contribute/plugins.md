@@ -34,52 +34,18 @@ As a plugin's primary maintainer, you do not have to spend a lot of time improvi
 In fact, attracting more users and getting the community involved is likely to recude your personal maintenance burden,
 since you'll receive contributions with bug fixes and new features that you will only be expected to review, not build yourself.
 
-### <a name="local-changes-to-discovery-yml"></a>Local changes to `discovery.yml`
-
-When you need to make changes to `discovery.yml`, these changes are not automatically detected inside of the `meltano` repo during development. While there are a few ways to solve this problem, it is recommended to create a symbolic link in order ensure that changes made inside of the `meltano` repo appear inside the Meltano project you initialized and are testing on.
-
-1. Get path for `discovery.yml` in the repo
-
-- Example: `/Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml`
-
-2. Open your Meltano project in your terminal
-
-3. Create a symbolic link by running the following command:
-
-```
-ln -s $YOUR_DISCOVERY_YML_PATH
-```
-
-Now, when you run the `ls -l` command, you should see something like:
-
-```
-bencodezen  staff   72 Nov 19 09:19 discovery.yml -> /Users/bencodezen/Projects/meltano/src/meltano/core/bundle/discovery.yml
-```
-
-Now, you can see your changes in `discovery.yml` live in your project during development! 🎉
-
-### `discovery.yml` version
-
-Whenever new functionality is introduced that changes the schema of `discovery.yml` (the exact properties it supports and their types), the `version` in `src/meltano/core/bundle/discovery.yml` and the `VERSION` constant in `src/meltano/core/plugin_discovery_service.py` must be incremented, so that older instances of Meltano don't attempt to download and parse a `discovery.yml` its parser is not compatible with.
-
-Changes to `discovery.yml` that only use existing properties do not constitute schema changes and do not require `version` to be incremented.
-
 ## Plugin Development
 
 ### <a name="taps-targets-development"></a>Taps & Targets Development
-
-Watch ["How taps are built"](https://www.youtube.com/watch?v=aImidnW8nsU) for an explanation of how Singer taps (which form the basis for Meltano extractors) work, and what goes into building new ones or verifying and modifying existing ones for various types of APIs.
-
-Then watch ["How transforms are built"](https://www.youtube.com/watch?v=QRaCSKQC_74) for an explanation of how DBT transforms work, and what goes into building new ones for new data sources.
 
 #### For existing taps/targets
 
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
 
 1. Fork (using Meltano organization)
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Modify and submits PRs
-1. If there is resistance, fork as our tap (2)
+1. Add a webhook to trigger the `meltano/meltano` pipeline.
+1. Modify and submit PRs
+1. If there is resistance, fork as our tap
 
 ##### How to test a tap?
 
@@ -113,53 +79,7 @@ This might be a configuration issue with the catalog file that is sent to the ta
 
 #### For taps/targets we create
 
-1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
-1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. For tap and target development please use the [Meltano Singer SDK](https://sdk.meltano.com/en/latest/).
 1. Use a separate repo (meltano/target|tap-x) in GitHub
-   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+   e.g. Snowflake: https://github.com/meltanolabs/target-snowflake
 1. Publish PyPI packages of these package (not for now)
-1. We could mirror this repo on GitHub if we want (not for now)
-
-### Transform & Models Development
-
-When you need to expose data to the user through Meltano UI, this often will require updating the transforms and models. At a high level:
-
-- **Transforms** will allow you to create the necessary PostgreSQL tables for users to query against
-- **Models** will determine the structure of what is exposed on the UI side
-
-#### Transforms
-
-You can test local transforms in a project by adding them in a Meltano project's `transform` > `models` > `my_meltano_project` directory.
-
-Every transform file is a SQL file that will determine how the table is created. Some caveats include:
-
-- Rather than referring to the tables directly (i.e., `analytics.gitlab_issues`), the syntax uses `ref` to refer to tables
-- When joining two tables together, `*` seems to crash dbt. Instead, you should explicitly define every column. For example:
-
-```sql
-users.user_id as user_id,
-users.user_name as user_name,
-issues.month_closed as month_closed,
-issues.year_closed as year_closed,
-```
-
-Once you've created your transforms, you can run it with the following command:
-
-```bash
-# Replace your extractors / targets with the appropriate ones
-meltano elt tap-gitlab target-postgres --transform only
-```
-
-### File Bundle Development
-
-To create a file bundle plugin like <https://github.com/meltano/files-dbt>, follow these steps:
-
-1. Create a new plugin repository named `files-<service/tool>` (e.g. `files-airflow` or `files-docker`).
-1. Copy over `setup.py`, `README.md`, and `LICENSE` from <https://github.com/meltano/files-dbt> and edit these files as appropriate.
-1. Create a `bundle` directory with an empty `__init__.py` file.
-1. Add all desired directories and files to the `bundle` directory. All of these files will be copied over into the Meltano project directory when the file bundle is added to the project.
-1. Add all file paths under `bundle` to the `package_data["bundle"]` array in `setup.py`
-1. Push your new plugin repository to GitLab.com. Official file bundle plugins live at `https://github.com/meltano/files-...`.
-1. Add an entry to `src/meltano/core/bundle/discovery.yml` under `files`. Set `name` and `pip_url` as appropriate, and if applicable, set `namespace` to the `namespace` of the plugin the file bundle is related to (e.g. `dbt`).
-1. If any files are to be updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run, add an `update` object with `[file path]: True` entries for each file.
-1. Success! You can now submit a pull request to Meltano containing the changes to `discovery.yml` (and an appropriate `CHANGELOG` item, of course).

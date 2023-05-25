@@ -92,11 +92,11 @@ To use an environment, you can pass the option `--environment=<ENV>` to the CLI 
 
 ```shell
 # Using the CLI option
-meltano --environment=dev elt tap-github target-sqlite
+meltano --environment=dev run tap-github target-sqlite
 
 # Using env vars
 export MELTANO_ENVIRONMENT=dev
-meltano elt tap-github target-sqlite
+meltano run tap-github target-sqlite
 ```
 
 Once activated, Plugins and other processes invoked by Meltano can access the current environment via the `MELTANO_ENVIRONMENT` environment variable available in every Plugins execution environment.

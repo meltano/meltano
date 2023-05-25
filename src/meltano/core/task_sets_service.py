@@ -10,7 +10,7 @@ logger = structlog.getLogger(__name__)
 
 
 class JobAlreadyExistsError(Exception):
-    """Occurs when a TaskSet (aka job) already exists."""
+    """A TaskSet (aka job) already exists."""
 
     def __init__(self, name: str):
         """Initialize a JobAlreadyExistsError.
@@ -22,7 +22,7 @@ class JobAlreadyExistsError(Exception):
 
 
 class JobNotFoundError(Exception):
-    """Occurs when a TaskSet (aka job) does not exists."""
+    """A TaskSet (aka job) does not exists."""
 
     def __init__(self, name: str):
         """Initialize a JobNotFoundError.

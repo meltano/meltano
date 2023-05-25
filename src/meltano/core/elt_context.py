@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
 from collections import namedtuple
-from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -14,15 +14,14 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
 
 
 class PluginContext(
-    namedtuple("PluginContext", "plugin settings_service session")  # noqa: WPS606
+    namedtuple("PluginContext", "plugin settings_service session"),  # noqa: WPS606
 ):
     """Plugin Context container."""
 
-    def __getattr__(self, attr: str) -> Any:
+    def __getattr__(self, attr: str) -> t.Any:
         """Get plugin attribute.
 
         Args:
@@ -33,7 +32,7 @@ class PluginContext(
         """
         return getattr(self.plugin, attr)
 
-    def get_config(self, name: str, **kwargs: Any) -> Any:
+    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:
         """Get plugin config by name.
 
         Args:
@@ -95,7 +94,6 @@ class ELTContext:  # noqa: WPS230
         select_filter: list | None = None,
         catalog: str | None = None,
         state: str | None = None,
-        plugins_service: ProjectPluginsService = None,
         base_output_logger: OutputLogger | None = None,
     ):
         """Initialise ELT Context instance.
@@ -114,7 +112,6 @@ class ELTContext:  # noqa: WPS230
             select_filter: Select filters to apply to extractor.
             catalog: Catalog to pass to extractor.
             state: State to pass to extractor.
-            plugins_service: PluginsService to use.
             base_output_logger: OutputLogger to use.
         """
         self.project = project
@@ -133,7 +130,6 @@ class ELTContext:  # noqa: WPS230
         self.catalog = catalog
         self.state = state
 
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
         self.base_output_logger = base_output_logger
 
     @property
@@ -167,7 +163,6 @@ class ELTContext:  # noqa: WPS230
             plugin_context.plugin,
             context=self,
             run_dir=self.elt_run_dir,
-            plugins_service=self.plugins_service,
             plugin_settings_service=plugin_context.settings_service,
         )
 
@@ -199,19 +194,13 @@ class ELTContext:  # noqa: WPS230
 class ELTContextBuilder:  # noqa: WPS214
     """ELT Context Builder."""
 
-    def __init__(
-        self,
-        project: Project,
-        plugins_service: ProjectPluginsService = None,
-    ):
+    def __init__(self, project: Project):
         """Instantiate new ELTContextBuilder.
 
         Args:
             project: A Meltano Project instance.
-            plugins_service: A PluginsService instance.
         """
         self.project = project
-        self.plugins_service = plugins_service or ProjectPluginsService(project)
 
         self._session = None
         self._job = None
@@ -334,7 +323,8 @@ class ELTContextBuilder:  # noqa: WPS214
         """Include full refresh flag when building context.
 
         Args:
-            full_refresh: Flag. Perform a full refresh (ignore state left behind by any previous runs).
+            full_refresh: Whether to perform a full refresh (ignore state left
+                behind by any previous runs).
 
         Returns:
             Updated ELTContextBuilder instance.
@@ -406,17 +396,17 @@ class ELTContextBuilder:  # noqa: WPS214
             PluginNotFoundError: if a plugin specified cannot be found.
         """
         try:
-            plugin = self.plugins_service.get_plugin(plugin_ref)
+            plugin = self.project.plugins.get_plugin(plugin_ref)
         except PluginNotFoundError as err:
             if plugin_ref.name == "dbt":
                 raise PluginNotFoundError(
                     "Transformer 'dbt' not found.\n"
-                    + "Use of the legacy 'dbt' Transformer is deprecated in favor of "
-                    + "new adapter specific implementations (e.g. 'dbt-snowflake') "
-                    + "compatible with the 'meltano run ...' command.\n"
-                    + "https://docs.meltano.com/guide/transformation\n"
-                    + "To continue using the legacy 'dbt' Transformer, "
-                    + "add it to your Project using 'meltano add transformer dbt'."
+                    "Use of the legacy 'dbt' Transformer is deprecated in favor of "
+                    "new adapter specific implementations (e.g. 'dbt-snowflake') "
+                    "compatible with the 'meltano run ...' command.\n"
+                    "https://docs.meltano.com/guide/transformation\n"
+                    "To continue using the legacy 'dbt' Transformer, "
+                    "add it to your Project using 'meltano add transformer dbt'.",
                 ) from err
             raise
 
@@ -425,7 +415,6 @@ class ELTContextBuilder:  # noqa: WPS214
             settings_service=PluginSettingsService(
                 self.project,
                 plugin,
-                plugins_service=self.plugins_service,
                 env_override=env,
                 config_override=config,
             ),
@@ -496,6 +485,5 @@ class ELTContextBuilder:  # noqa: WPS214
             select_filter=self._select_filter,
             catalog=self._catalog,
             state=self._state,
-            plugins_service=self.plugins_service,
             base_output_logger=self._base_output_logger,
         )

@@ -1,12 +1,18 @@
 """Defines MeltanoInvoker."""
+
 from __future__ import annotations
 
 import os
+import platform
 import subprocess
 import sys
+import typing as t
+from collections.abc import Mapping
 from pathlib import Path
 
-from .project_settings_service import ProjectSettingsService, SettingValueStore
+from meltano.core.project import Project
+from meltano.core.project_settings_service import SettingValueStore
+from meltano.core.tracking import Tracker
 
 MELTANO_COMMAND = "meltano"
 
@@ -14,29 +20,33 @@ MELTANO_COMMAND = "meltano"
 class MeltanoInvoker:
     """Class used to find and invoke all commands passed to it."""
 
-    def __init__(self, project, settings_service: ProjectSettingsService = None):
+    def __init__(self, project: Project):
         """
         Load the class with the project and service settings.
 
         Args:
-            project: Project class
-            settings_service: ProjectSettingsService Class blank
+            project: Project instance.
         """
         self.project = project
-        self.settings_service = settings_service or ProjectSettingsService(project)
+        self.tracker = Tracker(project)
 
-    def invoke(self, args, command=MELTANO_COMMAND, env=None, **kwargs):
-        """
-        Invoke meltano or other provided command.
+    def invoke(
+        self,
+        args: t.Iterable[str],
+        command: str = MELTANO_COMMAND,
+        env: dict[str, str] | None = None,
+        **kwargs: t.Any,
+    ) -> subprocess.CompletedProcess:
+        """Invoke meltano or other provided command.
 
         Args:
-            args: list.
-            command: string containing command to invoke.
-            env: dictionary.
-            kwargs: dictionary.
+            args: CLI arguments to pass to the command.
+            command: Executable to invoke.
+            env: Extra environment variables to use for the subprocess.
+            kwargs: Keyword arguments for `subprocess.run`.
 
         Returns:
-            A CompletedProcess class object from subprocess.run().
+            A `CompletedProcess` class object from `subprocess.run`.
         """
         return subprocess.run(
             [self._executable_path(command), *args],
@@ -51,31 +61,24 @@ class MeltanoInvoker:
             if executable_symlink.exists():
                 return str(executable_symlink)
 
-        if os.name == "nt":
-            command_exe = f"{command}.exe"
-            executable = Path(os.path.dirname(sys.executable), command_exe)
-        else:
-            executable = Path(os.path.dirname(sys.executable), command)
-
-        if executable.exists():
-            return str(executable)
-
-        # Fall back on expecting command to be in the PATH
-        return command
-
-    def _executable_env(self, env=None):
-        exec_env = {}
-
-        # Include env that project settings are evaluated in
-        exec_env.update(self.settings_service.env)
-
-        # Include env for settings explicitly overridden using CLI flags
-        exec_env.update(
-            self.settings_service.as_env(source=SettingValueStore.CONFIG_OVERRIDE)
+        executable = Path(
+            os.path.dirname(sys.executable),
+            f"{command}.exe" if platform.system() == "Windows" else command,
         )
 
-        # Include explicitly provided env
-        if env:
-            exec_env.update(env)
+        # Fall back on expecting command to be in the PATH
+        return str(executable) if executable.exists() else command
 
-        return exec_env
+    def _executable_env(self, env: Mapping[str, str] | None = None) -> dict[str, str]:
+        if env is None:
+            env = {}
+        return {
+            # Include env that project settings are evaluated in
+            **self.project.settings.env,
+            # Include env for settings explicitly overridden using CLI flags
+            **self.project.settings.as_env(source=SettingValueStore.CONFIG_OVERRIDE),
+            # Include explicitly provided env
+            **env,
+            # Include telemetry env vars
+            **self.tracker.env,
+        }

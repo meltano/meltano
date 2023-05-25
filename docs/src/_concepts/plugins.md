@@ -11,8 +11,7 @@ Meltano takes a modular approach to data engineering in general and EL(T) in par
 where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
-[**transformers**](#transformers) ([dbt](https://www.getdbt.com) and [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models)), and
-[**orchestrators**](#orchestrators) (currently [Airflow](https://airflow.apache.org/), with [Dagster](https://dagster.io/) [in development](https://github.com/meltano/meltano/issues/2349)).
+[**utilities**](#utilities) ([dbt](https://www.getdbt.com) for transformation, [Airflow](https://airflow.apache.org/)/[Dagster](https://dagster.io/)/etc. for orchestration, and much more on [MeltanoHub](https://hub.meltano.com/utilities/)).
 
 Meltano provides the glue to make these components work together smoothly and enables consistent [configuration](/guide/configuration) and [deployment](/guide/production).
 
@@ -120,15 +119,19 @@ Meltano supports the following types of plugins:
 - [**Extractors**](#extractors) pull data out of arbitrary data sources.
 - [**Mappers**](#mappers) perform stream map transforms on data between extractors and loaders.
 - [**Loaders**](#loaders) load extracted data into arbitrary data destinations.
-- [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
+- [**Utilities**](#utilities) perform arbitrary tasks provided by [pip packages](https://pip.pypa.io/en/stable/) with executables. All plugins previously referred to as `transformers` and `orchestrators` are being transistioned to utilities.
+- [**File bundles**](#file-bundles) bundle files you may want in your project.
+
+These plugin types are still supported but are transitioning to being referred to as [**Utilities**](#utilities):
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
-- [**File bundles**](#file-bundles) bundle files you may want in your project.
-- [**Utilities**](#utilities) perform arbitrary tasks provided by [pip packages](https://pip.pypa.io/en/stable/) with executables.
+
+These plugin types are deprecated:
+- [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
 
 ### Extractors
 
-Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data integration](/guide/integration).
+Extractors are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke) as part of [data integration](/guide/integration).
 They are responsible for pulling data out of arbitrary data sources: databases, SaaS APIs, or file formats.
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
@@ -240,7 +243,7 @@ export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 An extractor's `metadata` [extra](/guide/configuration#plugin-extras) holds an object describing
 [Singer stream and property metadata](https://hub.meltano.com/singer/spec#metadata)
 rules that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
-when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 Stream (entity) metadata `<key>: <value>` pairs (e.g. `{"replication-method": "INCREMENTAL"}`) are nested under top-level entity identifiers that correspond to Singer stream `tap_stream_id` values.
@@ -351,7 +354,7 @@ export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 
 An extractor's `select` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection rules](/reference/command-line-interface#select)
 that are applied to the extractor's [discovered catalog file](https://hub.meltano.com/singer/spec#catalog-files)
-when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt).
 These rules are not applied when a catalog is [provided manually](#catalog-extra).
 
 A selection rule is comprised of an entity identifier that corresponds to a Singer stream's `tap_stream_id` value, and an attribute identifier that that corresponds to a Singer stream property name, separated by a period (`.`). Rules indicating that an entity or attribute should be excluded are prefixed with an exclamation mark (`!`). [Unix shell-style wildcards](<https://en.wikipedia.org/wiki/Glob_(programming)#Syntax>) can be used in entity and attribute identifiers to match multiple entities and/or attributes at once.
@@ -400,7 +403,7 @@ meltano select tap-gitlab commits "*"
 
 An extractor's `select_filter` [extra](/guide/configuration#plugin-extras) holds an array of [entity selection](#select-extra) filter rules
 that are applied to the extractor's [discovered](/guide/integration#extractor-catalog-generation) or [provided](#catalog-extra) catalog file
-when the extractor is run using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke),
+when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), or [`meltano elt`](/reference/command-line-interface#elt),
 after [schema](#schema-extra), [selection](#select-extra), and [metadata](#metadata-extra) rules are applied.
 
 It can be used to only extract records for specific matching entities, or to extract records for all entities _except_ for those specified, by letting you apply filters on top of configured [entity selection rules](#select-extra).
@@ -515,8 +518,7 @@ Loaders support the following [extras](/guide/configuration#plugin-extras):
 
 A loader's `dialect` [extra](/guide/configuration#plugin-extras)
 holds the name of the dialect of the target database, so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
-can determine the type of database to connect to.
+[transformers](#transformers) in the same pipeline can determine the type of database to connect to.
 
 The value of this extra [can be referenced](/guide/configuration#expansion-in-setting-values) from a transformer's configuration using the `MELTANO_LOAD__DIALECT`
 [pipeline environment variable](/guide/integration#pipeline-environment-variables).
@@ -553,8 +555,7 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 A loader's `target_schema` [extra](/guide/configuration#plugin-extras)
 holds the name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that
-[transformers](#transformers) in the same pipeline and [Meltano UI](/reference/ui)'s [Analysis feature](/guide/analysis)
-can determine the database schema to load data from.
+[transformers](#transformers) in the same pipeline can determine the database schema to load data from.
 
 The value of this extra is usually not set explicitly, since its should correspond to the value of the loader's own "target schema" setting.
 If the name of this setting is not `schema`, its value [can be referenced](/guide/configuration#expansion-in-setting-values) from the extra's value using `$MELTANO_LOAD_<TARGET_SCHEMA_SETTING>`, e.g. `$MELTANO_LOAD_DESTINATION_SCHEMA` for setting `destination_schema`.
@@ -592,6 +593,11 @@ export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
 ```
 
 ### Transforms
+
+<div class="notification is-warning">
+  <p> Transform plugins are being deprecated in favor of calling dbt packages directly.</p>
+  <p> The transform plugin type is still supported for now but will eventually be phased out.</p>
+</div>
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
 that are used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
@@ -690,16 +696,26 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 ```
 ### Orchestrators
 
+<div class="notification is-warning">
+  <p> Orchestrator plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
+  <p> The orchestrator plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
+</div>
+
 Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
 
-Meltano supports [Apache Airflow](https://airflow.apache.org/) out of the box, but can be used with any tool capable of reading the output of [`meltano schedule list --format=json`](/reference/command-line-interface#schedule) and executing each pipeline's [`meltano elt`](/reference/command-line-interface#elt) command on a schedule.
+Meltano supports [Apache Airflow](https://airflow.apache.org/) out of the box, but can be used with any tool capable of reading the output of [`meltano schedule list --format=json`](/reference/command-line-interface#schedule) and executing each pipeline's [`meltano run`](/reference/command-line-interface#run) command on a schedule.
 
 When the `airflow` orchestrator is added to your project using [`meltano add`](/reference/command-line-interface#add),
 its related [file bundle](#file-bundles) will automatically be added as well.
 
 ### Transformers
 
-Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
+<div class="notification is-warning">
+  <p> Transformers plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
+  <p> The transformer plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
+</div>
+
+Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano run`](/reference/command-line-interface#run) as part of [data transformation](/guide/transformation).
 They are responsible for running [transforms](#transforms).
 
 Meltano supports [dbt](https://www.getdbt.com) and its [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models) out of the box.
@@ -764,8 +780,13 @@ export DBT__UPDATE='{"transform/dbt_project.yml": false, "profiles/*.yml": true}
 
 ### Utilities
 
-If none of the other plugin types address your needs, any [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility.
+The utility plugin type represents all non-EL plugins.
+Plugins that were under the transformer (e.g. dbt) and orchestrator (e.g. Airflow, Dagster) plugin types are now included as utilities.
+
+Also any additional [pip package](https://pip.pypa.io/en/stable/) that exposes an executable can be added to your project as a utility.
 Meltano has a selection of available utilities listed on [MeltanoHub](https://hub.meltano.com/utilities), or you can easily add your own custom utility.
+
+Meltano also has an [Extension Developer Kit (EDK)](/guide/advanced-topics#extension-developer-kit-edk) that can be used to integrate existing data tools with Meltano.
 
 #### Custom Utilities
 

@@ -5,18 +5,26 @@ from __future__ import annotations
 import asyncio
 import shutil
 import sys
-from typing import Iterable
+import typing as t
 
 import click
 import structlog
-from sqlalchemy.orm.session import sessionmaker
 
-from meltano.cli import activate_environment, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd, propagate_stop_signals
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    InstrumentedCmd,
+    propagate_stop_signals,
+)
 from meltano.core.db import project_engine
-from meltano.core.project import Project
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
+
+if t.TYPE_CHECKING:
+    from collections import abc
+
+    from sqlalchemy.orm.session import sessionmaker
+
+    from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
 
@@ -59,7 +67,11 @@ class CommandLineRunner(ValidationsRunner):
         return exit_code
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Run validations using plugins' tests.")
+@click.command(
+    cls=InstrumentedCmd,
+    short_help="Run validations using plugins' tests.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+)
 @click.option(
     "--all",
     "all_tests",
@@ -73,9 +85,7 @@ class CommandLineRunner(ValidationsRunner):
     nargs=-1,
 )
 @pass_project(migrate=True)
-@click.pass_context
 def test(
-    ctx: click.Context,
     project: Project,
     all_tests: bool,
     plugin_tests: tuple[str] = (),
@@ -85,7 +95,6 @@ def test(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#test
     """
-    activate_environment(ctx, project)
     _, session_maker = project_engine(project)
     session = session_maker()
 
@@ -109,7 +118,7 @@ def test(
 
 async def _run_plugin_tests(
     session: sessionmaker,
-    runners: Iterable[ValidationsRunner],
+    runners: abc.Iterable[ValidationsRunner],
 ) -> dict[str, dict[str, int]]:
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
@@ -134,7 +143,7 @@ def _report_and_exit(results: dict[str, dict[str, int]]):
     status = "successfully" if failed_count == 0 else "with failures"
     message = (
         f"Testing completed {status}. "
-        + f"{passed_count} test(s) successful. {failed_count} test(s) failed."
+        f"{passed_count} test(s) successful. {failed_count} test(s) failed."
     )
 
     write_sep_line(message, "=", fg=("red" if exit_code else "green"))

@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import structlog
 from dotenv import dotenv_values
 
-from meltano.core.project import ProjectReadonly
+from meltano.core.error import ProjectReadonly
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
-from .config_service import ConfigService
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.get_logger(__name__)
 
@@ -23,29 +25,42 @@ UI_CFG_SETTINGS = {
 }
 
 
-class ProjectSettingsService(SettingsService):
+class ProjectSettingsService(SettingsService):  # noqa: WPS214
     """Project Settings Service."""
 
     config_override = {}
     supports_environments = False
 
-    def __init__(self, *args, config_service: ConfigService = None, **kwargs):
-        """Instantiate ProjectSettingsService instance.
+    def __init__(
+        self,
+        project: Project,
+        show_hidden: bool = True,
+        env_override: dict | None = None,
+        config_override: dict | None = None,
+    ):
+        """Instantiate a `ProjectSettingsService` instance.
 
         Args:
-            args: Positional arguments to pass to the superclass.
-            config_service: Project configuration service instance.
-            kwargs: Keyword arguments to pass to the superclass.
+            project: Meltano project instance.
+            show_hidden: Whether to display secret setting values.
+            env_override: Optional override environment values.
+            config_override:  Optional override configuration values.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            project=project,
+            show_hidden=show_hidden,
+            env_override=env_override,
+            config_override=config_override,
+        )
 
-        self.config_service = config_service or ConfigService(self.project)
-
+        # terminal env vars are already present from `SettingService.env`
         self.env_override = {
-            # terminal environment variables already present from SettingService.env
-            **self.project.env,  # static, project-level envs (e.g. MELTANO_ENVIRONMENT)
-            **self.project.meltano.env,  # env vars stored in the base `meltano.yml` `env:` key
-            **self.env_override,  # overrides
+            # static, project-level env vars (e.g. MELTANO_ENVIRONMENT)
+            **self.project.env,
+            # env vars stored in the base `meltano.yml` `env:` key
+            **self.project.meltano.env,
+            # overrides
+            **self.env_override,
         }
 
         self.config_override = {  # noqa: WPS601
@@ -57,14 +72,26 @@ class ProjectSettingsService(SettingsService):
             self.ensure_project_id()
         except ProjectReadonly:
             logger.debug(
-                "Cannot update `project_id` in `meltano.yml`: project is read-only."
+                "Cannot update `project_id` in `meltano.yml`: project is read-only.",
             )
+
+    @property
+    def project_settings_service(self):
+        """Get the settings service for this project.
+
+        For ProjectSettingsService, just returns self.
+
+        Returns:
+            self
+        """
+        return self
 
     def ensure_project_id(self) -> None:
         """Ensure `project_id` is configured properly.
 
-        Every `meltano.yml` file should contain the `project_id` key-value pair. It should be
-        present in the top-level config, rather than in any environment-level configs.
+        Every `meltano.yml` file should contain the `project_id`
+        key-value pair. It should be present in the top-level config, rather
+        than in any environment-level configs.
 
         If it is not present, it will be restored from `analytics.json` if possible.
         """
@@ -76,12 +103,13 @@ class ProjectSettingsService(SettingsService):
         if project_id is None:
             try:
                 with open(
-                    self.project.meltano_dir() / "analytics.json"
+                    self.project.meltano_dir() / "analytics.json",
                 ) as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]
             except (OSError, KeyError, json.JSONDecodeError) as err:
                 logger.debug(
-                    "Unable to restore 'project_id' from 'analytics.json'", err=err
+                    "Unable to restore 'project_id' from 'analytics.json'",
+                    err=err,
                 )
             else:
                 self.set("project_id", project_id, store=SettingValueStore.MELTANO_YML)
@@ -121,7 +149,7 @@ class ProjectSettingsService(SettingsService):
         Returns:
             A list of defined settings.
         """
-        return self.config_service.settings
+        return self.project.config_service.settings
 
     @property
     def meltano_yml_config(self):
@@ -130,7 +158,7 @@ class ProjectSettingsService(SettingsService):
         Returns:
             Current configuration in `meltano.yml`.
         """
-        return self.config_service.current_config
+        return self.project.config_service.current_config
 
     def update_meltano_yml_config(self, config):
         """Update configuration in `meltano.yml`.
@@ -138,16 +166,16 @@ class ProjectSettingsService(SettingsService):
         Args:
             config: Updated config.
         """
-        self.config_service.update_config(config)
+        self.project.config_service.update_config(config)
 
     def process_config(self, config) -> dict:
-        """Process configuration dictionary for presentation in `meltano config meltano`.
+        """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:
             config: Config to process.
 
         Returns:
-            Processed configuration dictionary for presentation in `meltano config meltano`.
+            Processed configuration dict for presentation in `meltano config meltano`.
         """
         return nest_object(config)
 

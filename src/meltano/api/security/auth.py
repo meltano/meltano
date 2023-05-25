@@ -12,7 +12,6 @@ from werkzeug.exceptions import Forbidden
 
 from meltano.api.models import db
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 
 HTTP_READONLY_CODE = 499
 
@@ -64,9 +63,8 @@ def permit(permission_type, context):
 
 def passes_authentication_checks():
     project = Project.find()
-    settings_service = ProjectSettingsService(project)
 
-    if not settings_service.get("ui.authentication"):
+    if not project.settings.get("ui.authentication"):
         logging.debug("Authentication not required because it's disabled")
         return True
 
@@ -74,7 +72,7 @@ def passes_authentication_checks():
         logging.debug(f"Authenticated as '{current_user.username}'")
         return True
 
-    if settings_service.get("ui.anonymous_readonly") and current_user.is_anonymous:
+    if project.settings.get("ui.anonymous_readonly") and current_user.is_anonymous:
         # The `@roles_required("admin")` and `@block_if_readonly` checks
         # will take care of enforcing authentication as appropriate
         logging.debug(
@@ -100,9 +98,8 @@ def block_if_readonly(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         project = Project.find()
-        settings_service = ProjectSettingsService(project)
 
-        if settings_service.get("ui.readonly"):
+        if project.settings.get("ui.readonly"):
             return (
                 jsonify(
                     {"error": True, "code": "Meltano UI is running in read-only mode"}
@@ -110,7 +107,7 @@ def block_if_readonly(f):
                 HTTP_READONLY_CODE,
             )
 
-        if settings_service.get("ui.anonymous_readonly") and current_user.is_anonymous:
+        if project.settings.get("ui.anonymous_readonly") and current_user.is_anonymous:
             return (
                 jsonify(
                     {

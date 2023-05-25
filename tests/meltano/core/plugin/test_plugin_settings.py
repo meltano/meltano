@@ -29,7 +29,10 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 @pytest.mark.order(0)
 def test_create(session):
     setting = Setting(
-        name="api_key.test.test", namespace="gitlab", value="C4F3C4F3", enabled=True
+        name="api_key.test.test",
+        namespace="gitlab",
+        value="C4F3C4F3",
+        enabled=True,
     )
 
     session.add(setting)
@@ -40,7 +43,7 @@ def test_create(session):
 
 
 @pytest.fixture(scope="class")
-def env_var(plugin_discovery_service):
+def env_var(plugin_discovery_service):  # noqa: ARG001
     def _wrapper(plugin_settings_service, setting_name):
         setting_def = plugin_settings_service.find_setting(setting_name)
         return plugin_settings_service.setting_env(setting_def)
@@ -63,16 +66,18 @@ def custom_tap(project_add_service):
         return err.plugin
 
 
-@pytest.fixture
+@pytest.fixture()
 def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
     return plugin_settings_service_factory(tap)
 
 
-@pytest.fixture
-def active_environment(project: Project) -> Environment:
+@pytest.fixture()
+def environment(project: Project) -> Environment:
     project.activate_environment("dev")
-    yield project.active_environment
-    project.active_environment = None
+    try:
+        yield project.environment
+    finally:
+        project.deactivate_environment()
 
 
 class TestPluginSettingsService:
@@ -104,7 +109,10 @@ class TestPluginSettingsService:
 
         # overriden by an Setting db value when set
         subject.set(
-            "test", "THIS_IS_FROM_DB", store=SettingValueStore.DB, session=session
+            "test",
+            "THIS_IS_FROM_DB",
+            store=SettingValueStore.DB,
+            session=session,
         )
 
         assert subject.get_with_source("test", session=session) == (
@@ -115,7 +123,10 @@ class TestPluginSettingsService:
         # overriden via the `meltano.yml` configuration
         test_value = 42
         subject.set(
-            "test", test_value, store=SettingValueStore.MELTANO_YML, session=session
+            "test",
+            test_value,
+            store=SettingValueStore.MELTANO_YML,
+            session=session,
         )
 
         assert subject.get_with_source("test", session=session) == (
@@ -182,7 +193,7 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_definitions(self, subject, monkeypatch):
+    def test_definitions(self, subject):
         subject.show_hidden = False
         subject._setting_defs = None
 
@@ -196,7 +207,8 @@ class TestPluginSettingsService:
         assert "secret" not in setting_defs_by_name
 
     @pytest.mark.order(1)
-    def test_as_dict(self, subject, session, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_as_dict(self, subject, session):
         expected = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_dict(session=session)
         redacted_config = subject.as_dict(redacted=True, session=session)
@@ -207,7 +219,7 @@ class TestPluginSettingsService:
 
     def test_environment_only_config(
         self,
-        active_environment: Environment,
+        environment: Environment,
         subject: PluginSettingsService,
         project: Project,
     ):
@@ -224,10 +236,11 @@ class TestPluginSettingsService:
 
             dev_environment = meltano.environments[0]
             env_plugin = dev_environment.config.plugins[PluginType.EXTRACTORS][0]
-            assert dev_environment == active_environment
+            assert dev_environment == environment
             assert env_plugin.config["test_environment"] == "THIS_IS_FROM_ENVIRONMENT"
 
-    def test_as_dict_process(self, subject: PluginSettingsService, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_as_dict_process(self, subject: PluginSettingsService):
         config = subject.as_dict()
         assert config["auth.username"] is None
         assert config["auth.password"] is None
@@ -264,13 +277,18 @@ class TestPluginSettingsService:
         assert "auth.username" not in config
         assert "auth.password" not in config
 
+    @pytest.mark.usefixtures("project")
     def test_as_dict_custom(
-        self, session, project, custom_tap, plugin_settings_service_factory
+        self,
+        session,
+        custom_tap,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(custom_tap)
         assert subject.as_dict(extras=False, session=session) == custom_tap.config
 
-    def test_as_dict_redacted(self, subject, session, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_as_dict_redacted(self, subject, session):
         store = SettingValueStore.DB
 
         # ensure values are redacted when they are set
@@ -284,7 +302,8 @@ class TestPluginSettingsService:
         config = subject.as_dict(session=session)
         assert config["secure"] == "thisisatest"
 
-    def test_as_env(self, subject, session, tap, env_var):
+    @pytest.mark.usefixtures("tap")
+    def test_as_env(self, subject, session, env_var):
         subject.set("boolean", True, store=SettingValueStore.DOTENV)
         subject.set("list", [1, 2, 3, "4"], store=SettingValueStore.DOTENV)
         subject.set("object", {"1": {"2": 3}}, store=SettingValueStore.DOTENV)
@@ -308,8 +327,13 @@ class TestPluginSettingsService:
         assert config["MELTANO_EXTRACT_OBJECT"] == '{"1": {"2": 3}}'
         assert config["MELTANO_EXTRACT_BOOLEAN"] == "true"
 
+    @pytest.mark.usefixtures("project")
     def test_as_env_custom(
-        self, project, session, custom_tap, env_var, plugin_settings_service_factory
+        self,
+        session,
+        custom_tap,
+        env_var,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(custom_tap)
         config = subject.as_env(session=session)
@@ -317,8 +341,13 @@ class TestPluginSettingsService:
             assert config.get(env_var(subject, key)) == value
 
     @pytest.mark.order(4)
+    @pytest.mark.usefixtures("env_var")
     def test_namespace_as_env_prefix(
-        self, project, session, target, env_var, plugin_settings_service_factory
+        self,
+        project,
+        session,
+        target,
+        plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(target)
 
@@ -354,13 +383,18 @@ class TestPluginSettingsService:
         )  # Generic prefix, read-only
 
     def test_setting_env_vars(
-        self, tap, inherited_tap, alternative_target, plugin_settings_service_factory
+        self,
+        tap,
+        inherited_tap,
+        alternative_target,
+        plugin_settings_service_factory,
     ):
         def env_vars(service, setting_name, **kwargs):
             return [
                 setting.definition
                 for setting in service.setting_env_vars(
-                    service.find_setting(setting_name), **kwargs
+                    service.find_setting(setting_name),
+                    **kwargs,
                 )
             ]
 
@@ -380,13 +414,13 @@ class TestPluginSettingsService:
         service = plugin_settings_service_factory(alternative_target)
         # For reading setting values from environment
         assert env_vars(service, "schema") == [
-            "TARGET_MOCK_ALTERNATIVE_SCHEMA"  # Name and namespace prefix
+            "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
         ]
         # For writing values into the execution environment
         assert env_vars(service, "schema", for_writing=True) == [
             "MOCKED_SCHEMA",  # Custom `env`
             "TARGET_MOCK_ALTERNATIVE_SCHEMA",  # Name and namespace prefix
-            "TARGET_MOCK_SCHEMA",  # Parent name  prefix
+            "TARGET_MOCK_SCHEMA",  # Parent name prefix
             "MOCK_SCHEMA",  # Parent namespace prefix
             "MELTANO_LOAD_SCHEMA",  # Generic prefix
         ]
@@ -395,7 +429,7 @@ class TestPluginSettingsService:
         service = plugin_settings_service_factory(inherited_tap)
         # For reading setting values from environment
         assert env_vars(service, "boolean") == [
-            "TAP_MOCK_INHERITED_BOOLEAN"  # Name and namespace prefix
+            "TAP_MOCK_INHERITED_BOOLEAN",  # Name and namespace prefix
         ]
         # For writing values into the execution environment
         assert env_vars(service, "boolean", for_writing=True) == [
@@ -404,7 +438,8 @@ class TestPluginSettingsService:
             "MELTANO_EXTRACT_BOOLEAN",  # Generic prefix
         ]
 
-    def test_store_db(self, session, subject, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_store_db(self, session, subject):
         store = SettingValueStore.DB
 
         subject.set("test_a", "THIS_IS_FROM_DB", store=store, session=session)
@@ -420,7 +455,8 @@ class TestPluginSettingsService:
 
         assert session.query(Setting).count() == 0
 
-    def test_store_meltano_yml(self, subject, project, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_store_meltano_yml(self, subject, project):
         store = SettingValueStore.MELTANO_YML
 
         subject.set("test_a", "THIS_IS_FROM_YML", store=store)
@@ -446,7 +482,8 @@ class TestPluginSettingsService:
             assert "test_b" not in extractor.config
 
     @pytest.mark.order(2)
-    def test_store_dotenv(self, subject, project, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_store_dotenv(self, subject, project):
         store = SettingValueStore.DOTENV
 
         assert not project.dotenv.exists()
@@ -504,12 +541,18 @@ class TestPluginSettingsService:
         subject.reset(store=store)
         assert not project.dotenv.exists()
 
+    @pytest.mark.usefixtures("tap")
     def test_env_var_expansion(
-        self, session, subject, project, tap, monkeypatch, env_var
+        self,
+        session,
+        subject,
+        project,
+        monkeypatch,
+        env_var,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         monkeypatch.setenv("VAR", "hello world!")
         monkeypatch.setenv("FOO", "42")
@@ -559,7 +602,8 @@ class TestPluginSettingsService:
         }
 
     @pytest.mark.order(3)
-    def test_nested_keys(self, session, subject, project, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_nested_keys(self, session, subject, project):
         def set_config(path, value):
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
 
@@ -619,7 +663,8 @@ class TestPluginSettingsService:
         assert "metadata" not in yml
         assert "metadata.stream.replication-key" not in final_config()
 
-    def test_custom_setting(self, session, subject, tap, env_var):
+    @pytest.mark.usefixtures("tap")
+    def test_custom_setting(self, session, subject, env_var):
         subject.set("custom_string", "from_yml", store=SettingValueStore.MELTANO_YML)
         subject.set("custom_bool", True, store=SettingValueStore.MELTANO_YML)
         subject.set("custom_array", [1, 2, 3, "4"], store=SettingValueStore.MELTANO_YML)
@@ -665,8 +710,12 @@ class TestPluginSettingsService:
         monkeypatch.setitem(subject.plugin.config, "start_date", now)
         assert subject.get("start_date") == now.isoformat()
 
+    @pytest.mark.usefixtures("tap")
     def test_kind_object(
-        self, subject: PluginSettingsService, tap, monkeypatch, env_var
+        self,
+        subject: PluginSettingsService,
+        monkeypatch,
+        env_var,
     ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
@@ -743,7 +792,8 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_extra(self, subject, tap, monkeypatch, env_var):
+    @pytest.mark.usefixtures("tap")
+    def test_extra(self, subject, monkeypatch, env_var):
         subject._setting_defs = None
 
         assert "_select" in subject.as_dict()
@@ -756,7 +806,9 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin.parent._variant.extras, "select", ["from_default"]
+            subject.plugin.parent._variant.extras,
+            "select",
+            ["from_default"],
         )
         subject._setting_defs = None
 
@@ -766,7 +818,9 @@ class TestPluginSettingsService:
         )
 
         monkeypatch.setitem(
-            subject.plugin.config, "_select", ["from_meltano_yml_config"]
+            subject.plugin.config,
+            "_select",
+            ["from_meltano_yml_config"],
         )
 
         assert subject.get_with_source("_select") == (
@@ -802,9 +856,9 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
+    @pytest.mark.usefixtures("environment")
     def test_extra_object(
         self,
-        active_environment,
         subject,
         monkeypatch,
         env_var,
@@ -813,7 +867,8 @@ class TestPluginSettingsService:
     ):
         try:
             transform = project_add_service.add(
-                PluginType.TRANSFORMS, "tap-mock-transform"
+                PluginType.TRANSFORMS,
+                "tap-mock-transform",
             )
         except PluginAlreadyAddedException as err:
             transform = err.plugin
@@ -883,7 +938,7 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_ENV,
         )
 
-        subject.project.active_environment = None
+        subject.project.deactivate_environment()
 
         inherited = project_add_service.add(
             PluginType.TRANSFORMS,
@@ -902,7 +957,10 @@ class TestPluginSettingsService:
         )
 
     def test_find_setting_raises_with_conflicting(
-        self, tap, plugin_settings_service_factory, monkeypatch
+        self,
+        tap,
+        plugin_settings_service_factory,
+        monkeypatch,
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -911,7 +969,10 @@ class TestPluginSettingsService:
             subject.get("aliased")
 
     def test_find_setting_raises_with_multiple(
-        self, tap, plugin_settings_service_factory, monkeypatch
+        self,
+        tap,
+        plugin_settings_service_factory,
+        monkeypatch,
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -926,13 +987,19 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_on_raises_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            True,
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
     @pytest.mark.order(-1)
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.project_settings_service.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+            False,
+        )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None

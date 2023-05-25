@@ -4,20 +4,27 @@ from __future__ import annotations
 
 import os
 import platform
+import sys
+import typing as t
 import uuid
 from collections import defaultdict
+from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from warnings import warn
 
 import psutil
-from cached_property import cached_property
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr
+from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
 
 logger = get_logger(__name__)
 
@@ -25,23 +32,72 @@ logger = get_logger(__name__)
 release_marker_path = Path(__file__).parent / ".release_marker"
 
 
+def _get_parent_context_uuid_str() -> str | None:
+    with suppress(KeyError):
+        uuid_str = os.environ["MELTANO_PARENT_CONTEXT_UUID"]
+        try:
+            return str(uuid.UUID(uuid_str))
+        except ValueError:
+            warn(
+                (
+                    f"Invalid telemetry parent environment context UUID "
+                    f"{uuid_str!r} from $MELTANO_PARENT_CONTEXT_UUID - "
+                    "Meltano will continue as if $MELTANO_PARENT_CONTEXT_UUID "
+                    "had not been set"
+                ),
+                stacklevel=2,
+            )
+    return None
+
+
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
+    ci_markers = {
+        "GITHUB_ACTIONS",
+        "CI",
+    }
+    notable_flag_env_vars = {
+        "CODESPACES",
+        *ci_markers,
+    }
+    notable_hashed_env_vars = {
+        "CODESPACE_NAME",
+        "GITHUB_REPOSITORY",
+        "GITHUB_USER",
+    }
+
+    @classmethod
+    def _notable_hashed_env_vars(cls) -> t.Iterable[str]:
+        for env_var_name in cls.notable_hashed_env_vars:
+            with suppress(KeyError):  # Skip unset env vars
+                env_var_value = os.environ[env_var_name]
+                yield env_var_name, hash_sha256(env_var_value)
+
+    @classmethod
+    def _notable_flag_env_vars(cls) -> t.Iterable[str]:
+        for env_var_name in cls.notable_flag_env_vars:
+            with suppress(KeyError):  # Skip unset env vars
+                env_var_value = os.environ[env_var_name]
+                try:
+                    yield env_var_name, strtobool(env_var_value)
+                except ValueError:
+                    yield env_var_name, None
+
     def __init__(self):
         """Initialize the environment context."""
-        ci_markers = ("GITHUB_ACTIONS", "CI")
         super().__init__(
             EnvironmentContextSchema.url,
             {
                 "context_uuid": str(uuid.uuid4()),
+                "parent_context_uuid": _get_parent_context_uuid_str(),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.exists(),
                 "is_ci_environment": any(
-                    # True if 'true', 'TRUE', 'True', or '1'
-                    os.environ.get(marker, "").lower()[:1] in {"1", "t"}
-                    for marker in ci_markers
+                    get_boolean_env_var(marker) for marker in self.ci_markers
                 ),
+                "notable_flag_env_vars": dict(self._notable_flag_env_vars()),
+                "notable_hashed_env_vars": dict(self._notable_hashed_env_vars()),
                 "python_version": platform.python_version(),
                 "python_implementation": platform.python_implementation(),
                 **self.system_info,
@@ -50,7 +106,7 @@ class EnvironmentContext(SelfDescribingJson):
         )
 
     @cached_property
-    def system_info(self) -> dict[str, Any]:
+    def system_info(self) -> dict[str, t.Any]:
         """Get system information.
 
         Returns:
@@ -87,11 +143,12 @@ class EnvironmentContext(SelfDescribingJson):
         return f"{datetime.utcfromtimestamp(process.create_time()).isoformat()}Z"
 
     @cached_property
-    def process_info(self) -> dict[str, Any]:
+    def process_info(self) -> dict[str, t.Any]:
         """Obtain the process information for the current process.
 
         Returns:
-            A dictionary containing the process information. Such as the hashed process name, pid, core counts, etc
+            A dictionary containing the process information. Such as the hashed
+            process name, pid, core counts, etc
         """
         process = psutil.Process()
         with process.oneshot():
@@ -111,10 +168,11 @@ class EnvironmentContext(SelfDescribingJson):
     def num_available_cores(self) -> int:
         """Obtain the number of available CPU cores.
 
-        Uses sched_getaffinity where available, otherwise falls back to cpu_count().
+        Uses `sched_getaffinity` where available, otherwise falls back to
+        `cpu_count`.
 
         Returns:
-            int: The number of available CPU cores.
+            The number of available CPU cores.
         """
         if safe_hasattr(os, "sched_getaffinity"):
             return len(os.sched_getaffinity(0))

@@ -6,7 +6,7 @@ INTEGRATION_BASE_DIR="${BASE_DIR}/integration"
 # What we'll "compile" the markdown to.
 TEST_SCRIPT_NAME="${TEST_NAME}.sh"
 
-TEST_DOCS_DIR="./docs/example-library/$TEST_NAME"
+TEST_DOCS_DIR="${BASE_DIR}/docs/example-library/${TEST_NAME}"
 if [ ! -d "$TEST_DOCS_DIR" ]; then
   echo "Test directory $TEST_DOCS_DIR does not exist"
   exit 1

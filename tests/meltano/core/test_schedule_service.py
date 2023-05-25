@@ -56,7 +56,9 @@ def create_job_schedule():
 @pytest.fixture(scope="class")
 def custom_tap(project_add_service):
     tap = ProjectPlugin(
-        PluginType.EXTRACTORS, name="tap-custom", namespace="tap_custom"
+        PluginType.EXTRACTORS,
+        name="tap-custom",
+        namespace="tap_custom",
     )
     try:
         return project_add_service.add_plugin(tap)
@@ -101,7 +103,7 @@ class TestScheduleService:
     def test_remove_schedule(self, subject):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         schedules = list(subject.schedules())
@@ -138,17 +140,29 @@ class TestScheduleService:
         assert schedule is not subject.schedules()[0]
 
         # it must exists
+        schedule.name = "llamasareverynice"
         with pytest.raises(ScheduleDoesNotExistError):
-            schedule.name = "llamasareverynice"
             subject.update_schedule(schedule)
 
     def test_schedule_start_date(
-        self, subject, session, tap, target, plugin_settings_service_factory
+        self,
+        subject,
+        session,
+        tap,
+        target,
+        plugin_settings_service_factory,
     ):
         # curry the `add_elt` method to remove some arguments
-        add_elt = lambda name, start_date: subject.add_elt(  # noqa: E731
-            session, name, tap.name, target.name, "run", "@daily", start_date=start_date
-        )
+        def add_elt(name, start_date):
+            return subject.add_elt(  # noqa: E731
+                session,
+                name,
+                tap.name,
+                target.name,
+                "run",
+                "@daily",
+                start_date=start_date,
+            )
 
         mock_date = datetime(2002, 1, 1)  # noqa: WPS432
 
@@ -173,7 +187,7 @@ class TestScheduleService:
     def test_run_elt_schedule(self, subject, session, tap, target):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         schedule = subject.add_elt(
@@ -196,7 +210,9 @@ class TestScheduleService:
             return_value=process_mock,
         ) as invoke_mock:
             process = subject.run(
-                schedule, "--dump=config", env={"TAP_MOCK_SECURE": "overridden"}
+                schedule,
+                "--dump=config",
+                env={"TAP_MOCK_SECURE": "overridden"},
             )
             assert process.returncode == 0
 
@@ -212,10 +228,11 @@ class TestScheduleService:
                 env={"TAP_MOCK_TEST": "overridden", "TAP_MOCK_SECURE": "overridden"},
             )
 
-    def test_run_job_schedule(self, subject, session, tap, target):
+    @pytest.mark.usefixtures("session", "tap", "target")
+    def test_run_job_schedule(self, subject):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         schedule = subject.add(
@@ -234,7 +251,9 @@ class TestScheduleService:
             return_value=process_mock,
         ) as invoke_mock:
             process = subject.run(
-                schedule, "--dry-run", env={"MOCK_ENV_ENTRY": "athing"}
+                schedule,
+                "--dry-run",
+                env={"MOCK_ENV_ENTRY": "athing"},
             )
             assert process.returncode == 0
 
@@ -250,29 +269,22 @@ class TestScheduleService:
                 },
             )
 
-    def test_find_namespace_schedule(
-        self, subject, tap, create_elt_schedule, project_plugins_service
-    ):
+    def test_find_namespace_schedule(self, subject, tap, create_elt_schedule):
         schedule = create_elt_schedule(tap.name)
         subject.add_schedule(schedule)
-        with mock.patch(
-            "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            found_schedule = subject.find_namespace_schedule(tap.namespace)
-            assert found_schedule.extractor == tap.name
+        found_schedule = subject.find_namespace_schedule(tap.namespace)
+        assert found_schedule.extractor == tap.name
 
+    @pytest.mark.usefixtures("create_elt_schedule")
     def test_find_namespace_schedule_custom_extractor(
-        self, subject, create_elt_schedule, custom_tap, project_plugins_service
+        self,
+        subject,
+        custom_tap,
     ):
         schedule = Schedule(name="tap-custom", extractor="tap-custom")
         subject.add_schedule(schedule)
-        with mock.patch(
-            "meltano.core.project_plugins_service.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ):
-            found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
-            assert found_schedule.extractor == custom_tap.name
+        found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
+        assert found_schedule.extractor == custom_tap.name
 
     def test_find_namespace_schedule_not_found(self, subject):
         with pytest.raises(ScheduleNotFoundError):

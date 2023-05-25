@@ -1,3 +1,5 @@
+"""dbt plugins."""
+
 from __future__ import annotations
 
-from .base import DbtInvoker, DbtPlugin, DbtTransformPlugin, DbtTransformPluginInstaller
+from meltano.core.plugin.dbt.base import DbtInvoker, DbtPlugin, DbtTransformPlugin

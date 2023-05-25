@@ -2,20 +2,26 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.project import Project
-from meltano.core.tracking import CliEvent
+from meltano.core.tracking.contexts import CliEvent
 
-from . import cli
-from .utils import InstrumentedGroup, PartialInstrumentedCmd
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 ENVIRONMENT_SERVICE_KEY = "environment_service"
 
 
-@cli.group(cls=InstrumentedGroup, name="environment", short_help="Manage environments.")
+@click.group(
+    cls=InstrumentedGroup,
+    name="environment",
+    short_help="Manage environments.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_environment(project: Project, ctx: click.Context):
@@ -23,7 +29,7 @@ def meltano_environment(project: Project, ctx: click.Context):
     Manage Environments.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#environment
-    """
+    """  # noqa: E501
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
 
 

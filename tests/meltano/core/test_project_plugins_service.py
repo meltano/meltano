@@ -6,15 +6,20 @@ from copy import deepcopy
 
 import pytest
 
+from meltano.core import utils
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import DefinitionSource, ProjectPluginsService
+from meltano.core.project_plugins_service import (
+    DefinitionSource,
+    PluginDefinitionNotFoundError,
+)
+from meltano.core.settings_service import FeatureFlags
 
 
-@pytest.fixture
+@pytest.fixture()
 def modified_lockfile(project: Project):
     lockfile_path = project.plugin_lock_path(
         PluginType.EXTRACTORS,
@@ -37,34 +42,35 @@ def modified_lockfile(project: Project):
 
 
 class TestProjectPluginsService:
-    @pytest.fixture
-    def subject(self, project_plugins_service):
-        return project_plugins_service
-
-    def test_default_init_should_not_fail(self, subject):
-        assert subject
+    @pytest.fixture(autouse=True)
+    def setup(self, project: Project, tap):
+        project.plugins.lock_service.save(tap, exists_ok=True)
+        project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)
-    def test_plugins(self, subject):
+    def test_plugins(self, project):
         assert all(
-            isinstance(plugin.parent, BasePlugin) for plugin in subject.plugins()
+            isinstance(plugin.parent, BasePlugin)
+            for plugin in project.plugins.plugins()
         )
 
-    @pytest.mark.order(1)
     def test_get_plugin(
-        self, subject, tap, alternative_tap, inherited_tap, alternative_target
+        self,
+        project,
+        tap,
+        alternative_tap,
+        inherited_tap,
+        alternative_target,
     ):
-        subject._use_cache = True  # Disabled by defaults in testing
-
         # name="tap-mock", variant="meltano"
-        plugin = subject.get_plugin(tap)
+        plugin = project.plugins.get_plugin(tap)
         assert plugin.type == PluginType.EXTRACTORS
         assert plugin.name == "tap-mock"
         assert plugin.variant == "meltano"
         assert plugin.parent
 
         # name="tap-mock--singer-io", inherit_from="tap-mock", variant="singer-io"
-        alternative_plugin = subject.get_plugin(alternative_tap)
+        alternative_plugin = project.plugins.get_plugin(alternative_tap)
         assert alternative_plugin.type == PluginType.EXTRACTORS
         assert alternative_plugin.name == "tap-mock--singer-io"
         assert alternative_plugin.inherit_from == "tap-mock"
@@ -72,32 +78,32 @@ class TestProjectPluginsService:
         assert plugin.parent
 
         # name="tap-mock-inherited", inherit_from="tap-mock"
-        inherited_plugin = subject.get_plugin(inherited_tap)
+        inherited_plugin = project.plugins.get_plugin(inherited_tap)
         assert inherited_plugin.type == PluginType.EXTRACTORS
         assert inherited_plugin.name == "tap-mock-inherited"
         assert inherited_plugin.inherit_from == "tap-mock"
         assert plugin.parent
 
         # name="target-mock-alternative", inherit_from="target-mock"
-        alternative_plugin = subject.get_plugin(alternative_target)
+        alternative_plugin = project.plugins.get_plugin(alternative_target)
         assert alternative_plugin.type == PluginType.LOADERS
         assert alternative_plugin.name == "target-mock-alternative"
         assert alternative_plugin.inherit_from == "target-mock"
         assert plugin.parent
 
         # Results are cached
-        assert subject.get_plugin(tap) is plugin
+        assert project.plugins.get_plugin(tap) is plugin
 
-        subject._use_cache = False
-        assert subject.get_plugin(tap) is not plugin
+        project.refresh()
+        assert project.plugins.get_plugin(tap) is not plugin
 
     @pytest.mark.order(2)
+    @pytest.mark.usefixtures("modified_lockfile")
     def test_get_parent_from_lockfile(
         self,
-        subject: ProjectPluginsService,
+        project: Project,
         tap: ProjectPlugin,
         locked_definition_service: LockedDefinitionService,
-        modified_lockfile,
     ):
         expected = locked_definition_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
@@ -105,78 +111,119 @@ class TestProjectPluginsService:
             variant="meltano",
         )
 
-        result, source = subject.find_parent(tap)
+        result, source = project.plugins.find_parent(tap)
         assert source == DefinitionSource.LOCKFILE
         assert result == expected
         assert result.settings == expected.settings
         assert result.settings[-1].name == "foo"
 
+    @pytest.mark.order(2)
+    def test_get_parent_no_source_enabled(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+    ):
+        with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
+            PluginDefinitionNotFoundError,
+        ):
+            project.plugins.get_parent(tap)
+
+    def test_ff_plugins_lock_required(
+        self,
+        project: Project,
+        monkeypatch,
+    ):
+        assert project.plugins._prefer_source == DefinitionSource.ANY
+
+        monkeypatch.setenv(
+            utils.to_env_var(
+                "meltano",
+                FeatureFlags.PLUGIN_LOCKS_REQUIRED.setting_name,
+            ),
+            "1",
+        )
+        project.refresh()
+        assert project.plugins._prefer_source == DefinitionSource.LOCAL
+
     def test_get_parent_no_lockfiles(
         self,
-        subject: ProjectPluginsService,
+        project: Project,
         tap,
         alternative_tap,
         inherited_tap,
         alternative_target,
         plugin_discovery_service,
     ):
-
         # The behavior being tested here assumes that no lockfiles exist.
-        shutil.rmtree(subject.project.root_dir("plugins"), ignore_errors=True)
+        shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
-        assert subject.get_parent(tap) == plugin_discovery_service.find_base_plugin(
+        parent = project.plugins.get_parent(tap)
+        base = plugin_discovery_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
             plugin_name="tap-mock",
             variant="meltano",
         )
+        assert base.name == parent.name
+        assert base.type == parent.type
 
         # name="tap-mock-inherited", inherit_from="tap-mock"
         # Inherits from project plugin
-        assert subject.get_parent(inherited_tap) == tap
+        assert project.plugins.get_parent(inherited_tap) == tap
 
         # name="tap-mock--singer-io", inherit_from="tap-mock", variant="singer-io"
         # Inherits from base plugin with correct variant
-        assert subject.get_parent(
-            alternative_tap
-        ) == plugin_discovery_service.find_base_plugin(
+        parent = project.plugins.get_parent(alternative_tap)
+        base = plugin_discovery_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
             plugin_name="tap-mock",
             variant="singer-io",
         )
+        assert base.name == parent.name
+        assert base.type == parent.type
 
         # name="target-mock-alternative", inherit_from="target-mock"
         # Inherits from base plugin because no plugin shadowing the base plugin exists
-        assert subject.get_parent(
-            alternative_target
-        ) == plugin_discovery_service.find_base_plugin(
+        base = plugin_discovery_service.find_base_plugin(
             plugin_type=PluginType.LOADERS,
             plugin_name="target-mock",
         )
+        parent = project.plugins.get_parent(alternative_target)
+        assert base.name == parent.name
+        assert base.type == parent.type
 
         nonexistent_parent = ProjectPlugin(
-            PluginType.EXTRACTORS, name="tap-foo", inherit_from="tap-bar"
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+            inherit_from="tap-bar",
         )
-        with pytest.raises(PluginParentNotFoundError):
-            assert subject.get_parent(nonexistent_parent)
+        with pytest.raises(PluginDefinitionNotFoundError) as excinfo:
+            assert project.plugins.get_parent(nonexistent_parent)
 
-    def test_update_plugin(self, subject, tap):
+        assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
+
+    def test_update_plugin(self, project: Project, tap):
         # update a tap with a random value
         tap.config["test"] = 42
-        outdated = subject.update_plugin(tap)
+        outdated = project.plugins.update_plugin(tap)
         assert (
-            subject.get_plugin(tap).config["test"]
+            project.plugins.get_plugin(tap).config["test"]
             == 42  # noqa: WPS432 (OK magic number)
         )
 
         # revert back
-        subject.update_plugin(outdated)
+        project.plugins.update_plugin(outdated)
         assert (
-            subject.get_plugin(tap).config == {}  # noqa: WPS520 (OK compare with falsy)
+            project.plugins.get_plugin(tap).config
+            == {}  # noqa: WPS520 (OK compare with falsy)
         )
 
-    def test_find_plugins_by_mapping_name(self, subject, mapper):
-        assert subject.find_plugins_by_mapping_name("mock-mapping-1") == [mapper]
-        assert subject.find_plugins_by_mapping_name("mock-mapping-0") == [mapper]
+    def test_find_plugins_by_mapping_name(self, project: Project, mapper):
+        assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
+            mapper,
+        ]
+        assert project.plugins.find_plugins_by_mapping_name("mock-mapping-0") == [
+            mapper,
+        ]
         with pytest.raises(PluginNotFoundError):
-            subject.find_plugins_by_mapping_name("non-existent-mapping")
+            project.plugins.find_plugins_by_mapping_name("non-existent-mapping")

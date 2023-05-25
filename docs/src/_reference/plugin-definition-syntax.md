@@ -39,6 +39,16 @@ A human-readable label for the plugin.
 label: Airflow
 ```
 
+## `description`
+
+A brief description of what the tool, API, or file is used for.
+
+An example description for Salesforce:
+
+```yaml
+description: Customer-relationship management & customer success platform
+```
+
 ## `docs`
 
 The URL of the plugin's documentation.
@@ -49,10 +59,27 @@ docs: https://docs.meltano.com/guide/orchestration
 
 ## `repo`
 
-The URL of the plugin's repository (in GitHub, GitLab, etc.).
+The URL of the plugin's repository (in GitHub, GitLab, etc.). In the case of extensions
+wrapping another application this should point the applications repository, not the extensions.
 
 ```yaml
 repo: https://github.com/apache/airflow
+```
+
+## `repo_ext`
+
+The URL of the plugins extensions repository itself (in GitHub, GitLab, etc.).
+
+```yaml
+repo_ext: https://github.com/meltano/airflow-ext
+```
+
+## `executable`
+
+The default executable to call when invoking plugin commands.
+
+```yaml
+executable: airflow_invoker
 ```
 
 ## `capabilities`
@@ -134,7 +161,15 @@ domain_url: https://ads.google.com
 Path to the plugin's logo in the Meltano Hub repository.
 
 ```yaml
-logo_url: /assets/logos/orchestrators/airflow.png
+logo_url: /assets/logos/utilities/airflow.png
+```
+
+## `definition`
+
+Markdown formatted text that defines what the plugin is and what it does.
+
+```yaml
+definition: is an [utilities](/concepts/plugins#utilities) that allows for workflows to be programmatically authored, scheduled, and monitored via Airflow.
 ```
 
 ## `settings_preamble`
@@ -315,9 +350,44 @@ An array of host volumes to mount in the container.
 
 A mapping of environment variables to set in the container.
 
+## `settings_group_validation`
+
+An array of arrays listing the minimal valid group of settings required to use the connector. A common use case is defining which settings are required for different authorization methods.
+
+An example definition for Redshift where there are 3 types of authorization available:
+
+```yaml
+settings_group_validation:
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_profile
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_access_key_id
+  - aws_secret_access_key
+- - host
+  - port
+  - user
+  - password
+  - dbname
+  - s3_bucket
+  - default_target_schema
+  - aws_session_token
+```
+
 ## `settings`
 
-Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. In the Meltano UI these settings are parsed to generate a configuration form. To improve the UX of this form, each setting has a number of optional properties.
+Each plugin variant in Meltano Hub has a `settings` property. Nested under this property are a variable amount of individual settings. To improve the UX of this form, each setting has a number of optional properties.
 
 Example:
 
@@ -421,7 +491,7 @@ settings:
 
 ### `settings[*].tooltip`
 
-Optional. Use to provide a tooltip for the setting in the Meltano UI.
+Optional. Use to provide a tooltip for the setting when rendered within a UI that supports tooltips.
 
 ```yaml
 settings:
@@ -437,4 +507,14 @@ Optional. Use to set a default value for the setting
 settings:
 - name: setting_name
   value: default_value
+```
+
+## `env`
+
+Optional. Environment variables that will be used when [expanding environment variables in lower levels within your project's configuration](../guide/configuration#expansion-in-setting-values), and when running the plugin. These environment variables can make use of other environment variables from higher levels [as explained in the configuration guide](../guide/configuration#environment-variable-expansion).
+
+```yaml
+env:
+  ENV_VAR_NAME: env var value
+  PATH: "${PATH}:${MELTANO_PROJECT_ROOT}/bin"
 ```

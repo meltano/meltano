@@ -2,7 +2,7 @@
   "name": "meltano.com",
   "author": "Meltano Team & Contributors <hello@meltano.com>",
   "license": "MIT",
-  "version": "2.8.0",
+  "version": "2.19.0",
   "description": "https://meltano.com",
   "main": "index.js",
   "scripts": {

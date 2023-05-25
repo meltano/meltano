@@ -9,13 +9,16 @@ from flask_security.utils import login_user, logout_user
 
 from meltano.api import app as meltano_app
 from meltano.api.security.identity import create_dev_user
+from meltano.core.project import Project
 
 
-@pytest.fixture
-def impersonate(app):
+@pytest.fixture()
+def impersonate(
+    app,  # noqa: ARG001
+):
     @contextmanager
     def factory(user):
-        def push(sender):
+        def push(_):
             if user:
                 login_user(user)
             else:
@@ -38,7 +41,10 @@ def app(create_app):
 
 
 @pytest.fixture(scope="class")
-def create_app(request, project):
+def create_app(
+    request,
+    project,  # noqa: ARG001
+):
     def _factory(**kwargs):
         config = {"TESTING": True, "LOGIN_DISABLED": False, "ENV": "test", **kwargs}
 
@@ -58,10 +64,14 @@ def create_app(request, project):
 
 
 @pytest.fixture()
-def api(app):
+def api(app, project: Project):
+    project.refresh()
     return app.test_client()
 
 
 @pytest.fixture()
-def seed_users(app, session):
+def seed_users(
+    app,  # noqa: ARG001
+    session,  # noqa: ARG001
+) -> None:
     create_dev_user()

@@ -20,8 +20,9 @@ Python:
 - [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
 - [MyPy](https://mypy.readthedocs.io/en/stable/)
 
-Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code,
-and `wemake-python-styleguide` is a plugin for Flake8 that offers an extensive set of opinionated rules that encourage clean and correct code.
+Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code. Notable among these is `wemake-python-styleguide`, which offers an extensive set of opinionated rules that encourage clean and correct code.
+
+To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files flakeheaven` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 
@@ -29,7 +30,7 @@ Javascript:
 - [ESLint Vue Plugin](https://github.com/vuejs/eslint-plugin-vue)
 - [Prettier](https://prettier.io/)
 
-You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+To lint your Javascript code, run `yarn lint` from the root of the project.
 
 ### Static typing
 
@@ -129,19 +130,17 @@ For new, deprecated, or experimental features, the relevant code path can be wra
 ```python
 # Example feature flag usage
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.settings_service import FeatureFlags
 
 class ExistingClass:
 
     def __init__(self):
         self.project = Project.find()
-        self.settings_service = ProjectSettingsService(self.project)
 
     # If this method is called elsewhere in the code and the NEW_BEHAVIOR
     # feature flag is not set to 'true' it will throw an error:
     def experimental_method(self):
-        with self.settings_service.feature_flag(FeatureFlags.NEW_BEHAVIOR):
+        with self.project.settings.feature_flag(FeatureFlags.NEW_BEHAVIOR):
             print("Doing new behavior...")
 
     # If this method is called elsewhere, its behavior will vary based on whether
@@ -149,7 +148,7 @@ class ExistingClass:
     # The same pattern can be used to deprecate existing behavior
     # Notice the "raise_error=False" in the feature_flag method call
     def existing_method_with_new_behavior(self):
-        with self.settings_service.feature_flag(FeatureFlags.NEW_BEHAVIOR, raise_error=False) as new_behavior:
+        with self.project.settings.feature_flag(FeatureFlags.NEW_BEHAVIOR, raise_error=False) as new_behavior:
             if new_behavior:
                 print("Doing the new behavior...")
             else:

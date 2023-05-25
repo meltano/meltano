@@ -1,0 +1,26 @@
+version: 1
+default_environment: dev
+project_id: abd310b5-698b-4244-a109-9490047fa2ec
+send_anonymous_usage_stats: false
+environments:
+- name: dev # Use this environment when adding or experimenting with new plugins
+plugins:
+  utilities:
+  - name: example
+    namespace: example
+    settings:
+    - name: a_string
+    - name: an_integer
+      kind: integer
+    - name: an_object
+      kind: object
+    - name: an_array
+      kind: array
+    config:
+      a_string: '-86.75'
+      an_integer: 42
+      an_object:
+        foo: bar
+      an_array:
+      - foo
+      - bar

@@ -17,7 +17,7 @@ definition = {
 
 
 class TestCanonical:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self):
         return Canonical(**definition)
 
@@ -44,7 +44,7 @@ class TestCanonical:
         subject.nested = nested
 
         assert Canonical.as_canonical(subject)["nested"] == Canonical.as_canonical(
-            nested
+            nested,
         )
 
     def test_nested_empty(self, subject):
@@ -80,7 +80,7 @@ class TestCanonical:
 
     def test_defaults(self, subject):
         with pytest.raises(AttributeError):
-            subject.test  # noqa: WPS428
+            subject.test  # noqa: B018, WPS428
 
         subject.test = None
 
@@ -102,7 +102,7 @@ class TestCanonical:
     def test_fallbacks(self, subject):
         # Calling an unknown attribute is not supported
         with pytest.raises(AttributeError):
-            subject.unknown  # noqa: WPS428
+            subject.unknown  # noqa: B018, WPS428
 
         fallback = Canonical(unknown="value", known="value")
         # This would typically be set from a Canonical subclass
@@ -163,3 +163,14 @@ class TestCanonical:
         out_stream.seek(0)
         new_contents = out_stream.read()
         assert new_contents == contents
+
+    def test_annotations(self):
+        original = CommentedMap(
+            {"a": 1, "annotations": {"cloud": {"data": 123}}, "z": -1},
+        )
+        obj = Canonical.parse(original)
+        assert obj.a == 1
+        with pytest.raises(AttributeError):
+            assert obj.annotations
+        assert obj.z == -1
+        assert obj.canonical() == original

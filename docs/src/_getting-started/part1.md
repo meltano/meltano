@@ -21,12 +21,12 @@ We'll assume you have [Meltano installed](/getting-started/installation) already
 
 ```console
 $ meltano --version
-meltano, version 2.6.0
+meltano, version 2.19.0
 </div>
 <br />
 This tutorial is written using meltano >= v2.0.0.
 
-If you don't have a GitHub account to follow along, you could either exchange the commands for a differe tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+If you don't have a GitHub account to follow along, you could either exchange the commands for a different tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -96,23 +96,23 @@ cd my-meltano-project
 
 ## Add an Extractor to Pull Data from a Source
 
-Now that you have your very own Meltano project, it's time to add [plugins](/concepts/plugins) to it. We're going to add an extrator for GitHub to get our data. An [extractor](/concepts/plugins#extractors) is responsible for pulling data out of any data source.
+Now that you have your very own Meltano project, it's time to add [plugins](/concepts/plugins) to it. We're going to add an extrator for GitHub to get our data. An [extractor](/concepts/plugins#extractors) is responsible for pulling data out of any data source. In this case, we choose a specific one with the `--variant` option to make this tutorial easy to work with.
 
 1.  Add the GitHub extractor
 
 ```bash
-$ meltano add extractor tap-github
+meltano add extractor tap-github --variant=meltanolabs
 ```
 <br />
 
 <div class="termy">
 
 ```console
-$ meltano add extractor tap-github
+$ meltano add extractor tap-github --variant=meltanolabs
 2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
 Added extractor 'tap-github' to your Meltano project
-Variant:        singer-io (default)
-Repository:     https://github.com/singer-io/tap-github
+Variant:        meltanolabs (default)
+Repository:     https://github.com/meltanolabs/tap-github
 Documentation:  https://hub.meltano.com/extractors/tap-github
 
 Installing extractor 'tap-github'...
@@ -129,10 +129,9 @@ This will add the new plugin to your [`meltano.yml` project file](/concepts/proj
 plugins:
 extractors:
   - name: tap-github
-    variant: singer-io
-    pip_url: tap-github
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
 ```
-
 
 1.  Test that the installation was successful by calling [`meltano invoke`](/reference/command-line-interface#invoke):
 
@@ -147,18 +146,23 @@ If you see the extractor's help message printed, the plugin was definitely insta
 ```console
 $ meltano invoke tap-github --help
 2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
-usage: tap-github [-h] -c CONFIG [-s STATE] [-p PROPERTIES] [--catalog CATALOG] [-d]
+Usage: tap-github [OPTIONS]
 
-options:
-  -h, --help            show this help message and exit
-  -c CONFIG, --config CONFIG
-                        Config file
-  -s STATE, --state STATE
-                        State file
-  -p PROPERTIES, --properties PROPERTIES
-                        Property selections: DEPRECATED, Please use --catalog instead
-  --catalog CATALOG     Catalog file
-  -d, --discover        Do schema discovery
+  Execute the Singer tap.
+
+Options:
+  --state PATH              Use a bookmarks file for incremental replication.
+  --catalog PATH            Use a Singer catalog file with the tap.
+  --test TEXT               Use --test to sync a single record for each
+                            stream. Use --test=schema to test schema output
+                            without syncing records.
+  --discover                Run the tap in discovery mode.
+  --config TEXT             Configuration file location or 'ENV' to use
+                            environment variables.
+  --format [json|markdown]  Specify output style for --about
+  --about                   Display package metadata and settings.
+  --version                 Display the package version.
+  --help                    Show this message and exit.
 ```
 </div>
 
@@ -169,27 +173,31 @@ The GitHub tap requires [configuration](/guide/configuration) before it can star
 1. The simplest way to configure a new plugin in Meltano is using the mode `interactive`:
 
 ```bash
-$ meltano config tap-github set --interactive
+meltano config tap-github set --interactive
 ```
-2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories, start_date and your private_token.
+
+2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["sbalnojan/meltano-lightdash"]`), start_date, and your auth_token.
 <br>
 <div class="termy">
 
 ```console
 $ meltano config tap-github set --interactive
-2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
- Configuring Extractor 'tap-github'
-[...]                                                                      1. access_token: Personal access token used to authenticate with GitHub. The token can be...
-2. repository: Space-separated list of repositories. Each repository must be prefaced b...
-3. start_date: Defines how far into the past to pull data for the provided repositories.
+Configuring Extractor 'tap-github' Interactively
+[...]
+Settings
+ 1. additional_auth_tokens:                                                       [...]
+ 2. auth_token: GitHub token to authenticate ...
+ [...]
+ 8. repositories: An array of strings containing the github repos to be ...
+ [...]
+ 11. start_date:
+ [...]
+To learn more about extractor 'tap-github' and its settings, visit https://hub.meltano.com/extractors/tap-github--meltanolabs
 
-To learn more about extractor 'tap-github' and its settings, visit https://hub.meltano.com/extractors/tap-github
-
-Loop through all settings (all), select a setting by number (1 - 3), or exit (e)? [all]:
-$ 1
+Loop through all settings (all), select a setting by number (1 - 16), or exit (e)? [all]:
+$ 2
 [...]Description:
-Personal access token used to authenticate with GitHub. The token can be generated by going to the Personal Access Token
- settings page.
+GitHub token to authenticate with.
 New value:
 $
 Repeat for confirmation:
@@ -205,11 +213,15 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
       extractors:
         - name: tap-github
           config:
-            access_token: YOUR_TOKEN
-            start_date: 2022-01-01
-            repository: sbalnojan/meltano-lightdash
+            start_date: '2022-01-01'
+            repositories:
+            - sbalnojan/meltano-lightdash
   ```
 
+It will also add your secret auth token to the file `.env`:
+  ```yml
+  TAP_GITHUB_AUTH_TOKEN='ghp_XXX' # your token!
+  ```
 
 3. Double check the config by running [`meltano config tap-github`](/reference/command-line-interface#config):
 
@@ -225,8 +237,10 @@ $ meltano config tap-github
 2022-09-19T11:26:23.573556Z [info     ] The default environment (dev) will be ignored for `meltano config`. To configure a specific Environment, please use option `--environment=[]`.
 
 {
-  "access_token": "[YOUR_TOKEN]",
-  "repository": "sbalnojan/meltano-lightdash",
+  "auth_token": "ghp_XXX",
+  "repositories": [
+  &ensp;&ensp;"sbalnojan/meltano-lightdash"
+  ],
   "start_date": "2022-01-01"
 }
 ```
@@ -249,7 +263,8 @@ meltano select tap-github --list --all
 
 ```console
 $ meltano select tap-github --list
-2022-09-19T10:59:43.554214Z [info     ] Environment 'dev' is active
+2023-05-17T20:07:24.085827Z [info     ] The default environment 'dev' will be ignored for 'meltano select'. To configure a specific environment, please use the option '--environment=environment name'.
+
 Legend:
         selected
         excluded
@@ -277,6 +292,7 @@ Selected attributes:
 ```bash
 meltano select tap-github commits url
 meltano select tap-github commits sha
+meltano select tap-github commits commit_timestamp
 ```
 <br />
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
@@ -286,25 +302,23 @@ This will add the [selection rules](/concepts/plugins#select-extra) to your [`me
   default_environment: dev
   environments:
   - name: dev
-    config:
-      plugins:
-        extractors:
-        - name: tap-github
-          select:
-          - commits.url
-          - commits.sha
   - name: staging
   - name: prod
   project_id: YOUR_ID
   plugins:
     extractors:
     - name: tap-github
-      variant: singer-io
-      pip_url: tap-github
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-github.git
       config:
-        access_token: YOUR_TOKEN
-        start_date: 2022-01-01
-        repository: sbalnojan/meltano-lightdash
+        start_date: '2022-01-01'
+        repositories:
+        - sbalnojan/meltano-lightdash
+      select:
+      - commits.url
+      - commits.sha
+      - commits.commit_timestamp
+
   ```
 
 
@@ -317,21 +331,21 @@ meltano select tap-github --list
 ## Add a dummy loader to dump the data into JSON
 To test that the extraction process works, we add a JSON target.
 
-1. Add the JSON target using ```meltano add loader target-jsonl```.
+1. Add the JSON target using ```meltano add loader target-jsonl --variant=andyh1203```.
 <br>
 <div class="termy">
 
 ```console
-$ meltano add loader target-jsonl</span>
-2022-09-19T13:47:42.389423Z [info     ] Environment 'dev' is active
-To add it to your project another time so that each can be configured differently,
-add a new plugin inheriting from the existing one with its own unique name:
- &nbsp;&nbsp;&nbsp;&nbsp;meltano add loader target-jsonl--new --inherit-from target-jsonl
+$ meltano add loader target-jsonl --variant=andyh1203</span>
+Added loader 'target-jsonl' to your Meltano project
+Variant:        andyh1203 (default)
+Repository:     https://github.com/andyh1203/target-jsonl
+Documentation:  https://hub.meltano.com/loaders/target-jsonl--andyh1203
 
 Installing loader 'target-jsonl'...
 Installed loader 'target-jsonl'
 
-To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl
+To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl--andyh1203
 ```
 </div>
 <br />
@@ -344,7 +358,7 @@ Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-
 There's just one step here: run your newly added extractor and jsonl loader in a pipeline using [`meltano run`](/reference/command-line-interface#run):
 
 ```bash
-$ meltano run tap-github target-jsonl
+meltano run tap-github target-jsonl
 ```
 <br>
 <div class="termy">
@@ -370,13 +384,13 @@ You can verify that it worked by looking inside the newly created file called ``
 
 ```console
 $ cat output/commits.jsonl
-{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0"}
+{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2022-09-14T12:41:21Z"}
 ```
 
 </div>
 ## Next Steps
 
-Next, head over to [Part 2: Loading extracted data into a target (currently inside the large Getting Started Tutorial)](/getting-started/part2).
+Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).
 
 
    <script src="/js/termynal.js" data-termynal-container="#termy1|#termy2|#termy3|#termy4|#termy5|#termy6|#termy7|#termy8|#termy9|#termy10"></script>

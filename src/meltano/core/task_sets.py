@@ -23,7 +23,7 @@ TASKS_JSON_SCHEMA = {
                 "oneOf": [
                     {"type": "string"},
                     {"type": "array", "items": {"type": "string"}},
-                ]
+                ],
             },
         },
     ],
@@ -48,18 +48,17 @@ def _flat_split(items):
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)
+        elif " " in el:
+            yield from _flat_split(el.split(" "))
         else:
-            if " " in el:
-                yield from _flat_split(el.split(" "))
-            else:
-                yield el
+            yield el
 
 
 class TaskSets(NameEq, Canonical):
-    """A job is a named entity that holds one or more Task's that can be executed by meltano."""
+    """A named entity that holds one or more tasks that can be executed by Meltano."""
 
     def __init__(self, name: str, tasks: list[str] | list[list[str]]):
-        """Initialize a TaskSets.
+        """Initialize a `TaskSets`.
 
         Args:
             name: The name of the job.
@@ -71,10 +70,11 @@ class TaskSets(NameEq, Canonical):
         self.tasks = tasks
 
     def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
-        """Convert the job's tasks into invocable representations, suitable for passing as a cli args or block names.
+        """Get job tasks as CLI args.
 
         Args:
-            preserve_top_level: Whether to preserve the defined top level task list to allow for fine-grained executions.
+            preserve_top_level: Whether to preserve the defined top level task
+                list to allow for fine-grained executions.
 
         Returns:
             The run arguments.
@@ -91,11 +91,14 @@ class TaskSets(NameEq, Canonical):
         return flattened
 
     @property
-    def flat_args(self) -> list[str]:
-        """Convert job's tasks to a single invocable representations. For passing as a cli argument or as block names.
+    def flat_args(self) -> list[str] | list[list[str]]:
+        """Convert job's tasks to a single invocable representations.
+
+        For passing as a cli argument or as block names.
 
         Example:
-            TaskSets(name="foo", tasks=["tap target", "some:cmd"]).flat_args -> ["tap", "target", "some:cmd"]
+            >>> TaskSets(name="foo", tasks=["tap target", "some:cmd"]).flat_args
+            ["tap", "target", "some:cmd"]
 
         Returns:
             The run arguments.
@@ -104,21 +107,24 @@ class TaskSets(NameEq, Canonical):
 
     @property
     def flat_args_per_set(self) -> list[str] | list[list[str]]:
-        """Convert the job's tasks into perk task representations (preserving top level list hierarchy).
+        """Convert the job's tasks into perk task representations.
+
+        Preserves top level list hierarchy.
 
         Example:
-            TaskSets(name="foo", tasks=[["tap trgt"], ["some:cmd"]).flat_args_per_set -> [["tap", "trgt"], ["some:cmd"]]
+        >>> TaskSets(name="foo", tasks=[["a b"], ["some:cmd"]).flat_args_per_set
+        [["a", "b"], ["some:cmd"]]
 
         Returns:
             The per-task run arguments.
-        """
+        """  # noqa: F721
         return self._as_args(preserve_top_level=True)
 
 
 def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     """Create a TaskSets from a yaml string.
 
-    The resulting object is validated against the TASKS_JSON_SCHEMA.
+    The resulting object is validated against the `TASKS_JSON_SCHEMA`.
 
     Args:
         name: The name of the job.
@@ -128,18 +134,25 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
         The TaskSets.
 
     Raises:
-        InvalidTasksError: If the yaml string failed to parse or failed to validate against the TASKS_JSON_SCHEMA.
+        InvalidTasksError: If the yaml string failed to parse or failed to
+            validate against the `TASKS_JSON_SCHEMA`.
     """
     tasks = []
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:
-        raise InvalidTasksError(name, f"Failed to parse yaml '{yaml_str}': {yerr}")
+        raise InvalidTasksError(
+            name,
+            f"Failed to parse yaml '{yaml_str}': {yerr}",
+        ) from yerr
 
     try:
         validate(instance=tasks, schema=TASKS_JSON_SCHEMA)
     except ValidationError as verr:
-        raise InvalidTasksError(name, f"Failed to validate task schema: {verr}")
+        raise InvalidTasksError(
+            name,
+            f"Failed to validate task schema: {verr}",
+        ) from verr
 
     # Handle the special case of a single task
     if isinstance(tasks, str):

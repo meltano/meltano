@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
+import typing as t
 import warnings
 from contextlib import closing
-from typing import Generator
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
@@ -16,7 +16,7 @@ from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri: str) -> Generator:
+def engine_uri_env(engine_uri: str) -> t.Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
     monkeypatch = MonkeyPatch()
@@ -68,14 +68,20 @@ def connection(engine_sessionmaker):  # noqa: WPS442
         with warnings.catch_warnings():
             # Ignore warnings about rolling back the same transaction twice
             warnings.filterwarnings(
-                "ignore", "transaction already deassociated from connection", SAWarning
+                "ignore",
+                "transaction already deassociated from connection",
+                SAWarning,
             )
             transaction.rollback()
         connection.close()
 
 
 @pytest.fixture()
-def session(project: Project, engine_sessionmaker, connection):  # noqa: WPS442
+def session(
+    project: Project,  # noqa: ARG001
+    engine_sessionmaker,
+    connection,
+):  # noqa: WPS442
     """Create a new database session for a test.
 
     Args:

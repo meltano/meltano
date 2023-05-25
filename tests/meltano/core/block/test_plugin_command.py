@@ -7,10 +7,9 @@ from meltano.core.block.plugin_command import plugin_command_invoker
 
 
 class TestInvokerCommand:
-    @pytest.mark.asyncio
-    async def test_run_passes_command_args_when_required(
-        self, project, session, project_plugins_service, dbt
-    ):
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("session")
+    async def test_run_passes_command_args_when_required(self, project, dbt):
         cmd = plugin_command_invoker(
             dbt,
             project,

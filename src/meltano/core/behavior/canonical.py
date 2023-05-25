@@ -4,21 +4,21 @@ from __future__ import annotations
 
 import copy
 import json
+import typing as t
 from functools import lru_cache
 from os import PathLike
-from typing import Any, TypeVar
 
 import yaml
 from ruamel.yaml import Representer
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 
-T = TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
+T = t.TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
 
 
 class IdHashBox:
     """Wrapper class that makes the hash of an object its Python ID."""
 
-    def __init__(self, content: Any):
+    def __init__(self, content: t.Any):
         """Initialize the `IdHashBox`.
 
         Parameters:
@@ -35,7 +35,7 @@ class IdHashBox:
         """
         return id(self.content)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: t.Any) -> bool:
         """Check equality of this instance and some other object.
 
         Parameters:
@@ -50,7 +50,42 @@ class IdHashBox:
 CANONICAL_PARSE_CACHE_SIZE = 4096
 
 
-class Canonical:  # noqa: WPS214 (too many methods)
+class Annotations(t.NamedTuple):
+    """Tuple storing the data of an annotation, and its index."""
+
+    index: int
+    data: CommentedMap
+
+
+class AnnotationsMeta(type):
+    """Metaclass to intercept and store annotations before calling `__init__`."""
+
+    def __call__(cls, *args: t.Any, **kwargs: t.Any) -> t.Any:
+        """Create and return an instance of the class this metaclass is applied to.
+
+        Args:
+            *args: Positional arguments for the instance.
+            **kwargs: Keyword arguments for the instance.
+
+        Returns:
+            The newly created instance of the class this metaclass is applied to.
+        """
+        # Remove the annotations from the arguments that would be used for `__init__`.
+        extracted_annotations = (
+            Annotations(
+                index=list(kwargs.keys()).index("annotations"),
+                data=kwargs.pop("annotations"),
+            )
+            if "annotations" in kwargs
+            else None
+        )
+        instance = super().__call__(*args, **kwargs)
+        # Store the annotations for later re-insertion during serialization
+        instance._annotations = extracted_annotations  # noqa: WPS437
+        return instance
+
+
+class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
     """Defines an object that can be represented as a subset of its attributes.
 
     Its purpose is to be serializable as the smallest possible form.
@@ -62,7 +97,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
       - All attributes that start with "_" are excluded
     """
 
-    def __init__(self, *args: Any, **attrs: Any):
+    def __init__(self, *args: t.Any, **attrs: t.Any):
         """Initialize the current instance with the given attributes.
 
         Args:
@@ -84,51 +119,62 @@ class Canonical:  # noqa: WPS214 (too many methods)
         self._defaults = {}
 
     @classmethod
+    def _canonize(cls, val: t.Any) -> t.Any:
+        """Call `as_canonical` on `val`, respecting `Canonical` subclasses.
+
+        Args:
+            val: An object on which `as_canonical` should be called. If `val`
+                has an `as_canonical` attribute it will be called. Otherwise
+                the `as_caonical` attribute of this class will be used.
+
+        Returns:
+            The value obtained from calling `as_canonical`.
+        """
+        return getattr(type(val), "as_canonical", cls.as_canonical)(val)
+
+    @classmethod
     def as_canonical(
-        cls: type[T], target: Any
-    ) -> dict | list | CommentedMap | CommentedSeq | Any:
+        cls: type[T],
+        target: t.Any,
+    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:
         """Return a canonical representation of the given instance.
 
         Args:
-            target: Instance to convert.
+            target: An instance to convert.
 
         Returns:
-            Canonical representation of the given instance.
+            A canonical representation of the given instance.
         """
         if isinstance(target, Canonical):
-            result = CommentedMap([(key, cls.as_canonical(val)) for key, val in target])
+            result = CommentedMap((key, cls._canonize(val)) for key, val in target)
+            if target._annotations is not None:  # noqa: WPS437
+                result.insert(
+                    target._annotations.index,  # noqa: WPS437
+                    "annotations",
+                    target._annotations.data,  # noqa: WPS437
+                )
             target.attrs.copy_attributes(result)
             return result
 
-        if isinstance(target, (CommentedSet, CommentedSeq)):
-            result = CommentedSeq(cls.as_canonical(val) for val in target)
-            target.copy_attributes(result)
-            return result
-
-        if isinstance(target, CommentedMap):
-            results = CommentedMap()
-            for key, val in target.items():
-                if isinstance(val, Canonical):
-                    results[key] = val.canonical()
-                else:
-                    results[key] = cls.as_canonical(val)
-            target.copy_attributes(results)
-            return results
-
-        if isinstance(target, (list, set)):
-            return list(map(cls.as_canonical, target))
-
         if isinstance(target, dict):
-            return {
-                key: val.canonical()
-                if isinstance(val, Canonical)
-                else cls.as_canonical(val)
-                for key, val in target.items()
-            }
+            as_dict = {key: cls._canonize(val) for key, val in target.items()}
+            if isinstance(target, CommentedMap):
+                as_commented_map = CommentedMap(as_dict)
+                target.copy_attributes(as_commented_map)
+                return as_commented_map
+            return as_dict
+
+        if isinstance(target, (list, set, CommentedSet)):
+            as_list = [cls._canonize(val) for val in target]
+            if isinstance(target, (CommentedSet, CommentedSeq)):
+                as_commented_seq = CommentedSeq(as_list)
+                target.copy_attributes(as_commented_seq)
+                return as_commented_seq
+            return as_list
 
         return copy.deepcopy(target)
 
-    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | Any:
+    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | t.Any:
         """Return a canonical representation of the current instance.
 
         Returns:
@@ -136,7 +182,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return type(self).as_canonical(self)
 
-    def with_attrs(self: T, *args: Any, **kwargs: Any) -> T:
+    def with_attrs(self: T, *args: t.Any, **kwargs: t.Any) -> T:
         """Return a new instance with the given attributes set.
 
         Args:
@@ -146,10 +192,10 @@ class Canonical:  # noqa: WPS214 (too many methods)
         Returns:
             A new instance with the given attributes set.
         """
-        return type(self)(**{**self.canonical(), **kwargs})
+        return type(self)(*args, **{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: type[T], obj: Any) -> T:
+    def parse(cls: type[T], obj: t.Any) -> T:
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
         Args:
@@ -206,7 +252,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return self._dict.get(attr) is not None
 
-    def __getattr__(self, attr: str) -> Any:
+    def __getattr__(self, attr: str) -> t.Any:  # noqa: C901
         """Return the value of the given attribute.
 
         Args:
@@ -236,11 +282,11 @@ class Canonical:  # noqa: WPS214 (too many methods)
             return value
 
         if attr in self._defaults:
-            value = self._defaults[attr](self)  # noqa: WPS529 (implicit .get())
+            value = self._defaults[attr](self)
 
         return value
 
-    def __setattr__(self, attr: str, value: Any):
+    def __setattr__(self, attr: str, value: t.Any):
         """Set the given attribute to the given value.
 
         Args:
@@ -252,7 +298,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         else:
             self._dict[attr] = value
 
-    def __getitem__(self, attr: str) -> Any:
+    def __getitem__(self, attr: str) -> t.Any:
         """Return the value of the given attribute.
 
         Args:
@@ -263,7 +309,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return getattr(self, attr)
 
-    def __setitem__(self, attr: str, value: Any) -> None:
+    def __setitem__(self, attr: str, value: t.Any) -> None:
         """Set the given attribute to the given value.
 
         Args:
@@ -311,7 +357,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return len(self._dict)
 
-    def __contains__(self, obj: Any):
+    def __contains__(self, obj: t.Any):
         """Return whether the current instance contains the given object.
 
         Args:
@@ -322,7 +368,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
         """
         return obj in self._dict
 
-    def update(self, *others: Any, **kwargs: Any) -> None:
+    def update(self, *others: t.Any, **kwargs: t.Any) -> None:
         """Update the current instance with the given others.
 
         Args:
@@ -339,7 +385,7 @@ class Canonical:  # noqa: WPS214 (too many methods)
                 setattr(self, key, val)
 
     @classmethod
-    def yaml(cls, dumper: yaml.BaseDumper, obj: Any) -> yaml.MappingNode:
+    def yaml(cls, dumper: yaml.BaseDumper, obj: t.Any) -> yaml.MappingNode:
         """YAML serializer for Canonical objects.
 
         Args:
@@ -350,11 +396,13 @@ class Canonical:  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return dumper.represent_mapping(
-            "tag:yaml.org,2002:map", cls.as_canonical(obj), flow_style=False
+            "tag:yaml.org,2002:map",
+            cls.as_canonical(obj),
+            flow_style=False,
         )
 
     @classmethod
-    def to_yaml(cls, representer: Representer, obj: Any):
+    def to_yaml(cls, representer: Representer, obj: t.Any):
         """YAML serializer for Canonical objects.
 
         Args:
@@ -365,7 +413,8 @@ class Canonical:  # noqa: WPS214 (too many methods)
             The serialized YAML representation of the object.
         """
         return representer.represent_mapping(
-            "tag:yaml.org,2002:map", cls.as_canonical(obj)
+            "tag:yaml.org,2002:map",
+            cls.as_canonical(obj),
         )
 
     @classmethod

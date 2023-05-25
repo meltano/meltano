@@ -10,17 +10,19 @@ from meltano.core.utils import iso8601_datetime
 
 class TestCliSchedule:
     @pytest.mark.order(0)
-    @pytest.mark.usefixtures("tap", "target")
+    @pytest.mark.usefixtures("project", "session", "tap", "target")
     @mock.patch(
-        "meltano.core.schedule_service.PluginSettingsService.get", autospec=True
+        "meltano.core.schedule_service.PluginSettingsService.get",
+        autospec=True,
     )
-    def test_schedule_add(self, get, session, project, cli_runner, schedule_service):
+    def test_schedule_add(self, get, cli_runner, schedule_service):
         test_date = "2010-01-01"
         get.return_value = test_date
 
         # test adding a scheduled elt
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
         ):
             res = cli_runner.invoke(
                 cli,
@@ -51,7 +53,8 @@ class TestCliSchedule:
 
         # test adding a scheduled job
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
         ):
             res = cli_runner.invoke(
                 cli,
@@ -74,9 +77,11 @@ class TestCliSchedule:
         assert schedule.job == "mock-job"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
 
-        # test default schedule case where no argument (set, remove, add, etc) is provided
+        # Test default schedule case where no argument (set, remove, add, etc)
+        # is provided
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
         ):
             res = cli_runner.invoke(
                 cli,
@@ -100,7 +105,8 @@ class TestCliSchedule:
 
         # verify that you can't use job and elt flags together
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
         ):
             res = cli_runner.invoke(
                 cli,
@@ -123,23 +129,27 @@ class TestCliSchedule:
 
         assert res.exit_code == 1
 
-    @pytest.mark.parametrize("exit_code", [0, 1, 143])
+    @pytest.mark.parametrize("exit_code", (0, 1, 143))
     def test_schedule_run(self, exit_code, cli_runner, elt_schedule, job_schedule):
         process_mock = mock.Mock(returncode=exit_code)
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService.run", return_value=process_mock
+            "meltano.cli.schedule.ScheduleService.run",
+            return_value=process_mock,
         ) as run_mock:
             res = cli_runner.invoke(
-                cli, ["schedule", "run", elt_schedule.name, "--transform", "run"]
+                cli,
+                ["schedule", "run", elt_schedule.name, "--transform", "run"],
             )
             assert res.exit_code == exit_code
             run_mock.assert_called_once_with(elt_schedule, "--transform", "run")
 
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService.run", return_value=process_mock
+            "meltano.cli.schedule.ScheduleService.run",
+            return_value=process_mock,
         ) as run_mock:
             res = cli_runner.invoke(
-                cli, ["schedule", "run", job_schedule.name, "--dry-run"]
+                cli,
+                ["schedule", "run", job_schedule.name, "--dry-run"],
             )
             assert res.exit_code == exit_code
             run_mock.assert_called_once_with(job_schedule, "--dry-run")
@@ -148,21 +158,27 @@ class TestCliSchedule:
         process_mock = mock.Mock(returncode=0)
 
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService.remove", return_value=process_mock
+            "meltano.cli.schedule.ScheduleService.remove",
+            return_value=process_mock,
         ) as remove_mock:
             res = cli_runner.invoke(cli, ["schedule", "remove", job_schedule.name])
             assert res.exit_code == 0
             remove_mock.assert_called_once_with(job_schedule.name)
 
     def test_schedule_set(
-        self, cli_runner, elt_schedule, job_schedule, schedule_service
+        self,
+        cli_runner,
+        elt_schedule,
+        job_schedule,
+        schedule_service,
     ):
-
         with mock.patch(
-            "meltano.cli.schedule.ScheduleService", return_value=schedule_service
+            "meltano.cli.schedule.ScheduleService",
+            return_value=schedule_service,
         ):
             res = cli_runner.invoke(
-                cli, ["schedule", "set", job_schedule.name, "--job", "mock-job-renamed"]
+                cli,
+                ["schedule", "set", job_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 0
             assert (
@@ -188,7 +204,8 @@ class TestCliSchedule:
 
             # interval applies to both and should always work
             res = cli_runner.invoke(
-                cli, ["schedule", "set", job_schedule.name, "--interval", "@hourly"]
+                cli,
+                ["schedule", "set", job_schedule.name, "--interval", "@hourly"],
             )
             assert res.exit_code == 0
             assert (
@@ -197,7 +214,8 @@ class TestCliSchedule:
             )
 
             res = cli_runner.invoke(
-                cli, ["schedule", "set", elt_schedule.name, "--interval", "@hourly"]
+                cli,
+                ["schedule", "set", elt_schedule.name, "--interval", "@hourly"],
             )
             assert res.exit_code == 0
             assert (
@@ -223,7 +241,8 @@ class TestCliSchedule:
             )
 
             res = cli_runner.invoke(
-                cli, ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"]
+                cli,
+                ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 1
             assert (

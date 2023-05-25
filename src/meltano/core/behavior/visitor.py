@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Callable
+import typing as t
 
 
 class visit_with:  # noqa: N801
-    def __init__(self, visit: Callable):
+    def __init__(self, visit: t.Callable):  # noqa: D107
         self.visit = visit
 
     def __call__(self, base_cls):

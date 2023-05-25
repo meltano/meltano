@@ -1,4 +1,5 @@
 """New Project Initialization CLI."""
+
 from __future__ import annotations
 
 import logging
@@ -6,13 +7,12 @@ from pathlib import Path
 
 import click
 
+from meltano.cli.params import database_uri_option
+from meltano.cli.utils import InstrumentedCmd
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import CliContext, CliEvent, Tracker
-
-from . import cli
-from .params import database_uri_option
-from .utils import CliError, InstrumentedCmd
+from meltano.core.tracking import Tracker
+from meltano.core.tracking.contexts import CliContext, CliEvent
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
@@ -22,14 +22,21 @@ logger = logging.getLogger(__name__)
 path_type = click.Path(file_okay=False, path_type=Path)
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
+@click.command(cls=InstrumentedCmd, short_help="Create a new Meltano project.")
 @click.pass_context
 @click.argument("project_directory", required=False, type=path_type)
 @click.option(
-    "--no_usage_stats", help="Do not send anonymous usage stats.", is_flag=True
+    "--no_usage_stats",
+    help="Do not send anonymous usage stats.",
+    is_flag=True,
+)
+@click.option(
+    "--force",
+    help="Overwrite `meltano.yml` if it exists in the project directory.",
+    is_flag=True,
 )
 @database_uri_option
-def init(ctx, project_directory: Path, no_usage_stats):
+def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
     """
     Create a new Meltano project.
 
@@ -39,20 +46,20 @@ def init(ctx, project_directory: Path, no_usage_stats):
     if not project_directory:
         click.echo("We need a project name to get started!")
         project_directory = click.prompt(
-            "Enter a name now to create a Meltano project", type=path_type
+            "Enter a name now to create a Meltano project",
+            type=path_type,
         )
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
         logging.warning(f"Found meltano project at: {root}")
-        raise CliError("`meltano init` cannot run inside a Meltano project.")
 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
     init_service = ProjectInitService(project_directory)
 
-    project = init_service.init()
+    project = init_service.init(force=force)
     init_service.echo_instructions(project)
 
     # since the project didn't exist, tracking was not initialized in cli.py

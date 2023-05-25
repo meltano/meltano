@@ -4,38 +4,38 @@ from collections import Counter
 
 import pytest
 
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.project_plugins_service import PluginDefinitionNotFoundError
 
 
 class TestProjectAddService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project_add_service):
         return project_add_service
 
     def test_missing_plugin_exception(self, subject, hub_request_counter):
-        with pytest.raises(PluginNotFoundError):
+        with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
         assert hub_request_counter["/extractors/index"] == 1
         assert len(hub_request_counter) == 1
 
     @pytest.mark.order(0)
-    @pytest.mark.parametrize(  # noqa: WPS317
+    @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "variant", "default_variant"),
-        [
+        (
             (PluginType.EXTRACTORS, "tap-mock", "meltano", "meltano"),
             (PluginType.LOADERS, "target-mock", None, "original"),
             (PluginType.TRANSFORMERS, "transformer-mock", None, "original"),
             (PluginType.TRANSFORMS, "tap-mock-transform", None, "original"),
             (PluginType.UTILITIES, "utility-mock", None, "original"),
-        ],
+        ),
     )
     def test_add(
         self,
@@ -80,15 +80,17 @@ class TestProjectAddService:
         self,
         tap,
         subject,
-        project_plugins_service,
+        project: Project,
         hub_request_counter,
     ):
         # Make sure tap-mock is not in the project as a project plugin
-        project_plugins_service.remove_from_file(tap)
+        project.plugins.remove_from_file(tap)
 
         # Inheriting from base plugin
         inherited = subject.add(
-            PluginType.EXTRACTORS, "tap-mock-inherited", inherit_from="tap-mock"
+            PluginType.EXTRACTORS,
+            "tap-mock-inherited",
+            inherit_from="tap-mock",
         )
         assert inherited.canonical() == {
             "name": "tap-mock-inherited",

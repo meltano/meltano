@@ -2,6 +2,8 @@
 title: Migrate an Existing dbt Project
 description: Learn how to import an existing dbt project into your Meltano project.
 layout: doc
+redirect_from:
+  - /guide/existing-dbt-project
 weight: 25
 ---
 
@@ -16,18 +18,18 @@ As always, we highly recommend git versioning your Meltano project prior to foll
 
 ### Add dbt Transformer
 
-Add your adapter-specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/transformers/).
+Add your adapter-specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/utilities/).
 
 
 ```
-meltano add transformer dbt-<adapter_name>
+meltano add utility dbt-<adapter_name>
 
 # For example
-meltano add transformer dbt-postgres
+meltano add utility dbt-postgres
 ```
 
 Next configure your transformer to include database names, connection credentials, etc.
-See the [transform data guide](https://docs.meltano.com/guide/transformation#install-dbt) for more details.
+See the [transform data guide](/guide/transformation#install-dbt) for more details.
 Or use the [interactive config flag](/reference/command-line-interface#how-to-use-interactive-config) to follow prompts.
 
 ```
@@ -42,8 +44,8 @@ meltano invoke dbt-postgres debug
 
 ### Migrating dbt Code Into Meltano
 
-Note that adding a transformer creates scaffolding within your Meltano `/transform` directory including a `dbt_project.yml` and `/profile/profiles.yml`.
-If you have an existing dbt project you will already have your own version of these files in your other repo so we'll describe how to merge what you have and what Meltano provides and expects.
+Note that the `initialize` command for a dbt transformer utility creates the expected scaffolding within your Meltano `/transform` directory including a `dbt_project.yml` and `/profile/profiles.yml`.
+If you have an existing dbt project you can skip running the `initialize` because you will already have your own version of these files in your other repo, so we'll describe how to merge what you have and what Meltano provides and expects.
 
 #### Meltano's Default Structure For dbt
 

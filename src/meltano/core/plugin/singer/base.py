@@ -10,10 +10,18 @@ from meltano.core.utils import nest_object
 
 
 class SingerPlugin(BasePlugin):
-    def __init__(self, *args, **kwargs):
-        """Canonical class leads to  an error if the UUID is defined here directly. Also, This data attribute must be defined or we'll get errors from Canonical."""
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize a `SingerPlugin`.
+
+        Args:
+            args: Positional arguments for the super class.
+            kwargs: Keyword arguments for the super class.
+        """
         super().__init__(*args, **kwargs)
-        self._instance_uuid: str = None
+        # Canonical class leads to an error if the UUID is defined here
+        # directly. Also, this data attribute must be defined or we'll get
+        # errors from Canonical.
+        self._instance_uuid: str | None = None
 
     def process_config(self, flat_config):
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
@@ -33,8 +41,12 @@ class SingerPlugin(BasePlugin):
         return processed_config
 
     @hook("before_configure")
-    async def before_configure(self, invoker, session):
-        """Create configuration file."""
+    async def before_configure(
+        self,
+        invoker,
+        session,  # noqa: ARG002
+    ):
+        """Create configuration file."""  # noqa: DAR101
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config = invoker.plugin_config_processed

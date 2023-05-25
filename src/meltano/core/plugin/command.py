@@ -3,18 +3,18 @@
 from __future__ import annotations
 
 import shlex
-from typing import TypeVar
+import typing as t
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.container.container_spec import ContainerSpec
 from meltano.core.error import Error
 from meltano.core.utils import expand_env_vars
 
-TCommand = TypeVar("TCommand")
+TCommand = t.TypeVar("TCommand")
 
 
 class UndefinedEnvVarError(Error):
-    """Occurs when an environment variable is used as a command argument but is not set."""
+    """An environment variable is used as a command argument but is not set."""
 
     def __init__(self, command_name, var):
         """Initialize UndefinedEnvVarError.
@@ -24,8 +24,9 @@ class UndefinedEnvVarError(Error):
             var: Environment variable name.
         """
         super().__init__(
-            f"Command '{command_name}' referenced unset environment variable '{var}' in an argument. "
-            + "Set the environment variable or update the command definition."
+            f"Command '{command_name}' referenced unset environment variable "
+            f"'{var}' in an argument. Set the environment variable or update "
+            "the command definition.",
         )
 
 

@@ -20,7 +20,7 @@ In  [part 1](/getting-started/part1), we extracted data from GitHub and are now 
 We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local PostgreSQL container, you just need to run:
 
 ```bash
-$ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
+docker run --name meltano_postgres -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
 ```
 <br />
 <div class="termy">
@@ -42,23 +42,24 @@ The container will need a few seconds to initialize. You can test the connection
 - user: meltano
 - password: password
 
-## Add the tap-postgres loader
-Add the postgres loader using the `meltano add loader target-postgres` command.
+## Add the postgres loader
+Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
 
 <div class="termy">
 
 ```console
-$ meltano add loader target-postgres
+$ meltano add loader target-postgres --variant=meltanolabs
 Added loader 'target-postgres' to your Meltano project
-Variant:        transferwise (default)
-Repository:     https://github.com/transferwise/pipelinewise-target-postgres
-Documentation:  https://hub.meltano.com/loaders/target-postgres
+Variant:        meltanolabs (default)
+Repository:     https://github.com/MeltanoLabs/target-postgres
+Documentation:  https://hub.meltano.com/loaders/target-postgres--meltanolabs
 
 Installing loader 'target-postgres'...
 ---> 100%
+
 Installed loader 'target-postgres'
 
-To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres
+To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
 </div>
 <br />
@@ -68,11 +69,19 @@ Use the ```meltano invoke target-postgres --help``` command to test that the ins
 
 ```console
 $ meltano invoke target-postgres --help
-usage: target-postgres [-h] [-c CONFIG]
+Usage: target-postgres [OPTIONS]
 
-optional arguments:
--h, --help            show this help message and exit
--c CONFIG, --config CONFIG Config file
+  Execute the Singer target.
+
+Options:
+  --input FILENAME          A path to read messages from instead of from
+                            standard in.
+  --config TEXT             Configuration file location or 'ENV' to use
+                            environment variables.
+  --format [json|markdown]  Specify output style for --about
+  --about                   Display package metadata and settings.
+  --version                 Display the package version.
+  --help                    Show this message and exit.
 ```
 </div>
 
@@ -86,26 +95,26 @@ To configure the plugin, look at the options by running ```meltano config target
 $ meltano config target-postgres list
 
 [...]
-
-user [env: TARGET_POSTGRES_USER] current value: None (default)
-&ensp;&ensp;User: PostgreSQL user
+host [env: TARGET_POSTGRES_HOST] current value: 'postgres' (from `meltano.yml`)
+&ensp;&ensp;Host: Hostname for postgres instance. Note if sqlalchemy_url is set this will be ignored.
+port [env: TARGET_POSTGRES_PORT] current value: None (default)
+&ensp;&ensp;Port: The port on which postgres is awaiting connection. Note if sqlalchemy_url is set this will be ignored. Defaults to 5432
+user [env: TARGET_POSTGRES_USER] current value: 'meltano' (from `meltano.yml`)
+ &ensp;&ensp;User: User name used to authenticate. Note if sqlalchemy_url is set this will be ignored.
 password [env: TARGET_POSTGRES_PASSWORD] current value: None (default)
-&ensp;&ensp;Password: PostgreSQL password
-dbname [env: TARGET_POSTGRES_DBNAME] current value: None (default)
-&ensp;&ensp;Database Name: PostgreSQL database name
-
+&ensp;&ensp;Password: Password used to authenticate. Note if sqlalchemy_url is set this will be ignored.
+database [env: TARGET_POSTGRES_DATABASE] current value: 'postgres' (from `meltano.yml`)
+&ensp;&ensp;Database: Database name. Note if sqlalchemy_url is set this will be ignored.
+[...]
+add_record_metadata [env: TARGET_POSTGRES_ADD_RECORD_METADATA] current value: None (default)
+&ensp;&ensp;Add Record Metadata: Note that this must be enabled for activate_version to work!This adds _sdc_extracted_at, _sdc_batched_at, and more to every table. See https://sdk.meltano.com/en/latest/implementation/record_metadata.html for more information.
 [...]
 
-add_metadata_columns [env: TARGET_POSTGRES_ADD_METADATA_COLUMNS] current value: False (default)
-&ensp;&ensp;Add Metadata Columns: Useful if you want to load multiple streams from one tap to multiple Postgres schemas.
-
-[...]
-
-To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres
+To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
 </div>
 <br />
-Fill in the details for these four attributes, and set add_metadata_columns to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
+Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
 
  <div class="termy">
 
@@ -113,11 +122,13 @@ Fill in the details for these four attributes, and set add_metadata_columns to T
 $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
-&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: 'password'
-$ meltano config target-postgres set dbname postgres
-&ensp;&ensp;Loader 'target-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
-$ meltano config target-postgres set add_metadata_columns True
-&ensp;&ensp;Loader 'target-postgres' setting 'add_metadata_columns' was set in `meltano.yml`: True
+&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: '(redacted)'
+$ meltano config target-postgres set database postgres
+&ensp;&ensp;Loader 'target-postgres' setting 'database' was set in `meltano.yml`: 'postgres'
+$ meltano config target-postgres set add_record_metadata True
+&ensp;&ensp;Loader 'target-postgres' setting 'add_record_metadata' was set in `meltano.yml`: True
+$ meltano config target-postgres set host localhost
+&ensp;&ensp;Loader 'target-postgres' setting 'host' was set in `meltano.yml`: localhost
 ```
 </div>
 <br />
@@ -127,12 +138,13 @@ This will add the non-sensitive configuration to your [`meltano.yml` project fil
    plugins:
      loaders:
        - name: target-postgres
-         variant: transferwise
-         pip_url: pipelinewise-target-postgres
+         variant: meltanolabs
+         pip_url: git+https://github.com/MeltanoLabs/target-postgres.git
          config:
            user: meltano
-           dbname: postgres
-           add_metadata_columns: true
+           database: postgres
+           add_record_metadata: true
+           host: localhost
    ```
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
@@ -143,21 +155,13 @@ You can use `meltano config target-postgres` to check the configuration, includi
 ```console
 $ meltano config target-postgres
 {
+&ensp;&ensp;&ensp;&ensp;"add_record_metadata": true,
+&ensp;&ensp;&ensp;&ensp;"database": "postgres",
+&ensp;&ensp;&ensp;&ensp;"dialect+driver": "postgresql+psycopg2",
 &ensp;&ensp;&ensp;&ensp;"host": "localhost",
-&ensp;&ensp;&ensp;&ensp;"port": 5432,
-&ensp;&ensp;&ensp;&ensp;"user": "meltano",
 &ensp;&ensp;&ensp;&ensp;"password": "password",
-&ensp;&ensp;&ensp;&ensp;"dbname": "postgres",
-&ensp;&ensp;&ensp;&ensp;"ssl": "false",
-&ensp;&ensp;&ensp;&ensp;"batch_size_rows": 100000,
-&ensp;&ensp;&ensp;&ensp;"flush_all_streams": false,
-&ensp;&ensp;&ensp;&ensp;"parallelism": 0,
-&ensp;&ensp;&ensp;&ensp;"parallelism_max": 16,
-&ensp;&ensp;&ensp;&ensp;"add_metadata_columns": true,
-&ensp;&ensp;&ensp;&ensp;"hard_delete": false,
-&ensp;&ensp;&ensp;&ensp;"data_flattening_max_level": 0,
-&ensp;&ensp;&ensp;&ensp;"primary_key_required": true,
-&ensp;&ensp;&ensp;&ensp;"validate_records": false
+&ensp;&ensp;&ensp;&ensp;"port": 5432,
+&ensp;&ensp;&ensp;&ensp;"user": "meltano"
 }
 ```
 </div>
@@ -188,6 +192,7 @@ $ meltano run tap-github target-postgres
 </div>
 <br />
 If everything was configured correctly, you should now see your data flow from your source into your destination!
+The postgres database should now have a schema `tap_github` with the table `commits` containing your data.
 
 ## Next Steps
 

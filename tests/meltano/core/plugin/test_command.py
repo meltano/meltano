@@ -7,7 +7,7 @@ from meltano.core.plugin.command import Command, UndefinedEnvVarError
 
 
 class TestCommand:
-    @pytest.fixture
+    @pytest.fixture()
     def commands(self):
         return {
             "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
@@ -17,7 +17,6 @@ class TestCommand:
         }
 
     def test_serialize(self, commands):
-
         assert Command.parse(commands["foo"]).args == "foo"
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"

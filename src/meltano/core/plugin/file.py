@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import typing as t
 
 import structlog
 
@@ -17,7 +17,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.venv_service import VirtualEnv
 
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
@@ -27,22 +27,25 @@ if TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class FilePlugin(BasePlugin):
+class FilePlugin(BasePlugin):  # noqa: WPS214
     """Meltano file plugin type."""
 
     __plugin_type__ = PluginType.FILES
 
     EXTRA_SETTINGS = [
         SettingDefinition(
-            name="_update", kind=SettingKind.OBJECT, aliases=["update"], value={}
-        )
+            name="_update",
+            kind=SettingKind.OBJECT,
+            aliases=["update"],
+            value={},
+        ),
     ]
 
     def is_invokable(self) -> bool:
         """Return whether the plugin is invokable.
 
         Returns:
-            True if the plugin is invokable, False otherwise.
+            Whether the plugin is invokable.
         """
         return False
 
@@ -85,10 +88,21 @@ class FilePlugin(BasePlugin):
         """
         return "\n".join(
             (
-                f"# This file is managed by the '{self.name}' {self.type.descriptor} and updated automatically when `meltano upgrade` is run.",
-                f"# To prevent any manual changes from being overwritten, remove the {self.type.descriptor} from `meltano.yml` or disable automatic updates:",
-                f"#     meltano config --plugin-type={self.type} {self.name} set _update {relative_path} false",
-            )
+                (
+                    f"# This file is managed by the '{self.name}' "
+                    f"{self.type.descriptor} and updated automatically when "
+                    "`meltano upgrade` is run."
+                ),
+                (
+                    f"# To prevent any manual changes from being overwritten, "
+                    f"remove the {self.type.descriptor} from `meltano.yml` or "
+                    "disable automatic updates:"
+                ),
+                (
+                    f"#     meltano config --plugin-type={self.type} "
+                    f"{self.name} set _update {relative_path} false"
+                ),
+            ),
         )
 
     def project_file_contents(
@@ -182,16 +196,17 @@ class FilePlugin(BasePlugin):
                 return relative_path
 
             logger.info(
-                f"File {str(relative_path)!r} already exists, keeping both versions"
+                f"File {str(relative_path)!r} already exists, keeping both versions",
             )
             return relative_path.with_name(
-                f"{relative_path.stem} ({self.name}){relative_path.suffix}"
+                f"{relative_path.stem} ({self.name}){relative_path.suffix}",
             )
 
         return {
             rename_if_exists(relative_path): content
             for relative_path, content in self.project_file_contents(
-                project, paths_to_update
+                project,
+                paths_to_update,
             ).items()
         }
 
@@ -233,7 +248,8 @@ class FilePlugin(BasePlugin):
         return self.write_files(
             project,
             self.files_to_create(
-                project, [] if paths_to_update is None else paths_to_update
+                project,
+                [] if paths_to_update is None else paths_to_update,
             ),
         )
 
@@ -254,51 +270,46 @@ class FilePlugin(BasePlugin):
         return self.write_files(
             project,
             self.files_to_update(
-                project, [] if paths_to_update is None else paths_to_update
+                project,
+                [] if paths_to_update is None else paths_to_update,
             ),
         )
 
     @hook("after_install")
     async def after_install(
         self,
-        installer: PluginInstallService,
+        install_service: PluginInstallService,
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
     ):
         """Trigger after install tasks.
 
         Args:
-            installer: The plugin installer.
+            install_service: The plugin installation service.
             plugin: The installed plugin.
             reason: The reason for the installation.
         """
-        project = installer.project
-        plugins_service = installer.plugins_service
-
-        plugin_settings_service = PluginSettingsService(
-            project, plugin, plugins_service=plugins_service
+        update_config = PluginSettingsService(install_service.project, plugin).get(
+            "_update",
         )
-        update_config = plugin_settings_service.get("_update")
         paths_to_update = [
             path for path, to_update in update_config.items() if to_update
         ]
 
         if reason is PluginInstallReason.ADD:
             logger.info(f"Adding '{plugin.name}' files to project...")
-
-            for path in self.create_files(project, paths_to_update):
+            for path in self.create_files(install_service.project, paths_to_update):
                 logger.info(f"Created {path}")
         elif reason is PluginInstallReason.UPGRADE:
             logger.info(f"Updating '{plugin.name}' files in project...")
-
-            updated_paths = self.update_files(project, paths_to_update)
+            updated_paths = self.update_files(install_service.project, paths_to_update)
             if not updated_paths:
                 logger.info("Nothing to update")
                 return
-
             for path in updated_paths:
                 logger.info(f"Updated {path}")
         else:
             logger.info(
-                f"Run `meltano upgrade files` to update your project's '{plugin.name}' files."
+                "Run `meltano upgrade files` to update your project's "
+                f"{plugin.name!r} files.",
             )

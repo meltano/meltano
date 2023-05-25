@@ -38,12 +38,14 @@ disable_existing_loggers: false
 formatters:
   default: # use a format similar to default generic python logging format
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
-  structured_plain: # log format for structured plain text logs without colored output
+  structured_plain_no_locals: # log format for structured plain text logs without colored output and without local variables
     (): meltano.core.logging.console_log_formatter
     colors: False # also disables `rich` traceback formatting
-  structured_colored: # log format for structured plain text logs WITH colored output
+    show_locals: False # disables local variable logging in tracebacks (which be very verbose and leak sensitive data)
+  structured_locals: # log format for structured plain text logs WITH local variables
     (): meltano.core.logging.console_log_formatter
     colors: True # also enables traceback formatting with `rich`
+    show_locals: True # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
     sort_keys: False

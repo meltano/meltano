@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import copy
 import logging
+import typing as t
 from collections import OrderedDict
+from copy import copy
 from os import PathLike
 from pathlib import Path
-from typing import Any, Mapping, MutableMapping, Sequence, TypeVar
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
+from meltano.core.utils import deep_merge
 
 logger = logging.getLogger(__name__)
-TMapping = TypeVar("TMapping", bound=MutableMapping)
 
 BLANK_SUBFILE = CommentedMap(
     [
@@ -23,7 +23,7 @@ BLANK_SUBFILE = CommentedMap(
         ("schedules", []),
         ("jobs", []),
         ("environments", []),
-    ]
+    ],
 )
 MULTI_FILE_KEYS = {
     "plugins",
@@ -33,33 +33,8 @@ MULTI_FILE_KEYS = {
 }
 
 
-def deep_merge(parent: TMapping, children: list[TMapping]) -> TMapping:
-    """Deep merge a list of child dicts with a given parent.
-
-    Args:
-        parent: The parent dict.
-        children: The child dicts.
-
-    Returns:
-        The merged dict.
-    """
-    base = copy.copy(parent)
-    for child in children:
-        for key, value in child.items():
-            if isinstance(value, Mapping):
-                # get node or create one
-                node = base.setdefault(key, value.__class__())
-                base[key] = deep_merge(node, [value])
-            elif isinstance(value, Sequence):
-                node = base.setdefault(key, value.__class__())
-                node.extend(value)
-            else:
-                base[key] = value
-    return base
-
-
 class InvalidIncludePathError(Exception):
-    """Occurs when an included file path matches a provided pattern but is not a valid config file."""
+    """Included file path matches a provided pattern but is not a valid config file."""
 
 
 class ProjectFiles:  # noqa: WPS214
@@ -109,19 +84,23 @@ class ProjectFiles:  # noqa: WPS214
         included_file_contents = self._load_included_files()
 
         # If the exact same objects are loaded again, use the cached result:
-        k = TypeVar("k")
+        k = t.TypeVar("k")
 
-        def id_vals(x: dict[k, Any]) -> dict[k, int]:
+        def id_vals(x: dict[k, t.Any]) -> dict[k, int]:
             return {k: id(v) for k, v in x.items()}
 
         if self._cached_loaded is None or id_vals(prev_raw_contents_map) != id_vals(
-            self._raw_contents_map
+            self._raw_contents_map,
         ):
-            self._cached_loaded = deep_merge(self.meltano, included_file_contents)
+            self._cached_loaded = (
+                deep_merge(self.meltano, *included_file_contents)
+                if included_file_contents
+                else copy(self.meltano)
+            )
 
         return self._cached_loaded
 
-    def update(self, meltano_config: dict) -> dict:
+    def update(self, meltano_config: CommentedMap) -> CommentedMap:
         """Update config by overriding current config with new, changed config.
 
         Note: `.update()` will write blank entities for those no longer in use
@@ -166,8 +145,8 @@ class ProjectFiles:  # noqa: WPS214
             List of paths matching the given glob patterns.
 
         Raises:
-            InvalidIncludePathError: If a path is matched by a pattern but is not a valid
-                file.
+            InvalidIncludePathError: If a path is matched by a pattern but is
+                not a valid file.
         """
         include_paths = []
         for pattern in include_path_patterns:
@@ -198,14 +177,17 @@ class ProjectFiles:  # noqa: WPS214
             key_path_string = ":".join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
-                f'Plugin with path "{key_path_string}" already added in file {existing_key_file_path}.'
+                f'Plugin with path "{key_path_string}" already added in '
+                f"file {existing_key_file_path}.",
             )
             raise Exception("Duplicate plugin name found.")
         else:
             self._plugin_file_map.update({key: str(include_path)})
 
     def _index_file(  # noqa: WPS210
-        self, include_file_path: Path, include_file_contents: CommentedMap
+        self,
+        include_file_path: Path,
+        include_file_contents: CommentedMap,
     ) -> None:
         """Populate map of plugins/schedules to their respective files.
 
@@ -257,7 +239,8 @@ class ProjectFiles:  # noqa: WPS214
                 raise exc
             else:
                 self._raw_contents_map[str(path)] = contents
-                # TODO: validate dict schema (https://gitlab.com/meltano/meltano/-/issues/3029)
+                # TODO: validate dict schema
+                # https://gitlab.com/meltano/meltano/-/issues/3029
                 self._index_file(include_file_path=path, include_file_contents=contents)
                 included_file_contents.append(contents)
         return included_file_contents
@@ -330,9 +313,9 @@ class ProjectFiles:  # noqa: WPS214
 
             # Restore sorting in project files
             sorted_file_dicts[file] = CommentedMap()
-            for key in contents.keys():
+            for key in contents:
                 if key in file_dicts[file]:
-                    sorted_file_dicts[file][key] = file_dicts[file][key]  # noqa: WPS529
+                    sorted_file_dicts[file][key] = file_dicts[file][key]
 
             # Add the new keys at the end
             for new_key in new_keys:
@@ -357,7 +340,8 @@ class ProjectFiles:  # noqa: WPS214
             original_contents.copy_attributes(file_dict)
 
             original_environments = original_contents.get(
-                "environments", CommentedSeq()
+                "environments",
+                CommentedSeq(),
             )
             environments = file_dict.get("environments", CommentedSeq())
             original_environments.copy_attributes(environments)
@@ -370,7 +354,8 @@ class ProjectFiles:  # noqa: WPS214
             plugins = file_dict.get("plugins", CommentedMap())
             for plugin_type, plugin_type_plugins in plugins.items():
                 original_plugin_type_plugins = original_plugins.get(
-                    plugin_type, CommentedSeq()
+                    plugin_type,
+                    CommentedSeq(),
                 )
                 original_plugin_type_plugins.copy_attributes(plugin_type_plugins)
 
@@ -378,6 +363,6 @@ class ProjectFiles:  # noqa: WPS214
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: Mapping):
+    def _write_file(self, file_path: PathLike, contents: t.Mapping):
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)

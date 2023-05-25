@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from hashlib import sha256
 from pathlib import Path
 
@@ -10,7 +11,9 @@ from structlog.stdlib import get_logger
 
 from meltano.core.plugin.base import PluginRef, StandalonePlugin
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 
@@ -58,16 +61,36 @@ class PluginLock:
         with self.path.open("w") as lockfile:
             json.dump(locked_def.canonical(), lockfile, indent=2)
 
-    def load(self) -> StandalonePlugin:
+    def load(
+        self,
+        create: bool = False,
+        loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
+    ) -> StandalonePlugin:
         """Load the plugin lockfile.
+
+        Args:
+            create: Create the lockfile if it does not yet exist.
+            loader: Function to process the lock file. Defaults to constructing
+                a `StandalonePlugin` instance.
+
+        Raises:
+            FileNotFoundError: The lock file was not found at its expected path.
 
         Returns:
             The loaded plugin.
         """
-        with self.path.open() as lockfile:
-            locked_def = json.load(lockfile)
 
-        return StandalonePlugin(**locked_def)
+        def _load():
+            with open(self.path) as lockfile:
+                return loader(lockfile)
+
+        try:
+            return _load()
+        except FileNotFoundError:
+            if create:
+                self.save()
+                return _load()
+            raise
 
     @property
     def sha256_checksum(self) -> str:

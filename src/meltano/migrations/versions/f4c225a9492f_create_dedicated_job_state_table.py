@@ -1,4 +1,7 @@
-"""Create dedicated job_state table
+"""THIS IS A NO-OP.
+
+IT EXISTS ONLY TO PREVENT USERS WHO APPLIED THIS MIGRATION
+FROM ENDING UP WITH AN ORPHANED alembic_version IN THEIR DB.
 
 Revision ID: f4c225a9492f
 Revises: 5b43800443d1
@@ -17,11 +20,8 @@ depends_on = None
 
 
 def upgrade():
-    # Create state table
     pass
 
 
 def downgrade():
-    # Remove job_state table
-    # Job run history is still maintained, so no need to copy
-    op.drop_table("state")
+    pass

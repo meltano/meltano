@@ -12,7 +12,7 @@ from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
     EnvironmentService,
 )
-from meltano.core.state_service import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 
@@ -69,7 +69,7 @@ class TestEnvironmentService:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]

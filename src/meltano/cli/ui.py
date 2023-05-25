@@ -6,33 +6,33 @@ import logging
 import os
 import secrets
 import signal
+import typing as t
 
 import click
 
 from meltano.api.workers import APIWorker, UIAvailableWorker
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
-from meltano.core.project import Project
 from meltano.core.project_settings_service import (
     ProjectSettingsService,
     SettingValueStore,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 
 
 def ensure_secure_setup(project: Project):
     """Verify UI security settings."""
-    settings_service = ProjectSettingsService(project)
-
-    if not settings_service.get("ui.authentication"):
+    if not project.settings.get("ui.authentication"):
         return
 
     facts = []
     if (
-        settings_service.get("ui.server_name") is None
-        and settings_service.get("ui.session_cookie_domain") is None
+        project.settings.get("ui.server_name") is None
+        and project.settings.get("ui.session_cookie_domain") is None
     ):
         facts.append(
             "- Neither the 'ui.server_name' or 'ui.session_cookie_domain' setting has been set"
@@ -40,7 +40,7 @@ def ensure_secure_setup(project: Project):
 
     secure_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secure_settings:
-        value, source = settings_service.get_with_source(setting_name)
+        value, source = project.settings.get_with_source(setting_name)
         if source is SettingValueStore.DEFAULT:
             facts.append(
                 f"- The '{setting_name}' setting has not been changed from the default test value"
@@ -75,7 +75,7 @@ def start_workers(workers):
     return stop_all
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedDefaultGroup,
     default="start",
     default_if_no_args=True,
@@ -90,6 +90,13 @@ def ui(ctx, project: Project):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#ui
     """
     ctx.obj["project"] = project
+    click.secho(
+        "\n"
+        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        "┃ The Meltano UI is deprecated, and scheduled for removal in Meltano 3.0 ┃\n"
+        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n",
+        fg="red",
+    )
 
 
 @ui.command(cls=InstrumentedCmd, short_help="Start the Meltano UI webserver.")
@@ -146,17 +153,17 @@ def setup(ctx, server_name, **flags):
     Use with caution!
     """
     project = ctx.obj["project"]
-    settings_service = ProjectSettingsService(project)
 
     def set_setting_env(setting_name, value):
-        settings_service.set(setting_name, value, store=SettingValueStore.DOTENV)
+        project.settings.set(setting_name, value, store=SettingValueStore.DOTENV)
 
     set_setting_env("ui.server_name", server_name)
 
     ui_cfg_path = project.root_dir("ui.cfg")
     if ui_cfg_path.exists():
         raise CliError(
-            f"Found existing secrets in file '{ui_cfg_path}'. Please delete this file and rerun this command to regenerate the secrets."
+            f"Found existing secrets in file '{ui_cfg_path}'. Please delete "
+            "this file and rerun this command to regenerate the secrets."
         )
 
     def generate_secret():
@@ -164,17 +171,21 @@ def setup(ctx, server_name, **flags):
 
     secret_settings = ["ui.secret_key", "ui.password_salt"]
     for setting_name in secret_settings:
-        value, source = settings_service.get_with_source(setting_name)
+        value, source = project.settings.get_with_source(setting_name)
         if source is not SettingValueStore.DEFAULT:
             click.echo(
-                f"Setting '{setting_name}' has already been set in {source.label}. Please unset it manually and rerun this command to regenerate this secret."
+                f"Setting '{setting_name}' has already been set in "
+                f"{source.label}. Please unset it manually and rerun this "
+                "command to regenerate this secret."
             )
         else:
             set_setting_env(setting_name, generate_secret())
 
     click.echo(
-        "The server name and generated secrets have been stored in your project's `.env` file."
+        "The server name and generated secrets have been stored in your "
+        "project's `.env` file."
     )
     click.echo(
-        "In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default."
+        "In production, you will likely want to move these settings to actual "
+        "environment variables, since `.env` is in `.gitignore` by default."
     )

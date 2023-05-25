@@ -1,8 +1,18 @@
 from __future__ import annotations
 
+from collections import OrderedDict
+
 import pytest  # noqa: F401
 
-from meltano.core.utils import expand_env_vars, flatten, nest, pop_at_path, set_at_path
+from meltano.core.utils import (
+    EnvVarMissingBehavior,
+    expand_env_vars,
+    flatten,
+    nest,
+    pop_at_path,
+    remove_suffix,
+    set_at_path,
+)
 
 
 def test_nest():
@@ -25,7 +35,23 @@ def test_nest():
     assert subject["a"]["b"]["c"] is two_deep
     assert isinstance(arr, list)
     # make sure it is a copy
-    assert val == start_value and val is not start_value
+    assert val == start_value
+    assert val is not start_value
+
+    new_b = nest(subject, "a.b", "not_a_dict", force=True)
+    assert new_b == "not_a_dict"
+    assert subject == {"a": {"b": "not_a_dict", "list": [], "value": {"value": 1}}}
+
+    # make sure existing values aren't cleared when `value=None` and `force=True`
+    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)  # noqa: WPS122
+    assert subject == {
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
+    }
+    similar_b = nest(subject, "a.b", force=True)
+    assert similar_b == OrderedDict({"d": "d_value"})
+    assert subject == {
+        "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
+    }
 
 
 def test_pop_at_path():
@@ -82,9 +108,31 @@ def test_flatten():
 
 
 def test_expand_env_vars():
+    env = {"ENV_VAR": "substituted"}
+    assert expand_env_vars("${ENV_VAR}_suffix", env) == "substituted_suffix"
+    assert expand_env_vars("prefix_${ENV_VAR}", env) == "prefix_substituted"
     assert (
-        expand_env_vars("${ENV_VAR}_suffix", {"ENV_VAR": "substituted"})
-        == "substituted_suffix"
+        expand_env_vars("prefix_${ENV_VAR}_suffix", env) == "prefix_substituted_suffix"
+    )
+    assert expand_env_vars("${ENV_VAR}", env) == "substituted"
+    assert expand_env_vars("$ENV_VAR", env) == "substituted"
+
+    assert expand_env_vars("$ENV_VAR", {}) == ""
+    assert (
+        expand_env_vars("$ENV_VAR", {}, if_missing=EnvVarMissingBehavior.ignore)
+        == "${ENV_VAR}"
+    )
+    assert (
+        expand_env_vars("${ENV_VAR}", {}, if_missing=EnvVarMissingBehavior.ignore)
+        == "${ENV_VAR}"
+    )
+    assert (
+        expand_env_vars(
+            "prefix-${ENV_VAR}-suffix",
+            {},
+            if_missing=EnvVarMissingBehavior.ignore,
+        )
+        == "prefix-${ENV_VAR}-suffix"
     )
 
 
@@ -111,3 +159,9 @@ def test_expand_env_vars_nested():
     }
 
     assert expand_env_vars(input_dict, env) == expected_output
+
+
+def test_remove_suffix():
+    assert remove_suffix("a_string", "ing") == "a_str"
+    assert remove_suffix("a_string", "in") == "a_string"
+    assert remove_suffix("a_string", "gni") == "a_string"

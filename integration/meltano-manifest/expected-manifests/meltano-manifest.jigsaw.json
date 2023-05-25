@@ -1,0 +1,2641 @@
+{
+  "annotations": {
+    "airflow": {
+      "key3": true,
+      "key4": {
+        "key5": {},
+        "key6": [
+          "list",
+          "values"
+        ]
+      },
+      "key7": [
+        {
+          "key8": {}
+        },
+        null
+      ]
+    },
+    "meltano.cloud": {
+      "key1": "value1",
+      "key2": "value2"
+    }
+  },
+  "default_environment": "userdev",
+  "env": {
+    "AIRFLOW_VAR_MELTANO_ENVIRONMENT": "userdev",
+    "AIRFLOW_VAR_OPERATOR_TYPE": "bash",
+    "AIRFLOW__CORE__PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/plugins_local",
+    "AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL": "30",
+    "HUB_METRICS_S3_PATH": "s3://devtest-meltano-bucket-01/hub_metrics/",
+    "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
+    "MELTANO_CLI_LOG_LEVEL": "info",
+    "MELTANO_DATABASE_MAX_RETRIES": "3",
+    "MELTANO_DATABASE_RETRY_TIMEOUT": "5",
+    "MELTANO_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/meltano.db",
+    "MELTANO_DEFAULT_ENVIRONMENT": "userdev",
+    "MELTANO_DISCOVERY_URL": "https://discovery.meltano.com/discovery.yml",
+    "MELTANO_ELT_BUFFER_SIZE": "10485760",
+    "MELTANO_EXPERIMENTAL": "false",
+    "MELTANO_FF_ENABLE_API_SCHEDULED_JOB_LIST": "false",
+    "MELTANO_FF_ENABLE_UVICORN": "false",
+    "MELTANO_FF_PLUGIN_LOCKS_REQUIRED": "false",
+    "MELTANO_FF_STRICT_ENV_VAR_MODE": "false",
+    "MELTANO_HUB_URL": "https://hub.meltano.com",
+    "MELTANO_MAIL_DEBUG": "false",
+    "MELTANO_MAIL_DEFAULT_SENDER": "\"Meltano\" <bot@meltano.com>",
+    "MELTANO_MAIL_PORT": "1025",
+    "MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID": "12751",
+    "MELTANO_MAIL_SERVER": "localhost",
+    "MELTANO_MAIL_USE_TLS": "false",
+    "MELTANO_OAUTH_SERVICE_PROVIDERS": "all",
+    "MELTANO_PROJECT_ID": "20f9e32a-be7a-41c7-9847-da9712f40d23",
+    "MELTANO_PROJECT_READONLY": "false",
+    "MELTANO_SEND_ANONYMOUS_USAGE_STATS": "false",
+    "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS": "[\"https://sp.meltano.com\"]",
+    "MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS": "1",
+    "MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS": "10",
+    "MELTANO_STATE_BACKEND_URI": "systemdb",
+    "MELTANO_UI_ANALYSIS": "false",
+    "MELTANO_UI_ANONYMOUS_READONLY": "false",
+    "MELTANO_UI_AUTHENTICATION": "false",
+    "MELTANO_UI_BIND_HOST": "0.0.0.0",
+    "MELTANO_UI_BIND_PORT": "5000",
+    "MELTANO_UI_FORWARDED_ALLOW_IPS": "127.0.0.1",
+    "MELTANO_UI_NOTIFICATION": "false",
+    "MELTANO_UI_PASSWORD_SALT": "b4c124932584ad6e69f2774a0ae5c138",
+    "MELTANO_UI_READONLY": "false",
+    "MELTANO_UI_SECRET_KEY": "thisisnotapropersecretkey",
+    "MELTANO_UI_SESSION_COOKIE_SECURE": "false",
+    "MELTANO_UI_WORKERS": "4",
+    "SUPERSET_API_URL": "http://localhost:8088",
+    "SUPERSET_PASS": "admin",
+    "SUPERSET_USER": "admin",
+    "USER_PREFIX": "wbanks"
+  },
+  "jobs": [
+    {
+      "name": "slack_notifications",
+      "tasks": [
+        "dbt-snowflake:run_slack_notifications",
+        "tap-snowflake-singer-activity target-apprise"
+      ]
+    },
+    {
+      "name": "dbt_docs",
+      "tasks": [
+        "dbt-snowflake:docs-generate",
+        "dbt-snowflake:docs-serve"
+      ]
+    },
+    {
+      "name": "meltanohub_el",
+      "tasks": [
+        "tap-meltanohub target-snowflake",
+        "dbt-snowflake:test_source_meltanohub",
+        "dbt-snowflake:run_snapshot_meltanohub",
+        "dbt-snowflake:run_staging_meltanohub",
+        "dbt-snowflake:test_staging_meltanohub"
+      ]
+    },
+    {
+      "name": "spreadsheets_anywhere_el",
+      "tasks": [
+        "tap-spreadsheets-anywhere coalesce-gcp-ips target-snowflake",
+        "dbt-snowflake:test_source_spreadsheets_anywhere",
+        "dbt-snowflake:run_snapshot_spreadsheets_anywhere"
+      ]
+    },
+    {
+      "name": "snowplow_el",
+      "tasks": [
+        "dbt-snowflake:run_staging_snowplow",
+        "dbt-snowflake:test_staging_snowplow"
+      ]
+    },
+    {
+      "name": "github_search_el",
+      "tasks": [
+        "tap-github-search target-snowflake",
+        "dbt-snowflake:run_staging_github_search",
+        "dbt-snowflake:test_staging_github_search"
+      ]
+    },
+    {
+      "name": "github_meltano_el",
+      "tasks": [
+        "tap-github-meltano target-snowflake",
+        "dbt-snowflake:run_staging_github_meltano",
+        "dbt-snowflake:test_staging_github_meltano"
+      ]
+    },
+    {
+      "name": "gitlab_el",
+      "tasks": [
+        "tap-gitlab target-snowflake",
+        "dbt-snowflake:run_staging_gitlab",
+        "dbt-snowflake:test_staging_gitlab"
+      ]
+    },
+    {
+      "name": "slack_el",
+      "tasks": [
+        "tap-slack target-snowflake",
+        "tap-slack-public target-snowflake",
+        "dbt-snowflake:run_staging_slack",
+        "dbt-snowflake:test_staging_slack"
+      ]
+    },
+    {
+      "name": "google_analytics_el",
+      "tasks": [
+        "tap-google-analytics target-snowflake",
+        "dbt-snowflake:run_staging_google_analytics",
+        "dbt-snowflake:test_staging_google_analytics"
+      ]
+    },
+    {
+      "name": "hub_metrics_publish",
+      "tasks": [
+        "dbt-snowflake:run_hub_metrics",
+        "dbt-snowflake:test_hub_metrics",
+        "tap-snowflake-metrics target-yaml-metrics awscli:s3_copy_metrics",
+        "tap-snowflake-audit target-yaml-audit awscli:s3_copy_audit"
+      ]
+    },
+    {
+      "name": "marts_refresh",
+      "tasks": [
+        "dbt-snowflake:run_marts",
+        "dbt-snowflake:test_marts"
+      ]
+    },
+    {
+      "name": "cloudwatch_el",
+      "tasks": [
+        "tap-cloudwatch target-snowflake",
+        "dbt-snowflake:run_staging_cloudwatch",
+        "dbt-snowflake:test_staging_cloudwatch"
+      ]
+    }
+  ],
+  "plugins": {
+    "extractors": [
+      {
+        "capabilities": [
+          "catalog",
+          "state",
+          "discover",
+          "about",
+          "stream-maps",
+          "schema-flattening"
+        ],
+        "config": {
+          "aws_region_name": "us-west-2",
+          "log_group_name": "API-Gateway-Execution-Logs_i32s35df22/prod",
+          "query": "fields @timestamp, @message",
+          "start_date": "2022-12-08"
+        },
+        "description": "AWS Application and Infrastructure Monitoring",
+        "docs": "https://deploy-preview-1125--meltano-hub.netlify.app/extractors/tap-cloudwatch--meltanolabs",
+        "env": {
+          "MELTANO_EXTRACT_AWS_REGION_NAME": "us-west-2",
+          "MELTANO_EXTRACT_LOG_GROUP_NAME": "API-Gateway-Execution-Logs_i32s35df22/prod",
+          "MELTANO_EXTRACT_QUERY": "fields @timestamp, @message",
+          "MELTANO_EXTRACT_START_DATE": "2022-12-08",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_cloudwatch",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_CLOUDWATCH_AWS_REGION_NAME": "us-west-2",
+          "TAP_CLOUDWATCH_LOG_GROUP_NAME": "API-Gateway-Execution-Logs_i32s35df22/prod",
+          "TAP_CLOUDWATCH_QUERY": "fields @timestamp, @message",
+          "TAP_CLOUDWATCH_START_DATE": "2022-12-08",
+          "TAP_CLOUDWATCH__LOAD_SCHEMA": "tap_cloudwatch",
+          "TAP_CLOUDWATCH__METADATA": "{}",
+          "TAP_CLOUDWATCH__SCHEMA": "{}",
+          "TAP_CLOUDWATCH__SELECT": "[\"*.*\"]",
+          "TAP_CLOUDWATCH__SELECT_FILTER": "[]"
+        },
+        "executable": "tap-cloudwatch",
+        "label": "Cloudwatch",
+        "logo_url": "https://deploy-preview-1125--meltano-hub.netlify.app/assets/logos/extractors/cloudwatch.png",
+        "name": "tap-cloudwatch",
+        "namespace": "tap_cloudwatch",
+        "pip_url": "git+https://github.com/meltanolabs/tap-cloudwatch.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/meltanolabs/tap-cloudwatch",
+        "settings": [
+          {
+            "description": "The access key for your AWS account.",
+            "kind": "password",
+            "label": "Aws Access Key Id",
+            "name": "aws_access_key_id"
+          },
+          {
+            "description": "The secret key for your AWS account.",
+            "kind": "password",
+            "label": "Aws Secret Access Key",
+            "name": "aws_secret_access_key"
+          },
+          {
+            "description": "The session key for your AWS account. This is only needed when you are using temporary credentials.",
+            "kind": "password",
+            "label": "Aws Session Token",
+            "name": "aws_session_token"
+          },
+          {
+            "description": "The AWS credentials profile name to use. The profile must be configured and accessible.",
+            "kind": "string",
+            "label": "Aws Profile",
+            "name": "aws_profile"
+          },
+          {
+            "description": "The complete URL to use for the constructed client.",
+            "kind": "string",
+            "label": "Aws Endpoint Url",
+            "name": "aws_endpoint_url"
+          },
+          {
+            "description": "The AWS region name (e.g. us-east-1) ",
+            "kind": "string",
+            "label": "Aws Region Name",
+            "name": "aws_region_name"
+          },
+          {
+            "description": "The earliest record date to sync",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "description": "The log group on which to perform the query.",
+            "kind": "string",
+            "label": "Log Group Name",
+            "name": "log_group_name"
+          },
+          {
+            "description": "The query string to use. For more information, see [CloudWatch Logs Insights Query Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html).",
+            "kind": "string",
+            "label": "Query",
+            "name": "query"
+          },
+          {
+            "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit.",
+            "kind": "integer",
+            "label": "Batch Increment S",
+            "name": "batch_increment_s"
+          },
+          {
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "log_group_name",
+            "start_date",
+            "query"
+          ]
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "state",
+          "discover",
+          "about",
+          "stream-maps",
+          "schema-flattening"
+        ],
+        "docs": "https://hub.meltano.com/extractors/tap-meltanohub--autoidm",
+        "env": {
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_meltanohub",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"plugins.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_MELTANOHUB__LOAD_SCHEMA": "tap_meltanohub",
+          "TAP_MELTANOHUB__METADATA": "{}",
+          "TAP_MELTANOHUB__SCHEMA": "{}",
+          "TAP_MELTANOHUB__SELECT": "[\"plugins.*\"]",
+          "TAP_MELTANOHUB__SELECT_FILTER": "[]"
+        },
+        "label": "Meltanohub",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/meltanohub.png",
+        "name": "tap-meltanohub",
+        "namespace": "tap_meltanohub",
+        "pip_url": "git+https://github.com/AutoIDM/tap-meltanohub.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/AutoIDM/tap-meltanohub",
+        "select": [
+          "plugins.*"
+        ],
+        "settings": [
+          {
+            "description": "The url for the API service",
+            "label": "Api Url",
+            "name": "api_url"
+          },
+          {
+            "description": "Config object for stream maps capability.",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
+          }
+        ],
+        "settings_group_validation": [
+          []
+        ],
+        "variant": "autoidm"
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "discover",
+          "state"
+        ],
+        "config": {
+          "tables": [
+            {
+              "format": "json",
+              "json_path": "prefixes",
+              "key_properties": [
+                "ip_prefix"
+              ],
+              "name": "aws_ips",
+              "path": "https://ip-ranges.amazonaws.com",
+              "pattern": "ip-ranges.json",
+              "start_date": "2020-01-01T00:00:00Z"
+            },
+            {
+              "format": "json",
+              "json_path": "prefixes",
+              "key_properties": [
+                "id"
+              ],
+              "name": "gcp_ips",
+              "path": "https://www.gstatic.com/ipranges",
+              "pattern": "cloud.json",
+              "start_date": "2020-01-01T00:00:00Z"
+            },
+            {
+              "format": "json",
+              "json_path": "values",
+              "key_properties": [
+                "id"
+              ],
+              "name": "azure_ips",
+              "path": "https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63",
+              "pattern": "ServiceTags_Public_20230116.json",
+              "start_date": "2020-01-01T00:00:00Z"
+            }
+          ]
+        },
+        "docs": "https://hub.meltano.com/extractors/tap-spreadsheets-anywhere--ets",
+        "env": {
+          "MELTANO_EXTRACT_TABLES": "[{\"path\": \"https://ip-ranges.amazonaws.com\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"ip_prefix\"], \"name\": \"aws_ips\", \"pattern\": \"ip-ranges.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://www.gstatic.com/ipranges\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"gcp_ips\", \"pattern\": \"cloud.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"azure_ips\", \"pattern\": \"ServiceTags_Public_20230116.json\", \"json_path\": \"values\"}]",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_spreadsheets_anywhere",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SPREADSHEETS_ANYWHERE_TABLES": "[{\"path\": \"https://ip-ranges.amazonaws.com\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"ip_prefix\"], \"name\": \"aws_ips\", \"pattern\": \"ip-ranges.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://www.gstatic.com/ipranges\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"gcp_ips\", \"pattern\": \"cloud.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"azure_ips\", \"pattern\": \"ServiceTags_Public_20230116.json\", \"json_path\": \"values\"}]",
+          "TAP_SPREADSHEETS_ANYWHERE__LOAD_SCHEMA": "tap_spreadsheets_anywhere",
+          "TAP_SPREADSHEETS_ANYWHERE__METADATA": "{}",
+          "TAP_SPREADSHEETS_ANYWHERE__SCHEMA": "{}",
+          "TAP_SPREADSHEETS_ANYWHERE__SELECT": "[\"*.*\"]",
+          "TAP_SPREADSHEETS_ANYWHERE__SELECT_FILTER": "[]"
+        },
+        "label": "Spreadsheets Anywhere",
+        "name": "tap-spreadsheets-anywhere",
+        "namespace": "tap_spreadsheets_anywhere",
+        "pip_url": "git+https://github.com/ets/tap-spreadsheets-anywhere.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/ets/tap-spreadsheets-anywhere",
+        "settings": [
+          {
+            "description": "An array holding json objects that each describe a set of targeted source files. See [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for details.",
+            "kind": "array",
+            "label": "Tables",
+            "name": "tables"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "tables"
+          ]
+        ],
+        "variant": "ets"
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "state",
+          "discover",
+          "about",
+          "stream-maps"
+        ],
+        "config": {
+          "auto_join_channels": false,
+          "channel_types": [
+            "private_channel"
+          ],
+          "selected_channels": [
+            "C01SK13R9NJ"
+          ],
+          "start_date": "2021-01-01"
+        },
+        "docs": "https://hub.meltano.com/extractors/tap-slack--meltanolabs",
+        "env": {
+          "MELTANO_EXTRACT_AUTO_JOIN_CHANNELS": "false",
+          "MELTANO_EXTRACT_CHANNEL_TYPES": "[\"private_channel\"]",
+          "MELTANO_EXTRACT_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
+          "MELTANO_EXTRACT_START_DATE": "2021-01-01",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_slack",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"users.*\", \"channels.*\", \"messages.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
+          "TAP_SLACK_CHANNEL_TYPES": "[\"private_channel\"]",
+          "TAP_SLACK_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
+          "TAP_SLACK_START_DATE": "2021-01-01",
+          "TAP_SLACK__LOAD_SCHEMA": "tap_slack",
+          "TAP_SLACK__METADATA": "{}",
+          "TAP_SLACK__SCHEMA": "{}",
+          "TAP_SLACK__SELECT": "[\"users.*\", \"channels.*\", \"messages.*\"]",
+          "TAP_SLACK__SELECT_FILTER": "[]"
+        },
+        "label": "Slack",
+        "name": "tap-slack",
+        "namespace": "tap_slack",
+        "pip_url": "git+https://github.com/MeltanoLabs/tap-slack.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/MeltanoLabs/tap-slack",
+        "select": [
+          "users.*",
+          "channels.*",
+          "messages.*"
+        ],
+        "settings": [
+          {
+            "kind": "password",
+            "label": "API Key",
+            "name": "api_key"
+          },
+          {
+            "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "description": "The number of days to look in the past for new thread replies to existing messages",
+            "kind": "integer",
+            "label": "Thread Lookback Days",
+            "name": "thread_lookback_days"
+          },
+          {
+            "description": "The types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages.",
+            "kind": "array",
+            "label": "Channel Types",
+            "name": "channel_types"
+          },
+          {
+            "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages.",
+            "kind": "boolean",
+            "label": "Auto Join Channels",
+            "name": "auto_join_channels"
+          },
+          {
+            "description": "A list of channel IDs that should be retrieved. If not defined then all are selected.",
+            "kind": "array",
+            "label": "Selected Channels",
+            "name": "selected_channels"
+          },
+          {
+            "description": "A list of channel IDs that should not be retrieved. Excluding overrides a selected setting, so if a channel is included in both selected and excluded, it will be excluded.",
+            "kind": "array",
+            "label": "Excluded Channels",
+            "name": "excluded_channels"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "api_key"
+          ]
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "config": {
+          "auto_join_channels": false,
+          "channel_types": [
+            "public_channel"
+          ],
+          "selected_channels": [],
+          "start_date": "2022-09-01",
+          "thread_lookback_days": 1
+        },
+        "env": {
+          "MELTANO_EXTRACT_AUTO_JOIN_CHANNELS": "false",
+          "MELTANO_EXTRACT_CHANNEL_TYPES": "[\"public_channel\"]",
+          "MELTANO_EXTRACT_SELECTED_CHANNELS": "[]",
+          "MELTANO_EXTRACT_START_DATE": "2022-09-01",
+          "MELTANO_EXTRACT_THREAD_LOOKBACK_DAYS": "1",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_slack_public",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
+          "TAP_SLACK_CHANNEL_TYPES": "[\"public_channel\"]",
+          "TAP_SLACK_PUBLIC_AUTO_JOIN_CHANNELS": "false",
+          "TAP_SLACK_PUBLIC_CHANNEL_TYPES": "[\"public_channel\"]",
+          "TAP_SLACK_PUBLIC_SELECTED_CHANNELS": "[]",
+          "TAP_SLACK_PUBLIC_START_DATE": "2022-09-01",
+          "TAP_SLACK_PUBLIC_THREAD_LOOKBACK_DAYS": "1",
+          "TAP_SLACK_PUBLIC__LOAD_SCHEMA": "tap_slack_public",
+          "TAP_SLACK_PUBLIC__METADATA": "{}",
+          "TAP_SLACK_PUBLIC__SCHEMA": "{}",
+          "TAP_SLACK_PUBLIC__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
+          "TAP_SLACK_PUBLIC__SELECT_FILTER": "[]",
+          "TAP_SLACK_SELECTED_CHANNELS": "[]",
+          "TAP_SLACK_START_DATE": "2022-09-01",
+          "TAP_SLACK_THREAD_LOOKBACK_DAYS": "1",
+          "TAP_SLACK__LOAD_SCHEMA": "tap_slack_public",
+          "TAP_SLACK__METADATA": "{}",
+          "TAP_SLACK__SCHEMA": "{}",
+          "TAP_SLACK__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
+          "TAP_SLACK__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-slack",
+        "name": "tap-slack-public",
+        "select": [
+          "channels.*",
+          "messages.*",
+          "threads.*"
+        ]
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "discover",
+          "state",
+          "about",
+          "stream-maps"
+        ],
+        "config": {
+          "reports": "./extract/ga_reports/cli_events_report_definition.json",
+          "view_id": "188392047"
+        },
+        "docs": "https://hub.meltano.com/extractors/tap-google-analytics--meltanolabs",
+        "env": {
+          "MELTANO_EXTRACT_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
+          "MELTANO_EXTRACT_VIEW_ID": "188392047",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_google_analytics",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_GOOGLE_ANALYTICS_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
+          "TAP_GOOGLE_ANALYTICS_VIEW_ID": "188392047",
+          "TAP_GOOGLE_ANALYTICS__LOAD_SCHEMA": "tap_google_analytics",
+          "TAP_GOOGLE_ANALYTICS__METADATA": "{}",
+          "TAP_GOOGLE_ANALYTICS__SCHEMA": "{}",
+          "TAP_GOOGLE_ANALYTICS__SELECT": "[\"*.*\"]",
+          "TAP_GOOGLE_ANALYTICS__SELECT_FILTER": "[]"
+        },
+        "label": "Google Analytics",
+        "name": "tap-google-analytics",
+        "namespace": "tap_google_analytics",
+        "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/MeltanoLabs/tap-google-analytics",
+        "settings": [
+          {
+            "description": "#### How to get\n\nFollow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.\n\nThis extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.\n\nTo access your Google Analytics data, the \"Analytics Reporting API\" and \"Analytics API\" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.\n\n##### Step 1: Creating Service Account Credentials\n\nAs a first step, you need to create a new project in Google Cloud Platform or use an existing one:\n\n1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).\n\n2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.\n\n  ![Screenshot of Google Service Accounts page](/assets/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)\n\n3. Click \"Create service account\"\n\n  In the Create service account window, type a name for the service account, and click `Create`.\n\n  We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.\n\n  We also do not need to grant access to any users for this service account, as we only need the key.\n\n  ![Screenshot of Google Service Account Configuration for new Account](/assets/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)\n\n  Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.\n\nMeltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.\n\n##### Step 2: Linking Credentials to Google Analytics\n\nThe newly created service account will have an email address that looks similar to:\n\n```\nservice-account-name@PROJECT-ID.iam.gserviceaccount.com\n```\n\nTo grant this service account access to your Google Analytics data, add the email address as a [new user](https://support.google.com/analytics/answer/1009702) to your Google Analytics account, property or view through the \"Admin > User Management\" page.\n\nOnly the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.\n\n![Screenshot of Google Analytics Add User](/assets/images/tap-google-analytics/03-ga-add-user.png)\n\n##### Step 3: Enabling the APIs\n\n1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.\n\n  Now enable the API using the button at the top, so that the button will say \"Disable API\" instead:\n\n  ![Screenshot of Google Analytics Reporting API](/assets/images/tap-google-analytics/04-ga-reporting-api.png)\n\n2. Next, visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable this API as well.\n\n  ![Screenshot of Google Analytics API](/assets/images/tap-google-analytics/05-ga-api.png)\n",
+            "kind": "file",
+            "label": "Client Secrets File Location",
+            "name": "key_file_location",
+            "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json"
+          },
+          {
+            "description": "Follow the above steps for [Key File Location](#key-file-location) but instead of providing a path you can provide the serialized json directly. This can be useful for ephemeral runtime environments where its easier to provide an environment variable instead of a file.\n",
+            "kind": "object",
+            "label": "Client Secrets JSON",
+            "name": "client_secrets",
+            "placeholder": "Ex. client_secrets.json"
+          },
+          {
+            "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
+            "kind": "password",
+            "label": "OAuth Client ID",
+            "name": "oauth_credentials.client_id"
+          },
+          {
+            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Client Secret",
+            "name": "oauth_credentials.client_secret"
+          },
+          {
+            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Access Token",
+            "name": "oauth_credentials.access_token"
+          },
+          {
+            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Refresh Token",
+            "name": "oauth_credentials.refresh_token"
+          },
+          {
+            "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
+            "label": "View ID",
+            "name": "view_id",
+            "placeholder": "Ex. 198343027"
+          },
+          {
+            "description": "Project-relative path to JSON file with the definition of the reports to be generated.\n\nSee <https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/> for valid dimensions and metrics.\n\nThe JSON structure expected is as follows:\n\n```json\n[\n  { \"name\" : \"name of stream to be used\",\n    \"dimensions\" :\n    [\n      \"Google Analytics Dimension\",\n      \"Another Google Analytics Dimension\",\n      // ... up to 7 dimensions per stream ...\n    ],\n    \"metrics\" :\n    [\n      \"Google Analytics Metric\",\n      \"Another Google Analytics Metric\",\n      // ... up to 10 metrics per stream ...\n    ]\n  },\n  // ... as many streams / reports as the user wants ...\n]\n```\n\nFor example, if you want to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:\n\n```json\n[\n  { \"name\" : \"users_per_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:users\",\n      \"ga:newUsers\"\n    ]\n  },\n  { \"name\" : \"sessions_per_country_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\",\n      \"ga:country\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:sessions\",\n      \"ga:sessionsPerUser\",\n      \"ga:avgSessionDuration\"\n    ]\n  }\n]\n```\n",
+            "label": "Reports",
+            "name": "reports",
+            "placeholder": "Ex. my_report_definition.json"
+          },
+          {
+            "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "description": "Date up to when historical data will be extracted.",
+            "kind": "date_iso8601",
+            "label": "End Date",
+            "name": "end_date"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "key_file_location",
+            "view_id",
+            "start_date"
+          ],
+          [
+            "client_secrets",
+            "view_id",
+            "start_date"
+          ],
+          [
+            "oauth_credentials.client_id",
+            "oauth_credentials.client_secret",
+            "oauth_credentials.access_token",
+            "oauth_credentials.refresh_token",
+            "view_id",
+            "start_date"
+          ]
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "discover",
+          "state"
+        ],
+        "docs": "https://hub.meltano.com/extractors/tap-gitlab--meltanolabs",
+        "env": {
+          "MELTANO_EXTRACT_API_URL": "https://gitlab.com",
+          "MELTANO_EXTRACT_FETCH_MERGE_REQUEST_COMMITS": "false",
+          "MELTANO_EXTRACT_FETCH_PIPELINES_EXTENDED": "false",
+          "MELTANO_EXTRACT_GROUPS": "",
+          "MELTANO_EXTRACT_PRIVATE_TOKEN": "",
+          "MELTANO_EXTRACT_PROJECTS": "",
+          "MELTANO_EXTRACT_ULTIMATE_LICENSE": "false",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_gitlab",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"projects.*\", \"merge_requests.*\", \"issues.*\", \"!issues.description\", \"!issues.title\", \"!merge_requests.description\", \"!merge_requests.title\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_GITLAB_API_URL": "https://gitlab.com",
+          "TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS": "false",
+          "TAP_GITLAB_FETCH_PIPELINES_EXTENDED": "false",
+          "TAP_GITLAB_GROUPS": "",
+          "TAP_GITLAB_PRIVATE_TOKEN": "",
+          "TAP_GITLAB_PROJECTS": "",
+          "TAP_GITLAB_ULTIMATE_LICENSE": "false",
+          "TAP_GITLAB__LOAD_SCHEMA": "tap_gitlab",
+          "TAP_GITLAB__METADATA": "{}",
+          "TAP_GITLAB__SCHEMA": "{}",
+          "TAP_GITLAB__SELECT": "[\"projects.*\", \"merge_requests.*\", \"issues.*\", \"!issues.description\", \"!issues.title\", \"!merge_requests.description\", \"!merge_requests.title\"]",
+          "TAP_GITLAB__SELECT_FILTER": "[]"
+        },
+        "label": "GitLab",
+        "name": "tap-gitlab",
+        "namespace": "tap_gitlab",
+        "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/MeltanoLabs/tap-gitlab",
+        "select": [
+          "projects.*",
+          "merge_requests.*",
+          "issues.*",
+          "!issues.description",
+          "!issues.title",
+          "!merge_requests.description",
+          "!merge_requests.title"
+        ],
+        "settings": [
+          {
+            "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.",
+            "label": "GitLab Instance",
+            "name": "api_url",
+            "protected": true,
+            "value": "https://gitlab.com"
+          },
+          {
+            "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
+            "kind": "password",
+            "label": "Access Token",
+            "name": "private_token",
+            "placeholder": "Ex. *****************",
+            "value": ""
+          },
+          {
+            "description": "This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).\n\nLeave empty if you'd like to pull data from a project in a personal user namespace.\n\nFor example, `https://github.com/MeltanoLabs/tap-gitlab` has a group of `meltano`.\n\nMultiple group names can be separated using space characters.\n",
+            "label": "Groups",
+            "name": "groups",
+            "placeholder": "Ex. my-organization",
+            "value": ""
+          },
+          {
+            "description": "This property allows you to scope the project(s) that the extractor fetches.\n\nLeave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.\n\nThe format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:\n\n- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/meltano)\n- `meltano/sdk` - The project for the [Meltano SDK for Singer Taps and Targets ](https://gitlab.com/meltano/sdk)\n\nMultiple group paths can be separated using space characters.\n",
+            "label": "Project",
+            "name": "projects",
+            "placeholder": "Ex. my-organization/project-1",
+            "value": ""
+          },
+          {
+            "description": "Enable to pull in extra data (like Epics, Epic Issues and other entities)\nonly available to GitLab Ultimate and GitLab.com Gold accounts.\n\nThe `epics` and `epic_issues` entities cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
+            "kind": "boolean",
+            "label": "Ultimate License",
+            "name": "ultimate_license",
+            "value": false
+          },
+          {
+            "description": "For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs.\n\nThis can slow down extraction considerably because of the many API calls required.\n\nThe `merge_request_commits` entity cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
+            "kind": "boolean",
+            "label": "Fetch Merge Request Commits",
+            "name": "fetch_merge_request_commits",
+            "value": false
+          },
+          {
+            "description": "For every Pipeline, also fetch extended details of each of these pipelines.\n\nThis  can slow down extraction considerably because of the many API calls required.\n\nThe `pipelines_extended` entity cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
+            "kind": "boolean",
+            "label": "Fetch Pipelines Extended",
+            "name": "fetch_pipelines_extended",
+            "value": false
+          },
+          {
+            "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "api_url",
+            "groups",
+            "start_date"
+          ],
+          [
+            "api_url",
+            "projects",
+            "start_date"
+          ]
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "state",
+          "discover",
+          "about",
+          "stream-maps",
+          "schema-flattening"
+        ],
+        "docs": "https://hub.meltano.com/extractors/tap-github--meltanolabs",
+        "env": {
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_GITHUB__LOAD_SCHEMA": "tap_github",
+          "TAP_GITHUB__METADATA": "{}",
+          "TAP_GITHUB__SCHEMA": "{}",
+          "TAP_GITHUB__SELECT": "[\"*.*\"]",
+          "TAP_GITHUB__SELECT_FILTER": "[]"
+        },
+        "label": "GitHub",
+        "name": "tap-github",
+        "namespace": "tap_github",
+        "pip_url": "git+https://github.com/MeltanoLabs/tap-github.git",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/MeltanoLabs/tap-github",
+        "settings": [
+          {
+            "label": "User Agent",
+            "name": "user_agent"
+          },
+          {
+            "description": "The log level of the API response metrics.",
+            "label": "Metrics Log Level",
+            "name": "metrics_log_level"
+          },
+          {
+            "description": "GitHub token to authenticate with.",
+            "kind": "password",
+            "label": "Auth Token",
+            "name": "auth_token"
+          },
+          {
+            "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits.",
+            "kind": "array",
+            "label": "Additional Auth Tokens",
+            "name": "additional_auth_tokens"
+          },
+          {
+            "description": "Add a buffer to avoid consuming all query points for the token at hand. Defaults to 1000.",
+            "kind": "integer",
+            "label": "Rate Limit Buffer",
+            "name": "rate_limit_buffer"
+          },
+          {
+            "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)",
+            "kind": "array",
+            "label": "Searches",
+            "name": "searches"
+          },
+          {
+            "description": "An array of strings containing the github organizations to be included",
+            "kind": "array",
+            "label": "Organizations",
+            "name": "organizations"
+          },
+          {
+            "description": "An array of strings containing the github repos to be included",
+            "kind": "array",
+            "label": "Repositories",
+            "name": "repositories"
+          },
+          {
+            "description": "A list of GithHub usernames.",
+            "kind": "array",
+            "label": "User Usernames",
+            "name": "user_usernames"
+          },
+          {
+            "description": "A list of GitHub user ids.",
+            "kind": "array",
+            "label": "User IDs",
+            "name": "user_ids"
+          },
+          {
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Set to true to skip API calls for the parent streams (such as repositories) if it is not selected but children are.",
+            "kind": "boolean",
+            "label": "Skip Parent Streams",
+            "name": "skip_parent_streams"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "repositories"
+          ],
+          [
+            "organizations"
+          ],
+          [
+            "searches"
+          ],
+          [
+            "user_usernames"
+          ],
+          [
+            "user_ids"
+          ]
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "config": {
+          "organizations": [
+            "MeltanoLabs",
+            "meltano"
+          ],
+          "stream_maps": {
+            "issues": {
+              "__filter__": "record['type'] = 'issue'"
+            }
+          }
+        },
+        "env": {
+          "MELTANO_EXTRACT_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
+          "MELTANO_EXTRACT_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "MELTANO_EXTRACT_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github_meltano",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_GITHUB_MELTANO_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
+          "TAP_GITHUB_MELTANO_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "TAP_GITHUB_MELTANO_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB_MELTANO__LOAD_SCHEMA": "tap_github_meltano",
+          "TAP_GITHUB_MELTANO__METADATA": "{}",
+          "TAP_GITHUB_MELTANO__SCHEMA": "{}",
+          "TAP_GITHUB_MELTANO__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
+          "TAP_GITHUB_MELTANO__SELECT_FILTER": "[]",
+          "TAP_GITHUB_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
+          "TAP_GITHUB_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "TAP_GITHUB_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB__LOAD_SCHEMA": "tap_github_meltano",
+          "TAP_GITHUB__METADATA": "{}",
+          "TAP_GITHUB__SCHEMA": "{}",
+          "TAP_GITHUB__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
+          "TAP_GITHUB__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-github",
+        "name": "tap-github-meltano",
+        "select": [
+          "repositories.*",
+          "pull_requests.*",
+          "issues.*",
+          "!issues.body",
+          "!issues.title",
+          "!pull_requests.body",
+          "!pull_requests.title"
+        ]
+      },
+      {
+        "config": {
+          "metrics_log_level": "DEBUG",
+          "searches": [
+            {
+              "name": "tap non-forks",
+              "query": "tap- fork:false language:Python singer in:readme"
+            },
+            {
+              "name": "target non-forks",
+              "query": "target- fork:false language:Python singer in:readme"
+            }
+          ],
+          "start_date": "2022-02-13",
+          "stream_maps": {
+            "issues": {
+              "__filter__": "record['type'] = 'issue'"
+            },
+            "repositories": {
+              "__filter__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n"
+            }
+          }
+        },
+        "env": {
+          "MELTANO_EXTRACT_METRICS_LOG_LEVEL": "DEBUG",
+          "MELTANO_EXTRACT_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
+          "MELTANO_EXTRACT_START_DATE": "2022-02-13",
+          "MELTANO_EXTRACT_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "MELTANO_EXTRACT_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "MELTANO_EXTRACT_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github_search",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_GITHUB_METRICS_LOG_LEVEL": "DEBUG",
+          "TAP_GITHUB_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
+          "TAP_GITHUB_SEARCH_METRICS_LOG_LEVEL": "DEBUG",
+          "TAP_GITHUB_SEARCH_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
+          "TAP_GITHUB_SEARCH_START_DATE": "2022-02-13",
+          "TAP_GITHUB_SEARCH_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "TAP_GITHUB_SEARCH_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB_SEARCH_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "TAP_GITHUB_SEARCH__LOAD_SCHEMA": "tap_github_search",
+          "TAP_GITHUB_SEARCH__METADATA": "{}",
+          "TAP_GITHUB_SEARCH__SCHEMA": "{}",
+          "TAP_GITHUB_SEARCH__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
+          "TAP_GITHUB_SEARCH__SELECT_FILTER": "[]",
+          "TAP_GITHUB_START_DATE": "2022-02-13",
+          "TAP_GITHUB_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
+          "TAP_GITHUB_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
+          "TAP_GITHUB_STREAM_MAPS_REPOSITORIES___FILTER__": "('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\n",
+          "TAP_GITHUB__LOAD_SCHEMA": "tap_github_search",
+          "TAP_GITHUB__METADATA": "{}",
+          "TAP_GITHUB__SCHEMA": "{}",
+          "TAP_GITHUB__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
+          "TAP_GITHUB__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-github",
+        "name": "tap-github-search",
+        "select": [
+          "repositories.*",
+          "readme.*",
+          "issues.*",
+          "pull_requests.*"
+        ]
+      },
+      {
+        "capabilities": [
+          "catalog",
+          "discover",
+          "state"
+        ],
+        "config": {
+          "account": "epa06486",
+          "password": "${SNOWFLAKE_PASSWORD}"
+        },
+        "docs": "https://hub.meltano.com/extractors/tap-snowflake--transferwise",
+        "env": {
+          "MELTANO_EXTRACT_ACCOUNT": "epa06486",
+          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_snowflake",
+          "MELTANO_EXTRACT__METADATA": "{}",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE__LOAD_SCHEMA": "tap_snowflake",
+          "TAP_SNOWFLAKE__METADATA": "{}",
+          "TAP_SNOWFLAKE__SCHEMA": "{}",
+          "TAP_SNOWFLAKE__SELECT": "[\"*.*\"]",
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+        },
+        "label": "Snowflake",
+        "name": "tap-snowflake",
+        "namespace": "tap_snowflake",
+        "pip_url": "pipelinewise-tap-snowflake",
+        "plugin_type": "extractors",
+        "repo": "https://github.com/transferwise/pipelinewise-tap-snowflake",
+        "settings": [
+          {
+            "description": "Snowflake account name (i.e. `rtXXXXX.eu-central-1`)",
+            "label": "Account",
+            "name": "account",
+            "placeholder": "E.g. rtXXXXX.eu-central-1"
+          },
+          {
+            "description": "Snowflake Database name",
+            "label": "Database Name",
+            "name": "dbname"
+          },
+          {
+            "description": "Snowflake User",
+            "label": "User",
+            "name": "user"
+          },
+          {
+            "description": "Snowflake Password",
+            "kind": "password",
+            "label": "Password",
+            "name": "password"
+          },
+          {
+            "description": "Snowflake virtual warehouse name",
+            "label": "Warehouse",
+            "name": "warehouse"
+          },
+          {
+            "description": "A comma separated list of the table names that you want to sync. The table names should be fully qualified including the db and schema name. For example, syncing table1 and table2 would look like `db.schema.table1,db.schema.table2`.",
+            "label": "Tables",
+            "name": "tables"
+          },
+          {
+            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "A path to your private key used for authenticating using Key Pair authentication instead of user/pass.",
+            "label": "Private Key Path",
+            "name": "private_key_path"
+          },
+          {
+            "description": "The private key passphrase used for authenticating using Key Pair authentication instead of user/pass.",
+            "label": "Private Key Passphrase",
+            "name": "private_key_passphrase"
+          },
+          {
+            "description": "Use insecure mode to avoid \"Failed to get OCSP response\" warnings.",
+            "label": "Insecure Mode",
+            "name": "insecure_mode",
+            "value": false
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "account",
+            "dbname",
+            "password",
+            "user",
+            "warehouse",
+            "tables"
+          ],
+          [
+            "account",
+            "dbname",
+            "user",
+            "warehouse",
+            "tables",
+            "private_key_path",
+            "private_key_passphrase"
+          ]
+        ],
+        "variant": "transferwise"
+      },
+      {
+        "env": {
+          "MELTANO_EXTRACT_ACCOUNT": "epa06486",
+          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_snowflake_metrics",
+          "MELTANO_EXTRACT__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "MELTANO_EXTRACT__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_METRICS_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_METRICS_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_METRICS__LOAD_SCHEMA": "tap_snowflake_metrics",
+          "TAP_SNOWFLAKE_METRICS__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE_METRICS__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE_METRICS__SCHEMA": "{}",
+          "TAP_SNOWFLAKE_METRICS__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
+          "TAP_SNOWFLAKE_METRICS__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__LOAD_SCHEMA": "tap_snowflake_metrics",
+          "TAP_SNOWFLAKE__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE__SCHEMA": "{}",
+          "TAP_SNOWFLAKE__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-snowflake",
+        "metadata": {
+          "*": {
+            "replication-method": "FULL_TABLE"
+          }
+        },
+        "name": "tap-snowflake-metrics",
+        "select": [
+          "*FACT_VARIANT_HUB_METRICS.NAME",
+          "*FACT_VARIANT_HUB_METRICS.VARIANT",
+          "*FACT_VARIANT_HUB_METRICS.REPO",
+          "*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE",
+          "*FACT_VARIANT_HUB_METRICS.PIP_URL",
+          "*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS",
+          "*FACT_VARIANT_HUB_METRICS.ALL_EXECS",
+          "*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT",
+          "*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME",
+          "*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT"
+        ]
+      },
+      {
+        "env": {
+          "MELTANO_EXTRACT_ACCOUNT": "epa06486",
+          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_snowflake_audit",
+          "MELTANO_EXTRACT__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "MELTANO_EXTRACT__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_AUDIT_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_AUDIT_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_AUDIT__LOAD_SCHEMA": "tap_snowflake_audit",
+          "TAP_SNOWFLAKE_AUDIT__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE_AUDIT__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE_AUDIT__SCHEMA": "{}",
+          "TAP_SNOWFLAKE_AUDIT__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
+          "TAP_SNOWFLAKE_AUDIT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE__LOAD_SCHEMA": "tap_snowflake_audit",
+          "TAP_SNOWFLAKE__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE__SCHEMA": "{}",
+          "TAP_SNOWFLAKE__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-snowflake",
+        "metadata": {
+          "*": {
+            "replication-method": "FULL_TABLE"
+          }
+        },
+        "name": "tap-snowflake-audit",
+        "select": [
+          "*HUB_METRICS_AUDIT.UPDATED_DATE",
+          "*HUB_METRICS_AUDIT.METRIC_TYPE"
+        ]
+      },
+      {
+        "env": {
+          "MELTANO_EXTRACT_ACCOUNT": "epa06486",
+          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_snowflake_singer_activity",
+          "MELTANO_EXTRACT__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "MELTANO_EXTRACT__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "MELTANO_EXTRACT__SCHEMA": "{}",
+          "MELTANO_EXTRACT__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
+          "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY_ACCOUNT": "epa06486",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__LOAD_SCHEMA": "tap_snowflake_singer_activity",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__SCHEMA": "{}",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__LOAD_SCHEMA": "tap_snowflake_singer_activity",
+          "TAP_SNOWFLAKE__METADATA": "{\"*\": {\"replication-method\": \"FULL_TABLE\"}}",
+          "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
+          "TAP_SNOWFLAKE__SCHEMA": "{}",
+          "TAP_SNOWFLAKE__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+        },
+        "inherit_from": "tap-snowflake",
+        "metadata": {
+          "*": {
+            "replication-method": "FULL_TABLE"
+          }
+        },
+        "name": "tap-snowflake-singer-activity",
+        "select": [
+          "*SLACK_ALERTS.TITLE",
+          "*SLACK_ALERTS.BODY"
+        ]
+      }
+    ],
+    "files": [],
+    "loaders": [
+      {
+        "annotations": {
+          "airflow": {
+            "loader-key3": true,
+            "loader-key4": {
+              "loader-key5": {},
+              "loader-key6": [
+                "loader",
+                "list",
+                "values"
+              ]
+            },
+            "loader-key7": [
+              {
+                "loader-key8": {}
+              },
+              null
+            ]
+          },
+          "meltano.cloud": {
+            "loader-key1": "loader-value1",
+            "loader-key2": "loader-value2"
+          }
+        },
+        "capabilities": [
+          "about",
+          "stream-maps"
+        ],
+        "config": {
+          "file_naming_scheme": "{stream_name}.yml",
+          "overwrite_behavior": "replace_records"
+        },
+        "docs": "https://hub.meltano.com/loaders/target-yaml--meltanolabs",
+        "env": {
+          "MELTANO_LOAD_FILE_NAMING_SCHEME": "{stream_name}.yml",
+          "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_records",
+          "MELTANO_LOAD__DIALECT": "target_yaml",
+          "TARGET_YAML_FILE_NAMING_SCHEME": "{stream_name}.yml",
+          "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_records",
+          "TARGET_YAML__DIALECT": "target_yaml"
+        },
+        "label": "YAML",
+        "name": "target-yaml",
+        "namespace": "target_yaml",
+        "pip_url": "git+https://github.com/MeltanoLabs/target-yaml.git",
+        "plugin_type": "loaders",
+        "repo": "https://github.com/MeltanoLabs/target-yaml",
+        "settings": [
+          {
+            "description": "The scheme with which output files will be named. Naming scheme may leverage any of the following substitutions - \\n\\n- `{stream_name}`- `{datestamp}`- `{timestamp}`",
+            "label": "File Naming Scheme",
+            "name": "file_naming_scheme"
+          },
+          {
+            "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
+            "label": "Datestamp Format",
+            "name": "datestamp_format"
+          },
+          {
+            "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
+            "label": "Timestamp Format",
+            "name": "timestamp_format"
+          },
+          {
+            "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to \"UTC\". For a list of possible values, please see - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+            "label": "Timestamp Timezone",
+            "name": "timestamp_timezone"
+          },
+          {
+            "description": "Allows inline stream transformations and aliasing. For more information see - https://sdk.meltano.com/en/latest/stream_maps.html",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "A jsonpath string determining the insertion point for new records. Currently, this must be the path to a map key which will be populated by a list of records. \\n\\nFor example \"$.metrics\" will populate the file with `metrics - [{<record1>},{<record2>},...]` \\n\\nFor JSONPath syntax help, see - https://jsonpath.com",
+            "label": "Record Insert Jsonpath",
+            "name": "record_insert_jsonpath"
+          },
+          {
+            "description": "A property in the record which will be used as the dictionary key.\\n\\nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list.",
+            "label": "Record Key Property Name",
+            "name": "record_key_property_name"
+          },
+          {
+            "description": "A property in the record which will be used as a sort key.\\n\\nIf this property is omitted, records will not be sorted.",
+            "label": "Record Sort Property Name",
+            "name": "record_sort_property_name"
+          },
+          {
+            "description": "Determines the overwrite behavior if destination file already exists. Must be one of the following string values - \\n\\n- `append_records` (default) - append records at the insertion point\\n- `replace_records` - replace all records at the insertion point\\n- `replace_file` - replace entire file using `default_yaml_template`\\n",
+            "label": "Overwrite Behavior",
+            "name": "overwrite_behavior"
+          },
+          {
+            "description": "Text string to use for a yaml template file. This text will be used to create a new file if the destination file does not exist.",
+            "label": "Default Yaml Template",
+            "name": "default_yaml_template"
+          }
+        ],
+        "variant": "meltanolabs"
+      },
+      {
+        "config": {
+          "default_yaml_template": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
+          "file_naming_scheme": "variant_metrics.yml",
+          "overwrite_behavior": "replace_file",
+          "record_insert_jsonpath": "$.metrics",
+          "record_key_property_name": "REPO",
+          "record_sort_property_name": "REPO"
+        },
+        "env": {
+          "MELTANO_LOAD_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
+          "MELTANO_LOAD_FILE_NAMING_SCHEME": "variant_metrics.yml",
+          "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
+          "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.metrics",
+          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "MELTANO_LOAD_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "MELTANO_LOAD__DIALECT": "target_yaml_metrics",
+          "TARGET_YAML_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
+          "TARGET_YAML_FILE_NAMING_SCHEME": "variant_metrics.yml",
+          "TARGET_YAML_METRICS_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
+          "TARGET_YAML_METRICS_FILE_NAMING_SCHEME": "variant_metrics.yml",
+          "TARGET_YAML_METRICS_OVERWRITE_BEHAVIOR": "replace_file",
+          "TARGET_YAML_METRICS_RECORD_INSERT_JSONPATH": "$.metrics",
+          "TARGET_YAML_METRICS_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_METRICS_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_METRICS__DIALECT": "target_yaml_metrics",
+          "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
+          "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.metrics",
+          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "TARGET_YAML__DIALECT": "target_yaml_metrics"
+        },
+        "inherit_from": "target-yaml",
+        "name": "target-yaml-metrics"
+      },
+      {
+        "config": {
+          "default_yaml_template": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
+          "file_naming_scheme": "audit.yml",
+          "overwrite_behavior": "replace_file",
+          "record_insert_jsonpath": "$.audit_log",
+          "record_key_property_name": "METRIC_TYPE"
+        },
+        "env": {
+          "MELTANO_LOAD_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
+          "MELTANO_LOAD_FILE_NAMING_SCHEME": "audit.yml",
+          "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
+          "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.audit_log",
+          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "MELTANO_LOAD__DIALECT": "target_yaml_audit",
+          "TARGET_YAML_AUDIT_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
+          "TARGET_YAML_AUDIT_FILE_NAMING_SCHEME": "audit.yml",
+          "TARGET_YAML_AUDIT_OVERWRITE_BEHAVIOR": "replace_file",
+          "TARGET_YAML_AUDIT_RECORD_INSERT_JSONPATH": "$.audit_log",
+          "TARGET_YAML_AUDIT_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML_AUDIT__DIALECT": "target_yaml_audit",
+          "TARGET_YAML_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
+          "TARGET_YAML_FILE_NAMING_SCHEME": "audit.yml",
+          "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
+          "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.audit_log",
+          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML__DIALECT": "target_yaml_audit"
+        },
+        "inherit_from": "target-yaml",
+        "name": "target-yaml-audit"
+      },
+      {
+        "config": {
+          "account": "epa06486",
+          "add_metadata_columns": true,
+          "dbname": "JIGSAW_LABS_RAW",
+          "default_target_schema": "${MELTANO_EXTRACT__LOAD_SCHEMA}",
+          "file_format": "CSV",
+          "password": "${SNOWFLAKE_PASSWORD}",
+          "role": "jigsaw_labs_developer",
+          "user": "${USER_PREFIX}",
+          "warehouse": "CORE"
+        },
+        "dialect": "snowflake",
+        "docs": "https://hub.meltano.com/loaders/target-snowflake--transferwise",
+        "env": {
+          "MELTANO_LOAD_ACCOUNT": "epa06486",
+          "MELTANO_LOAD_ADD_METADATA_COLUMNS": "true",
+          "MELTANO_LOAD_ARCHIVE_LOAD_FILES": "false",
+          "MELTANO_LOAD_BATCH_SIZE_ROWS": "100000",
+          "MELTANO_LOAD_DATA_FLATTENING_MAX_LEVEL": "0",
+          "MELTANO_LOAD_DBNAME": "JIGSAW_LABS_RAW",
+          "MELTANO_LOAD_DISABLE_TABLE_CACHE": "false",
+          "MELTANO_LOAD_FILE_FORMAT": "CSV",
+          "MELTANO_LOAD_FLUSH_ALL_STREAMS": "false",
+          "MELTANO_LOAD_HARD_DELETE": "false",
+          "MELTANO_LOAD_NO_COMPRESSION": "false",
+          "MELTANO_LOAD_PARALLELISM": "0",
+          "MELTANO_LOAD_PARALLELISM_MAX": "16",
+          "MELTANO_LOAD_PRIMARY_KEY_REQUIRED": "true",
+          "MELTANO_LOAD_ROLE": "jigsaw_labs_developer",
+          "MELTANO_LOAD_USER": "wbanks",
+          "MELTANO_LOAD_VALIDATE_RECORDS": "false",
+          "MELTANO_LOAD_WAREHOUSE": "CORE",
+          "MELTANO_LOAD__DIALECT": "snowflake",
+          "TARGET_SNOWFLAKE_ACCOUNT": "epa06486",
+          "TARGET_SNOWFLAKE_ADD_METADATA_COLUMNS": "true",
+          "TARGET_SNOWFLAKE_ARCHIVE_LOAD_FILES": "false",
+          "TARGET_SNOWFLAKE_BATCH_SIZE_ROWS": "100000",
+          "TARGET_SNOWFLAKE_DATA_FLATTENING_MAX_LEVEL": "0",
+          "TARGET_SNOWFLAKE_DBNAME": "JIGSAW_LABS_RAW",
+          "TARGET_SNOWFLAKE_DISABLE_TABLE_CACHE": "false",
+          "TARGET_SNOWFLAKE_FILE_FORMAT": "CSV",
+          "TARGET_SNOWFLAKE_FLUSH_ALL_STREAMS": "false",
+          "TARGET_SNOWFLAKE_HARD_DELETE": "false",
+          "TARGET_SNOWFLAKE_NO_COMPRESSION": "false",
+          "TARGET_SNOWFLAKE_PARALLELISM": "0",
+          "TARGET_SNOWFLAKE_PARALLELISM_MAX": "16",
+          "TARGET_SNOWFLAKE_PRIMARY_KEY_REQUIRED": "true",
+          "TARGET_SNOWFLAKE_ROLE": "jigsaw_labs_developer",
+          "TARGET_SNOWFLAKE_USER": "wbanks",
+          "TARGET_SNOWFLAKE_VALIDATE_RECORDS": "false",
+          "TARGET_SNOWFLAKE_WAREHOUSE": "CORE",
+          "TARGET_SNOWFLAKE__DIALECT": "snowflake"
+        },
+        "label": "Snowflake",
+        "name": "target-snowflake",
+        "namespace": "target_snowflake",
+        "pip_url": "pipelinewise-target-snowflake",
+        "plugin_type": "loaders",
+        "repo": "https://github.com/transferwise/pipelinewise-target-snowflake",
+        "settings": [
+          {
+            "description": "Snowflake account name (i.e. `rtXXXXX.eu-central-1`)",
+            "label": "Account",
+            "name": "account",
+            "placeholder": "E.g. rtXXXXX.eu-central-1"
+          },
+          {
+            "aliases": [
+              "database"
+            ],
+            "description": "Snowflake Database name",
+            "label": "Database Name",
+            "name": "dbname"
+          },
+          {
+            "aliases": [
+              "username"
+            ],
+            "description": "Snowflake User",
+            "label": "User",
+            "name": "user"
+          },
+          {
+            "description": "Snowflake Password",
+            "kind": "password",
+            "label": "Password",
+            "name": "password"
+          },
+          {
+            "description": "Snowflake virtual warehouse name",
+            "label": "Warehouse",
+            "name": "warehouse"
+          },
+          {
+            "description": "The Snowflake file format object name which needs to be manually created as part of the [requirements](#requirements) section of the docs. Has to be the fully qualified name including the schema. Refer to the [Snowflake docs](https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements) for more details.",
+            "label": "File Format",
+            "name": "file_format"
+          },
+          {
+            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used",
+            "kind": "password",
+            "label": "AWS Access Key ID",
+            "name": "aws_access_key_id"
+          },
+          {
+            "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used",
+            "kind": "password",
+            "label": "AWS Secret Access Key",
+            "name": "aws_secret_access_key"
+          },
+          {
+            "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used",
+            "kind": "password",
+            "label": "AWS Session Token",
+            "name": "aws_session_token"
+          },
+          {
+            "description": "AWS profile name for profile based authentication. If not provided, `AWS_PROFILE` environment variable will be used.",
+            "label": "AWS Profile",
+            "name": "aws_profile"
+          },
+          {
+            "aliases": [
+              "schema"
+            ],
+            "description": "Note `$MELTANO_EXTRACT__LOAD_SCHEMA` [will expand to](https://docs.meltano.com/guide/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](https://docs.meltano.com/concepts/plugins#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/extractors/gitlab). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.\n\nName of the schema where the tables will be created, without database\nprefix. If `schema_mapping` is not defined then every stream sent by the tap is\nloaded into this schema.\n",
+            "label": "Default Target Schema",
+            "name": "default_target_schema",
+            "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+            "value_processor": "upcase_string"
+          },
+          {
+            "description": "S3 Bucket name",
+            "label": "S3 Bucket",
+            "name": "s3_bucket"
+          },
+          {
+            "description": "A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket.",
+            "label": "S3 Key Prefix",
+            "name": "s3_key_prefix"
+          },
+          {
+            "description": "The complete URL to use for the constructed client. This is allowing to use non-native s3 account.",
+            "label": "S3 Endpoint URL",
+            "name": "s3_endpoint_url"
+          },
+          {
+            "description": "Default region when creating new connections",
+            "label": "S3 Region Name",
+            "name": "s3_region_name"
+          },
+          {
+            "description": "S3 ACL name to set on the uploaded files",
+            "label": "S3 ACL",
+            "name": "s3_acl"
+          },
+          {
+            "description": "Named external stage name created at pre-requirements section. Has to be a fully qualified name including the schema name",
+            "label": "Stage",
+            "name": "stage"
+          },
+          {
+            "description": "Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Snowflake.",
+            "kind": "integer",
+            "label": "Batch Size Rows",
+            "name": "batch_size_rows",
+            "value": 100000
+          },
+          {
+            "description": "Maximum time to wait for batch to reach batch_size_rows.",
+            "kind": "integer",
+            "label": "Batch Wait Limit Seconds",
+            "name": "batch_wait_limit_seconds"
+          },
+          {
+            "description": "Flush and load every stream into Snowflake when one batch is full. Warning: This may trigger the COPY command to use files with low number of records, and may cause performance problems.",
+            "kind": "boolean",
+            "label": "Flush All Streams",
+            "name": "flush_all_streams",
+            "value": false
+          },
+          {
+            "description": "The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max.",
+            "kind": "integer",
+            "label": "Parallelism",
+            "name": "parallelism",
+            "value": 0
+          },
+          {
+            "description": "Max number of parallel threads to use when flushing tables.",
+            "kind": "integer",
+            "label": "Parallelism Max",
+            "name": "parallelism_max",
+            "value": 16
+          },
+          {
+            "description": "Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.",
+            "label": "Default Target Schema Select Permission",
+            "name": "default_target_schema_select_permission"
+          },
+          {
+            "description": "Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.\n\nIf the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.\n\nNote, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.\n",
+            "kind": "object",
+            "label": "Schema Mapping",
+            "name": "schema_mapping"
+          },
+          {
+            "description": "By default the connector caches the available table structures in Snowflake at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With `disable_table_cache` option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.",
+            "kind": "boolean",
+            "label": "Disable Table Cache",
+            "name": "disable_table_cache",
+            "value": false
+          },
+          {
+            "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string.",
+            "kind": "password",
+            "label": "Client Side Encryption Master Key",
+            "name": "client_side_encryption_master_key"
+          },
+          {
+            "description": "Required when `client_side_encryption_master_key` is defined. The name of the encrypted stage object in Snowflake that created separately and using the same encryption master key.",
+            "label": "Client Side Encryption Stage Object",
+            "name": "client_side_encryption_stage_object"
+          },
+          {
+            "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in snowflake etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Snowflake.",
+            "kind": "boolean",
+            "label": "Add Metadata Columns",
+            "name": "add_metadata_columns",
+            "value": false
+          },
+          {
+            "description": "When `hard_delete` option is true then DELETE SQL commands will be performed in Snowflake to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.",
+            "kind": "boolean",
+            "label": "Hard Delete",
+            "name": "hard_delete",
+            "value": false
+          },
+          {
+            "description": "Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.",
+            "kind": "integer",
+            "label": "Data Flattening Max Level",
+            "name": "data_flattening_max_level",
+            "value": 0
+          },
+          {
+            "description": "Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined.",
+            "kind": "boolean",
+            "label": "Primary Key Required",
+            "name": "primary_key_required",
+            "value": true
+          },
+          {
+            "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Snowflake. Enabling this option will detect invalid records earlier but could cause performance degradation.",
+            "kind": "boolean",
+            "label": "Validate Records",
+            "name": "validate_records",
+            "value": false
+          },
+          {
+            "description": "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages.",
+            "label": "Temporary Directory",
+            "name": "temp_dir"
+          },
+          {
+            "description": "Generate uncompressed CSV files when loading to Snowflake. Normally, by default GZIP compressed files are generated.",
+            "kind": "boolean",
+            "label": "No Compression",
+            "name": "no_compression",
+            "value": false
+          },
+          {
+            "description": "Optional string to tag executed queries in Snowflake. Replaces tokens\n\n`schema` and `table` with the appropriate values. The tags are displayed in the\noutput of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.\n",
+            "label": "Query Tag",
+            "name": "query_tag"
+          },
+          {
+            "description": "When enabled, the files loaded to Snowflake will also be stored in\n`archive_load_files_s3_bucket` under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/.\n\nAll archived files will have tap, schema, table and archived-by as S3 metadata keys.\n\nWhen incremental replication is used, the archived files will also have\nthe following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.\n",
+            "kind": "boolean",
+            "label": "Archive Load Files",
+            "name": "archive_load_files",
+            "value": false
+          },
+          {
+            "description": "When `archive_load_files` is enabled, the archived files will be placed in the archive S3 bucket under this prefix.",
+            "label": "Archive Load Files S3 Prefix",
+            "name": "archive_load_files_s3_prefix"
+          },
+          {
+            "description": "When archive_load_files is enabled, the archived files will be placed in this bucket.",
+            "label": "Archive Load Files S3 Bucket",
+            "name": "archive_load_files_s3_bucket"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "account",
+            "dbname",
+            "user",
+            "password",
+            "warehouse",
+            "file_format",
+            "default_target_schema"
+          ]
+        ],
+        "target_schema": "$TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA",
+        "variant": "transferwise"
+      },
+      {
+        "capabilities": [
+          "about",
+          "stream-maps",
+          "record-flattening"
+        ],
+        "docs": "https://hub.meltano.com/loaders/target-apprise--AutoIDM",
+        "env": {
+          "MELTANO_LOAD__DIALECT": "target_apprise",
+          "TARGET_APPRISE__DIALECT": "target_apprise"
+        },
+        "label": "Apprise",
+        "name": "target-apprise",
+        "namespace": "target_apprise",
+        "pip_url": "target-apprise",
+        "plugin_type": "loaders",
+        "repo": "https://github.com/AutoIDM/target-apprise",
+        "settings": [
+          {
+            "description": "Array of apprise URIs",
+            "kind": "array",
+            "label": "URIs",
+            "name": "uris"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "uris"
+          ]
+        ],
+        "variant": "AutoIDM"
+      }
+    ],
+    "mappers": [
+      {
+        "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
+        "env": {
+          "MELTANO_MAP_STREAM_MAPS_GCP_IPS_ID": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
+          "MELTANO_MAP_STREAM_MAPS_GCP_IPS_IPV4": "record.get('ipv4prefix', '')",
+          "MELTANO_MAP_STREAM_MAPS_GCP_IPS_IPV6": "record.get('ipv6prefix', '')",
+          "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_ID": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
+          "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV4": "record.get('ipv4prefix', '')",
+          "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV6": "record.get('ipv6prefix', '')",
+          "MELTANO_MAP_TRANSFORMER__MAPPING": "true",
+          "MELTANO_MAP_TRANSFORMER__MAPPINGS": "[{\"name\": \"coalesce-gcp-ips\", \"config\": {\"stream_maps\": {\"gcp_ips\": {\"ipv4prefix\": null, \"ipv6prefix\": null, \"ipv4\": \"record.get('ipv4prefix', '')\", \"ipv6\": \"record.get('ipv6prefix', '')\", \"id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}}}}]",
+          "MELTANO_MAP_TRANSFORMER__MAPPING_NAME": "coalesce-gcp-ips",
+          "MELTANO_MAP__MAPPING": "true",
+          "MELTANO_MAP__MAPPINGS": "[{\"name\": \"coalesce-gcp-ips\", \"config\": {\"stream_maps\": {\"gcp_ips\": {\"ipv4prefix\": null, \"ipv6prefix\": null, \"ipv4\": \"record.get('ipv4prefix', '')\", \"ipv6\": \"record.get('ipv6prefix', '')\", \"id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}}}}]",
+          "MELTANO_MAP__MAPPING_NAME": "coalesce-gcp-ips"
+        },
+        "executable": "meltano-map-transform",
+        "label": "meltano-map-transformer",
+        "mappings": [
+          {
+            "config": {
+              "stream_maps": {
+                "gcp_ips": {
+                  "id": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
+                  "ipv4": "record.get('ipv4prefix', '')",
+                  "ipv4prefix": null,
+                  "ipv6": "record.get('ipv6prefix', '')",
+                  "ipv6prefix": null
+                }
+              }
+            },
+            "name": "coalesce-gcp-ips"
+          }
+        ],
+        "name": "meltano-map-transformer",
+        "namespace": "meltano_map_transformer",
+        "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+        "plugin_type": "mappers",
+        "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
+        "variant": "meltano"
+      }
+    ],
+    "orchestrators": [],
+    "transformers": [],
+    "transforms": [],
+    "utilities": [
+      {
+        "commands": {
+          "create-admin": {
+            "args": "users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.org",
+            "description": "Create an Airflow user with admin privileges."
+          },
+          "describe": {
+            "args": "describe",
+            "description": "Describe the Airflow Extension",
+            "executable": "airflow_extension"
+          },
+          "initialize": {
+            "args": "initialize",
+            "description": "Initialize the Airflow Extension which will seed the database, create the default airflow.cfg, and deploy the Meltano DAG orchestrator.",
+            "executable": "airflow_extension"
+          },
+          "test_dag_generator": {
+            "args": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/tests/test_dag_generator.py",
+            "executable": "pytest"
+          },
+          "ui": {
+            "args": "webserver",
+            "description": "Start the Airflow webserver."
+          }
+        },
+        "docs": "https://hub.meltano.com/utilities/airflow--apache",
+        "env": {
+          "AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
+          "AIRFLOW_CORE_DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "AIRFLOW_CORE_DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
+          "AIRFLOW_CORE_LOAD_EXAMPLES": "False",
+          "AIRFLOW_CORE_PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
+          "AIRFLOW_DATABASE_SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
+          "AIRFLOW_EXTENSION_AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
+          "AIRFLOW_EXTENSION_AIRFLOW_HOME": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow",
+          "AIRFLOW_HOME": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow",
+          "AIRFLOW_LOGGING_BASE_LOG_FOLDER": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs",
+          "AIRFLOW_LOGGING_DAG_PROCESSOR_MANAGER_LOG_LOCATION": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
+          "AIRFLOW_SCHEDULER_CHILD_PROCESS_LOG_DIRECTORY": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/scheduler",
+          "AIRFLOW_WEBSERVER_WEB_SERVER_PORT": "8080",
+          "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "AIRFLOW__CORE__DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
+          "AIRFLOW__CORE__LOAD_EXAMPLES": "False",
+          "AIRFLOW__CORE__PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
+          "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
+          "AIRFLOW__EXT_REPO": "https://github.com/meltano/airflow-ext",
+          "AIRFLOW__LOGGING__BASE_LOG_FOLDER": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs",
+          "AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
+          "AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/scheduler",
+          "AIRFLOW__WEBSERVER__WEB_SERVER_PORT": "8080",
+          "MELTANO_UTILIZE_CORE_DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "MELTANO_UTILIZE_CORE_DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
+          "MELTANO_UTILIZE_CORE_LOAD_EXAMPLES": "False",
+          "MELTANO_UTILIZE_CORE_PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
+          "MELTANO_UTILIZE_DATABASE_SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
+          "MELTANO_UTILIZE_EXTENSION_AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
+          "MELTANO_UTILIZE_EXTENSION_AIRFLOW_HOME": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow",
+          "MELTANO_UTILIZE_LOGGING_BASE_LOG_FOLDER": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs",
+          "MELTANO_UTILIZE_LOGGING_DAG_PROCESSOR_MANAGER_LOG_LOCATION": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
+          "MELTANO_UTILIZE_SCHEDULER_CHILD_PROCESS_LOG_DIRECTORY": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/scheduler",
+          "MELTANO_UTILIZE_WEBSERVER_WEB_SERVER_PORT": "8080",
+          "MELTANO_UTILIZE__EXT_REPO": "https://github.com/meltano/airflow-ext"
+        },
+        "executable": "airflow_invoker",
+        "ext_repo": "https://github.com/meltano/airflow-ext",
+        "label": "Airflow (EDK preview)",
+        "name": "airflow",
+        "namespace": "airflow",
+        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+        "plugin_type": "utilities",
+        "repo": "https://github.com/apache/airflow",
+        "settings": [
+          {
+            "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
+            "label": "SQL Alchemy Connection",
+            "name": "database.sql_alchemy_conn",
+            "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db"
+          },
+          {
+            "env": "AIRFLOW__CORE__DAGS_FOLDER",
+            "label": "DAGs Folder",
+            "name": "core.dags_folder",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/dags"
+          },
+          {
+            "env": "AIRFLOW__CORE__PLUGINS_FOLDER",
+            "label": "Plugins Folder",
+            "name": "core.plugins_folder",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/plugins"
+          },
+          {
+            "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
+            "label": "Load Examples",
+            "name": "core.load_examples",
+            "value": false
+          },
+          {
+            "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
+            "label": "Pause DAGs at Creation",
+            "name": "core.dags_are_paused_at_creation",
+            "value": false
+          },
+          {
+            "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
+            "label": "Webserver Port",
+            "name": "webserver.web_server_port",
+            "value": 8080
+          },
+          {
+            "description": "The folder where airflow should store its log files. This path must be absolute. There are a few existing\nconfigurations that assume this is set to the default. If you choose to override this you may need to update\nthe dag_processor_manager_log_location and child_process_log_directory settings as well.\n",
+            "env": "AIRFLOW__LOGGING__BASE_LOG_FOLDER",
+            "label": "Base Log Folder",
+            "name": "logging.base_log_folder",
+            "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs"
+          },
+          {
+            "description": "Where to send dag parser logs.\n",
+            "env": "AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION",
+            "label": "Dag Processor Manager Log Location",
+            "name": "logging.dag_processor_manager_log_location",
+            "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log"
+          },
+          {
+            "description": "Where to send the logs of each scheduler process.\n",
+            "env": "AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY",
+            "label": "Child Process Log Directory",
+            "name": "scheduler.child_process_log_directory",
+            "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/scheduler"
+          },
+          {
+            "description": "The directory where Airflow will store its configuration, logs, and other files.\n",
+            "env": "AIRFLOW_HOME",
+            "label": "Airflow Home",
+            "name": "extension.airflow_home",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow"
+          },
+          {
+            "description": "The path where the Airflow configuration file will be stored.\n",
+            "env": "AIRFLOW_CONFIG",
+            "label": "Airflow Home",
+            "name": "extension.airflow_config",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg"
+          }
+        ],
+        "variant": "apache"
+      },
+      {
+        "commands": {
+          "build": {
+            "args": "build",
+            "description": "Will run your models, tests, snapshots and seeds in DAG order."
+          },
+          "clean": {
+            "args": "clean",
+            "description": "Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)"
+          },
+          "compile": {
+            "args": "compile",
+            "description": "Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory."
+          },
+          "create_userdev_env": {
+            "args": "run-operation create_userdev_env --args \"{'db_list': ['RAW'], 'dry_run': False, 'schema_list': []}\"",
+            "description": "Clones all production schemas in the PREP database that the user has access to."
+          },
+          "debug": {
+            "args": "debug",
+            "description": "Debug your DBT project and warehouse connection."
+          },
+          "deps": {
+            "args": "deps",
+            "description": "Pull the most recent version of the dependencies listed in packages.yml"
+          },
+          "describe": {
+            "args": "describe",
+            "description": "Describe the",
+            "executable": "dbt_extension"
+          },
+          "docs-generate": {
+            "args": "docs generate",
+            "description": "Generate documentation for your project."
+          },
+          "docs-serve": {
+            "args": "docs serve",
+            "description": "Serve documentation for your project. Make sure you ran `docs-generate` first."
+          },
+          "freshness": {
+            "args": "source freshness",
+            "description": "Check the freshness of your source data."
+          },
+          "initialize": {
+            "args": "initialize",
+            "description": "Initialize a new dbt project. This will create a dbt_project.yml file, a profiles.yml file, and models directory.\n",
+            "executable": "dbt_extension"
+          },
+          "run": {
+            "args": "run",
+            "description": "Compile SQL and execute against the current target database."
+          },
+          "run_dbt_artifacts": "run --select dbt_artifacts.*",
+          "run_hub_metrics": "run --select publish.meltano_hub.*",
+          "run_marts": "run --select marts.* common.* --exclude staging.*,dbt_artifacts.*",
+          "run_slack_notifications": "run --select publish.slack_notifications.*",
+          "run_snapshot_meltanohub": "snapshot --select meltanohub.*",
+          "run_snapshot_spreadsheets_anywhere": "snapshot --select spreadsheets_anywhere.*",
+          "run_staging_cloudwatch": "run --select staging.cloudwatch.*",
+          "run_staging_github_meltano": "run --select staging.github_meltano.*",
+          "run_staging_github_search": "run --select staging.github_search.*",
+          "run_staging_gitlab": "run --select staging.gitlab.*",
+          "run_staging_google_analytics": "run --select staging.google_analytics.*",
+          "run_staging_meltanohub": "run --select staging.meltanohub.*",
+          "run_staging_slack": "run --select staging.slack.*",
+          "run_staging_snowplow": "run --select staging.snowplow.*",
+          "seed": {
+            "args": "seed",
+            "description": "Load data from csv files into your data warehouse."
+          },
+          "snapshot": {
+            "args": "snapshot",
+            "description": "Execute snapshots defined in your project."
+          },
+          "test": {
+            "args": "test",
+            "description": "Runs tests on data in deployed models."
+          },
+          "test_hub_metrics": "test --select publish.meltano_hub.*",
+          "test_marts": "test --select marts.* common.* --exclude staging.*,dbt_artifacts.*",
+          "test_source_meltanohub": "test --select source:tap_meltanohub",
+          "test_source_spreadsheets_anywhere": "test --select source:tap_spreadsheets_anywhere",
+          "test_staging_cloudwatch": "test --select staging.cloudwatch.*,test_type:generic",
+          "test_staging_github_meltano": "test --select staging.github_meltano.*,test_type:generic",
+          "test_staging_github_search": "test --select staging.github_search.*,test_type:generic",
+          "test_staging_gitlab": "test --select staging.gitlab.*,test_type:generic",
+          "test_staging_google_analytics": "test --select staging.google_analytics.*,test_type:generic",
+          "test_staging_meltanohub": "test --select staging.meltanohub.*,test_type:generic",
+          "test_staging_slack": "test --select staging.slack.*,test_type:generic",
+          "test_staging_snowplow": "test --select staging.snowplow.*,test_type:generic"
+        },
+        "config": {
+          "account": "epa06486",
+          "database": "JIGSAW_LABS_PROD",
+          "database_prep": "JIGSAW_LABS_PREP",
+          "database_raw": "JIGSAW_LABS_RAW",
+          "role": "jigsaw_labs_developer",
+          "source_schema_prefix": "JIGSAW_LABS_",
+          "target_schema_prefix": "JIGSAW_LABS_",
+          "user": "${USER_PREFIX}",
+          "warehouse": "CORE"
+        },
+        "docs": "https://hub.meltano.com/utilities/dbt-snowflake--dbt-labs",
+        "env": {
+          "DBT_EXT_SKIP_PRE_INVOKE": "false",
+          "DBT_EXT_TYPE": "snowflake",
+          "DBT_PROFILES_DIR": "${MELTANO_PROJECT_ROOT}/transform/profiles/snowflake",
+          "DBT_SNOWFLAKE_ACCOUNT": "epa06486",
+          "DBT_SNOWFLAKE_DATABASE": "JIGSAW_LABS_PROD",
+          "DBT_SNOWFLAKE_DATABASE_PREP": "JIGSAW_LABS_PREP",
+          "DBT_SNOWFLAKE_DATABASE_RAW": "JIGSAW_LABS_RAW",
+          "DBT_SNOWFLAKE_PROFILES_DIR": "${MELTANO_PROJECT_ROOT}/transform/profiles/snowflake",
+          "DBT_SNOWFLAKE_PROJECT_DIR": "${MELTANO_PROJECT_ROOT}/transform",
+          "DBT_SNOWFLAKE_ROLE": "jigsaw_labs_developer",
+          "DBT_SNOWFLAKE_SKIP_PRE_INVOKE": "false",
+          "DBT_SNOWFLAKE_SOURCE_SCHEMA_PREFIX": "JIGSAW_LABS_",
+          "DBT_SNOWFLAKE_TARGET_SCHEMA_PREFIX": "JIGSAW_LABS_",
+          "DBT_SNOWFLAKE_TYPE": "snowflake",
+          "DBT_SNOWFLAKE_USER": "wbanks",
+          "DBT_SNOWFLAKE_WAREHOUSE": "CORE",
+          "DBT_SNOWFLAKE__EXT_REPO": "https://github.com/meltano/dbt-ext",
+          "MELTANO_UTILIZE_ACCOUNT": "epa06486",
+          "MELTANO_UTILIZE_DATABASE": "JIGSAW_LABS_PROD",
+          "MELTANO_UTILIZE_DATABASE_PREP": "JIGSAW_LABS_PREP",
+          "MELTANO_UTILIZE_DATABASE_RAW": "JIGSAW_LABS_RAW",
+          "MELTANO_UTILIZE_PROFILES_DIR": "${MELTANO_PROJECT_ROOT}/transform/profiles/snowflake",
+          "MELTANO_UTILIZE_PROJECT_DIR": "${MELTANO_PROJECT_ROOT}/transform",
+          "MELTANO_UTILIZE_ROLE": "jigsaw_labs_developer",
+          "MELTANO_UTILIZE_SKIP_PRE_INVOKE": "false",
+          "MELTANO_UTILIZE_SOURCE_SCHEMA_PREFIX": "JIGSAW_LABS_",
+          "MELTANO_UTILIZE_TARGET_SCHEMA_PREFIX": "JIGSAW_LABS_",
+          "MELTANO_UTILIZE_TYPE": "snowflake",
+          "MELTANO_UTILIZE_USER": "wbanks",
+          "MELTANO_UTILIZE_WAREHOUSE": "CORE",
+          "MELTANO_UTILIZE__EXT_REPO": "https://github.com/meltano/dbt-ext"
+        },
+        "executable": "dbt_invoker",
+        "ext_repo": "https://github.com/meltano/dbt-ext",
+        "label": "dbt Snowflake (EDK preview)",
+        "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
+        "name": "dbt-snowflake",
+        "namespace": "dbt_snowflake",
+        "pip_url": "dbt-core~=1.3.0 dbt-snowflake~=1.3.0 git+https://github.com/meltano/dbt-ext.git@main",
+        "plugin_type": "utilities",
+        "repo": "https://github.com/dbt-labs/dbt-snowflake",
+        "settings": [
+          {
+            "description": "Whether to skip pre-invoke hooks which automatically run dbt clean and deps",
+            "env": "DBT_EXT_SKIP_PRE_INVOKE",
+            "kind": "boolean",
+            "label": "Skip Pre-invoke",
+            "name": "skip_pre_invoke",
+            "value": false
+          },
+          {
+            "env": "DBT_EXT_TYPE",
+            "label": "dbt Profile type",
+            "name": "type",
+            "value": "snowflake"
+          },
+          {
+            "label": "Projects Directory",
+            "name": "project_dir",
+            "value": "$MELTANO_PROJECT_ROOT/transform"
+          },
+          {
+            "env": "DBT_PROFILES_DIR",
+            "label": "Profiles Directory",
+            "name": "profiles_dir",
+            "value": "$MELTANO_PROJECT_ROOT/transform/profiles/snowflake"
+          },
+          {
+            "description": "The snowflake account to connect to.",
+            "kind": "string",
+            "label": "Account",
+            "name": "account"
+          },
+          {
+            "description": "The user to connect as.",
+            "kind": "string",
+            "label": "User",
+            "name": "user"
+          },
+          {
+            "description": "The user password to authenticate with.",
+            "kind": "password",
+            "label": "Password",
+            "name": "password"
+          },
+          {
+            "description": "The user role to assume.",
+            "kind": "string",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "The compute warehouse to use when building models.",
+            "kind": "string",
+            "label": "Warehouse",
+            "name": "warehouse"
+          },
+          {
+            "description": "The database to create models in.",
+            "kind": "string",
+            "label": "Database",
+            "name": "database"
+          },
+          {
+            "description": "The schema to build models into by default.",
+            "kind": "string",
+            "label": "Schema",
+            "name": "schema"
+          }
+        ],
+        "variant": "dbt-labs"
+      },
+      {
+        "commands": {
+          "fix": {
+            "args": "fix",
+            "description": "Automatically fix SQL files according to your defined rules."
+          },
+          "fix-force": {
+            "args": "fix --force",
+            "description": "Automatically fix SQL files according to your defined rules (does not ask for confirmation)."
+          },
+          "lint": {
+            "args": "lint",
+            "description": "Lint SQL in transform models."
+          }
+        },
+        "config": {
+          "account": "epa06486",
+          "role": "TRANSFORMER",
+          "user": "${USER_PREFIX}",
+          "warehouse": "CORE"
+        },
+        "docs": "https://hub.meltano.com/utilities/sqlfluff--sqlfluff",
+        "env": {
+          "DBT_SNOWFLAKE_ACCOUNT": "epa06486",
+          "DBT_SNOWFLAKE_DATABASE": "foo",
+          "DBT_SNOWFLAKE_DATABASE_PREP": "foo",
+          "DBT_SNOWFLAKE_DATABASE_RAW": "foo",
+          "DBT_SNOWFLAKE_ROLE": "TRANSFORMER",
+          "DBT_SNOWFLAKE_USER": "wbanks",
+          "DBT_SNOWFLAKE_WAREHOUSE": "CORE",
+          "MELTANO_UTILIZE_ACCOUNT": "epa06486",
+          "MELTANO_UTILIZE_DATABASE": "foo",
+          "MELTANO_UTILIZE_DATABASE_PREP": "foo",
+          "MELTANO_UTILIZE_DATABASE_RAW": "foo",
+          "MELTANO_UTILIZE_ROLE": "TRANSFORMER",
+          "MELTANO_UTILIZE_USER": "wbanks",
+          "MELTANO_UTILIZE_WAREHOUSE": "CORE",
+          "SQLFLUFF_ACCOUNT": "epa06486",
+          "SQLFLUFF_DATABASE": "foo",
+          "SQLFLUFF_DATABASE_PREP": "foo",
+          "SQLFLUFF_DATABASE_RAW": "foo",
+          "SQLFLUFF_ROLE": "TRANSFORMER",
+          "SQLFLUFF_USER": "wbanks",
+          "SQLFLUFF_WAREHOUSE": "CORE"
+        },
+        "label": "SQLFluff",
+        "name": "sqlfluff",
+        "namespace": "sqlfluff",
+        "pip_url": "sqlfluff[dbt]",
+        "plugin_type": "utilities",
+        "repo": "https://github.com/sqlfluff/sqlfluff",
+        "settings": [
+          {
+            "env": "DBT_SNOWFLAKE_USER",
+            "name": "user"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_ROLE",
+            "name": "role"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_DATABASE",
+            "name": "database",
+            "value": "foo"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_DATABASE_PREP",
+            "name": "database_prep",
+            "value": "foo"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_DATABASE_RAW",
+            "name": "database_raw",
+            "value": "foo"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_ACCOUNT",
+            "name": "account"
+          },
+          {
+            "env": "DBT_SNOWFLAKE_WAREHOUSE",
+            "name": "warehouse"
+          }
+        ],
+        "variant": "sqlfluff"
+      },
+      {
+        "commands": {
+          "s3_copy_audit": "s3 cp audit.yml ${HUB_METRICS_S3_PATH}",
+          "s3_copy_metrics": "s3 cp variant_metrics.yml ${HUB_METRICS_S3_PATH}",
+          "s3_copy_metrics_legacy": "s3 cp metrics.yml ${HUB_METRICS_S3_PATH}"
+        },
+        "env": {},
+        "executable": "aws",
+        "label": "awscli",
+        "name": "awscli",
+        "namespace": "awscli",
+        "pip_url": "awscli==1.21.7",
+        "plugin_type": "utilities"
+      },
+      {
+        "commands": {
+          "create-admin": {
+            "args": "fab create-admin",
+            "description": "Create an admin user."
+          },
+          "load-examples": {
+            "args": "load_examples",
+            "description": "Load examples."
+          },
+          "ui": {
+            "args": "--bind $SUPERSET_UI_BIND_HOST:$SUPERSET_UI_PORT --timeout $SUPERSET_UI_TIMEOUT --workers $SUPERSET_UI_WORKERS superset.app:create_app()",
+            "description": "Start the Superset UI. Will be available on the configured `ui.bind_host` and `ui.port`, which default to `http://localhost:8088`",
+            "executable": "gunicorn"
+          }
+        },
+        "docs": "https://docs.meltano.com/guide/analysis",
+        "env": {
+          "MELTANO_UTILIZE_SECRET_KEY": "thisisnotapropersecretkey",
+          "MELTANO_UTILIZE_SQLALCHEMY_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/superset/superset.db",
+          "MELTANO_UTILIZE_UI_BIND_HOST": "0.0.0.0",
+          "MELTANO_UTILIZE_UI_PORT": "8088",
+          "MELTANO_UTILIZE_UI_TIMEOUT": "60",
+          "MELTANO_UTILIZE_UI_WORKERS": "4",
+          "SUPERSET_SECRET_KEY": "thisisnotapropersecretkey",
+          "SUPERSET_SQLALCHEMY_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/superset/superset.db",
+          "SUPERSET_UI_BIND_HOST": "0.0.0.0",
+          "SUPERSET_UI_PORT": "8088",
+          "SUPERSET_UI_TIMEOUT": "60",
+          "SUPERSET_UI_WORKERS": "4"
+        },
+        "label": "Superset",
+        "name": "superset",
+        "namespace": "superset",
+        "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1",
+        "plugin_type": "utilities",
+        "repo": "https://github.com/apache/superset",
+        "settings": [
+          {
+            "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`.",
+            "label": "UI Bind Host",
+            "name": "ui.bind_host",
+            "value": "0.0.0.0"
+          },
+          {
+            "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`.",
+            "label": "UI Port",
+            "name": "ui.port",
+            "value": 8088
+          },
+          {
+            "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option",
+            "label": "UI Timeout",
+            "name": "ui.timeout",
+            "value": 60
+          },
+          {
+            "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option",
+            "label": "UI Workers",
+            "name": "ui.workers",
+            "value": 4
+          },
+          {
+            "description": "Superset metadata database connection string. Equivalent to the `SQLALCHEMY_DATABASE_URI` setting in `superset_config.py`.\n\nSQLite is used by default, but in production PostgreSQL or MySQL is more appropriate. See the [Superset documentation](https://superset.apache.org/docs/installation/configuring-superset/#using-a-production-metastore) for more information. To add a database driver like `psycopg2` or `mysqlclient`, refer to the [Add additional database drivers](#add-additional-database-drivers) section above.\n",
+            "label": "SQLAlchemy Database URI",
+            "name": "SQLALCHEMY_DATABASE_URI",
+            "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db"
+          },
+          {
+            "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
+            "kind": "password",
+            "label": "Secret Key",
+            "name": "SECRET_KEY",
+            "value": "thisisnotapropersecretkey"
+          }
+        ],
+        "variant": "apache"
+      },
+      {
+        "commands": {
+          "test_dbt_hub_metrics": "checkpoint run dbt_hub_metrics",
+          "test_ga_raw": "checkpoint run google_analytics_raw"
+        },
+        "config": {
+          "host": "epa06486",
+          "password": "${SNOWFLAKE_PASSWORD}",
+          "prod_database": "JIGSAW_LABS_PROD",
+          "raw_database": "JIGSAW_LABS_RAW",
+          "role": "${USER_PREFIX}",
+          "username": "${USER_PREFIX}",
+          "warehouse": "CORE"
+        },
+        "docs": "https://hub.meltano.com/utilities/great_expectations--great-expectations",
+        "env": {
+          "GE_HOME": "${MELTANO_PROJECT_ROOT}/utilities/great_expectations",
+          "GE_PROD_DATABASE": "JIGSAW_LABS_PROD",
+          "GE_RAW_DATABASE": "JIGSAW_LABS_RAW",
+          "GE_ROLE": "wbanks",
+          "GE_USERNAME": "wbanks",
+          "GE_WAREHOUSE": "CORE",
+          "GREAT_EXPECTATIONS_GE_HOME": "${MELTANO_PROJECT_ROOT}/utilities/great_expectations",
+          "GREAT_EXPECTATIONS_HOST": "epa06486",
+          "GREAT_EXPECTATIONS_PROD_DATABASE": "JIGSAW_LABS_PROD",
+          "GREAT_EXPECTATIONS_RAW_DATABASE": "JIGSAW_LABS_RAW",
+          "GREAT_EXPECTATIONS_ROLE": "wbanks",
+          "GREAT_EXPECTATIONS_USERNAME": "wbanks",
+          "GREAT_EXPECTATIONS_WAREHOUSE": "CORE",
+          "MELTANO_UTILIZE_GE_HOME": "${MELTANO_PROJECT_ROOT}/utilities/great_expectations",
+          "MELTANO_UTILIZE_HOST": "epa06486",
+          "MELTANO_UTILIZE_PROD_DATABASE": "JIGSAW_LABS_PROD",
+          "MELTANO_UTILIZE_RAW_DATABASE": "JIGSAW_LABS_RAW",
+          "MELTANO_UTILIZE_ROLE": "wbanks",
+          "MELTANO_UTILIZE_USERNAME": "wbanks",
+          "MELTANO_UTILIZE_WAREHOUSE": "CORE"
+        },
+        "executable": "great_expectations",
+        "label": "Great Expectations",
+        "name": "great_expectations",
+        "namespace": "great_expectations",
+        "pip_url": "great_expectations",
+        "plugin_type": "utilities",
+        "repo": "https://github.com/great-expectations/great_expectations",
+        "requires": {
+          "files": [
+            {
+              "name": "files-great-expectations",
+              "variant": "meltano"
+            }
+          ]
+        },
+        "settings": [
+          {
+            "env": "GE_RAW_DATABASE",
+            "name": "raw_database"
+          },
+          {
+            "env": "GE_PROD_DATABASE",
+            "name": "prod_database"
+          },
+          {
+            "env": "GE_USERNAME",
+            "name": "username"
+          },
+          {
+            "env": "GE_ROLE",
+            "name": "role"
+          },
+          {
+            "env": "GE_WAREHOUSE",
+            "name": "warehouse"
+          },
+          {
+            "env": "GE_HOME",
+            "label": "Great Expectations Home Directory",
+            "name": "ge_home",
+            "value": "$MELTANO_PROJECT_ROOT/utilities/great_expectations"
+          }
+        ],
+        "variant": "great-expectations"
+      },
+      {
+        "commands": {
+          "run": "run utilities/permifrost/roles.yml",
+          "spec-test": "spec-test utilities/permifrost/roles.yml"
+        },
+        "env": {},
+        "executable": "permifrost",
+        "label": "permifrost",
+        "name": "permifrost",
+        "namespace": "permifrost",
+        "pip_url": "permifrost==0.14.0",
+        "plugin_type": "utilities"
+      },
+      {
+        "commands": {
+          "decrypt": "decrypt $KMS_KEY_ID --input-path $KMS_SECRETS_PATH --output-path $KMS_DOTENV_PATH",
+          "encrypt": "encrypt $KMS_PUBLIC_KEY_PATH --dotenv-path $KMS_DOTENV_PATH --output-path $KMS_SECTRETS_PATH"
+        },
+        "env": {},
+        "executable": "kms",
+        "label": "kms",
+        "name": "kms",
+        "namespace": "kms",
+        "pip_url": "git+https://github.com/meltano/kms-ext.git",
+        "plugin_type": "utilities"
+      }
+    ]
+  },
+  "project_id": "20f9e32a-be7a-41c7-9847-da9712f40d23",
+  "schedules": [
+    {
+      "env": {},
+      "interval": "0 12 * * *",
+      "job": "slack_notifications",
+      "name": "slack_notifications"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "cloudwatch_el",
+      "name": "cloudwatch_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "meltanohub_el",
+      "name": "meltanohub_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "spreadsheets_anywhere_el",
+      "name": "spreadsheets_anywhere_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "snowplow_el",
+      "name": "snowplow_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "github_search_el",
+      "name": "github_search_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "github_meltano_el",
+      "name": "github_meltano_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "gitlab_el",
+      "name": "gitlab_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "slack_el",
+      "name": "slack_el"
+    },
+    {
+      "env": {},
+      "interval": "0 6 * * *",
+      "job": "google_analytics_el",
+      "name": "google_analytics_el"
+    },
+    {
+      "env": {},
+      "interval": "0 12 * * *",
+      "job": "hub_metrics_publish",
+      "name": "hub_metrics_publish"
+    },
+    {
+      "env": {},
+      "interval": "0 8 * * *",
+      "job": "marts_refresh",
+      "name": "marts_refresh"
+    }
+  ],
+  "send_anonymous_usage_stats": false,
+  "version": 1
+}

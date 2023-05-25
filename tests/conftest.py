@@ -3,17 +3,17 @@ from __future__ import annotations
 import json
 import logging
 import os
-from collections import Counter
+import typing as t
+from collections import Counter, abc
 from copy import deepcopy
 from http import HTTPStatus
-from typing import Any, Mapping
 
 import pytest
 import requests
 from requests.adapters import BaseAdapter
 
-from meltano.core.hub.client import MeltanoHubService
 from meltano.core.plugin.base import PluginType
+from meltano.core.project import Project
 
 logging.basicConfig(level=logging.INFO)
 
@@ -61,6 +61,10 @@ def concurrency():
 
 
 class MockAdapter(BaseAdapter):
+    RETURN_500 = {
+        "/extractors/this-returns-500--original": {"error": "Server error"},
+    }
+
     def _process_discovery(self, api_url: str, discovery: dict) -> dict:
         hub = {}
         for plugin_type in PluginType:
@@ -68,8 +72,7 @@ class MockAdapter(BaseAdapter):
             hub[index_key] = {}
             for plugin in discovery.get(plugin_type, []):
                 plugin_name = plugin["name"]
-                hub[index_key][plugin_name] = {}
-                hub[index_key][plugin_name]["variants"] = {}
+                hub[index_key][plugin_name] = {"variants": {}}
                 default_variant = None
 
                 variants = plugin.pop("variants", [])
@@ -81,7 +84,10 @@ class MockAdapter(BaseAdapter):
                         default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -99,7 +105,10 @@ class MockAdapter(BaseAdapter):
                     default_variant = variant_name
 
                     hub[index_key][plugin_name]["variants"][variant_name] = {
-                        "ref": f"{api_url}/plugins/{plugin_type}/{plugin_name}--{variant_name}"
+                        "ref": (
+                            f"{api_url}/plugins/{plugin_type}/"
+                            f"{plugin_name}--{variant_name}"
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -116,7 +125,7 @@ class MockAdapter(BaseAdapter):
                     }
 
                     if "dialect" in plugin:
-                        hub[plugin_key]["dialect"] = plugin["dialect"]  # noqa: WPS529
+                        hub[plugin_key]["dialect"] = plugin["dialect"]
 
                 hub[index_key][plugin_name][
                     "logo_url"
@@ -137,18 +146,41 @@ class MockAdapter(BaseAdapter):
         self.count = Counter()
         self._mapping = self._process_discovery(api_url, deepcopy(discovery))
 
+        # Special cases
+        self._mapping["/extractors/index"]["this-returns-500"] = {
+            "default_variant": "original",
+            "logo_url": "https://mock.meltano.com/this-returns-500.png",
+            "variants": {
+                "original": {
+                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original",
+                },
+            },
+        }
+
     def send(
         self,
         request: requests.PreparedRequest,
-        stream: bool = False,
-        timeout: float | tuple[float, float] | tuple[float, None] | None = None,
-        verify: bool | str = True,
-        cert: Any | None = None,
-        proxies: Mapping[str, str] | None = None,
+        stream: bool = False,  # noqa: ARG002
+        timeout: float  # noqa: ARG002, WPS320
+        | tuple[float, float]
+        | tuple[float, None]
+        | None = None,
+        verify: bool | str = True,  # noqa: ARG002
+        cert: t.Any | None = None,  # noqa: ARG002
+        proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
+
         response = requests.Response()
         response.request = request
+        response.url = request.url
+
+        response_500 = self.RETURN_500.get(endpoint)
+        if response_500:
+            response.status_code = HTTPStatus.INTERNAL_SERVER_ERROR
+            response.reason = "Internal Server Error"
+            response._content = json.dumps(response_500).encode()
+            return response
 
         try:
             data = self._mapping[endpoint]
@@ -163,23 +195,24 @@ class MockAdapter(BaseAdapter):
         return response
 
 
-@pytest.fixture(scope="class")
-def meltano_hub_service(project, discovery):
-    hub = MeltanoHubService(project)
-    hub.session.mount(hub.hub_api_url, MockAdapter(hub.hub_api_url, discovery))
-    return hub
+@pytest.fixture(scope="class", autouse=True)
+def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
+    project.hub_service.session.mount(
+        project.hub_service.hub_api_url,
+        MockAdapter(project.hub_service.hub_api_url, discovery),
+    )
 
 
 @pytest.fixture(scope="class")
-def hub_endpoints(meltano_hub_service):
-    adapter = meltano_hub_service.session.adapters[meltano_hub_service.hub_api_url]
+def hub_endpoints(project: Project):
+    adapter = project.hub_service.session.adapters[project.hub_service.hub_api_url]
     return adapter._mapping
 
 
-@pytest.fixture(scope="function")
-def hub_request_counter(meltano_hub_service: MeltanoHubService):
-    counter: Counter = meltano_hub_service.session.get_adapter(
-        meltano_hub_service.hub_api_url
+@pytest.fixture()
+def hub_request_counter(project: Project):
+    counter: Counter = project.hub_service.session.get_adapter(
+        project.hub_service.hub_api_url,
     ).count
     counter.clear()
     return counter

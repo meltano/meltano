@@ -64,7 +64,6 @@ You will use cookiecutter to clone the Meltano SDK template repo for implementin
 
 Poetry serves as the dependency manager for the project. If you have used npm before, poetry serves a similar purpose but for Python projects.
 
-
 ## 2. Create a Project Using the Cookiecutter Template
 
 Run the following command to create the project files from the cookiecutter template:
@@ -75,9 +74,10 @@ cookiecutter https://github.com/meltano/sdk --directory="cookiecutter/tap-templa
 
 After running the above command, you will be prompted to configure your project.
 
-- Type `jsonplaceholder` as your source name
+- Type `jsonplaceholder` as your source name.
 - Then input your first name and last name.
-- You can leave the tap_id and library name as the default suggested names.
+- You can leave the `tap_id` and library name as the default suggested names.
+- If you are planning to distribute your project on PyPI and the `tap_id` is already in use, you can set a variant name. e.g. 'meltanolabs' or 'pipelinewise'.
 - For the stream type, you should select REST, and Custom or N/A for the auth method.
 - Finally, you can choose to add a CI/CD template or not. It doesn’t really matter in this case.
 
@@ -89,6 +89,8 @@ admin_name [FirstName LastName]: <Your First Name, Your Last Name>
 tap_id [tap-jsonplaceholder]:
 
 library_name [tap_jsonplaceholder]:
+
+variant [None (Skip)]:
 
 Select stream_type:
 
@@ -131,7 +133,7 @@ Change directory into the json-placeholder tap directory, and install the python
 cd tap-jsonplaceholder
 
 # [Optional] but useful if you need to debug your custom extractor
-poetry config virtualenv.in-project true
+poetry config virtualenvs.in-project true
 
 poetry install
 ```
@@ -142,7 +144,7 @@ See [Debug A Custom Extractor](https://docs.meltano.com/guide/debugging-custom-e
 
 To configure your custom extractor to consume data from the JSON placeholder, you need to set the **API_URL** and the **streams** that will be replicated.
 
-Open the file ```tap-jsonplaceholder/tap_jsonplaceholder/tap.py``` and replace its content with the content below:
+Open the file `tap-jsonplaceholder/tap_jsonplaceholder/tap.py` and replace its content with the content below:
 
 ```python
 """jsonplaceholder tap class."""
@@ -185,8 +187,7 @@ return [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
 ```
 
-Then replace the content of ```tap-jsonplaceholder/tap_jsonplaceholder/streams.py``` with the content below:
-
+Then replace the content of `tap-jsonplaceholder/tap_jsonplaceholder/streams.py` with the content below:
 
 ```python
 """Stream type classes for tap-jsonplaceholder."""
@@ -209,12 +210,11 @@ class CommentsStream(jsonplaceholderStream):
     ).to_dict()
 ```
 
-The ```tap.py``` file defines the tap settings and the available streams, which is the comments stream in this case. You can find the available stream types in the STREAM_TYPES array.
+The `tap.py` file defines the tap settings and the available streams, which is the comments stream in this case. You can find the available stream types in the STREAM_TYPES array.
 
-The ```streams.py``` file configures the comments stream to use the /comments path and also sets the properties of the extracted fields.
+The `streams.py` file configures the comments stream to use the `/comments` path and also sets the properties of the extracted fields.
 
-Finally, change the url_base in the ```tap-jsonplaceholder/tap_jsonplaceholder/client.py``` file to https://jsonplaceholder.typicode.com.
-
+Finally, change the value of `url_base` in the `tap-jsonplaceholder/tap_jsonplaceholder/client.py` file to https://jsonplaceholder.typicode.com.
 
 ```python
 ...
@@ -249,6 +249,7 @@ Execute the command below to run an ELT pipeline that replicates data from the R
 ```bash
 meltano run tap-jsonplaceholder target-jsonl
 ```
+
 You can inspect the output directory for the extracted JSON data.
 
 Use the command below to get the first five lines of the extracted comments JSON file:
@@ -305,6 +306,7 @@ Navigate to the parent directory of your custom extractor and run the following 
 ```bash
 meltano init
 ```
+
 The above command will prompt you to enter a project name. You should enter a name like meltano-demo. Afterward, navigate into the newly created project using the below command:
 
 ```bash
@@ -317,7 +319,6 @@ To test the custom extractor as part of your Meltano project, you will need to a
 
 There are two ways you can do this:
 
-
 ## 1. Use The Meltano Add Command
 
 Run the command below to add the extractor as a custom extractor not hosted on MeltanoHub registry:
@@ -326,9 +327,9 @@ Run the command below to add the extractor as a custom extractor not hosted on M
 meltano add --custom extractor tap-jsonplaceholder
 ```
 
-You will be prompted to input the namespace URL. Choose ```tap-jsonplaceholder```.
+You will be prompted to input the namespace URL. Choose `tap-jsonplaceholder`.
 
-Also, choose ```-e …/tap-jsonplaceholder``` as the pip_url since you are working with a local extractor project. This should be the full path to your custom extractor.
+Also, choose `-e ../tap-jsonplaceholder` as the pip_url since you are working with a local extractor project. This should be the full path to your custom extractor.
 
 Go with the default executable name.
 
@@ -410,7 +411,7 @@ plugins:
 ```
 
 <div class="notification is-info">
-  <p>You can further customize the appearance of your custom extractor in [Meltano UI](/reference/ui) using the following options:</p>
+  <p>You can further customize the appearance of your custom extractor using the following options:</p>
   <ul>
     <li>`label`</li>
     <li>`logo_url`</li>
@@ -437,6 +438,7 @@ To properly expose and configure your settings, you'll need to define them:
 
   - `foo` represents the `{ foo: VALUE }` in the output configuration.
   - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.
+
 - **kind**: Represent the type of value this should be, (e.g. `password` for sensitive values or `date_iso8601` for dates).
 - **value** (optional): Define a default value for the plugin's setting.
 
@@ -453,7 +455,6 @@ You may use any of the following to configure setting values (in order of preced
 
 - Environment variables
 - `config` section in the plugin
-- Meltano UI
 - `value` of the setting's definition
 
 ## Publishing to the world
@@ -471,8 +472,8 @@ your tap directly to PyPI.
 
 1. Create an account with [PyPI](https://pypi.org).
 2. Create a PyPI API token for use in automated publishing. (Optional but recommended.)
-3. Run `poetry --build publish` from within your repo to build and push your latest version
-   to the PyPI servers.
+3. Run `poetry build` from within your repo to build.
+4. Run `poetry publish` to push your latest version to the PyPI servers.
 
 ### Test a `pip` install
 

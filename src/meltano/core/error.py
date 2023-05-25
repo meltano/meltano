@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import typing as t
 from asyncio.streams import StreamReader
 from asyncio.subprocess import Process
 from enum import Enum
-from typing import Any
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class ExitCode(int, Enum):  # noqa: D101
@@ -21,8 +24,8 @@ class MeltanoError(Exception):
         self,
         reason: str,
         instruction: str | None = None,
-        *args: Any,
-        **kwargs: Any,
+        *args: t.Any,
+        **kwargs: t.Any,
     ) -> None:
         """Initialize a MeltanoError.
 
@@ -35,6 +38,18 @@ class MeltanoError(Exception):
         self.reason = reason
         self.instruction = instruction
         super().__init__(reason, instruction, *args, **kwargs)
+
+    def __str__(self) -> str:
+        """Return a string representation of the error.
+
+        Returns:
+            A string representation of the error.
+        """
+        return (
+            f"{self.reason}. {self.instruction}."
+            if self.instruction
+            else f"{self.reason}."
+        )
 
 
 class Error(Exception):
@@ -85,9 +100,37 @@ class PluginInstallWarning(Exception):
     """Exception for when a plugin optional optional step fails to install."""
 
 
-class EmptyMeltanoFileException(Exception):
+class EmptyMeltanoFileException(MeltanoError):
     """Exception for empty meltano.yml file."""
+
+    def __init__(self) -> None:
+        """Instantiate the error."""
+        reason = "Your meltano.yml file is empty"
+        instruction = "Please update your meltano file with a valid configuration"
+        super().__init__(reason, instruction)
 
 
 class MeltanoConfigurationError(MeltanoError):
     """Exception for when Meltano is inproperly configured."""
+
+
+class ProjectNotFound(Error):
+    """A Project is instantiated outside of a meltano project structure."""
+
+    def __init__(self, project: Project):
+        """Instantiate the error.
+
+        Args:
+            project: the name of the project which cannot be found
+        """
+        super().__init__(
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?",
+        )
+
+
+class ProjectReadonly(Error):
+    """Attempting to update a readonly project."""
+
+    def __init__(self):
+        """Instantiate the error."""
+        super().__init__("This Meltano project is deployed as read-only")

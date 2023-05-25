@@ -1,118 +1,135 @@
 """Project plugin service."""
 
+
 from __future__ import annotations
 
 import enum
-from contextlib import contextmanager
-from typing import Generator
+import sys
+import typing as t
+from contextlib import contextmanager, suppress
 
 import structlog
 
 from meltano.core.environment import EnvironmentPluginConfig
-from meltano.core.hub import MeltanoHubService
+from meltano.core.error import MeltanoError
+from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.base import VariantNotFoundError
+from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_discovery_service import (
+    LockedDefinitionService,
+    PluginDiscoveryService,
+)
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.settings_service import FeatureFlags
 
-from .config_service import ConfigService
-from .plugin import PluginRef, PluginType
-from .plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from .plugin.project_plugin import ProjectPlugin
-from .plugin_discovery_service import LockedDefinitionService, PluginDiscoveryService
-from .project import Project
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class DefinitionSource(str, enum.Enum):
+class DefinitionSource(enum.Flag):
     """The source of a plugin definition."""
 
-    DISCOVERY = "discovery"
-    HUB = "hub"
-    CUSTOM = "custom"
-    LOCKFILE = "lockfile"
-    INHERITED = "inherited"
+    NONE = 0
+    DISCOVERY = enum.auto()
+    HUB = enum.auto()
+    CUSTOM = enum.auto()
+    LOCKFILE = enum.auto()
+    INHERITED = enum.auto()
+
+    ANY = DISCOVERY | HUB | CUSTOM | LOCKFILE | INHERITED
+    LOCAL = ~HUB
 
 
 class PluginAlreadyAddedException(Exception):
     """Raised when a plugin is already added to the project."""
 
-    def __init__(self, plugin: PluginRef):
+    def __init__(self, plugin: PluginRef, new_plugin: PluginRef):
         """Create a new Plugin Already Added Exception.
 
         Args:
             plugin: The plugin that was already added.
+            new_plugin: The plugin that was attempted to be added.
         """
         self.plugin = plugin
+        self.new_plugin = new_plugin
         super().__init__()
+
+
+class PluginDefinitionNotFoundError(MeltanoError):
+    """Raised when no plugin definition is found."""
+
+    def __init__(
+        self,
+        plugin: ProjectPlugin,
+        error: Exception | None,
+        source: DefinitionSource,
+    ):
+        """Initialize a new error.
+
+        Args:
+            plugin: The plugin that was not found.
+            error: The error that was raised, if any.
+            source: The sources searched for the plugin.
+        """
+        reason = (
+            str(error)
+            if error
+            else f"No definition found for {plugin.type.descriptor} {plugin.name}"
+        )
+        instruction = None
+
+        if DefinitionSource.HUB in source:
+            instruction = (
+                f"Run `meltano discover {plugin.type.descriptor}` to explore available "
+                "plugins"
+            )
+        else:
+            instruction = (
+                "Try running `meltano lock --update --all` to ensure your plugins are "
+                "up to date"
+            )
+
+        super().__init__(reason=reason, instruction=instruction)
 
 
 class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
     """Project Plugins Service."""
 
-    def __init__(
-        self,
-        project: Project,
-        config_service: ConfigService = None,
-        lock_service: PluginLockService = None,
-        discovery_service: PluginDiscoveryService = None,
-        locked_definition_service: LockedDefinitionService = None,
-        hub_service: MeltanoHubService = None,
-        use_cache: bool = True,
-    ):
+    def __init__(self, project: Project):
         """Create a new Project Plugins Service.
 
         Args:
             project: The Meltano project.
-            config_service: The Meltano Config Service.
-            lock_service: The Meltano Plugin Lock Service.
-            discovery_service: The Meltano Plugin Discovery Service.
-            locked_definition_service: The Meltano Locked Definition Service.
-            hub_service: The Meltano Hub Service.
-            use_cache: Whether to use the plugin cache.
         """
         self.project = project
+        self.discovery_service = PluginDiscoveryService(project)
+        self.lock_service = PluginLockService(project)
+        self.locked_definition_service = LockedDefinitionService(project)
+        with self.project.settings.feature_flag(
+            FeatureFlags.PLUGIN_LOCKS_REQUIRED.value,
+            raise_error=False,
+        ) as flag:
+            if flag:
+                self._prefer_source = DefinitionSource.LOCAL
+            else:
+                self._prefer_source = DefinitionSource.ANY
 
-        self.config_service = config_service or ConfigService(project)
-        self.discovery_service = discovery_service or PluginDiscoveryService(project)
-        self.lock_service = lock_service or PluginLockService(project)
-        self.locked_definition_service = (
-            locked_definition_service or LockedDefinitionService(project)
-        )
-        self.hub_service = hub_service or MeltanoHubService(project)
-
-        self._current_plugins = None
-        self._use_cache = use_cache
-
-        self.settings_service = ProjectSettingsService(project)
-
-        self._use_discovery_yaml: bool = True
-        self._prefer_source = None
-
-    @contextmanager
-    def disallow_discovery_yaml(self) -> Generator[None, None, None]:
-        """Disallow the discovery yaml from being used.
-
-        This is useful when you want to add a plugin to the project without
-        having to worry about the discovery yaml.
-
-        Yields:
-            None.
-        """
-        self._use_discovery_yaml = False
-        yield
-        self._use_discovery_yaml = True
-
-    @property
+    @cached_property
     def current_plugins(self):
         """Return the current plugins.
 
         Returns:
             The current plugins.
         """
-        if self._current_plugins is None or not self._use_cache:
-            self._current_plugins = self.config_service.current_meltano_yml.plugins
-        return self._current_plugins
+        return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
     def update_plugins(self):
@@ -121,10 +138,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Yields:
             The current plugins.
         """
-        with self.config_service.update_meltano_yml() as meltano_yml:
+        with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
-
-        self._current_plugins = None
 
     def add_to_file(self, plugin: ProjectPlugin):
         """Add plugin to `meltano.yml`.
@@ -138,14 +153,17 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Returns:
             The added plugin.
         """
-        if not plugin.should_add_to_file():
+        # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
+        #        not a subclass of `ProjectPlugin`. I've left this call to it
+        #        in-place because I'm worried that removing it will break stuff
+        #        that relies on it, but something is definitely wrong here.
+        #        We default to `True` for `ProjectPlugin` objects.
+        if not getattr(plugin, "should_add_to_file", lambda: True)():
             return plugin
 
-        try:
+        with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin)
-        except PluginNotFoundError:
-            pass
+            raise PluginAlreadyAddedException(existing_plugin, plugin)
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
@@ -212,7 +230,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
-                f"Plugin configuration profiles are no longer supported, ignoring `@{profile_name}` in plugin name."
+                "Plugin configuration profiles are no longer supported, "
+                f"ignoring `@{profile_name}` in plugin name.",
             )
 
         try:
@@ -236,11 +255,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             return self.ensure_parent(plugin)
         except StopIteration as stop:
             raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name
+                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
             ) from stop
 
     def find_plugin_by_namespace(
-        self, plugin_type: PluginType, namespace: str
+        self,
+        plugin_type: PluginType,
+        namespace: str,
     ) -> ProjectPlugin:
         """
         Find a plugin based on its PluginType and namespace.
@@ -268,7 +289,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             raise PluginNotFoundError(namespace) from stop
 
     def find_plugins_by_mapping_name(self, mapping_name: str) -> list[ProjectPlugin]:
-        """Search for plugins with the specified mapping name present in  their mappings config.
+        """Find plugins with the specified mapping name in their mappings config.
 
         Args:
             mapping_name: The name of the mapping to find.
@@ -277,7 +298,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             The mapping plugins with the specified mapping name.
 
         Raises:
-            PluginNotFoundError: If no mapper plugin with the specified mapping name is found.
+            PluginNotFoundError: If no mapper plugin with the specified mapping
+                name is found.
         """
         found: list[ProjectPlugin] = []
         for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):
@@ -311,7 +333,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             raise PluginNotFoundError(plugin_ref) from stop
 
     def get_plugins_of_type(
-        self, plugin_type: PluginType, ensure_parent=True
+        self,
+        plugin_type: PluginType,
+        ensure_parent=True,
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -341,19 +365,20 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         """
         return {
             plugin_type: self.get_plugins_of_type(
-                plugin_type, ensure_parent=ensure_parent
+                plugin_type,
+                ensure_parent=ensure_parent,
             )
             for plugin_type in PluginType
         }
 
-    def plugins(self, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:
+    def plugins(self, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
         Args:
             ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Yields:
-            A generator of all plugins.
+            Plugins.
         """
         yield from (
             plugin
@@ -388,7 +413,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Args:
             plugin: The plugin configuration to update.
         """
-        with self.config_service.update_active_environment() as environment:
+        with self.project.config_service.update_active_environment() as environment:
             environment.config.plugins.setdefault(plugin.type, [])
 
             # find the proper plugin to update
@@ -424,7 +449,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         except (PluginNotFoundError, VariantNotFoundError) as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
-
             raise
 
     def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
@@ -440,11 +464,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             PluginParentNotFoundError: If the parent plugin is not found.
         """
         try:
-            return self.hub_service.get_base_plugin(plugin, variant_name=plugin.variant)
+            return self.project.hub_service.get_base_plugin(
+                plugin,
+                variant_name=plugin.variant,
+            )
         except PluginNotFoundError as err:
             if plugin.inherit_from:
                 raise PluginParentNotFoundError(plugin, err) from err
-
             raise
 
     def find_parent(
@@ -460,25 +486,26 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             The parent plugin and the source of the parent.
 
         Raises:
-            error: If the parent plugin is not found.
+            PluginDefinitionNotFoundError: If the parent plugin is not found.
         """
         error = None
         if (
             plugin.inherit_from
             and not plugin.is_variant_set
-            and self._prefer_source in {None, DefinitionSource.INHERITED}
+            and DefinitionSource.INHERITED in self._prefer_source
         ):
             try:
                 return (
                     self.find_plugin(
-                        plugin_type=plugin.type, plugin_name=plugin.inherit_from
+                        plugin_type=plugin.type,
+                        plugin_name=plugin.inherit_from,
                     ),
                     DefinitionSource.INHERITED,
                 )
             except PluginNotFoundError as inherited_exc:
                 error = inherited_exc
 
-        if self._prefer_source in {None, DefinitionSource.LOCKFILE}:
+        if DefinitionSource.LOCKFILE in self._prefer_source:
             try:
                 return (
                     self.locked_definition_service.get_base_plugin(
@@ -490,10 +517,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except PluginNotFoundError as lockfile_exc:
                 error = lockfile_exc
 
-        if self._use_discovery_yaml and self._prefer_source in {
-            None,
-            DefinitionSource.DISCOVERY,
-        }:
+        if DefinitionSource.DISCOVERY in self._prefer_source:
             try:
                 return (
                     self._get_parent_from_discovery(plugin),
@@ -502,16 +526,19 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except Exception as discovery_exc:
                 error = discovery_exc
 
-        if self._prefer_source in {None, DefinitionSource.HUB}:
+        if DefinitionSource.HUB in self._prefer_source:
             try:
                 return (self._get_parent_from_hub(plugin), DefinitionSource.HUB)
             except Exception as hub_exc:
                 error = hub_exc
 
-        if error:
-            raise error
+        raise PluginDefinitionNotFoundError(
+            plugin,
+            error,
+            self._prefer_source,
+        ) from error
 
-    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | None:
+    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Get plugin's parent plugin.
 
         Args:
@@ -554,7 +581,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             First available transformer plugin.
         """
         transformer = next(
-            iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)), None
+            iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)),
+            None,
         )
         if not transformer:
             raise PluginNotFoundError("No Plugin of type Transformer found.")

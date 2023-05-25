@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import mock
 import pytest
 from click.testing import CliRunner
 
 from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.hub import MeltanoHubService
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLock
@@ -14,22 +14,14 @@ from meltano.core.project import Project
 
 
 class TestLock:
-    @pytest.fixture(autouse=True)
-    def patch_hub(self, meltano_hub_service: MeltanoHubService):
-        with mock.patch(
-            "meltano.core.project_plugins_service.MeltanoHubService",
-            return_value=meltano_hub_service,
-        ):
-            yield
-
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
         "args",
-        [
+        (
             ["lock"],
             ["lock", "--all", "tap-mock"],
-        ],
-        ids=["noop", "all-and-plugin-name"],
+        ),
+        ids=("noop", "all-and-plugin-name"),
     )
     def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
         result = cli_runner.invoke(cli, args)
@@ -39,12 +31,11 @@ class TestLock:
         assert exception_message == str(result.exception)
 
     @pytest.mark.order(1)
+    @pytest.mark.usefixtures("tap", "target")
     def test_lockfile_exists(
         self,
         cli_runner: CliRunner,
         project: Project,
-        tap: ProjectPlugin,
-        target: ProjectPlugin,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         assert len(lockfiles) == 2
@@ -74,7 +65,7 @@ class TestLock:
             {
                 "name": "foo",
                 "value": "bar",
-            }
+            },
         )
 
         result = cli_runner.invoke(cli, ["lock", "--all", "--update"])
@@ -92,13 +83,11 @@ class TestLock:
         assert new_setting.value == "bar"
 
     @pytest.mark.order(3)
+    @pytest.mark.usefixtures("tap", "inherited_tap", "hub_endpoints")
     def test_lockfile_update_extractors(
         self,
         cli_runner: CliRunner,
         project: Project,
-        tap: ProjectPlugin,
-        inherited_tap: ProjectPlugin,
-        hub_endpoints: MeltanoHubService,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         # 1 tap, 1 target
@@ -112,3 +101,9 @@ class TestLock:
         assert "Lockfile exists" not in result.stdout
         assert "Locked definition for extractor tap-mock" in result.stdout
         assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
+
+    def test_lock_plugin_not_found(self, cli_runner: CliRunner):
+        result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])
+        assert result.exit_code == 1
+        assert isinstance(result.exception, CliError)
+        assert "No matching plugin(s) found" in str(result.exception)

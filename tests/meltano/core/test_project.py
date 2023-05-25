@@ -9,10 +9,11 @@ from multiprocessing.pool import ThreadPool
 import pytest
 
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.project import PROJECT_ROOT_ENV, Project, ProjectNotFound
+from meltano.core.error import ProjectNotFound
+from meltano.core.project import PROJECT_ROOT_ENV, Project
 
 
-@pytest.fixture
+@pytest.fixture()
 def deactivate_project(project):
     Project.deactivate()
     yield
@@ -99,11 +100,11 @@ class TestProject:
         projects = workers.map(Project.find, range(concurrency["cases"]))
         assert all(x is project for x in projects)
 
-    @pytest.mark.concurrent
+    @pytest.mark.concurrent()
     def test_meltano_concurrency(self, project, concurrency):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         payloads = [{f"test_{i}": i} for i in range(1, concurrency["cases"] + 1)]

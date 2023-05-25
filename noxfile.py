@@ -20,8 +20,8 @@ except ImportError:
 
 
 package = "meltano"
-python_versions = ["3.10", "3.9", "3.8", "3.7"]
-main_python_version = "3.9"
+python_versions = ["3.11", "3.10", "3.9", "3.8", "3.7"]
+main_python_version = "3.10"
 locations = "src", "tests", "noxfile.py"
 
 
@@ -35,9 +35,10 @@ def tests(session: Session) -> None:
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
     if backend_db == "mssql":
-        session.install(".[mssql]")
+        session.install(".[mssql,azure,gcs,s3]")
+
     else:
-        session.install(".")
+        session.install(".[azure,gcs,s3]")
 
     session.install(
         "colorama",  # colored output in Windows
@@ -49,20 +50,17 @@ def tests(session: Session) -> None:
         "pytest-docker",
         "pytest-order",
         "pytest-randomly",
+        "pytest-structlog",
         "pytest-xdist",
         "requests-mock",
     )
 
-    try:
-        session.run(
-            "pytest",
-            f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
-            *session.posargs,
-            env={"NOX_CURRENT_SESSION": "tests"},
-        )
-    finally:
-        if session.interactive:
-            session.notify("coverage", posargs=[])
+    session.run(
+        "pytest",
+        f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
+        *session.posargs,
+        env={"NOX_CURRENT_SESSION": "tests"},
+    )
 
 
 @nox_session(python=main_python_version)
@@ -89,13 +87,23 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["src/meltano", "--exclude", "src/meltano/migrations/"]
+    args = session.posargs or [
+        "src/meltano",
+        "--exclude",
+        "src/meltano/migrations/",
+        "--exclude",
+        ".nox/",
+    ]
 
     session.install(".")
     session.install(
+        "boto3-stubs[essential]",
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",
+        "types-jsonschema",
+        "types-psutil",
+        "types-PyYAML",
         "types-requests",
     )
     session.run("mypy", *args)

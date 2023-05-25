@@ -24,9 +24,8 @@ def project_tap_mock(project_add_service):
 
 @pytest.mark.usefixtures("project_tap_mock")
 class TestCliInvoke:
-    @pytest.fixture
+    @pytest.fixture()
     def mock_invoke(self, utility, plugin_invoker_factory):
-
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=0)
@@ -35,7 +34,9 @@ class TestCliInvoke:
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), patch.object(
             asyncio,
             "create_subprocess_exec",
@@ -43,13 +44,15 @@ class TestCliInvoke:
         ) as invoke_async:
             yield invoke_async
 
-    @pytest.fixture
+    @pytest.fixture()
     def mock_invoke_containers(self, utility, plugin_invoker_factory):
         with patch(
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), mock.patch(
             "aiodocker.Docker",
             autospec=True,
@@ -76,7 +79,9 @@ class TestCliInvoke:
 
     def test_invoke_command(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
-            cli, ["invoke", "utility-mock:cmd"], env={"ENV_VAR_ARG": "arg"}
+            cli,
+            ["invoke", "utility-mock:cmd"],
+            env={"ENV_VAR_ARG": "arg"},
         )
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -94,10 +99,10 @@ class TestCliInvoke:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Doesn't pass on windows, this is currently being tracked here https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
-        async def async_generator(*args, **kwargs):
+        async def async_generator(*args, **kwargs):  # noqa: ARG001
             yield "Line 1"
             yield "Line 2"  # noqa: WPS354
 
@@ -133,7 +138,7 @@ class TestCliInvoke:
 
         port_bindings = container_config["HostConfig"]["PortBindings"]
         assert port_bindings == {
-            "5000": [{"HostPort": "5000", "HostIP": "0.0.0.0"}]  # noqa: S104
+            "5000": [{"HostPort": "5000", "HostIP": "0.0.0.0"}],  # noqa: S104
         }
 
         exposed_ports = container_config["ExposedPorts"]
@@ -151,7 +156,9 @@ class TestCliInvoke:
 
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
-            cli, ["invoke", "utility-mock:cmd", "--verbose"], env={"ENV_VAR_ARG": "arg"}
+            cli,
+            ["invoke", "utility-mock:cmd", "--verbose"],
+            env={"ENV_VAR_ARG": "arg"},
         )
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -161,9 +168,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg", "--verbose")
 
-    def test_invoke_exit_code(
-        self, cli_runner, tap, project_plugins_service, plugin_invoker_factory, utility
-    ):
+    def test_invoke_exit_code(self, cli_runner, tap, plugin_invoker_factory, utility):
         process_mock = Mock()
         process_mock.name = "utility-mock"
         process_mock.wait = AsyncMock(return_value=2)
@@ -172,7 +177,9 @@ class TestCliInvoke:
             "meltano.core.plugin_invoker.invoker_factory",
             return_value=plugin_invoker_factory,
         ), patch.object(
-            ProjectPluginsService, "find_plugin", return_value=utility
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
         ), patch.object(
             asyncio,
             "create_subprocess_exec",
@@ -184,41 +191,39 @@ class TestCliInvoke:
     def test_invoke_triggers(
         self,
         cli_runner: CliRunner,
-        project_plugins_service: ProjectPluginsService,
         project: Project,
         tap: ProjectPlugin,
     ):
-        with patch(
-            "meltano.cli.invoke.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), patch.object(
-            SingerTap, "discover_catalog"
+        with patch.object(
+            SingerTap,
+            "discover_catalog",
         ) as discover_catalog, patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ) as apply_catalog_rules, patch.object(
-            SingerTap, "look_up_state"
+            SingerTap,
+            "look_up_state",
         ) as look_up_state:
-
             # Modes other than sync don't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name, "--some-tap-option"])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
-            project.clear_cache()
+            project.refresh()
 
             # Dumping config doesn't trigger discovery or applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
             assert discover_catalog.call_count == 0
             assert apply_catalog_rules.call_count == 0
             assert look_up_state.call_count == 0
-            project.clear_cache()
+            project.refresh()
 
             # Sync mode triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", tap.name])
             assert discover_catalog.call_count == 1
             assert apply_catalog_rules.call_count == 1
             assert look_up_state.call_count == 1
-            project.clear_cache()
+            project.refresh()
 
             # Dumping catalog triggers discovery and applying catalog rules
             cli_runner.invoke(cli, ["invoke", "--dump", "catalog", tap.name])
@@ -226,21 +231,18 @@ class TestCliInvoke:
             assert apply_catalog_rules.call_count == 2
             assert look_up_state.call_count == 2
 
-    def test_invoke_dump_config(
-        self, cli_runner, tap, project_plugins_service, plugin_settings_service_factory
-    ):
+    def test_invoke_dump_config(self, cli_runner, tap, plugin_settings_service_factory):
         settings_service = plugin_settings_service_factory(tap)
 
-        with patch(
-            "meltano.cli.invoke.ProjectPluginsService",
-            return_value=project_plugins_service,
-        ), patch.object(SingerTap, "discover_catalog"), patch.object(
-            SingerTap, "apply_catalog_rules"
+        with patch.object(SingerTap, "discover_catalog"), patch.object(
+            SingerTap,
+            "apply_catalog_rules",
         ):
             result = cli_runner.invoke(cli, ["invoke", "--dump", "config", tap.name])
 
             assert json.loads(result.stdout) == settings_service.as_dict(
-                extras=False, process=True
+                extras=False,
+                process=True,
             )
 
     def test_list_commands(self, cli_runner, mock_invoke):

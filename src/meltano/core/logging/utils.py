@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-from contextlib import suppress
+import sys
 from logging import config as logging_config
 
 import structlog
@@ -17,13 +17,12 @@ from meltano.core.logging.formatters import (
     rich_exception_formatter_factory,
 )
 from meltano.core.project import Project
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_no_color_flag
 
-try:
-    from typing import Protocol  # noqa: WPS433
-except ImportError:
-    from typing_extensions import Protocol  # noqa: WPS433
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 LEVELS = {  # noqa: WPS407
@@ -34,7 +33,7 @@ LEVELS = {  # noqa: WPS407
     "critical": logging.CRITICAL,
 }
 DEFAULT_LEVEL = "info"
-FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323
+FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
 
 
 def parse_log_level(log_level: dict[str, int]) -> int:
@@ -127,7 +126,7 @@ def default_config(log_level: str) -> dict:
 
 
 def setup_logging(  # noqa: WPS210
-    project: Project = None,
+    project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: dict | None = None,
 ) -> None:
@@ -149,9 +148,8 @@ def setup_logging(  # noqa: WPS210
     log_level = log_level.upper()
 
     if project:
-        settings_service = ProjectSettingsService(project)
-        log_config = log_config or settings_service.get("cli.log_config")
-        log_level = settings_service.get("cli.log_level")
+        log_config = log_config or project.settings.get("cli.log_config")
+        log_level = project.settings.get("cli.log_level")
 
     config = read_config(log_config) or default_config(log_level)
     logging_config.dictConfig(config)
@@ -171,11 +169,12 @@ def setup_logging(  # noqa: WPS210
 
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:
-    """Change the log level for the current root logger, but only on the 'console' handler.
+    """Change the log level for the root logger, but only on the 'console' handler.
 
-    Most useful when you want change the log level on the fly for console output, but want to respect other aspects
-    of any potential logging.yaml sourced configs. Note that if a logging.yaml config without a 'console' handler
-    is used, this will not override the log level.
+    Most useful when you want change the log level on the fly for console
+    output, but want to respect other aspects of any potential `logging.yaml`
+    sourced configs. Note that if a `logging.yaml` config without a 'console'
+    handler is used, this will not override the log level.
 
     Args:
         log_level: set log levels to provided level.
@@ -188,26 +187,24 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
 
 
 class SubprocessOutputWriter(Protocol):
-    """SubprocessOutputWriter is a basic interface definition suitable for use with capture_subprocess_output."""
+    """A basic interface suitable for use with `capture_subprocess_output`."""
 
     def writelines(self, lines: str):
-        """Any type with a writelines method accepting a string could be used as an output writer.
+        """Write the provided lines to an output.
 
         Args:
-            lines: string to write
+            lines: String to write
         """
 
 
 async def _write_line_writer(writer, line):
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
-        try:  # noqa: WPS229
+        try:
             writer.write(line)
             await writer.drain()
         except (BrokenPipeError, ConnectionResetError):
-            with suppress(AttributeError):  # `wait_closed` is Python 3.7+
-                await writer.wait_closed()
-
+            await writer.wait_closed()
             return False
     else:
         writer.writeline(line.decode())
@@ -216,7 +213,8 @@ async def _write_line_writer(writer, line):
 
 
 async def capture_subprocess_output(
-    reader: asyncio.StreamReader | None, *line_writers: SubprocessOutputWriter
+    reader: asyncio.StreamReader | None,
+    *line_writers: SubprocessOutputWriter,
 ) -> None:
     """Capture in real time the output stream of a suprocess that is run async.
 
@@ -228,8 +226,9 @@ async def capture_subprocess_output(
     for the subprocess to end.
 
     Args:
-        reader: asyncio.StreamReader object that is the output stream of the subprocess.
-        line_writers: any object thats a StreamWriter or has a writelines method accepting a string.
+        reader: `asyncio.StreamReader` object that is the output stream of the
+            subprocess.
+        line_writers: A `StreamWriter`, or object has a compatible writelines method.
     """
     while not reader.at_eof():
         line = await reader.readline()

@@ -189,29 +189,26 @@ extractors:
 
 Plugin [commands](/reference/command-line-interface#commands) are defined by the `commands` property. The keys are the name of the command and the values are the arguments to be passed to the plugin executable. These can contain dynamic references to [configuration](/guide/configuration) using the [Environment variable form](/guide/configuration#environment-variables) of the configuration option.
 
-```yaml{3-7}
-transformers:
-- name: dbt
-  executable: dbt
+```yaml
+utilities:
+- name: dbt-snowflake
+  variant: dbt-labs
   commands:
-    seed: seed --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
-    snapshot: snapshot --project-dir $DBT_PROJECT_DIR --profile $DBT_PROFILE --target $DBT_TARGET --select $DBT_MODEL
+    my_models:
+      args: run --select +my_model_name
+      description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
 ```
 
 Commands can optionally specify some documentation displayed when [listing commands](/reference/command-line-interface#commands). They can also optionally specify an alternative executable from the default one for the plugin.
 
 ```yaml
 - name: dagster
-  executable: dagster
+  variant: quantile-development
   commands:
-    ui:
-      description: Start the webserver
-      executable: dagit
-      args: -w $DAGSTER_HOME/workspace.yaml
-    scheduler:
-      description: Run the scheduler daemon
-      executable: dagster-daemon
-      args: run
+    start:
+      args: -f $REPOSITORY_DIR/repository.py
+      description: Start Dagster.
+      executable: dagit_invoker
 ```
 
 ##### Containerized commands
@@ -298,6 +295,34 @@ Meltano will use these paths or patterns to collect the config from them for use
 
 Currently supported elements in subfiles are [plugins](/concepts/project#plugins), [schedules](/concepts/project#plugins) and [environments](/concepts/environments).
 
+### Annotations
+
+To better integrate with software other than the core Meltano library and CLI, `meltano.yml` support "annotations", which is a dictionary that map from tool/vendor names to arbitrary dictionaries with whatever that tool/vendor wants to annotate the Meltano config with.
+
+```yaml
+annotations:
+  meltano.cloud: {
+    # Meltano Cloud config
+  }
+  arbitrary-third-party-tool: {
+    # Configuration for the third party tool
+  }
+  # etc.
+```
+
+The core Meltano library and CLI never access the `annotations` field. To access it, one must read `meltano.yml`. Nothing within an `annotations` field should be thought of as part of Meltano's own configuration - it is merely extra data that Meltano permits within its configuration files.
+
+Annotations are supported in the following locations within `meltano.yml`:
+
+- At the top level
+- In a job definition
+- In a schedule definition
+- In an environment definition
+- In a plugin definition
+- In an environment plugin definition
+- In a plugin setting definition
+
+
 ## `.gitignore`
 
 A newly initialized project comes with a [`.gitignore` file](https://git-scm.com/docs/gitignore) to ensure that
@@ -332,9 +357,9 @@ In a newly initialized project, this directory will be included in [`.gitignore`
 While you would usually not want to modify files in this directory directly, knowing what's in there can aid in debugging:
 
 - `.meltano/meltano.db`: The default SQLite [system database](#system-database).
-- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) output logs for the specified pipeline run.
+- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) output logs for the specified pipeline run.
 - `.meltano/run/bin`: Symlink to the [`meltano` executable](/reference/command-line-interface) most recently used in this project.
-- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
+- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
@@ -354,9 +379,9 @@ Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
 - `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
-- `user` table: Users for [Meltano UI](/reference/ui) created using [`meltano user add`](/reference/command-line-interface#user).
+- `user` table: Users for [the deprecated Meltano UI](/guide/troubleshooting#meltano-ui) created using [`meltano user add`](/reference/command-line-interface#user).
 
-The remaining tables in the database are used exclusively by Meltano UI, mostly for authentication and authorization purposes:
+The remaining tables in the database are used exclusively by [Meltano UI](/guide/troubleshooting#meltano-ui), mostly for authentication and authorization purposes:
 
 - `role`
 - `role_permissions`

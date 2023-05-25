@@ -5,13 +5,17 @@ from __future__ import annotations
 import asyncio
 import logging
 import sys
+import typing as t
 
 import click
-from sqlalchemy.orm import sessionmaker
 
-from meltano.cli import activate_environment, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd, propagate_stop_signals
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    CliError,
+    PartialInstrumentedCmd,
+    propagate_stop_signals,
+)
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
@@ -21,25 +25,35 @@ from meltano.core.plugin_invoker import (
     UnknownCommandError,
     invoker_factory,
 )
-from meltano.core.project import Project
-from meltano.core.project_plugins_service import ProjectPluginsService
-from meltano.core.tracking import CliEvent, PluginsTrackingContext, Tracker
+from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import sessionmaker
+
+    from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
 logger = logging.getLogger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
 @click.option(
     "--print-var",
-    help="Print to stdout the values for the provided environment variables, as passed to the plugininvoker context. Useful for debugging.",
+    help=(
+        "Print to stdout the values for the provided environment variables, "
+        "as passed to the plugininvoker context. Useful for debugging."
+    ),
     multiple=True,
 )
 @click.option(
-    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+    "--plugin-type",
+    type=click.Choice(PluginType.cli_arguments()),
+    default=None,
 )
 @click.option(
     "--dump",
@@ -76,7 +90,6 @@ def invoke(
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
     """
-    activate_environment(ctx, project)
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
@@ -88,11 +101,11 @@ def invoke(
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
-    plugins_service = ProjectPluginsService(project)
-
     try:
-        plugin = plugins_service.find_plugin(
-            plugin_name, plugin_type=plugin_type, invokable=True
+        plugin = project.plugins.find_plugin(
+            plugin_name,
+            plugin_type=plugin_type,
+            invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(CliEvent.inflight)
@@ -105,20 +118,18 @@ def invoke(
         tracker.track_command_event(CliEvent.completed)
         return
 
-    invoker = invoker_factory(project, plugin, plugins_service=plugins_service)
+    invoker = invoker_factory(project, plugin)
     try:
         exit_code = asyncio.run(
             _invoke(
                 invoker,
-                project,
-                plugin_name,
                 plugin_args,
                 session,
                 dump,
                 command_name,
                 containers,
                 print_var=print_var,
-            )
+            ),
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
@@ -133,8 +144,6 @@ def invoke(
 
 async def _invoke(
     invoker: PluginInvoker,
-    project: Project,
-    plugin_name: str,
     plugin_args: str,
     session: sessionmaker,
     dump: str,
@@ -184,7 +193,8 @@ def do_list_commands(plugin):
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
-            f"Plugin '{plugin.name}' does not define any commands.", fg="yellow"
+            f"Plugin '{plugin.name}' does not define any commands.",
+            fg="yellow",
         )
         return
 
@@ -192,7 +202,7 @@ def do_list_commands(plugin):
         f"{plugin.name}:{cmd}": props.description
         for cmd, props in plugin.all_commands.items()
     }
-    column_len = max(len(name) for name in descriptions.keys()) + 2
+    column_len = max(len(name) for name in descriptions) + 2
     for name, desc in descriptions.items():
         click.secho(name.ljust(column_len, " "), fg="blue", nl=False)
         click.echo(desc)

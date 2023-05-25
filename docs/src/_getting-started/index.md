@@ -20,7 +20,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, or 3.10 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
@@ -127,7 +127,7 @@ This will allow you to use [`git diff`](https://git-scm.com/docs/git-diff) to ea
 
 ## View and Activate Your Environments
 
-As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project. Theres also a [`default_environment`](https://docs.meltano.com/concepts/environments#default-environments) setting in the `meltano.yml` that get automatically set to `dev`, you can list and change the active environment using:
+As part of creating your Meltano project, we automatically added your first [environments](/concepts/environments) called `dev`, `staging` and `prod`. This allows you to define configurations specific to the environment in which you're running your project. There's also a [`default_environment`](https://docs.meltano.com/concepts/environments#default-environments) setting in the `meltano.yml` that get automatically set to `dev`, you can list and change the active environment using:
 
 1. List your available environments:
 
@@ -147,7 +147,7 @@ As part of creating your Meltano project, we automatically added your first [env
    $env:MELTANO_ENVIRONMENT="dev"
    ```
 
-   Alternatively you can include the `--environment=dev` argument to each meltano command. You should now see a log message that says `Environment 'dev' is active` each time you run a meltano command.
+   Alternatively you can include the `--environment=dev` argument to each `meltano` command. You should now see a log message that says `Environment 'dev' is active` each time you run a `meltano` command.
 
 1. [optional] Add a new environment:
 
@@ -167,9 +167,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover extractors
-        ```
+    ```bash
+    meltano discover extractors
+    ```
 
 1.  Depending on the result, pick your next step:
 
@@ -192,7 +192,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
     ```yml
     plugins:
-    extractors:
+      extractors:
       - name: tap-gitlab
         variant: meltanolabs
         pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git

@@ -13,12 +13,16 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 The following options are available for all `meltano` subcommands:
 
+### Log Configurations
+
 * [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
 * [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
-The following configuration is available for all meltano subcommands via an environment variable:
+### No Color
 
-* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no_color.org`](https://no-color.org/) for more information.
+The no color configuration is available for all meltano subcommands via an environment variable:
+
+* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
 ## `add`
 
@@ -116,6 +120,69 @@ meltano add extractor tap-spotify --no-install
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `compile`
+
+<div class="notification is-warning">
+    <p><a href="https://github.com/meltano/meltano/discussions/7323">The compile command is currently in beta</a>, and subject to change without corresponding semantic version updates.</p>
+</div>
+
+### How to use
+
+Generally, the `compile` command need not be executed manually, as it will be run automatically by Meltano as-needed.
+
+If you wish to manually compile a manifest file for each environment (including the no-environment manifest file), the compile command can be used like so:
+
+```bash
+meltano compile
+```
+
+To compile a manifest file for a specific environment:
+
+```bash
+meltano --environment <environment name> compile
+```
+
+To compile the no-environment manifest file:
+
+```bash
+meltano --no-environment compile
+```
+
+To save the manifest JSON files to a specific directory:
+
+```bash
+meltano compile --directory /some/directory/path
+```
+
+By default, the manifest files are saved to `${MELTANO_SYS_DIR_ROOT}/manifests`, which defaults to `${MELTANO_PROJECT_ROOT}/.meltano/manifests`.
+
+Use the `--indent` CLI option to control the indentation in the manifest JSON files:
+
+```bash
+# Use 2 spaces of indentation instead of the default 4
+meltano compile --indent 2
+
+# Only use newlines
+meltano compile --indent 0
+
+# Remove all non-essential whitespace
+meltano compile --indent -1
+```
+
+### Using `compile` with Environments
+
+The `compile` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
+
+When an environment is specified, only the manifest JSON file for that environment will be compiled.
+
+When no environment is explicitly specified, a manifest JSON file for each environment is compiled, including `meltano-manifest.json`, which is the manifest file for the project when no environment is active.
+
+To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`, pass the `--no-environment` CLI option to `meltano`.
+
+## `cloud`
+
+See the full [Cloud CLI reference](/cloud/cloud-cli).
+
 ## `config`
 
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
@@ -178,6 +245,14 @@ If multiple plugins share the same name, you can provide an additional `--plugin
 
 ```bash
 meltano config --plugin-type=<type> <plugin> ...
+```
+
+When setting a config value that contains the character `$`, you can avoid expansion by
+escaping it with `\` or using single quotes:
+
+```bash
+meltano config <plugin> set <name> "@\$a"
+meltano config <plugin> set <name> '@$a'
 ```
 
 #### Nested properties
@@ -307,6 +382,9 @@ meltano discover loaders
 
 The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
+## `docs`
+
+Open the Meltano documentation site in the default browser.
 
 ## `elt`
 
@@ -456,7 +534,12 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 - [`config`](#using-config-with-environments)
 - [`elt`](#using-elt-with-environments)
 - [`invoke`](#using-invoke-with-environments)
+- [`job`](#using-job-with-environments)
+- [`run`](#using-run-with-environments)
+- [`schedule`](#using-schedule-with-environments)
 - [`select`](#using-select-with-environments)
+- [`state`](#using-state-with-environments)
+- [`test`](#using-test-with-environments)
 
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
@@ -497,16 +580,17 @@ The new project directory will contain:
 
 ```bash
 # Format
-meltano init [project_directory] [--no_usage_stats]
+meltano init [project_directory] [--no_usage_stats] [--force]
 ```
 
 #### Parameters
 
-- **project_directory** - This determines the directory path to create the project at.
+- **project_directory** - This determines the directory path to create the project at. Can be `.` to create a project in the current directory.
 
 #### Options
 
 - **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
+- **force** - This flag overwrites any existing `meltano.yml` in the project directory.
 
 #### Examples
 
@@ -544,11 +628,14 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-Use `--include-related` to automatically install transforms related to installed extractor plugins.
+To only install plugins for a particular schedule specify the `--schedule` argument.
+This can be useful in CI test workflows or for deployments that need to install plugins before every run.
 
-Subsequent calls to `meltano install` will upgrade a plugin to it's latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
+
+If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the `--force` flag to `meltano install`.
 
 <div class="notification is-info">
   <p>If you're using a custom Docker image, make sure `python3-venv` is installed:</p>
@@ -581,12 +668,12 @@ meltano install
 meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
-
-
-meltano install --include-related
+meltano install --schedule=<schedule_name>
 
 meltano install --parallelism=16
 meltano install --clean
+
+meltano install --force
 ```
 
 ### Using `install` with Environments
@@ -1341,53 +1428,9 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
-## `ui`
+## `ui` (deprecated)
 
-- `meltano ui`: Start the Meltano UI.
-
-### `start` (default)
-
-Start the Meltano UI.
-
-### `setup`
-
-<div class="notification is-info">
-  <p>This command is only relevant for production-grade setup.</p>
-</div>
-
-Generate secrets for the [`ui.secret_key`](/reference/settings#ui-secret-key)
-and [`ui.password_salt`](/reference/settings#ui-password-salt) settings, that
-will be stored in your project's [`.env` file](/concepts/project#env) along with the
-specified value for the [`ui.server_name` setting](/reference/settings#ui-server-name).
-
-In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
-
-<div class="notification is-danger">
-  <p><strong>Regenerating secrets will cause the following:</strong></p>
-  <p>
-    <ul>
-      <li>All passwords will be invalid</li>
-      <li>All sessions will be expired</li>
-    </ul>
-  </p>
-  <p>Use with caution!</p>
-</div>
-
-#### How to use
-
-The `--bits` flag can be used to specify the size of the secrets, default to 256.
-
-```bash
-# Format
-meltano ui setup [--bits=256] <server_name>
-
-meltano ui setup meltano.example.com
-```
-
-### Using `ui` with Environments
-
-The `ui` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
-
+The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
 ## `user`
 
 <div class="notification is-info">

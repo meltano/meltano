@@ -12,13 +12,29 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
+from meltano.core.error import MeltanoError
 from meltano.core.project import Project
-
-from .project_settings_service import ProjectSettingsService
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = {}
+
+
+class MeltanoDatabaseCompatibilityError(MeltanoError):
+    """Raised when the database is not compatible with Meltano."""
+
+    INSTRUCTION = (
+        "Upgrade your database to be compatible with Meltano or use a different "
+        "database"
+    )
+
+    def __init__(self, reason: str):
+        """Initialize the error with a reason.
+
+        Args:
+            reason: The reason why the database is not compatible.
+        """
+        super().__init__(reason, self.INSTRUCTION)
 
 
 def project_engine(
@@ -39,9 +55,7 @@ def project_engine(
     if existing_engine:
         return existing_engine
 
-    settings = ProjectSettingsService(project)
-
-    engine_uri = settings.get("database_uri")
+    engine_uri = project.settings.get("database_uri")
     logging.debug(f"Creating engine '{project}@{engine_uri}'")
 
     engine = create_engine(engine_uri, poolclass=NullPool)
@@ -49,10 +63,11 @@ def project_engine(
     # Connect to the database to ensure it is available.
     connect(
         engine,
-        max_retries=settings.get("database_max_retries"),
-        retry_timeout=settings.get("database_retry_timeout"),
+        max_retries=project.settings.get("database_max_retries"),
+        retry_timeout=project.settings.get("database_retry_timeout"),
     )
 
+    check_database_compatibility(engine)
     init_hook(engine)
 
     engine_session = (engine, sessionmaker(bind=engine))
@@ -90,13 +105,13 @@ def connect(
             if attempt >= max_retries:
                 logging.error(
                     f"Could not connect to the database after {attempt} "
-                    "attempts. Max retries exceeded."
+                    "attempts. Max retries exceeded.",
                 )
                 raise
             attempt += 1
             logging.info(
                 f"DB connection failed. Will retry after {retry_timeout}s. "
-                f"Attempt {attempt}/{max_retries}"
+                f"Attempt {attempt}/{max_retries}",
             )
             time.sleep(retry_timeout)
 
@@ -142,15 +157,15 @@ def ensure_schema_exists(
         schema_name: The name of the schema.
         grant_roles: Roles to grant to the specified schema.
     """
-    schema_identifier = schema_name
     group_identifiers = ",".join(grant_roles)
 
-    create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_identifier}")
+    create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
     grant_select_schema = text(
-        f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_identifier} GRANT SELECT ON TABLES TO {group_identifiers}"
+        f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_name} GRANT SELECT ON "
+        f"TABLES TO {group_identifiers}",
     )
     grant_usage_schema = text(
-        f"GRANT USAGE ON SCHEMA {schema_identifier} TO {group_identifiers}"
+        f"GRANT USAGE ON SCHEMA {schema_name} TO {group_identifiers}",
     )
 
     with engine.connect() as conn, conn.begin():
@@ -162,3 +177,25 @@ def ensure_schema_exists(
     logging.info(f"Schema {schema_name} has been created successfully.")
     for role in grant_roles:
         logging.info(f"Usage has been granted for role: {role}.")
+
+
+def check_database_compatibility(engine: Engine) -> None:
+    """Check that the database is compatible with Meltano.
+
+    Args:
+        engine: The DB engine to be used. This should already be connected to
+            the database.
+
+    Raises:
+        MeltanoDatabaseCompatibilityError: The database is not compatible with
+            Meltano.
+    """
+    dialect = engine.dialect.name
+    version = engine.dialect.server_version_info
+
+    if dialect == "sqlite" and version < (3, 25, 1):
+        version_string = ".".join(map(str, version))
+        reason = (
+            f"Detected SQLite {version_string}, but Meltano requires at least 3.25.1"
+        )
+        raise MeltanoDatabaseCompatibilityError(reason)

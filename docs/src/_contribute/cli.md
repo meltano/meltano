@@ -6,7 +6,7 @@ weight: 10
 hidden: true
 ---
 
-This section of the guide provides guidance on how to work with the Meltano CLI, which serves as the primary UI of Meltano
+This section of the guide provides guidance on how to work with the Meltano CLI, which serves as the primary user interface of Meltano,
 and is built with the [Python package: click](https://click.palletsprojects.com/en/8.1.x/).
 
 ## Getting Set Up

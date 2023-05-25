@@ -15,7 +15,10 @@ class PluginNotFoundError(Exception):
             self.plugin_name = plugin_or_name
 
     def __str__(self):
-        return f"{self.plugin_type.capitalize()} '{self.plugin_name}' is not known to Meltano"
+        return (
+            f"{self.plugin_type.capitalize()} '{self.plugin_name}' is not "
+            "known to Meltano"
+        )
 
 
 class PluginParentNotFoundError(Exception):
@@ -27,10 +30,9 @@ class PluginParentNotFoundError(Exception):
         self.parent_not_found_error = parent_not_found_error
 
     def __str__(self):
-        return "Could not find parent plugin for {type} '{name}': {error}".format(
-            type=self.plugin.type.descriptor,
-            name=self.plugin.name,
-            error=self.parent_not_found_error,
+        return (
+            f"Could not find parent plugin for {self.plugin.type.descriptor} "
+            f"'{self.plugin.name}': {self.parent_not_found_error}"
         )
 
 
@@ -42,11 +44,14 @@ class PluginNotSupportedError(Exception):
         self.plugin = plugin
 
     def __str__(self):
-        return f"Operation not supported for {self.plugin.type.descriptor} '{self.plugin.name}'"
+        return (
+            "Operation not supported for "
+            f"{self.plugin.type.descriptor} '{self.plugin.name}'"
+        )
 
 
 class PluginExecutionError(Exception):
-    """Base exception for problems that stem from the execution of a plugin (sub-process)."""
+    """Error stemming from the execution of a plugin (sub-process)."""
 
 
 class PluginLacksCapabilityError(Exception):
