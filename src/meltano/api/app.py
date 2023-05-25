@@ -5,19 +5,29 @@ import importlib
 import logging
 from urllib.parse import urlsplit
 
-from flask import Flask, g, jsonify, request  # noqa: WPS347
-from flask_cors import CORS
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-
 from meltano import __version__ as meltano_version
 from meltano.api import config as api_config
 from meltano.api.headers import VERSION_HEADER
-from meltano.api.security.auth import HTTP_READONLY_CODE
 from meltano.core.db import project_engine
-from meltano.core.error import ProjectReadonly
+from meltano.core.error import ProjectReadonly, MissingFlaskError
 from meltano.core.logging.utils import FORMAT, setup_logging
 from meltano.core.project import Project
-from meltano.oauth.app import create_app as create_oauth_service
+
+try:
+    from flask import Flask, g, jsonify, request  # noqa: WPS347
+    from flask_cors import CORS
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from meltano.api.security.auth import HTTP_READONLY_CODE
+    from meltano.oauth.app import create_app as create_oauth_service
+except ImportError:
+    Flask = None  # type: ignore
+    g = None  # type: ignore
+    jsonify = None  # type: ignore
+    request = None  # type: ignore
+    CORS = None  # type: ignore
+    DispatcherMiddleware = None  # type: ignore
+    HTTP_READONLY_CODE = None  # type: ignore
+    create_oauth_service = None  # type: ignore
 
 STATUS_SERVER_ERROR = 500
 
@@ -33,6 +43,9 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     Args:
         config: app configuration
 
+    Raises:
+        MissingFlaskError: When the meltano[ui] extra is not installed.
+
     Returns:
         Flask app
     """
@@ -40,6 +53,9 @@ def create_app(config: dict = {}) -> Flask:  # noqa: WPS210,WPS213,B006
     setup_logging(project)
 
     project_engine(project, default=True)
+
+    if not Flask:
+        raise MissingFlaskError
 
     app = Flask(
         __name__, instance_path=str(project.root), instance_relative_config=True

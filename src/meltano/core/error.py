@@ -134,3 +134,14 @@ class ProjectReadonly(Error):
     def __init__(self):
         """Instantiate the error."""
         super().__init__("This Meltano project is deployed as read-only")
+
+
+class MissingFlaskError(Exception):
+    """Raised when Flask is required but not installed."""
+
+    def __init__(self):
+        """Initialize a MissingFlaskError."""
+        super().__init__(
+            "Flask required but not installed. The UI has been deprecated and will be "
+            "removed in future versions. Install meltano[ui] to use the UI.",
+        )
