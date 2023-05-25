@@ -10,7 +10,7 @@ hidden: true
 
 ## Meltano Cloud Fees
 
-_Last updated: May 18, 2023_
+_Last updated: May 25, 2023_
 
 Unless specified otherwise in the applicable Order Form, the following terms and fees shall apply to the Cloud Service:
 
@@ -40,17 +40,17 @@ Unless specified otherwise in the applicable Order Form, the following terms and
     - Runtime: The cumulative execution time of all tasks in a Pipeline Run, from the start of the task to the end of the task, excluding platform startup and shutdown time.
     - Schedule: A schedule defined in the Project and enabled in a specific Deployment.
 
-2. Credits are priced based on a diminishing slope: in other words, the more Pipelines Customer runs, the cheaper the incremental cost per unique Pipeline Run. Rates will be determined by the Service Consumption Table set forth below, subject to the terms of your specific Order Form. Meltano will provide Customer with monthly usage for the current and previous months via the Meltano Cloud CLI and dashboard.
+2. Credits are priced based on a diminishing slope. In other words, the more Pipelines Customer runs, the cheaper the incremental cost per unique Pipeline Run. Rates will be determined by the Service Consumption Table set forth below, subject to the terms of your specific Order Form. Meltano will provide Customer with monthly usage for the current and previous months via the Meltano Cloud CLI and dashboard.
 
-3. When the Credits in Customer’s Organization are depleted, the Organization will no longer run Pipelines. When Credits are close to being depleted, Meltano Cloud will alert Customer. If Customer has a Credit Purchase that is coming to an end, Customer must contact Customer's account representative to arrange for a new purchase on an updated Order Form, or complete a Credit Purchase through Meltano Cloud.‍
+3. Purchased Credits do not expire so long the Meltano Cloud platform continues to be used; _provided, however_, Credits expire if no Pipeline Runs are attempted for one year. When the Credits in Customer’s Organization are fully consumed, the Organization will cease running Pipelines. When Credits are close to being, fully consumed Meltano Cloud will alert Customer. If Customer has a Credit Purchase that is close to being fully consumed, Customer must contact Customer's account representative to arrange for a new purchase on an updated Order Form or complete a Credit Purchase through Meltano Cloud.
 
 4. <u>Service Consumption Table</u>:
 
-    | Unit               | Consumption            |
-    |--------------------|------------------------|
-    | Infrequent Run     | 1 Credit               |
-    | Frequent Run       | 0.5 Credits            |
-    | Extra Runtime      | 0.1 Credits per minute |
-    | Extra Egress       | 0.01 Credits per 10 MB |
+    | Unit               | Consumption           |
+    |--------------------|-----------------------|
+    | Infrequent Run     | 1 Credit              |
+    | Frequent Run       | 0.5 Credit            |
+    | Extra Runtime      | 0.1 Credit per minute |
+    | Extra Egress       | 0.01 Credit per 10 MB |
 
-    Pricing of Credits is specified on Customer's Order Form. The table will be added to this page once Meltano Cloud is out of Beta.
+    Pricing of Credits is specified in Customer's Order Form. The final table will be added to this page once Meltano Cloud is out of Beta.
