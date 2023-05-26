@@ -312,6 +312,7 @@ pyflakes = [
 [tool.flakeheaven.exceptions."scripts/*"]
 "wemake-python-styleguide" = [
   "-WPS421", # Allow for print function calls
+  "-WPS328", # Allow useless node violations, since this detects absense of ui extra
 ]
 
 [tool.flakeheaven.exceptions."src/meltano/cli/*"]
