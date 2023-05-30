@@ -13,15 +13,10 @@ from alembic.script import ScriptDirectory
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from meltano.api.models.security import Role, RolePermissions
 from meltano.core.db import project_engine
-from meltano.core.error import MissingFlaskError
 from meltano.core.project import Project
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR
-
-try:
-    from meltano.api.models.security import Role, RolePermissions
-except ImportError:
-    Role, RolePermissions = None, None  # type: ignore
 
 SPLAT = "*"
 
@@ -138,13 +133,7 @@ class MigrationService:
 
         Args:
             session: The session to use.
-
-        Raises:
-            MissingFlaskError: When the meltano[ui] extra is not installed.
         """
-        if not Role:
-            raise MissingFlaskError
-
         if not session.query(Role).filter_by(name="admin").first():
             session.add(
                 Role(

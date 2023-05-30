@@ -315,6 +315,28 @@ pyflakes = [
   "-WPS328", # Allow useless node violations, since this detects absense of ui extra
 ]
 
+[tool.flakeheaven.exceptions."src/meltano/api/meltano_sqlalchemy/*"]
+"flake8-docstrings" = [
+    "-D107", # Allow missing docstring in __init__
+    "-D105", # Allow missing docstring in magic methods
+]
+mccabe = [
+    "-C901", # Allow complex methods.
+]
+pyflakes = [
+    "-C901", # Allow complex methods.
+]
+"wemake-python-styleguide" = [
+    "-WPS114", # Allow underscored number name pattern
+    "-WPS301", # Allow dotted raw imports
+    "-WPS428", # Allow statements that have no effect
+    "-WPS214", # Allow many methods
+    "-WPS331",
+    "-WPS325",
+    "-WPS612", # Allow useless overwritten methods
+    "-WPS517", # Allow pointless starred expressions
+]
+
 [tool.flakeheaven.exceptions."src/meltano/cli/*"]
 "flake8-docstrings" = [
   "-D301", # Allow backslashes in dosctrings
