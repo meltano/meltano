@@ -106,7 +106,7 @@ meltano-cloud project use <project name>
 
 In order for pipelines to run, they must have a [deployment](/cloud/concepts#meltano-cloud-deployments) to run in.
 
-To deploy a named [Meltano Environment](/concepts/environments) to Meltano Cloud, run:
+To deploy a named [Meltano Environment](/concepts/environments) to Meltano Cloud, run the following [command](https://docs.meltano.com/cloud/cloud-cli#deployment):
 
 ```console
 meltano-cloud deployment create --name <deployment name> --environment-name <Meltano Environment name> --git-rev <the git revision to use for this deployment>
