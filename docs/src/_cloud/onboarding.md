@@ -105,8 +105,7 @@ meltano-cloud project list
 ```
 
 ```console
-meltano-cloud schedule list
-```
+Running this command will verify that your project is connected and you're properly authenticated with Meltano Cloud.
 
 ### Step 4: Initialize secrets
 
