@@ -241,7 +241,7 @@ class TestDeploymentCommand:
             f"{path}/ultra-production",
             "POST",
         ).respond_with_json(prepared_request)
-        requests_mock.post(prepared_request["url"], json=deployments[0])
+        requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
         result = CliRunner().invoke(
             cli,
             (
@@ -279,7 +279,7 @@ class TestDeploymentCommand:
             f"{path}/ultra-production",
             "POST",
         ).respond_with_json(prepared_request)
-        requests_mock.post(prepared_request["url"], json=deployments[0])
+        requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
         result = CliRunner().invoke(
             cli,
             (
@@ -308,7 +308,10 @@ class TestDeploymentCommand:
             f"{path}/ultra-production",
             "DELETE",
         ).respond_with_json(prepared_request)
-        requests_mock.delete(prepared_request["url"], status_code=HTTPStatus.NO_CONTENT)
+        requests_mock.delete(  # noqa: S113
+            prepared_request["url"],
+            status_code=HTTPStatus.NO_CONTENT,
+        )
         result = CliRunner().invoke(
             cli,
             (
