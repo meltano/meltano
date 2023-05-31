@@ -44,7 +44,7 @@ meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 
 ## `deployment`
 
-The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts.md#meltano-cloud-deployments) for your projects.
+The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
 
 Create a new deployment interactively:
 
