@@ -108,8 +108,13 @@ meltano-cloud project list
 
 ```console
 Running this command will verify that your project is connected and you're properly authenticated with Meltano Cloud.
+```
 
 ### Step 4: Initialize secrets
+
+Secrets allow you to pass environment variables to your workloads without needing to expose them within your `meltano.yml`.
+Setting a secret in Meltano Cloud is equivalent to using a `.env` file to store environment variables at runtime.
+Secrets are shared across all deployments in your project and can be referenced in your `meltano.yml` file just as you would reference environment variables locally.
 
 Secrets are configured using the Cloud CLI.
 

@@ -3,8 +3,10 @@ title: Meltano Cloud
 description: Information about Meltano Cloud Concepts.
 layout: doc
 toc: false
-hidden: true
+hidden: false
 ---
+
+
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
