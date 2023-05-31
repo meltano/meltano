@@ -83,7 +83,8 @@ The above commands will install a `meltano-cloud` CLI command into your workstat
 
 ### Step 2: User creation and authorization
 
-First, create your user account by logging in via: `meltano-cloud login`.
+Login to Meltano Cloud by running `meltano-cloud login` in your local terminal.
+This must be the same user you provided when you signed up via the waitlist.
 
 The login command will open a browser window which you can use to create your account. In the Beta, your identification and authorization will be driven by your GitHub login identity. No Meltano-specific passwords or usernames are needed, and Meltano Cloud does not have access to your personal GitHub credentials.
 
