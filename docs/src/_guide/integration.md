@@ -39,7 +39,7 @@ Because these catalog files can be very large and can get outdated as data sourc
 
 To save you a headache, Meltano can handle catalog generation for you, by letting you describe your desired modifications using
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
-and are applied to the discovered catalog on the fly when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), [`meltano run`](/reference/command-line-interface#run.
+and are applied to the discovered catalog on the fly when the extractor is run using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
 
