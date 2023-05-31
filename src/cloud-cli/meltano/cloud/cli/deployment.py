@@ -7,6 +7,7 @@ import json
 import platform
 import typing as t
 from datetime import datetime
+from http import HTTPStatus
 
 import click
 import questionary
@@ -15,7 +16,7 @@ import tabulate
 from slugify import slugify
 from yaspin import yaspin
 
-from meltano.cloud.api.client import MeltanoCloudClient
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
@@ -29,6 +30,15 @@ MAX_PAGE_SIZE = 250
 
 class DeploymentsCloudClient(MeltanoCloudClient):
     """A Meltano Cloud client with extensions for deployments."""
+
+    async def deployment_exists(self, deployment_name: str) -> bool:
+        try:
+            await self.get_deployment(deployment_name=deployment_name)
+        except MeltanoCloudError as ex:
+            if ex.response.status == HTTPStatus.NOT_FOUND:
+                return False
+            raise
+        return True
 
     async def get_deployment(self, deployment_name: str) -> CloudDeployment:
         """Use GET to get a Meltano Cloud deployment.
@@ -124,7 +134,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
             )
         response = requests.request(**prepared_request)
         response.raise_for_status()
-        deployment = response.json()["deployment"]
+        deployment = response.json()
         return {
             **deployment,
             "default": (
@@ -363,14 +373,23 @@ async def create_deployment(
     git_rev: str,
 ) -> None:
     """Create a new Meltano Cloud project deployment."""
-    with yaspin(text="Creating deployment - this may take several minutes..."):
-        async with DeploymentsCloudClient(config=context.config) as client:
+    async with DeploymentsCloudClient(config=context.config) as client:
+        if await client.deployment_exists(deployment_name=deployment_name):
+            raise click.ClickException(
+                f"Deployment {slugify(deployment_name)!r} already exists. "
+                "Use `meltano cloud deployment update` to update an "
+                "existing Meltano Cloud project deployment.",
+            )
+        with yaspin(text="Creating deployment - this may take several minutes..."):
             deployment = await client.update_deployment(
                 deployment_name=deployment_name,
                 environment_name=environment_name,
                 git_rev=git_rev,
             )
-    click.secho(f"Created deployment {deployment['deployment_name']!r}", fg="green")
+        click.secho(
+            f"Created deployment {deployment['deployment_name']!r}",
+            fg="green",
+        )
 
 
 @deployment_group.command("update")
