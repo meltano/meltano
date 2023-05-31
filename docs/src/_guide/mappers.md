@@ -120,7 +120,7 @@ meltano discover mappers
 meltano add mapper <mapper name>
 
 # Example
-meltano add mapper meltano-map-transform
+meltano add mapper meltano-map-transformer
 ```
 
 #### Example
