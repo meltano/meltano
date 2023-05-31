@@ -3054,14 +3054,14 @@ test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "tes
 
 [[package]]
 name = "rich"
-version = "13.3.5"
+version = "13.4.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.3.5-py3-none-any.whl", hash = "sha256:69cdf53799e63f38b95b9bf9c875f8c90e78dd62b2f00c13a911c7a3b9fa4704"},
-    {file = "rich-13.3.5.tar.gz", hash = "sha256:2d11b9b8dd03868f09b4fffadc84a6a8cda574e40dc90821bd845720ebb8e89c"},
+    {file = "rich-13.4.0-py3-none-any.whl", hash = "sha256:db8c367c0fbe39f72334452ecfdd708e8f2a6b8d16b2c94f451775d6c86e3965"},
+    {file = "rich-13.4.0.tar.gz", hash = "sha256:9aca0d9df7b38b17522a56ff1efe28995dc768f5b7169956251947352cf0d492"},
 ]
 
 [package.dependencies]
@@ -3591,7 +3591,7 @@ files = [
 name = "types-python-slugify"
 version = "8.0.0.2"
 description = "Typing stubs for python-slugify"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 files = [
@@ -3906,4 +3906,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7.2,<3.12"
-content-hash = "d336f3badf1de5f40307d3bf6fa4eb16a83be57a978657621540e8e0cc5ca565"
+content-hash = "e90a1b50ca584524e40094ec5fbeba0497fb7c89b096af8b1c177264ec17a41e"
