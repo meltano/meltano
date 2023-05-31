@@ -295,6 +295,33 @@ class TestDeploymentCommand:
         assert "Updating deployment - this may take several minutes..." in result.output
         assert "Updated deployment 'ultra-production'\n" in result.output
 
+    def test_update_non_existent_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_response(Response(status=HTTPStatus.NOT_FOUND))
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "update",
+                "--name",
+                "ultra-production",
+            ),
+        )
+        assert result.exit_code == 1, result.output
+        assert (
+            "Deployment 'ultra-production' does not exist. Use `meltano cloud "
+            "deployment create` to create a new Meltano Cloud deployment.\n"
+        ) in result.output
+
     @pytest.mark.parametrize("prepared_request", ({"method": "DELETE"},), indirect=True)
     def test_delete_deployment(
         self,

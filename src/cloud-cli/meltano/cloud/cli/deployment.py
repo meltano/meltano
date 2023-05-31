@@ -376,10 +376,11 @@ async def create_deployment(
     git_rev: str,
 ) -> None:
     """Create a new Meltano Cloud deployment."""
+    deployment_name = slugify(deployment_name)
     async with DeploymentsCloudClient(config=context.config) as client:
         if await client.deployment_exists(deployment_name=deployment_name):
             raise click.ClickException(
-                f"Deployment {slugify(deployment_name)!r} already exists. "
+                f"Deployment {deployment_name!r} already exists. "
                 "Use `meltano cloud deployment update` to update an "
                 "existing Meltano Cloud deployment.",
             )
@@ -430,11 +431,21 @@ async def update_deployment(  # noqa: D103
     force: bool,
     preserve_git_hash: bool,
 ) -> None:
+    deployment_name = slugify(deployment_name)
     with yaspin(text="Updating deployment - this may take several minutes..."):
         async with DeploymentsCloudClient(config=context.config) as client:
-            existing_deployment = await client.get_deployment(
-                deployment_name=deployment_name,
-            )
+            try:
+                existing_deployment = await client.get_deployment(
+                    deployment_name=deployment_name,
+                )
+            except MeltanoCloudError as ex:
+                if ex.response.status == HTTPStatus.NOT_FOUND:
+                    raise click.ClickException(
+                        f"Deployment {deployment_name!r} does not exist. "
+                        "Use `meltano cloud deployment create` to create a "
+                        "new Meltano Cloud deployment.",
+                    ) from ex
+                raise
             updated_deployment = await client.update_deployment(
                 deployment_name=deployment_name,
                 environment_name=existing_deployment["environment_name"],
@@ -462,6 +473,7 @@ async def delete_deployment(
     deployment_name: str,
 ) -> None:
     """Delete a Meltano Cloud deployment."""
+    deployment_name = slugify(deployment_name)
     with yaspin(text="Deleting deployment - this may take several minutes..."):
         async with DeploymentsCloudClient(config=context.config) as client:
             await client.delete_deployment(deployment_name=deployment_name)
