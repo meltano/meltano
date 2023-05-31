@@ -14,7 +14,7 @@ import questionary
 import requests
 import tabulate
 from slugify import slugify
-from yaspin import yaspin  # type: ignore[import]
+from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import pass_context, run_async
@@ -307,7 +307,10 @@ class DeploymentChoicesQuestionaryOption(click.Option):
         ).unsafe_ask()  # Use Click's Ctrl-C handling instead of Questionary's
 
 
-@deployment_group.command("use")
+@deployment_group.command(
+    "use",
+    short_help="Set a deployment as the default to use for Meltano Cloud CLI commands.",
+)
 @click.option(
     "--name",
     "deployment_name",
@@ -320,11 +323,10 @@ class DeploymentChoicesQuestionaryOption(click.Option):
 )
 @pass_context
 @run_async
-async def use_deployment(
+async def use_deployment(  # noqa: D103
     context: MeltanoCloudCLIContext,
     deployment_name: str,
 ) -> None:
-    """Set a deployment as the default to use for Meltano Cloud CLI commands."""
     deployment_name = slugify(deployment_name)
     if context.deployments is None:  # Interactive config was not used
         context.deployments = await _get_deployments(context.config)
@@ -393,7 +395,13 @@ async def create_deployment(
         )
 
 
-@deployment_group.command("update")
+@deployment_group.command(
+    "update",
+    short_help=(
+        "Update a Meltano Cloud project deployment, using the latest commit "
+        "from the tracked git rev."
+    ),
+)
 @click.option(
     "--name",
     "deployment_name",
@@ -416,13 +424,12 @@ async def create_deployment(
 )
 @pass_context
 @run_async
-async def update_deployment(
+async def update_deployment(  # noqa: D103
     context: MeltanoCloudCLIContext,
     deployment_name: str,
     force: bool,
     preserve_git_hash: bool,
 ) -> None:
-    """Update a Meltano Cloud project deployment, using the latest commit from the tracked git rev."""  # noqa: E501
     with yaspin(text="Updating deployment - this may take several minutes..."):
         async with DeploymentsCloudClient(config=context.config) as client:
             existing_deployment = await client.get_deployment(
