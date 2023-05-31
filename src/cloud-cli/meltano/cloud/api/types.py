@@ -49,3 +49,16 @@ class CloudProject(TypedDict):
 
     # Added client-side:
     default: bool
+
+
+class CloudDeployment(TypedDict):
+    """Meltano Cloud project deployment details."""
+
+    deployment_name: str
+    environment_name: str
+    git_rev: str
+    git_rev_hash: str
+    last_deployed_timestamp: str
+
+    # Added client-side:
+    default: bool

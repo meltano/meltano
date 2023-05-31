@@ -6,13 +6,24 @@ import click
 from structlog import get_logger
 
 from meltano.cloud.api import MeltanoCloudError
-from meltano.cloud.cli import config, docs, history, login, logs, project, run, schedule
+from meltano.cloud.cli import (  # noqa: WPS235
+    config,
+    deployment,
+    docs,
+    history,
+    login,
+    logs,
+    project,
+    run,
+    schedule,
+)
 from meltano.cloud.cli.base import cloud
 
 logger = get_logger()
 
 cloud.add_command(config.config)
 cloud.add_command(docs.docs)
+cloud.add_command(deployment.deployment_group)
 cloud.add_command(history.history)
 cloud.add_command(login.login)
 cloud.add_command(login.logout)

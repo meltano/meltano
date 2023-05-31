@@ -69,6 +69,7 @@ pyjwt = "^2.6.0"
 pymssql = {version = "^2.2.5", optional = true}
 python = ">=3.7.2,<3.12"
 python-dotenv = "^0.21.1"
+python-slugify = "^8.0.1"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.0"
 questionary = "^1.10.0"

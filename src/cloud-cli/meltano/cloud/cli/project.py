@@ -63,6 +63,14 @@ def project_group() -> None:
     """Interact with Meltano Cloud projects."""
 
 
+def _safe_get_internal_project_id(config: MeltanoCloudConfig) -> str | None:
+    """Get the internal project ID, or `None` if it could not be obtained."""
+    try:
+        return config.internal_project_id
+    except Exception:
+        return None
+
+
 async def _get_projects(
     config: MeltanoCloudConfig,
     *,
@@ -93,7 +101,7 @@ async def _get_projects(
     return [
         {
             **x,  # type: ignore[misc]
-            "default": x["project_id"] == config.internal_project_id,
+            "default": x["project_id"] == _safe_get_internal_project_id(config),
         }
         for x in results[:limit]
     ]
