@@ -133,7 +133,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                     },
                 ),
             )
-        response = requests.request(**t.cast(dict[str, t.Any], prepared_request))
+        response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
         response.raise_for_status()
         deployment = response.json()
         return {
@@ -160,7 +160,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                     f"/{deployment_name}"
                 ),
             )
-        response = requests.request(**t.cast(dict[str, t.Any], prepared_request))
+        response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
         response.raise_for_status()
 
 
