@@ -7,15 +7,18 @@ import platform
 import subprocess
 import sys
 import typing as t
+from http import HTTPStatus
 from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+from pytest_httpserver.httpserver import Response
 
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
     from pytest_httpserver import HTTPServer
+    from requests_mock import Mocker as RequestsMocker
 
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudDeployment
@@ -56,6 +59,21 @@ class TestDeploymentCommand:
     @pytest.fixture()
     def path(self, tenant_resource_key: str, internal_project_id: str) -> str:
         return f"/deployments/v1/{tenant_resource_key}/{internal_project_id}"
+
+    @pytest.fixture()
+    def prepared_request(self, request: pytest.FixtureRequest):
+        return {
+            "method": request.param["method"],
+            "url": "https://asdf.lambda-url.us-west-2.on.aws.example.com/",
+            "params": {},
+            "headers": {
+                "Content-Type": "application/json",
+                "X-Amz-Date": "20230525T185058Z",
+                "X-Amz-Security-Token": "IQoJb3JpZ2luX2VjEOP/////////wEaCXV==",
+                "Authorization": "AWS4-HMAC-SHA256 Credential=ASI3AV1SM3BH...",
+            },
+            "data": '{"environment_name": "staging", "git_rev": "main"}',
+        }
 
     def test_deployment_list_table(
         self,
@@ -157,8 +175,8 @@ class TestDeploymentCommand:
         )
         assert result.exit_code == 0, result.output
         assert result.output == (
-            "Set 'ultra-production' as the default Meltano Cloud project "
-            "deployment for future commands\n"
+            "Set 'ultra-production' as the default Meltano Cloud deployment "
+            "for future commands\n"
         )
         assert (
             json.loads(Path(config.config_path).read_text())["default_deployment_name"]
@@ -178,7 +196,7 @@ class TestDeploymentCommand:
         config: MeltanoCloudConfig,
         deployments: list[CloudDeployment],
     ):
-        httpserver.expect_oneshot_request(path).respond_with_json(
+        httpserver.expect_oneshot_request(path, "GET").respond_with_json(
             {"results": deployments, "pagination": None},
         )
         result = subprocess.run(
@@ -198,10 +216,110 @@ class TestDeploymentCommand:
         )
         assert result.returncode == 0, result.stdout
         assert (
-            "Set 'legacy' as the default Meltano Cloud "
-            "project deployment for future commands\n"
+            "Set 'legacy' as the default Meltano Cloud deployment for future commands\n"
         ) in result.stdout
         assert (
             json.loads(Path(config.config_path).read_text())["default_deployment_name"]
             == "legacy"
         )
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
+    def test_create_new_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_response(Response(status=HTTPStatus.NOT_FOUND))
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "POST",
+        ).respond_with_json(prepared_request)
+        requests_mock.post(prepared_request["url"], json=deployments[0])
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "create",
+                "--name",
+                "ultra-production",
+                "--environment",
+                "Ultra Production",
+                "--git-rev",
+                "Main",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "Creating deployment - this may take several minutes..." in result.output
+        assert "Created deployment 'ultra-production'\n" in result.output
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
+    def test_update_existing_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_json(deployments[0])
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "POST",
+        ).respond_with_json(prepared_request)
+        requests_mock.post(prepared_request["url"], json=deployments[0])
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "update",
+                "--name",
+                "ultra-production",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "Updating deployment - this may take several minutes..." in result.output
+        assert "Updated deployment 'ultra-production'\n" in result.output
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "DELETE"},), indirect=True)
+    def test_delete_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "DELETE",
+        ).respond_with_json(prepared_request)
+        requests_mock.delete(prepared_request["url"], status_code=HTTPStatus.NO_CONTENT)
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "delete",
+                "--name",
+                "ultra-production",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "Deleting deployment - this may take several minutes..." in result.output
+        assert "Deleted deployment 'ultra-production'\n" in result.output

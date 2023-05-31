@@ -339,7 +339,7 @@ async def use_deployment(  # noqa: D103
     context.config.write_to_file()
     click.secho(
         (
-            f"Set {deployment_name!r} as the default Meltano Cloud project "
+            f"Set {deployment_name!r} as the default Meltano Cloud "
             "deployment for future commands"
         ),
         fg="green",

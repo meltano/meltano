@@ -63,6 +63,7 @@ pytest-asyncio = "^0.21.0"
 pytest-httpserver = "^1.0.6"
 pytest-randomly = "^3.12"
 pytest-structlog = "^0.6"
+requests-mock = "^1.10.0"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
