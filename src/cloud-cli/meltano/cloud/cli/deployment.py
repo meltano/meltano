@@ -10,8 +10,10 @@ from datetime import datetime
 
 import click
 import questionary
+import requests
 import tabulate
 from slugify import slugify
+from yaspin import yaspin
 
 from meltano.cloud.api.client import MeltanoCloudClient
 from meltano.cloud.cli.base import pass_context, run_async
@@ -27,6 +29,30 @@ MAX_PAGE_SIZE = 250
 
 class DeploymentsCloudClient(MeltanoCloudClient):
     """A Meltano Cloud client with extensions for deployments."""
+
+    async def get_deployment(self, deployment_name: str) -> CloudDeployment:
+        """Use GET to get a Meltano Cloud deployment.
+
+        Args:
+            deployment_name: The name of the deployment to get.
+        """
+        async with self.authenticated():
+            deployment = await self._json_request(
+                "GET",
+                (
+                    "/deployments"
+                    "/v1"
+                    f"/{self.config.tenant_resource_key}"
+                    f"/{self.config.internal_project_id}"
+                    f"/{deployment_name}"
+                ),
+            )
+        return {
+            **deployment,
+            "default": (
+                self.config.default_deployment_name == deployment["deployment_name"]
+            ),
+        }
 
     async def get_deployments(
         self,
@@ -57,6 +83,74 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                     },
                 ),
             )
+
+    async def update_deployment(
+        self,
+        deployment_name: str,
+        environment_name: str,
+        git_rev: str,
+        force: bool = False,
+        preserve_git_hash: bool = False,
+    ) -> CloudDeployment:
+        """Use POST to update a Meltano Cloud deployment.
+
+        Args:
+            deployment_name: The name of the deployment to update.
+            environment_name: The name of the environment for the deployment.
+            git_rev: The git revision from which to source the project.
+            force: Whether to force the update to occur even if no changes are
+                detected via the manifest.
+            preserve_git_hash: Whether to preserve the git commit hash of the
+                deployment, or update it to the latest for the tracked git
+                revision.
+        """
+        async with self.authenticated():
+            prepared_request = await self._json_request(
+                "POST",
+                (
+                    "/deployments"
+                    "/v1"
+                    f"/{self.config.tenant_resource_key}"
+                    f"/{self.config.internal_project_id}"
+                    f"/{deployment_name}"
+                ),
+                json={"environment_name": environment_name, "git_rev": git_rev},
+                params=self.clean_params(
+                    {
+                        "force": str(force),
+                        "preserve_git_hash": str(preserve_git_hash),
+                    },
+                ),
+            )
+        response = requests.request(**prepared_request)
+        response.raise_for_status()
+        deployment = response.json()["deployment"]
+        return {
+            **deployment,
+            "default": (
+                self.config.default_deployment_name == deployment["deployment_name"]
+            ),
+        }
+
+    async def delete_deployment(self, deployment_name: str) -> None:
+        """Use DELETE to delete a Meltano Cloud deployment.
+
+        Args:
+            deployment_name: The name of the deployment to delete.
+        """
+        async with self.authenticated():
+            prepared_request = await self._json_request(
+                "DELETE",
+                (
+                    "/deployments"
+                    "/v1"
+                    f"/{self.config.tenant_resource_key}"
+                    f"/{self.config.internal_project_id}"
+                    f"/{deployment_name}"
+                ),
+            )
+        response = requests.request(**prepared_request)
+        response.raise_for_status()
 
 
 @click.group("deployment")
@@ -237,3 +331,111 @@ async def use_deployment(
         ),
         fg="green",
     )
+
+
+@deployment_group.command("create")
+@click.option(
+    "--name",
+    "deployment_name",
+    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    prompt=True,
+)
+@click.option(
+    "--environment",
+    "environment_name",
+    help="The name of the Meltano environment to be deployed",
+    prompt=True,
+)
+@click.option(
+    "--git-rev",
+    help=(
+        "The git revision this deployment should track, such as a branch name "
+        "or commit hash"
+    ),
+    prompt=True,
+)
+@pass_context
+@run_async
+async def create_deployment(
+    context: MeltanoCloudCLIContext,
+    deployment_name: str,
+    environment_name: str,
+    git_rev: str,
+) -> None:
+    """Create a new Meltano Cloud project deployment."""
+    with yaspin(text="Creating deployment - this may take several minutes..."):
+        async with DeploymentsCloudClient(config=context.config) as client:
+            deployment = await client.update_deployment(
+                deployment_name=deployment_name,
+                environment_name=environment_name,
+                git_rev=git_rev,
+            )
+    click.secho(f"Created deployment {deployment['deployment_name']!r}", fg="green")
+
+
+@deployment_group.command("update")
+@click.option(
+    "--name",
+    "deployment_name",
+    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    prompt=True,
+)
+@click.option(
+    "--force/--no-force",
+    help=(
+        "Whether to re-deploy the Meltano environment in Meltano Cloud even "
+        "if no changes to the project have been detected"
+    ),
+)
+@click.option(
+    "--preserve-git-hash/--no-preserve-git-hash",
+    help=(
+        "The git revision this deployment should track, such as a branch name "
+        "or commit hash"
+    ),
+)
+@pass_context
+@run_async
+async def update_deployment(
+    context: MeltanoCloudCLIContext,
+    deployment_name: str,
+    force: bool,
+    preserve_git_hash: bool,
+) -> None:
+    """Update a Meltano Cloud project deployment, using the latest commit from the tracked git rev."""  # noqa: E501
+    with yaspin(text="Updating deployment - this may take several minutes..."):
+        async with DeploymentsCloudClient(config=context.config) as client:
+            existing_deployment = await client.get_deployment(
+                deployment_name=deployment_name,
+            )
+            updated_deployment = await client.update_deployment(
+                deployment_name=deployment_name,
+                environment_name=existing_deployment["environment_name"],
+                git_rev=existing_deployment["git_rev"],
+                force=force,
+                preserve_git_hash=preserve_git_hash,
+            )
+    click.secho(
+        f"Updated deployment {updated_deployment['deployment_name']!r}",
+        fg="green",
+    )
+
+
+@deployment_group.command("delete")
+@click.option(
+    "--name",
+    "deployment_name",
+    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    prompt=True,
+)
+@pass_context
+@run_async
+async def delete_deployment(
+    context: MeltanoCloudCLIContext,
+    deployment_name: str,
+) -> None:
+    """Delete a Meltano Cloud project deployment."""
+    with yaspin(text="Deleting deployment - this may take several minutes..."):
+        async with DeploymentsCloudClient(config=context.config) as client:
+            await client.delete_deployment(deployment_name=deployment_name)
+    click.secho(f"Deleted deployment {slugify(deployment_name)!r}", fg="green")
