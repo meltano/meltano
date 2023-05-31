@@ -62,14 +62,6 @@ Each Cloud Deployment must specify an environment name to deploy and a git branc
   <p>All operations that perform compute require a deployed environment - including: ad-hoc job execution, EL pipelines, scheduled tasks, etc.</p>
 </div>
 
-### Deployment Names
-
-Each deployment has a "Deployment Name", which defaults to the "Environment Name" for the Meltano Environment that was deployed.
-
-<div class="notification is-info">
-  <p>At the current time, the Deployment Name will always be equivalent to the name of the environment that was deployed - and we do not yet support deploying the same environment twice as two different deployments. In future versions of Meltano, we plan to allow Environments to be deployed more than once (for example, for CI use cases), and for Deployment to be renamed.</p>
-</div>
-
 ## Meltano Cloud Schedules
 
 Schedules within Meltano Cloud map directly to schedules defined in `meltano.yml`. However, in Meltano Cloud, each schedule starts off disabled by default, and each schedule is enabled or disabled on a per-Deployment basis.
