@@ -330,7 +330,12 @@ class TestDeploymentCommand:
         httpserver: HTTPServer,
         prepared_request,
         requests_mock: RequestsMocker,
+        deployments: list[CloudDeployment],
     ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_json(deployments[0])
         httpserver.expect_oneshot_request(
             f"{path}/ultra-production",
             "DELETE",
@@ -353,3 +358,27 @@ class TestDeploymentCommand:
         assert result.exit_code == 0, result.output
         assert "Deleting deployment - this may take several minutes..." in result.output
         assert "Deleted deployment 'ultra-production'\n" in result.output
+
+    def test_delete_non_existent_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/fake",
+            "GET",
+        ).respond_with_response(Response(status=HTTPStatus.NOT_FOUND))
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "delete",
+                "--name",
+                "fake",
+            ),
+        )
+        assert result.exit_code == 1, result.output
+        assert "Deployment 'fake' does not exist.\n" in result.output

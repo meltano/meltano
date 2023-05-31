@@ -476,5 +476,9 @@ async def delete_deployment(
     deployment_name = slugify(deployment_name)
     with yaspin(text="Deleting deployment - this may take several minutes..."):
         async with DeploymentsCloudClient(config=context.config) as client:
+            if not await client.deployment_exists(deployment_name=deployment_name):
+                raise click.ClickException(
+                    f"Deployment {deployment_name!r} does not exist.",
+                )
             await client.delete_deployment(deployment_name=deployment_name)
     click.secho(f"Deleted deployment {slugify(deployment_name)!r}", fg="green")
