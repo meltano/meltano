@@ -14,7 +14,7 @@ import questionary
 import requests
 import tabulate
 from slugify import slugify
-from yaspin import yaspin
+from yaspin import yaspin  # type: ignore[import]
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import pass_context, run_async
@@ -59,7 +59,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                 ),
             )
         return {
-            **deployment,
+            **deployment,  # type: ignore[misc]
             "default": (
                 self.config.default_deployment_name == deployment["deployment_name"]
             ),
@@ -133,11 +133,11 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                     },
                 ),
             )
-        response = requests.request(**prepared_request)
+        response = requests.request(**t.cast(dict[str, t.Any], prepared_request))
         response.raise_for_status()
         deployment = response.json()
         return {
-            **deployment,
+            **deployment,  # type: ignore[misc]
             "default": (
                 self.config.default_deployment_name == deployment["deployment_name"]
             ),
@@ -160,7 +160,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                     f"/{deployment_name}"
                 ),
             )
-        response = requests.request(**prepared_request)
+        response = requests.request(**t.cast(dict[str, t.Any], prepared_request))
         response.raise_for_status()
 
 
@@ -322,7 +322,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
 @run_async
 async def use_deployment(
     context: MeltanoCloudCLIContext,
-    deployment_name: str | None,
+    deployment_name: str,
 ) -> None:
     """Set a deployment as the default to use for Meltano Cloud CLI commands."""
     deployment_name = slugify(deployment_name)

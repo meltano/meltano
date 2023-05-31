@@ -171,6 +171,7 @@ def mypy(session: Session) -> None:
         "types-croniter",
         "types-jsonschema",
         "types-psutil",
+        "types-python-slugify",
         "types-PyYAML",
         "types-requests",
         "types-tabulate",

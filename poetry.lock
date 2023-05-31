@@ -3588,6 +3588,18 @@ files = [
 ]
 
 [[package]]
+name = "types-python-slugify"
+version = "8.0.0.2"
+description = "Typing stubs for python-slugify"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-python-slugify-8.0.0.2.tar.gz", hash = "sha256:de237b01c69ad3a57ae36a0e8a6a0c65b47bac529483007c1cae2d424cb07cc8"},
+    {file = "types_python_slugify-8.0.0.2-py3-none-any.whl", hash = "sha256:9e81f49eac8c805f924695de559fb8dc123ccbd15adb47d40ceaec51c739f044"},
+]
+
+[[package]]
 name = "types-pyyaml"
 version = "6.0.12.10"
 description = "Typing stubs for PyYAML"
@@ -3894,4 +3906,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7.2,<3.12"
-content-hash = "cefc9e7fe29ad2914a88eeec5f2eea3f0ca3c9cecc795b843a2a83f06feda879"
+content-hash = "d336f3badf1de5f40307d3bf6fa4eb16a83be57a978657621540e8e0cc5ca565"
