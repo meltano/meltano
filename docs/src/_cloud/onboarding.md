@@ -101,7 +101,7 @@ After logging in you can explore the interface with a few different commands.
 The full list of CLI commands is in the [Cloud Docs](https://docs.meltano.com/cloud/cloud-cli).
 
 ```console
-meltano-cloud history
+meltano-cloud project list
 ```
 
 ```console
