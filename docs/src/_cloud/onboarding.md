@@ -144,7 +144,7 @@ meltano-cloud config env list
 
 ### Step 6: Run your workloads
 
-You can invoke a schedule on-demand with the `meltano-cloud run` command:
+You can invoke a schedule on-demand with the `meltano-cloud run` [command](/cloud/cloud-cli#run):
 
 ```console
 meltano-cloud run --deployment=staging SCHEDULE_NAME
