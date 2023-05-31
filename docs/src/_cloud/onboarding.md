@@ -97,7 +97,7 @@ While Meltano Cloud is in Beta, it may take up to one business day for your user
 
 ### Step 3: Test basic functionality
 
-After logging in you can explore the interface with a few different commands. 
+After logging in you can explore the interface with a few different commands.
 The full list of CLI commands is in the [Cloud Docs](https://docs.meltano.com/cloud/cloud-cli).
 
 ```console
