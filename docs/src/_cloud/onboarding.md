@@ -123,7 +123,7 @@ meltano-cloud config env list
 > TAP_GITLAB_PASSWORD
 ```
 
-### Step 5: Run and debug your workloads
+### Step 5: Run your workloads
 
 You can invoke a schedule on-demand with the `meltano-cloud run` command:
 
