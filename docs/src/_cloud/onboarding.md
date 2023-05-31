@@ -40,7 +40,9 @@ environments:
 default_environment: dev
 ```
 
-### Prereq #4: Create schedules if needed
+### Prereq #4: Define your schedules
+
+Meltano Cloud uses the [schedules](https://docs.meltano.com/concepts/project#schedules) defined in your meltano.yml project file to run workloads.
 
 If your project does not yet have schedules defined - for instance, if you are running workloads via an external orchestrator - you'll want to create new schedules for use by Meltano Cloud.
 
