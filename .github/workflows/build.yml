@@ -28,7 +28,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.6.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: 3.9
         architecture: x64

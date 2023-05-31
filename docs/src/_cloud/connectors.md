@@ -27,7 +27,7 @@ To give users a better understanding of the overall quality of a connector, we h
 | Gold    | Yes       | > 5 Projects  | Official, Partner, or Community | High           |
 | Silver  | Possibly  | >= 1 Projects | Partner or Community          | Medium |
 | Bronze  | No        | >= 1 Projects | Community          | Low            |
-| No Data | No        | Unkonwn       | Community          | Unknown        |
+| No Data | No        | Unknown       | Community          | Unknown        |
 
 For all connectors we may apply feedback we get from the community or our judgement to adjust the quality indicator of a connector.
 
