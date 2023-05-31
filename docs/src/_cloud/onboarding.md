@@ -24,23 +24,9 @@ Click the following link to install the [Meltano Cloud GitHub App](https://githu
 When asked "Where do you want to install this app?" you _must_ select your GitHub organization, not your personal account.
 When asked which repositories to provide the app access to, select your GitHub project repo.
 
-### Prereq #3: Creating a test or sandbox environment
+If you do not yet have a Meltano project in GitHub, you can follow the steps in our [Getting Started](/getting-started) guide.
 
-For onboarding and debugging purposes, we recommend that teams create a [Meltano Environment](/concepts/environments) named `'sandbox'`, which can be used by Meltano Cloud to test that all jobs are working as expected.
-
-For more information, please see our guide: [Creating a Sandbox Environment for Meltano Cloud](/cloud/sandbox_environments)
-
-If you aren't yet declaring 'environments' in `meltano.yml`, you can get started quickly by copy-pasting this snippet into your `meltano.yml` file:
-
-```yml
-environments:
-- dev
-- staging
-- prod
-default_environment: dev
-```
-
-### Prereq #4: Define your schedules
+### Prereq #3: Define your schedules
 
 Meltano Cloud uses the [schedules](https://docs.meltano.com/concepts/project#schedules) defined in your meltano.yml project file to run workloads.
 
