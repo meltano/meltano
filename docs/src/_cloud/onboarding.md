@@ -165,4 +165,4 @@ meltano-cloud logs print --execution-id=ASDF1234...
 ### Step 7: Enable schedules
 
 Your Meltano Cloud project's schedules are disabled by default.
-Use the `meltano-cloud schedule enable <SCHEDULE NAME>` command to enable schedules.
+Use the `meltano-cloud schedule enable <SCHEDULE NAME>` [command](/cloud/cloud-cli#schedule) to enable schedules.
