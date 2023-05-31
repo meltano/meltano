@@ -49,6 +49,7 @@ platformdirs = "^3.0.0"
 pyjwt = "^2.6.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.5.0"
+yaspin = "^2.3.0"
 
 [tool.poetry.scripts]
 meltano-cloud = "meltano.cloud.cli:main"
