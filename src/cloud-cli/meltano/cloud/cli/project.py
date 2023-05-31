@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import platform
 import sys
 import typing as t
@@ -22,6 +23,8 @@ if t.TYPE_CHECKING:
 
 DEFAULT_GET_PROJECTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
+
+logger = logging.getLogger()
 
 
 class ProjectsCloudClient(MeltanoCloudClient):
@@ -68,6 +71,9 @@ def _safe_get_internal_project_id(config: MeltanoCloudConfig) -> str | None:
     try:
         return config.internal_project_id
     except Exception:
+        logger.debug(
+            "Could not get internal project ID from config; using `None` instead.",
+        )
         return None
 
 
