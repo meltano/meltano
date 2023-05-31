@@ -79,7 +79,7 @@ The login command will open a browser window which you can use to access your ac
 While Meltano Cloud is in Beta, it may take up to one business day for your user to be fully provisioned and added to your Meltano Cloud organization. You'll be notified via email once your newly created user has been added to your organization, at which time you can logout via `meltano-cloud logout` and then log back in to have full CLI access to your organization's Meltano Cloud resources.
 
 <div class="notification is-info">
-  <p>As of now, installing the Meltano Cloud <a href="#prereq-1-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
+  <p>As of now, installing the Meltano Cloud <a href="#prereq-2-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
 </div>
 
 
