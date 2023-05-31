@@ -71,7 +71,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         page_size: int | None = None,
         page_token: str | None = None,
     ):
-        """Use GET to get Meltano Cloud project deployments.
+        """Use GET to get Meltano Cloud deployments.
 
         Args:
             project_id: The ID of the project the deployments are of.
@@ -302,7 +302,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
         context.deployments = asyncio.run(_get_deployments(context.config))
         return questionary.select(
             message="",
-            qmark="Use Meltano Cloud project deployment",
+            qmark="Use Meltano Cloud deployment",
             choices=[x["deployment_name"] for x in context.deployments],
         ).unsafe_ask()  # Use Click's Ctrl-C handling instead of Questionary's
 
@@ -316,7 +316,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
     "deployment_name",
     cls=DeploymentChoicesQuestionaryOption,
     help=(
-        "The name of a Meltano Cloud project deployment - "
+        "The name of a Meltano Cloud deployment - "
         "see `meltano cloud deployment list` for the available options."
     ),
     prompt=True,
@@ -333,7 +333,7 @@ async def use_deployment(  # noqa: D103
         if deployment_name not in {x["deployment_name"] for x in context.deployments}:
             raise click.ClickException(
                 f"Unable to use deployment named {deployment_name!r} - no available "
-                "Meltano Cloud project deployment matches name.",
+                "Meltano Cloud deployment matches name.",
             )
     context.config.default_deployment_name = deployment_name
     context.config.write_to_file()
@@ -350,7 +350,7 @@ async def use_deployment(  # noqa: D103
 @click.option(
     "--name",
     "deployment_name",
-    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    help="A name which uniquely identifies the new Meltano Cloud deployment",
     prompt=True,
 )
 @click.option(
@@ -375,13 +375,13 @@ async def create_deployment(
     environment_name: str,
     git_rev: str,
 ) -> None:
-    """Create a new Meltano Cloud project deployment."""
+    """Create a new Meltano Cloud deployment."""
     async with DeploymentsCloudClient(config=context.config) as client:
         if await client.deployment_exists(deployment_name=deployment_name):
             raise click.ClickException(
                 f"Deployment {slugify(deployment_name)!r} already exists. "
                 "Use `meltano cloud deployment update` to update an "
-                "existing Meltano Cloud project deployment.",
+                "existing Meltano Cloud deployment.",
             )
         with yaspin(text="Creating deployment - this may take several minutes..."):
             deployment = await client.update_deployment(
@@ -398,14 +398,14 @@ async def create_deployment(
 @deployment_group.command(
     "update",
     short_help=(
-        "Update a Meltano Cloud project deployment, using the latest commit "
+        "Update a Meltano Cloud deployment, using the latest commit "
         "from the tracked git rev."
     ),
 )
 @click.option(
     "--name",
     "deployment_name",
-    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    help="A name which uniquely identifies the new Meltano Cloud deployment",
     prompt=True,
 )
 @click.option(
@@ -452,7 +452,7 @@ async def update_deployment(  # noqa: D103
 @click.option(
     "--name",
     "deployment_name",
-    help="A name which uniquely identifies the new Meltano Cloud project deployment",
+    help="A name which uniquely identifies the new Meltano Cloud deployment",
     prompt=True,
 )
 @pass_context
@@ -461,7 +461,7 @@ async def delete_deployment(
     context: MeltanoCloudCLIContext,
     deployment_name: str,
 ) -> None:
-    """Delete a Meltano Cloud project deployment."""
+    """Delete a Meltano Cloud deployment."""
     with yaspin(text="Deleting deployment - this may take several minutes..."):
         async with DeploymentsCloudClient(config=context.config) as client:
             await client.delete_deployment(deployment_name=deployment_name)

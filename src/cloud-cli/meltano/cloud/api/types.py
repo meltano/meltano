@@ -52,7 +52,7 @@ class CloudProject(TypedDict):
 
 
 class CloudDeployment(TypedDict):
-    """Meltano Cloud project deployment details."""
+    """Meltano Cloud deployment details."""
 
     deployment_name: str
     environment_name: str
