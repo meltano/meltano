@@ -94,6 +94,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
         default_project_id: str | None = None,
+        default_deployment_name: str | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
@@ -111,6 +112,8 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
             default_project_id: The ID of the default Meltano Cloud project.
+            default_deployment_name: The name of the default Meltano Cloud
+                deployment.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -122,6 +125,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             Path(config_path).resolve() if config_path else self.user_config_path()
         )
         self.default_project_id = default_project_id
+        self.default_deployment_name = default_deployment_name
 
     def __getattribute__(self, name: str) -> str | None:
         """Get config attribute.

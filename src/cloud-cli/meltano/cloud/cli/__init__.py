@@ -8,6 +8,7 @@ from structlog import get_logger
 from meltano.cloud.api import MeltanoCloudError
 from meltano.cloud.cli import (  # noqa: WPS235
     config,
+    deployment,
     docs,
     history,
     job,
@@ -23,6 +24,7 @@ logger = get_logger()
 
 cloud.add_command(config.config)
 cloud.add_command(docs.docs)
+cloud.add_command(deployment.deployment_group)
 cloud.add_command(history.history)
 cloud.add_command(job.job_group)
 cloud.add_command(login.login)
