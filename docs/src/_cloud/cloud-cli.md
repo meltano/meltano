@@ -96,6 +96,8 @@ If you've made a change to your schedules configuration and would like them to b
 
 ```sh
 meltano-cloud deployment update --name prod
+```
+
 ## `docs`
 
 Opens the Meltano Cloud documentation in the system browser.
