@@ -32,6 +32,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
     """A Meltano Cloud client with extensions for deployments."""
 
     async def deployment_exists(self, deployment_name: str) -> bool:
+        """Check if a deployment exists."""
         try:
             await self.get_deployment(deployment_name=deployment_name)
         except MeltanoCloudError as ex:
