@@ -78,6 +78,35 @@ class TestScheduleCommand:
             assert result.exit_code == 0, result.output
             assert not result.output
 
+    def test_schedule_enable_with_missing_deployment(
+        self,
+        tenant_resource_key: str,
+        internal_project_id: str,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+    ):
+        path = (
+            f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
+            "/test-deployment/daily/enabled"
+        )
+        config.default_deployment_name = None
+        config.write_to_file()
+        runner = CliRunner()
+        for cmd in ("enable", "disable"):
+            httpserver.expect_oneshot_request(path).respond_with_data(status=204)
+            result = runner.invoke(
+                cli,
+                (
+                    "--config-path",
+                    config.config_path,
+                    "schedule",
+                    cmd,
+                    "--schedule=daily",
+                ),
+            )
+            assert result.exit_code == 2, result.output
+            assert "A deployment name is required." in result.output
+
     @pytest.fixture()
     def schedules(self) -> list[CloudProjectSchedule]:
         return [
