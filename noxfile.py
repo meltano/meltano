@@ -35,10 +35,10 @@ def tests(session: Session) -> None:
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
 
     if backend_db == "mssql":
-        session.install(".[mssql,azure,gcs,s3]")
+        session.install(".[mssql,azure,gcs,s3,ui]")
 
     else:
-        session.install(".[azure,gcs,s3]")
+        session.install(".[azure,gcs,s3,ui]")
 
     session.install(
         "colorama",  # colored output in Windows
