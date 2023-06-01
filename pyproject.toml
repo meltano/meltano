@@ -90,7 +90,7 @@ python-dotenv = "^0.21.1"
 python-gitlab = "^3.14.0"
 pyyaml = "^6.0.0"
 requests = "^2.31.0"
-rich = "^13.3.5"
+rich = "^13.4.1"
 "ruamel.yaml" = "^0.17.21"
 smart-open = {version = "^6.2.0"}
 smtpapi = "^0.4.1"
