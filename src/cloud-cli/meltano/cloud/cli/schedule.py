@@ -151,7 +151,14 @@ async def _set_enabled_state(
     if schedule_name is None:
         raise click.UsageError("Missing option '--schedule'")
     if deployment_name is None:
-        raise click.UsageError("Missing option '--deployment'")
+        if config.default_deployment_name is not None:
+            deployment_name = config.default_deployment_name
+        else:
+            raise click.UsageError(
+                "A deployment name is required. Please specify "
+                "one with the '--deployment' option, or specify a default"
+                "deployment by running 'meltano cloud deployment use'.",
+            )
     async with SchedulesCloudClient(config=config) as client:
         await client.set_schedule_enabled(
             deployment_name=deployment_name,
