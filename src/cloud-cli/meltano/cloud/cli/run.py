@@ -50,15 +50,17 @@ async def run(
     deployment: str | None = None,
 ) -> None:
     """Run a Meltano project in Meltano Cloud."""
+    deployment = (
+        deployment
+        if deployment is not None
+        else context.config.default_deployment_name
+    )
     if deployment is None:
-        if context.config.default_deployment_name is not None:
-            deployment = context.config.default_deployment_name
-        else:
-            raise click.UsageError(
-                "A deployment name is required. Please specify "
-                "one with the '--deployment' option, or specify a default"
-                "deployment by running 'meltano cloud deployment use'.",
-            )
+        raise click.UsageError(
+            "A deployment name is required. Please specify "
+            "one with the '--deployment' option, or specify a default"
+            "deployment by running 'meltano cloud deployment use'.",
+        )
     click.echo("Running a Meltano project in Meltano Cloud.")
 
     result = await run_project(
