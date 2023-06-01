@@ -121,11 +121,11 @@ def default_config(log_level: str) -> dict:
                 "level": logging.INFO,
                 "propagate": False,
             },
-            "azure.core.pipeline.policies.http_logging_policy": {    # see #7723 , azure http logs at info level, too noisy
-             "handlers": ["console"], 
-             "level": logging.WARNING, 
-             "propagate": False, 
-            }, 
+            "azure.core.pipeline.policies.http_logging_policy": {  # see #7723 , azure http logs at info level, too noisy
+                "handlers": ["console"],
+                "level": logging.WARNING,
+                "propagate": False,
+            },
         },
     }
 
