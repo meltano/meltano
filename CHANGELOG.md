@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.19.1 (2023-06-02)
+
+### 🐛 Fixes
+
+- [#7644](https://github.com/meltano/meltano/issues/7644) Install schedule elt style and mappings
+- [#7636](https://github.com/meltano/meltano/issues/7636) Print a clearer message when `meltano.yml` is empty -- _**Thanks @rawwar!**_
+
+### 📚 Documentation Improvements
+
+- [#7732](https://github.com/meltano/meltano/issues/7732) Update Meltano Cloud GitHub App Installation Docs
+- [#7717](https://github.com/meltano/meltano/issues/7717) Update onboarding docs
+- [#7724](https://github.com/meltano/meltano/issues/7724) Add Cloud CLI docs for `deployment` command
+- [#7722](https://github.com/meltano/meltano/issues/7722) Add credit pricing, clarify expiration
+- [#7713](https://github.com/meltano/meltano/issues/7713) Spelling oopsie -- _**Thanks @visch!**_
+- [#7706](https://github.com/meltano/meltano/issues/7706) Add egress pricing and Credit expiration (after 1 year of non-use) to Cloud Fees
+- [#7703](https://github.com/meltano/meltano/issues/7703) Correct name of meltano-map-transformer in add command -- _**Thanks @mjsqu!**_
+- [#7702](https://github.com/meltano/meltano/issues/7702) Fix typo in `docs/src/_guide/integration.md` -- _**Thanks @burmecia!**_
+- [#7694](https://github.com/meltano/meltano/issues/7694) Add cloud python version
+- [#7678](https://github.com/meltano/meltano/issues/7678) Refresh getting started guide
+- [#7630](https://github.com/meltano/meltano/issues/7630) Add details on platinum connectors
+- [#7639](https://github.com/meltano/meltano/issues/7639) Promote `pipx` to install Meltano
+
 ## v2.19.0 (2023-05-02)
 
 ### ✨ New
