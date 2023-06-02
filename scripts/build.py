@@ -83,6 +83,8 @@ original_wheel_build = WheelBuilder.build
 def custom_build_wheel(*args, **kwargs) -> str:
     """Wheel building via poetry-core with customizations for Meltano.
 
+    Skip building the webapp if the UI extra is not included.
+
     Args:
         args: Positional arguments to pass through to `WheelBuilder.build`.
         kwargs: Keyword arguments to pass through to `WheelBuilder.build`.
@@ -90,6 +92,12 @@ def custom_build_wheel(*args, **kwargs) -> str:
     Returns:
         The value returned by `WheelBuilder.build(*args, **kwargs)`.
     """
+    try:  # noqa:WPS328
+        # a stand-in for the ui extra
+        import Flask  # noqa:F401
+    except ImportError:
+        return original_wheel_build(*args, **kwargs)
+
     build_webapp()
     include_webapp()
     return original_wheel_build(*args, **kwargs)

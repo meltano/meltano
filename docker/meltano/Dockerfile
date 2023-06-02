@@ -22,7 +22,7 @@ ENV PATH="/venv/bin:${PATH}"
 
 # Installing the application the same way our users do when using PyPI
 RUN pip install --upgrade pip wheel && \
-    pip install "meltano[azure,gcs,mssql,s3]==${MELTANO_VERSION}"
+    pip install "meltano[azure,gcs,mssql,s3,ui]==${MELTANO_VERSION}"
 
 # Run the Meltano UI by default
 EXPOSE 5000

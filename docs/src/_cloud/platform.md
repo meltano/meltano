@@ -15,6 +15,11 @@ redirect_from:
 
 Meltano Cloud currently runs on AWS.
 
+### Python Version
+
+Meltano Cloud uses Python 3.9.
+After our GA launch, we aim to support all active versions of Python that are not yet at their [end of life](https://devguide.python.org/versions/).
+
 ## Region
 
 The primary AWS region hosting Meltano Cloud is `us-west-2` (Oregon, US).

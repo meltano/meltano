@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from flask_security import RoleMixin, UserMixin
-
 from . import db
 
 DEFAULT_VARCHAR_LENGTH = 255
 NAME_LENGTH = 80
 
 
-class User(db.Model, UserMixin):
+class User(db.Model):
+    """User model."""
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(DEFAULT_VARCHAR_LENGTH), unique=True, index=True)
     email = db.Column(db.String(DEFAULT_VARCHAR_LENGTH), unique=True)
@@ -63,7 +63,9 @@ class RolePermissions(db.Model):
         return canonical
 
 
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
+    """Role model."""
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(NAME_LENGTH), unique=True)
     description = db.Column(db.String(DEFAULT_VARCHAR_LENGTH))

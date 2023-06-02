@@ -100,8 +100,14 @@ class PluginInstallWarning(Exception):
     """Exception for when a plugin optional optional step fails to install."""
 
 
-class EmptyMeltanoFileException(Exception):
+class EmptyMeltanoFileException(MeltanoError):
     """Exception for empty meltano.yml file."""
+
+    def __init__(self) -> None:
+        """Instantiate the error."""
+        reason = "Your meltano.yml file is empty"
+        instruction = "Please update your meltano file with a valid configuration"
+        super().__init__(reason, instruction)
 
 
 class MeltanoConfigurationError(MeltanoError):
@@ -128,3 +134,14 @@ class ProjectReadonly(Error):
     def __init__(self):
         """Instantiate the error."""
         super().__init__("This Meltano project is deployed as read-only")
+
+
+class MissingFlaskError(Exception):
+    """Raised when Flask is required but not installed."""
+
+    def __init__(self):
+        """Initialize a MissingFlaskError."""
+        super().__init__(
+            "Flask required but not installed. The UI has been deprecated and will be "
+            "removed in future versions. Install meltano[ui] to use the UI.",
+        )
