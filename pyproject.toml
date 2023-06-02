@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.19.0"
+version = "2.19.1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -479,7 +479,7 @@ skip_covered = true
 [tool.commitizen]
 name = "cz_version_bump"
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "2.19.0"
+version = "2.19.1"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
