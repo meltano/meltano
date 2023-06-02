@@ -1,0 +1,151 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-postgres",
+  "namespace": "target_postgres",
+  "variant": "transferwise",
+  "label": "PostgreSQL",
+  "docs": "https://hub.meltano.com/loaders/target-postgres--transferwise",
+  "repo": "https://github.com/transferwise/pipelinewise-target-postgres",
+  "pip_url": "pipelinewise-target-postgres",
+  "description": "PostgreSQL database loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/postgres.png",
+  "settings_group_validation": [
+    [
+      "host",
+      "port",
+      "user",
+      "password",
+      "dbname",
+      "default_target_schema"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "host",
+      "value": "localhost",
+      "label": "Host",
+      "description": "PostgreSQL host"
+    },
+    {
+      "name": "port",
+      "kind": "integer",
+      "value": 5432,
+      "label": "Port",
+      "description": "PostgreSQL port"
+    },
+    {
+      "name": "user",
+      "label": "User",
+      "description": "PostgreSQL user"
+    },
+    {
+      "name": "password",
+      "kind": "password",
+      "label": "Password",
+      "description": "PostgreSQL password"
+    },
+    {
+      "name": "dbname",
+      "label": "Database Name",
+      "description": "PostgreSQL database name"
+    },
+    {
+      "name": "ssl",
+      "kind": "boolean",
+      "value": false,
+      "label": "SSL",
+      "description": "Using SSL via postgres `sslmode='require'` option.\n\nIf the server does not accept SSL connections or the client certificate is not recognized the connection will fail.\n",
+      "value_post_processor": "stringify"
+    },
+    {
+      "name": "default_target_schema",
+      "aliases": [
+        "schema"
+      ],
+      "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+      "label": "Default Target Schema",
+      "description": "Note that `$MELTANO_EXTRACT__LOAD_SCHEMA` [will expand to](https://docs.meltano.com/guide/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](https://docs.meltano.com/concepts/plugins#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/extractors/gitlab).\n\nName of the schema where the tables will be created. If `schema_mapping`\nis not defined then every stream sent by the tap is loaded into this schema.\n"
+    },
+    {
+      "name": "batch_size_rows",
+      "kind": "integer",
+      "value": 100000,
+      "label": "Batch Size Rows",
+      "description": "Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Postgres."
+    },
+    {
+      "name": "flush_all_streams",
+      "kind": "boolean",
+      "value": false,
+      "label": "Flush All Streams",
+      "description": "Flush and load every stream into Postgres when one batch is full. Warning: This may trigger the COPY command to use files with low number of records."
+    },
+    {
+      "name": "parallelism",
+      "kind": "integer",
+      "value": 0,
+      "label": "Parallelism",
+      "description": "The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max."
+    },
+    {
+      "name": "parallelism_max",
+      "kind": "integer",
+      "value": 16,
+      "label": "Max Parallelism",
+      "description": "Max number of parallel threads to use when flushing tables."
+    },
+    {
+      "name": "default_target_schema_select_permission",
+      "label": "Default Target Schema Select Permission",
+      "description": "Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly."
+    },
+    {
+      "name": "schema_mapping",
+      "kind": "object",
+      "label": "Schema Mapping",
+      "description": "Useful if you want to load multiple streams from one tap to multiple\nPostgres schemas.\n\nIf the tap sends the `stream_id` in `<schema_name>-<table_name>`\nformat then this option overwrites the `default_target_schema` value. Note,\nthat using `schema_mapping` you can overwrite the `default_target_schema_select_permission`\nvalue to grant SELECT permissions to different groups per schemas or optionally\nyou can create indices automatically for the replicated tables.\n\nThis setting can hold an object mapping source schema names to objects with `target_schema` and (optionally) `target_schema_select_permissions` and `indices` keys.\n\nExample structure (as YAML):\n\n\n```yaml\nschema_mapping:\n  my_tap_stream_id:\n    target_schema: my_postgres_schema\n    target_schema_select_permissions: [ \"role_with_select_privs\" ]\n    indices: [\"column_1\", \"column_2s\"]\n```\n"
+    },
+    {
+      "name": "add_metadata_columns",
+      "kind": "boolean",
+      "value": false,
+      "label": "Add Metadata Columns",
+      "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in postgres etc.)\n Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming\n conventions documented in the [Stitch Docs](https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns). Enabling metadata columns will flag the deleted\n rows by setting the _SDC_DELETED_AT metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recognisable\n in Postgres. Default - False\n"
+    },
+    {
+      "name": "hard_delete",
+      "kind": "boolean",
+      "value": false,
+      "label": "Hard Delete",
+      "description": "When `hard_delete` option is true then DELETE SQL commands will be performed in Postgres to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well."
+    },
+    {
+      "name": "data_flattening_max_level",
+      "kind": "integer",
+      "value": 0,
+      "label": "Data Flattening Max Level",
+      "description": "Object type `RECORD`` items from taps can be transformed to flattened columns by creating columns automatically. When value is 0 (default) then flattening functionality is turned off."
+    },
+    {
+      "name": "primary_key_required",
+      "kind": "boolean",
+      "value": true,
+      "label": "Primary Key Required",
+      "description": "Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined."
+    },
+    {
+      "name": "validate_records",
+      "kind": "boolean",
+      "value": false,
+      "label": "Validate Records",
+      "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Postgres. Enabling this option will detect invalid records earlier but could cause performance degradation."
+    },
+    {
+      "name": "temp_dir",
+      "label": "Temporary Directory",
+      "description": "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
+    }
+  ],
+  "dialect": "postgres",
+  "target_schema": "$TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA"
+}
