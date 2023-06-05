@@ -102,7 +102,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         git_rev: str,
         force: bool = False,
         preserve_git_hash: bool = False,
-    ) -> CloudDeployment:
+    ) -> CloudDeployment | None:
         """Use POST to update a Meltano Cloud deployment.
 
         Args:
@@ -135,6 +135,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
             )
         response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
         response.raise_for_status()
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
         deployment = response.json()
         return {
             **deployment,  # type: ignore[misc]
@@ -390,10 +392,13 @@ async def create_deployment(
                 environment_name=environment_name,
                 git_rev=git_rev,
             )
-        click.secho(
-            f"Created deployment {deployment['deployment_name']!r}",
-            fg="green",
-        )
+        if deployment is None:
+            click.secho("Deployment already exists, and was not updated.", fg="yellow")
+        else:
+            click.secho(
+                f"Created deployment {deployment['deployment_name']!r}",
+                fg="green",
+            )
 
 
 @deployment_group.command(
@@ -453,10 +458,20 @@ async def update_deployment(  # noqa: D103
                 force=force,
                 preserve_git_hash=preserve_git_hash,
             )
-    click.secho(
-        f"Updated deployment {updated_deployment['deployment_name']!r}",
-        fg="green",
-    )
+    if updated_deployment is None:
+        click.secho(
+            (
+                "Deployment already up-to-date. No changes to the Meltano "
+                "manifest were detected. Use the '--force' option to perform "
+                "an update anyway."
+            ),
+            fg="yellow",
+        )
+    else:
+        click.secho(
+            f"Updated deployment {updated_deployment['deployment_name']!r}",
+            fg="green",
+        )
 
 
 @deployment_group.command("delete")
