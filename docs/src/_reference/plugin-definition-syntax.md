@@ -449,6 +449,15 @@ settings:
 
 Use to delegate to an environment variable for overriding this setting's value.
 
+### `settings[*].hidden`
+Optional. Use to hide a setting.
+
+```yaml
+settings:
+- name: setting_name
+  hidden: true
+```
+
 ### `settings[*].kind`
 
 Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden` (deprecated).
@@ -468,12 +477,7 @@ settings:
 <br/>
 
 <div class="notification is-warning">
-  <p><code>kind: hidden</code> is deprecated in favour of <code>hidden: true</code>.</p>
-<pre>
-settings:
-- name: setting_name
-  hidden: true
-</pre>
+  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden: true</code></a>.</p>
 </div>
 
 ### `settings[*].label`
