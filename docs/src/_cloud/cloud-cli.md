@@ -42,6 +42,62 @@ The `delete` subcommand provides an interface to delete env vars:
 meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 ```
 
+## `deployment`
+
+The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
+
+Create a new deployment interactively:
+
+```sh
+meltano-cloud deployment create
+```
+
+Create a new deployment non-interactively:
+
+```sh
+meltano-cloud deployment create --name 'my-dev-deployment' --environment 'dev' --git-rev 'develop'
+```
+
+The above example creates a new deployment named `my-dev-deployment` for the Meltano environment named `dev`, using the `develop` branch of the project's git repository. Note that the Meltano environment name must match what is in `meltano.yml`.
+
+List deployments:
+
+```sh
+$ meltano-cloud deployment list
+╭───────────┬──────────┬───────────────┬───────────────────┬────────────────────┬───────────────────────╮
+│  Default  │ Name     │ Environment   │ Tracked Git Rev   │ Current Git Hash   │ Last Deployed (UTC)   │
+├───────────┼──────────┼───────────────┼───────────────────┼────────────────────┼───────────────────────┤
+│           │ prod     │ prod          │ main              │ 0fa3aab            │ 2023-05-30 16:52:44   │
+│     X     │ staging  │ staging       │ main              │ a3268dd            │ 2023-05-31 11:14:34   │
+│           │ 1234-xyz │ dev           │ feat/1234-xyz     │ d105f18            │ 2023-06-01 03:57:31   │
+╰───────────┴──────────┴───────────────┴───────────────────┴────────────────────┴───────────────────────╯
+```
+
+Delete a deployment:
+
+```sh
+meltano-cloud deployment delete --name 'my-dev-deployment'
+```
+
+Use a deployment as the default deployment for other commands:
+
+```sh
+meltano-cloud deployment use --name 'my-dev-deployment'
+```
+
+Selecting a default deployment can also be done interactively:
+
+```sh
+meltano-cloud deployment use
+```
+
+Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file.
+If you've made a change to your schedules configuration and would like them to be re-deployed to Meltano Cloud you can run the following:
+
+```sh
+meltano-cloud deployment update --name prod
+```
+
 ## `docs`
 
 Opens the Meltano Cloud documentation in the system browser.
