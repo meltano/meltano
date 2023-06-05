@@ -21,7 +21,7 @@ Waitlist members are added to Meltano Cloud on a rolling basis. You'll receive a
 ### Prereq #2: Provide access to your repo
 
 Click the following link to install the [Meltano Cloud GitHub App](https://github.com/apps/meltano-cloud) to your organization.
-When asked "Where do you want to install this app?" you _must_ select your GitHub organization, not your personal account.
+When asked "Where do you want to install this app?" you _must_ select either your GitHub organization or personal account depending on which contains the repository you wish to provide access.
 When asked which repositories to provide the app access to, select your GitHub project repo.
 
 If you do not yet have a Meltano project in GitHub, you can follow the steps in our [Getting Started](/getting-started) guide.

@@ -36,6 +36,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
       - id: end-of-file-fixer
+        exclude: ^.*/plugins/.*/*.\.lock$
       - id: check-yaml
       - id: check-json
       - id: pretty-format-json
