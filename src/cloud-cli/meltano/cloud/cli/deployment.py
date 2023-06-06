@@ -17,11 +17,11 @@ from slugify import slugify
 from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.types import CloudDeployment
 from meltano.cloud.cli.base import pass_context, run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
-    from meltano.cloud.api.types import CloudDeployment
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 DEFAULT_GET_DEPLOYMENTS_LIMIT = 125
@@ -138,12 +138,14 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         if response.status_code == HTTPStatus.NO_CONTENT:
             return None
         deployment = response.json()
-        return {
-            **deployment,  # type: ignore[misc]
-            "default": (
-                self.config.default_deployment_name == deployment["deployment_name"]
-            ),
-        }
+        return CloudDeployment(
+            {
+                **deployment,  # type: ignore[misc]
+                "default": (
+                    self.config.default_deployment_name == deployment["deployment_name"]
+                ),
+            },
+        )
 
     async def delete_deployment(self, deployment_name: str) -> None:
         """Use DELETE to delete a Meltano Cloud deployment.
