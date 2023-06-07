@@ -42,6 +42,10 @@ The `delete` subcommand provides an interface to delete env vars:
 meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 ```
 
+### Reserved Variables
+
+See the [reserved variables](/cloud/platform#reserved-variables) docs for more details on variables that are reserved for use by Meltano Cloud.
+
 ## `deployment`
 
 The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
