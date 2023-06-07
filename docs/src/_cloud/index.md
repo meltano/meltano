@@ -38,6 +38,9 @@ Meltano Cloud connects to an existing Meltano project in your GitHub repository,
     ```bash
     meltano init <INSERT_YOUR_PROJECT_NAME>
     ```
+
+    Commit your changes back to the GitHub repository.
+
 4. Add Sample Plugins and Schedules
 
     The following configuration snippet can be added to your `meltano.yml` file located in your new project directory.
@@ -82,8 +85,6 @@ You can find more details on each in the [Cloud Concepts](/cloud/concepts) docum
 - [Deployments](/cloud/concepts#meltano-cloud-deployments)
 - [Schedules](/cloud/concepts#meltano-cloud-schedules)
 - [Pipelines](/cloud/concepts#meltano-cloud-pipelines)
-
-INSERT INFO GRAPHIC
 
 ## Usage
 
