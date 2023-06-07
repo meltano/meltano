@@ -99,7 +99,7 @@ Running this command will verify that your project is connected and you're prope
 You should select a project to use as default for all commands.
 You can do this by running:
 ```console
-meltano-cloud project use <project name>
+meltano-cloud project use --name <project name>
 ```
 
 ### Step 4: Create deployments
