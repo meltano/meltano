@@ -109,13 +109,13 @@ In order for pipelines to run, they must have a [deployment](/cloud/concepts#mel
 To deploy a named [Meltano Environment](/concepts/environments) to Meltano Cloud, run the following [command](https://docs.meltano.com/cloud/cloud-cli#deployment):
 
 ```console
-meltano-cloud deployment create --name <deployment name> --environment-name <Meltano Environment name> --git-rev <the git revision to use for this deployment>
+meltano-cloud deployment create --name <deployment name> --environment <Meltano Environment name> --git-rev <the git revision to use for this deployment>
 ```
 
 For example, if you wanted to deploy the `prod` Meltano Environment as defined in your `meltano.yml` in the `main` branch of your git repo and you wanted the Meltano Cloud deployment to be named `production`,  you would run:
 
 ```console
-meltano-cloud deployment create --name production --environment-name prod --git-rev main
+meltano-cloud deployment create --name production --environment prod --git-rev main
 ```
 
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
