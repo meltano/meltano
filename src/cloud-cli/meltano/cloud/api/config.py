@@ -184,7 +184,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Returns:
             The internal project IDs found in the ID token.
         """
-        return {perm.split("::")[1] for perm in self._trks_and_pids}
+        # NOTE: The ID 00000000000000000000000000 is used as a placeholder
+        # within the Cognito custom attribute trk_and_pid, because the trk
+        # part is the only significant part.
+        ignore_ids = {"00000000000000000000000000"}
+        return {perm.split("::")[1] for perm in self._trks_and_pids} - ignore_ids
 
     @property
     def internal_project_id(self) -> str:
