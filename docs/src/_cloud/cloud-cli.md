@@ -95,11 +95,17 @@ Selecting a default deployment can also be done interactively:
 meltano-cloud deployment use
 ```
 
-Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file.
-If you've made a change to your schedules configuration and would like them to be re-deployed to Meltano Cloud you can run the following:
+Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file or changes to your tracked branch.
+If you've made a change to your schedules configuration or tracked branch and would like them to be re-deployed to Meltano Cloud you can run the following:
 
 ```sh
 meltano-cloud deployment update --name prod
+```
+
+You can then confirm the deployment is on the correct revision of your tracked branch by running the following:
+
+```sh
+meltano-cloud deployment list
 ```
 
 ## `docs`
