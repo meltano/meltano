@@ -173,8 +173,8 @@ If the catalog does not seem to take effect, you may need to [validate the capab
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs catalog %}
+{% tab catalog meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -183,7 +183,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab catalog config %}
 
 ```bash
 meltano config <extractor> set _catalog <path>
@@ -220,8 +220,8 @@ It is used as the default value for the [`target-postgres`](https://hub.meltano.
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs load_schema %}
+{% tab load_schema meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -230,7 +230,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab load_schema config %}
 
 ```bash
 meltano config <extractor> set _load_schema <schema>
@@ -271,8 +271,8 @@ Entity and attribute names can be discovered using [`meltano select --list --all
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs metadata %}
+{% tab metadata meltano.yml %}
 
 ```yaml{3-8}
 extractors:
@@ -286,7 +286,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab metadata config %}
 
 ```bash
 meltano config <extractor> set _metadata <entity> <key> <value>
@@ -334,8 +334,8 @@ This allows you to define a full schema for taps such as [`tap-dynamodb`](https:
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs schema %}
+{% tab schema meltano.yml %}
 
 ```yaml{3-7}
 extractors:
@@ -348,7 +348,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab schema config %}
 
 ```bash
 meltano config <extractor> set _schema <entity> <attribute> <schema description>
@@ -391,8 +391,8 @@ selection rules are typically specified using [`meltano select`](/reference/comm
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs select %}
+{% tab select meltano.yml %}
 
 ```yaml{3-5}
 extractors:
@@ -403,7 +403,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab select config %}
 
 ```bash
 meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
@@ -448,8 +448,8 @@ selection filers are typically specified using [`meltano elt`](/reference/comman
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs select_filter %}
+{% tab select_filter meltano.yml %}
 
 ```yaml{6-7}
 extractors:
@@ -462,7 +462,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab select_filter config %}
 
 ```bash
 meltano config <extractor> set _select_filter '["<entity>", ...]'
@@ -506,8 +506,8 @@ a state file is typically provided using [`meltano elt`](/reference/command-line
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs state %}
+{% tab state meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -516,7 +516,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab state config %}
 
 ```bash
 meltano config <extractor> set _state <path>
@@ -569,8 +569,8 @@ It is used as the default value for `dbt`'s `target` setting, and should therefo
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs dialect %}
+{% tab dialect meltano.yml %}
 
 ```yaml{3}
 loaders:
@@ -579,7 +579,7 @@ loaders:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab dialect config %}
 
 ```bash
 meltano config <loader> set _dialect <dialect>
@@ -615,8 +615,8 @@ It is used as the default value for `dbt`'s `source_schema` setting.
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs target_schema %}
+{% tab target_schema meltano.yml %}
 
 ```yaml{5}
 loaders:
@@ -627,7 +627,7 @@ loaders:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab target_schema config %}
 
 ```bash
 meltano config <loader> set _target_schema <schema>
@@ -687,8 +687,8 @@ It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRAN
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs package_name %}
+{% tab package_name meltano.yml %}
 
 ```yaml{4}
 transforms:
@@ -698,7 +698,7 @@ transforms:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab package_name config %}
 
 ```bash
 meltano config <transform> set _package_name <name>
@@ -730,8 +730,8 @@ Because these variables are handled by dbt rather than Meltano, [environment var
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs vars %}
+{% tab vars meltano.yml %}
 
 ```yaml
 {% raw %}
@@ -743,7 +743,7 @@ transforms:
 ```
 
 {% endtab %}
-{% tab cli config %}
+{% tab vars config %}
 
 ```bash
 {% raw %}
@@ -811,8 +811,8 @@ When a file path's value is `True`, the matching files are considered to be mana
 ##### How to use
 
 Manage this extra:
-{% tabs cli %}
-{% tab cli meltano.yml %}
+{% tabs update %}
+{% tab update meltano.yml %}
 
 ```yaml{3-4}
 files:
@@ -833,7 +833,7 @@ files:
 </div>
 
 {% endtab %}
-{% tab cli config %}
+{% tab update config %}
 
 ```bash
 meltano config <bundle> set _update <path> <true/false>
