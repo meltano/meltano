@@ -172,7 +172,9 @@ If the catalog does not seem to take effect, you may need to [validate the capab
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -180,7 +182,8 @@ extractors:
   catalog: extract/tap-gitlab.catalog.json
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _catalog <path>
@@ -195,7 +198,10 @@ meltano config tap-gitlab set _catalog extract/tap-gitlab.catalog.json
 export TAP_GITLAB__CATALOG=extract/tap-gitlab.catalog.json
 
 meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### <a name="load-schema-extra"></a>`load_schema` extra
 
@@ -213,7 +219,9 @@ It is used as the default value for the [`target-postgres`](https://hub.meltano.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -221,7 +229,8 @@ extractors:
   load_schema: gitlab_data
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _load_schema <schema>
@@ -232,7 +241,10 @@ export <EXTRACTOR>__LOAD_SCHEMA=<schema>
 meltano config tap-gitlab set _load_schema gitlab_data
 
 export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### `metadata` extra
 
@@ -258,7 +270,9 @@ Entity and attribute names can be discovered using [`meltano select --list --all
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3-8}
 extractors:
@@ -271,7 +285,8 @@ extractors:
         is-replication-key: true
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _metadata <entity> <key> <value>
@@ -289,7 +304,10 @@ meltano config tap-postgres set _metadata some_stream_id replication-key created
 meltano config tap-postgres set _metadata some_stream_id created_at is-replication-key true
 
 export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=FULL_TABLE
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### `schema` extra
 
@@ -315,7 +333,9 @@ This allows you to define a full schema for taps such as [`tap-dynamodb`](https:
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3-7}
 extractors:
@@ -327,7 +347,8 @@ extractors:
         format: date-time
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _schema <entity> <attribute> <schema description>
@@ -344,7 +365,10 @@ meltano config tap-postgres set _metadata some_stream_id created_at type '["stri
 meltano config tap-postgres set _metadata some_stream_id created_at format date-time
 
 export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### `select` extra
 
@@ -366,7 +390,9 @@ selection rules are typically specified using [`meltano select`](/reference/comm
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3-5}
 extractors:
@@ -376,7 +402,8 @@ extractors:
   - commits.*
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
@@ -392,7 +419,10 @@ export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
 
 meltano select tap-gitlab project_members "*"
 meltano select tap-gitlab commits "*"
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### <a name="select-filter-extra"></a>`select_filter` extra
 
@@ -417,7 +447,9 @@ selection filers are typically specified using [`meltano elt`](/reference/comman
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{6-7}
 extractors:
@@ -429,7 +461,8 @@ extractors:
   - commits
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _select_filter '["<entity>", ...]'
@@ -450,7 +483,10 @@ export TAP_GITLAB__SELECT_FILTER='["!project_members"]'
 
 meltano elt tap-gitlab target-jsonl --select commits
 meltano elt tap-gitlab target-jsonl --exclude project_members
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### `state` extra
 
@@ -469,7 +505,9 @@ a state file is typically provided using [`meltano elt`](/reference/command-line
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3}
 extractors:
@@ -477,7 +515,8 @@ extractors:
   state: extract/tap-gitlab.state.json
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <extractor> set _state <path>
@@ -492,7 +531,10 @@ meltano config tap-gitlab set _state extract/tap-gitlab.state.json
 export TAP_GITLAB__STATE=extract/tap-gitlab.state.json
 
 meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
+
 ```
+{% endtab %}
+{% endtabs %}
 
 ### Loaders
 
@@ -526,7 +568,9 @@ It is used as the default value for `dbt`'s `target` setting, and should therefo
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3}
 loaders:
@@ -534,7 +578,8 @@ loaders:
   dialect: example-db
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <loader> set _dialect <dialect>
@@ -545,7 +590,10 @@ export <LOADER>__DIALECT=<dialect>
 meltano config target-example-db set _dialect example-db
 
 export TARGET_EXAMPLE_DB__DIALECT=example-db
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### <a name="target-schema-extra"></a>`target_schema` extra
 
@@ -566,7 +614,9 @@ It is used as the default value for `dbt`'s `source_schema` setting.
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{5}
 loaders:
@@ -576,7 +626,8 @@ loaders:
   target_schema: $MELTANO_LOAD_DESTINATION_SCHEMA # Value of `destination_schema` setting
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <loader> set _target_schema <schema>
@@ -590,7 +641,10 @@ meltano config target-example-db set _target_schema '$MELTANO_LOAD_DESTINATION_S
 meltano config target-example-db set _target_schema explicit_target_schema
 
 export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
+
 ```
+{% endtab %}
+{% endtabs %}
 
 ### Transforms
 
@@ -632,7 +686,9 @@ It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRAN
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{4}
 transforms:
@@ -641,7 +697,8 @@ transforms:
   package_name: facebook_ads
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <transform> set _package_name <name>
@@ -652,7 +709,10 @@ export <TRANSFORM>__PACKAGE_NAME=<name>
 meltano config dbt-facebook-ads set _package_name facebook_ads
 
 export DBT_FACEBOOK_ADS__PACKGE_NAME=facebook_ads
+
 ```
+{% endtab %}
+{% endtabs %}
 
 #### `vars` extra
 
@@ -669,7 +729,9 @@ Because these variables are handled by dbt rather than Meltano, [environment var
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml
 {% raw %}
@@ -680,7 +742,8 @@ transforms:
 {% endraw %}
 ```
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 {% raw %}
@@ -693,7 +756,10 @@ meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('
 
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 {% endraw %}
+
 ```
+{% endtab %}
+{% endtabs %}
 ### Orchestrators
 
 <div class="notification is-warning">
@@ -744,7 +810,9 @@ When a file path's value is `True`, the matching files are considered to be mana
 
 ##### How to use
 
-Manage this extra directly in your [`meltano.yml` project file](project#meltano-yml-project-file):
+Manage this extra:
+{% tabs cli %}
+{% tab cli meltano.yml %}
 
 ```yaml{3-4}
 files:
@@ -764,7 +832,8 @@ files:
 </pre>
 </div>
 
-Alternatively, manage this extra using [`meltano config`](/reference/command-line-interface#config) or an [environment variable](/guide/configuration#configuring-settings):
+{% endtab %}
+{% tab cli config %}
 
 ```bash
 meltano config <bundle> set _update <path> <true/false>
@@ -776,7 +845,10 @@ meltano config --plugin-type=files dbt set _update transform/dbt_project.yml fal
 meltano config --plugin-type=files dbt set _update profiles/*.yml true
 
 export DBT__UPDATE='{"transform/dbt_project.yml": false, "profiles/*.yml": true}'
+
 ```
+{% endtab %}
+{% endtabs %}
 
 ### Utilities
 
