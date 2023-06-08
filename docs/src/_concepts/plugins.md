@@ -977,3 +977,4 @@ call mappings that leverage the same plugin at multiple locations numerous times
 # Mask the id if the customer is in the EU region using transform-field mapper.
 $ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
 ```
+<script src="/js/tabs.js"></script>
