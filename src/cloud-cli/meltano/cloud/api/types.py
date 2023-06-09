@@ -19,6 +19,7 @@ class CloudExecution(TypedDict):
     status: str
     exit_code: int
 
+    deployment_name: str
     environment_name: str
     schedule_name: str
     job_name: str
