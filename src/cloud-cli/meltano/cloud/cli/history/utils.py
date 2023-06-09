@@ -56,7 +56,7 @@ def process_table_row(row: CloudExecution) -> tuple[str, ...]:
     return (  # noqa: WPS227
         row["execution_id"],
         row["schedule_name"],
-        row["environment_name"],
+        row["deployment_name"],
         start_time.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S"),
         status,
         duration,
