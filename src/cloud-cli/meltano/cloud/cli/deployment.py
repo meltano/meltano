@@ -6,6 +6,7 @@ import asyncio
 import json
 import platform
 import typing as t
+from contextlib import contextmanager
 from datetime import datetime
 from http import HTTPStatus
 
@@ -26,6 +27,15 @@ if t.TYPE_CHECKING:
 
 DEFAULT_GET_DEPLOYMENTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
+
+
+@contextmanager
+def _raise_with_details():
+    try:
+        yield
+    except requests.HTTPError as ex:
+        if "detail" in ex.response.json():
+            raise click.ClickException(ex.response.json()["detail"]) from ex
 
 
 class DeploymentsCloudClient(MeltanoCloudClient):
@@ -388,7 +398,9 @@ async def create_deployment(
                 "Use `meltano cloud deployment update` to update an "
                 "existing Meltano Cloud deployment.",
             )
-        with yaspin(text="Creating deployment - this may take several minutes..."):
+        with yaspin(
+            text="Creating deployment - this may take several minutes...",
+        ), _raise_with_details():
             deployment = await client.update_deployment(
                 deployment_name=deployment_name,
                 environment_name=environment_name,
@@ -453,13 +465,14 @@ async def update_deployment(  # noqa: D103
                         "new Meltano Cloud deployment.",
                     ) from ex
                 raise
-            updated_deployment = await client.update_deployment(
-                deployment_name=deployment_name,
-                environment_name=existing_deployment["environment_name"],
-                git_rev=existing_deployment["git_rev"],
-                force=force,
-                preserve_git_hash=preserve_git_hash,
-            )
+            with _raise_with_details():
+                updated_deployment = await client.update_deployment(
+                    deployment_name=deployment_name,
+                    environment_name=existing_deployment["environment_name"],
+                    git_rev=existing_deployment["git_rev"],
+                    force=force,
+                    preserve_git_hash=preserve_git_hash,
+                )
     if updated_deployment is None:
         click.secho(
             (
@@ -497,5 +510,6 @@ async def delete_deployment(
                 raise click.ClickException(
                     f"Deployment {deployment_name!r} does not exist.",
                 )
-            await client.delete_deployment(deployment_name=deployment_name)
+            with _raise_with_details():
+                await client.delete_deployment(deployment_name=deployment_name)
     click.secho(f"Deleted deployment {slugify(deployment_name)!r}", fg="green")
