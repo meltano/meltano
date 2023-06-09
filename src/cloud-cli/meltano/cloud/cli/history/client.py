@@ -89,7 +89,7 @@ class HistoryClient(MeltanoCloudClient):
         Args:
             config: The meltano config to use
             schedule_filter: Used to filter the history by schedule name.
-            environment_filter: Used to filter the history by environment name.
+            deployment_filter: Used to filter the history by deployment name.
             result_filter: Used to filter the history by result.
             start_time: Used to filter the history by start time.
             limit: The maximum number of history items to return.
