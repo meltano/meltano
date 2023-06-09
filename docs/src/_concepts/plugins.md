@@ -176,14 +176,14 @@ Manage this extra:
 {% tabs catalog %}
 {% tab catalog meltano.yml %}
 
-```yaml{3}
+```yaml
 extractors:
 - name: tap-gitlab
   catalog: extract/tap-gitlab.catalog.json
 ```
 
 {% endtab %}
-{% tab catalog config %}
+{% tab catalog terminal %}
 
 ```bash
 meltano config <extractor> set _catalog <path>
@@ -223,14 +223,14 @@ Manage this extra:
 {% tabs load_schema %}
 {% tab load_schema meltano.yml %}
 
-```yaml{3}
+```yaml
 extractors:
 - name: tap-gitlab
   load_schema: gitlab_data
 ```
 
 {% endtab %}
-{% tab load_schema config %}
+{% tab load_schema terminal %}
 
 ```bash
 meltano config <extractor> set _load_schema <schema>
@@ -274,7 +274,7 @@ Manage this extra:
 {% tabs metadata %}
 {% tab metadata meltano.yml %}
 
-```yaml{3-8}
+```yaml
 extractors:
 - name: tap-postgres
   metadata:
@@ -286,7 +286,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab metadata config %}
+{% tab metadata terminal %}
 
 ```bash
 meltano config <extractor> set _metadata <entity> <key> <value>
@@ -337,7 +337,7 @@ Manage this extra:
 {% tabs schema %}
 {% tab schema meltano.yml %}
 
-```yaml{3-7}
+```yaml
 extractors:
 - name: tap-postgres
   schema:
@@ -348,7 +348,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab schema config %}
+{% tab schema terminal %}
 
 ```bash
 meltano config <extractor> set _schema <entity> <attribute> <schema description>
@@ -394,7 +394,7 @@ Manage this extra:
 {% tabs select %}
 {% tab select meltano.yml %}
 
-```yaml{3-5}
+```yaml
 extractors:
 - name: tap-gitlab
   select:
@@ -403,7 +403,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab select config %}
+{% tab select terminal %}
 
 ```bash
 meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
@@ -451,7 +451,7 @@ Manage this extra:
 {% tabs select_filter %}
 {% tab select_filter meltano.yml %}
 
-```yaml{6-7}
+```yaml
 extractors:
 - name: tap-gitlab
   select:
@@ -462,7 +462,7 @@ extractors:
 ```
 
 {% endtab %}
-{% tab select_filter config %}
+{% tab select_filter terminal %}
 
 ```bash
 meltano config <extractor> set _select_filter '["<entity>", ...]'
@@ -509,14 +509,14 @@ Manage this extra:
 {% tabs state %}
 {% tab state meltano.yml %}
 
-```yaml{3}
+```yaml
 extractors:
 - name: tap-gitlab
   state: extract/tap-gitlab.state.json
 ```
 
 {% endtab %}
-{% tab state config %}
+{% tab state terminal %}
 
 ```bash
 meltano config <extractor> set _state <path>
@@ -572,14 +572,14 @@ Manage this extra:
 {% tabs dialect %}
 {% tab dialect meltano.yml %}
 
-```yaml{3}
+```yaml
 loaders:
 - name: target-example-db
   dialect: example-db
 ```
 
 {% endtab %}
-{% tab dialect config %}
+{% tab dialect terminal %}
 
 ```bash
 meltano config <loader> set _dialect <dialect>
@@ -618,7 +618,7 @@ Manage this extra:
 {% tabs target_schema %}
 {% tab target_schema meltano.yml %}
 
-```yaml{5}
+```yaml
 loaders:
 - name: target-example-db
   settings:
@@ -627,7 +627,7 @@ loaders:
 ```
 
 {% endtab %}
-{% tab target_schema config %}
+{% tab target_schema terminal %}
 
 ```bash
 meltano config <loader> set _target_schema <schema>
@@ -690,7 +690,7 @@ Manage this extra:
 {% tabs package_name %}
 {% tab package_name meltano.yml %}
 
-```yaml{4}
+```yaml
 transforms:
 - name: dbt-facebook-ads
   namespace: tap_facebook
@@ -698,7 +698,7 @@ transforms:
 ```
 
 {% endtab %}
-{% tab package_name config %}
+{% tab package_name terminal %}
 
 ```bash
 meltano config <transform> set _package_name <name>
@@ -743,7 +743,7 @@ transforms:
 ```
 
 {% endtab %}
-{% tab vars config %}
+{% tab vars terminal %}
 
 ```bash
 {% raw %}
@@ -814,7 +814,7 @@ Manage this extra:
 {% tabs update %}
 {% tab update meltano.yml %}
 
-```yaml{3-4}
+```yaml
 files:
 - name: dbt
   update:
@@ -833,7 +833,7 @@ files:
 </div>
 
 {% endtab %}
-{% tab update config %}
+{% tab update terminal %}
 
 ```bash
 meltano config <bundle> set _update <path> <true/false>
