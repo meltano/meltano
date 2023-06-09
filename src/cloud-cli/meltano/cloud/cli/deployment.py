@@ -29,13 +29,24 @@ DEFAULT_GET_DEPLOYMENTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
 
 
+def _safe_get_response_json_dict(response: requests.Response) -> dict:
+    try:
+        response_json = response.json()
+    except json.JSONDecodeError:
+        return {}
+    if isinstance(response_json, dict):
+        return response_json
+    return {}
+
+
 @contextmanager
 def _raise_with_details():
     try:
         yield
     except requests.HTTPError as ex:
-        if "detail" in ex.response.json():
+        if "detail" in _safe_get_response_json_dict(ex.response):
             raise click.ClickException(ex.response.json()["detail"]) from ex
+        raise
 
 
 class DeploymentsCloudClient(MeltanoCloudClient):
