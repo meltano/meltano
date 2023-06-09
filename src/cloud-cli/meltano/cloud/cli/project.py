@@ -242,6 +242,11 @@ class ProjectChoicesQuestionaryOption(click.Option):
             ),
             {"project_name": None},
         )["project_name"]
+        if not context.projects:
+            raise click.ClickException(
+                "No Meltano Cloud projects available to use. Please create a "
+                "project before running 'meltano cloud project use'.",
+            )
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud project",
