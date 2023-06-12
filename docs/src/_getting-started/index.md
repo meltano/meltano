@@ -678,7 +678,20 @@ loaders:
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
 
-1. Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+1. The simplest way to configure a new plugin in Meltano is using `interactive`:
+
+   ```bash
+   meltano config <plugin> set --interactive
+
+   # For example:
+   meltano config target-postgres set --interactive
+   ```
+
+Follow the prompts to step through all available settings, or select an individual setting to configure.
+
+You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
+
+- Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
    ```bash
    meltano config <plugin> list
@@ -687,7 +700,7 @@ loaders:
    meltano config target-postgres list
    ```
 
-1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
    ```bash
    meltano config <plugin> set <setting> <value>
