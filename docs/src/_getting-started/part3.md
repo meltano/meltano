@@ -81,6 +81,21 @@ Installed 1/1 plugins
 
 </div>
 
+## Initialize dbt
+
+Next you can run the `initialize` command to have the transformer utility populate the project scaffold for dbt.
+
+<div class="termy">
+
+```console
+$ meltano invoke dbt-postgres:initialize
+2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
+creating dbt profiles directory path=PosixPath('/[...]/my-meltano-project/transform/profiles/postgres')
+dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath('/[...]/my-meltano-project/transform/profiles/postgres') dbt_project_dir=PosixPath('/[...]/my-meltano-project/transform')
+```
+
+</div>
+
 <br />
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
 
