@@ -151,7 +151,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 "executable",
                 "capabilities",
                 "settings_group_validation",
-            ]
+            ],
         )
 
         # If no variant is set, we fall back on the default
@@ -179,7 +179,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         if "profiles" in extras:
             logger.warning(
                 "Plugin configuration profiles are no longer supported, ignoring "
-                f"`profiles` in '{name}' {plugin_type.descriptor} definition."
+                f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
             )
 
     @property

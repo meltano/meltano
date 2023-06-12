@@ -44,16 +44,23 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 
 
 @click.group(
-    cls=NoWindowsGlobbingGroup, invoke_without_command=True, no_args_is_help=True
+    cls=NoWindowsGlobbingGroup,
+    invoke_without_command=True,
+    no_args_is_help=True,
 )
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option(
-    "--log-config", type=str, help="Path to a python logging yaml config file."
+    "--log-config",
+    type=str,
+    help="Path to a python logging yaml config file.",
 )
 @click.option("-v", "--verbose", count=True, help="Not used.")
 @click.option("--environment", help="Meltano environment name.")
 @click.option(
-    "--no-environment", is_flag=True, default=False, help="Don't use any environment."
+    "--no-environment",
+    is_flag=True,
+    default=False,
+    help="Don't use any environment.",
 )
 @click.option(
     "--cwd",
@@ -97,7 +104,7 @@ def cli(  # noqa: C901,WPS231
         except OSError as ex:
             raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
 
-    try:  # noqa: WPS229
+    try:
         project = Project.find()
         setup_logging(project)
         if project.readonly:
@@ -127,7 +134,7 @@ def cli(  # noqa: C901,WPS231
         )
         click.echo(
             "For more details, visit "
-            "https://docs.meltano.com/guide/installation#upgrading-meltano-version"
+            "https://docs.meltano.com/guide/installation#upgrading-meltano-version",
         )
         sys.exit(3)
 

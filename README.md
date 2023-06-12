@@ -1,6 +1,6 @@
 
-<h1 align="center">Meltano - Your CLI for ELT+</h1>
-<h3 align="center">Open source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love.</h3>
+<h1 align="center">Meltano - Extract & Load /with joy/</h1>
+<h3 align="center">CLI & version control for ELT without limitations. No more black box. Let your creativity flow.</h3>
 
 <div align="center">
 <a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
@@ -10,7 +10,17 @@
 
 ---
 
-![Meltano Logo](https://user-images.githubusercontent.com/11428666/215905636-073eee14-b368-4e62-89c9-9d3d41bda7fd.png)
+</br>
+
+<div align="center">
+  <picture align="center">
+    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/5394188/228290090-d8a1bfe4-988e-49ef-9f2f-a86f2b014536.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg">
+  <img alt="Meltano Logo" src="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg" width="800"/>
+  </picture>
+</div>
+
+</br>
 
 <div align="center">
 <a href="https://docs.meltano.com/">
@@ -51,16 +61,10 @@
 </a>
 </div>
 
----
-
-Welcome to your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love.
-
-If you're a fan, star the repo ⭐️. For every ⭐ on GitHub removes 2 lb/~1 kg of trash from our waterways 🌊.
-
 Integrations
 ------------
 
-[MeltanoHub](https://hub.meltano.com/) is the single source of truth to find any Meltano plugins as well as [Singer](https://singer.io/) taps and targets. Users are also able to add more plugins to the Hub and have them immediately discoverable and usable within Meltano. The Hub is lovingly curated by Meltano and the wider Meltano community.
+[Meltano Hub](https://hub.meltano.com/) is the single source of truth to find any Meltano plugins as well as [Singer](https://singer.io/) taps and targets. Users are also able to add more plugins to the Hub and have them immediately discoverable and usable within Meltano. The Hub is lovingly curated by Meltano and the wider Meltano community.
 
 Installation
 ------------

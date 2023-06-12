@@ -87,7 +87,7 @@ class MockAdapter(BaseAdapter):
                         "ref": (
                             f"{api_url}/plugins/{plugin_type}/"
                             f"{plugin_name}--{variant_name}"
-                        )
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -108,7 +108,7 @@ class MockAdapter(BaseAdapter):
                         "ref": (
                             f"{api_url}/plugins/{plugin_type}/"
                             f"{plugin_name}--{variant_name}"
-                        )
+                        ),
                     }
 
                     plugin_key = f"/{plugin_type}/{plugin_name}--{variant_name}"
@@ -152,19 +152,22 @@ class MockAdapter(BaseAdapter):
             "logo_url": "https://mock.meltano.com/this-returns-500.png",
             "variants": {
                 "original": {
-                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original"
-                }
+                    "ref": f"{api_url}/plugins/extractors/this-returns-500--original",
+                },
             },
         }
 
     def send(
         self,
         request: requests.PreparedRequest,
-        stream: bool = False,
-        timeout: float | tuple[float, float] | tuple[float, None] | None = None,
-        verify: bool | str = True,
-        cert: t.Any | None = None,
-        proxies: abc.Mapping[str, str] | None = None,
+        stream: bool = False,  # noqa: ARG002
+        timeout: float  # noqa: ARG002, WPS320
+        | tuple[float, float]
+        | tuple[float, None]
+        | None = None,
+        verify: bool | str = True,  # noqa: ARG002
+        cert: t.Any | None = None,  # noqa: ARG002
+        proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
 
@@ -193,7 +196,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mount_meltano_hub_mock_adapter(project: Project, discovery):
+def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
     project.hub_service.session.mount(
         project.hub_service.hub_api_url,
         MockAdapter(project.hub_service.hub_api_url, discovery),
@@ -206,10 +209,10 @@ def hub_endpoints(project: Project):
     return adapter._mapping
 
 
-@pytest.fixture
+@pytest.fixture()
 def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
-        project.hub_service.hub_api_url
+        project.hub_service.hub_api_url,
     ).count
     counter.clear()
     return counter

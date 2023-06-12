@@ -34,8 +34,11 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
 
     EXTRA_SETTINGS = [
         SettingDefinition(
-            name="_update", kind=SettingKind.OBJECT, aliases=["update"], value={}
-        )
+            name="_update",
+            kind=SettingKind.OBJECT,
+            aliases=["update"],
+            value={},
+        ),
     ]
 
     def is_invokable(self) -> bool:
@@ -99,7 +102,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
                     f"#     meltano config --plugin-type={self.type} "
                     f"{self.name} set _update {relative_path} false"
                 ),
-            )
+            ),
         )
 
     def project_file_contents(
@@ -193,16 +196,17 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
                 return relative_path
 
             logger.info(
-                f"File {str(relative_path)!r} already exists, keeping both versions"
+                f"File {str(relative_path)!r} already exists, keeping both versions",
             )
             return relative_path.with_name(
-                f"{relative_path.stem} ({self.name}){relative_path.suffix}"
+                f"{relative_path.stem} ({self.name}){relative_path.suffix}",
             )
 
         return {
             rename_if_exists(relative_path): content
             for relative_path, content in self.project_file_contents(
-                project, paths_to_update
+                project,
+                paths_to_update,
             ).items()
         }
 
@@ -244,7 +248,8 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         return self.write_files(
             project,
             self.files_to_create(
-                project, [] if paths_to_update is None else paths_to_update
+                project,
+                [] if paths_to_update is None else paths_to_update,
             ),
         )
 
@@ -265,7 +270,8 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         return self.write_files(
             project,
             self.files_to_update(
-                project, [] if paths_to_update is None else paths_to_update
+                project,
+                [] if paths_to_update is None else paths_to_update,
             ),
         )
 
@@ -284,7 +290,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
             reason: The reason for the installation.
         """
         update_config = PluginSettingsService(install_service.project, plugin).get(
-            "_update"
+            "_update",
         )
         paths_to_update = [
             path for path, to_update in update_config.items() if to_update
@@ -305,5 +311,5 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         else:
             logger.info(
                 "Run `meltano upgrade files` to update your project's "
-                f"{plugin.name!r} files."
+                f"{plugin.name!r} files.",
             )

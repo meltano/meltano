@@ -1,0 +1,7 @@
+# This config file extends the shared Meltano GitHub org stale bot config:
+# https://github.com/meltano/.github/blob/main/.github/stale.yml
+
+_extends: .github
+
+# In most cases, this file should not be updated.
+# Updates to the stale bot config should be shared by all Meltano GitHub repositories.

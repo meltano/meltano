@@ -8,7 +8,6 @@ from pathlib import Path
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.environment import Environment
@@ -21,7 +20,11 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Compile a Meltano manifest. (beta)")
+@click.command(
+    "compile",
+    cls=InstrumentedCmd,
+    short_help="Compile a Meltano manifest. (beta)",
+)
 @click.option(
     "--directory",
     default=".meltano/manifests",
@@ -49,7 +52,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def compile(  # noqa: WPS125
+def compile_command(
     project: Project,
     ctx: click.Context,
     directory: Path,
@@ -69,14 +72,14 @@ def compile(  # noqa: WPS125
         directory.mkdir(parents=True, exist_ok=True)
     except OSError as ex:
         raise CliError(
-            f"Unable to create directory for Meltano manifests {directory}: {ex}"
+            f"Unable to create directory for Meltano manifests {directory}: {ex}",
         ) from ex
 
     environments = _environments(ctx, project)
 
     click.echo(
         "Compiling Meltano manifest for environments: "
-        + ", ".join("no environment" if x is None else x.name for x in environments)
+        + ", ".join("no environment" if x is None else x.name for x in environments),
     )
     for environment in environments:
         path = directory / (
@@ -96,7 +99,7 @@ def compile(  # noqa: WPS125
                 )
         except OSError as ex:
             raise CliError(
-                f"Unable to write Meltano manifest {str(path)!r}: {ex}"
+                f"Unable to write Meltano manifest {str(path)!r}: {ex}",
             ) from ex
 
         click.echo(f"Compiled {path}")
@@ -112,7 +115,8 @@ def _environments(
     if ctx.obj["selected_environment"] and not ctx.obj["is_default_environment"]:
         return (
             Environment.find(
-                project.meltano.environments, ctx.obj["selected_environment"]
+                project.meltano.environments,
+                ctx.obj["selected_environment"],
             ),
         )
     return (None, *EnvironmentService(project).list_environments())

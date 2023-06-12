@@ -71,7 +71,8 @@ class ExtractorTestService(PluginTestService):
 
         try:
             process = await self.plugin_invoker.invoke_async(
-                stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.STDOUT,
             )
         except Exception as exc:
             return False, str(exc)

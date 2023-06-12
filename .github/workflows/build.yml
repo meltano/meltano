@@ -6,14 +6,19 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write  # Needed to upload artifacts to the release
+  id-token: write  # Needed for OIDC PyPI publishing
+
 jobs:
   build:
     name: Build artifacts
     runs-on: ubuntu-latest
+    environment: publishing
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -23,7 +28,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.5.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: 3.9
         architecture: x64
@@ -72,9 +77,10 @@ jobs:
     name: Publish to PyPI
     needs: [build]
     runs-on: ubuntu-latest
+    environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3.5.2
 
     - name: Download artifacts
       uses: actions/download-artifact@v3.0.2
@@ -98,11 +104,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.8.1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_SECRET_TOKEN }}
-        packages_dir: dist/
-        ## Test PyPI can be used here
-        # password: ${{ secrets.TEST_PYPI_TOKEN }}
-        # repository_url: https://test.pypi.org/legacy/
+      uses: pypa/gh-action-pypi-publish@v1.8.6

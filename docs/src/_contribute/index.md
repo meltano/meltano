@@ -11,7 +11,7 @@ Thank you for your interest in contributing! Meltano is built for and by its com
 
 ## Code of Conduct
 
-Before getting started, please make sure you review our Code of Conduct. Everyone interacting in Slack, codebases, issue trackers, mailing lists, events, or other Meltano activities is expected to follow [this code of conduct](https://www.python.org/psf/conduct/). If you are unable to abide by the code of conduct set forth here, we encourage you not to participate in the community. If you see a violation please notify us by messaging `@Amanda Folson` on Slack.
+Before getting started, please make sure you review our Code of Conduct. Everyone interacting in Slack, codebases, issue trackers, mailing lists, events, or other Meltano activities is expected to follow [this code of conduct](https://www.python.org/psf/conduct/). If you are unable to abide by the code of conduct set forth here, we encourage you not to participate in the community. If you see a violation please notify us by messaging `@Sven Balnojan` on Slack.
 
 ## Ways to Contribute
 

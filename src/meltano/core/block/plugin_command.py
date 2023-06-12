@@ -135,7 +135,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         if exitcode:
             command = self.command or self.command_args[0]
             raise RunnerError(
-                f"`{self.name} {command}` failed with exit code: {exitcode}"
+                f"`{self.name} {command}` failed with exit code: {exitcode}",
             )
 
 

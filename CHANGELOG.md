@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.19.1 (2023-06-02)
+
+### 🐛 Fixes
+
+- [#7644](https://github.com/meltano/meltano/issues/7644) Install schedule elt style and mappings
+- [#7636](https://github.com/meltano/meltano/issues/7636) Print a clearer message when `meltano.yml` is empty -- _**Thanks @rawwar!**_
+
+### 📚 Documentation Improvements
+
+- [#7732](https://github.com/meltano/meltano/issues/7732) Update Meltano Cloud GitHub App Installation Docs
+- [#7717](https://github.com/meltano/meltano/issues/7717) Update onboarding docs
+- [#7724](https://github.com/meltano/meltano/issues/7724) Add Cloud CLI docs for `deployment` command
+- [#7722](https://github.com/meltano/meltano/issues/7722) Add credit pricing, clarify expiration
+- [#7713](https://github.com/meltano/meltano/issues/7713) Spelling oopsie -- _**Thanks @visch!**_
+- [#7706](https://github.com/meltano/meltano/issues/7706) Add egress pricing and Credit expiration (after 1 year of non-use) to Cloud Fees
+- [#7703](https://github.com/meltano/meltano/issues/7703) Correct name of meltano-map-transformer in add command -- _**Thanks @mjsqu!**_
+- [#7702](https://github.com/meltano/meltano/issues/7702) Fix typo in `docs/src/_guide/integration.md` -- _**Thanks @burmecia!**_
+- [#7694](https://github.com/meltano/meltano/issues/7694) Add cloud python version
+- [#7678](https://github.com/meltano/meltano/issues/7678) Refresh getting started guide
+- [#7630](https://github.com/meltano/meltano/issues/7630) Add details on platinum connectors
+- [#7639](https://github.com/meltano/meltano/issues/7639) Promote `pipx` to install Meltano
+
+## v2.19.0 (2023-05-02)
+
+### ✨ New
+
+- [#7609](https://github.com/meltano/meltano/issues/7609) Support arm64 Meltano Docker image -- _**Thanks @space192!**_
+- [#7594](https://github.com/meltano/meltano/issues/7594) Install plugins using schedule name
+
+## v2.18.0 (2023-04-25)
+
+### ✨ New
+
+- [#7555](https://github.com/meltano/meltano/issues/7555) Add docs command
+- [#7097](https://github.com/meltano/meltano/issues/7097) Feature flag to disable calls to Hub and `discovery.yml` outside of `add` and `discover`
+
+### 🐛 Fixes
+
+- [#7537](https://github.com/meltano/meltano/issues/7537) Add correct type for state_backend lock settings
+
+### 📚 Documentation Improvements
+
+- [#7585](https://github.com/meltano/meltano/issues/7585) Updates for Meltano Cloud GitHub App permissions and remove Alpha references
+- [#7582](https://github.com/meltano/meltano/issues/7582) Include fix for git+ssh urls with colons -- _**Thanks @acarter24!**_
+- [#7579](https://github.com/meltano/meltano/issues/7579) Change "meltano cloud" to "meltano-cloud" during Beta
+- [#7571](https://github.com/meltano/meltano/issues/7571) Remove dead link to GitLab container registry -- _**Thanks @longtomjr!**_
+- [#7566](https://github.com/meltano/meltano/issues/7566) Remove references to --include-related -- _**Thanks @msardana94!**_
+- [#7545](https://github.com/meltano/meltano/issues/7545) Update link to Meltano dbt Jaffle shop example -- _**Thanks @flexponsive!**_
+- [#7482](https://github.com/meltano/meltano/issues/7482) Add the Matatika GitHub Analytics project to the example projects page -- _**Thanks @DanielPDWalker!**_
+
+## v2.17.1 (2023-04-04)
+
+### 🐛 Fixes
+
+- [#7403](https://github.com/meltano/meltano/issues/7403) Print right variant name in instructions to switch a plugin variant
+- [#7399](https://github.com/meltano/meltano/issues/7399) Display the right message when adding a new variant of an existing plugin
+
+### 📚 Documentation Improvements
+
+- [#7469](https://github.com/meltano/meltano/issues/7469) Add Cloud Fees stub
+- [#7466](https://github.com/meltano/meltano/issues/7466) Yaml snippets for Cloud quickstart
+- [#7462](https://github.com/meltano/meltano/issues/7462) Update Cloud onboarding docs
+- [#7457](https://github.com/meltano/meltano/issues/7457) Change link color from pink to blue
+- [#7452](https://github.com/meltano/meltano/issues/7452) Fix two broken links to example repo
+- [#7450](https://github.com/meltano/meltano/issues/7450) Update branding
+- [#7433](https://github.com/meltano/meltano/issues/7433) Document incremental replication support
+- [#7428](https://github.com/meltano/meltano/issues/7428) Add Cloud Docs
+- [#7394](https://github.com/meltano/meltano/issues/7394) Add mappers docs guide
+- [#7385](https://github.com/meltano/meltano/issues/7385) Redirect for dbt migration guide
+
 ## v2.17.0 (2023-03-14)
 
 ### ✨ New

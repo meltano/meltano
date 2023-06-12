@@ -7,9 +7,8 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import PartialInstrumentedCmd
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_lock_service import (
     LockfileAlreadyExistsError,
@@ -27,7 +26,7 @@ __all__ = ["lock"]
 logger = structlog.get_logger(__name__)
 
 
-@cli.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
+@click.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
 @click.option(
     "--all",
     "all_plugins",
@@ -64,8 +63,9 @@ def lock(
         raise CliError("Exactly one of --all or plugin name must be specified.")
 
     try:
-        # Make it a list so source preference is not lazily evaluated.
-        plugins = list(project.plugins.plugins())
+        with project.plugins.use_preferred_source(DefinitionSource.ANY):
+            # Make it a list so source preference is not lazily evaluated.
+            plugins = list(project.plugins.plugins())
     except Exception:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -91,7 +91,8 @@ def lock(
             click.secho(f"{descriptor.capitalize()} is a custom plugin", fg="yellow")
         elif plugin.inherit_from is not None:
             click.secho(
-                f"{descriptor.capitalize()} is an inherited plugin", fg="yellow"
+                f"{descriptor.capitalize()} is an inherited plugin",
+                fg="yellow",
             )
         else:
             plugin.parent = None

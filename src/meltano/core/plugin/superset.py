@@ -55,7 +55,11 @@ class Superset(BasePlugin):
         return {"config": "superset_config.py"}
 
     @hook("before_configure")
-    async def before_configure(self, invoker: SupersetInvoker, session):  # noqa: WPS217
+    async def before_configure(
+        self,
+        invoker: SupersetInvoker,
+        session,  # noqa: ARG002
+    ):  # noqa: WPS217
         """Write plugin configuration to superset_config.py.
 
         Args:
@@ -91,13 +95,13 @@ class Superset(BasePlugin):
                         "for key in dir(custom_config):",
                         "    if key.isupper():",
                         "        setattr(module, key, getattr(custom_config, key))",
-                    ]
+                    ],
                 )
 
                 logger.info(f"Merged in config from {custom_config_path}")
             else:
                 raise PluginExecutionError(
-                    f"Could not find config file {custom_config_path}"
+                    f"Could not find config file {custom_config_path}",
                 )
 
         config_path = invoker.files["config"]
@@ -106,7 +110,11 @@ class Superset(BasePlugin):
         logging.debug(f"Created configuration at {config_path}")
 
     @hook("before_invoke")
-    async def db_upgrade_hook(self, invoker: PluginInvoker, exec_args: list[str]):
+    async def db_upgrade_hook(
+        self,
+        invoker: PluginInvoker,
+        exec_args: list[str],  # noqa: ARG002
+    ):
         """Create or upgrade metadata database.
 
         Args:
@@ -136,7 +144,11 @@ class Superset(BasePlugin):
         logging.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
-    async def init_hook(self, invoker: PluginInvoker, exec_args: list[str]):
+    async def init_hook(
+        self,
+        invoker: PluginInvoker,
+        exec_args: list[str],  # noqa: ARG002
+    ):
         """Create default roles and permissions.
 
         Args:

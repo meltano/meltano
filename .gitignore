@@ -126,7 +126,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.env.dev
+.env.*
 
 # Spyder project settings
 .spyderproject
@@ -166,3 +166,6 @@ setup.py
 
 # Ruff
 .ruff_cache/
+
+# Flakeheaven
+.flakeheaven_cache/

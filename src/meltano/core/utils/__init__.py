@@ -242,9 +242,24 @@ def nest_object(flat_object):
     return obj
 
 
-def to_env_var(*xs):
-    xs = [re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x]
-    return "_".join(xs)
+def to_env_var(*xs: str) -> str:
+    """Convert a list of strings to an environment variable name.
+
+    Args:
+        *xs: the strings to convert
+
+    Returns:
+        The environment variable name.
+
+    Examples:
+        >>> to_env_var("foo", "bar")
+        'FOO_BAR'
+        >>> to_env_var("foo", "bar", "baz")
+        'FOO_BAR_BAZ'
+        >>> to_env_var("foo.bar")
+        'FOO_BAR'
+    """
+    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
 def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
@@ -385,7 +400,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
 def makedirs(func):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
-        enabled = kwargs.get("make_dirs", True)
+        enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs)
 
@@ -523,7 +538,7 @@ def expand_env_vars(
             val = str(env[var])
         except KeyError as ex:
             logger.debug(
-                f"Variable '${var}' is not set in the provided env dictionary."
+                f"Variable '${var}' is not set in the provided env dictionary.",
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
@@ -625,7 +640,7 @@ def format_exception(exception: BaseException) -> str:
         had it been raised and not caught.
     """
     return "".join(
-        traceback.format_exception(type(exception), exception, exception.__traceback__)
+        traceback.format_exception(type(exception), exception, exception.__traceback__),
     )
 
 
@@ -744,11 +759,14 @@ default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
     MergeStrategy(
         t.Mapping,
         lambda x, k, v, s: setitem(
-            x, k, _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s)
+            x,
+            k,
+            _deep_merge(x.setdefault(k, v.__class__()), v, strategies=s),
         ),
     ),
     MergeStrategy(
-        Extendable, lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v)
+        Extendable,
+        lambda x, k, v, _: x.setdefault(k, v.__class__()).extend(v),
     ),
     MergeStrategy(object, lambda x, k, v, _: setitem(x, k, v)),
 )
@@ -814,7 +832,19 @@ def remove_suffix(string: str, suffix: str) -> str:
 
 _filename_restriction_pattern = re.compile(r"[^\w.-]")
 _reserved_windows_filenames = frozenset(
-    ("AUX", "COM1", "COM2", "COM3", "COM4", "CON", "LPT1", "LPT2", "LPT3", "NUL", "PRN")
+    (
+        "AUX",
+        "COM1",
+        "COM2",
+        "COM3",
+        "COM4",
+        "CON",
+        "LPT1",
+        "LPT2",
+        "LPT3",
+        "NUL",
+        "PRN",
+    ),
 )
 _sanitize_filename_transformations = (
     # Normalize unicode data in the string:

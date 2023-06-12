@@ -57,9 +57,9 @@ def _meltanofile_update_dict(
                     {
                         "name": plugin_name,
                         "config": {"from": "environment_level_plugin_config"},
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         }
     if environment_level_env:
         environment["env"] = {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"}
@@ -70,11 +70,11 @@ def _meltanofile_update_dict(
                     {
                         "name": plugin_name,
                         "env": {
-                            "TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env"  # noqa: E501
+                            "TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_plugin_env",  # noqa: E501
                         },
-                    }
-                ]
-            }
+                    },
+                ],
+            },
         }
     if environment_level_plugin_config_indirected:
         environment.update(
@@ -85,14 +85,14 @@ def _meltanofile_update_dict(
                             {
                                 "name": plugin_name,
                                 "config": {"from": "$INDIRECTED_ENV_VAR"},
-                            }
-                        ]
-                    }
+                            },
+                        ],
+                    },
                 },
                 "env": {
-                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indirected"
+                    "INDIRECTED_ENV_VAR": "environment_level_plugin_config_indirected",
                 },
-            }
+            },
         )
     return {
         "plugins": {"utilities": [utility]},
@@ -142,7 +142,9 @@ _env_var_resolution_expectations = {
     "08 Environment-level env": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
-            top_level_env=True, top_level_plugin_env=True, environment_level_env=True
+            top_level_env=True,
+            top_level_plugin_env=True,
+            environment_level_env=True,
         ),
     ),
     "09 Environment-level Plugin env": EnvVarResolutionExpectation(
@@ -181,7 +183,8 @@ _env_var_resolution_expectations = {
     "13 Top-level plugin setting": EnvVarResolutionExpectation(
         {"TEST_ENV_VAR_RESOLUTION_FROM": "environment_level_env"},
         _meltanofile_update_dict(
-            environment_level_env=True, top_level_plugin_setting=True
+            environment_level_env=True,
+            top_level_plugin_setting=True,
         ),
     ),
     "14 Set in top-level plugin config": EnvVarResolutionExpectation(
@@ -220,18 +223,18 @@ class TestEnvVarResolution:
         [tuple(x) for x in _env_var_resolution_expectations.values()],
         ids=_env_var_resolution_expectations.keys(),
     )
+    @pytest.mark.usefixtures("cli_runner")
     def test_env_var_resolution(
         self,
         expected_env_values,
         meltanofile_updates,
         terminal_env,
-        cli_runner,
         project,
         monkeypatch,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         for key, val in terminal_env.items():
@@ -244,11 +247,7 @@ class TestEnvVarResolution:
             (
                 "meltano",
                 "invoke",
-                *(
-                    arg
-                    for key in expected_env_values.keys()
-                    for arg in ("--print-var", key)
-                ),
+                *(arg for key in expected_env_values for arg in ("--print-var", key)),
                 "test-env-var-resolution",
             ),
             text=True,
@@ -273,7 +272,7 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
                             "namespace": "test_environment_inheritance",
                             "executable": "pwd",
                             "env": {"STACKED": "${STACKED}4"},
-                        }
+                        },
                     ],
                 },
                 "environments": [
@@ -286,11 +285,11 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
                                     {
                                         "name": "test-environment-inheritance",
                                         "env": {"STACKED": "${STACKED}5"},
-                                    }
-                                ]
-                            }
+                                    },
+                                ],
+                            },
                         },
-                    }
+                    },
                 ],
             },
         )
@@ -308,7 +307,9 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
 
 
 def test_environment_variable_inheritance_meltano_env_only(
-    cli_runner, project, monkeypatch
+    cli_runner,
+    project,
+    monkeypatch,
 ):
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
@@ -320,7 +321,7 @@ def test_environment_variable_inheritance_meltano_env_only(
                             "name": "test-environment-inheritance",
                             "namespace": "test_environment_inheritance",
                             "executable": "pwd",
-                        }
+                        },
                     ],
                 },
                 "environments": [
@@ -346,7 +347,8 @@ def test_environment_variable_inheritance_meltano_env_only(
 
 def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
     project.settings.set(
-        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+        True,
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())
@@ -370,7 +372,8 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
 
 def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
     project.settings.set(
-        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True
+        [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
+        True,
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())

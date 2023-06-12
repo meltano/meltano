@@ -12,10 +12,11 @@ from meltano.core.project import Project
 
 
 class TestCliConfig:
-    def test_config(self, project: Project, cli_runner, tap):
+    @pytest.mark.usefixtures("project")
+    def test_config(self, cli_runner, tap):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["config", tap.name])
         assert_cli_runner(result)
@@ -23,24 +24,27 @@ class TestCliConfig:
         json_config = json.loads(result.stdout)
         assert json_config["test"] == "mock"
 
-    def test_config_extras(self, project: Project, cli_runner, tap):
+    @pytest.mark.usefixtures("project")
+    def test_config_extras(self, cli_runner, tap):
         result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
         assert_cli_runner(result)
 
         json_config = json.loads(result.stdout)
         assert "_select" in json_config
 
-    def test_config_env(self, project: Project, cli_runner, tap):
+    @pytest.mark.usefixtures("project")
+    def test_config_env(self, cli_runner, tap):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
         assert_cli_runner(result)
 
         assert "TAP_MOCK_TEST='mock'" in result.stdout
 
-    def test_config_meltano(self, project: Project, cli_runner, engine_uri):
+    @pytest.mark.usefixtures("project")
+    def test_config_meltano(self, cli_runner, engine_uri):
         result = cli_runner.invoke(cli, ["config", "meltano"])
         assert_cli_runner(result)
 
@@ -48,9 +52,11 @@ class TestCliConfig:
         assert json_config["database_uri"] == engine_uri
         assert json_config["cli"]["log_level"] == "info"
 
-    def test_config_meltano_set(self, project: Project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_config_meltano_set(self, cli_runner):
         result = cli_runner.invoke(
-            cli, ["config", "meltano", "set", "cli.log_config", "log_config.yml"]
+            cli,
+            ["config", "meltano", "set", "cli.log_config", "log_config.yml"],
         )
         assert_cli_runner(result)
         assert (
@@ -58,7 +64,8 @@ class TestCliConfig:
             "'log_config.yml'"
         ) in result.stdout
 
-    def test_config_test(self, project: Project, cli_runner, tap):
+    @pytest.mark.usefixtures("project")
+    def test_config_test(self, cli_runner, tap):
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
@@ -77,7 +84,8 @@ class TestCliConfig:
 
             assert "Plugin configuration is valid" in result.stdout
 
-    def test_config_meltano_test(self, project: Project, cli_runner):
+    @pytest.mark.usefixtures("project")
+    def test_config_meltano_test(self, cli_runner):
         result = cli_runner.invoke(cli, ["config", "meltano", "test"])
 
         assert result.exit_code == 1
@@ -88,7 +96,8 @@ class TestCliConfig:
 
 
 class TestCliConfigSet:
-    def test_environments_order_of_precedence(self, project: Project, cli_runner, tap):
+    @pytest.mark.usefixtures("tap")
+    def test_environments_order_of_precedence(self, project: Project, cli_runner):
         # set base config in `meltano.yml`
         result = cli_runner.invoke(
             cli,

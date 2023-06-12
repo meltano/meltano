@@ -69,7 +69,7 @@ class TestEnvironmentService:
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]

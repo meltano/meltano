@@ -35,7 +35,8 @@ def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
         project_dir.mkdir()
 
     ProjectInitService(project_dir.relative_to(Path.cwd())).init(
-        activate=False, add_discovery=False
+        activate=False,
+        add_discovery=False,
     )
 
     shutil.rmtree(project_dir)
@@ -75,14 +76,16 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
         ProjectInitService(project_dir).init(activate=False, add_discovery=False)
 
     ProjectInitService(project_dir).init(
-        activate=False, add_discovery=False, force=True
+        activate=False,
+        add_discovery=False,
+        force=True,
     )
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):
     if platform.system() == "Windows":
         pytest.xfail(
-            "Windows can still create new directories inside a read-only directory."
+            "Windows can still create new directories inside a read-only directory.",
         )
 
     protected_dir = tmp_path.joinpath("protected")
@@ -104,7 +107,7 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
     if platform.system() == "Windows":
         pytest.xfail(
             "Windows can't remove a directory that is in use. "
-            "See https://docs.python.org/3/library/os.html#os.remove"
+            "See https://docs.python.org/3/library/os.html#os.remove",
         )
 
     missing_dir = tmp_path.joinpath("missing")
@@ -113,11 +116,10 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
 
     project_dir = missing_dir.joinpath("test_project")
 
+    project_init_service = ProjectInitService(project_dir)
+    missing_dir.rmdir()  # remove the parent directory
     with pytest.raises(
         ProjectInitServiceError,
         match="Could not create directory 'test_project'.",
     ):
-        project_init_service = ProjectInitService(project_dir)
-        missing_dir.rmdir()  # remove the parent directory
-
         project_init_service.init(activate=False, add_discovery=False)

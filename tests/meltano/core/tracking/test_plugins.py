@@ -21,7 +21,7 @@ class TestPluginsTrackingContext:
                 dbt,
                 project,
                 command="test",
-            )
+            ),
         )
         assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 1

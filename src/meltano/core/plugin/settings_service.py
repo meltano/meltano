@@ -65,7 +65,8 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         environment_env = {}
         if self.project.environment:
             with self.project.settings.feature_flag(
-                FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+                FeatureFlags.STRICT_ENV_VAR_MODE,
+                raise_error=False,
             ) as strict_env_var_mode:
                 environment_env = {
                     var: expand_env_vars(
@@ -159,7 +160,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
 
         if self.environment_plugin_config is not None:
             settings.extend(
-                self.environment_plugin_config.get_orphan_settings(settings)
+                self.environment_plugin_config.get_orphan_settings(settings),
             )
 
         return settings

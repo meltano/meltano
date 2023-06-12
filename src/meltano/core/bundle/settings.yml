@@ -1,4 +1,3 @@
-
 # If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!
 
 settings:
@@ -45,10 +44,12 @@ settings:
 
 ## Filesystem state backends
 - name: state_backend.lock_timeout_seconds
-  value: 120
+  value: 10
+  kind: integer
   env_specific: true
-- name: state_backend.lock_rety_seconds
+- name: state_backend.lock_retry_seconds
   value: 1
+  kind: integer
   env_specific: true
 
 ## Azure state backend
@@ -231,5 +232,9 @@ settings:
 - name: ff.strict_env_var_mode
   kind: boolean
   value: False
+# Whether invoke, and run operations if a plugin is not custom or it is not locked.
+- name: ff.plugin_locks_required
+  kind: boolean
+  value: false
 
 # If you add/update a setting that affects `meltano.yml`, update `meltano.schema.json` too!

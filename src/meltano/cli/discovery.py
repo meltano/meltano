@@ -6,7 +6,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
@@ -15,16 +14,20 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@cli.command(
+@click.command(
     cls=InstrumentedCmd,
     short_help="List the available plugins in Meltano Hub and their variants.",
 )
 @click.argument(
-    "plugin_type", type=click.Choice([*list(PluginType), "all"]), default="all"
+    "plugin_type",
+    type=click.Choice([*list(PluginType), "all"]),
+    default="all",
 )
 @pass_project()
-@click.pass_context
-def discover(ctx: click.Context, project: Project, plugin_type: str):
+def discover(  # noqa: C901
+    project: Project,
+    plugin_type: str,
+):
     """
     List the available discoverable plugins and their variants.
 
@@ -45,7 +48,7 @@ def discover(ctx: click.Context, project: Project, plugin_type: str):
 
         try:
             plugin_type_index = project.hub_service.get_plugins_of_type(
-                discovered_plugin_type
+                discovered_plugin_type,
             )
         except Exception:
             click.secho(

@@ -71,7 +71,10 @@ class StateService:  # noqa: WPS214
         if isinstance(job, str):
             now = datetime.datetime.utcnow()
             return Job(
-                job_name=job, state=State.STATE_EDIT, started_at=now, ended_at=now
+                job_name=job,
+                state=State.STATE_EDIT,
+                started_at=now,
+                ended_at=now,
             )
         elif isinstance(job, Job):
             return job
@@ -86,7 +89,8 @@ class StateService:  # noqa: WPS214
         """
         if not self._state_store_manager:
             self._state_store_manager = state_store_manager_from_project_settings(
-                self.project.settings, self.session
+                self.project.settings,
+                self.session,
             )
         return self._state_store_manager
 
@@ -102,7 +106,7 @@ class StateService:  # noqa: WPS214
         """
         if SINGER_STATE_KEY not in state:
             raise InvalidJobStateError(
-                f"{SINGER_STATE_KEY} not found in top level of provided state"
+                f"{SINGER_STATE_KEY} not found in top level of provided state",
             )
 
     def add_state(
@@ -129,7 +133,7 @@ class StateService:  # noqa: WPS214
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}"
+            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",
         )
         partial_state = (
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
@@ -171,7 +175,7 @@ class StateService:  # noqa: WPS214
             validate=validate,
         )
 
-    def clear_state(self, state_id, save: bool = True):
+    def clear_state(self, state_id, save: bool = True):  # noqa: ARG002
         """Clear the state for the state_id.
 
         Args:

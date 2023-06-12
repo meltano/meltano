@@ -13,23 +13,25 @@ from meltano.core.venv_service import PLATFORM_SPECS, VenvService, VirtualEnv
 
 
 class TestVenvService:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return VenvService(project, "namespace", "name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
         file = project.run_dir("name", "test.file.txt")
         file.touch()
-        assert file.exists() and file.is_file()
+        assert file.exists()
+        assert file.is_file()
 
         subject.clean_run_files()
         assert not file.exists()
 
-    @pytest.mark.asyncio
-    async def test_clean_install(self, project, subject: VenvService):
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("project")
+    async def test_clean_install(self, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         await subject.install(["example"], clean=True)
@@ -40,7 +42,8 @@ class TestVenvService:
 
         # ensure that the binary is python3
         assert os.path.samefile(
-            venv_dir.joinpath("bin/python"), venv_dir.joinpath("bin/python3")
+            venv_dir.joinpath("bin/python"),
+            venv_dir.joinpath("bin/python3"),
         )
 
         # ensure that the package is installed
@@ -77,11 +80,12 @@ class TestVenvService:
                 == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
             )
 
-    @pytest.mark.asyncio
-    async def test_install(self, project, subject: VenvService):
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("project")
+    async def test_install(self, subject: VenvService):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         # Make sure the venv exists already
@@ -112,8 +116,9 @@ class TestVenvService:
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
-    @pytest.mark.asyncio
-    async def test_requires_clean_install(self, project, subject: VenvService):
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("project")
+    async def test_requires_clean_install(self, subject: VenvService):
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
 
@@ -137,7 +142,7 @@ class TestVenvService:
 
 
 class TestVirtualEnv:
-    @pytest.mark.parametrize("system", ["Linux", "Darwin", "Windows"])
+    @pytest.mark.parametrize("system", ("Linux", "Darwin", "Windows"))
     def test_cross_platform(self, system, project):
         with mock.patch("platform.system", return_value=system):
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
@@ -145,6 +150,7 @@ class TestVirtualEnv:
 
     def test_unknown_platform(self, project):
         with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
-            Exception, match="(?i)Platform 'commodore64'.*?not supported."
+            Exception,
+            match="(?i)Platform 'commodore64'.*?not supported.",
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))

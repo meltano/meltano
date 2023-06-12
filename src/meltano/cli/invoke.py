@@ -9,7 +9,6 @@ import typing as t
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -37,7 +36,7 @@ if t.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     context_settings={"ignore_unknown_options": True, "allow_interspersed_args": False},
     short_help="Invoke a plugin.",
@@ -52,7 +51,9 @@ logger = logging.getLogger(__name__)
     multiple=True,
 )
 @click.option(
-    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+    "--plugin-type",
+    type=click.Choice(PluginType.cli_arguments()),
+    default=None,
 )
 @click.option(
     "--dump",
@@ -102,7 +103,9 @@ def invoke(
     session = Session()
     try:
         plugin = project.plugins.find_plugin(
-            plugin_name, plugin_type=plugin_type, invokable=True
+            plugin_name,
+            plugin_type=plugin_type,
+            invokable=True,
         )
         tracker.add_contexts(PluginsTrackingContext([(plugin, command_name)]))
         tracker.track_command_event(CliEvent.inflight)
@@ -120,15 +123,13 @@ def invoke(
         exit_code = asyncio.run(
             _invoke(
                 invoker,
-                project,
-                plugin_name,
                 plugin_args,
                 session,
                 dump,
                 command_name,
                 containers,
                 print_var=print_var,
-            )
+            ),
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
@@ -143,8 +144,6 @@ def invoke(
 
 async def _invoke(
     invoker: PluginInvoker,
-    project: Project,
-    plugin_name: str,
     plugin_args: str,
     session: sessionmaker,
     dump: str,
@@ -194,7 +193,8 @@ def do_list_commands(plugin):
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
-            f"Plugin '{plugin.name}' does not define any commands.", fg="yellow"
+            f"Plugin '{plugin.name}' does not define any commands.",
+            fg="yellow",
         )
         return
 
@@ -202,7 +202,7 @@ def do_list_commands(plugin):
         f"{plugin.name}:{cmd}": props.description
         for cmd, props in plugin.all_commands.items()
     }
-    column_len = max(len(name) for name in descriptions.keys()) + 2
+    column_len = max(len(name) for name in descriptions) + 2
     for name, desc in descriptions.items():
         click.secho(name.ljust(column_len, " "), fg="blue", nl=False)
         click.echo(desc)

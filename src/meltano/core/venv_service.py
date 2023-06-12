@@ -166,7 +166,7 @@ class VenvService:  # noqa: WPS214
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
                 f"Packages for '{self.namespace}/{self.name}' have changed so "
-                "performing a clean install."
+                "performing a clean install.",
             )
             clean = True
 
@@ -249,7 +249,8 @@ class VenvService:  # noqa: WPS214
             return await self._pip_install(["--upgrade", *PIP_PACKAGES])
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
-                "Failed to upgrade pip to the latest version.", err.process
+                "Failed to upgrade pip to the latest version.",
+                err.process,
             ) from err
 
     def read_fingerprint(self) -> str | None:
@@ -296,7 +297,9 @@ class VenvService:  # noqa: WPS214
         )
 
     async def _pip_install(
-        self, pip_install_args: list[str], clean: bool = False
+        self,
+        pip_install_args: list[str],
+        clean: bool = False,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
 
@@ -322,14 +325,19 @@ class VenvService:  # noqa: WPS214
             else f"Installing with args {pip_install_args_str!r} into"
         )
         logger.debug(
-            f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'"
+            f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",
         )
 
         try:
             return await exec_async(
-                str(self.exec_path("python")), "-m", "pip", "install", *pip_install_args
+                str(self.exec_path("python")),
+                "-m",
+                "pip",
+                "install",
+                *pip_install_args,
             )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
-                f"Failed to install plugin '{self.name}'.", err.process
+                f"Failed to install plugin '{self.name}'.",
+                err.process,
             ) from err

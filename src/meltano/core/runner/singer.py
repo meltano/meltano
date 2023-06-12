@@ -75,10 +75,10 @@ class SingerRunner(Runner):
 
         tap_stdout_future = asyncio.ensure_future(
             # forward subproc stdout to tap_outputs (i.e. targets stdin)
-            capture_subprocess_output(p_tap.stdout, *tap_outputs)
+            capture_subprocess_output(p_tap.stdout, *tap_outputs),
         )
         tap_stderr_future = asyncio.ensure_future(
-            capture_subprocess_output(p_tap.stderr, extractor_log)
+            capture_subprocess_output(p_tap.stderr, extractor_log),
         )
 
         # Process target output
@@ -90,10 +90,10 @@ class SingerRunner(Runner):
             target_outputs.insert(0, loader_out)
 
         target_stdout_future = asyncio.ensure_future(
-            capture_subprocess_output(p_target.stdout, *target_outputs)
+            capture_subprocess_output(p_target.stdout, *target_outputs),
         )
         target_stderr_future = asyncio.ensure_future(
-            capture_subprocess_output(p_target.stderr, loader_log)
+            capture_subprocess_output(p_target.stderr, loader_log),
         )
 
         # Wait for tap or target to complete, or for one of the output handlers
@@ -140,7 +140,7 @@ class SingerRunner(Runner):
                     )
 
                 failed_future = output_futures_failed.pop()
-                raise failed_future.exception()
+                raise failed_future.exception()  # noqa: RSE102
             else:
                 # If all of the output handlers completed without raising an
                 # exception, we still need to wait for the tap or target to
@@ -205,7 +205,11 @@ class SingerRunner(Runner):
         logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")
 
     async def run(
-        self, extractor_log=None, loader_log=None, extractor_out=None, loader_out=None
+        self,
+        extractor_log=None,
+        loader_log=None,
+        extractor_out=None,
+        loader_out=None,
     ):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
@@ -242,15 +246,15 @@ class SingerRunner(Runner):
         logging.error(
             f"The extractor generated a message exceeding the message size "
             f"limit of {human_size(line_length_limit)} (half the buffer size "
-            f"of {human_size(stream_buffer_size)})."
+            f"of {human_size(stream_buffer_size)}).",
         )
         logging.error(
             "To let this message be processed, increase the 'elt.buffer_size' "
             "setting to at least double the size of the largest expected "
-            "message, and try again."
+            "message, and try again.",
         )
         logging.error(
             "To learn more, visit "
-            "https://docs.meltano.com/reference/settings#eltbuffer_size"
+            "https://docs.meltano.com/reference/settings#eltbuffer_size",
         )
         raise RunnerError("Output line length limit exceeded") from exception

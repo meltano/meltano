@@ -179,7 +179,8 @@ class PluginInstallService:  # noqa: WPS214
 
     @staticmethod
     def remove_duplicates(
-        plugins: t.Iterable[ProjectPlugin], reason: PluginInstallReason
+        plugins: t.Iterable[ProjectPlugin],
+        reason: PluginInstallReason,
     ):
         """Deduplicate list of plugins, keeping the last occurrences.
 
@@ -213,12 +214,13 @@ class PluginInstallService:  # noqa: WPS214
                             f"Plugin {plugin.name!r} does not require "
                             "installation: reusing parent virtualenv"
                         ),
-                    )
+                    ),
                 )
         return states, deduped_plugins
 
     def install_all_plugins(
-        self, reason=PluginInstallReason.INSTALL
+        self,
+        reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
@@ -254,7 +256,7 @@ class PluginInstallService:  # noqa: WPS214
         for state in states:
             self.status_cb(state)
         states.extend(
-            asyncio.run(self.install_plugins_async(new_plugins, reason=reason))
+            asyncio.run(self.install_plugins_async(new_plugins, reason=reason)),
         )
         return states
 
@@ -273,7 +275,7 @@ class PluginInstallService:  # noqa: WPS214
             Install state of installed plugins.
         """
         return await asyncio.gather(
-            *[self.install_plugin_async(plugin, reason) for plugin in plugins]
+            *[self.install_plugin_async(plugin, reason) for plugin in plugins],
         )
 
     def install_plugin(
@@ -297,7 +299,7 @@ class PluginInstallService:  # noqa: WPS214
             self.install_plugin_async(
                 plugin,
                 reason=reason,
-            )
+            ),
         )
 
     @with_semaphore
@@ -320,7 +322,7 @@ class PluginInstallService:  # noqa: WPS214
                 plugin=plugin,
                 reason=reason,
                 status=PluginInstallStatus.RUNNING,
-            )
+            ),
         )
 
         if not plugin.is_installable() or self._is_mapping(plugin):
@@ -336,7 +338,9 @@ class PluginInstallService:  # noqa: WPS214
         try:
             async with plugin.trigger_hooks("install", self, plugin, reason):
                 installer: PluginInstaller = getattr(
-                    plugin, "installer", install_pip_plugin
+                    plugin,
+                    "installer",
+                    install_pip_plugin,
                 )
                 await installer(
                     project=self.project,
@@ -347,7 +351,9 @@ class PluginInstallService:  # noqa: WPS214
                     env=self.plugin_installation_env(plugin),
                 )
                 state = PluginInstallState(
-                    plugin=plugin, reason=reason, status=PluginInstallStatus.SUCCESS
+                    plugin=plugin,
+                    reason=reason,
+                    status=PluginInstallStatus.SUCCESS,
                 )
                 self.status_cb(state)
                 return state
@@ -420,7 +426,8 @@ class PluginInstallService:  # noqa: WPS214
         """  # noqa: E501
         plugin_settings_service = PluginSettingsService(self.project, plugin)
         with self.project.settings.feature_flag(
-            FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+            FeatureFlags.STRICT_ENV_VAR_MODE,
+            raise_error=False,
         ) as strict_env_var_mode:
             expanded_project_env = expand_env_vars(
                 self.project.settings.env,
@@ -478,7 +485,7 @@ async def install_pip_plugin(
     force: bool = False,
     venv_service: VenvService | None = None,
     env: t.Mapping[str, str] | None = None,
-    **kwargs,
+    **kwargs,  # noqa: ARG001
 ):
     """Install the plugin with pip.
 
@@ -492,7 +499,8 @@ async def install_pip_plugin(
         kwargs: Unused additional arguments for the installation of the plugin.
     """
     with project.settings.feature_flag(
-        FeatureFlags.STRICT_ENV_VAR_MODE, raise_error=False
+        FeatureFlags.STRICT_ENV_VAR_MODE,
+        raise_error=False,
     ) as strict_env_var_mode:
         pip_install_args = expand_env_vars(
             plugin.pip_url,
@@ -501,7 +509,9 @@ async def install_pip_plugin(
         ).split(" ")
 
     venv_service = venv_service or VenvService(
-        project, namespace=plugin.type, name=plugin.venv_name
+        project,
+        namespace=plugin.type,
+        name=plugin.venv_name,
     )
     await venv_service.install(
         pip_install_args=["--ignore-requires-python", *pip_install_args]

@@ -56,7 +56,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
         """
         super().__init__(
             f"The plugin name '{name}' cannot contain the state ID component "
-            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
 
@@ -175,7 +175,7 @@ class PluginType(YAMLEnum):  # noqa: WPS214
             if value in {plugin_type.value, plugin_type.singular}:
                 return plugin_type
 
-        raise ValueError(f"{value} is not a valid {cls.__name__}")
+        raise ValueError(f"{value!r} is not a valid {cls.__name__}")
 
     @classmethod
     def plurals(cls) -> list[str]:
@@ -640,8 +640,11 @@ class BasePlugin(HookObject):  # noqa: WPS214
         # including flattened keys of default nested object items
         existing_settings.extend(
             SettingDefinition.from_missing(
-                existing_settings, defaults, custom=False, default=True
-            )
+                existing_settings,
+                defaults,
+                custom=False,
+                default=True,
+            ),
         )
 
         return existing_settings
@@ -655,7 +658,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.requires
 
-    def env_prefixes(self, for_writing=False) -> list[str]:
+    def env_prefixes(
+        self,
+        for_writing=False,  # noqa: ARG002
+    ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
         Args:
@@ -698,7 +704,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return True
 
-    def exec_args(self, files: dict):
+    def exec_args(
+        self,
+        files: dict,  # noqa: ARG002
+    ):
         """Return the arguments to pass to the plugin runner.
 
         Args:

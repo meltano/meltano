@@ -115,7 +115,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             {
                 "Accept": "application/json",
                 "User-Agent": f"Meltano/{meltano.__version__}",
-            }
+            },
         )
 
         if self.project.settings.get("send_anonymous_usage_stats"):
@@ -268,7 +268,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             plugin = plugins[plugin_name]
         except KeyError as plugins_key_err:
             raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name)
+                PluginRef(plugin_type, plugin_name),
             ) from plugins_key_err
 
         if variant_name is None or variant_name in {
@@ -281,7 +281,9 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             url = plugin.variants[variant_name].ref
         except KeyError as variant_key_err:
             raise HubPluginVariantNotFoundError(
-                plugin_type, plugin, variant_name
+                plugin_type,
+                plugin,
+                variant_name,
             ) from variant_key_err
 
         response = self._get(url)

@@ -13,7 +13,6 @@ from pathlib import Path
 import click
 import dotenv
 
-from meltano.cli import cli
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -113,14 +112,16 @@ def get_label(metadata) -> str:
         return f"from {source.label}"
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Display Meltano or plugin configuration.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_ignore_default,
 )
 @click.option(
-    "--plugin-type", type=click.Choice(PluginType.cli_arguments()), default=None
+    "--plugin-type",
+    type=click.Choice(PluginType.cli_arguments()),
+    default=None,
 )
 @click.argument("plugin_name")
 @click.option(
@@ -154,7 +155,9 @@ def config(  # noqa: WPS231
 
     try:
         plugin = project.plugins.find_plugin(
-            plugin_name, plugin_type=plugin_type, configurable=True
+            plugin_name,
+            plugin_type=plugin_type,
+            configurable=True,
         )
     except PluginNotFoundError:
         if plugin_name == "meltano":
@@ -185,7 +188,9 @@ def config(  # noqa: WPS231
             if config_format == "json":
                 process = extras is not True
                 json_config = settings.as_dict(
-                    extras=extras, process=process, session=session
+                    extras=extras,
+                    process=process,
+                    session=session,
                 )
                 click.echo(json.dumps(json_config, indent=2))
             elif config_format == "env":
@@ -293,7 +298,7 @@ def list_settings(ctx, extras: bool):
     if docs_url:
         click.echo()
         click.echo(
-            f"To learn more about {settings.label} and its settings, visit {docs_url}"
+            f"To learn more about {settings.label} and its settings, visit {docs_url}",
         )
     tracker.track_command_event(CliEvent.completed)
 
@@ -320,7 +325,7 @@ def reset(ctx, store):
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
             f"{settings.label.capitalize()} settings in {store.label} could "
-            f"not be reset: {err}"
+            f"not be reset: {err}",
         ) from err
 
     store = metadata["store"]
@@ -415,7 +420,7 @@ def unset(ctx, setting_name, store):
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
             f"{settings.label.capitalize()} setting '{path}' in {store.label} "
-            f"could not be unset: {err}"
+            f"could not be unset: {err}",
         ) from err
 
     name = metadata["name"]

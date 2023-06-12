@@ -17,7 +17,7 @@ from meltano.core.state_store import (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def state_path(tmp_path: Path):
     path = tmp_path / ".meltano" / "state"
     try:
@@ -30,7 +30,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     project.settings.set(["state_backend", "uri"], StateBackend.SYSTEMDB)
     project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
     db_state_store: DBStateStoreManager = state_store_manager_from_project_settings(
-        project.settings
+        project.settings,
     )
     assert isinstance(db_state_store, DBStateStoreManager)
 
@@ -45,7 +45,8 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     # Azure
     project.settings.set(["state_backend", "uri"], "azure://some_container/some/path")
     project.settings.set(
-        ["state_backend", "azure", "connection_string"], "SOME_CONNECTION_STRING"
+        ["state_backend", "azure", "connection_string"],
+        "SOME_CONNECTION_STRING",
     )
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
@@ -58,7 +59,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     # GCS
     project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
     gs_state_store: GCSStateStoreManager = state_store_manager_from_project_settings(
-        project.settings
+        project.settings,
     )
     assert isinstance(gs_state_store, GCSStateStoreManager)
     assert gs_state_store.bucket == "some_container"
@@ -70,7 +71,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
         "s3://aws_access_key_id:aws_secret_access_key@some_bucket/some/path",
     )
     s3_state_store: S3StateStoreManager = state_store_manager_from_project_settings(
-        project.settings
+        project.settings,
     )
     assert isinstance(s3_state_store, S3StateStoreManager)
     assert s3_state_store.bucket == "some_bucket"
@@ -85,7 +86,8 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     )
     project.settings.set(["state_backend", "s3", "aws_access_key_id"], "a_different_id")
     project.settings.set(
-        ["state_backend", "s3", "aws_secret_access_key"], "a_different_key"
+        ["state_backend", "s3", "aws_secret_access_key"],
+        "a_different_key",
     )
     s3_state_store_direct_creds: S3StateStoreManager = (
         state_store_manager_from_project_settings(project.settings)

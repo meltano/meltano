@@ -105,13 +105,13 @@ def connect(
             if attempt >= max_retries:
                 logging.error(
                     f"Could not connect to the database after {attempt} "
-                    "attempts. Max retries exceeded."
+                    "attempts. Max retries exceeded.",
                 )
                 raise
             attempt += 1
             logging.info(
                 f"DB connection failed. Will retry after {retry_timeout}s. "
-                f"Attempt {attempt}/{max_retries}"
+                f"Attempt {attempt}/{max_retries}",
             )
             time.sleep(retry_timeout)
 
@@ -162,10 +162,10 @@ def ensure_schema_exists(
     create_schema = text(f"CREATE SCHEMA IF NOT EXISTS {schema_name}")
     grant_select_schema = text(
         f"ALTER DEFAULT PRIVILEGES IN SCHEMA {schema_name} GRANT SELECT ON "
-        f"TABLES TO {group_identifiers}"
+        f"TABLES TO {group_identifiers}",
     )
     grant_usage_schema = text(
-        f"GRANT USAGE ON SCHEMA {schema_name} TO {group_identifiers}"
+        f"GRANT USAGE ON SCHEMA {schema_name} TO {group_identifiers}",
     )
 
     with engine.connect() as conn, conn.begin():

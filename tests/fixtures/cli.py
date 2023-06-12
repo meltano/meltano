@@ -35,7 +35,7 @@ class MeltanoCliRunner(CliRunner):
         return results
 
 
-@pytest.fixture
+@pytest.fixture()
 def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
     pushd(os.getcwd())  # Ensure we return to the CWD after the test
     root_logger = logging.getLogger()

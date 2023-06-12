@@ -18,7 +18,8 @@ BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix
 
 TracebackLevelsJSON = t.List[t.Dict[str, t.Union[str, int]]]
 ExceptionContextJSON = t.Dict[
-    str, t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"]
+    str,
+    t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"],
 ]
 
 
@@ -73,7 +74,7 @@ def get_traceback_json(tb: TracebackType) -> TracebackLevelsJSON:
             {
                 "file": get_relative_traceback_path(tb),
                 "line_number": tb.tb_lineno,
-            }
+            },
         )
         tb = tb.tb_next
     return levels

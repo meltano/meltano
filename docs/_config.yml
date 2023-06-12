@@ -91,7 +91,7 @@ algolia:
 
 # Set display to true/false to toggle announcements on/off
 announcement:
-  display: true
+  display: false
   text: For every star on GitHub, we'll donate $2 to clean up our waterways.
   cta: Star us now!
   cta-link: https://github.com/meltano/meltano/

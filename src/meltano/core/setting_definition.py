@@ -115,7 +115,11 @@ class YAMLEnum(str, Enum):
         return representer.represent_scalar("tag:yaml.org,2002:str", str(node))
 
     @classmethod
-    def from_yaml(cls, constructor, node):
+    def from_yaml(
+        cls,
+        constructor,  # noqa: ARG003
+        node,
+    ):
         """Construct from yaml.
 
         Args:
@@ -154,9 +158,9 @@ class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
         name: str | None = None,
-        aliases: list[str] = None,
+        aliases: list[str] | None = None,
         env: str | None = None,
-        env_aliases: list[str] = None,
+        env_aliases: list[str] | None = None,
         kind: SettingKind | None = None,
         value=None,
         label: str | None = None,
@@ -390,7 +394,7 @@ class SettingDefinition(NameEq, Canonical):
             The parsed value.
         """
         parse_error = ValueError(
-            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}"
+            f"Failed to parse JSON {expected_type_name} from string: {unparsed!r}",
         )
         try:
             parsed = json.loads(unparsed)

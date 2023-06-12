@@ -82,7 +82,8 @@ def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormat
         A configured log processor.
     """
     return structlog.stdlib.ProcessorFormatter(
-        processor=processor, foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN
+        processor=processor,
+        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
     )
 
 
@@ -114,8 +115,9 @@ def console_log_formatter(
 
     return _process_formatter(
         structlog.dev.ConsoleRenderer(
-            colors=colors, exception_formatter=exception_formatter
-        )
+            colors=colors,
+            exception_formatter=exception_formatter,
+        ),
     )
 
 
@@ -139,8 +141,10 @@ def key_value_formatter(
     """
     return _process_formatter(
         processor=structlog.processors.KeyValueRenderer(
-            sort_keys=sort_keys, key_order=key_order, drop_missing=drop_missing
-        )
+            sort_keys=sort_keys,
+            key_order=key_order,
+            drop_missing=drop_missing,
+        ),
     )
 
 

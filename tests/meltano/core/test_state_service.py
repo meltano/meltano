@@ -13,13 +13,13 @@ class TestStateService:
     def test_validate_state(self, state_service):
         with pytest.raises(InvalidJobStateError):
             state_service.validate_state(
-                json.loads('{"root key not singer_state": {}}')
+                json.loads('{"root key not singer_state": {}}'),
             )
         assert (
             state_service.validate_state(
                 json.loads(
-                    '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}'
-                )
+                    '{"singer_state": {"bookmarks": {"mock-stream": "mock-value"}}}',
+                ),
             )
             is None
         )
@@ -34,14 +34,16 @@ class TestStateService:
     def test_add_state(self, state_service, payloads):
         mock_state_id = "nonexistent"
         state_service.add_state(
-            mock_state_id, json.dumps(payloads.mock_state_payloads[0])
+            mock_state_id,
+            json.dumps(payloads.mock_state_payloads[0]),
         )
         assert state_service.get_state(mock_state_id) == payloads.mock_state_payloads[0]
 
-    def test_set_state(self, job_history_session, jobs, payloads, state_service):
+    @pytest.mark.usefixtures("job_history_session")
+    def test_set_state(self, jobs, payloads, state_service):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
 
         for job in jobs:
@@ -49,12 +51,14 @@ class TestStateService:
                 state_service.set_state(job.job_name, json.dumps(state))
                 assert state_service.get_state(job.job_name) == state
 
-    def test_clear_state(self, job_history_session, jobs, payloads, state_service):
+    @pytest.mark.usefixtures("job_history_session")
+    def test_clear_state(self, jobs, payloads, state_service):
         for job in jobs:
             state_service.clear_state(job.job_name)
             assert state_service.get_state(job.job_name) == payloads.mock_empty_payload
 
-    def test_merge_state(self, job_history_session, jobs, state_service):
+    @pytest.mark.usefixtures("job_history_session")
+    def test_merge_state(self, jobs, state_service):
         job_pairs = [(jobs[idx], jobs[idx + 1]) for idx in range(0, len(jobs) - 1, 2)]
         for job_src, job_dst in job_pairs:
             state_src = state_service.get_state(job_src.job_name)

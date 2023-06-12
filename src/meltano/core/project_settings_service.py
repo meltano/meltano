@@ -72,7 +72,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             self.ensure_project_id()
         except ProjectReadonly:
             logger.debug(
-                "Cannot update `project_id` in `meltano.yml`: project is read-only."
+                "Cannot update `project_id` in `meltano.yml`: project is read-only.",
             )
 
     @property
@@ -103,12 +103,13 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         if project_id is None:
             try:
                 with open(
-                    self.project.meltano_dir() / "analytics.json"
+                    self.project.meltano_dir() / "analytics.json",
                 ) as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]
             except (OSError, KeyError, json.JSONDecodeError) as err:
                 logger.debug(
-                    "Unable to restore 'project_id' from 'analytics.json'", err=err
+                    "Unable to restore 'project_id' from 'analytics.json'",
+                    err=err,
                 )
             else:
                 self.set("project_id", project_id, store=SettingValueStore.MELTANO_YML)

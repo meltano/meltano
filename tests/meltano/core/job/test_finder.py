@@ -15,8 +15,8 @@ from meltano.core.job.job import (
 
 class TestJobFinder:
     @pytest.mark.parametrize(
-        "state,started_at_hours_ago,last_heartbeat_at_minutes_ago,is_stale",
-        [
+        ("state", "started_at_hours_ago", "last_heartbeat_at_minutes_ago", "is_stale"),
+        (
             (State.RUNNING, None, None, False),
             (State.RUNNING, HEARTBEATLESS_JOB_VALID_HOURS - 1, None, False),
             (State.RUNNING, HEARTBEATLESS_JOB_VALID_HOURS + 1, None, True),
@@ -25,7 +25,7 @@ class TestJobFinder:
             (State.RUNNING, None, HEARTBEAT_VALID_MINUTES + 1, True),
             (State.SUCCESS, None, None, False),
             (State.FAIL, None, None, False),
-        ],
+        ),
     )
     def test_all_stale(
         self,
@@ -42,7 +42,7 @@ class TestJobFinder:
         last_heartbeat_at = None
         if last_heartbeat_at_minutes_ago is not None:
             last_heartbeat_at = datetime.utcnow() - timedelta(
-                minutes=last_heartbeat_at_minutes_ago
+                minutes=last_heartbeat_at_minutes_ago,
             )
 
         job = Job(

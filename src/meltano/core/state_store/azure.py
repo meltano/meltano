@@ -39,7 +39,7 @@ def requires_azure():
         None
     """
     if not BlobServiceClient:
-        raise MissingAzureError()
+        raise MissingAzureError
     yield
 
 
@@ -120,14 +120,11 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         state_ids = set()
         container_client = self.client.get_container_client(self.container_name)
         for blob in container_client.list_blobs(
-            name_starts_with=self.prefix.lstrip("/")
+            name_starts_with=self.prefix.lstrip("/"),
         ):
             (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json":
-                if not pattern:
-                    state_ids.add(state_id)
-                elif pattern_re.match(state_id):
-                    state_ids.add(state_id)
+            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
+                state_ids.add(state_id)
         return list(state_ids)
 
     def delete(self, file_path: str):
@@ -140,12 +137,11 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
             Exception: if error not indicating file is not found is thrown
         """
         blob_client = self.client.get_blob_client(
-            container=self.container_name, blob=file_path
+            container=self.container_name,
+            blob=file_path,
         )
         try:
             blob_client.delete_blob()
         except Exception as e:
-            if self.is_file_not_found_error(e):
-                ...
-            else:
+            if not self.is_file_not_found_error(e):
                 raise e

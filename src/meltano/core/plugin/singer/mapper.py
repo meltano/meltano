@@ -22,7 +22,10 @@ class SingerMapper(SingerPlugin):
 
     EXTRA_SETTINGS = [
         SettingDefinition(
-            name="_mappings", kind=SettingKind.ARRAY, aliases=["mappings"], value={}
+            name="_mappings",
+            kind=SettingKind.ARRAY,
+            aliases=["mappings"],
+            value={},
         ),
         SettingDefinition(
             name="_mapping_name",
@@ -42,8 +45,12 @@ class SingerMapper(SingerPlugin):
         return {"config": f"mapper.{self.instance_uuid}.config.json"}
 
     @hook("before_configure")
-    async def before_configure(self, invoker: PluginInvoker, session):
-        """Create configuration file."""
+    async def before_configure(
+        self,
+        invoker: PluginInvoker,
+        session,  # noqa: ARG002
+    ):
+        """Create configuration file."""  # noqa: DAR101
         config_path = invoker.files["config"]
 
         config_payload: dict = {}

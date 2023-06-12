@@ -71,11 +71,11 @@ class ProjectInitService:
                 raise ProjectInitServiceError(msg) from ex
         except PermissionError as ex:
             raise ProjectInitServiceError(
-                f"Permission denied to create '{self.project_directory}'."
+                f"Permission denied to create '{self.project_directory}'.",
             ) from ex
         except Exception as ex:
             raise ProjectInitServiceError(
-                f"Could not create directory '{self.project_directory}'. {ex}"
+                f"Could not create directory '{self.project_directory}'. {ex}",
             ) from ex
 
         project = Project(self.project_directory)

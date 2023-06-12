@@ -7,11 +7,11 @@ from flask_principal import Identity, Need
 from meltano.api.security.auth import ResourcePermission
 
 
-@pytest.fixture
+@pytest.fixture()
 def identity(app):
     identity = Identity("test")
 
-    def handler(sender):
+    def handler(_):
         g.identity = identity
 
     with appcontext_pushed.connected_to(handler, app):

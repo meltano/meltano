@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import pytest
+
 from meltano.core.meltano_file import MeltanoFile
 
 
 class TestMeltanoFile:
-    def test_load(self, project, tap, target):
+    @pytest.mark.usefixtures("tap", "target")
+    def test_load(self, project):
         meltano_file = MeltanoFile.parse(project.meltano)
         assert meltano_file
 
-    def test_get_plugins_for_mappings(self, project, mapper):
+    @pytest.mark.usefixtures("mapper")
+    def test_get_plugins_for_mappings(self, project):
         meltano_file = MeltanoFile.parse(project.meltano)
 
         test_config = {
@@ -23,8 +27,8 @@ class TestMeltanoFile:
                                 "field_id": "author_email",
                                 "tap_stream_name": "commits",
                                 "type": "MASK-HIDDEN",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
                 {
@@ -35,8 +39,8 @@ class TestMeltanoFile:
                                 "field_id": "given_name",
                                 "tap_stream_name": "users",
                                 "type": "lowercase",
-                            }
-                        ]
+                            },
+                        ],
                     },
                 },
             ],

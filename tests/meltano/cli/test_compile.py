@@ -29,7 +29,7 @@ def check_indent(json_path: Path, indent: int):
 
 
 class TestCompile:
-    @pytest.fixture
+    @pytest.fixture()
     def manifest_dir(self, project: Project) -> Path:
         return project.sys_dir_root / "manifests"
 
@@ -45,12 +45,15 @@ class TestCompile:
 
     @pytest.mark.parametrize("environment_name", ("dev", "staging", "prod"))
     def test_compile_specific_environment(
-        self, manifest_dir: Path, cli_runner: CliRunner, environment_name: str
+        self,
+        manifest_dir: Path,
+        cli_runner: CliRunner,
+        environment_name: str,
     ):
         result = cli_runner.invoke(cli, ("--environment", environment_name, "compile"))
         assert result.exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {
-            f"meltano-manifest.{environment_name}.json"
+            f"meltano-manifest.{environment_name}.json",
         }
 
     def test_compile_no_environment(self, manifest_dir: Path, cli_runner: CliRunner):
@@ -60,18 +63,25 @@ class TestCompile:
 
     @pytest.mark.parametrize("indent", (-3, -1, 0, 1, 4, 9))
     def test_compile_with_indent(
-        self, manifest_dir: Path, cli_runner: CliRunner, indent: int
+        self,
+        manifest_dir: Path,
+        cli_runner: CliRunner,
+        indent: int,
     ):
         assert (
             cli_runner.invoke(
-                cli, ("--environment=dev", "compile", f"--indent={indent}")
+                cli,
+                ("--environment=dev", "compile", f"--indent={indent}"),
             ).exit_code
             == 0
         )
         check_indent(manifest_dir / "meltano-manifest.dev.json", indent)
 
     def test_specify_output_dir(
-        self, manifest_dir: Path, cli_runner: CliRunner, tmp_path: Path
+        self,
+        manifest_dir: Path,
+        cli_runner: CliRunner,
+        tmp_path: Path,
     ):
         result = cli_runner.invoke(cli, ("compile", "--directory", tmp_path))
         assert result.exit_code == 0

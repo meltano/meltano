@@ -14,7 +14,7 @@ from meltano.core.db import (
 class TestDatabaseCompatibility:
     @pytest.mark.parametrize(
         ("dialect", "version", "expected"),
-        [
+        (
             pytest.param(
                 "sqlite",
                 (3, 25, 0),
@@ -37,7 +37,7 @@ class TestDatabaseCompatibility:
                 nullcontext(),
                 id="postgresql-10.0.0",
             ),
-        ],
+        ),
     )
     def test_db_compatibility(self, dialect, version, expected):
         engine_mock = Mock()

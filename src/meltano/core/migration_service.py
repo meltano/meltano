@@ -41,7 +41,10 @@ class MigrationService:
         self.engine = engine
 
     def ensure_migration_needed(
-        self, script: ScriptDirectory, context: MigrationContext, target_revision: str
+        self,
+        script: ScriptDirectory,
+        context: MigrationContext,
+        target_revision: str,
     ) -> None:
         """Ensure that a migration of the system database is actually needed.
 
@@ -60,7 +63,8 @@ class MigrationService:
                 raise MigrationUneededException
 
     def upgrade(  # noqa: WPS213, WPS231 too many expression and too complex
-        self, silent: bool = False
+        self,
+        silent: bool = False,
     ) -> None:
         """Upgrade to the latest revision.
 
@@ -86,7 +90,7 @@ class MigrationService:
 
         context = MigrationContext.configure(conn)
 
-        try:  # noqa: WPS229
+        try:
             # try to find the locked version
             head = LOCK_PATH.open().read().strip()
             self.ensure_migration_needed(script, context, head)
@@ -97,19 +101,19 @@ class MigrationService:
 
             if silent:
                 migration_logger.setLevel(original_log_level)
-        except FileNotFoundError:
+        except FileNotFoundError as ex:
             raise MigrationError(
-                "Cannot upgrade the system database, revision lock not found."
-            )
+                "Cannot upgrade the system database, revision lock not found.",
+            ) from ex
         except MigrationUneededException:
             if not silent:
                 click.secho("System database up-to-date.")
-        except Exception as err:
-            logging.exception(str(err))
+        except Exception as ex:
+            logging.exception(str(ex))
             raise MigrationError(
                 "Cannot upgrade the system database. It might be corrupted or "
-                "was created before database migrations where introduced (v0.34.0)"
-            )
+                "was created before database migrations where introduced (v0.34.0)",
+            ) from ex
         finally:
             conn.close()
 
@@ -140,7 +144,7 @@ class MigrationService:
                         RolePermissions(type="view:reports", context=SPLAT),
                         RolePermissions(type="modify:acl", context=SPLAT),
                     ],
-                )
+                ),
             )
 
         if not session.query(Role).filter_by(name="regular").first():
@@ -150,7 +154,9 @@ class MigrationService:
         admin = session.query(Role).filter_by(name="admin").one()
         try:
             session.query(RolePermissions).filter_by(
-                role=admin, type=SPLAT, context=SPLAT
+                role=admin,
+                type=SPLAT,
+                context=SPLAT,
             ).one()
         except sqlalchemy.orm.exc.NoResultFound:
             admin.permissions.append(RolePermissions(type=SPLAT, context=SPLAT))

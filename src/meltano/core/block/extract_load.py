@@ -222,7 +222,9 @@ class ELBContextBuilder:  # noqa: WPS214
         return PluginContext(
             plugin=plugin,
             settings_service=PluginSettingsService(
-                self.project, plugin, env_override=env
+                self.project,
+                plugin,
+                env_override=env,
             ),
             session=self.session,
         )
@@ -299,12 +301,16 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
 
         elif self.context.update_state:
             state_id = generate_state_id(
-                self.context.project, self.context.state_id_suffix, self.head, self.tail
+                self.context.project,
+                self.context.state_id_suffix,
+                self.head,
+                self.tail,
             )
             self.context.job = Job(job_name=state_id)
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
-                self.context.job.job_name, self.context.job.run_id
+                self.context.job.job_name,
+                self.context.job.run_id,
             )
             self.output_logger = OutputLogger(log_file)
 
@@ -335,7 +341,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         if not self._state_service:
             if self.has_state():
                 self._state_service = StateService(
-                    project=self.context.project, session=self.context.session
+                    project=self.context.project,
+                    session=self.context.session,
                 )
             else:
                 raise BlockSetHasNoStateError
@@ -377,7 +384,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             await block.stop()
 
     async def process_wait(
-        self, output_exception_future: asyncio.Task | None, subset: int | None = None
+        self,
+        output_exception_future: asyncio.Task | None,
+        subset: int | None = None,
     ) -> set[asyncio.Task]:
         """Wait on all process futures in the block set.
 
@@ -416,7 +425,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         for block in self.intermediate:
             if not block.consumer or not block.producer:
                 raise BlockSetValidationError(
-                    "intermediate blocks must be producers AND consumers"
+                    "intermediate blocks must be producers AND consumers",
                 )
 
     async def execute(self) -> None:
@@ -438,7 +447,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             logger.warning(
                 "No active environment, proceeding with stateless run! See "
                 "https://docs.meltano.com/reference/command-line-interface#run "
-                "for details."
+                "for details.",
             )
         await self.execute()
 
@@ -457,7 +466,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 raise RunnerError(
                     f"Another '{job.job_name}' pipeline is already running "
                     f"which started at {existing.started_at}. To ignore this "
-                    "check use the '--force' option."
+                    "check use the '--force' option.",
                 )
 
         with closing(self.context.session) as session:
@@ -548,7 +557,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Yields:
             None
         """
-        try:  # noqa:  WPS229
+        try:
             for block in self.blocks:
                 await block.pre(self.context)
                 await block.start()
@@ -581,22 +590,22 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     self.output_logger.out(
                         block.string_id,
                         logger_base.bind(stdio="stdout"),
-                    )
+                    ),
                 )
             block.stderr_link(
                 self.output_logger.out(
                     block.string_id,
                     logger_base.bind(stdio="stderr"),
-                )
+                ),
             )
             if block.consumer:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
-                        block.stdin
+                        block.stdin,
                     )  # link previous blocks stdout with current blocks stdin
                 else:
                     raise BlockSetValidationError(
-                        "run step requires input but has no upstream"
+                        "run step requires input but has no upstream",
                     )
 
 
@@ -611,7 +620,7 @@ class ELBExecutionManager:
         """
         self.elb = elb
         self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
-            "elt.buffer_size"
+            "elt.buffer_size",
         )
         self.line_length_limit = self.stream_buffer_size // 2
 
@@ -629,7 +638,9 @@ class ELBExecutionManager:
         """
         await self._wait_for_process_completion(self.elb.head)
         _check_exit_codes(
-            self._producer_code, self._consumer_code, self._intermediate_codes
+            self._producer_code,
+            self._consumer_code,
+            self._intermediate_codes,
         )
 
     async def _complete_upstream(self) -> None:
@@ -652,7 +663,8 @@ class ELBExecutionManager:
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
     async def _wait_for_process_completion(  # noqa: WPS213 WPS217 WPS210
-        self, current_head: IOBlock
+        self,
+        current_head: IOBlock,
     ) -> tuple[int, int] | None:
         """Wait for the current head block to complete or for an error to occur.
 
@@ -679,7 +691,7 @@ class ELBExecutionManager:
             asyncio.wait(
                 [*stdout_futures, *stderr_futures],
                 return_when=asyncio.FIRST_EXCEPTION,
-            )
+            ),
         )
 
         logger.debug("waiting for process completion or exception")
@@ -695,7 +707,7 @@ class ELBExecutionManager:
                     line_length_limit=self.line_length_limit,
                     stream_buffer_size=self.stream_buffer_size,
                 )
-            raise output_futures_failed.exception()
+            raise output_futures_failed.exception()  # noqa: RSE102
         else:
             # If all the output handlers completed without raising an
             # exception, we still need to wait for all the underlying block
@@ -708,7 +720,8 @@ class ELBExecutionManager:
             await self._complete_upstream()
         elif current_head.process_future.done():
             logger.debug(
-                "head producer completed first as expected", name=current_head.string_id
+                "head producer completed first as expected",
+                name=current_head.string_id,
             )
             await self._handle_head_completed(current_head, start_idx)
         else:
@@ -726,7 +739,9 @@ class ELBExecutionManager:
             )
 
     async def _handle_head_completed(
-        self, current_head: IOBlock, start_idx: int
+        self,
+        current_head: IOBlock,
+        start_idx: int,
     ) -> None:
         next_head: IOBlock = self.elb.blocks[start_idx + 1]
 
@@ -824,7 +839,7 @@ def generate_state_id(
     """
     if not project.environment:
         raise RunnerError(
-            "No active environment for invocation, but requested state ID"
+            "No active environment for invocation, but requested state ID",
         )
 
     state_id_components = [
@@ -836,7 +851,7 @@ def generate_state_id(
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
         raise RunnerError(
             "Cannot generate a state ID from components containing the "
-            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
     return STATE_ID_COMPONENT_DELIMITER.join(c for c in state_id_components if c)

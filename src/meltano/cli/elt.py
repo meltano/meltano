@@ -11,7 +11,6 @@ from contextlib import asynccontextmanager, nullcontext, suppress
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
@@ -43,7 +42,7 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
@@ -79,7 +78,9 @@ logger = structlog_stdlib.get_logger(__name__)
     help="Dump content of pipeline-specific generated file.",
 )
 @click.option(
-    "--state-id", envvar="MELTANO_STATE_ID", help="A custom string to identify the job."
+    "--state-id",
+    envvar="MELTANO_STATE_ID",
+    help="A custom string to identify the job.",
 )
 @click.option(
     "--force",
@@ -93,7 +94,7 @@ logger = structlog_stdlib.get_logger(__name__)
 @click.pass_context
 @pass_project(migrate=True)
 @click_run_async
-async def elt(
+async def elt(  # WPS408
     project: Project,
     ctx: click.Context,
     extractor: str,
@@ -123,7 +124,7 @@ async def elt(
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "
             "as documented here: "
-            "https://docs.meltano.com/reference/command-line-interface#run"
+            "https://docs.meltano.com/reference/command-line-interface#run",
         )
 
     tracker: Tracker = ctx.obj["tracker"]
@@ -141,7 +142,7 @@ async def elt(
         or (
             f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
             f"{extractor}--{loader}"
-        )
+        ),
     )
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -234,7 +235,7 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
             raise CliError(
                 f"Another '{job.job_name}' pipeline is already running which "
                 f"started at {existing.started_at}. To ignore this check use "
-                "the '--force' option."
+                "the '--force' option.",
             )
 
     async with job.run(session):
@@ -252,10 +253,12 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 @asynccontextmanager
 async def _redirect_output(log, output_logger):
     meltano_stdout = output_logger.out(
-        "meltano", log.bind(stdio="stdout", cmd_type="elt")
+        "meltano",
+        log.bind(stdio="stdout", cmd_type="elt"),
     )
     meltano_stderr = output_logger.out(
-        "meltano", log.bind(stdio="stderr", cmd_type="elt")
+        "meltano",
+        log.bind(stdio="stderr", cmd_type="elt"),
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
@@ -295,11 +298,16 @@ async def _run_elt(
                 "--log-level=debug ...' CLI flag.\nNote that you can also "
                 f"check the generated log file at '{output_logger.file}'.\n"
                 "For more information on debugging and logging: "
-                "https://docs.meltano.com/reference/command-line-interface#debugging"
+                "https://docs.meltano.com/reference/command-line-interface#debugging",
             ) from err
 
 
-async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa: WPS231
+async def _run_extract_load(  # noqa: WPS210, WPS231
+    log,
+    elt_context,
+    output_logger,
+    **kwargs,
+):
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -321,10 +329,14 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
             stdio="stdout",
         )
         extractor_out = output_logger.out(
-            f"{extractor} (out)", stdout_log.bind(cmd_type="extractor"), logging.DEBUG
+            f"{extractor} (out)",
+            stdout_log.bind(cmd_type="extractor"),
+            logging.DEBUG,
         )
         loader_out = output_logger.out(
-            f"{loader} (out)", stdout_log.bind(cmd_type="loader"), logging.DEBUG
+            f"{loader} (out)",
+            stdout_log.bind(cmd_type="loader"),
+            logging.DEBUG,
         )
 
         extractor_out_writer_ctxmgr = extractor_out.line_writer
@@ -336,7 +348,9 @@ async def _run_extract_load(log, elt_context, output_logger, **kwargs):  # noqa:
 
     singer_runner = SingerRunner(elt_context)
     try:
-        with extractor_log.line_writer() as extractor_log_writer:
+        # Once Python 3.9 support has been dropped, consolidate these
+        # with-statements by using parentheses.
+        with extractor_log.line_writer() as extractor_log_writer:  # noqa: SIM117
             with loader_log.line_writer() as loader_log_writer:
                 with extractor_out_writer_ctxmgr() as extractor_out_writer:
                     with loader_out_writer_ctxmgr() as loader_out_writer:
@@ -391,12 +405,14 @@ def _find_transform_for_extractor(extractor: str, plugins_service):
     discovery_service = plugins_service.discovery_service
     try:
         extractor_plugin_def = discovery_service.find_definition(
-            PluginType.EXTRACTORS, extractor
+            PluginType.EXTRACTORS,
+            extractor,
         )
 
         # Check if there is a default transform for this extractor
         transform_plugin_def = discovery_service.find_definition_by_namespace(
-            PluginType.TRANSFORMS, extractor_plugin_def.namespace
+            PluginType.TRANSFORMS,
+            extractor_plugin_def.namespace,
         )
 
         # Check if the transform has been added to the project

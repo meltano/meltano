@@ -20,7 +20,9 @@ from meltano.core.job.job import (
 class TestJob:
     def sample_job(self, payload=None):
         return Job(
-            job_name="meltano:sample-elt", state=State.IDLE, payload=payload or {}
+            job_name="meltano:sample-elt",
+            state=State.IDLE,
+            payload=payload or {},
         )
 
     def test_save(self, session):
@@ -48,7 +50,7 @@ class TestJob:
         assert transition == (State.RUNNING, State.SUCCESS)
         subject.ended_at = datetime.utcnow()
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run(self, session):
         subject = self.sample_job().save(session)
 
@@ -74,13 +76,13 @@ class TestJob:
         # Allow one additional second of delay:
         assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_failed(self, session):
         # A failed run will mark the subject as FAILED an set the payload['error']
         subject = self.sample_job({"original_state": 1}).save(session)
         exception = Exception("This is a test.")
 
-        with pytest.raises(Exception) as err:
+        with pytest.raises(Exception) as err:  # noqa: PT012, PT011
             async with subject.run(session):
                 raise exception
 
@@ -92,14 +94,14 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_interrupted(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
-        with pytest.raises(KeyboardInterrupt):
+        with pytest.raises(KeyboardInterrupt):  # noqa: PT012
             async with subject.run(session):
                 send_signal(signal.SIGINT)
 
@@ -108,15 +110,15 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was interrupted"
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_run_terminated(self, session):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/2842"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 
-        with pytest.raises(SystemExit):
+        with pytest.raises(SystemExit):  # noqa: PT012
             async with subject.run(session):
                 send_signal(signal.SIGTERM)
 

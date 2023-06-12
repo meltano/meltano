@@ -37,7 +37,10 @@ class OutputLogger:
         self.outs = {}
 
     def out(
-        self, name: str, logger=None, write_level: int | None = logging.INFO
+        self,
+        name: str,
+        logger=None,
+        write_level: int | None = logging.INFO,
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 
@@ -165,7 +168,8 @@ class Out:  # noqa: WPS230
         """
         formatter = structlog.stdlib.ProcessorFormatter(
             processor=structlog.dev.ConsoleRenderer(
-                colors=False, exception_formatter=structlog.dev.plain_traceback
+                colors=False,
+                exception_formatter=structlog.dev.plain_traceback,
             ),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         )

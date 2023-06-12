@@ -12,19 +12,19 @@ from meltano.core.venv_service import VirtualEnv
 
 
 class TestPluginInvoker:
-    @pytest.fixture
+    @pytest.fixture()
     async def plugin_invoker(self, utility, session, plugin_invoker_factory):
         subject = plugin_invoker_factory(utility)
         async with subject.prepared(session):
             yield subject
 
-    @pytest.fixture
+    @pytest.fixture()
     async def nonpip_plugin_invoker(self, nonpip_tap, session, plugin_invoker_factory):
         subject = plugin_invoker_factory(nonpip_tap)
         async with subject.prepared(session):
             yield subject
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_env(self, project, tap, session, plugin_invoker_factory):
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
@@ -62,9 +62,13 @@ class TestPluginInvoker:
             == environment_context.data["context_uuid"]
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_environment_env(
-        self, project_with_environment, tap, session, plugin_invoker_factory
+        self,
+        project_with_environment,
+        tap,
+        session,
+        plugin_invoker_factory,
     ):
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
@@ -73,23 +77,27 @@ class TestPluginInvoker:
         # Project env
         assert env["MELTANO_ENVIRONMENT"] == project_with_environment.environment.name
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_expanded_environment_env(
-        self, project_with_environment, tap, session, plugin_invoker_factory
+        self,
+        project_with_environment,
+        tap,
+        session,
+        plugin_invoker_factory,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
             env = subject.env()
 
         assert env["ENVIRONMENT_ENV_VAR"] == str(
-            project_with_environment.root / "file.txt"
+            project_with_environment.root / "file.txt",
         )
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_unknown_command(self, plugin_invoker):
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
@@ -123,7 +131,7 @@ class TestPluginInvoker:
         assert exec_args[0].endswith("utility-mock")
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_undefined_env_var(self, plugin_invoker):
         with pytest.raises(UndefinedEnvVarError) as err:
             await plugin_invoker.invoke_async(command="cmd")
@@ -147,20 +155,24 @@ class TestPluginInvoker:
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
     @pytest.mark.parametrize(
-        "executable_str,assert_fn",
-        [
-            ("tap-test", lambda exe, name: exe == "tap-test"),
+        ("executable_str", "assert_fn"),
+        (
+            ("tap-test", lambda exe, _: exe == "tap-test"),
             ("./tap-test", lambda exe, name: exe.endswith(f"{name}/tap-test")),
-            ("/apps/tap-test", lambda exe, name: exe == "/apps/tap-test"),
-        ],
+            ("/apps/tap-test", lambda exe, _: exe == "/apps/tap-test"),
+        ),
     )
-    @pytest.mark.asyncio
+    @pytest.mark.asyncio()
     async def test_expand_nonpip_command_exec_args(
-        self, nonpip_plugin_invoker, session, executable_str, assert_fn
+        self,
+        nonpip_plugin_invoker,
+        session,
+        executable_str,
+        assert_fn,
     ):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         nonpip_plugin_invoker.plugin.executable = executable_str
         exec_args = nonpip_plugin_invoker.exec_args()

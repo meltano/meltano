@@ -91,7 +91,7 @@ class Project(Versioned):  # noqa: WPS214
         self.environment: Environment | None = environment
         self.readonly = readonly
         self.sys_dir_root = Path(
-            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano")
+            os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
     def refresh(self, **kwargs) -> None:
@@ -212,12 +212,12 @@ class Project(Versioned):  # noqa: WPS214
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "
-                            f"present in {str(Path(sys.executable).parent)}"
+                            f"present in {str(Path(sys.executable).parent)}",
                         )
                 else:
                     logger.warning(
                         "Failed to create symlink to 'meltano.exe': "
-                        "administrator privilege required"
+                        "administrator privilege required",
                     )
             else:
                 executable = Path(sys.executable).parent / "meltano"
@@ -229,7 +229,7 @@ class Project(Versioned):  # noqa: WPS214
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
                     f"Could not create symlink: {error}\nPlease make sure "
-                    "that the underlying filesystem supports symlinks."
+                    "that the underlying filesystem supports symlinks.",
                 )
             else:
                 raise
@@ -315,7 +315,7 @@ class Project(Versioned):  # noqa: WPS214
 
         conf: dict[str, t.Any] = yaml.load(self.meltanofile)
         if conf is None:
-            raise EmptyMeltanoFileException()
+            raise EmptyMeltanoFileException
 
         lock = (
             self._meltano_rw_lock.write_lock
@@ -428,12 +428,11 @@ class Project(Versioned):  # noqa: WPS214
         self.refresh()
 
     @makedirs
-    def meltano_dir(self, *joinpaths, make_dirs: bool = True):
+    def meltano_dir(self, *joinpaths):
         """Path to the project `.meltano` directory.
 
         Args:
             joinpaths: Paths to join to the `.meltano` directory.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
@@ -441,12 +440,11 @@ class Project(Versioned):  # noqa: WPS214
         return self.sys_dir_root.joinpath(*joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths, make_dirs: bool = True):
+    def analyze_dir(self, *joinpaths):
         """Path to the project `analyze` directory.
 
         Args:
             joinpaths: Paths to join to the `analyze` directory.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `analyze` dir optionally joined to given paths.
@@ -454,12 +452,11 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths, make_dirs: bool = True):
+    def extract_dir(self, *joinpaths):
         """Path to the project `extract` directory.
 
         Args:
             joinpaths: Paths to join to the `extract` directory.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `extract` dir optionally joined to given paths.
@@ -467,99 +464,86 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes, make_dirs: bool = True):
+    def venvs_dir(self, *prefixes):
         """Path to a `venv` directory in `.meltano`.
 
         Args:
             prefixes: Paths to prepend to the `venv` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `venv` dir optionally prepended with given prefixes.
         """
-        return self.meltano_dir(*prefixes, "venv", make_dirs=make_dirs)
+        return self.meltano_dir(*prefixes, "venv")
 
     @makedirs
-    def run_dir(self, *joinpaths, make_dirs: bool = True):
+    def run_dir(self, *joinpaths):
         """Path to the `run` directory in `.meltano`.
 
         Args:
             joinpaths: Paths to join to the `run` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `run` dir optionally joined to given paths.
         """
-        return self.meltano_dir("run", *joinpaths, make_dirs=make_dirs)
+        return self.meltano_dir("run", *joinpaths)
 
     @makedirs
-    def logs_dir(self, *joinpaths, make_dirs: bool = True):
+    def logs_dir(self, *joinpaths):
         """Path to the `logs` directory in `.meltano`.
 
         Args:
             joinpaths: Paths to join to the `logs` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `logs` dir optionally joined to given paths.
         """
-        return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
+        return self.meltano_dir("logs", *joinpaths)
 
     @makedirs
-    def job_dir(self, state_id, *joinpaths, make_dirs: bool = True):
+    def job_dir(self, state_id, *joinpaths):
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
             state_id: State ID of `run` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.run_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
-        )
+        return self.run_dir("elt", sanitize_filename(state_id), *joinpaths)
 
     @makedirs
-    def job_logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):
+    def job_logs_dir(self, state_id, *joinpaths):
         """Path to the `elt` directory in `.meltano/logs`.
 
         Args:
             state_id: State ID of `logs` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.logs_dir(
-            "elt", sanitize_filename(state_id), *joinpaths, make_dirs=make_dirs
-        )
+        return self.logs_dir("elt", sanitize_filename(state_id), *joinpaths)
 
     @makedirs
-    def plugin_dir(self, plugin: PluginRef, *joinpaths, make_dirs: bool = True):
+    def plugin_dir(self, plugin: PluginRef, *joinpaths):
         """Path to the plugin installation directory in `.meltano`.
 
         Args:
             plugin: Plugin to retrieve or create directory for.
             joinpaths: Paths to join to the plugin installation directory in `.meltano`.
-            make_dirs: Flag to make directories if not exists.
 
         Returns:
             Resolved path to plugin installation dir optionally joined to given paths.
         """
-        return self.meltano_dir(
-            plugin.type, plugin.name, *joinpaths, make_dirs=make_dirs
-        )
+        return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
 
     @makedirs
-    def root_plugins_dir(self, *joinpaths: str, make_dirs: bool = True):
+    def root_plugins_dir(self, *joinpaths: str):
         """Path to the project `plugins` directory.
 
         Args:
             joinpaths: Paths to join with the project `plugins` directory.
-            make_dirs: If True, create the directory hierarchy if it does not exist.
 
         Returns:
             Path to the project `plugins` directory.
@@ -572,7 +556,6 @@ class Project(Versioned):  # noqa: WPS214
         plugin_type: str,
         plugin_name: str,
         variant_name: str | None = None,
-        make_dirs: bool = True,
     ):
         """Path to the project lock file.
 
@@ -580,7 +563,6 @@ class Project(Versioned):  # noqa: WPS214
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
-            make_dirs: If True, create the directory hierarchy if it does not exist.
 
         Returns:
             Path to the plugin lock file.
@@ -590,11 +572,7 @@ class Project(Versioned):  # noqa: WPS214
         if variant_name:
             filename = f"{filename}--{variant_name}"
 
-        return self.root_plugins_dir(
-            plugin_type,
-            f"{filename}.lock",
-            make_dirs=make_dirs,
-        )
+        return self.root_plugins_dir(plugin_type, f"{filename}.lock")
 
     def __eq__(self, other):
         """Project equivalence check.

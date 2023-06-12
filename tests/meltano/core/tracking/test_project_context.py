@@ -11,7 +11,6 @@ from meltano.core.utils import hash_sha256
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
     from fixtures.docker import SnowplowMicro
-    from meltano.core.project import Project
 
 
 @pytest.mark.parametrize(
@@ -31,12 +30,12 @@ if t.TYPE_CHECKING:
         "explicit-prod",
     ),
 )
+@pytest.mark.usefixtures("project")
 def test_environment_name_hash(
     cmd: str,
     expected: str,
     snowplow: SnowplowMicro,
     cli_runner: MeltanoCliRunner,
-    project: Project,
 ):
     results = cli_runner.invoke(cli, cmd.split())
     assert_cli_runner(results)

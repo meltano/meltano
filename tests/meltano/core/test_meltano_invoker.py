@@ -8,7 +8,6 @@ from pathlib import Path
 
 import mock
 import pytest
-from pytest import MonkeyPatch
 
 import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
@@ -17,20 +16,20 @@ from meltano.core.tracking.contexts import environment_context
 
 
 class TestMeltanoInvoker:
-    @pytest.fixture
+    @pytest.fixture()
     def subject(self, project):
         return MeltanoInvoker(project)
 
     def test_invoke(self, subject: MeltanoInvoker):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
         assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
 
-    def test_env(self, subject: MeltanoInvoker, monkeypatch: MonkeyPatch):
+    def test_env(self, subject: MeltanoInvoker, monkeypatch: pytest.MonkeyPatch):
         # Process env vars are injected
         monkeypatch.setenv("ENV_VAR_KEY", "ENV_VAR_VALUE_1")
         assert subject._executable_env()["ENV_VAR_KEY"] == "ENV_VAR_VALUE_1"
@@ -48,7 +47,7 @@ class TestMeltanoInvoker:
     def test_invoke_executable(self, subject: MeltanoInvoker, project: Project):
         if platform.system() == "Windows":
             pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444"
+                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         process_mock = mock.Mock(returncode=0)
         with mock.patch("subprocess.run", return_value=process_mock) as run_mock:

@@ -27,6 +27,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
       - id: end-of-file-fixer
+        exclude: ^.*/plugins/.*/*.\.lock$
       - id: check-yaml
       - id: check-json
       - id: pretty-format-json
@@ -37,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.22.0
+    rev: 0.23.1
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -52,14 +53,14 @@ repos:
         args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.2
+    rev: v0.9.0.5
     hooks:
       - id: shellcheck
         name: shellcheck
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.36.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.42.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
@@ -70,26 +71,26 @@ repos:
           - "@vue/eslint-config-prettier@7.0.0"
           - "@vue/babel-preset-app@5.0.8"
           - "@babel/eslint-parser@7.19.1"
-          - "eslint@8.35.0" # Keep this in sync with the rev above!
+          - "eslint@8.39.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.5.0"
           - "eslint-plugin-prettier@4.2.1"
           - "eslint-plugin-vue@9.8.0"
           - "prettier@2.8.1"
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.257
+    rev: v0.0.270
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix]
 
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.3.0
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)
 
   - repo: https://github.com/flakeheaven/flakeheaven
-    rev: 3.2.1
+    rev: 3.3.0
     hooks:
       - id: flakeheaven
         exclude: ^(src/meltano/migrations/)

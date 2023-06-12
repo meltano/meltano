@@ -11,7 +11,7 @@ ENV PIP_NO_CACHE_DIR=1
 
 RUN mkdir "${WORKDIR}" && \
     apt-get update && \
-    apt-get install -y build-essential git && \
+    apt-get install -y build-essential freetds-bin freetds-dev git libkrb5-dev libssl-dev tdsodbc unixodbc unixodbc-dev && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 WORKDIR "${WORKDIR}"
@@ -22,7 +22,7 @@ ENV PATH="/venv/bin:${PATH}"
 
 # Installing the application the same way our users do when using PyPI
 RUN pip install --upgrade pip wheel && \
-    pip install "meltano==${MELTANO_VERSION}"
+    pip install "meltano[azure,gcs,mssql,s3]==${MELTANO_VERSION}"
 
 # Run the Meltano UI by default
 EXPOSE 5000

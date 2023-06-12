@@ -25,7 +25,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
         # detectable on our end, unlike if we had just filtered it out
         # completely.
         logger.debug(
-            "Plugin tracker context some how encountered plugin without info attr."
+            "Plugin tracker context some how encountered plugin without info attr.",
         )
         return {}
 
@@ -77,7 +77,7 @@ class PluginsTrackingContext(SelfDescribingJson):
                 (
                     (elt_context.extractor.plugin, None),
                     (elt_context.loader.plugin, None),
-                )
+                ),
             )
         if elt_context.transformer:
             plugins.append((elt_context.transformer.plugin, None))
@@ -107,12 +107,13 @@ class PluginsTrackingContext(SelfDescribingJson):
             return cls([(blk.context.plugin, blk.command)])
         raise TypeError(
             "Parameter 'blk' must be an instance of 'BlockSet' or "
-            f"'PluginCommandBlock', not {type(blk)!r}"
+            f"'PluginCommandBlock', not {type(blk)!r}",
         )
 
     @classmethod
     def from_blocks(
-        cls, parsed_blocks: list[BlockSet | PluginCommandBlock]
+        cls,
+        parsed_blocks: list[BlockSet | PluginCommandBlock],
     ) -> PluginsTrackingContext:
         """Create a `PluginsTrackingContext` from blocks.
 

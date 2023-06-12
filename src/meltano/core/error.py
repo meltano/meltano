@@ -100,8 +100,14 @@ class PluginInstallWarning(Exception):
     """Exception for when a plugin optional optional step fails to install."""
 
 
-class EmptyMeltanoFileException(Exception):
+class EmptyMeltanoFileException(MeltanoError):
     """Exception for empty meltano.yml file."""
+
+    def __init__(self) -> None:
+        """Instantiate the error."""
+        reason = "Your meltano.yml file is empty"
+        instruction = "Please update your meltano file with a valid configuration"
+        super().__init__(reason, instruction)
 
 
 class MeltanoConfigurationError(MeltanoError):
@@ -118,7 +124,7 @@ class ProjectNotFound(Error):
             project: the name of the project which cannot be found
         """
         super().__init__(
-            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?"
+            f"Cannot find `{project.meltanofile}`. Are you in a meltano project?",
         )
 
 

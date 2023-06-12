@@ -41,8 +41,12 @@ class SingerPlugin(BasePlugin):
         return processed_config
 
     @hook("before_configure")
-    async def before_configure(self, invoker, session):
-        """Create configuration file."""
+    async def before_configure(
+        self,
+        invoker,
+        session,  # noqa: ARG002
+    ):
+        """Create configuration file."""  # noqa: DAR101
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config = invoker.plugin_config_processed

@@ -10,7 +10,7 @@ def assert_cli_runner(results: Result, message=None):
 
     if results.exception:
         assertion_message += "".join(
-            ("\n", *traceback.format_exception(*results.exc_info))
+            ("\n", *traceback.format_exception(*results.exc_info)),
         )
 
     assert results.exit_code == 0, assertion_message

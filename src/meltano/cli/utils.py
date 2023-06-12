@@ -74,7 +74,8 @@ def print_added_plugin(
 
     if plugin.should_add_to_file():
         click.secho(
-            f"Added {descriptor} '{plugin.name}' to your Meltano project", fg="green"
+            f"Added {descriptor} '{plugin.name}' to your Meltano project",
+            fg="green",
         )
     else:
         click.secho(
@@ -110,21 +111,21 @@ def _prompt_plugin_namespace(plugin_type, plugin_name):
     click.echo(
         f"\nSpecify the plugin's {click.style('namespace', fg='blue')}, which "
         "will serve as the:\n"
-        "- identifier to find related/compatible plugins"
+        "- identifier to find related/compatible plugins",
     )
     if plugin_type == PluginType.EXTRACTORS:
         click.echo(
             "- default database schema (`load_schema` extra),"
-            "  for use by loaders that support a target schema"
+            "  for use by loaders that support a target schema",
         )
     elif plugin_type == PluginType.LOADERS:
         click.echo(
             "- default target database dialect (`dialect` extra),"
-            "  for use by transformers that connect with the database"
+            "  for use by transformers that connect with the database",
         )
     click.echo(
         "\nHit Return to accept the default: plugin name with underscores "
-        "instead of dashes\n"
+        "instead of dashes\n",
     )
 
     return click.prompt(
@@ -145,10 +146,12 @@ def _prompt_plugin_pip_url(plugin_name: str) -> str | None:
         "- local directory, in editable/development mode:\n"
         f"\t-e extract/{plugin_name}\n"
         "- 'n' if using a local executable (nothing to install)\n\n"
-        "Default: plugin name as PyPI package name\n"
+        "Default: plugin name as PyPI package name\n",
     )
     result = click.prompt(
-        click.style("(pip_url)", fg="blue"), type=str, default=plugin_name
+        click.style("(pip_url)", fg="blue"),
+        type=str,
+        default=plugin_name,
     )
     return None if result == "n" else result
 
@@ -161,7 +164,7 @@ def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
         prompt_request = "executable path"
     click.echo(
         f"\nSpecify the plugin's {click.style(prompt_request, fg='blue')}\n"
-        f"\nDefault: name derived from {derived_from}\n"
+        f"\nDefault: name derived from {derived_from}\n",
     )
     plugin_basename = os.path.basename(pip_url or plugin_name)
     package_name, _ = os.path.splitext(plugin_basename)
@@ -183,7 +186,7 @@ def _prompt_plugin_capabilities(plugin_type):
         "documentation or try one of the tricks under"
         "https://docs.meltano.com/guide/integration#troubleshooting.\n\n"
         "Multiple capabilities can be separated using commas.\n\n"
-        "Default: no capabilities\n"
+        "Default: no capabilities\n",
     )
 
     return click.prompt(
@@ -211,10 +214,10 @@ def _prompt_plugin_settings(plugin_type):
         "A setting kind can be specified alongside the name (key) by using "
         "the `:` delimiter,\n"
         "e.g. `port:integer` to set the kind `integer` for the name `port`\n\n"
-        "Supported setting kinds:"
+        "Supported setting kinds:",
     )
     click.echo(
-        " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind])
+        " | ".join([click.style(kind.value, fg="magenta") for kind in SettingKind]),
     )
     click.echo(
         "\n- Credentials and other sensitive setting types should use the "
@@ -225,7 +228,7 @@ def _prompt_plugin_settings(plugin_type):
         'e.g. `auth.username` for `{ "auth": { "username": value } }`.\n'
         f"- To find out what settings a {plugin_type.descriptor} supports, "
         "reference its documentation.\n"
-        "\nDefault: no settings\n"
+        "\nDefault: no settings\n",
     )
 
     settings: dict | None = None
@@ -252,7 +255,6 @@ def _prompt_plugin_settings(plugin_type):
 
 
 def add_plugin(
-    project: Project,
     plugin_type: PluginType,
     plugin_name: str,
     add_service: ProjectAddService,
@@ -322,7 +324,7 @@ def add_plugin(
                 f"{plugin.name}--{new_plugin.variant} --inherit-from {plugin.name} "
                 f"--variant {new_plugin.variant}\n\n"
                 "To learn more, visit "
-                "https://docs.meltano.com/guide/plugin-management#multiple-variants"
+                "https://docs.meltano.com/guide/plugin-management#multiple-variants",
             )
         else:
             click.echo(
@@ -331,7 +333,7 @@ def add_plugin(
                 "add a new plugin inheriting from the existing one with its "
                 "own unique name:\n"
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new "
-                f"--inherit-from {plugin.name}"
+                f"--inherit-from {plugin.name}",
             )
     except LockfileAlreadyExistsError as exc:
         # TODO: This is a BasePlugin, not a ProjectPlugin, as this method
@@ -352,7 +354,6 @@ def add_plugin(
 
 
 def add_required_plugins(
-    project: Project,
     plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
     lock: bool = True,
@@ -459,7 +460,8 @@ def propagate_stop_signals(proc):
 
 
 def check_dependencies_met(
-    plugin_refs: list[PluginRef], plugins_service: ProjectPluginsService
+    plugin_refs: list[PluginRef],
+    plugins_service: ProjectPluginsService,
 ) -> tuple[bool, str]:
     """Check dependencies of added plugins are met.
 
@@ -483,7 +485,7 @@ def check_dependencies_met(
                 passed = False
                 messages.append(
                     f"Plugin '{plugin.name}' requires a transformer plugin. "
-                    "Please first add a transformer using `meltano add transformer`."
+                    "Please first add a transformer using `meltano add transformer`.",
                 )
     if passed:
         message = "All dependencies met"
@@ -493,7 +495,9 @@ def check_dependencies_met(
 
 
 def activate_environment(
-    ctx: click.Context, project: Project, required: bool = False
+    ctx: click.Context,
+    project: Project,
+    required: bool = False,
 ) -> None:
     """Activate the selected environment.
 
@@ -523,7 +527,8 @@ def activate_environment(
 
 
 def activate_explicitly_provided_environment(
-    ctx: click.Context, project: Project
+    ctx: click.Context,
+    project: Project,
 ) -> None:
     """Activate the selected environment if it has been explicitly set.
 
@@ -539,7 +544,7 @@ def activate_explicitly_provided_environment(
         logger.info(
             f"The default environment {ctx.obj['selected_environment']!r} will "
             f"be ignored for `meltano {ctx.command.name}`. To configure a specific "
-            "environment, please use the option `--environment=<environment name>`."
+            "environment, please use the option `--environment=<environment name>`.",
         )
         project.deactivate_environment()
     else:

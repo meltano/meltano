@@ -40,7 +40,8 @@ class DBStateStoreManager(StateStoreManager):
         if existing_job_state:
             if existing_job_state.partial_state and not state.is_complete():
                 partial_state = merge(
-                    state.partial_state, existing_job_state.partial_state
+                    state.partial_state,
+                    existing_job_state.partial_state,
                 )
             if not state.is_complete():
                 completed_state = existing_job_state.completed_state

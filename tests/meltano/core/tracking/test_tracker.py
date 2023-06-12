@@ -12,7 +12,6 @@ from time import sleep
 
 import mock
 import pytest
-from pytest import MonkeyPatch
 from snowplow_tracker import Emitter
 
 from meltano.core.project import Project
@@ -79,7 +78,8 @@ class TestTracker:
 
     def test_telemetry_state_change_check(self, project: Project):
         with mock.patch.object(
-            Tracker, "save_telemetry_settings"
+            Tracker,
+            "save_telemetry_settings",
         ) as mocked, delete_analytics_json(project):
             Tracker(project)
             assert mocked.call_count == 1
@@ -102,7 +102,7 @@ class TestTracker:
                 analytics_json_pre["client_id"],
                 analytics_json_pre["project_id"],
                 analytics_json_pre["send_anonymous_usage_stats"],
-            )
+            ),
         )
 
         # Ensure `send_anonymous_usage_stats` has been flipped on disk
@@ -174,17 +174,19 @@ class TestTracker:
 
     @pytest.mark.parametrize(
         "analytics_json_content",
-        [
+        (
             f'{{"clientId":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
             f'{{"client_id":"{str(uuid.uuid4())}","projectId":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
             f'{{"client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anon_usage_stats":true}}',  # noqa: E501
             f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
             f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-        ],
+        ),
         ids=(0, 1, 2, 3, 4),
     )
     def test_invalid_analytics_json_is_overwritten(
-        self, project: Project, analytics_json_content: str
+        self,
+        project: Project,
+        analytics_json_content: str,
     ):
         with delete_analytics_json(project):
             # Use `delete_analytics_json` to ensure `analytics.json` is restored after
@@ -192,7 +194,7 @@ class TestTracker:
             with open(analytics_json_path, "w") as analytics_json_file:
                 analytics_json_file.write(analytics_json_content)
 
-            with pytest.raises(Exception):
+            with pytest.raises((TypeError, KeyError, json.JSONDecodeError)):
                 check_analytics_json(project)
 
             Tracker(project)
@@ -238,7 +240,7 @@ class TestTracker:
                 project.settings.config_override = original_config_override
 
     @pytest.mark.parametrize(
-        "snowplow_endpoints,send_stats,expected",
+        ("snowplow_endpoints", "send_stats", "expected"),
         (
             (["https://example.com"], True, True),
             (["https://example.com"], False, False),
@@ -274,7 +276,9 @@ class TestTracker:
 
     @pytest.mark.parametrize("setting_value", (False, True))
     def test_send_anonymous_usage_stats_no_env(
-        self, project: Project, setting_value: bool
+        self,
+        project: Project,
+        setting_value: bool,
     ):
         project.settings.set("send_anonymous_usage_stats", setting_value)
         assert Tracker(project).send_anonymous_usage_stats is setting_value
@@ -282,7 +286,8 @@ class TestTracker:
     def test_default_send_anonymous_usage_stats(self, project: Project):
         assert Tracker(project).send_anonymous_usage_stats
 
-    def test_exit_event_is_fired(self, project: Project, snowplow: SnowplowMicro):
+    @pytest.mark.usefixtures("project")
+    def test_exit_event_is_fired(self, snowplow: SnowplowMicro):
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
         event_summary = snowplow.all()
@@ -295,7 +300,9 @@ class TestTracker:
 
     @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
     def test_context_with_telemetry_state_change_event(
-        self, project: Project, send_anonymous_usage_stats: bool
+        self,
+        project: Project,
+        send_anonymous_usage_stats: bool,
     ):
         tracker = Tracker(project)
         tracker.send_anonymous_usage_stats = send_anonymous_usage_stats
@@ -317,17 +324,23 @@ class TestTracker:
         tracker.snowplow_tracker = MockSnowplowTracker()
 
         tracker.track_telemetry_state_change_event(
-            "project_id", uuid.uuid4(), uuid.uuid4()
+            "project_id",
+            uuid.uuid4(),
+            uuid.uuid4(),
         )
         assert passed
 
         tracker.track_telemetry_state_change_event(
-            "send_anonymous_usage_stats", True, False
+            "send_anonymous_usage_stats",
+            True,
+            False,
         )
         assert passed
 
         tracker.track_telemetry_state_change_event(
-            "send_anonymous_usage_stats", False, True
+            "send_anonymous_usage_stats",
+            False,
+            True,
         )
         assert passed
 
@@ -337,7 +350,10 @@ class TestTracker:
         ids=("no_timeout", "timeout"),
     )
     def test_timeout_if_endpoint_unavailable(
-        self, project: Project, sleep_duration, timeout_should_occur
+        self,
+        project: Project,
+        sleep_duration,
+        timeout_should_occur,
     ):
         """Test to ensure that the default tracker timeout is respected.
 
@@ -357,7 +373,8 @@ class TestTracker:
 
         server = server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler)
         server_thread = Thread(
-            target=server.serve_forever, kwargs={"poll_interval": 0.1}
+            target=server.serve_forever,
+            kwargs={"poll_interval": 0.1},
         )
         server_thread.start()
 
@@ -366,7 +383,7 @@ class TestTracker:
             f'["http://localhost:{server.server_port}"]',
         )
 
-        def emitter_failure_callback(_, failure_events: list):
+        def emitter_failure_callback(_, failure_events: list):  # noqa: ARG001
             nonlocal timeout_occured
             # `timeout_occured` is technically a misnomer here, since there are
             # multiple reasons for failure, but this callback doesn't let us
@@ -387,7 +404,9 @@ class TestTracker:
         assert timeout_occured is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
-        self, project: Project, monkeypatch
+        self,
+        project: Project,
+        monkeypatch,
     ):
         def get_source():
             return ProjectContext(project, uuid.uuid4()).to_json()["data"][
@@ -406,7 +425,10 @@ class TestTracker:
         assert get_source() == "env"
 
     def test_get_snowplow_tracker_invalid_endpoint(
-        self, project: Project, caplog, monkeypatch
+        self,
+        project: Project,
+        caplog,
+        monkeypatch,
     ):
         endpoints = """
             [
@@ -447,7 +469,11 @@ class TestTracker:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
 
-    def test_client_id_from_env_var(self, project: Project, monkeypatch: MonkeyPatch):
+    def test_client_id_from_env_var(
+        self,
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         with delete_analytics_json(project):
             monkeypatch.setenv("MELTANO_CLIENT_ID", "invalid-context-uuid")
             with pytest.warns(RuntimeWarning, match="Invalid telemetry client UUID"):

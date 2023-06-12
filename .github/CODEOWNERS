@@ -15,12 +15,12 @@
 
 # Discovery (End-of-Life)
 
-/src/meltano/core/bundle/discovery.yml @aaronsteers
+/src/meltano/core/bundle/discovery.yml @meltano/engineering
 
 # Web App and API owners
 
-/src/webapp/ @rwfeather @cjohnhanson
-/src/meltano/api/ @rwfeather @cjohnhanson
+/src/webapp/ @cjohnhanson
+/src/meltano/api/ @cjohnhanson
 
 # Docs (General)
 

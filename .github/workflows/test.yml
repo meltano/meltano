@@ -6,6 +6,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
@@ -15,6 +16,7 @@ on:
       - src/**
       - tests/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
@@ -85,7 +87,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -95,7 +97,7 @@ jobs:
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.5.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -230,7 +232,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -240,7 +242,7 @@ jobs:
         poetry --version
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4.5.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: '3.10'
         architecture: x64
@@ -270,7 +272,7 @@ jobs:
         nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
-      uses: codecov/codecov-action@v3.1.1
+      uses: codecov/codecov-action@v3.1.4
 
   mypy:
     name: "Static type checking"
@@ -280,7 +282,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.4.0
+      uses: actions/checkout@v3.5.2
 
     - name: Install Poetry
       env:
@@ -290,7 +292,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.10
-      uses: actions/setup-python@v4.5.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: '3.10'
         architecture: x64

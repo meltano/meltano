@@ -68,14 +68,20 @@ def connection(engine_sessionmaker):  # noqa: WPS442
         with warnings.catch_warnings():
             # Ignore warnings about rolling back the same transaction twice
             warnings.filterwarnings(
-                "ignore", "transaction already deassociated from connection", SAWarning
+                "ignore",
+                "transaction already deassociated from connection",
+                SAWarning,
             )
             transaction.rollback()
         connection.close()
 
 
 @pytest.fixture()
-def session(project: Project, engine_sessionmaker, connection):  # noqa: WPS442
+def session(
+    project: Project,  # noqa: ARG001
+    engine_sessionmaker,
+    connection,
+):  # noqa: WPS442
     """Create a new database session for a test.
 
     Args:

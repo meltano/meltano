@@ -7,9 +7,8 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli import CliError, cli
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliEnvironmentBehavior, PartialInstrumentedCmd
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -27,7 +26,7 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-@cli.command(
+@click.command(
     cls=PartialInstrumentedCmd,
     short_help="Run a set of plugins in series.",
     environment_behavior=CliEnvironmentBehavior.environment_required,
@@ -183,7 +182,7 @@ async def _run_blocks(
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise CliError(
-                f"Run invocation could not be completed as block failed: {err}"
+                f"Run invocation could not be completed as block failed: {err}",
             ) from err
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions

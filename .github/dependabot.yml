@@ -8,9 +8,27 @@ updates:
       timezone: "UTC"
     reviewers: [meltano/engineering]
     labels: [deps]
+    commit-message:
+      prefix: "ci: "
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: daily
+      time: "12:00"
+      timezone: "UTC"
     reviewers: [meltano/engineering]
     labels: [deps]
+    commit-message:
+      prefix: "ci: "
+  - package-ecosystem: pip
+    versioning-strategy: increase
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "12:00"
+      timezone: "UTC"
+    reviewers: [meltano/engineering]
+    labels: [deps]
+    commit-message:
+      prefix: "chore(deps): "
+      prefix-development: "chore(deps-dev): "

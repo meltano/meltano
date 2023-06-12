@@ -41,8 +41,8 @@ class PIDFile:
 
         try:
             return psutil.Process(self.pid)
-        except psutil.NoSuchProcess:
-            raise UnknownProcessError(self)
+        except psutil.NoSuchProcess as ex:
+            raise UnknownProcessError(self) from ex
 
     def unlink(self):
         return self.path.unlink()

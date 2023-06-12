@@ -7,7 +7,10 @@ import typing as t
 
 from meltano.core.plugin import BasePlugin, PluginType, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import (
+    DefinitionSource,
+    PluginAlreadyAddedException,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -67,7 +70,7 @@ class ProjectAddService:
             default_variant=Variant.DEFAULT_NAME,
         )
 
-        with self.project.plugins.disallow_discovery_yaml():
+        with self.project.plugins.use_preferred_source(~DefinitionSource.DISCOVERY):
             self.project.plugins.ensure_parent(plugin)
 
             # If we are inheriting from a base plugin definition,
@@ -98,7 +101,7 @@ class ProjectAddService:
         """
         return self.project.plugins.add_to_file(plugin)
 
-    def add_required(
+    def add_required(  # noqa: WPS210
         self,
         plugin: ProjectPlugin,
         *,

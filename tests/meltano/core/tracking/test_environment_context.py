@@ -22,7 +22,8 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
             )
 
         assert EnvironmentContext().data["notable_flag_env_vars"] == dict.fromkeys(
-            EnvironmentContext.notable_flag_env_vars, expected
+            EnvironmentContext.notable_flag_env_vars,
+            expected,
         )
 
     check(("Yes", "TRUE", "1", "true", "y", "on", "t"), True)

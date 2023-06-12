@@ -34,19 +34,19 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v3.4.0
+    - uses: actions/checkout@v3.5.2
       with:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4.5.0
+      uses: actions/setup-python@v4.6.1
       with:
         python-version: "3.10"
         architecture: x64
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@0.18.0
+      uses: commitizen-tools/commitizen-action@0.18.2
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
@@ -69,7 +69,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
+      uses: peter-evans/create-pull-request@v5
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request

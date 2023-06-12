@@ -212,7 +212,11 @@ class SettingsStoreManager(ABC):
     readable = True
     writable = False
 
-    def __init__(self, settings_service: SettingsService, **kwargs):
+    def __init__(
+        self,
+        settings_service: SettingsService,
+        **kwargs,  # noqa: ARG002
+    ):
         """Initialise settings store manager.
 
         Args:
@@ -312,8 +316,8 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
     def get(
         self,
         name: str,
-        setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
@@ -343,7 +347,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
     def get(
         self,
-        name: str,
+        name: str,  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
         cast_value: bool = False,
     ) -> tuple[str, dict]:
@@ -375,10 +379,10 @@ class BaseEnvStoreManager(SettingsStoreManager):
         if len(vals_with_metadata) > 1:
             if reduce(eq, (val for val, _ in vals_with_metadata)):
                 raise MultipleEnvVarsSetException(
-                    [metadata["env_var"] for _, metadata in vals_with_metadata]
+                    [metadata["env_var"] for _, metadata in vals_with_metadata],
                 )
             raise ConflictingSettingValueException(
-                [metadata["env_var"] for _, metadata in vals_with_metadata]
+                [metadata["env_var"] for _, metadata in vals_with_metadata],
             )
 
         value, metadata = vals_with_metadata[0] if vals_with_metadata else (None, {})
@@ -494,7 +498,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
         return value, metadata
 
-    def set(self, name: str, path: list[str], value, setting_def=None):
+    def set(self, name: str, path: list[str], value, setting_def=None):  # noqa: ARG002
         """Set value by name in the .env file.
 
         Args:
@@ -531,8 +535,8 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
     def unset(
         self,
-        name: str,
-        path: list[str],
+        name: str,  # noqa: ARG002
+        path: list[str],  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Unset value by SettingDefinition in the .env file.
@@ -659,7 +663,8 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
             vals_with_metadata.append((value, {"key": key, "expandable": True}))
 
         if len(vals_with_metadata) > 1 and not reduce(
-            eq, (val for val, _ in vals_with_metadata)
+            eq,
+            (val for val, _ in vals_with_metadata),
         ):
             raise ConflictingSettingValueException(
                 metadata["key"] for _, metadata in vals_with_metadata
@@ -837,7 +842,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
             raise StoreNotSupportedError(
-                "Project config cannot be stored in an Environment."
+                "Project config cannot be stored in an Environment.",
             )
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
@@ -874,7 +879,11 @@ class DbStoreManager(SettingsStoreManager):
     writable = True
 
     def __init__(
-        self, *args, bulk: bool = False, session: Session | None = None, **kwargs
+        self,
+        *args,
+        bulk: bool = False,
+        session: Session | None = None,
+        **kwargs,
     ):
         """Initialise DbStoreManager.
 
@@ -890,7 +899,10 @@ class DbStoreManager(SettingsStoreManager):
         self.bulk = bulk
         self._all_settings = None
 
-    def ensure_supported(self, method: str = "get") -> None:
+    def ensure_supported(
+        self,
+        method: str = "get",  # noqa: ARG002
+    ) -> None:
         """Return True if passed method is supported by this store.
 
         Args:
@@ -905,8 +917,8 @@ class DbStoreManager(SettingsStoreManager):
     def get(
         self,
         name: str,
-        setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
@@ -937,9 +949,9 @@ class DbStoreManager(SettingsStoreManager):
     def set(
         self,
         name: str,
-        path: list[str],
+        path: list[str],  # noqa: ARG002
         value: t.Any,
-        setting_def: SettingDefinition | None = None,
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
     ) -> dict:
         """Set value by name in the system database.
 
@@ -953,7 +965,10 @@ class DbStoreManager(SettingsStoreManager):
             An empty dictionary.
         """
         setting = Setting(
-            namespace=self.namespace, name=name, value=value, enabled=True
+            namespace=self.namespace,
+            name=name,
+            value=value,
+            enabled=True,
         )
         self.session.merge(setting)
         self.session.commit()
@@ -966,8 +981,8 @@ class DbStoreManager(SettingsStoreManager):
     def unset(
         self,
         name: str,
-        path: list[str],
-        setting_def: SettingDefinition | None = None,
+        path: list[str],  # noqa: ARG002
+        setting_def: SettingDefinition | None = None,  # noqa: ARG002
     ) -> dict:
         """Unset value by name in the system database store.
 
@@ -980,7 +995,8 @@ class DbStoreManager(SettingsStoreManager):
             An empty dictionary.
         """
         self.session.query(Setting).filter_by(
-            namespace=self.namespace, name=name
+            namespace=self.namespace,
+            name=name,
         ).delete()
         self.session.commit()
 
@@ -1035,7 +1051,11 @@ class InheritedStoreManager(SettingsStoreManager):
     label = "inherited"
 
     def __init__(
-        self, settings_service: SettingsService, *args, bulk: bool = False, **kwargs
+        self,
+        settings_service: SettingsService,
+        *args,
+        bulk: bool = False,
+        **kwargs,
     ):
         """Initialize inherited store manager.
 
@@ -1054,7 +1074,7 @@ class InheritedStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
@@ -1132,7 +1152,7 @@ class DefaultStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 

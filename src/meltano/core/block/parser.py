@@ -38,7 +38,8 @@ def is_command_block(plugin: ProjectPlugin) -> bool:
 
 
 def validate_block_sets(
-    log: structlog.BoundLogger, blocks: list[BlockSet | PluginCommandBlock]
+    log: structlog.BoundLogger,
+    blocks: list[BlockSet | PluginCommandBlock],
 ) -> bool:
     """Perform validation of all blocks in a list that implement the BlockSet interface.
 
@@ -117,7 +118,7 @@ class BlockParser:  # noqa: D101
             if plugin and task_sets_service.exists(name):
                 raise click.ClickException(
                     f"Ambiguous reference to '{name}' which matches a job "
-                    "name AND a plugin name."
+                    "name AND a plugin name.",
                 )
 
             if plugin.type == PluginType.MAPPERS:
@@ -134,6 +135,15 @@ class BlockParser:  # noqa: D101
                 )
 
             self.log.debug("found plugin in cli invocation", plugin_name=plugin.name)
+
+    @property
+    def plugins(self) -> list[ProjectPlugin]:
+        """Return the list of plugins in the block.
+
+        Returns:
+            A list of ProjectPlugin.
+        """
+        return self._plugins
 
     def _expand_jobs(self, blocks: list[str], task_sets: TaskSetsService) -> list[str]:
         """Expand any jobs present in a list of blocks into their raw block names.
@@ -163,7 +173,8 @@ class BlockParser:  # noqa: D101
         return expanded_blocks
 
     def find_blocks(
-        self, offset: int = 0
+        self,
+        offset: int = 0,
     ) -> t.Generator[BlockSet | PluginCommandBlock, None, None]:
         """Find all blocks in the invocation.
 
@@ -200,7 +211,7 @@ class BlockParser:  # noqa: D101
             else:
                 raise BlockSetValidationError(
                     "Unknown command type or bad block sequence at index "
-                    f"{cur + 1}, starting block '{plugin.name}'"  # noqa: WPS237
+                    f"{cur + 1}, starting block '{plugin.name}'",  # noqa: WPS237
                 )
 
     def _find_plugin_or_mapping(self, name: str) -> ProjectPlugin | None:
@@ -228,7 +239,7 @@ class BlockParser:  # noqa: D101
 
         if len(mapper) > 1:
             raise click.ClickException(
-                f"Ambiguous mapping name {name}, found multiple matches."
+                f"Ambiguous mapping name {name}, found multiple matches.",
             )
         return mapper[0] if mapper else None
 
@@ -266,7 +277,8 @@ class BlockParser:  # noqa: D101
             return None, offset
 
         self.log.debug(
-            "head of set is extractor as expected", block=self._plugins[offset]
+            "head of set is extractor as expected",
+            block=self._plugins[offset],
         )
 
         blocks.append(builder.make_block(self._plugins[offset]))
@@ -305,7 +317,7 @@ class BlockParser:  # noqa: D101
                     )
                     raise BlockSetValidationError(
                         f"Expected unique mappings name not the mapper plugin "
-                        f"name: {plugin.name}."
+                        f"name: {plugin.name}.",
                     )
                 else:
                     blocks.append(builder.make_block(plugin))
@@ -321,6 +333,6 @@ class BlockParser:  # noqa: D101
                     plugin_name=plugin.name,
                 )
                 raise BlockSetValidationError(
-                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}."
+                    f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",
                 )
         raise BlockSetValidationError("Found no end in block set!")

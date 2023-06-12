@@ -84,7 +84,9 @@ class EnvironmentService:
         """
         with self.project.meltano_update() as meltano:
             environment = find_named(
-                self.list_environments(), name, obj_type=Environment
+                self.list_environments(),
+                name,
+                obj_type=Environment,
             )
 
             # find the schedules plugin config

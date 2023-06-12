@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import click
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
@@ -15,12 +14,11 @@ from meltano.core.plugin_location_remove import (
 from meltano.core.plugin_remove_service import PluginRemoveService
 
 
-@cli.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
+@click.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
-@click.pass_context
-def remove(ctx, project, plugin_type, plugin_names):
+def remove(project, plugin_type, plugin_names):
     """
     Remove plugins from your project.
 
@@ -76,7 +74,8 @@ def removal_manager_status_update(removal_manager: PluginLocationRemoveManager):
 
     elif removal_manager.plugin_not_found:
         click.secho(
-            f"Could not find {plugin_descriptor} in {location} to remove", fg="yellow"
+            f"Could not find {plugin_descriptor} in {location} to remove",
+            fg="yellow",
         )
 
     elif removal_manager.plugin_removed:

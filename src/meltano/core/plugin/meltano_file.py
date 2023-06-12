@@ -6,9 +6,8 @@ from pathlib import Path
 import yaml
 
 from meltano.core import bundle
+from meltano.core.plugin.file import FilePlugin
 from meltano.core.project import Project
-
-from .file import FilePlugin
 
 
 class MeltanoFilePlugin(FilePlugin):
@@ -18,7 +17,10 @@ class MeltanoFilePlugin(FilePlugin):
         super().__init__(None, None)
         self._discovery = discovery
 
-    def file_contents(self, project) -> dict[Path, str]:
+    def file_contents(
+        self,
+        project,  # noqa: ARG002
+    ) -> dict[Path, str]:
         """Get a mapping of paths to contents.
 
         Args:
@@ -36,7 +38,7 @@ class MeltanoFilePlugin(FilePlugin):
             file_contents["discovery.yml"] = (bundle.root / "discovery.yml").read_text()
         return file_contents
 
-    def update_config(self, project):
+    def update_config(self, project):  # noqa: ARG002, D102
         return {}
 
     def files_to_create(
@@ -58,7 +60,7 @@ class MeltanoFilePlugin(FilePlugin):
     def project_file_contents(
         self,
         project: Project,
-        paths_to_update: list[str],
+        paths_to_update: list[str],  # noqa: ARG002
     ) -> dict[Path, str]:
         """Return the contents of the files to be created or updated in the project.
 

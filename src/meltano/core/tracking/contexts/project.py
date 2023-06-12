@@ -95,7 +95,7 @@ class ProjectContext(SelfDescribingJson):
             ProjectUUIDSource: The source of the `project_uuid` used for telemetry.
         """
         # Ensure the `project_uuid` has been generated
-        self.project_uuid  # noqa: WPS428
+        self.project_uuid  # noqa: B018, WPS428
         return self._project_uuid_source
 
     @cached_property

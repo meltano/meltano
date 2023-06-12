@@ -39,7 +39,7 @@ Because these catalog files can be very large and can get outdated as data sourc
 
 To save you a headache, Meltano can handle catalog generation for you, by letting you describe your desired modifications using
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
-and are applied to the discovered catalog on the fly when the extractor is run using [`meltano run`](/reference/command-line-interface#run), [`meltano invoke`](/reference/command-line-interface#invoke), [`meltano run`](/reference/command-line-interface#run.
+and are applied to the discovered catalog on the fly when the extractor is run using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
 
@@ -340,56 +340,4 @@ This feature is used to dynamically configure the `target-postgres` and `target-
 
 ## Troubleshooting
 
-### Debug Mode
-
-If you're running into some trouble running a pipeline, the first recommendation is to run the same command in [debug mode](/reference/command-line-interface#debugging) so more information is shared on the command line.
-
-```bash
-meltano --log-level=debug run...
-```
-
-The output from debug mode will often be the first thing requested if you're asking for help via the <SlackChannelLink>Meltano Slack group</SlackChannelLink>.
-
-### Isolate the Connector
-
-If it's unclear which part of the pipeline is generating the problem, test the tap and target individually by using `meltano invoke`.
-The [`invoke` command](/reference/command-line-interface#invoke) will run the executable with any specified arguments.
-
-```bash
-meltano invoke <plugin> [PLUGIN_ARGS...]
-```
-
-This command can also be run in debug mode for additional information.
-
-### Validate Tap Capabilities
-
-In cases where the tap is not loading any streams or it does not appear to be respecting the configured [`select`](/reference/command-line-interface#select) rules, you may need to validate the capabilities of the tap.
-
-In prior versions of the Singer spec, the `--properties` option was used instead of `--catalog` for the [catalog files](https://hub.meltano.com/singer/spec#catalog-files).
-If this is the case for a tap, ensure `properties` is set as a [capability](/contribute/plugins) for the tap instead of `catalog`.
-Then `meltano elt` will accept the catalog file and will pass it to the tap using the appropriate flag.
-
-For more information, please refer to the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities).
-
-### Incremental Replication Not Running as Expected
-
-If using a custom tap, ensure that the tap declares the `state` capability as described in the [plugin capabilities reference](/reference/plugin-definition-syntax#capabilities).
-
-If you're using `meltano run` be aware that the state ID is generated using the extractor name + loader name + environment name. If you switched multiple environments you might not have the state you were expecting.
-
-If you're trying to run a pipeline with incremental replication using `meltano elt` but it's running a full sync, ensure that you're passing a [State ID](/getting-started#run-a-data-integration-el-pipeline) via the [`--state-id` flag](/reference/command-line-interface#how-to-use-4).
-
-
-### Testing Specific Failing Streams
-
-When extracting several streams with a single tap using the `elt` command, it may be challenging to debug a single failing stream.
-In this case, it can be useful to run the tap with just the single stream selected.
-
-Instead of duplicating the extractor in `meltano.yml`, try running `meltano elt` with the [`--select` flag](/reference/command-line-interface#parameters-2).
-This will run the pipeline with just that stream selected.
-
-You can also have `meltano invoke` select an individual stream by setting the [`select_filter` extra](/concepts/plugins#select-filter-extra) as an environment variable:
-
-```bash
-export <TAP_NAME>__SELECT_FILTER='["<your_stream>"]'
-```
+See the [troubleshooting guide](/guide/troubleshooting) for more information to resolving any issues that arise.

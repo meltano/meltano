@@ -6,13 +6,12 @@ import json
 import re
 import typing as t
 from datetime import datetime as dt
-from functools import partial, reduce, wraps
+from functools import partial, reduce
 from operator import xor
 
 import click
 import structlog
 
-from meltano.cli import cli
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
 from meltano.core.block.parser import BlockParser
@@ -48,32 +47,29 @@ class MutuallyExclusiveOptionsError(Exception):
 def _prompt_for_confirmation(prompt):
     """Wrap destructive CLI commands which should prompt the user for confirmation."""
 
-    def wrapper(func):
-        fun = click.option(
-            "--force", is_flag=True, help="Don't prompt for confirmation."
-        )(func)
+    def _prompt_callback(ctx, param, value):  # noqa: ARG001
+        if not value:
+            click.confirm(prompt)
 
-        @wraps(func)
-        def _wrapper(force=False, *args, **kwargs):
-            if force or click.confirm(prompt):
-                return fun(*args, **kwargs, force=force)
-            else:
-                click.secho("Aborting.", fg="red")
-
-        return _wrapper
-
-    return wrapper
+    return click.option(
+        "--force",
+        is_flag=True,
+        expose_value=False,
+        callback=_prompt_callback,
+        help="Don't prompt for confirmation.",
+    )
 
 
 prompt_for_confirmation = partial(
-    _prompt_for_confirmation, prompt="This is a destructive command. Continue?"
+    _prompt_for_confirmation,
+    prompt="This is a destructive command. Continue?",
 )
 
 
 def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
     state_id_re = re.compile(
-        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$"
+        r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$",
     )
     match = state_id_re.match(state_id)
     if match:
@@ -85,13 +81,13 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             if not project.environment:
                 logger.warn(
                     "Running state operation for environment "
-                    f"'{match['env']}' outside of an environment"
+                    f"'{match['env']}' outside of an environment",
                 )
 
             elif project.environment.name != match["env"]:
                 logger.warn(
                     f"Environment '{match['env']}' used in state operation does "
-                    f"not match current environment '{project.environment.name}'."
+                    f"not match current environment '{project.environment.name}'.",
                 )
 
             project.activate_environment(match["env"])
@@ -105,7 +101,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
     return None
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     name="state",
     short_help="Manage Singer state.",
@@ -151,7 +147,7 @@ def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
 
 @meltano_state.command(cls=InstrumentedCmd, name="copy")
 @prompt_for_confirmation(
-    prompt="This will overwrite state for the destination. Continue?"
+    prompt="This will overwrite state for the destination. Continue?",
 )
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
@@ -162,7 +158,6 @@ def copy_state(
     project: Project,
     src_state_id: str,
     dst_state_id: str,
-    force: bool,
 ):
     """Copy state to another job ID."""
     # Retrieve state for copying
@@ -174,13 +169,15 @@ def copy_state(
 
     logger.info(
         f"State for {dst_state_id} was successfully copied from "
-        f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="move")
 @prompt_for_confirmation(
-    prompt="This will clear the source state and overwrite destination state. Continue?"
+    prompt=(
+        "This will clear the source state and overwrite destination state. Continue?"
+    ),
 )
 @click.argument("src-state-id", type=str)
 @click.argument("dst-state-id", type=str)
@@ -191,7 +188,6 @@ def move_state(
     project: Project,
     src_state_id: str,
     dst_state_id: str,
-    force: bool,
 ):
     """Move state to another job ID, clearing the original."""
     # Retrieve state for moveing
@@ -203,7 +199,7 @@ def move_state(
 
     logger.info(
         f"State for {src_state_id} was successfully moved to {dst_state_id} "
-        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
@@ -244,7 +240,9 @@ def merge_state(
     elif input_file:
         with open(input_file) as state_f:
             state_service.add_state(
-                state_id, state_f.read(), payload_flags=Payload.INCOMPLETE_STATE
+                state_id,
+                state_f.read(),
+                payload_flags=Payload.INCOMPLETE_STATE,
             )
     elif state:
         state_service.add_state(state_id, state, payload_flags=Payload.INCOMPLETE_STATE)
@@ -252,13 +250,13 @@ def merge_state(
         state_service.merge_state(from_state_id, state_id)
     logger.info(
         f"State for {state_id} was successfully "
-        f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="set")
 @prompt_for_confirmation(
-    prompt="This will overwrite the state's current value. Continue?"
+    prompt="This will overwrite the state's current value. Continue?",
 )
 @click.option(
     "--input-file",
@@ -275,7 +273,6 @@ def set_state(
     state_id: str,
     state: str | None,
     input_file: click.Path | None,
-    force: bool,
 ):
     """Set state."""
     state_service: StateService = (
@@ -294,7 +291,7 @@ def set_state(
         state_service.set_state(state_id, state)
     logger.info(
         f"State for {state_id} was successfully set "
-        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}."  # noqa: WPS323
+        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
 
@@ -316,7 +313,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str, force: bool):
+def clear_state(ctx: click.Context, project: Project, state_id: str):
     """Clear state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]

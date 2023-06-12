@@ -61,7 +61,8 @@ class CatalogRule:
         # If provided, the breadcrumb should still match, even on negated rules
         if breadcrumb is not None:
             result = result and fnmatch.fnmatch(
-                ".".join(breadcrumb), ".".join(self.breadcrumb)
+                ".".join(breadcrumb),
+                ".".join(self.breadcrumb),
             )
 
         return result
@@ -171,7 +172,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=[],
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
         if prop_pattern:
@@ -183,7 +184,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     breadcrumb=property_breadcrumb(props),
                     key="selected",
                     value=selected,
-                )
+                ),
             )
 
     return include_rules + exclude_rules
@@ -201,11 +202,18 @@ def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule
     # We set `selected: false` if the `tap_stream_id`
     # does NOT match any of the selection/inclusion patterns
     include_rule = MetadataRule(
-        negated=True, tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        negated=True,
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
     # Or if it matches one of the exclusion patterns
     exclude_rule = MetadataRule(
-        tap_stream_id=[], breadcrumb=[], key="selected", value=False
+        tap_stream_id=[],
+        breadcrumb=[],
+        key="selected",
+        value=False,
     )
 
     for pattern in patterns:
@@ -294,7 +302,11 @@ class SelectionType(str, Enum):
 
 
 @singledispatch
-def visit(node, executor, path: str = ""):
+def visit(  # noqa: D103
+    node,  # noqa: ARG001
+    executor,  # noqa: ARG001
+    path: str = "",
+):
     logging.debug("Skipping node at '%s'", path)  # noqa: WPS323
 
 
@@ -416,7 +428,11 @@ class MetadataExecutor(CatalogExecutor):
             # Legacy catalogs have underscorized keys on the streams themselves
             self.set_metadata(node, path, rule.key.replace("-", "_"), rule.value)
 
-    def property_node(self, node: Node, path: str):
+    def property_node(
+        self,
+        node: Node,  # noqa: ARG002
+        path: str,
+    ):
         """Process property metadata node."""
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
@@ -436,7 +452,10 @@ class MetadataExecutor(CatalogExecutor):
 
         for rule in MetadataRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_metadata(
-                node["metadata"], f"{path}.metadata", rule.key, rule.value
+                node["metadata"],
+                f"{path}.metadata",
+                rule.key,
+                rule.value,
             )
 
     def set_metadata(self, node: Node, path: str, key: str, value: t.Any):
@@ -488,7 +507,11 @@ class SchemaExecutor(CatalogExecutor):
 
             next_node = next_node[key]
 
-    def stream_node(self, node: Node, path):
+    def stream_node(
+        self,
+        node: Node,
+        path,  # noqa: ARG002
+    ):
         """Process stream schema node."""
         self._stream = node
         tap_stream_id: str = self._stream["tap_stream_id"]
@@ -523,13 +546,21 @@ class ListExecutor(CatalogExecutor):
 
         super().__init__()
 
-    def stream_node(self, node: Node, path: str):
+    def stream_node(
+        self,
+        node: Node,
+        path: str,  # noqa: ARG002
+    ):
         """Initialize empty property set stream."""
         stream = node["tap_stream_id"]
         if stream not in self.properties:
             self.properties[stream] = set()
 
-    def property_node(self, node: Node, path: str):
+    def property_node(
+        self,
+        node: Node,  # noqa: ARG002
+        path: str,
+    ):
         """Add property to stream collection."""
         prop = path_property(path)
         # current stream
@@ -591,17 +622,29 @@ class ListSelectedExecutor(CatalogExecutor):
             return SelectionType.SELECTED
         return SelectionType.EXCLUDED
 
-    def stream_node(self, node: Node, path: str):
+    def stream_node(
+        self,
+        node: Node,
+        path: str,  # noqa: ARG002
+    ):
         """Initialize empty set for selected nodes in stream."""
         self._stream: str = node["tap_stream_id"]
         self.properties[self._stream] = set()
 
-    def stream_metadata_node(self, node: Node, path: str):
+    def stream_metadata_node(
+        self,
+        node: Node,
+        path: str,  # noqa: ARG002
+    ):
         """Add stream selection to tap's collection."""
         selection = SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
 
-    def property_metadata_node(self, node: Node, path: str):
+    def property_metadata_node(
+        self,
+        node: Node,
+        path: str,  # noqa: ARG002
+    ):
         """Add property selection to stream's collection."""
         property_path = ".".join(node["breadcrumb"])
         prop = path_property(property_path)

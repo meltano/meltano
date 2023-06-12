@@ -31,7 +31,7 @@ class EnvironmentNameContainsStateIdDelimiterError(Exception):
         """
         super().__init__(
             f"The environment name '{name}' cannot contain the state ID component "
-            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'"
+            f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 
 
@@ -95,7 +95,8 @@ class EnvironmentPluginConfig(PluginRef):
                 self.config[key] = value
 
     def get_orphan_settings(
-        self, existing: t.Iterable[SettingDefinition]
+        self,
+        existing: t.Iterable[SettingDefinition],
     ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 

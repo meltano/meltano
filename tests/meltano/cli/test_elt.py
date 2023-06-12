@@ -5,13 +5,12 @@ import json
 import platform
 
 import pytest
-import structlog
 from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
-from meltano.cli import CliError, cli
+from meltano.cli import cli
+from meltano.cli.utils import CliError
 from meltano.core.job import Job, State
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
@@ -90,9 +89,8 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         seen_lines.append(parsed_line)
 
     for line in seen_lines:
-        if line.get("exc_info"):
-            if repr(exc) in line.get("exc_info"):
-                return True
+        if line.get("exc_info") and repr(exc) in line.get("exc_info"):
+            return True
     return False
 
 
@@ -104,34 +102,6 @@ def assert_log_lines(result_output: str, expected: list[LogEntry]):
 
     for entry in expected:
         assert entry.matches(seen_lines)
-
-
-test_log_config = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "test": {
-            "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
-        },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "test",
-            "stream": "ext://sys.stderr",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
-}
 
 
 def failure_help_log_suffix(job_logs_file):
@@ -172,7 +142,7 @@ def tap_process(process_mock_factory, tap):
     tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
     tap.stderr.at_eof.side_effect = (False, False, False, True)
     tap.stderr.readline = AsyncMock(
-        side_effect=(b"Starting\n", b"Running\n", b"Done\n")
+        side_effect=(b"Starting\n", b"Running\n", b"Done\n"),
     )
     return tap
 
@@ -190,11 +160,11 @@ def target_process(process_mock_factory, target):
 
     target.stdout.at_eof.side_effect = (False, False, False, True)
     target.stdout.readline = AsyncMock(
-        side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
+        side_effect=(b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n'),
     )
     target.stderr.at_eof.side_effect = (False, False, False, True)
     target.stderr.readline = AsyncMock(
-        side_effect=(b"Starting\n", b"Running\n", b"Done\n")
+        side_effect=(b"Starting\n", b"Running\n", b"Done\n"),
     )
     return target
 
@@ -213,7 +183,7 @@ def dbt_process(process_mock_factory, dbt):
     dbt.stdout.at_eof.side_effect = (True,)
     dbt.stderr.at_eof.side_effect = (False, False, False, True)
     dbt.stderr.readline = AsyncMock(
-        side_effect=(b"Starting\n", b"Running\n", b"Done\n")
+        side_effect=(b"Starting\n", b"Running\n", b"Done\n"),
     )
     return dbt
 
@@ -224,12 +194,9 @@ class TestWindowsELT:
         reason="Test is only for Windows",
     )
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config")
     def test_elt_windows(
         self,
-        default_config,
         cli_runner,
         tap,
         target,
@@ -252,14 +219,10 @@ class TestWindowsELT:
 )
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -275,7 +238,8 @@ class TestCliEltScratchpadOne:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -287,10 +251,16 @@ class TestCliEltScratchpadOne:
                 [
                     LogEntry("meltano", None, "Running extract & load...", "info"),
                     LogEntry(
-                        None, None, "No state was found, complete import.", "warning"
+                        None,
+                        None,
+                        "No state was found, complete import.",
+                        "warning",
                     ),
                     LogEntry(
-                        None, None, "Incremental state has been updated at", "info"
+                        None,
+                        None,
+                        "Incremental state has been updated at",
+                        "info",
                     ),
                     LogEntry("meltano", None, "Extract & load complete!", "info"),
                     LogEntry("meltano", None, "Transformation skipped.", "info"),
@@ -330,14 +300,10 @@ class TestCliEltScratchpadOne:
             assert "Exception: This is a grave danger." in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_debug_logging(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -352,7 +318,8 @@ class TestCliEltScratchpadOne:
 
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -363,20 +330,35 @@ class TestCliEltScratchpadOne:
             lines = [
                 LogEntry("meltano", None, "Running extract & load...", "info"),
                 LogEntry(
-                    None, None, "Created configuration at", "debug"
+                    None,
+                    None,
+                    "Created configuration at",
+                    "debug",
                 ),  # followed by path
                 LogEntry(
-                    None, None, "Could not find tap.properties.json in", "debug"
+                    None,
+                    None,
+                    "Could not find tap.properties.json in",
+                    "debug",
                 ),  # followed by path
                 LogEntry(
-                    None, None, "Could not find state.json in", "debug"
+                    None,
+                    None,
+                    "Could not find state.json in",
+                    "debug",
                 ),  # followed by path
                 LogEntry(
-                    None, None, "Created configuration at", "debug"
+                    None,
+                    None,
+                    "Created configuration at",
+                    "debug",
                 ),  # followed by path
                 LogEntry(None, None, "No state was found, complete import.", "warning"),
                 LogEntry(
-                    None, None, "Incremental state has been updated at", "info"
+                    None,
+                    None,
+                    "Incremental state has been updated at",
+                    "info",
                 ),  # followed by timestamp
                 LogEntry(
                     None,
@@ -407,13 +389,25 @@ class TestCliEltScratchpadOne:
                 LogEntry("target-mock", "loader", "Starting", "info", "stderr"),
                 LogEntry("target-mock", "loader", "Running", "info", "stderr"),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 1}', "debug", "stdout"
+                    "target-mock (out)",
+                    "loader",
+                    '{"line": 1}',
+                    "debug",
+                    "stdout",
                 ),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 2}', "debug", "stdout"
+                    "target-mock (out)",
+                    "loader",
+                    '{"line": 2}',
+                    "debug",
+                    "stdout",
                 ),
                 LogEntry(
-                    "target-mock (out)", "loader", '{"line": 3}', "debug", "stdout"
+                    "target-mock (out)",
+                    "loader",
+                    '{"line": 3}',
+                    "debug",
+                    "stdout",
                 ),
                 LogEntry("target-mock", "loader", "Done", "info", "stderr"),
             ]
@@ -434,14 +428,10 @@ class TestCliEltScratchpadOne:
             assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_tap_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -460,7 +450,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -478,7 +470,7 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Extractor failed.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
@@ -495,14 +487,10 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_target_failure_before_tap_finishes(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -542,7 +530,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -559,7 +549,7 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Loader failed.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
@@ -576,14 +566,10 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_target_failure_after_tap_finishes(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -602,7 +588,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -620,7 +608,7 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Loader failed.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
@@ -637,14 +625,10 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_tap_and_target_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -670,7 +654,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -690,7 +676,7 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Extractor and loader failed.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
@@ -707,14 +693,10 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_tap_line_length_limit_error(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -729,7 +711,8 @@ class TestCliEltScratchpadOne:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         try:  # noqa: WPS328
             raise asyncio.LimitOverrunError(
-                "Separator is not found, and chunk exceed the limit", 0
+                "Separator is not found, and chunk exceed the limit",
+                0,
             )
         except asyncio.LimitOverrunError as err:
             try:  # noqa: WPS328, WPS505
@@ -749,7 +732,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -777,19 +762,15 @@ class TestCliEltScratchpadOne:
                 result.stdout + result.stderr,
                 CliError(
                     "ELT could not be completed: Output line length limit exceeded.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_elt_output_handler_error(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
         tap_process,
@@ -811,7 +792,9 @@ class TestCliEltScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -825,7 +808,8 @@ class TestCliEltScratchpadOne:
             )
 
             assert exception_logged(
-                result.stderr, Exception("Failed to read from target stderr.")
+                result.stderr,
+                Exception("Failed to read from target stderr."),
             )
 
     def test_elt_already_running(self, cli_runner, tap, target, session):
@@ -836,12 +820,13 @@ class TestCliEltScratchpadOne:
         existing_job.save(session)
 
         with mock.patch(
-            "meltano.cli.elt.project_engine", return_value=(None, lambda: session)
+            "meltano.cli.elt.project_engine",
+            return_value=(None, lambda: session),
         ):
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
             assert f"Another '{state_id}' pipeline is already running" in str(
-                result.exception
+                result.exception,
             )
 
     def test_dump_catalog(
@@ -873,9 +858,9 @@ class TestCliEltScratchpadOne:
 
         assert json.loads(result.stdout) == catalog
 
+    @pytest.mark.usefixtures("session")
     def test_dump_state(
         self,
-        session,
         cli_runner,
         project,
         tap,
@@ -899,17 +884,18 @@ class TestCliEltScratchpadOne:
         ]
 
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
             assert json.loads(result.stdout) == state
 
+    @pytest.mark.usefixtures("project")
     def test_dump_extractor_config(
         self,
         cli_runner,
-        project,
         tap,
         target,
         plugin_settings_service_factory,
@@ -928,19 +914,21 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(tap)
 
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
             assert json.loads(result.stdout) == settings_service.as_dict(
-                extras=False, process=True
+                extras=False,
+                process=True,
             )
 
+    @pytest.mark.usefixtures("project")
     def test_dump_loader_config(
         self,
         cli_runner,
-        project,
         tap,
         target,
         plugin_settings_service_factory,
@@ -959,13 +947,15 @@ class TestCliEltScratchpadOne:
         settings_service = plugin_settings_service_factory(target)
 
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap, "apply_catalog_rules"
+            SingerTap,
+            "apply_catalog_rules",
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
 
             assert json.loads(result.stdout) == settings_service.as_dict(
-                extras=False, process=True
+                extras=False,
+                process=True,
             )
 
 
@@ -975,22 +965,21 @@ class TestCliEltScratchpadOne:
 )
 class TestCliEltScratchpadTwo:
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "tap_mock_transform",
     )
     def test_elt_transform_run(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         silent_dbt_process,
         dbt_process,
-        tap_mock_transform,
     ):
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -1001,10 +990,12 @@ class TestCliEltScratchpadTwo:
                 silent_dbt_process,  # dbt clean
                 silent_dbt_process,  # dbt deps
                 dbt_process,  # dbt run
-            )
+            ),
         )
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -1035,22 +1026,21 @@ class TestCliEltScratchpadTwo:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "tap_mock_transform",
     )
     def test_elt_transform_run_dbt_failure(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
         tap_process,
         target_process,
         silent_dbt_process,
         dbt_process,
-        tap_mock_transform,
         job_logging_service,
     ):
         state_id = "pytest_test_elt"
@@ -1079,10 +1069,12 @@ class TestCliEltScratchpadTwo:
                 silent_dbt_process,  # dbt clean
                 silent_dbt_process,  # dbt deps
                 dbt_process,  # dbt run
-            )
+            ),
         )
         with mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
+            PluginInvoker,
+            "invoke_async",
+            new=invoke_async,
         ) as invoke_async:
             result = cli_runner.invoke(cli, args)
             assert result.exit_code == 1
@@ -1102,7 +1094,7 @@ class TestCliEltScratchpadTwo:
                 result.stderr,
                 CliError(
                     "ELT could not be completed: `dbt run` failed.\n"
-                    + failure_help_log_suffix(job_logs_file)
+                    + failure_help_log_suffix(job_logs_file),
                 ),
             )
 
@@ -1128,17 +1120,12 @@ class TestCliEltScratchpadTwo:
 )
 class TestCliEltScratchpadThree:
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
-    )
+    @pytest.mark.usefixtures("use_test_log_config", "project", "dbt")
     def test_elt_transform_only(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
@@ -1156,18 +1143,17 @@ class TestCliEltScratchpadThree:
             )
 
     @pytest.mark.backend("sqlite")
-    @mock.patch(
-        "meltano.core.logging.utils.default_config", return_value=test_log_config
+    @pytest.mark.usefixtures(
+        "use_test_log_config",
+        "project",
+        "dbt",
+        "tap_mock_transform",
     )
     def test_elt_transform_only_with_transform(
         self,
-        default_config,
         cli_runner,
-        project,
         tap,
         target,
-        dbt,
-        tap_mock_transform,
     ):
         args = ["elt", tap.name, target.name, "--transform", "only"]
 

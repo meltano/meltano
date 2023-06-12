@@ -5,13 +5,11 @@ from __future__ import annotations
 import click
 
 from meltano.api.app import create_app
-
-from . import cli
-from .params import pass_project
-from .utils import InstrumentedCmd, InstrumentedGroup
+from meltano.cli.params import pass_project
+from meltano.cli.utils import InstrumentedCmd, InstrumentedGroup
 
 
-@cli.group(
+@click.group(
     cls=InstrumentedGroup,
     invoke_without_command=True,
     short_help="Manage Meltano user accounts.",
@@ -49,8 +47,7 @@ def user(ctx, project):
         "admin and regular."
     ),
 )
-@click.pass_context
-def add(ctx, username, password, role, **flags):
+def add(username, password, role, **flags):
     """
     Create a Meltano user account.
 
@@ -67,7 +64,7 @@ def add(ctx, username, password, role, **flags):
             # make sure our User doesn't already exist
             if not flags["overwrite"] and users.get_user(username):
                 raise Exception(
-                    f"User '{username}' already exists. Use --overwrite to update it."
+                    f"User '{username}' already exists. Use --overwrite to update it.",
                 )
 
             # make sure all roles exists
@@ -80,7 +77,7 @@ def add(ctx, username, password, role, **flags):
                 roles.append(this_role)
 
             current_user = users.get_user(username) or users.create_user(
-                username=username
+                username=username,
             )
 
             current_user.password = hash_password(password)

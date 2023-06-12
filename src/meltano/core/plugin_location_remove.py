@@ -96,7 +96,8 @@ class DbRemoveManager(PluginLocationRemoveManager):
         session = self.session()
         try:
             self.plugins_settings_service.reset(
-                store=SettingValueStore.DB, session=session
+                store=SettingValueStore.DB,
+                session=session,
             )
         except sqlalchemy.exc.OperationalError as err:
             self.remove_status = PluginLocationRemoveStatus.ERROR

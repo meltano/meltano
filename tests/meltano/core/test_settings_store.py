@@ -100,13 +100,21 @@ def unsupported():
     @contextmanager
     def _unsupported(store):
         with mock.patch.object(
-            store.manager, "ensure_supported", side_effect=StoreNotSupportedError
+            store.manager,
+            "ensure_supported",
+            side_effect=StoreNotSupportedError,
         ), mock.patch.object(
-            store.manager, "set", side_effect=StoreNotSupportedError
+            store.manager,
+            "set",
+            side_effect=StoreNotSupportedError,
         ), mock.patch.object(
-            store.manager, "unset", side_effect=StoreNotSupportedError
+            store.manager,
+            "unset",
+            side_effect=StoreNotSupportedError,
         ), mock.patch.object(
-            store.manager, "reset", side_effect=StoreNotSupportedError
+            store.manager,
+            "reset",
+            side_effect=StoreNotSupportedError,
         ):
             yield
 
@@ -124,7 +132,10 @@ class TestAutoStoreManager:
     def set_value_store(self, subject):
         def _set_value_store(value, store, name="regular"):
             subject.manager_for(store).set(
-                name, [name], value, setting_def=subject.find_setting(name)
+                name,
+                [name],
+                value,
+                setting_def=subject.find_setting(name),
             )
 
         return _set_value_store
@@ -137,7 +148,8 @@ class TestAutoStoreManager:
     def assert_value_source(self, subject):
         def _assert_value_source(value, source, name="regular"):
             new_value, metadata = subject.get(
-                name, setting_def=subject.find_setting(name)
+                name,
+                setting_def=subject.find_setting(name),
             )
             assert new_value == value
             assert metadata["source"] == source
@@ -145,13 +157,13 @@ class TestAutoStoreManager:
         return _assert_value_source
 
     @pytest.mark.parametrize(
-        "setting_name,preferred_store",
-        [
+        ("setting_name", "preferred_store"),
+        (
             ("unknown", Store.MELTANO_YML),
             ("regular", Store.MELTANO_YML),
             ("password", Store.DOTENV),
             ("env_specific", Store.DOTENV),
-        ],
+        ),
     )
     def test_auto_store(
         self,
@@ -202,13 +214,13 @@ class TestAutoStoreManager:
 
         assert subject.auto_store(setting_name) == Store.DB
 
+    @pytest.mark.usefixtures("assert_value_source")
     def test_get(  # noqa: WPS213
         self,
         subject,
         project,
         dummy_settings_service,
         set_value_store,
-        assert_value_source,
         monkeypatch,
         environment,
     ):
@@ -265,7 +277,9 @@ class TestAutoStoreManager:
         assert metadata["overwritable"] is False
 
         monkeypatch.setitem(
-            dummy_settings_service.config_override, "regular", "from_config_override"
+            dummy_settings_service.config_override,
+            "regular",
+            "from_config_override",
         )
         value, metadata = subject.get("regular")
         assert value == "from_config_override"
@@ -288,12 +302,12 @@ class TestAutoStoreManager:
         assert metadata["auto_store"] == Store.DB
         assert metadata["overwritable"] is False
 
+    @pytest.mark.usefixtures("set_value_store")
     def test_set(
         self,
         subject: SettingsStoreManager,
         project,
         unsupported,
-        set_value_store,
         assert_value_source,
         monkeypatch,
         environment,
@@ -348,7 +362,7 @@ class TestAutoStoreManager:
 
         # Fails if no stores are supported
         with unsupported(Store.DOTENV), unsupported(Store.MELTANO_YML), unsupported(
-            Store.DB
+            Store.DB,
         ):
             with pytest.raises(StoreNotSupportedError):
                 set_value("nowhere")
@@ -398,7 +412,9 @@ class TestAutoStoreManager:
 
         # Unsets even when there is technically no setting with that exact full name
         subject.manager_for(Store.MELTANO_YML).set(
-            "custom.nested", ["custom", "nested"], "from_meltano_yml"
+            "custom.nested",
+            ["custom", "nested"],
+            "from_meltano_yml",
         )
         assert_value_source(None, Store.DEFAULT, name="custom")
         assert_value_source("from_meltano_yml", Store.MELTANO_YML, name="custom.nested")
@@ -410,10 +426,14 @@ class TestAutoStoreManager:
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "environment", environment)
             subject.manager_for(Store.MELTANO_ENV).set(
-                "custom_in_env", ["custom_in_env"], "from_meltano_environment"
+                "custom_in_env",
+                ["custom_in_env"],
+                "from_meltano_environment",
             )
             assert_value_source(
-                "from_meltano_environment", Store.MELTANO_ENV, name="custom_in_env"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="custom_in_env",
             )
 
         subject.unset("custom_in_env", ["custom_in_env"])
@@ -436,7 +456,9 @@ class TestAutoStoreManager:
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "environment", environment)
             set_value_store(
-                "from_meltano_environment", Store.MELTANO_ENV, name="dataops"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="dataops",
             )
 
         subject.reset()
@@ -449,7 +471,9 @@ class TestAutoStoreManager:
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "environment", environment)
             assert_value_source(
-                "from_meltano_environment", Store.MELTANO_ENV, name="dataops"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="dataops",
             )
 
         # Fails silently when store is not supported
@@ -462,10 +486,14 @@ class TestAutoStoreManager:
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "environment", environment)
             set_value_store(
-                "from_meltano_environment", Store.MELTANO_ENV, name="dataops"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="dataops",
             )
             assert_value_source(
-                "from_meltano_environment", Store.MELTANO_ENV, name="dataops"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="dataops",
             )
 
         # Resetting without an active environment has no effect on config 'dataops'
@@ -473,7 +501,9 @@ class TestAutoStoreManager:
         with monkeypatch.context() as mpc:
             mpc.setattr(project, "environment", environment)
             assert_value_source(
-                "from_meltano_environment", Store.MELTANO_ENV, name="dataops"
+                "from_meltano_environment",
+                Store.MELTANO_ENV,
+                name="dataops",
             )
 
         # Resetting with an active environment works fine :)
@@ -493,7 +523,8 @@ class TestMeltanoYmlStoreManager:
     def test_get(self, subject):
         def get():
             return subject.get(
-                "regular", setting_def=subject.settings_service.find_setting("regular")
+                "regular",
+                setting_def=subject.settings_service.find_setting("regular"),
             )
 
         assert get() == (None, {})
@@ -531,7 +562,9 @@ class TestMeltanoYmlStoreManager:
     def test_unset(self, subject):
         def unset_value(key):
             return subject.unset(
-                key, [key], setting_def=subject.settings_service.find_setting(key)
+                key,
+                [key],
+                setting_def=subject.settings_service.find_setting(key),
             )
 
         def set_values():
@@ -571,7 +604,8 @@ class TestInheritedStoreManager:
     def test_get(self, subject, project):
         def get(key="regular"):
             return subject.get(
-                key, setting_def=subject.settings_service.find_setting(key)
+                key,
+                setting_def=subject.settings_service.find_setting(key),
             )
 
         with pytest.raises(StoreNotSupportedError):
