@@ -2,7 +2,7 @@
 title: "Concepts"
 description: Details the concepts of Meltano Cloud
 layout: doc
-weight: 1
+weight: 3
 ---
 
 <div class="notification is-info">
@@ -66,3 +66,10 @@ Each Cloud Deployment must specify an environment name to deploy and a git branc
 
 Schedules within Meltano Cloud map directly to schedules defined in `meltano.yml`. However, in Meltano Cloud, each schedule starts off disabled by default, and each schedule is enabled or disabled on a per-Deployment basis.
 For example: The Acme Data Project has a schedule named `daily-transforms` and two environments named `prod` and `staging` respectively. Upon onboarding to Meltano Cloud, the Acme team can choose to enable `daily-transforms` on the `prod` environment only. Alternatively, the Acme team can choose to enable the schedule for both environments or neither environment. Whenever changing the status on a schedule, the action to enable or disable the schedule is in the context of one specific [Deployed Environment](#meltano-cloud-deployments) and one specified schedule name.
+
+## Meltano Cloud Pipelines
+
+A Meltano Cloud pipeline is an execution of a schedule.
+Pipelines use different amount of credits depending on how frequently they are run.
+
+For more details on credits and pricing see the [Pricing FAQ](https://meltano.com/pricing/).
