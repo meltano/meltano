@@ -560,9 +560,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover loaders
-        ```
+      ```bash
+      meltano discover loaders
+      ```
 
 1.  Depending on the result, pick your next step:
 
