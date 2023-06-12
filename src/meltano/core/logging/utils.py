@@ -108,25 +108,18 @@ def default_config(log_level: str) -> dict:
                 "propagate": True,
             },
             "snowplow_tracker.emitters": {
-                "handlers": ["console"],
                 "level": logging.ERROR,
             },
             "urllib3": {
-                "handlers": ["console"],
                 "level": logging.INFO,
-                "propagate": False,
             },
             "asyncio": {
-                "handlers": ["console"],
                 "level": logging.INFO,
-                "propagate": False,
             },
             # Azure HTTP logs at info level are too noisy; see
             # https://github.com/meltano/meltano/issues/7723
             "azure.core.pipeline.policies.http_logging_policy": {
-                "handlers": ["console"],
                 "level": logging.WARNING,
-                "propagate": False,
             },
         },
     }
