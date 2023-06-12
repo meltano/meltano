@@ -11,7 +11,7 @@ hidden: false
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
-With Meltano Cloud, data engineers can focus on high-value data work, and organizations can manage all their pipelines in one place, scale data volumes without cost concerns, and receive professional support for connectors and the Meltano SDK. It’s all the flexibility, without the hassle.
+With Meltano Cloud, data engineers can focus on high-value data work, and organizations can manage all their pipelines in one place, scale data volumes without cost concerns, and receive professional support for connectors and the Meltano SDK.
 
 You build the pipelines, we manage the infrastructure. All of the flexibility, none of the hassle.
 
