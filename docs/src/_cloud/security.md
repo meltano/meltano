@@ -9,8 +9,6 @@ weight: 6
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
-## Security Whitepaper
-
 <div class="notification is-info">
   <p>Meltano Cloud is currently in Beta. Features and implementation details may change between Beta and GA.</p>
 </div>

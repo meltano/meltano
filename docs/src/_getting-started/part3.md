@@ -29,6 +29,7 @@ This will add the following line to your project file:
 ```yaml
       extractors:
       - name: tap-github
+        [...]
         select:
         - commits.url # <== technically not necessary anymore, but no need to delete
         - commits.sha # <== technically not necessary anymore, but no need to delete
@@ -36,14 +37,14 @@ This will add the following line to your project file:
         - commits.* # <== new data.
 ```
 
-You can test that the new data is extracted by using `meltano invoke`:
+To refresh your database tables after the configuration changes you can run `meltano run --full-refresh tap-github target-postgres`:
 
 <div class="termy">
 ```console
-$ meltano invoke tap-github
+$ meltano run --full-refresh tap-github target-postgres
 2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
 {"type": "STATE", "value":  [...]}
-INFO Starting sync of repository: sbalnojan/meltano-example-el
+INFO Starting sync of repository: sbalnojan/meltano-lightdash
 ---> 100%
 {"type": "SCHEMA", "stream": "commits", [...]
 
@@ -51,11 +52,11 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 
 {"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":
 [...]
-"sbalnojan/meltano-example-el"}, "time_extracted": "2022-09-22T07:37:06.289545Z"}
+"sbalnojan/meltano-lightdash"}, "time_extracted": "2022-09-22T07:37:06.289545Z"}
 
 ...[many more records]...
 
-{"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-example-el": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
+{"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-lightdash": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
 ´´´
 </div>
 
@@ -81,7 +82,7 @@ Installed 1/1 plugins
 </div>
 
 <br />
-You can verify that this worked by viewing the newly populated directory `transform`.
+You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
 
 ## Configure dbt
 Configure the dbt-postgres utility to use the same configuration as our target-postgres loader using `meltano config`:
@@ -103,6 +104,22 @@ $ meltano config dbt-postgres set schema analytics
 ```
 </div>
 
+<br />
+The result of your configuration will look like this in your meltano.yml, remember that sensitive configurations are in your .env file:
+
+
+```yaml
+  utilities:
+  - name: dbt-postgres
+    [...]
+    config:
+      host: localhost
+      port: 5432
+      user: meltano
+      dbname: postgres
+      schema: analytics
+```
+
 ## Add our source data to dbt
 The EL pipeline run already added our source data into the schema `tap_github` as table `commits`. dbt will need to know where to locate this data. Let's add that to our dbt project:
 
@@ -110,7 +127,7 @@ The EL pipeline run already added our source data into the schema `tap_github` a
 mkdir transform/models/tap_github
 ```
 
-Add a file called `source.yml` into this directory with the following content:
+Add a file called `transform/models/tap_github/source.yml` into this directory with the following content:
 
 ```yaml
 config-version: 2
@@ -135,37 +152,49 @@ Add a file called `authors.sql` to the folder `transform/models/tap_github` with
   )
 }}
 
+with base as (
+    select *
+    from {{ source('tap_github', 'commits') }} {% endraw %}
+)
+select distinct (commit -> 'author' -> 'name') as authors
+from base
 
-with base as (select *
-from {{ source('tap_github', 'commits') }}) {% endraw %}
-
-select distinct (commit -> 'author' -> 'name') as authors from base
 ```
 
 This model is configured to creating a table via the `materialized='table'` configuration. The keyword `source` is used in dbt to reference the source we just created. The actual model selects the distinct author names from the commits which are wrapped into a JSON blob.
 
 ## Run the transformation process
-To create the actual table, we run the dbt model via `meltano invoke dbt-postgres:run`:
+To create the actual table, we run the dbt model via `meltano invoke dbt-postgres:run`. Note this relies on previously running `meltano run --full-refresh tap-github target-postgres` to postgres your database `commits` table:
 
 <div class="termy">
 
 ```console
 $ meltano invoke dbt-postgres:run
 2022-09-22T12:30:31.842691Z [info     ] Environment 'dev' is active
-12:31:01  Running with dbt=1.1.2
-12:31:02  Found 1 model, 0 tests, 0 snapshots, 0 analyses, 167 macros, 0 operations, 0 seed files, 1 source, 0 exposures, 0 metrics
-12:31:02
-12:31:03  Concurrency: 2 threads (target='dev')
-12:31:03
-12:31:03  1 of 1 START table model analytics.authors ..................................... [RUN]
----> 100%
-12:31:03  1 of 1 OK created table model analytics.authors ................................ [SELECT 2 in 0.59s]
-12:31:03
-12:31:03  Finished running 1 table model in 1.56s.
-12:31:03
-12:31:03  Completed successfully
-12:31:04
-12:31:04  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
+Extension executing `dbt clean`...
+[...]
+20:45:09  Finished cleaning all paths.
+
+
+Extension executing `dbt deps`...
+20:45:12  Running with dbt=1.3.4
+20:45:12  Warning: No packages were found in packages.yml
+
+
+Extension executing `dbt run`...
+20:45:15  Running with dbt=1.3.4
+20:45:15  Found 1 model, 0 tests, 0 snapshots, 0 analyses, 289 macros, 0 operations, 0 seed files, 1 source, 0 exposures, 0 metrics
+20:45:15
+20:45:15  Concurrency: 2 threads (target='dev')
+20:45:15
+20:45:15  1 of 1 START sql table model analytics.auhtors ................................. [RUN]
+20:45:15  1 of 1 OK created sql table model analytics.auhtors ............................ [SELECT 1 in 0.14s]
+20:45:15
+20:45:15  Finished running 1 table model in 0 hours 0 minutes and 0.31 seconds (0.31s).
+20:45:15
+20:45:15  Completed successfully
+20:45:15
+20:45:15  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 #
 ```
 
@@ -178,7 +207,7 @@ You can check the data inside the database using your favourite SQL editor. Ther
 To check that everything works together as a pipeline, we clean out once more and run the whole ELT pipeline. Drop the tap_github.commits and the analytics.authors tables by running
 
 ```bash
-docker exec meltano_postgres psql -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
+docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
 ```
 
 Run the final pipeline alltogether using the parameter `--full-refresh` to ignore the stored state:
@@ -189,7 +218,7 @@ Run the final pipeline alltogether using the parameter `--full-refresh` to ignor
 $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 [warning  ] Performing full refresh, ignoring state left behind by any previous runs.
 
- [info     ] INFO Starting sync of repository: sbalnojan/meltano-example-el
+ [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash
  <font color="red">[...]</font>
 [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration",[...]
 

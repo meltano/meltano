@@ -62,15 +62,12 @@ Each Cloud Deployment must specify an environment name to deploy and a git branc
   <p>All operations that perform compute require a deployed environment - including: ad-hoc job execution, EL pipelines, scheduled tasks, etc.</p>
 </div>
 
-### Deployment Names
-
-Each deployment has a "Deployment Name", which defaults to the "Environment Name" for the Meltano Environment that was deployed.
-
-<div class="notification is-info">
-  <p>At the current time, the Deployment Name will always be equivalent to the name of the environment that was deployed - and we do not yet support deploying the same environment twice as two different deployments. In future versions of Meltano, we plan to allow Environments to be deployed more than once (for example, for CI use cases), and for Deployment to be renamed.</p>
-</div>
-
 ## Meltano Cloud Schedules
 
 Schedules within Meltano Cloud map directly to schedules defined in `meltano.yml`. However, in Meltano Cloud, each schedule starts off disabled by default, and each schedule is enabled or disabled on a per-Deployment basis.
+
 For example: The Acme Data Project has a schedule named `daily-transforms` and two environments named `prod` and `staging` respectively. Upon onboarding to Meltano Cloud, the Acme team can choose to enable `daily-transforms` on the `prod` environment only. Alternatively, the Acme team can choose to enable the schedule for both environments or neither environment. Whenever changing the status on a schedule, the action to enable or disable the schedule is in the context of one specific [Deployed Environment](#meltano-cloud-deployments) and one specified schedule name.
+
+Meltano Cloud will use the cron expression specified by the `interval` key in for the schedules defined in `meltano.yml`, but will not run precisely on the minute specified by the cron expression. Instead, each schedule will be randomly assigned a constant offset of ±7 minutes from the exact minute the cron expression would have had it run at. This offset is consistent between runs of the same schedule within the same deployment, but may differ for different schedules within the same deployment, or for the same schedule between different deployments.
+
+As an example, if your schedule is configured to run every 15 minutes with a cron expression of `*/15 * * * *`, and it receives a random offset of +3 minutes, then instead of running at the 0th, 15th, 30th, and 45th minute of each hour, it will run at the 3rd, 18th, 33rd, and 48th minute of each hour.

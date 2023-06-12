@@ -120,7 +120,7 @@ meltano discover mappers
 meltano add mapper <mapper name>
 
 # Example
-meltano add mapper meltano-map-transform
+meltano add mapper meltano-map-transformer
 ```
 
 #### Example
@@ -152,7 +152,7 @@ plugins
             ip_address: __NULL__
 ```
 
-After running `meltano run tap-csv hash_email target-sqlite` the result would be:
+After running `meltano run tap-csv lower target-sqlite` the result would be:
 
 | count_t |           email            | first_name | id | last_name  |        __loaded_at         |
 |---------|----------------------------|------------|----|------------|----------------------------|

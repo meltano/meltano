@@ -10,6 +10,131 @@ weight: 3
   <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
+## `config`
+
+The `config` command provides an interface for managing project configuration and secrets.
+The `config` command supports the setting of environment variables via the `env` command group.
+
+### `env`
+
+Values set via this interface will be injected as Environment Variables into tasks run within the associated project.
+Once `set`, values cannot be viewed.
+If you are unsure of the current value of an env var, use the `set` command to set a known value.
+
+The `list` subcommand provides an interface to see existing set env var keys:
+
+```sh
+meltano-cloud config env list --limit 5
+
+TAP_GITHUB_AUTH_TOKEN
+TAP_GITHUB_USER_AGENT
+```
+
+The `set` subcommand provides an interface to set new, or override existing, env var values.
+
+```sh
+meltano-cloud config env set --key TAP_GITHUB_AUTH_TOKEN --value 'my_super_secret_auth_token'
+```
+
+The `delete` subcommand provides an interface to delete env vars:
+
+```sh
+meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
+```
+
+## `deployment`
+
+The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
+
+Create a new deployment interactively:
+
+```sh
+meltano-cloud deployment create
+```
+
+Create a new deployment non-interactively:
+
+```sh
+meltano-cloud deployment create --name 'my-dev-deployment' --environment 'dev' --git-rev 'develop'
+```
+
+The above example creates a new deployment named `my-dev-deployment` for the Meltano environment named `dev`, using the `develop` branch of the project's git repository. Note that the Meltano environment name must match what is in `meltano.yml`.
+
+List deployments:
+
+```sh
+$ meltano-cloud deployment list
+╭───────────┬──────────┬───────────────┬───────────────────┬────────────────────┬───────────────────────╮
+│  Default  │ Name     │ Environment   │ Tracked Git Rev   │ Current Git Hash   │ Last Deployed (UTC)   │
+├───────────┼──────────┼───────────────┼───────────────────┼────────────────────┼───────────────────────┤
+│           │ prod     │ prod          │ main              │ 0fa3aab            │ 2023-05-30 16:52:44   │
+│     X     │ staging  │ staging       │ main              │ a3268dd            │ 2023-05-31 11:14:34   │
+│           │ 1234-xyz │ dev           │ feat/1234-xyz     │ d105f18            │ 2023-06-01 03:57:31   │
+╰───────────┴──────────┴───────────────┴───────────────────┴────────────────────┴───────────────────────╯
+```
+
+Delete a deployment:
+
+```sh
+meltano-cloud deployment delete --name 'my-dev-deployment'
+```
+
+Use a deployment as the default deployment for other commands:
+
+```sh
+meltano-cloud deployment use --name 'my-dev-deployment'
+```
+
+Selecting a default deployment can also be done interactively:
+
+```sh
+meltano-cloud deployment use
+```
+
+Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file or changes to your tracked branch.
+If you've made a change to your schedules configuration or tracked branch and would like them to be re-deployed to Meltano Cloud you can run the following:
+
+```sh
+meltano-cloud deployment update --name prod
+```
+
+You can then confirm the deployment is on the correct revision of your tracked branch by running the following:
+
+```sh
+meltano-cloud deployment list
+```
+
+## `docs`
+
+Opens the Meltano Cloud documentation in the system browser.
+
+```sh
+meltano-cloud docs
+```
+
+## `history`
+
+Display the history of executions for a project.
+
+```sh
+$ meltano-cloud history --limit 3
+╭──────────────────────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮
+│ Execution ID                     │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │
+├──────────────────────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤
+│ 15e1cbbde6b2424f86c04b237291d652 │ daily           │ sandbox      │ 2023-03-22 00:04:49 │ Success  │ 00:05:08   │
+│ ad2b34087e7c4332a1398321552f2a82 │ daily           │ sandbox      │ 2023-03-22 00:03:23 │ Failed   │ 00:10:13   │
+│ 695de7b041b445f5a46a7aac1d0879b9 │ daily           │ sandbox      │ 2023-03-21 15:44:55 │ Failed   │ 00:08:09   │
+╰──────────────────────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯
+
+# Display the last 12 hours of executions
+$ meltano-cloud history --lookback 12h
+
+# Display the last week of executions
+$ meltano-cloud history --lookback 1w
+
+# Display the last hour and a half of executions
+$ meltano-cloud history --lookback 1h30m
+```
 
 ## `login`
 
@@ -29,6 +154,13 @@ Logging out of Meltano Cloud invalidates your login token, and deletes the local
 ```sh
 # Logout from Meltano Cloud
 meltano-cloud logout
+```
+
+## `logs`
+
+```sh
+# Print logs for an execution
+meltano-cloud logs print --execution-id <execution_id>
 ```
 
 ## `project`
@@ -68,36 +200,16 @@ meltano-cloud project list
 
 When specifying a project to use as the default for future command, its name must be exactly as shown when running `meltano-cloud project list`. If there are spaces or special characters in the name, then it must be quoted.
 
-## `history`
+## `run`
 
-Display the history of executions for a project.
-
-```sh
-$ meltano-cloud history --limit 3
-╭──────────────────────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮
-│ Execution ID                     │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │
-├──────────────────────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤
-│ 15e1cbbde6b2424f86c04b237291d652 │ daily           │ sandbox      │ 2023-03-22 00:04:49 │ Success  │ 00:05:08   │
-│ ad2b34087e7c4332a1398321552f2a82 │ daily           │ sandbox      │ 2023-03-22 00:03:23 │ Failed   │ 00:10:13   │
-│ 695de7b041b445f5a46a7aac1d0879b9 │ daily           │ sandbox      │ 2023-03-21 15:44:55 │ Failed   │ 00:08:09   │
-╰──────────────────────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯
-
-# Display the last 12 hours of executions
-$ meltano-cloud history --lookback 12h
-
-# Display the last week of executions
-$ meltano-cloud history --lookback 1w
-
-# Display the last hour and a half of executions
-$ meltano-cloud history --lookback 1h30m
-```
-
-## `logs`
+Run a schedule immediately specifying the schedule name and deployment.
 
 ```sh
-# Print logs for an execution
-meltano-cloud logs print --execution-id <execution_id>
+meltano-cloud run daily --deployment sandbox
+Running a Meltano project in Meltano Cloud.
 ```
+
+The running workload will appear in the `history` within 1-2 minutes.
 
 ## `schedule`
 
@@ -168,14 +280,3 @@ meltano-cloud schedule describe --deployment staging --schedule schedule_4 --num
 ```
 
 If a schedule is disabled, it will never have any upcoming scheduled runs.
-
-## `run`
-
-Run a schedule immediately specifying the schedule name and deployment.
-
-```sh
-meltano-cloud run daily --deployment sandbox
-Running a Meltano project in Meltano Cloud.
-```
-
-The running workload will appear in the `history` within 1-2 minutes.
