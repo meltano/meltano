@@ -61,7 +61,7 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 
 Next, we add the dbt plugin to transform this data.
 
-## Install and configure the Postgres specific dbt utility
+## Install and configure the Postgres-specific dbt utility
 dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano dbt utilities match this pattern; in this case our utility is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
