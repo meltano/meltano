@@ -31,6 +31,12 @@ meltano-cloud deployment update --name prod
 
 See the [deployments CLI reference](/cloud/cloud-cli#deployment).
 
+### Support-Requested Addition of Projects
+
+Meltano cloud will have support for users to self-manage addition of projects in the near future but currently a project addition needs to be requested through Meltano Cloud Support.
+
+See related issue: [#7412](https://github.com/meltano/meltano/issues/7412)
+
 ## Other Unsupported Features in Meltano Cloud
 
 The following features are not currently scoped for inclusion for the Meltano Cloud GA.
