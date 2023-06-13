@@ -141,6 +141,13 @@ class SchedulesCloudClient(MeltanoCloudClient):
             )
 
 
+class GetSchedulesResult(t.TypedDict):
+    """List of schedules, along with whether or not that list is truncated."""
+
+    schedules: list[CloudProjectSchedule]
+    truncated: bool
+
+
 async def _set_enabled_state(
     *,
     config: MeltanoCloudConfig,
@@ -237,27 +244,33 @@ async def _get_schedules(
     config: MeltanoCloudConfig,
     deployment_name: str | None,
     limit: int,
-) -> list[CloudProjectSchedule]:
+) -> GetSchedulesResult:
     page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[CloudProjectSchedule] = []
+    results: GetSchedulesResult = {"schedules": [], "truncated": False}
 
     async with SchedulesCloudClient(config=config) as client:
         while True:
+            remaining = limit - len(results["schedules"])
+            # Make the page size 1 larger than the remaining items required to reach the
+            # limit to efficiently detect whether or not there are any truncated
+            # schedules
+            page_size = min(remaining + 1, MAX_PAGE_SIZE)
             response = await client.get_schedules(
                 deployment_name=deployment_name,
                 page_size=page_size,
                 page_token=page_token,
             )
 
-            results.extend(response["results"])
+            results["schedules"].extend(response["results"])
 
-            if response["pagination"] and len(results) < limit:
+            if response["pagination"] and len(results["schedules"]) <= limit:
                 page_token = response["pagination"]["next_page_token"]
             else:
+                results["truncated"] = len(results["schedules"]) > limit
+                results["schedules"] = results["schedules"][:limit]
                 break
 
-    return results[:limit]
+    return results
 
 
 def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
@@ -357,15 +370,19 @@ async def list_schedules(
     limit: int,
 ) -> None:
     """List Meltano Cloud schedules."""
-    click.echo(
-        schedule_list_formatters[output_format](
-            await _get_schedules(
-                config=context.config,
-                deployment_name=context.deployment,
-                limit=limit,
-            ),
-        ),
+    results = await _get_schedules(
+        config=context.config,
+        deployment_name=context.deployment,
+        limit=limit,
     )
+    click.echo(schedule_list_formatters[output_format](results["schedules"]))
+    if results["truncated"]:
+        click.secho(
+            "Output truncated due to reaching the limit. To print more schedules, "
+            "increase the limit using the --limit flag.",
+            err=True,
+            fg="yellow",
+        )
 
 
 @schedule_group.command("describe")
