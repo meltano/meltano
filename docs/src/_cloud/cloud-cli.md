@@ -2,7 +2,7 @@
 title: Cloud Command Line
 description: Interact with Meltano Cloud projects from the command line.
 layout: doc
-weight: 3
+weight: 5
 ---
 
 <div class="notification is-info">
@@ -41,6 +41,10 @@ The `delete` subcommand provides an interface to delete env vars:
 ```sh
 meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 ```
+
+### Reserved Variables
+
+See the [reserved variables](/cloud/platform#reserved-variables) docs for more details on variables that are reserved for use by Meltano Cloud.
 
 ## `deployment`
 
