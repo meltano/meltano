@@ -100,6 +100,34 @@ class TestDeploymentCommand:
             "╰───────────┴──────────────────┴──────────────────┴──────────────────────────────────────────┴────────────────────┴───────────────────────╯\n"  # noqa: E501
         )  # noqa: E501
 
+    def test_deployment_list_table_limit(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+    ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": deployments, "pagination": None},
+        )
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            ("--config-path", config.config_path, "deployment", "list", "--limit", "2"),
+        )
+        assert result.exit_code == 0, result.output
+        assert result.stdout == (
+            "╭───────────┬──────────────────┬──────────────────┬──────────────────────────────────────────┬────────────────────┬───────────────────────╮\n"  # noqa: E501
+            "│  Default  │ Name             │ Environment      │ Tracked Git Rev                          │ Current Git Hash   │ Last Deployed (UTC)   │\n"  # noqa: E501
+            "├───────────┼──────────────────┼──────────────────┼──────────────────────────────────────────┼────────────────────┼───────────────────────┤\n"  # noqa: E501
+            "│           │ ultra-production │ Ultra Production │ Main                                     │ 0e3a4e1            │ 2023-05-30 16:52:44   │\n"  # noqa: E501
+            "│           │ temp             │ Ultra Production │ e219d8183ac288ea9a0de1b3b53da045c6c14570 │ e219d81            │ 2023-05-30 16:51:52   │\n"  # noqa: E501
+            "╰───────────┴──────────────────┴──────────────────┴──────────────────────────────────────────┴────────────────────┴───────────────────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == (
+            "Output truncated due to reaching the item limit. To print more items, "
+            "increase the limit using the --limit flag.\n"
+        )
+
     def test_deployment_list_table_with_default_deployment(
         self,
         config: MeltanoCloudConfig,
