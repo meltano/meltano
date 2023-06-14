@@ -206,7 +206,7 @@ class TestScheduleCommand:
             "╰──────────────┴────────────┴────────────┴──────────────┴───────────╯\n"
         )
         assert result.stderr == (
-            "Output truncated due to reaching the limit. To print more schedules, "
+            "Output truncated due to reaching the item limit. To print more items, "
             "increase the limit using the --limit flag.\n"
         )
 
