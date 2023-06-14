@@ -13,13 +13,18 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
-import tabulate
 from slugify import slugify
 from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.api.types import CloudDeployment
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.cli.base import (
+    LimitedResult,
+    get_paginated,
+    pass_context,
+    print_formatted_list,
+    run_async,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -198,35 +203,29 @@ async def _get_deployments(
     config: MeltanoCloudConfig,
     *,
     limit: int = DEFAULT_GET_DEPLOYMENTS_LIMIT,
-) -> list[CloudDeployment]:
-    page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[CloudDeployment] = []
-
+) -> LimitedResult[CloudDeployment]:
     async with DeploymentsCloudClient(config=config) as client:
-        while True:
-            response = await client.get_deployments(
+        results = await get_paginated(
+            lambda page_size, page_token: client.get_deployments(
                 page_size=page_size,
                 page_token=page_token,
-            )
+            ),
+            limit,
+            MAX_PAGE_SIZE,
+        )
 
-            results.extend(response["results"])
-
-            if response["pagination"] and len(results) < limit:
-                page_token = response["pagination"]["next_page_token"]
-            else:
-                break
-
-    return [
+    results.items = [
         {
             **x,  # type: ignore[misc]
             "default": x["deployment_name"] == config.default_deployment_name,
         }
-        for x in results[:limit]
+        for x in results.items
     ]
 
+    return results
 
-def _process_table_row(deployment: CloudDeployment) -> tuple[str, ...]:
+
+def _format_deployment(deployment: CloudDeployment) -> tuple[str, ...]:
     return (  # noqa: WPS227
         "X" if deployment["default"] else "",
         deployment["deployment_name"],
@@ -237,42 +236,6 @@ def _process_table_row(deployment: CloudDeployment) -> tuple[str, ...]:
             "%Y-%m-%d %H:%M:%S",
         ),
     )
-
-
-def _format_deployments_table(
-    deployments: list[CloudDeployment],
-    table_format: str,
-) -> str:
-    """Format the deployments as a table.
-
-    Args:
-        deployments: The deployments to format.
-
-    Returns:
-        The formatted deployments.
-    """
-    return tabulate.tabulate(
-        [_process_table_row(deployment) for deployment in deployments],
-        headers=(
-            "Default",
-            "Name",
-            "Environment",
-            "Tracked Git Rev",
-            "Current Git Hash",
-            "Last Deployed (UTC)",
-        ),
-        tablefmt=table_format,
-        # To avoid a tabulate bug (IndexError), only set colalign if there are
-        # deployments
-        colalign=("center", "left", "left") if deployments else (),
-    )
-
-
-deployment_list_formatters = {
-    "json": lambda x: json.dumps(x, indent=2),
-    "markdown": lambda x: _format_deployments_table(x, table_format="github"),
-    "terminal": lambda x: _format_deployments_table(x, table_format="rounded_outline"),
-}
 
 
 @deployment_group.command("list")
@@ -299,10 +262,20 @@ async def list_deployments(
     limit: int,
 ) -> None:
     """List Meltano Cloud deployments."""
-    click.echo(
-        deployment_list_formatters[output_format](
-            await _get_deployments(config=context.config, limit=limit),
+    results = await _get_deployments(config=context.config, limit=limit)
+    print_formatted_list(
+        results,
+        output_format,
+        _format_deployment,
+        (
+            "Default",
+            "Name",
+            "Environment",
+            "Tracked Git Rev",
+            "Current Git Hash",
+            "Last Deployed (UTC)",
         ),
+        ("center", "left", "left"),
     )
 
 
@@ -324,7 +297,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
-        context.deployments = asyncio.run(_get_deployments(context.config))
+        context.deployments = asyncio.run(_get_deployments(context.config)).items
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud deployment",
@@ -354,7 +327,7 @@ async def use_deployment(  # noqa: D103
 ) -> None:
     deployment_name = slugify(deployment_name)
     if context.deployments is None:  # Interactive config was not used
-        context.deployments = await _get_deployments(context.config)
+        context.deployments = (await _get_deployments(context.config)).items
         if deployment_name not in {x["deployment_name"] for x in context.deployments}:
             raise click.ClickException(
                 f"Unable to use deployment named {deployment_name!r} - no available "
