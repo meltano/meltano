@@ -7,7 +7,6 @@ from meltano.cloud.cli.base import LimitedResult, get_paginated, run_async
 
 def test_get_paginated():
     async def paged_func(page_size: int, page_token: str, max_items: int):
-        print(f"Ran with page_size={page_size}, page_token={page_token}")
         if not page_token:
             return {
                 "results": list(range(min(page_size, max_items))),
