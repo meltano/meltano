@@ -50,9 +50,9 @@ class LimitedResult(t.Generic[T]):
     Used to store lists that are to be printed by `print_formatted_list`.
     """
 
-    def __init__(self, items: list[T] = [], truncated: bool = False):
+    def __init__(self, items: list[T] = None, truncated: bool = False):
         """Initialize items to an empty list and truncated to False."""
-        self.items: list[T] = items
+        self.items: list[T] = items if items is not None else []
         self.truncated: bool = truncated
 
 
