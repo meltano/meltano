@@ -40,7 +40,7 @@ If you don't yet have an existing schedule, you can get started quickly by copy-
 schedules:
 - name: daily-refresh
   job: daily-refresh-job
-  interval: @daily  # Can be @daily, @hourly, etc., or a cron-based interval
+  interval: '@daily'  # Can be @daily, @hourly, etc., or a cron-based interval
 jobs:
 - name: daily-refresh-job
   tasks:
