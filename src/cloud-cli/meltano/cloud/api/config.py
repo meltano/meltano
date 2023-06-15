@@ -72,8 +72,8 @@ class NoMeltanoCloudProjectIDError(Exception):
     def __init__(self) -> None:
         """Initialize exception with message."""
         super().__init__(
-            "Logged in Meltano user has no projects. "
-            "Set one as the default project using the "
+            "No Meltano Cloud projects are available, or no project has been "
+            "selected as the default. Set one as the default using the "
             "`meltano cloud project use` command.",
         )
 

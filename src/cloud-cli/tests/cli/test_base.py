@@ -16,7 +16,7 @@ def test_get_paginated():
             }
         return {
             "results": list(
-                range(int(page_token), min(int(page_token) + page_size, max_items))
+                range(int(page_token), min(int(page_token) + page_size, max_items)),
             ),
             "pagination": None,
         }
@@ -24,7 +24,9 @@ def test_get_paginated():
     def test_case(max_items: int, limit: int, max_page_size: int) -> LimitedResult[int]:
         results = run_async(get_paginated)(
             lambda page_size, page_token: paged_func(
-                page_size, page_token, max_items=max_items
+                page_size,
+                page_token,
+                max_items=max_items,
             ),
             limit=limit,
             max_page_size=max_page_size,
