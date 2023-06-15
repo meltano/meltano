@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+import sys
 import typing as t
 from dataclasses import dataclass
 from functools import partial, wraps
@@ -17,6 +18,11 @@ from meltano.cloud import __version__ as version
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.api.types import CloudDeployment, CloudProject
+
+if sys.version_info >= (3, 8):
+    from typing import Protocol
+else:
+    from typing_extensions import Protocol
 
 
 def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
@@ -115,7 +121,7 @@ def print_formatted_list(
         print_limit_warning()
 
 
-class PaginatedCallable(t.Protocol):
+class PaginatedCallable(Protocol):
     """Type class defining a paginated function."""
 
     async def __call__(self, page_size: int, page_token: str | None):
