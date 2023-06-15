@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import datetime
-import json
 import typing as t
 
 import click
 
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.cli.base import pass_context, print_formatted_list, run_async
 from meltano.cloud.cli.history import utils
 from meltano.cloud.cli.history.client import HistoryClient
+from meltano.cloud.cli.history.utils import format_history_row
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
@@ -178,7 +178,7 @@ async def history(
     )
 
     now = datetime.datetime.now(tz=utils.UTC)
-    items = await HistoryClient.get_history_list(
+    results = await HistoryClient.get_history_list(
         context.config,
         schedule_filter=schedule_filter,
         deployment_filter=deployment_filter,
@@ -187,11 +187,17 @@ async def history(
         start_time=now - lookback if lookback else None,
     )
 
-    if output_format == "json":
-        output = json.dumps(items, indent=2)
-    elif output_format == "markdown":
-        output = utils.format_history_table(items, table_format="github")
-    else:
-        output = utils.format_history_table(items, table_format="rounded_outline")
-
-    click.echo(output)
+    print_formatted_list(
+        results,
+        output_format,
+        format_history_row,
+        (
+            "Execution ID",
+            "Schedule Name",
+            "Deployment",
+            "Executed At (UTC)",
+            "Result",
+            "Duration",
+        ),
+        (),
+    )
