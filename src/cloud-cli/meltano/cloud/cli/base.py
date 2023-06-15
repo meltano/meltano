@@ -123,7 +123,6 @@ class PaginatedCallable(t.Protocol):
         pass
 
 
-# TODO [!!!] Test this separately
 async def get_paginated(
     get_page: PaginatedCallable,
     limit: int,

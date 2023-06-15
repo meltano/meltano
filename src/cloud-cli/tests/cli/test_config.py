@@ -31,10 +31,11 @@ class TestConfigEnvCommand:
             {
                 "results": [{"name": "MY_ENV_VAR"}, {"name": "MY_OTHER_ENV_VAR"}],
                 "pagination": None,
-            }
+            },
         )
         result = CliRunner().invoke(
-            cli, ("--config-path", config.config_path, "config", "env", "list")
+            cli,
+            ("--config-path", config.config_path, "config", "env", "list"),
         )
         assert result.exit_code == 0, result.output
         assert result.output == "MY_ENV_VAR\nMY_OTHER_ENV_VAR\n"
@@ -52,7 +53,7 @@ class TestConfigEnvCommand:
             {
                 "results": [{"name": "MY_ENV_VAR"}, {"name": "MY_OTHER_ENV_VAR"}],
                 "pagination": None,
-            }
+            },
         )
         result = CliRunner(mix_stderr=False).invoke(
             cli,
