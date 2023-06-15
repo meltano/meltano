@@ -50,18 +50,18 @@ class LimitedResult(t.Generic[T]):
     Used to store lists that are to be printed by `print_formatted_list`.
     """
 
-    def __init__(self):
+    def __init__(self, items: list[T] = [], truncated: bool = False):
         """Initialize items to an empty list and truncated to False."""
-        self.items: list[T] = []
-        self.truncated: bool = False
+        self.items: list[T] = items
+        self.truncated: bool = truncated
 
 
 def _format_table(
     items: list[T],
     table_format: str,
     format_row: t.Callable[[T], tuple],
-    headers: tuple[str],
-    colalign: tuple[str],
+    headers: tuple[str, ...],
+    colalign: tuple[str, ...],
 ):
     return tabulate.tabulate(
         [format_row(item) for item in items],
@@ -87,8 +87,8 @@ def print_formatted_list(
     results: LimitedResult[T],
     output_format: str,
     format_row: t.Callable[[T], tuple],
-    headers: tuple[str],
-    colalign: tuple[str],
+    headers: tuple[str, ...],
+    colalign: tuple[str, ...],
 ):
     """
     Format a list of items according to the chosen output format and prints it.
@@ -130,7 +130,7 @@ async def get_paginated(
 ) -> LimitedResult:
     """Repeatedly call a paginated function until the item limit is reached."""
     page_token = None
-    results = LimitedResult()
+    results: LimitedResult = LimitedResult()
     while True:
         remaining = limit - len(results.items)
         # Make the page size 1 larger than the remaining items required to reach the

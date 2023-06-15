@@ -13,6 +13,7 @@ import questionary
 
 from meltano.cloud.api.client import MeltanoCloudClient
 from meltano.cloud.cli.base import (
+    LimitedResult,
     get_paginated,
     pass_context,
     print_formatted_list,
@@ -86,7 +87,7 @@ async def _get_projects(
     project_id: str | None = None,
     project_name: str | None = None,
     limit: int = DEFAULT_GET_PROJECTS_LIMIT,
-) -> list[CloudProject]:
+) -> LimitedResult[CloudProject]:
     async with ProjectsCloudClient(config=config) as client:
         results = await get_paginated(
             lambda page_size, page_token: client.get_projects(
@@ -109,7 +110,7 @@ async def _get_projects(
     return results
 
 
-def _format_project(project: CloudProject) -> tuple[str, ...]:
+def _format_project(project: dict[str, t.Any]) -> tuple[str, ...]:
     return (
         "X" if project["default"] else "",
         project["project_name"],
@@ -149,9 +150,12 @@ async def list_projects(
 ) -> None:
     """List Meltano Cloud projects."""
     results = await _get_projects(config=context.config, limit=limit)
-    results.items = [_remove_private_project_attributes(x) for x in results.items]
+    stripped_results = LimitedResult(
+        items=[_remove_private_project_attributes(x) for x in results.items],
+        truncated=results.truncated,
+    )
     print_formatted_list(
-        results,
+        stripped_results,
         output_format,
         _format_project,
         ("Default", "Name", "Git Repository"),

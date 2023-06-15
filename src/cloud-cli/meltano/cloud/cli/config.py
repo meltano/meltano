@@ -89,8 +89,6 @@ async def list_items(
     limit: int,
 ) -> None:
     """List Meltano Cloud config items."""
-    results: list[dict[str, str]] = []
-
     async with ConfigCloudClient(config=context.config) as client:
         results = await get_paginated(client.list_items, limit, MAX_PAGE_SIZE)
 
