@@ -73,6 +73,16 @@ def _format_table(
     )
 
 
+def print_limit_warning():
+    """Print a warning that items were truncated due to the --limit option."""
+    click.secho(
+        "Output truncated due to reaching the item limit. To print more items, "
+        "increase the limit using the --limit flag.",
+        err=True,
+        fg="yellow",
+    )
+
+
 def print_formatted_list(
     results: LimitedResult[T],
     output_format: str,
@@ -102,12 +112,7 @@ def print_formatted_list(
         raise ValueError(f"Unknown format: {output_format}")
     click.echo(output)
     if results.truncated:
-        click.secho(
-            "Output truncated due to reaching the item limit. To print more items, "
-            "increase the limit using the --limit flag.",
-            err=True,
-            fg="yellow",
-        )
+        print_limit_warning()
 
 
 class PaginatedCallable(t.Protocol):
