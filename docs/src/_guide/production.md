@@ -28,7 +28,7 @@ More on that [in the Kubernetes section](#kubernetes).
 
 Would you rather not be responsible for deploying your Meltano project and managing it in production?
 
-[Meltano Cloud](https://meltano.com/cloud) launches in Alpha in late 2022 and opens to the public in early 2023. [Sign up](https://meltano.com/cloud) to receive more information and reduce your self-management burden.
+[Meltano Cloud](https://meltano.com/cloud) is currently in Public Beta and will enter General Availability in Q3 2023. [Sign up](https://meltano.com/cloud) to receive more information and reduce your self-management burden.
 
 In the mean time, consider running your Meltano pipelines using a managed Airflow service like [Astronomer](https://www.astronomer.io/), [Google Cloud Composer](https://cloud.google.com/composer/), or [Amazon MWAA](https://docs.aws.amazon.com/mwaa).
 
