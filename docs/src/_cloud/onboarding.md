@@ -120,7 +120,7 @@ meltano-cloud deployment create --name production --environment prod --git-rev m
 
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
 ```console
-meltano-cloud deployments list
+meltano-cloud deployment list
 ```
 
 ### Step 5: Initialize secrets
