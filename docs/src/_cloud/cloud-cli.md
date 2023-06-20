@@ -66,7 +66,7 @@ The above example creates a new deployment named `my-dev-deployment` for the Mel
 
 <div class="notification is-info">
   <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
-  Also double check that you have schedules configured, otherwise the deployment will throw and error.</p>
+  Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
 </div>
 
 List deployments:
