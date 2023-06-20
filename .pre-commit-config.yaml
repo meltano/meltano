@@ -38,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.23.1
+    rev: 0.23.2
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -60,7 +60,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.42.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.43.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.([jt]sx?|vue)$
