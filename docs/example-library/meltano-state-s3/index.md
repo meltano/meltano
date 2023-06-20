@@ -56,5 +56,13 @@ meltano run tap-gitlab target-jsonl
 ## Check state output
 
 ```shell
-meltano state get dev:tap-gitlab-to-target-jsonl
+meltano state list
+meltano state get dev:tap-gitlab-to-target-jsonl > state.json
+```
+
+## Manually set state
+
+```shell
+meltano state set --force dev:tap-gitlab-to-target-jsonl '{"singer_state": {"bookmark-1": 0}}'
+meltano state get dev:tap-gitlab-to-target-jsonl > new_state.json
 ```
