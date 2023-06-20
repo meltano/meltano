@@ -12,10 +12,16 @@ meltano install
 ## Set up Minioadmin
 
 [MinIO](https://min.io) provides S3-compatible storage that can be run in a container.
+We'll set up a minio [Docker](https://www.docker.com) container to use as our state backend.
 
-We need to create a bucket to store state in. Open up the Minio Admin console at `http://localhost:9001` in a web browser and log in using the default Minio credentials: `minioadmin` for both username and password.
+```shell
+docker run -d  --name minio -p 9001:9001 -p 9000:9000 quay.io/minio/minio server /data --console-address ":9001"
+```
 
-Then create a bucket with the name `meltano`.
+Now we need to create a bucket to store state in.
+Open up the Minio Admin console at `http://localhost:9001` in a web browser and log in using the default Minio credentials: `minioadmin` for both username and password.
+
+Then create a bucket with the name `meltano`
 
 Alternatively you could create the bucket using [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html):
 

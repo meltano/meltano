@@ -30,15 +30,15 @@ jobs:
     strategy:
       matrix:
         include:
-        - { integration_test: "meltano-basics", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-run", needs_postgres: true, needs_minio: false}
-        - { integration_test: "meltano-objects", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-migrations", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-state-s3", needs_postgres: false, needs_minio: true}
-        - { integration_test: "meltano-state-local", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-config", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-annotations", needs_postgres: false, needs_minio: false}
-        - { integration_test: "meltano-manifest", needs_postgres: false, needs_minio: false}
+        - { integration_test: "meltano-basics", needs_postgres: false}
+        - { integration_test: "meltano-run", needs_postgres: true}
+        - { integration_test: "meltano-objects", needs_postgres: false}
+        - { integration_test: "meltano-migrations", needs_postgres: false}
+        - { integration_test: "meltano-state-s3", needs_postgres: false}
+        - { integration_test: "meltano-state-local", needs_postgres: false}
+        - { integration_test: "meltano-config", needs_postgres: false}
+        - { integration_test: "meltano-annotations", needs_postgres: false}
+        - { integration_test: "meltano-manifest", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -85,15 +85,6 @@ jobs:
         --health-timeout 5s
         --health-retries 5
         postgres:11
-
-    - name: Start MinIO Container
-      if: always() && (matrix.needs_minio == true)
-      run: >
-        docker run -d
-        --name minio
-        -p 9001:9001
-        -p 9000:9000
-        quay.io/minio/minio server /data --console-address ":9001"
 
     - name: Run integration tests
       run: |
