@@ -118,9 +118,14 @@ For example, if you wanted to deploy the `prod` Meltano Environment as defined i
 meltano-cloud deployment create --name production --environment prod --git-rev main
 ```
 
+<div class="notification is-info">
+  <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
+  Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
+</div>
+
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
 ```console
-meltano-cloud deployments list
+meltano-cloud deployment list
 ```
 
 ### Step 5: Initialize secrets

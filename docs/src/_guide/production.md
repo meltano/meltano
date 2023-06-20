@@ -21,8 +21,6 @@ This page will help you figure out:
 
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
-We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano to [Kubernetes](https://kubernetes.io).
-More on that [in the Kubernetes section](#kubernetes).
 
 ## Managed Hosting Options
 
