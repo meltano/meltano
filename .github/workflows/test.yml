@@ -89,7 +89,6 @@ jobs:
       PYTEST_MARKERS: not concurrent
       FORCE_COLOR: 1
       NOXPYTHON: ${{ matrix.nox-python || matrix.python-version }}
-      NOXSESSION: tests
 
     steps:
     - name: Check out the repository
