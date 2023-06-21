@@ -15,7 +15,7 @@ repos:
         # use a local hook to avoid that bug:
         # https://github.com/meltano/meltano/pull/7238#issuecomment-1409434351
         name: check that `poetry.lock` conforms to `pyproject.toml`
-        entry: poetry lock --check
+        entry: sh -c 'find . -type f -name poetry.lock -print0 | xargs -0 -n 1 -P 0 sh -c 'cd "$(dirname "$1")" && echo "$(pwd)/poetry.lock" && poetry lock --check' _ {} \;'
         language: python
         pass_filenames: false
         additional_dependencies:
@@ -27,7 +27,7 @@ repos:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
       - id: end-of-file-fixer
-        exclude: ^.*/plugins/.*/*.\.lock$
+        exclude: ^.*/plugins/.*/.*\.lock$
       - id: check-yaml
       - id: check-json
       - id: pretty-format-json
