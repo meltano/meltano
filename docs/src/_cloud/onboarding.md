@@ -40,7 +40,7 @@ If you don't yet have an existing schedule, you can get started quickly by copy-
 schedules:
 - name: daily-refresh
   job: daily-refresh-job
-  interval: @daily  # Can be @daily, @hourly, etc., or a cron-based interval
+  interval: '@daily'  # Can be @daily, @hourly, etc., or a cron-based interval
 jobs:
 - name: daily-refresh-job
   tasks:
@@ -99,7 +99,7 @@ Running this command will verify that your project is connected and you're prope
 You should select a project to use as default for all commands.
 You can do this by running:
 ```console
-meltano-cloud project use <project name>
+meltano-cloud project use --name <project name>
 ```
 
 ### Step 4: Create deployments
@@ -109,18 +109,23 @@ In order for pipelines to run, they must have a [deployment](/cloud/concepts#mel
 To deploy a named [Meltano Environment](/concepts/environments) to Meltano Cloud, run the following [command](https://docs.meltano.com/cloud/cloud-cli#deployment):
 
 ```console
-meltano-cloud deployment create --name <deployment name> --environment-name <Meltano Environment name> --git-rev <the git revision to use for this deployment>
+meltano-cloud deployment create --name <deployment name> --environment <Meltano Environment name> --git-rev <the git revision to use for this deployment>
 ```
 
 For example, if you wanted to deploy the `prod` Meltano Environment as defined in your `meltano.yml` in the `main` branch of your git repo and you wanted the Meltano Cloud deployment to be named `production`,  you would run:
 
 ```console
-meltano-cloud deployment create --name production --environment-name prod --git-rev main
+meltano-cloud deployment create --name production --environment prod --git-rev main
 ```
+
+<div class="notification is-info">
+  <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
+  Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
+</div>
 
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
 ```console
-meltano-cloud deployments list
+meltano-cloud deployment list
 ```
 
 ### Step 5: Initialize secrets
