@@ -53,18 +53,18 @@ environments:
 plugins: 
   extractors:
   - name: tap-github
-     variant: meltanolabs
-     pip_url: git+https://github.com/MeltanoLabs/tap-github.git
-     config:
-       start_date: '2022-01-01'
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
+    config:
+      start_date: '2022-01-01'
   loaders:
   - name: target-snowflake
-     variant: meltanolabs
-     pip_url: meltanolabs-target-snowflake
-     config:
-       account: meltano
-       add_record_metadata: true
-       password: ${SNOWFLAKE_PASSWORD}
+    variant: meltanolabs
+    pip_url: meltanolabs-target-snowflake
+    config:
+      account: meltano
+      add_record_metadata: true
+      password: ${SNOWFLAKE_PASSWORD}
 ```
 
 <div class="notification is-info">
