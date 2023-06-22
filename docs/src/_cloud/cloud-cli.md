@@ -143,6 +143,33 @@ $ meltano-cloud history --lookback 1w
 
 # Display the last hour and a half of executions
 $ meltano-cloud history --lookback 1h30m
+
+# Display the executions for the schedule named "daily"
+$ meltano-cloud history --schedule daily
+
+# Display the executions for schedules starting with "da"
+$ meltano-cloud history --schedule-prefix da
+
+# Display the executions for schedules containing the word "slack"
+# Can also use `--filter`
+$ meltano-cloud history --schedule-contains slack
+
+# Display the executions for the deployment named "prod"
+$ meltano-cloud history --deployment prod
+
+# Display the executions for deployments starting with "pr"
+$ meltano-cloud history --deployment-prefix pr
+
+# Display the executions for deployments containing the string "pr"
+$ meltano-cloud history --deployment-contains pr
+
+# Display the executions for executions that failed.
+# Options are success, failed, and running.
+$ meltano-cloud history --result failed
+
+# Display the execution history in json format
+# Options are terminal, markdown, and json
+$ meltano-cloud history --format json
 ```
 
 ## `login`
