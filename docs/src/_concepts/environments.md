@@ -50,7 +50,7 @@ environments:
               warehouse: dev_wh
               batch_size_rows: 1000
     state_id_suffix: ${CUSTOM_SUFFIX}
-plugins: 
+plugins:
   extractors:
   - name: tap-github
     variant: meltanolabs
