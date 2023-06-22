@@ -3365,13 +3365,13 @@ files = [
 
 [[package]]
 name = "types-croniter"
-version = "1.3.2.9"
+version = "1.4.0.0"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-croniter-1.3.2.9.tar.gz", hash = "sha256:35f4a7210a0ff7dafb2a8f90f2d78e96f0c24bd5237979a38f8434e3d20c2949"},
-    {file = "types_croniter-1.3.2.9-py3-none-any.whl", hash = "sha256:ea81cc233a4c7d25f88b6fda02c7adcd894b5e21ac5376a8de4f61c201f480bf"},
+    {file = "types-croniter-1.4.0.0.tar.gz", hash = "sha256:4b8f5e258a236213ebcd547514828d90fde56e16066b09f071e8886941d6ceb3"},
+    {file = "types_croniter-1.4.0.0-py3-none-any.whl", hash = "sha256:b0ace20837c6f33da46c7028d260fb7296b7074369452372463ec5d9cc99d3dd"},
 ]
 
 [[package]]
@@ -3900,4 +3900,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "93d23c7e75533c2a20e1d8979ff2523e074147ed53624458eb9b7f73f84a7bb3"
+content-hash = "aa6ab328b66ebc00da0f0db29bea6ad3d092458da3301eb8e0289680ee6c6c42"
