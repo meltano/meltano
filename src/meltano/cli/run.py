@@ -86,8 +86,8 @@ async def run(
     Run a set of command blocks in series.
 
     Blocks are specified as either:\n
-      * a list of plugin names\n
-      * a job name\n
+      - a list of plugin names\n
+      - a job name\n
     An example of a list of plugin names is: `meltano run some_extractor some_loader some_plugin:some_optional_command`. These would be run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
 
     Multiple command blocks can be chained together or repeated, and tap/target pairs will automatically be linked:
