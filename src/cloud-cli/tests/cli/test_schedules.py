@@ -131,7 +131,7 @@ class TestScheduleCommand:
         ]
 
     @pytest.fixture()
-    def schedules_get_reponse(
+    def schedules_get_response(
         self,
         schedules: list[CloudProjectSchedule],
         tenant_resource_key: str,
@@ -145,7 +145,7 @@ class TestScheduleCommand:
         )
 
     @freeze_time("2023-03-24 19:30:00")
-    @pytest.mark.usefixtures("schedules_get_reponse")
+    @pytest.mark.usefixtures("schedules_get_response")
     def test_schedule_list_table(self, config: MeltanoCloudConfig):
         result = CliRunner().invoke(
             cli,
@@ -162,7 +162,7 @@ class TestScheduleCommand:
             "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
         )  # noqa: E501
 
-    @pytest.mark.usefixtures("schedules_get_reponse")
+    @pytest.mark.usefixtures("schedules_get_response")
     def test_schedule_list_json(
         self,
         schedules: list[CloudProjectSchedule],
@@ -180,6 +180,64 @@ class TestScheduleCommand:
         )
         assert result.exit_code == 0, result.output
         assert json.loads(result.output) == schedules
+
+    @pytest.mark.usefixtures("schedules_get_response")
+    def test_schedule_list_limit_truncated(
+        self,
+        config: MeltanoCloudConfig,
+    ):
+        # Limit is strictly less than number of schedules
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "schedule",
+                "list",
+                "--limit=1",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert result.stdout == (
+            "╭──────────────┬────────────┬────────────┬──────────────┬───────────╮\n"
+            "│ Deployment   │ Schedule   │ Interval   │   Runs / Day │ Enabled   │\n"
+            "├──────────────┼────────────┼────────────┼──────────────┼───────────┤\n"
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *  │          1.0 │ True      │\n"
+            "╰──────────────┴────────────┴────────────┴──────────────┴───────────╯\n"
+        )
+        assert result.stderr == (
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
+        )
+
+    @pytest.mark.usefixtures("schedules_get_response")
+    def test_schedule_list_limit_equal(
+        self,
+        config: MeltanoCloudConfig,
+    ):
+        # Limit is equal to number of schedules
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "schedule",
+                "list",
+                "--limit=3",
+            ),
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0, result.output
+        assert result.output == (
+            "╭──────────────┬────────────┬─────────────────────┬──────────────┬───────────╮\n"  # noqa: E501
+            "│ Deployment   │ Schedule   │ Interval            │   Runs / Day │ Enabled   │\n"  # noqa: E501
+            "├──────────────┼────────────┼─────────────────────┼──────────────┼───────────┤\n"  # noqa: E501
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *           │          1.0 │ True      │\n"  # noqa: E501
+            "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │         10.3 │ False     │\n"  # noqa: E501
+            "│ deployment 3 │ schedule 3 │ 0 0 * * 1,3,5       │          < 1 │ False     │\n"  # noqa: E501
+            "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == ""
 
     @freeze_time("2023-03-24 16:00:00")
     def test_schedule_describe(

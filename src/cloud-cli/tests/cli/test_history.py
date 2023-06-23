@@ -16,9 +16,9 @@ from meltano.cloud.cli import cloud as cli
 from meltano.cloud.cli.history.utils import (
     LOOKBACK_PATTERN,
     UTC,
+    format_history_row,
     interval_to_lookback,
     lookback_to_interval,
-    process_table_row,
 )
 
 if t.TYPE_CHECKING:
@@ -86,7 +86,7 @@ def test_lookback_pattern(lookback: str):
     ),
 )
 def test_table_rows(execution: dict, expected: tuple):
-    assert process_table_row(execution) == expected
+    assert format_history_row(execution) == expected
 
 
 class TestHistoryCommand:
@@ -133,7 +133,7 @@ class TestHistoryCommand:
     ):
         httpserver.expect_oneshot_request(
             path,
-            query_string={"page_size": "10"},
+            query_string={"page_size": "11"},
         ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
@@ -201,7 +201,7 @@ class TestHistoryCommand:
     ):
         httpserver.expect_oneshot_request(
             path,
-            query_string={"page_size": "10", "schedule": expected_param},
+            query_string={"page_size": "11", "schedule": expected_param},
         ).respond_with_json(response_body)
         result = CliRunner().invoke(
             cli,
@@ -225,7 +225,7 @@ class TestHistoryCommand:
         httpserver.expect_oneshot_request(
             path,
             query_string={
-                "page_size": "10",
+                "page_size": "11",
                 "schedule": "gitlab_el",
                 "deployment": "ci*",
                 "result": "failed",
@@ -270,7 +270,7 @@ class TestHistoryCommand:
         httpserver.expect_oneshot_request(
             path,
             query_string={
-                "page_size": "10",
+                "page_size": "11",
                 "start_time": expected_start_time,
             },
         ).respond_with_json(response_body)
@@ -292,3 +292,66 @@ class TestHistoryCommand:
 
         assert result.exit_code == 2
         assert "Invalid value for '--lookback'" in result.output
+
+    def test_history_table(
+        self,
+        path: str,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+        response_body: dict,
+    ):
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_size": "11"},
+        ).respond_with_json(response_body)
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "history",
+            ),
+        )
+        assert result.exit_code == 0
+        assert result.stdout == (
+            "╭────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮\n"  # noqa: E501
+            "│   Execution ID │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │\n"  # noqa: E501
+            "├────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤\n"  # noqa: E501
+            "│            123 │ daily           │ dev          │ 2023-09-02 00:00:00 │ Success  │ 00:10:00   │\n"  # noqa: E501
+            "│            456 │ daily           │ dev          │ 2023-09-01 00:00:00 │ Failed   │ N/A        │\n"  # noqa: E501
+            "╰────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯\n"  # noqa: E501
+        )  # noqa: E501
+
+    def test_history_table_limit(
+        self,
+        path: str,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+        response_body: dict,
+    ):
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_size": "2"},
+        ).respond_with_json(response_body)
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "history",
+                "--limit",
+                "1",
+            ),
+        )
+        assert result.exit_code == 0
+        assert result.stdout == (
+            "╭────────────────┬─────────────────┬──────────────┬─────────────────────┬──────────┬────────────╮\n"  # noqa: E501
+            "│   Execution ID │ Schedule Name   │ Deployment   │ Executed At (UTC)   │ Result   │ Duration   │\n"  # noqa: E501
+            "├────────────────┼─────────────────┼──────────────┼─────────────────────┼──────────┼────────────┤\n"  # noqa: E501
+            "│            123 │ daily           │ dev          │ 2023-09-02 00:00:00 │ Success  │ 00:10:00   │\n"  # noqa: E501
+            "╰────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == (
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
+        )

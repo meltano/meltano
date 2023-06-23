@@ -101,6 +101,36 @@ class TestProjectCommand:
             "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
         )  # noqa: E501
 
+    def test_project_list_table_limit(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        projects: list[CloudProject],
+    ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": projects, "pagination": None},
+        )
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            ("--config-path", config.config_path, "project", "list", "--limit", "4"),
+        )
+        assert result.exit_code == 0, result.output
+        assert result.output == (
+            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────╮\n"  # noqa: E501
+            "│  Default  │ Name                            │ Git Repository                                 │\n"  # noqa: E501
+            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┤\n"  # noqa: E501
+            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │\n"  # noqa: E501
+            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │\n"  # noqa: E501
+            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == (
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
+        )
+
     def test_project_list_table_with_default_project(
         self,
         config: MeltanoCloudConfig,
