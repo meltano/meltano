@@ -2,10 +2,29 @@
 
 from __future__ import annotations
 
-from meltano.cloud.cli.base import LimitedResult, get_paginated, run_async
+import pytest
+
+from meltano.cloud.cli.base import get_paginated, run_async
 
 
-def test_get_paginated():
+@pytest.mark.parametrize(
+    ("max_items", "limit", "max_page_size"),
+    (
+        # Case: Page size, limit, and number of items all equal
+        (10, 10, 10),
+        # Case: Limit less than number of items, equal to page size
+        (11, 10, 10),
+        # Case: Limit greater than number of items
+        (5, 6, 10),
+        # Case: Limit less than number of items
+        (5, 4, 10),
+        # Case: Limit greater than number of items, multi-page
+        (15, 16, 10),
+        # Case: Limit less than number of items, multi-page
+        (15, 14, 10),
+    ),
+)
+def test_get_paginated(max_items: int, limit: int, max_page_size: int):
     async def paged_func(page_size: int, page_token: str, max_items: int):
         if not page_token:
             return {
@@ -21,36 +40,14 @@ def test_get_paginated():
             "pagination": None,
         }
 
-    def test_case(max_items: int, limit: int, max_page_size: int) -> LimitedResult[int]:
-        results = run_async(get_paginated)(
-            lambda page_size, page_token: paged_func(
-                page_size,
-                page_token,
-                max_items=max_items,
-            ),
-            limit=limit,
-            max_page_size=max_page_size,
-        )
-
-        assert results.items == list(range(min(limit, max_items)))
-        assert results.truncated == (limit < max_items)
-
-        return results
-
-    # Case: Page size, limit, and number of items all equal
-    test_case(max_items=10, limit=10, max_page_size=10)
-
-    # Case: Limit less than number of items, equal to page size
-    test_case(max_items=11, limit=10, max_page_size=10)
-
-    # Case: Limit greater than number of items
-    test_case(max_items=5, limit=6, max_page_size=10)
-
-    # Case: Limit less than number of items
-    test_case(max_items=5, limit=4, max_page_size=10)
-
-    # Case: Limit greater than number of items, multi-page
-    test_case(max_items=15, limit=16, max_page_size=10)
-
-    # Case: Limit less than number of items, multi-page
-    test_case(max_items=15, limit=14, max_page_size=10)
+    results = run_async(get_paginated)(
+        lambda page_size, page_token: paged_func(
+            page_size,
+            page_token,
+            max_items=max_items,
+        ),
+        limit=limit,
+        max_page_size=max_page_size,
+    )
+    assert results.items == list(range(min(limit, max_items)))
+    assert results.truncated == (limit < max_items)
