@@ -1027,7 +1027,7 @@ Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passe
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
-`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), or `@yearly` (`0 0 1 1 *`).
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or `@once` (for schedules that are to be triggered manually).
 
 ```bash
 # Add a schedule
