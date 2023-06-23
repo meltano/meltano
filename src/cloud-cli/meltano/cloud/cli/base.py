@@ -81,8 +81,8 @@ def _format_table(
 def print_limit_warning():
     """Print a warning that items were truncated due to the --limit option."""
     click.secho(
-        "Output truncated due to reaching the item limit. To print more items, "
-        "increase the limit using the --limit flag.",
+        "Output truncated. To print more items, increase the limit using the --limit "
+        "option.",
         err=True,
         fg="yellow",
     )

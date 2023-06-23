@@ -70,6 +70,6 @@ class TestConfigEnvCommand:
         assert result.exit_code == 0, result.output
         assert result.stdout == "MY_ENV_VAR\n"
         assert result.stderr == (
-            "Output truncated due to reaching the item limit. To print more items, "
-            "increase the limit using the --limit flag.\n"
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
         )

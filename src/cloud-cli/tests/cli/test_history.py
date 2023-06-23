@@ -352,6 +352,6 @@ class TestHistoryCommand:
             "╰────────────────┴─────────────────┴──────────────┴─────────────────────┴──────────┴────────────╯\n"  # noqa: E501
         )  # noqa: E501
         assert result.stderr == (
-            "Output truncated due to reaching the item limit. To print more items, "
-            "increase the limit using the --limit flag.\n"
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
         )

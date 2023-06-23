@@ -206,8 +206,8 @@ class TestScheduleCommand:
             "╰──────────────┴────────────┴────────────┴──────────────┴───────────╯\n"
         )
         assert result.stderr == (
-            "Output truncated due to reaching the item limit. To print more items, "
-            "increase the limit using the --limit flag.\n"
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
         )
 
     @pytest.mark.usefixtures("schedules_get_response")
