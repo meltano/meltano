@@ -7,7 +7,7 @@ import json
 import platform
 import sys
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial, wraps
 from pathlib import Path
 
@@ -49,6 +49,7 @@ def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
 T = t.TypeVar("T")
 
 
+@dataclass
 class LimitedResult(t.Generic[T]):
     """
     List of items, along with whether or not that list is truncated.
@@ -56,10 +57,8 @@ class LimitedResult(t.Generic[T]):
     Used to store lists that are to be printed by `print_formatted_list`.
     """
 
-    def __init__(self, items: list[T] | None = None, truncated: bool = False):
-        """Initialize items to an empty list and truncated to False."""
-        self.items: list[T] = items if items is not None else []
-        self.truncated: bool = truncated
+    items: list[T] = field(default_factory=list)
+    truncated: bool = False
 
 
 def _format_table(
