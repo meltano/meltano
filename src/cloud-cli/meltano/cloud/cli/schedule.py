@@ -269,7 +269,7 @@ def _approx_daily_freq(
     num_digits_precision: int = 1,
 ) -> str:
     if cron_expr == "@once":
-        return 0
+        return "0"
     now = datetime.now(timezone.utc)
     num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
     freq = round(num_runs / sample_period.days, num_digits_precision)
