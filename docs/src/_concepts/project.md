@@ -261,7 +261,7 @@ Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and
   extractor: tap-foo
   loader: target-bar
   transform: skip
-  interval: @hourly
+  interval: "@hourly"
 ```
 
 [Pipeline-specific configuration](/guide/integration#pipeline-specific-configuration) can be specified using [environment variables](/guide/configuration#configuring-settings) in an `env` dictionary:
@@ -270,7 +270,7 @@ Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and
 schedules:
 - name: foo-to-bar
   job: tap-foo-to-target-bat
-  interval: '@hourly'
+  interval: "@hourly"
   env:
     TAP_FOO_BAR: bar
     TAP_FOO_BAZ: baz

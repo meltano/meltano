@@ -356,7 +356,7 @@ def upgrade():
         sa.UniqueConstraint("state_id"),
     )
     session = Session(bind=conn)
-    for state_id in {job_run.job_name for job_run in session.query(Job).all()}:
+    for state_id in {row['job_name'] for row in session.query(Job.job_name).distinct().all()}:
         session.add(JobState.from_job_history(session, state_id))
     session.commit()
 
