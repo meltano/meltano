@@ -1,62 +1,61 @@
+/* eslint-disable no-undef */
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require("prism-react-renderer/themes/github");
+const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Meltano',
-  tagline: 'Meltano Documentation',
-  url: 'https://docs.meltano.com',
-  baseUrl: '/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  title: "Meltano",
+  tagline: "Dinosaurs are cool",
+  favicon: "img/favicon.ico",
+
+  // Set the production url of your site here
+  url: "https://your-docusaurus-test-site.com",
+  // Set the /<baseUrl>/ pathname under which your site is served
+  // For GitHub pages deployment, it is often '/<projectName>/'
+  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'meltano', // Usually your GitHub org/user name.
-  projectName: 'meltano', // Usually your repo name.
+  organizationName: "facebook", // Usually your GitHub org/user name.
+  projectName: "docusaurus", // Usually your repo name.
+
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
-  plugins: [
-    [
-      "docusaurus-plugin-remote-content",
-      {
-          // options here
-          name: "latest-changelog", // used by CLI, must be path safe
-          sourceBaseUrl: "https://raw.githubusercontent.com/meltano/meltano/main/", // the base url for the markdown (gets prepended to all of the documents when fetching)
-          outDir: "src/pages/", // the base directory to output to.
-          documents: ["CHANGELOG.md"], // the file names to download
-          performCleanup: false,
-      },
-    ],
-  ],
+  plugins: ["docusaurus-plugin-sass"],
 
   presets: [
     [
-      'classic',
+      "classic",
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
-          routeBasePath: '/',
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/meltano/meltano',
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
         },
-        blog: false,
+        blog: {
+          showReadingTime: true,
+          // Please change this to your repo.
+          // Remove this to remove the "edit this page" links.
+          editUrl:
+            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+        },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       }),
     ],
@@ -65,136 +64,89 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      // Replace with your project's social card
+      image: "img/docusaurus-social-card.jpg",
       navbar: {
-        title: 'Meltano Documentation',
+        title: "| Docs",
         logo: {
-          alt: 'Purple dragon with the meltano wordmark',
-          src: 'img/meltano-logo-padded.svg',
+          alt: "Meltano | Docs",
+          src: "img/meltano.svg",
         },
         items: [
-          {to: '#', label: 'Getting Started', position: 'left'},
-          {to: '#', label: 'Guides', position: 'left'},
-          {to: '#', label: 'Concepts', position: 'left'},
-          {to: '#', label: 'Tutorials', position: 'left'},
-          {to: '#', label: 'Reference', position: 'left'},
-          {to: '#', label: 'Contribute', position: 'left'},
+          // {
+          //   type: "docSidebar",
+          //   sidebarId: "tutorialSidebar",
+          //   position: "left",
+          //   label: "Tutorial",
+          // },
+          { to: "/blog", label: "Get Started", position: "left" },
+          { to: "/blog", label: "Tutorials", position: "left" },
+          { to: "/blog", label: "Docs", position: "left" },
+          { to: "/blog", label: "Changelog", position: "left" },
           {
-            type: 'docsVersionDropdown',
+            href: "https://github.com/facebook/docusaurus",
+            label: " ",
+            position: "right",
+            className: "header-github-link",
+            "aria-label": "GitHub repository",
           },
           {
-            href: 'https://github.com/meltano/meltano',
-            label: 'GitHub',
-            position: 'right',
+            href: "https://github.com/facebook/docusaurus",
+            label: " ",
+            position: "right",
+            className: "header-slack-link",
+            "aria-label": "Slack community",
           },
         ],
       },
       footer: {
-        style: 'dark',
+        style: "dark",
         links: [
           {
-            title: 'The Project',
+            title: "Docs",
             items: [
               {
-                label: 'Our Mission',
-                to: 'https://handbook.meltano.com/company/#mission',
-              },
-              {
-                label: 'Our Vision',
-                to: 'https://handbook.meltano.com/company/#vision',
-              },
-              {
-                label: 'Roadmap',
-                to: 'https://handbook.meltano.com/product/roadmap',
-              },
-              {
-                label: 'Strategy',
-                to: 'https://handbook.meltano.com/company/#strategy',
+                label: "Tutorial",
+                to: "/docs/intro",
               },
             ],
           },
           {
-            title: 'Company',
+            title: "Community",
             items: [
               {
-                label: 'Handbook',
-                href: 'https://handbook.meltano.com/',
+                label: "Stack Overflow",
+                href: "https://stackoverflow.com/questions/tagged/docusaurus",
               },
               {
-                label: 'Values',
-                href: 'https://handbook.meltano.com/company/values',
+                label: "Discord",
+                href: "https://discordapp.com/invite/docusaurus",
               },
               {
-                label: 'History',
-                href: 'https://handbook.meltano.com/timeline',
+                label: "Twitter",
+                href: "https://twitter.com/docusaurus",
               },
             ],
           },
           {
-            title: 'Community',
+            title: "More",
             items: [
               {
-                label: 'Slack',
-                href: 'https://meltano.com/slack',
+                label: "Blog",
+                to: "/blog",
               },
               {
-                label: 'MeltanoLabs',
-                href: 'https://github.com/MeltanoLabs',
-              },
-              {
-                label: 'Meltano Hub',
-                href: 'https://hub.meltano.com/',
-              },
-            ],
-          },
-          {
-            title: 'Get Help',
-            items: [
-              {
-                label: 'Contact',
-                href: 'https://meltano.com/slack',
-              },
-              {
-                label: 'StackOverflow',
-                href: 'https://stackoverflow.com/questions/tagged/meltano',
+                label: "GitHub",
+                href: "https://github.com/facebook/docusaurus",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Meltano.`,
+        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-      },
-      algolia: {
-        // The application ID provided by Algolia
-        appId: 'YOUR_APP_ID',
-
-        // Public API key: it is safe to commit it
-        apiKey: 'YOUR_SEARCH_API_KEY',
-
-        indexName: 'YOUR_INDEX_NAME',
-
-        // Optional: see doc section below
-        contextualSearch: true,
-
-        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
-        externalUrlRegex: 'external\\.com|domain\\.com',
-
-        // Optional: Algolia search parameters
-        searchParameters: {},
-
-        // Optional: path for search page that enabled by default (`false` to disable it)
-        searchPagePath: 'search',
-
-        //... other Algolia params
-      },
-      announcementBar: {
-        id: 'announcementBar',
-        content: "This is an announcement. <a href='#' style='color: #fbbf52; font-weight: bold;'>Call to action!</a>",
-        backgroundColor: '#031d4d',
-        textColor: '#ffffff',
-        isCloseable: true,
       },
     }),
 };

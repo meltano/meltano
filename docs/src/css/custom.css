@@ -1,30 +1,386 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "fonts.css";
 
-/* You can override the default Infima variables here. */
-:root {
-  --ifm-color-primary: #3438bf;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+h1 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 86px;
+  line-height: 110%;
+  letter-spacing: -0.03em;
+  margin: 38px;
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
-[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+h2 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin: 0;
+}
+
+h3 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 110%;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+h4 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 125%;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h5 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 130%;
+  letter-spacing: -0.0075em;
+  margin: 0;
+}
+
+h6 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 130%;
+}
+
+.p1 {
+  font-family: 'Hanken Grotesk', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 170%;
+  letter-spacing: -0.005em;
+}
+
+.p2 {
+  font-family: 'Hanken Grotesk', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 170%;
+}
+
+.p3 {
+  font-family: 'Hanken Grotesk', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 170%;
+}
+
+a {
+  text-decoration: none !important;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+pre {
+  font-family: 'IBM Plex Mono', Arial, sans-serif;
+  white-space: pre-line;
+}
+
+ol {
+  margin-bottom: 0;
+  font-family: Hanken Grotesk, Arial, sans-serif;
+}
+
+.docs-link {
+  font-family: 'IBM Plex Mono', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 100%;
+  color: #18c3fa;
+  display: flex;
+  gap: 10px;
+}
+
+.red {
+  color: #ff5f3c;
+}
+
+.red-bg {
+  background-color: #ff5f3c;
+}
+
+.pink {
+  color: #f963bc;
+}
+
+.pink-bg {
+  background-color: #f963bc;
+}
+
+.yellow {
+  color: #fbcc54;
+}
+
+.yellow-bg {
+  background-color: #fbcc54;
+}
+
+.green {
+  color: #99ce55;
+}
+
+.green-bg {
+  background-color: #99ce55;
+}
+
+.medium-gray {
+  color: #b5b4ba;
+}
+
+.medium-gray-bg {
+  background-color: #b5b4ba;
+}
+
+.blue {
+  color: #3a64fa;
+}
+
+.blue-bg {
+  background-color: #3a64fa;
+}
+
+.light-blue {
+  color: #18c3fa;
+}
+
+.light-blue-bg {
+  background-color: #18c3fa;
+}
+
+.purple {
+  color: #311772;
+}
+
+.purple-bg {
+  background-color: #311772;
+}
+
+.after-dd-blue:after {
+  content: ':';
+  color: #18c3fa;
+}
+
+.before-dash-blue:before {
+  content: '- ';
+  color: #18c3fa;
+}
+
+.ch-space-3 {
+  padding-left: 15px;
+  display: inline-block;
+}
+
+.ch-space-6 {
+  padding-left: 30px;
+  display: inline-block;
+}
+
+.ch-space-9 {
+  padding-left: 45px;
+  display: inline-block;
+}
+
+.ch-space-12 {
+  padding-left: 60px;
+  display: inline-block;
+}
+
+.highlighted {
+  background: rgb(255 255 255 / 15%);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+}
+
+.btn {
+  font-family: 'IBM Plex Mono', Arial, sans-serif;
+  padding: 16px 40px;
+  font-weight: 500;
+  font-size: 16px;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.main-btn {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 100%;
+  color: #fff !important;
+  background-color: #3a64fa;
+  border-radius: 4.6px;
+  display: flex;
+  align-items: center;
+}
+
+.main-btn:hover {
+  background-color: #311772;
+}
+
+.alt-blue-btn {
+  text-align: center;
+  color: #080216;
+  background-color: #18c3fa;
+  border-radius: 4.6px;
+  display: table;
+  cursor: pointer;
+  border: none;
+}
+
+.alt-blue-btn:hover {
+  background-color: #0397c7;
+}
+
+.arrow-link {
+  font-family: 'IBM Plex Mono', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 100%;
+  color: #fff;
+}
+
+.arrow-link img {
+  width: auto !important;
+  display: initial !important;
+}
+
+.brackets {
+  position: relative;
+  display: inline-block;
+}
+
+.brackets:before {
+  content: '/';
+  color: #f963bc;
+}
+
+.brackets:after {
+  content: '/';
+  color: #f963bc;
+}
+
+.brackets span {
+  width: 0%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-indent: -100vw;
+  display: inline-block;
+}
+
+.title-inline .brackets {
+  display: inline-block;
+}
+
+em {
+  position: relative;
+  display: inline-block;
+  font-style: normal;
+}
+
+em:before {
+  content: '/';
+  color: #f963bc;
+}
+
+em:after {
+  content: '/';
+  color: #f963bc;
+}
+
+.single-blog em {
+  font-style: italic;
+}
+
+.single-blog em:before {
+  content: '';
+}
+
+.single-blog em:after {
+  content: '';
+}
+
+em span {
+  width: 0%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-indent: -100vw;
+  display: inline-block;
+  font-style: normal;
+}
+
+.title-inline em {
+  display: inline-block;
+  font-style: normal;
+}
+
+.header-github-link {
+  padding: 0 0.5rem;
+}
+
+.header-github-link:hover {
+  opacity: 0.6;
+}
+
+.header-github-link:before {
+  background: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E") no-repeat;
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
+}
+
+.header-github-link svg {
+  display: none;
+}
+
+.header-slack-link {
+  padding: 0 0.5rem;
+}
+
+.header-slack-link:hover {
+  opacity: 0.6;
+}
+
+.header-slack-link:before {
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjMiIGhlaWdodD0iMjIiIHZpZXdCb3g9IjAgMCAyMyAyMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTguMjY3MjUgMEM3LjA1MDI5IDAgNi4wNjk4MyAwLjk4Mzk4NCA2LjA2OTgzIDIuMkM2LjA2OTgzIDIuNzgwMDggNi4zMDIwNCAzLjM0Mjk3IDYuNzEwNTcgMy43NTU0N0M3LjEyMzM5IDQuMTY3OTcgNy42ODI0MiA0LjQgOC4yNjcyNSA0LjRIMTAuNDY0N1YyLjJDMTAuNDY0NyAwLjk4ODI4MSA5LjQ4NDIyIDAuMDA0Mjk2ODggOC4yNjcyNSAwWk04LjI2NzI1IDUuODY1MjNIMi4zOTc0M0MxLjE4MDQ3IDUuODY1MjMgMC4yMDAwMTIgNi44NDkyMiAwLjIwMDAxMiA4LjA2NTIzQzAuMjAwMDEyIDkuMjgxMjUgMS4xODQ3NyAxMC4yNjUyIDIuMzk3NDMgMTAuMjY1Mkg4LjI2Mjk1QzkuNDc5OTIgMTAuMjY1MiAxMC40NjA0IDkuMjgxMjUgMTAuNDYwNCA4LjA2NTIzQzEwLjQ2NDcgNi44NTM1MiA5LjQ3OTkyIDUuODY1MjMgOC4yNjcyNSA1Ljg2NTIzWk0xNC4xMzI4IDEwLjI2NTJDMTUuMzQ5NyAxMC4yNjUyIDE2LjMzNDUgOS4yODEyNSAxNi4zMzAyIDguMDY1MjNWMi4yQzE2LjMzMDIgMC45ODM5ODQgMTUuMzQ1NCAwIDE0LjEzMjggMEMxMi45MjAxIDAgMTEuOTM1NCAwLjk4Mzk4NCAxMS45MzU0IDIuMlY4LjA2NTIzQzExLjkzNTQgOS4yODU1NSAxMi45MTU4IDEwLjI2NTIgMTQuMTMyOCAxMC4yNjUyWk0yMi4yIDguMDY1MjNDMjIuMiA2Ljg0OTIyIDIxLjIxNTMgNS44NjUyMyAyMC4wMDI2IDUuODY1MjNDMTguNzg5OSA1Ljg2NTIzIDE3LjgwNTIgNi44NDkyMiAxNy44MDUyIDguMDY1MjNWMTAuMjY1MkgyMC4wMDI2QzIxLjIxNTMgMTAuMjY1MiAyMi4yIDkuMjgxMjUgMjIuMiA4LjA2NTIzWk0xOS45OTgzIDExLjczNDhIMTQuMTMyOEMxMi45MTU4IDExLjczNDggMTEuOTM1NCAxMi43MTg3IDExLjkzNTQgMTMuOTM0OEMxMS45MzU0IDE0LjUxNDggMTIuMTY3NiAxNS4wNzc3IDEyLjU3NjEgMTUuNDkwMkMxMi45ODg5IDE1LjkwMjcgMTMuNTQ3OSAxNi4xMzQ4IDE0LjEzMjggMTYuMTM0OEgxOS45OTgzQzIxLjIxNTMgMTYuMTM0OCAyMi4xOTU3IDE1LjE1MDggMjIuMTk1NyAxMy45MzQ4QzIyLjIgMTIuNzE4NyAyMS4yMTUzIDExLjczNDggMTkuOTk4MyAxMS43MzQ4Wk0xNC4xMzI4IDE3LjZIMTEuOTM1NFYxOS44QzExLjkzNTQgMjEuMDE2IDEyLjkyMDEgMjIgMTQuMTMyOCAyMkMxNS4zNDU0IDIyIDE2LjMzNDUgMjEuMDE2IDE2LjMzMDIgMTkuOEMxNi4zMzQ1IDE4LjU4NCAxNS4zNDk3IDE3LjYwNDMgMTQuMTMyOCAxNy42Wk04LjI2NzI1IDExLjczNDhDNy4wNTAyOSAxMS43MzQ4IDYuMDY5ODMgMTIuNzE4NyA2LjA2OTgzIDEzLjkzNDhWMTkuOEM2LjA2OTgzIDIxLjAxNiA3LjA1NDU5IDIyIDguMjY3MjUgMjJDOS40Nzk5MiAyMiAxMC40NjkgMjEuMDE2IDEwLjQ2NDcgMTkuOFYxMy45MzQ4QzEwLjQ2NDcgMTMuMzU0NyAxMC4yMzI1IDEyLjc5MTggOS44MjM5NCAxMi4zNzkzQzkuNDExMTEgMTEuOTY2OCA4Ljg0Nzc4IDExLjczNDggOC4yNjcyNSAxMS43MzQ4Wk0wLjIwMDAxMiAxMy45MzQ4QzAuMjAwMDEyIDE0LjUxNDggMC40MzIyMjUgMTUuMDc3NyAwLjg0MDc0NyAxNS40OTAyQzEuMjUzNTcgMTUuOTAyNyAxLjgxMjYgMTYuMTM0OCAyLjM5NzQzIDE2LjEzNDhDMy42MTQ0IDE2LjEzNDggNC41OTkxNSAxNS4xNTA4IDQuNTk0ODUgMTMuOTM0OFYxMS43MzQ4SDIuMzk3NDNDMS4xODQ3NyAxMS43MzQ4IDAuMjAwMDEyIDEyLjcxODcgMC4yMDAwMTIgMTMuOTM0OFoiIGZpbGw9IiMzQTY0RkEiLz4KPC9zdmc+Cg==") no-repeat;
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
+}
+
+.header-slack-link svg {
+  display: none;
 }
