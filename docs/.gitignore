@@ -18,6 +18,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Ignore CHANGELOG.md as this gets pulled in on deploy
-src/pages/CHANGELOG.md
