@@ -17,7 +17,6 @@ def unset_env_vars(monkeypatch: pytest.MonkeyPatch):
 
     MeltanoCloudConfig __getattribute__ overrides the config value on get
     to env vars if set. This causes tests to fail unless you unset the env variables.
-
     """
     monkeypatch.delenv("MELTANO_CLOUD_BASE_URL", raising=False)
     monkeypatch.delenv("MELTANO_CLOUD_BASE_AUTH_URL", raising=False)
