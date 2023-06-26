@@ -1030,7 +1030,7 @@ The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/C
 `@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or one of `@manual`, `@once`, or `@none` (for schedules that are to be triggered manually).
 
 <div class="notification is-info">
-  <p>`@manual`, `@once`, and `@none` are all aliases for one another. They have no functional difference, and can be used interchangeably.</p>
+  <p><code>@manual</code>, <code>@once</code>, and <code>@none</code> are all aliases for one another. They have no functional difference, and can be used interchangeably.</p>
 </div>
 
 ```bash
