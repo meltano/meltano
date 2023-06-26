@@ -268,7 +268,7 @@ def _approx_daily_freq(
     sample_period: timedelta = timedelta_year,
     num_digits_precision: int = 1,
 ) -> str:
-    if cron_expr == "@once":
+    if cron_expr in {"@once", "@manual", "@none"}:
         return "0"
     now = datetime.now(timezone.utc)
     num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
