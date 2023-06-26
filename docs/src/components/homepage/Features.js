@@ -118,7 +118,7 @@ export default function HomepageFeatures() {
   return (
     <section className="my-20">
       <div className="container relative">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {FeatureList.map((props, idx) => (
             <Feature key={idx} {...props} />
           ))}

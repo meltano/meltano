@@ -76,7 +76,7 @@ export default function HomepageFindOutMore() {
         >
           Find Out More!
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-5">
+        <div className="grid grid-cols-1 lg:grid-cols-5">
           {FindOutMoreList.map((props, idx) => (
             <IconLink key={idx} {...props} />
           ))}
