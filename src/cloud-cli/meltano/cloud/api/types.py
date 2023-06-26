@@ -62,3 +62,16 @@ class CloudDeployment(TypedDict):
 
     # Added client-side:
     default: bool
+
+
+class CloudConfigProject(TypedDict):
+    """Meltano cloud config project settings for default deployments"""
+
+    default_deployment_name: str | None
+
+
+class CloudConfigOrg(TypedDict):
+    """Meltano cloud config organization for storing default projects and deployments"""
+
+    default_project_id: str | None
+    projects: dict[str, CloudConfigProject]

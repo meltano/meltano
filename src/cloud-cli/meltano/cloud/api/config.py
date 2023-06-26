@@ -12,6 +12,8 @@ from pathlib import Path
 import jwt
 import platformdirs
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
+
 if sys.version_info <= (3, 8):
     from cached_property import cached_property
 else:
@@ -95,6 +97,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         config_path: os.PathLike | str | None = None,
         default_project_id: str | None = None,
         default_deployment_name: str | None = None,
+        organizations_defaults: dict[str, CloudConfigOrg] | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
 
@@ -126,6 +129,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         )
         self.default_project_id = default_project_id
         self.default_deployment_name = default_deployment_name
+        self.organizations_defaults = organizations_defaults
 
     def __getattribute__(self, name: str) -> str | None:
         """Get config attribute.
@@ -221,7 +225,10 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             project_id: The Meltano Cloud project ID that should be used.
         """
         self.default_project_id = project_id
-        self.write_to_file()
+        self.internal_organization_default = {
+            **self.internal_organization_default,
+            "default_project_id": project_id,
+        }
 
     @property
     def tenant_resource_key(self) -> str:
@@ -242,6 +249,47 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             return next(iter(self.tenant_resource_keys))
         except StopIteration:  # noqa: WPS329
             raise NoMeltanoCloudTenantResourceKeyError from None
+
+    @property
+    def internal_organization_default(self) -> CloudConfigOrg:
+        """Get the current tenant resource key defaults for projects and deployments"""
+        if (
+            self.organizations_defaults
+            and self.tenant_resource_key in self.organizations_defaults
+        ):
+            return self.organizations_defaults[self.tenant_resource_key]
+
+        new_org_default = CloudConfigOrg(default_project_id=None, projects={})
+
+        self.internal_organization_default = new_org_default
+        return new_org_default
+
+    @internal_organization_default.setter
+    def internal_organization_default(self, org_default: CloudConfigOrg) -> None:
+        """Sets the internal organization defaults and updates the config file"""
+        if not self.organizations_defaults:
+            self.organizations_defaults = {}
+
+        self.organizations_defaults[self.tenant_resource_key] = org_default
+        self.write_to_file()
+
+    @property
+    def internal_project_default(self) -> CloudConfigProject:
+        """Get the current org projects default settings"""
+        org_default = self.internal_organization_default
+        if self.internal_project_id in org_default:
+            return self.internal_organization_default[self.internal_project_id]
+
+        new_project_config = CloudConfigProject(default_deployment_name=None)
+        self.internal_project_default = new_project_config
+        return new_project_config
+
+    @internal_project_default.setter
+    def internal_project_default(self, project_default: CloudConfigProject) -> None:
+        """Set the current org projects default settings and update config file"""
+        org_default = self.internal_organization_default
+        org_default["projects"][self.internal_project_id] = project_default
+        self.internal_organization_default = org_default
 
     @staticmethod
     def user_config_path() -> Path:  # noqa: WPS605

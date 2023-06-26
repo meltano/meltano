@@ -17,6 +17,7 @@ from slugify import slugify
 from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.config import CloudConfigProject
 from meltano.cloud.api.types import CloudDeployment
 from meltano.cloud.cli.base import (
     LimitedResult,
@@ -334,6 +335,11 @@ async def use_deployment(  # noqa: D103
                 "Meltano Cloud deployment matches name.",
             )
     context.config.default_deployment_name = deployment_name
+
+    context.config.internal_project_default = CloudConfigProject(
+        default_deployment_name=deployment_name,
+    )
+
     context.config.write_to_file()
     click.secho(
         (
