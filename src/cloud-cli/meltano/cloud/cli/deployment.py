@@ -88,7 +88,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         return {
             **deployment,  # type: ignore[misc]
             "default": (
-                self.config.default_deployment_name == deployment["deployment_name"]
+                self.config.internal_project_default["default_deployment_name"]
+                == deployment["deployment_name"]
             ),
         }
 
@@ -169,7 +170,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
             {
                 **deployment,  # type: ignore[misc]
                 "default": (
-                    self.config.default_deployment_name == deployment["deployment_name"]
+                    self.config.internal_project_default["default_deployment_name"]
+                    == deployment["deployment_name"]
                 ),
             },
         )
@@ -218,7 +220,8 @@ async def _get_deployments(
     results.items = [
         {
             **x,  # type: ignore[misc]
-            "default": x["deployment_name"] == config.default_deployment_name,
+            "default": x["deployment_name"]
+            == config.internal_project_default["default_deployment_name"],
         }
         for x in results.items
     ]
@@ -294,7 +297,8 @@ class DeploymentChoicesQuestionaryOption(click.Option):
         """
         if platform.system() == "Windows":
             asyncio.set_event_loop_policy(
-                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
+                # type: ignore[attr-defined]
+                asyncio.WindowsSelectorEventLoopPolicy(),
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
@@ -356,8 +360,6 @@ def _set_project_default_deployment(
         context: The Cloud CLI context.
         deployment_name: The name of the deployment to set as the default.
     """
-    # TODO: Remove dependency on this default_deployment_name
-    context.config.default_deployment_name = deployment_name
     context.config.internal_project_default = CloudConfigProject(
         default_deployment_name=deployment_name,
     )

@@ -6,6 +6,7 @@ import typing as t
 
 from click.testing import CliRunner
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -63,7 +64,16 @@ class TestCloudRun:
             f"{tenant_resource_key}/{internal_project_id}/"
             f"{deployment}/{job_or_schedule}"
         )
-        config.default_deployment_name = deployment
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name=deployment,
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         httpserver.expect_oneshot_request(path).respond_with_data(
             b"Running a Meltano project in Meltano Cloud",
@@ -89,7 +99,16 @@ class TestCloudRun:
             f"{tenant_resource_key}/{internal_project_id}/"
             f"{deployment}/{job_or_schedule}"
         )
-        config.default_deployment_name = None
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name=None,
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         httpserver.expect_oneshot_request(path).respond_with_data(
             b"Running a Meltano project in Meltano Cloud",
