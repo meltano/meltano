@@ -12,6 +12,8 @@ from meltano.core.job import JobFinder as StateJobFinder
 
 CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,
+    "@manual": None,
+    "@none": None,
     "@hourly": "0 * * * *",
     "@daily": "0 0 * * *",
     "@weekly": "0 0 * * 0",

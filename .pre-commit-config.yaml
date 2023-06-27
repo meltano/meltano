@@ -15,9 +15,7 @@ repos:
         # use a local hook to avoid that bug:
         # https://github.com/meltano/meltano/pull/7238#issuecomment-1409434351
         name: check that `poetry.lock` conforms to `pyproject.toml`
-        # TODO: Have this auto-detect each directory with both `poetry.lock`
-        #       and `pyproject.toml, and run `poetry lock --check` in each.
-        entry: bash -c 'poetry lock --check && cd src/cloud-cli && poetry lock --check'
+        entry: sh -c 'find . -type f -name poetry.lock -print0 | xargs -0 -n 1 -P 0 sh -c 'cd "$(dirname "$1")" && echo "$(pwd)/poetry.lock" && poetry lock --check' _ {} \;'
         language: python
         pass_filenames: false
         additional_dependencies:

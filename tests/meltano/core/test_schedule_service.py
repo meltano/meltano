@@ -73,14 +73,23 @@ class TestScheduleService:
 
     @pytest.mark.order(0)
     def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
-        intervals = ["once", "hourly", "daily", "weekly", "monthly", "yearly"]
+        intervals = [
+            "@once",
+            "@manual",
+            "@none",
+            "@hourly",
+            "@daily",
+            "@weekly",
+            "@monthly",
+            "@yearly",
+        ]
 
         job_schedules = [
-            create_job_schedule(f"job_schedule_{interval}", interval=f"@{interval}")
+            create_job_schedule(f"job_schedule_{interval[1:]}", interval=interval)
             for interval in intervals
         ]
         elt_schedules = [
-            create_elt_schedule(f"elt_schedule_{interval}", interval=f"@{interval}")
+            create_elt_schedule(f"elt_schedule_{interval[1:]}", interval=interval)
             for interval in intervals
         ]
 

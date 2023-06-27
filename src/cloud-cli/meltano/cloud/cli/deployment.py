@@ -454,7 +454,7 @@ async def create_deployment(
 @click.option(
     "--name",
     "deployment_name",
-    help="A name which uniquely identifies the new Meltano Cloud deployment",
+    help="A name which uniquely identifies the Meltano Cloud deployment to update",
     prompt=True,
 )
 @click.option(
