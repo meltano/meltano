@@ -298,8 +298,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
-        context.deployments = asyncio.run(
-            _get_deployments(context.config)).items
+        context.deployments = asyncio.run(_get_deployments(context.config)).items
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud deployment",

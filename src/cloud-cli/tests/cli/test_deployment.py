@@ -112,8 +112,7 @@ class TestDeploymentCommand:
         )
         result = CliRunner(mix_stderr=False).invoke(
             cli,
-            ("--config-path", config.config_path,
-             "deployment", "list", "--limit", "2"),
+            ("--config-path", config.config_path, "deployment", "list", "--limit", "2"),
         )
         assert result.exit_code == 0, result.output
         assert result.stdout == (
@@ -208,8 +207,7 @@ class TestDeploymentCommand:
             "for future commands\n"
         )
         assert (
-            json.loads(Path(config.config_path).read_text())[
-                "default_deployment_name"]
+            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
             == "ultra-production"
         )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
@@ -259,8 +257,7 @@ class TestDeploymentCommand:
             "Set 'legacy' as the default Meltano Cloud deployment for future commands\n"
         ) in result.stdout
         assert (
-            json.loads(Path(config.config_path).read_text())[
-                "default_deployment_name"]
+            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
             == "legacy"
         )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
