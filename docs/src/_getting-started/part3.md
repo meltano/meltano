@@ -62,22 +62,21 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 
 Next, we add the dbt plugin to transform this data.
 
-## Install the postgres specific dbt utility
-dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano dbt utilities match this pattern; in this case our adapter is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
+## Install and configure the Postgres-specific dbt utility
+dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano dbt utilities match this pattern; in this case our utility is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
 
 ```console
 $ meltano add utility dbt-postgres
-AAdded utility 'dbt-postgres' to your Meltano project
-Variant:        dbt-labs (default)
-Repository:     https://github.com/dbt-labs/dbt-core
-Documentation:  https://hub.meltano.com/utilities/dbt-postgres--dbt-labs
-
+2022-09-22T11:32:35.601357Z [info     ] Environment 'dev' is active
+Added utility 'dbt-postgres' to your Meltano project
+...
 Installing utility 'dbt-postgres'...
+---> 100%
+...
 Installed utility 'dbt-postgres'
-
-To learn more about utility 'dbt-postgres', visit https://hub.meltano.com/utilities/dbt-postgres--dbt-labs
+Installed 1/1 plugins
 ```
 
 </div>
@@ -101,22 +100,22 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
 
 ## Configure dbt
-Configure the dbt-postgres transformer to use the same configuration as our target-postgres loader using `meltano config`:
+Configure the dbt-postgres utility to use the same configuration as our target-postgres loader using `meltano config`:
 
 <div class="termy">
 ```console
 $ meltano config dbt-postgres set host localhost
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'host' was set in `meltano.yml`: 'localhost'
 $ meltano config dbt-postgres set port 5432
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'port' was set in `meltano.yml`: 5432
+&ensp;&ensp;Utility 'dbt-postgres' setting 'port' was set in `meltano.yml`: 5432
 $ meltano config dbt-postgres set user meltano
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config dbt-postgres set password password
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'password' was set in `.env`: 'password'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'password' was set in `.env`: 'password'
 $ meltano config dbt-postgres set dbname postgres
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
 $ meltano config dbt-postgres set schema analytics
-&ensp;&ensp;Transformer 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
 ```
 </div>
 
