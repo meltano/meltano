@@ -193,12 +193,11 @@ class MeltanoCloudAuth:  # noqa: WPS214
 
     @asynccontextmanager
     async def _get_user_info_response(self) -> t.AsyncIterator[aiohttp.ClientResponse]:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                yield response
+        async with aiohttp.ClientSession() as session, session.get(
+            urljoin(self.base_url, "oauth2/userInfo"),
+            headers=self.get_access_token_header(),
+        ) as response:
+            yield response
 
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
