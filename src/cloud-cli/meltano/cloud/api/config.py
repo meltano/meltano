@@ -117,6 +117,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             default_project_id: The ID of the default Meltano Cloud project.
             default_deployment_name: The name of the default Meltano Cloud
                 deployment.
+            organizations_defaults: Default org settings.
         """
         self.auth_callback_port = auth_callback_port
         self.base_url = base_url
@@ -252,7 +253,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @property
     def internal_organization_default(self) -> CloudConfigOrg:
-        """Get the current tenant resource key defaults for projects and deployments"""
+        """Get the current tenant resource key defaults for projects and deployments.
+
+        Returns:
+            The current tenant resource key default project and list of projects
+        """
         if (
             self.organizations_defaults
             and self.tenant_resource_key in self.organizations_defaults
@@ -266,7 +271,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @internal_organization_default.setter
     def internal_organization_default(self, org_default: CloudConfigOrg) -> None:
-        """Sets the internal organization defaults and updates the config file"""
+        """Set the internal organization defaults and updates the config file.
+
+        Args:
+            org_default: the new default organization settings
+        """
         if not self.organizations_defaults:
             self.organizations_defaults = {}
 
@@ -275,7 +284,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @property
     def internal_project_default(self) -> CloudConfigProject:
-        """Get the current org projects default settings"""
+        """Get the current org projects default settings.
+
+        Returns:
+            The current project deployment defaults
+        """
         org_default = self.internal_organization_default
         if self.internal_project_id in org_default:
             return self.internal_organization_default[self.internal_project_id]
@@ -286,7 +299,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
     @internal_project_default.setter
     def internal_project_default(self, project_default: CloudConfigProject) -> None:
-        """Set the current org projects default settings and update config file"""
+        """Set the current org projects default settings and update config file.
+
+        Args:
+            project_default: the new default project settings
+        """
         org_default = self.internal_organization_default
         org_default["projects"][self.internal_project_id] = project_default
         self.internal_organization_default = org_default

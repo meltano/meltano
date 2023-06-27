@@ -214,6 +214,12 @@ class TestProjectCommand:
             json.loads(Path(config.config_path).read_text())["default_project_id"]
             == "01GWQ7520WNMQT0PQ6KHCC4EE1"
         )
+        assert (
+            json.loads(Path(config.config_path).read_text())["organizations_defaults"][
+                config.tenant_resource_key
+            ]["default_project_id"]
+            == "01GWQ7520WNMQT0PQ6KHCC4EE1"
+        )
 
     @pytest.mark.xfail(
         platform.system() == "Windows",
@@ -253,6 +259,12 @@ class TestProjectCommand:
         ) in result.stdout
         assert (
             json.loads(Path(config.config_path).read_text())["default_project_id"]
+            == "01GWQ788M7TVP9HFVRGQ34BG17"
+        )
+        assert (
+            json.loads(Path(config.config_path).read_text())["organizations_defaults"][
+                config.tenant_resource_key
+            ]["default_project_id"]
             == "01GWQ788M7TVP9HFVRGQ34BG17"
         )
 
@@ -311,6 +323,12 @@ class TestProjectCommand:
             json.loads(Path(config.config_path).read_text())["default_project_id"]
             == "01GWQREZ7G0526JZS9JY5H3BH9"
         )
+        assert (
+            json.loads(Path(config.config_path).read_text())["organizations_defaults"][
+                config.tenant_resource_key
+            ]["default_project_id"]
+            == "01GWQREZ7G0526JZS9JY5H3BH9"
+        )
 
     def test_project_use_by_id(self, config: MeltanoCloudConfig):
         result = CliRunner().invoke(
@@ -331,6 +349,12 @@ class TestProjectCommand:
         )
         assert (
             json.loads(Path(config.config_path).read_text())["default_project_id"]
+            == "01GWQ7520WNMQT0PQ6KHCC4EE1"
+        )
+        assert (
+            json.loads(Path(config.config_path).read_text())["organizations_defaults"][
+                config.tenant_resource_key
+            ]["default_project_id"]
             == "01GWQ7520WNMQT0PQ6KHCC4EE1"
         )
 

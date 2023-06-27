@@ -210,6 +210,16 @@ class TestDeploymentCommand:
             json.loads(Path(config.config_path).read_text())["default_deployment_name"]
             == "ultra-production"
         )
+        default_org_settings = json.loads(Path(config.config_path).read_text())[
+            "organizations_defaults"
+        ][config.tenant_resource_key]
+        default_project_id = default_org_settings["default_project_id"]
+        assert (
+            default_org_settings["projects"][default_project_id][
+                "default_deployment_name"
+            ]
+            == "ultra-production"
+        )
 
     @pytest.mark.xfail(
         platform.system() == "Windows",
@@ -248,6 +258,17 @@ class TestDeploymentCommand:
         ) in result.stdout
         assert (
             json.loads(Path(config.config_path).read_text())["default_deployment_name"]
+            == "legacy"
+        )
+        default_org_settings = json.loads(Path(config.config_path).read_text())[
+            "organizations_defaults"
+        ][config.tenant_resource_key]
+        default_project_id = default_org_settings["default_project_id"]
+
+        assert (
+            default_org_settings["projects"][default_project_id][
+                "default_deployment_name"
+            ]
             == "legacy"
         )
 
