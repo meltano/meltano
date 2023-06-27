@@ -294,12 +294,12 @@ class DeploymentChoicesQuestionaryOption(click.Option):
         """
         if platform.system() == "Windows":
             asyncio.set_event_loop_policy(
-                # type: ignore[attr-defined]
-                asyncio.WindowsSelectorEventLoopPolicy(),
+                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
-        context.deployments = asyncio.run(_get_deployments(context.config)).items
+        context.deployments = asyncio.run(
+            _get_deployments(context.config)).items
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud deployment",

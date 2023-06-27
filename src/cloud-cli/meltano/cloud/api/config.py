@@ -226,10 +226,9 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             project_id: The Meltano Cloud project ID that should be used.
         """
         self.default_project_id = project_id
-        self.internal_organization_default = {
-            **self.internal_organization_default,
-            "default_project_id": project_id,
-        }
+        org_default = self.internal_organization_default
+        org_default["default_project_id"] = project_id
+        self.internal_organization_default = org_default
 
     @property
     def tenant_resource_key(self) -> str:
@@ -290,8 +289,8 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             The current project deployment defaults
         """
         org_default = self.internal_organization_default
-        if self.internal_project_id in org_default:
-            return self.internal_organization_default[self.internal_project_id]
+        if self.internal_project_id in org_default["projects"]:
+            return org_default["projects"][self.internal_project_id]
 
         new_project_config = CloudConfigProject(default_deployment_name=None)
         self.internal_project_default = new_project_config

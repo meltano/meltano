@@ -112,7 +112,8 @@ class TestDeploymentCommand:
         )
         result = CliRunner(mix_stderr=False).invoke(
             cli,
-            ("--config-path", config.config_path, "deployment", "list", "--limit", "2"),
+            ("--config-path", config.config_path,
+             "deployment", "list", "--limit", "2"),
         )
         assert result.exit_code == 0, result.output
         assert result.stdout == (
@@ -207,7 +208,8 @@ class TestDeploymentCommand:
             "for future commands\n"
         )
         assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
+            json.loads(Path(config.config_path).read_text())[
+                "default_deployment_name"]
             == "ultra-production"
         )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
@@ -257,7 +259,8 @@ class TestDeploymentCommand:
             "Set 'legacy' as the default Meltano Cloud deployment for future commands\n"
         ) in result.stdout
         assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
+            json.loads(Path(config.config_path).read_text())[
+                "default_deployment_name"]
             == "legacy"
         )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
@@ -291,7 +294,10 @@ class TestDeploymentCommand:
             "POST",
         ).respond_with_json(prepared_request)
         httpserver.expect_oneshot_request(
-            f"/deployments/v1/{config.tenant_resource_key}/{config.internal_project_id}",
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
             "GET",
             query_string="page_size=2",
         ).respond_with_json(
@@ -322,7 +328,7 @@ class TestDeploymentCommand:
         ) in result.output
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
-    def test_create_second_new_deployment(
+    def test_create_after_first_new_deployment(
         self,
         config: MeltanoCloudConfig,
         path: str,
@@ -340,7 +346,10 @@ class TestDeploymentCommand:
             "POST",
         ).respond_with_json(prepared_request)
         httpserver.expect_oneshot_request(
-            f"/deployments/v1/{config.tenant_resource_key}/{config.internal_project_id}",
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
             "GET",
             query_string="page_size=2",
         ).respond_with_json(
