@@ -10,14 +10,8 @@ import sys
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
+from functools import cached_property
 from multiprocessing import cpu_count
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-    from typing import Protocol
-else:
-    from cached_property import cached_property
-    from typing_extensions import Protocol
 
 from meltano.core.error import (
     AsyncSubprocessError,
@@ -454,7 +448,7 @@ class PluginInstallService:  # noqa: WPS214
             }
 
 
-class PluginInstaller(Protocol):
+class PluginInstaller(t.Protocol):
     """Prototype function for plugin installation.
 
     All plugin installation functions must support at least the specified

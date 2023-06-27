@@ -27,11 +27,6 @@ from pathlib import Path
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
-if sys.version_info >= (3, 8):
-    from typing import Protocol, runtime_checkable
-else:
-    from typing_extensions import Protocol, runtime_checkable
-
 from meltano.core.error import MeltanoError
 
 logger = logging.getLogger(__name__)
@@ -369,7 +364,7 @@ def iso8601_datetime(d):
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-class _GetItemProtocol(Protocol):
+class _GetItemProtocol(t.Protocol):
     def __getitem__(self, key: str) -> str:
         ...  # noqa: WPS428
 
@@ -743,8 +738,8 @@ class MergeStrategy(t.NamedTuple):
     ]
 
 
-@runtime_checkable
-class Extendable(Protocol):
+@t.runtime_checkable
+class Extendable(t.Protocol):
     """A type protocol for types which have an `extend` method."""
 
     def extend(self, x: t.Any) -> None:

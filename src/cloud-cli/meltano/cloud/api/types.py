@@ -2,15 +2,10 @@
 
 from __future__ import annotations
 
-import sys
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
+import typing as t
 
 
-class CloudExecution(TypedDict):
+class CloudExecution(t.TypedDict):
     """Meltano Cloud execution details."""
 
     execution_id: str
@@ -24,7 +19,7 @@ class CloudExecution(TypedDict):
     job_name: str
 
 
-class CloudProjectSchedule(TypedDict):
+class CloudProjectSchedule(t.TypedDict):
     """Meltano Cloud project schedule details."""
 
     deployment_name: str
@@ -33,7 +28,7 @@ class CloudProjectSchedule(TypedDict):
     enabled: bool
 
 
-class CloudProject(TypedDict):
+class CloudProject(t.TypedDict):
     """Meltano Cloud project details."""
 
     # Tenant resource key and project ID are included to enable
@@ -51,7 +46,7 @@ class CloudProject(TypedDict):
     default: bool
 
 
-class CloudDeployment(TypedDict):
+class CloudDeployment(t.TypedDict):
     """Meltano Cloud deployment details."""
 
     deployment_name: str
