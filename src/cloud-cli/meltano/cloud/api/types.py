@@ -74,4 +74,4 @@ class CloudConfigOrg(TypedDict):
     """Meltano cloud config org for storing default projects and deployments."""
 
     default_project_id: str | None
-    projects: dict[str, CloudConfigProject]
+    projects_defaults: dict[str, CloudConfigProject]

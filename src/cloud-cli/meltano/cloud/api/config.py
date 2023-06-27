@@ -226,9 +226,8 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             project_id: The Meltano Cloud project ID that should be used.
         """
         self.default_project_id = project_id
-        org_default = self.internal_organization_default
-        org_default["default_project_id"] = project_id
-        self.internal_organization_default = org_default
+        self.internal_organization_default["default_project_id"] = project_id
+        self.write_to_file()
 
     @property
     def tenant_resource_key(self) -> str:
@@ -263,10 +262,10 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         ):
             return self.organizations_defaults[self.tenant_resource_key]
 
-        new_org_default = CloudConfigOrg(default_project_id=None, projects={})
+        new_org_defaults = CloudConfigOrg(default_project_id=None, projects_defaults={})
 
-        self.internal_organization_default = new_org_default
-        return new_org_default
+        self.internal_organization_default = new_org_defaults
+        return new_org_defaults
 
     @internal_organization_default.setter
     def internal_organization_default(self, org_default: CloudConfigOrg) -> None:
@@ -289,8 +288,8 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             The current project deployment defaults
         """
         org_default = self.internal_organization_default
-        if self.internal_project_id in org_default["projects"]:
-            return org_default["projects"][self.internal_project_id]
+        if self.internal_project_id in org_default["projects_defaults"]:
+            return org_default["projects_defaults"][self.internal_project_id]
 
         new_project_config = CloudConfigProject(default_deployment_name=None)
         self.internal_project_default = new_project_config
@@ -304,7 +303,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             project_default: the new default project settings
         """
         org_default = self.internal_organization_default
-        org_default["projects"][self.internal_project_id] = project_default
+        org_default["projects_defaults"][self.internal_project_id] = project_default
         self.internal_organization_default = org_default
 
     @staticmethod
