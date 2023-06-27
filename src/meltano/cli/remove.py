@@ -42,11 +42,8 @@ def remove_plugins(project, plugins):
     )
 
     click.echo()
-    fg = "green"
-    if num_removed < total:
-        fg = "yellow"
-
     if len(plugins) > 1:
+        fg = "yellow" if num_removed < total else "green"
         click.secho(f"Fully removed {num_removed}/{total} plugins", fg=fg)
         click.echo()
 
@@ -64,9 +61,9 @@ def removal_manager_status_update(removal_manager: PluginLocationRemoveManager):
     """Print remove status message for a plugin location."""
     plugin_descriptor = removal_manager.plugin_descriptor
     location = removal_manager.location
-    message = removal_manager.remove_message
-
     if removal_manager.plugin_error:
+        message = removal_manager.remove_message
+
         click.secho(
             f"Error removing plugin {plugin_descriptor} from {location}: {message}",
             fg="red",

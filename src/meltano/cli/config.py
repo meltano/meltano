@@ -294,8 +294,7 @@ def list_settings(ctx, extras: bool):
                 click.echo(f"{setting_def.label}: ", nl=False)
             click.echo(f"{setting_def.description}")
 
-    docs_url = settings.docs_url
-    if docs_url:
+    if docs_url := settings.docs_url:
         click.echo()
         click.echo(
             f"To learn more about {settings.label} and its settings, visit {docs_url}",

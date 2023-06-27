@@ -157,8 +157,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         """
         with suppress(jwt.DecodeError):
             decoded = self.decode_jwt(self.id_token)  # type: ignore
-            trks_and_pids = decoded.get("custom:trk_and_pid")
-            if trks_and_pids:
+            if trks_and_pids := decoded.get("custom:trk_and_pid"):
                 return [perm.strip() for perm in trks_and_pids.split(",")]
         return []
 

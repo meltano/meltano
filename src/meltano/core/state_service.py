@@ -69,7 +69,7 @@ class StateService:  # noqa: WPS214
             A new job with given state_id, or the given Job
         """
         if isinstance(job, str):
-            now = datetime.datetime.utcnow()
+            now = datetime.datetime.now(datetime.timezone.utc)
             return Job(
                 job_name=job,
                 state=State.STATE_EDIT,
@@ -155,8 +155,7 @@ class StateService:  # noqa: WPS214
         Returns:
             Dict representing state that would be used in the next run.
         """
-        state = self.state_store_manager.get(state_id=state_id)
-        if state:
+        if state := self.state_store_manager.get(state_id=state_id):
             return json.loads(state.json_merged())
         return {}
 

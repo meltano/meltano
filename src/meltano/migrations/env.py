@@ -32,8 +32,7 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connection = config.attributes.get("connection")
-    if connection:
+    if connection := config.attributes.get("connection"):
         _run_migrations_online(connection)
         return
 

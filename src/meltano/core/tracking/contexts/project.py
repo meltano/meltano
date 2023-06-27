@@ -102,9 +102,7 @@ class ProjectContext(SelfDescribingJson):
         Returns:
             The project UUID.
         """
-        project_id_str = self.project.settings.get("project_id")
-
-        if project_id_str:
+        if project_id_str := self.project.settings.get("project_id"):
             try:
                 # Project ID might already be a UUID
                 project_id = uuid.UUID(project_id_str)

@@ -491,9 +491,7 @@ class SchemaExecutor(CatalogExecutor):
             # ensure property nodes exist for matching breadcrumbs.
             if re.match(r"[*?\[\]]", key):
                 node_keys = next_node.keys()
-                matching_keys = fnmatch.filter(node_keys, key)
-
-                if matching_keys:
+                if matching_keys := fnmatch.filter(node_keys, key):
                     matching_breadcrumb = breadcrumb.copy()
                     for key in matching_keys:
                         matching_breadcrumb[idx] = key

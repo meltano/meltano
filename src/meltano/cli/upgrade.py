@@ -96,8 +96,7 @@ def all(ctx, pip_url, force, skip_package):
             click.secho("Your Meltano project has been upgraded!", fg="green")
     else:
         project = ctx.obj["project"]
-        package_upgraded = upgrade_service.upgrade_package(pip_url=pip_url, force=force)
-        if package_upgraded:
+        if upgrade_service.upgrade_package(pip_url=pip_url, force=force):
             # Shell out instead of calling `upgrade_service` methods to
             # ensure the latest code is used.
             click.echo()

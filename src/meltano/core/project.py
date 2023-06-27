@@ -274,8 +274,7 @@ class Project(Versioned):  # noqa: WPS214
 
         readonly = truthy(os.getenv(PROJECT_READONLY_ENV, "false"))
 
-        project_root = project_root or os.getenv(PROJECT_ROOT_ENV)
-        if project_root:
+        if project_root := project_root or os.getenv(PROJECT_ROOT_ENV):
             project = Project(project_root, readonly=readonly)
             if not project.meltanofile.exists():
                 raise ProjectNotFound(project)

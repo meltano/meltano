@@ -66,7 +66,7 @@ def _arg_to_glob_filter(
         click.UsageError: More than one filter was specified.
     """
     # If more than one filter is specified, fail.
-    if sum(1 for f in (schedule, schedule_prefix, schedule_contains) if f) > 1:
+    if sum(bool(f) for f in (schedule, schedule_prefix, schedule_contains)) > 1:
         raise click.UsageError(
             "Only one of --schedule, --schedule-prefix, or "
             "--schedule-contains can be specified.",

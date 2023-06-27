@@ -39,9 +39,7 @@ def _safe_get_response_json_dict(response: requests.Response) -> dict:
         response_json = response.json()
     except json.JSONDecodeError:
         return {}
-    if isinstance(response_json, dict):
-        return response_json
-    return {}
+    return response_json if isinstance(response_json, dict) else {}
 
 
 @contextmanager
