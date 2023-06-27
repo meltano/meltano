@@ -211,10 +211,6 @@ class TestProjectCommand:
             "future commands\n"
         )
         assert (
-            json.loads(Path(config.config_path).read_text())["default_project_id"]
-            == "01GWQ7520WNMQT0PQ6KHCC4EE1"
-        )
-        assert (
             json.loads(Path(config.config_path).read_text())["organizations_defaults"][
                 config.tenant_resource_key
             ]["default_project_id"]
@@ -257,10 +253,6 @@ class TestProjectCommand:
             "Set 'Stranger in a Strange Org' as the default Meltano Cloud "
             "project for future commands\n"
         ) in result.stdout
-        assert (
-            json.loads(Path(config.config_path).read_text())["default_project_id"]
-            == "01GWQ788M7TVP9HFVRGQ34BG17"
-        )
         assert (
             json.loads(Path(config.config_path).read_text())["organizations_defaults"][
                 config.tenant_resource_key
@@ -320,10 +312,6 @@ class TestProjectCommand:
             "project for future commands\n"
         )
         assert (
-            json.loads(Path(config.config_path).read_text())["default_project_id"]
-            == "01GWQREZ7G0526JZS9JY5H3BH9"
-        )
-        assert (
             json.loads(Path(config.config_path).read_text())["organizations_defaults"][
                 config.tenant_resource_key
             ]["default_project_id"]
@@ -346,10 +334,6 @@ class TestProjectCommand:
         assert result.output == (
             "Set the project with ID '01GWQ7520WNMQT0PQ6KHCC4EE1' as the "
             "default Meltano Cloud project for future commands\n"
-        )
-        assert (
-            json.loads(Path(config.config_path).read_text())["default_project_id"]
-            == "01GWQ7520WNMQT0PQ6KHCC4EE1"
         )
         assert (
             json.loads(Path(config.config_path).read_text())["organizations_defaults"][

@@ -296,9 +296,8 @@ class DeploymentChoicesQuestionaryOption(click.Option):
             The name of the deployment to be used as the default for future commands.
         """
         if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
-                # type: ignore[attr-defined]
-                asyncio.WindowsSelectorEventLoopPolicy(),
+            asyncio.set_event_loop_policy( 
+                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
             )
 
         context: MeltanoCloudCLIContext = ctx.obj

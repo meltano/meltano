@@ -199,7 +199,7 @@ class ProjectChoicesQuestionaryOption(click.Option):
             return None
 
         if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
+            asyncio.set_event_loop_policy( 
                 asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
             )
 
@@ -210,7 +210,8 @@ class ProjectChoicesQuestionaryOption(click.Option):
             (
                 x
                 for x in context.projects
-                if x["project_id"] == context.config.default_project_id
+                if x["project_id"]
+                == context.config.internal_organization_default["default_project_id"]
             ),
             {"project_name": None},
         )["project_name"]

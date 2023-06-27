@@ -95,7 +95,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         id_token: str | None = None,
         access_token: str | None = None,
         config_path: os.PathLike | str | None = None,
-        default_project_id: str | None = None,
         organizations_defaults: dict[str, CloudConfigOrg] | None = None,
     ):
         """Initialize a MeltanoCloudConfig instance.
@@ -113,7 +112,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             id_token: ID token for use in authentication.
             access_token: Access token for use in authentication.
             config_path: Path to the config file to use.
-            default_project_id: The ID of the default Meltano Cloud project.
             organizations_defaults: Default org settings.
         """
         self.auth_callback_port = auth_callback_port
@@ -125,7 +123,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         self.config_path = (
             Path(config_path).resolve() if config_path else self.user_config_path()
         )
-        self.default_project_id = default_project_id
         self.organizations_defaults = organizations_defaults
 
     def __getattribute__(self, name: str) -> str | None:
@@ -203,8 +200,11 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
             MeltanoCloudProjectAmbiguityError: when ID token includes more
                 than one project ID.
         """
-        if self.default_project_id:
-            return self.default_project_id
+        org_default_project_id = self.internal_organization_default.get(
+            "default_project_id",
+        )
+        if org_default_project_id:
+            return org_default_project_id
         if len(self.internal_project_ids) > 1:
             raise MeltanoCloudProjectAmbiguityError
         try:
@@ -221,7 +221,6 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
         Args:
             project_id: The Meltano Cloud project ID that should be used.
         """
-        self.default_project_id = project_id
         self.internal_organization_default["default_project_id"] = project_id
         self.write_to_file()
 
@@ -321,6 +320,7 @@ class MeltanoCloudConfig:  # noqa: WPS214 WPS230
 
         Deprecated keys:
         - default_deployment_name
+        - default_project_id
 
         Args:
             config_path: Path to the config file.
