@@ -273,7 +273,7 @@ class TestDeploymentCommand:
         )
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
-    def test_create_new_deployment(
+    def test_create_first_new_deployment(
         self,
         config: MeltanoCloudConfig,
         path: str,
@@ -290,6 +290,16 @@ class TestDeploymentCommand:
             f"{path}/ultra-production",
             "POST",
         ).respond_with_json(prepared_request)
+        httpserver.expect_oneshot_request(
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
+            "GET",
+            query_string="page_size=2",
+        ).respond_with_json(
+            {"results": [deployments[0]], "pagination": None},
+        )
         requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
         result = CliRunner().invoke(
             cli,
@@ -308,7 +318,63 @@ class TestDeploymentCommand:
         )
         assert result.exit_code == 0, result.output
         assert "Creating deployment - this may take several minutes..." in result.output
-        assert "Created deployment 'ultra-production'\n" in result.output
+        assert (
+            "Created first deployment. "
+            "Set 'ultra-production' as the "
+            "default Meltano Cloud deployment for future commands"
+        ) in result.output
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
+    def test_create_after_first_new_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_response(Response(status=HTTPStatus.NOT_FOUND))
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "POST",
+        ).respond_with_json(prepared_request)
+        httpserver.expect_oneshot_request(
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
+            "GET",
+            query_string="page_size=2",
+        ).respond_with_json(
+            {"results": [deployments[0], deployments[1]], "pagination": None},
+        )
+        requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "create",
+                "--name",
+                "ultra-production",
+                "--environment",
+                "Ultra Production",
+                "--git-rev",
+                "Main",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "Creating deployment - this may take several minutes..." in result.output
+        assert (
+            'Created deployment "ultra-production". '
+            "To use as default run "
+            '"meltano cloud deployment use --name ultra-production."'
+        ) in result.output
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
     def test_update_existing_deployment(
