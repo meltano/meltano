@@ -9,7 +9,6 @@ from http import HTTPStatus
 import mock
 import pytest
 from mock import AsyncMock, MagicMock
-from werkzeug import Response
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.api.config import MeltanoCloudConfig
@@ -72,8 +71,9 @@ class TestMeltanoCloudClient:
         # Expect 403 response to cause an error if outside of an authenticated context
         path = "/fakeRequest"
         pattern = re.compile(f"^{path}(\\?.*)?$")
-        httpserver.clear()
-        httpserver.expect_oneshot_request(pattern).respond_with_data(status=403)
+        httpserver.expect_oneshot_request(pattern).respond_with_data(
+            status=HTTPStatus.FORBIDDEN,
+        )
         async with MeltanoCloudClient(config) as client:
             with pytest.raises(MeltanoCloudError) as excinfo:
                 async with client._raw_request("GET", "/fakeRequest"):  # noqa: WPS328
@@ -88,18 +88,14 @@ class TestMeltanoCloudClient:
         login_mock: MagicMock | AsyncMock,
         httpserver: HTTPServer,
     ):
-        handled = False
-
-        def handle_request(_):
-            nonlocal handled
-            status = HTTPStatus.OK if handled else HTTPStatus.FORBIDDEN
-            handled = True
-            return Response(status=status)
-
         path = "/fakeRequest"
         pattern = re.compile(f"^{path}(\\?.*)?$")
-        httpserver.clear()
-        httpserver.expect_request(pattern).respond_with_handler(handle_request)
+        httpserver.expect_oneshot_request(pattern).respond_with_data(
+            status=HTTPStatus.FORBIDDEN,
+        )
+        httpserver.expect_oneshot_request(pattern).respond_with_data(
+            status=HTTPStatus.OK,
+        )
         async with MeltanoCloudClient(config) as client, client.authenticated():
             async with client._raw_request("GET", "/fakeRequest") as response:
                 assert response.status == HTTPStatus.OK
@@ -114,8 +110,12 @@ class TestMeltanoCloudClient:
     ):
         path = "/fakeRequest"
         pattern = re.compile(f"^{path}(\\?.*)?$")
-        httpserver.clear()
-        httpserver.expect_request(pattern).respond_with_data(status=403)
+        httpserver.expect_oneshot_request(pattern).respond_with_data(
+            status=HTTPStatus.FORBIDDEN,
+        )
+        httpserver.expect_oneshot_request(pattern).respond_with_data(
+            status=HTTPStatus.FORBIDDEN,
+        )
         async with MeltanoCloudClient(config) as client, client.authenticated():
             with pytest.raises(MeltanoCloudError) as excinfo:
                 async with client._raw_request(  # noqa: WPS328
