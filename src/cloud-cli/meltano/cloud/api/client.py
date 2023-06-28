@@ -136,7 +136,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         within the context which get a 403 response will cause re-authentication, and
         the request will be remade.
 
-        Note: Will not work correctly if nested.
+        This context manager is not reentrant.
 
         Yields:
             None
@@ -185,9 +185,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         url = urljoin(base_url if base_url else self.api_url, path)
         logger.debug("Making Cloud CLI HTTP request", method=method, url=url)
         async with self.session.request(method, url, **kwargs) as response:
-            if not (
-                response.status == HTTPStatus.FORBIDDEN and self._within_authenticated
-            ):
+            if response.status != HTTPStatus.FORBIDDEN or not self._within_authenticated:
                 try:
                     response.raise_for_status()
                 except ClientResponseError as e:
