@@ -228,9 +228,16 @@ class MeltanoCloudAuth:  # noqa: WPS214
             True if logged in, else False
         """
         return bool(
-            self.config.access_token
-            and self.config.id_token
+            self.has_auth_tokens()
             # Perform this check at the end to avoid
             # spamming our servers if logout fails
             and (await self.get_user_info_response()).ok,
         )
+
+    def has_auth_tokens(self) -> bool:
+        """Check if this instance has cached access and ID tokens.
+
+        Returns:
+            True if it has both tokens, else False
+        """
+        return bool(self.config.access_token and self.config.id_token)
