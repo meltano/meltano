@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import React from "react";
-import clsx from "clsx";
-import styles from "./features.module.scss";
+import styles from "./findoutmore.module.scss";
 import Link from "@docusaurus/Link";
 
 const FindOutMoreList = [
@@ -39,7 +38,7 @@ function IconLink({ Svg, title, link }) {
         target={link.target}
         className="flex flex-col text-center items-center basis-1/3 lg:basis-1/6"
       >
-        <Svg className={"mb-6 " + styles.featureSvg} role="img" />
+        <Svg className={"mb-6 " + styles.findOutMoreSvg} role="img" />
         <p className="p1 font-semibold">{title}</p>
       </Link>
     );

@@ -45,9 +45,6 @@
   svg {
     width: 32px;
     height: 32px;
-    path {
-      stroke: var(--meltano-blue);
-    }
   }
   @media all and (min-width: 768px) {
     svg {
@@ -57,5 +54,10 @@
   }
   h3 {
     margin-bottom: 0;
+  }
+}
+.featureSvg {
+  path {
+    stroke: var(--meltano-blue);
   }
 }
