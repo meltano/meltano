@@ -29,7 +29,9 @@ function ColorModeToggle({ className, buttonClassName, value, onChange }) {
     }
   );
   return (
-    <div className={clsx(styles.toggle, className)}>
+    <div
+      className={clsx(styles.toggle, className, buttonClassName, "relative")}
+    >
       <label className="light-dark-toggle">
         <input
           className={styles.toggleCheckbox}
