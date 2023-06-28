@@ -89,7 +89,7 @@ python = ">=3.7,<3.12"
 python-dotenv = "^0.21.1"
 python-gitlab = "^3.15.0"
 # Pyston-lite doesn't yet support Python 3.11
-pyston-lite-autoload = {version = "^2.3.5", optional = true, python = "<3.11"}
+pyston-lite-autoload = {version = "^2.3.5", optional = true, python = "<3.11", markers = "platform_python_implementation == 'CPython' and (platform_system == 'Linux' or platform_system == 'Darwin')"}
 pyyaml = "^6.0.0"
 requests = "^2.31.0"
 rich = "^13.4.1"
