@@ -12,8 +12,8 @@ function HomepageHeader() {
   // const { siteConfig } = useDocusaurusContext();
   return (
     <header className={styles.heroBanner}>
-      <div className="container mt-20">
-        <h1 className="text-6xl font-bold">
+      <div className="container md:mt-20">
+        <h1 className="text-4xl md:text-6xl font-bold">
           Explore <span className="brackets">using</span> Meltano
         </h1>
       </div>

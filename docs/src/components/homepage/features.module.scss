@@ -9,12 +9,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px solid rgba(8, 2, 22, 0.15);
   border-radius: 5px;
   padding: 30px;
-  background-color: #ffffff;
+  border: 1px solid rgba(8, 2, 22, 0.15);
+  background: rgba(255, 255, 255, 0.7);
   position: relative;
   z-index: 3;
+}
+
+[data-theme="dark"] {
+  .card {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .card:before {
@@ -36,8 +43,14 @@
   align-items: flex-end;
   padding-bottom: 1rem;
   svg {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
+  }
+  @media all and (min-width: 768px) {
+    svg {
+      width: 40px;
+      height: 40px;
+    }
   }
   h3 {
     margin-bottom: 0;

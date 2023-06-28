@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
 import React from "react";
-import clsx from "clsx";
 import styles from "./features.module.scss";
 import Link from "@docusaurus/Link";
 
@@ -103,7 +102,7 @@ function Feature({ Svg, title, description, link }) {
       <div className="text-left z-10">
         <div className={styles.header}>
           <Svg className={styles.featureSvg} role="img" />
-          <h5 className="text-3xl font-semibold ms-1">{title}</h5>
+          <h3 className="font-semibold ms-1">{title}</h3>
         </div>
         <p className="p1 mb-3">{description}</p>
         <Link to={link.url} target={link.target} className="btn main-btn">
@@ -116,7 +115,7 @@ function Feature({ Svg, title, description, link }) {
 
 export default function HomepageFeatures() {
   return (
-    <section className="my-20">
+    <section className="md:my-20">
       <div className="container relative">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {FeatureList.map((props, idx) => (

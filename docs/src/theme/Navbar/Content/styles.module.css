@@ -1,0 +1,19 @@
+.background {
+  position: relative;
+}
+
+.background:before {
+  content: "";
+  display: block;
+  background-image: url(../../../../static/img/homepage/bg-ellipse-center.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  margin-top: -200px;
+  margin-right: -400px;
+  opacity: 0.5;
+  z-index: -2;
+  pointer-events: none;
+}

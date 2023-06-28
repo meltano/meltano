@@ -1,13 +1,5 @@
-@import "../css/variables";
-
 .heroBanner {
   text-align: center;
-  color: $base-color;
-  background-color: $base-bgcolor;
+  color: var(--ifm-color-primary);
+  background-color: var(--background-color);
 }
-
-// @media screen and (min-width: 768px) {
-//   .heroBanner {
-//     padding: 4rem;
-//   }
-// }

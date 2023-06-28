@@ -5,15 +5,8 @@ import styles from "./features.module.scss";
 import Link from "@docusaurus/Link";
 
 const FindOutMoreList = [
-  {},
   {
-    title: (
-      <>
-        Visit Our
-        <br />
-        Blog
-      </>
-    ),
+    title: <>Visit Our Blog</>,
     Svg: require("@site/static/img/homepage/melty.svg").default,
     link: {
       url: "#",
@@ -21,13 +14,7 @@ const FindOutMoreList = [
     },
   },
   {
-    title: (
-      <>
-        Join Our Slack
-        <br />
-        Community
-      </>
-    ),
+    title: <>Join Our Slack Community</>,
     Svg: require("@site/static/img/homepage/slack.svg").default,
     link: {
       url: "#",
@@ -35,13 +22,7 @@ const FindOutMoreList = [
     },
   },
   {
-    title: (
-      <>
-        Subscribe to our
-        <br />
-        Newsletter
-      </>
-    ),
+    title: <>Subscribe to our Newsletter</>,
     Svg: require("@site/static/img/homepage/subscribe.svg").default,
     link: {
       url: "#",
@@ -56,7 +37,7 @@ function IconLink({ Svg, title, link }) {
       <Link
         to={link.url}
         target={link.target}
-        className="flex flex-col text-center items-center"
+        className="flex flex-col text-center items-center basis-1/3 lg:basis-1/6"
       >
         <Svg className={"mb-6 " + styles.featureSvg} role="img" />
         <p className="p1 font-semibold">{title}</p>
@@ -67,16 +48,10 @@ function IconLink({ Svg, title, link }) {
 
 export default function HomepageFindOutMore() {
   return (
-    <section className="my-20">
+    <section className="my-10 md:my-20">
       <div className="container relative">
-        <h2
-          className={
-            "text-center text-5xl font-bold pb-20 " + styles.usecaseHeader
-          }
-        >
-          Find Out More!
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-5">
+        <h2 className="text-center font-bold pb-10 md:pb-20">Find Out More!</h2>
+        <div className="flex gap-2 justify-center">
           {FindOutMoreList.map((props, idx) => (
             <IconLink key={idx} {...props} />
           ))}

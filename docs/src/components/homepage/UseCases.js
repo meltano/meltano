@@ -1,6 +1,5 @@
 /* eslint-disable no-undef */
-import React, { useRef, useState } from "react";
-import clsx from "clsx";
+import React, { useRef, useState, useEffect } from "react";
 import styles from "./usecases.module.scss";
 import Link from "@docusaurus/Link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -121,7 +120,7 @@ export default function HomepageUseCases() {
   const prevRef = useRef();
   const nextRef = useRef();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (swiper) {
       swiper.params.navigation.prevEl = prevRef.current;
       swiper.params.navigation.nextEl = nextRef.current;
@@ -131,20 +130,20 @@ export default function HomepageUseCases() {
   }, [swiper]);
 
   return (
-    <section className="my-20">
+    <section className="my-10 md:my-20">
       <div className="container relative">
         <h2
           className={
-            "text-center text-5xl font-bold pb-20 " + styles.usecaseHeader
+            "text-center font-bold pb-10 md:pb-20 " + styles.usecaseHeader
           }
         >
           Use cases
         </h2>
-        <div className="relative">
+        <div className="relative px-10 md:px-0">
           <Swiper
             modules={[Navigation, A11y]}
-            slidesPerView={4}
-            onSlideChange={() => console.log("slide change")}
+            slidesPerView={1}
+            // onSlideChange={() => console.log("slide change")}
             onSwiper={setSwiper}
             spaceBetween="16"
             navigation={{

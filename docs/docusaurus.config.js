@@ -8,22 +8,12 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Meltano",
-  tagline: "Dinosaurs are cool",
-  favicon: "img/favicon.ico",
-
-  // Set the production url of your site here
-  url: "https://your-docusaurus-test-site.com",
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
+  tagline: "Meltano Documentation",
+  url: "https://docs.meltano.com",
   baseUrl: "/",
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: "facebook", // Usually your GitHub org/user name.
-  projectName: "docusaurus", // Usually your repo name.
-
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
+  favicon: "img/favicon.ico",
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -44,11 +34,10 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/meltano/meltano",
         },
         blog: {
-          showReadingTime: true,
+          // showReadingTime: true,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -64,21 +53,31 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        defaultMode: "light",
+        disableSwitch: false,
+        respectPrefersColorScheme: true,
+      },
+      announcementBar: {
+        id: "meltano_docs_announcment",
+        content: `<a href="#">⚡ New Release: Meltano Runbooks are now better than ever with conditions ⚡</a>`,
+        backgroundColor: "#311772",
+        textColor: "#F5F7FA",
+        isCloseable: false,
+      },
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
       navbar: {
         title: "| Docs",
         logo: {
-          alt: "Meltano | Docs",
+          alt: "Purple dragon with the meltano wordmark",
           src: "img/meltano.svg",
         },
         items: [
-          // {
-          //   type: "docSidebar",
-          //   sidebarId: "tutorialSidebar",
-          //   position: "left",
-          //   label: "Tutorial",
-          // },
+          {
+            type: "search",
+            position: "right",
+          },
           {
             to: "/blog",
             label: "Get Started",
@@ -124,14 +123,43 @@ const config = {
         ],
       },
       footer: {
-        style: "dark",
+        style: "light",
         links: [
           {
-            title: "Docs",
+            title: "The Project",
             items: [
               {
-                label: "Tutorial",
-                to: "/docs/intro",
+                label: "Our Mission",
+                to: "https://handbook.meltano.com/company/#mission",
+              },
+              {
+                label: "Our Vision",
+                to: "https://handbook.meltano.com/company/#vision",
+              },
+              {
+                label: "Roadmap",
+                to: "https://handbook.meltano.com/product/roadmap",
+              },
+              {
+                label: "Strategy",
+                to: "https://handbook.meltano.com/company/#strategy",
+              },
+            ],
+          },
+          {
+            title: "Company",
+            items: [
+              {
+                label: "Handbook",
+                href: "https://handbook.meltano.com/",
+              },
+              {
+                label: "Values",
+                href: "https://handbook.meltano.com/company/values",
+              },
+              {
+                label: "History",
+                href: "https://handbook.meltano.com/timeline",
               },
             ],
           },
@@ -139,38 +167,61 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/docusaurus",
+                label: "Slack",
+                href: "https://meltano.com/slack",
               },
               {
-                label: "Discord",
-                href: "https://discordapp.com/invite/docusaurus",
+                label: "MeltanoLabs",
+                href: "https://github.com/MeltanoLabs",
               },
               {
-                label: "Twitter",
-                href: "https://twitter.com/docusaurus",
+                label: "Meltano Hub",
+                href: "https://hub.meltano.com/",
               },
             ],
           },
           {
-            title: "More",
+            title: "Get Help",
             items: [
               {
-                label: "Blog",
-                to: "/blog",
+                label: "Contact",
+                href: "https://meltano.com/slack",
               },
               {
-                label: "GitHub",
-                href: "https://github.com/facebook/docusaurus",
+                label: "StackOverflow",
+                href: "https://stackoverflow.com/questions/tagged/meltano",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Meltano.`,
       },
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+      algolia: {
+        // The application ID provided by Algolia
+        appId: "YOUR_APP_ID",
+
+        // Public API key: it is safe to commit it
+        apiKey: "YOUR_SEARCH_API_KEY",
+
+        indexName: "YOUR_INDEX_NAME",
+
+        // Optional: see doc section below
+        contextualSearch: true,
+
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        externalUrlRegex: "external\\.com|domain\\.com",
+
+        // Optional: Algolia search parameters
+        searchParameters: {},
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: "search",
+
+        //... other Algolia params
       },
     }),
 };
