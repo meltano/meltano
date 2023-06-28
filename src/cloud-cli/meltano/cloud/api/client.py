@@ -185,7 +185,10 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         url = urljoin(base_url if base_url else self.api_url, path)
         logger.debug("Making Cloud CLI HTTP request", method=method, url=url)
         async with self.session.request(method, url, **kwargs) as response:
-            if response.status != HTTPStatus.FORBIDDEN or not self._within_authenticated:
+            if (
+                response.status != HTTPStatus.FORBIDDEN
+                or not self._within_authenticated
+            ):
                 try:
                     response.raise_for_status()
                 except ClientResponseError as e:
