@@ -14,6 +14,7 @@ import pytest
 from click.testing import CliRunner
 from pytest_httpserver.httpserver import Response
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -138,7 +139,16 @@ class TestDeploymentCommand:
         httpserver.expect_oneshot_request(path).respond_with_json(
             {"results": deployments, "pagination": None},
         )
-        config.default_deployment_name = "legacy"
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="legacy",
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         result = CliRunner().invoke(
             cli,
@@ -165,7 +175,16 @@ class TestDeploymentCommand:
         httpserver.expect_oneshot_request(path).respond_with_json(
             {"results": deployments, "pagination": None},
         )
-        config.default_deployment_name = "temp"
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="temp",
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         result = CliRunner().invoke(
             cli,
@@ -205,10 +224,6 @@ class TestDeploymentCommand:
         assert result.output == (
             "Set 'ultra-production' as the default Meltano Cloud deployment "
             "for future commands\n"
-        )
-        assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
-            == "ultra-production"
         )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
             "organizations_defaults"
@@ -256,10 +271,6 @@ class TestDeploymentCommand:
         assert (
             "Set 'legacy' as the default Meltano Cloud deployment for future commands\n"
         ) in result.stdout
-        assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
-            == "legacy"
-        )
         default_org_settings = json.loads(Path(config.config_path).read_text())[
             "organizations_defaults"
         ][config.tenant_resource_key]

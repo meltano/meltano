@@ -10,6 +10,7 @@ import pytest
 from click.testing import CliRunner
 from freezegun import freeze_time
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -60,7 +61,17 @@ class TestScheduleCommand:
             f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
             "/test-deployment/daily/enabled"
         )
-        config.default_deployment_name = "test-deployment"
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="test-deployment",
+                    ),
+                },
+            ),
+        }
+
         config.write_to_file()
         runner = CliRunner()
         for cmd in ("enable", "disable"):
@@ -89,7 +100,16 @@ class TestScheduleCommand:
             f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
             "/test-deployment/daily/enabled"
         )
-        config.default_deployment_name = None
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name=None,
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         runner = CliRunner()
         for cmd in ("enable", "disable"):
