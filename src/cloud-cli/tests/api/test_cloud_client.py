@@ -100,11 +100,10 @@ class TestMeltanoCloudClient:
         pattern = re.compile(f"^{path}(\\?.*)?$")
         httpserver.clear()
         httpserver.expect_request(pattern).respond_with_handler(handle_request)
-        async with MeltanoCloudClient(config) as client:
-            async with client.authenticated():
-                async with client._raw_request("GET", "/fakeRequest") as response:
-                    assert response.status == HTTPStatus.OK
-                login_mock.assert_awaited_once()
+        async with MeltanoCloudClient(config) as client, client.authenticated():
+            async with client._raw_request("GET", "/fakeRequest") as response:
+                assert response.status == HTTPStatus.OK
+            login_mock.assert_awaited_once()
 
     @pytest.mark.asyncio()
     async def test_authenticated_context_failure_on_retry(
@@ -117,13 +116,12 @@ class TestMeltanoCloudClient:
         pattern = re.compile(f"^{path}(\\?.*)?$")
         httpserver.clear()
         httpserver.expect_request(pattern).respond_with_data(status=403)
-        async with MeltanoCloudClient(config) as client:
-            async with client.authenticated():
-                with pytest.raises(MeltanoCloudError) as excinfo:
-                    async with client._raw_request(  # noqa: WPS328
-                        "GET",
-                        "/fakeRequest",
-                    ):
-                        pass
-                assert excinfo.value.response.status == 403
-                login_mock.assert_awaited_once()
+        async with MeltanoCloudClient(config) as client, client.authenticated():
+            with pytest.raises(MeltanoCloudError) as excinfo:
+                async with client._raw_request(  # noqa: WPS328
+                    "GET",
+                    "/fakeRequest",
+                ):
+                    pass
+            assert excinfo.value.response.status == 403
+            login_mock.assert_awaited_once()
