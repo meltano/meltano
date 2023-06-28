@@ -711,21 +711,6 @@ main {
   }
 }
 
-.searchBox_src-theme-Navbar-Search-styles-module {
-  position: relative !important;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  right: 0 !important;
-  margin-right: 1rem;
-}
-
-@media all and (min-width: 768px) and (max-width: 1279px) {
-  .searchBox_src-theme-Navbar-Search-styles-module {
-    justify-content: center;
-  }
-}
-
 .navbar__toggle {
   margin-left: 1rem;
   margin-right: 0;
