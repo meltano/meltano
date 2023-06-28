@@ -60,7 +60,6 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
         self.version = version
-        # Tracks nesting depth of authenticated contexts
         self._within_authenticated: bool = False
 
     async def __aenter__(self) -> Self:
