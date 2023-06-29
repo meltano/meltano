@@ -17,6 +17,7 @@ from slugify import slugify
 from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.api.config import CloudConfigProject
 from meltano.cloud.api.types import CloudDeployment
 from meltano.cloud.cli.base import (
     LimitedResult,
@@ -85,7 +86,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         return {
             **deployment,  # type: ignore[misc]
             "default": (
-                self.config.default_deployment_name == deployment["deployment_name"]
+                self.config.internal_project_default["default_deployment_name"]
+                == deployment["deployment_name"]
             ),
         }
 
@@ -166,7 +168,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
             {
                 **deployment,  # type: ignore[misc]
                 "default": (
-                    self.config.default_deployment_name == deployment["deployment_name"]
+                    self.config.internal_project_default["default_deployment_name"]
+                    == deployment["deployment_name"]
                 ),
             },
         )
@@ -215,7 +218,8 @@ async def _get_deployments(
     results.items = [
         {
             **x,  # type: ignore[misc]
-            "default": x["deployment_name"] == config.default_deployment_name,
+            "default": x["deployment_name"]
+            == config.internal_project_default["default_deployment_name"],
         }
         for x in results.items
     ]
@@ -331,7 +335,8 @@ async def use_deployment(  # noqa: D103
                 f"Unable to use deployment named {deployment_name!r} - no available "
                 "Meltano Cloud deployment matches name.",
             )
-    context.config.default_deployment_name = deployment_name
+
+    _set_project_default_deployment(context, deployment_name)
     context.config.write_to_file()
     click.secho(
         (
@@ -339,6 +344,21 @@ async def use_deployment(  # noqa: D103
             "deployment for future commands"
         ),
         fg="green",
+    )
+
+
+def _set_project_default_deployment(
+    context: MeltanoCloudCLIContext,
+    deployment_name: str,
+) -> None:
+    """Set the default deployment in the config for future commands.
+
+    Args:
+        context: The Cloud CLI context.
+        deployment_name: The name of the deployment to set as the default.
+    """
+    context.config.internal_project_default = CloudConfigProject(
+        default_deployment_name=deployment_name,
     )
 
 
@@ -389,12 +409,38 @@ async def create_deployment(
                 git_rev=git_rev,
             )
         if deployment is None:
-            click.secho("Deployment already exists, and was not updated.", fg="yellow")
-        else:
             click.secho(
-                f"Created deployment {deployment['deployment_name']!r}",
-                fg="green",
+                "Deployment already exists, and was not updated.",
+                fg="yellow",
             )
+            return
+
+        new_deployment_name = deployment["deployment_name"]
+        deployments = await client.get_deployments(page_size=2)
+
+        if isinstance(deployments, dict) and deployments["results"]:
+            results = deployments["results"]
+            if isinstance(results, list) and len(results) == 1:
+                _set_project_default_deployment(context, new_deployment_name)
+                click.secho(
+                    (
+                        "Created first deployment. "
+                        f"Set {new_deployment_name!r} as the "
+                        "default Meltano Cloud deployment for future commands"
+                    ),
+                    fg="green",
+                )
+
+                return
+
+        click.secho(
+            (
+                f'Created deployment "{new_deployment_name}". '
+                "To use as default run "
+                f'"meltano cloud deployment use --name {new_deployment_name}."'
+            ),
+            fg="green",
+        )
 
 
 @deployment_group.command(

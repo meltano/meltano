@@ -104,3 +104,15 @@ def config(
     )
     config.write_to_file()
     return config
+
+
+@pytest.fixture()
+def tenant_resource_key():
+    """Return a fake tenant resource key."""
+    return "meltano-cloud-test"
+
+
+@pytest.fixture()
+def internal_project_id():
+    """Return a fake Cloud/internal project ID."""
+    return "pytest-123"

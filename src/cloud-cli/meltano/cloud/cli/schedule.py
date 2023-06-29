@@ -158,7 +158,7 @@ async def _set_enabled_state(
     deployment_name = (
         deployment_name
         if deployment_name is not None
-        else config.default_deployment_name
+        else config.internal_project_default["default_deployment_name"]
     )
     if deployment_name is None:
         raise click.UsageError(

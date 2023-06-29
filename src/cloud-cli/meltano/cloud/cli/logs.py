@@ -40,9 +40,8 @@ class LogsClient(MeltanoCloudClient):
             f"/{self.config.internal_project_id}/{execution_id}"
         )
 
-        async with self.authenticated():
-            async with self._raw_request("GET", url) as response:
-                yield response
+        async with self.authenticated(), self._raw_request("GET", url) as response:
+            yield response
 
     async def _get_logs_page(
         self,

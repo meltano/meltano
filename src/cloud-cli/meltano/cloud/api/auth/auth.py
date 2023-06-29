@@ -193,12 +193,11 @@ class MeltanoCloudAuth:  # noqa: WPS214
 
     @asynccontextmanager
     async def _get_user_info_response(self) -> t.AsyncIterator[aiohttp.ClientResponse]:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                urljoin(self.base_url, "oauth2/userInfo"),
-                headers=self.get_access_token_header(),
-            ) as response:
-                yield response
+        async with aiohttp.ClientSession() as session, session.get(
+            urljoin(self.base_url, "oauth2/userInfo"),
+            headers=self.get_access_token_header(),
+        ) as response:
+            yield response
 
     async def get_user_info_response(self) -> aiohttp.ClientResponse:
         """Get user info.
@@ -225,9 +224,16 @@ class MeltanoCloudAuth:  # noqa: WPS214
             True if logged in, else False
         """
         return bool(
-            self.config.access_token
-            and self.config.id_token
+            self.has_auth_tokens()
             # Perform this check at the end to avoid
             # spamming our servers if logout fails
             and (await self.get_user_info_response()).ok,
         )
+
+    def has_auth_tokens(self) -> bool:
+        """Check if this instance has cached access and ID tokens.
+
+        Returns:
+            True if it has both tokens, else False
+        """
+        return bool(self.config.access_token and self.config.id_token)
