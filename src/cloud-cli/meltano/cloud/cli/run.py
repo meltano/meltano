@@ -51,7 +51,9 @@ async def run(
 ) -> None:
     """Run a Meltano project in Meltano Cloud."""
     deployment = (
-        deployment if deployment is not None else context.config.default_deployment_name
+        deployment
+        if deployment is not None
+        else context.config.internal_project_default["default_deployment_name"]
     )
     if deployment is None:
         raise click.UsageError(
