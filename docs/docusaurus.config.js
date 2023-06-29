@@ -31,10 +31,8 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          // sidebar: {
-          //   hideable: true,
-          // },
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/meltano/meltano",
@@ -82,21 +80,21 @@ const config = {
             position: "right",
           },
           {
-            to: "/blog",
+            to: "/intro",
             label: "Get Started",
             position: "left",
             className: "header-get-started-link",
             "aria-label": "Get Started",
           },
           {
-            to: "/blog",
+            to: "/intro",
             label: "Tutorials",
             position: "left",
             className: "header-tutorials-link",
             "aria-label": "Tutorials",
           },
           {
-            to: "/blog",
+            to: "/intro",
             label: "Docs",
             position: "left",
             className: "header-docs-link",
@@ -202,6 +200,11 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+      },
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
       },
       algolia: {
         // The application ID provided by Algolia
