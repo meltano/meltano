@@ -308,14 +308,14 @@ img {
 }
 
 .main-btn:hover {
+  color: var(--button-text-color);
   background-color: #311772;
 }
 
 [data-theme="dark"] .main-btn:hover {
+  color: var(--button-text-color);
   background-color: #0397c7;
 }
-
-
 
 .alt-blue-btn {
   text-align: center;
@@ -486,7 +486,7 @@ em span {
   }
 
   .p3 {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .ml-margins {

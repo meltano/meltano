@@ -98,9 +98,9 @@ function UseCase({ Svg, title, description, link }) {
         <div className={styles.usecaseContent}>
           <div className={styles.header}>
             <Svg className={styles.featureSvg} role="img" />
-            <h3 className="text-2xl font-semibold my-3">{title}</h3>
+            <h4 className="text-2xl font-semibold mt-6 mb-3">{title}</h4>
           </div>
-          <p className="p1 mb-6">{description}</p>
+          <p className="p2 mb-6">{description}</p>
         </div>
         <Link
           to={link.url}
