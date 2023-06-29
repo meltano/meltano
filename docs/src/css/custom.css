@@ -803,3 +803,10 @@ main {
 .navbar-sidebar__brand {
   box-shadow: none;
 }
+
+.lost-melty {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  margin-bottom: -4rem;
+}
