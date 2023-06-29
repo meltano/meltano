@@ -59,13 +59,13 @@ class CloudDeployment(t.TypedDict):
     default: bool
 
 
-class CloudConfigProject(TypedDict):
+class CloudConfigProject(t.TypedDict):
     """Meltano cloud config project settings for default deployments."""
 
     default_deployment_name: str | None
 
 
-class CloudConfigOrg(TypedDict):
+class CloudConfigOrg(t.TypedDict):
     """Meltano cloud config org for storing default projects and deployments."""
 
     default_project_id: str | None
