@@ -24,6 +24,7 @@
   --ifm-footer-background: linear-gradient(136deg, #EAE5FC 0%, rgba(234, 229, 252, 0.00) 100%);
   --ifm-navbar-link-hover-color: var(--meltano-black);
   --ifm-footer-title-color: var(--ifm-color-primary);
+  --ifm-navbar-sidebar-width: 100%;
 }
 
 @media all and (min-width: 768px) {
@@ -54,6 +55,7 @@ body {
   padding: 0;
 }
 
+body,
 main,
 section {
   background-color: var(--background-color);
@@ -497,6 +499,7 @@ em span {
 
 .navbar {
   height: 60px;
+  z-index: 202;
 }
 
 @media all and (min-width: 768px) {
@@ -666,6 +669,16 @@ main {
     padding-right: 3rem;
     padding-left: 3rem;
   }
+}
+
+@media all and (min-width: 997px) and (max-width: 1279px) {
+  .navbar__inner {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+@media (min-width: 997px) {
 
   .header-github-link,
   .header-slack-link {
@@ -677,7 +690,7 @@ main {
   flex: 1 0 auto;
 }
 
-@media (max-width: 1279px) {
+@media (max-width: 996px) {
   .navbar__items--left {
     display: none;
   }
@@ -693,14 +706,6 @@ main {
   }
 }
 
-@media (max-width: 767px) {
-  .DocSearch-Button {
-    border: none !important;
-    padding: 12px 0 !important;
-    width: 39px !important;
-  }
-}
-
 .navbar__items--right {
   flex: 0;
 }
@@ -708,6 +713,16 @@ main {
 @media all and (min-width: 768px) {
   .navbar__items--right {
     flex: 1 0 auto;
+  }
+}
+
+.navbar__toggle {
+  display: block;
+}
+
+@media all and (min-width: 997px) {
+  .navbar__toggle {
+    display: none;
   }
 }
 
@@ -756,4 +771,14 @@ main {
 .footer__copyright {
   font-size: 14px;
   font-family: 'IBM Plex Mono', Arial, sans-serif;
+}
+
+.primaryWrapper .menu__link {
+  line-height: 3;
+  padding: 0;
+}
+
+.primaryWrapper .menu__link:hover,
+.primaryWrapper .menu__caret:hover {
+  background: none;
 }

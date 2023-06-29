@@ -20,13 +20,13 @@ export default function FooterLayout({ style, links, logo, copyright }) {
         >
           <MeltanoLogo
             title="Meltano"
-            className="footer-soc-icon grow-0 me-32 mb-8"
+            className={"grow-0 me-32 mb-8 " + styles.meltano}
           />
           <div className="grow">{links}</div>
           <img
             src={FloatingIsland}
             alt="Floating Island"
-            className="footer-soc-icon grow-0 ms-16 hidden xl:block"
+            className="grow-0 ms-16 hidden xl:block"
           />
         </div>
         {(logo || copyright) && (

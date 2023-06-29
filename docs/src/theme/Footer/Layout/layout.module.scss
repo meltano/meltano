@@ -20,3 +20,11 @@ footer {
   pointer-events: all;
   z-index: -1;
 }
+
+.meltano path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .meltano path {
+  fill: #ffffff;
+}

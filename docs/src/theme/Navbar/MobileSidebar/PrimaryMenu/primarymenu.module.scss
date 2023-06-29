@@ -1,0 +1,16 @@
+.menuSocIcon path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .menuSocIcon path {
+  fill: #ffffff;
+}
+
+.menuSocIcon:hover path,
+[data-theme="dark"] .menuSocIcon:hover path {
+  fill: var(--meltano-blue);
+}
+
+.sidebarSearch {
+  justify-content: left;
+}
