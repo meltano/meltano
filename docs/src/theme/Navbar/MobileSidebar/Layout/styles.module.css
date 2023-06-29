@@ -1,16 +1,1 @@
-.navbar-sidebar__brand {
-  align-items: center;
-  box-shadow: var(--ifm-navbar-shadow);
-  display: flex;
-  flex: 1;
-  height: var(--ifm-navbar-height);
-  padding: var(--ifm-navbar-padding-vertical) var(--ifm-navbar-padding-horizontal);
-}
 
-.navbar__brand {
-  align-items: center;
-  color: var(--ifm-navbar-link-color);
-  display: flex;
-  margin-right: 1rem;
-  min-width: 0;
-}

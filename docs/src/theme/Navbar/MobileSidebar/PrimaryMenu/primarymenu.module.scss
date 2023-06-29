@@ -14,3 +14,13 @@
 .sidebarSearch {
   justify-content: left;
 }
+
+.navbarSidebarBrand {
+  align-items: center;
+  box-shadow: none;
+  display: flex;
+  flex: 1;
+  height: var(--ifm-navbar-height);
+  padding: var(--ifm-navbar-padding-vertical)
+    var(--ifm-navbar-padding-horizontal);
+}

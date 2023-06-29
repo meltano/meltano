@@ -25,6 +25,7 @@
   --ifm-navbar-link-hover-color: var(--meltano-black);
   --ifm-footer-title-color: var(--ifm-color-primary);
   --ifm-navbar-sidebar-width: 100%;
+  --ifm-navbar-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
 }
 
 @media all and (min-width: 768px) {
@@ -45,6 +46,7 @@
   --ifm-footer-background-color: var(--meltano-black);
   --ifm-footer-background: var(--meltano-black);
   --ifm-navbar-link-hover-color: var(--meltano-white);
+  --ifm-navbar-shadow: rgba(255, 255, 255, 0.1) 0px 1px 2px 0px;
 }
 
 /* common */
@@ -499,6 +501,10 @@ em span {
 
 .navbar {
   height: 60px;
+  z-index: 200;
+}
+
+.navbar-sidebar--show {
   z-index: 202;
 }
 
@@ -781,4 +787,8 @@ main {
 .primaryWrapper .menu__link:hover,
 .primaryWrapper .menu__caret:hover {
   background: none;
+}
+
+.navbar-sidebar__brand {
+  box-shadow: none;
 }
