@@ -38,7 +38,7 @@ except ImportError:
 # `.pre-commit-config.yaml`.
 
 root_path = Path(__file__).parent
-python_versions = ("3.7", "3.8", "3.9", "3.10", "3.11")
+python_versions = ("3.8", "3.9", "3.10", "3.11")
 main_python_version = "3.10"
 pytest_deps = (
     "backoff",

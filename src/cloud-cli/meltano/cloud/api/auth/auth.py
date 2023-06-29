@@ -8,6 +8,7 @@ import tempfile
 import typing as t
 import webbrowser
 from contextlib import asynccontextmanager
+from functools import cached_property
 from http import HTTPStatus
 from pathlib import Path
 from urllib.parse import urlencode, urljoin
@@ -18,11 +19,6 @@ import jinja2
 from aiohttp import web
 
 from meltano.cloud.api.config import MeltanoCloudConfig
-
-if sys.version_info <= (3, 8):
-    from cached_property import cached_property
-else:
-    from functools import cached_property
 
 if sys.version_info < (3, 9):
     import importlib_resources

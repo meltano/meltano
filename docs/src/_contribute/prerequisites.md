@@ -10,7 +10,7 @@ hidden: true
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.7+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
+1. [Python 3.8+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
 2. [Node 16](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 

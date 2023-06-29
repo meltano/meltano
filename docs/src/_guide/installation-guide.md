@@ -35,7 +35,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
+Currently Python 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 
@@ -104,7 +104,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
+Currently Python 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 

@@ -4,20 +4,15 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 import typing as t
 from contextlib import suppress
+from functools import cached_property
 from pathlib import Path
 
 import jwt
 import platformdirs
 
 from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
-
-if sys.version_info <= (3, 8):
-    from cached_property import cached_property
-else:
-    from functools import cached_property
 
 MELTANO_CLOUD_BASE_URL = "https://internal.api.meltano.cloud/"
 MELTANO_CLOUD_BASE_AUTH_URL = "https://auth.meltano.cloud"

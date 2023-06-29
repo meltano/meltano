@@ -25,7 +25,7 @@ body:
       description: Version of Python you are using
       options:
         - "3.6 (deprecated)"
-        - "3.7"
+        - "3.7 (deprecated)"
         - "3.8"
         - "3.9"
         - "3.10"
