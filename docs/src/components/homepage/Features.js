@@ -102,7 +102,7 @@ function Feature({ Svg, title, description, link }) {
       <div className="text-left z-10">
         <div className={styles.header}>
           <Svg className={styles.featureSvg} role="img" />
-          <h4 className="font-semibold ms-2">{title}</h4>
+          <h4 className="text-2xl font-semibold ms-2">{title}</h4>
         </div>
         <p className="p2 mt-3 mb-6">{description}</p>
         <Link to={link.url} target={link.target} className="btn main-btn">
