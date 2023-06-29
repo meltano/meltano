@@ -1,0 +1,12 @@
+.footerSocIcon path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .footerSocIcon path {
+  fill: #ffffff;
+}
+
+.footerSocIcon:hover path,
+[data-theme="dark"] .footerSocIcon:hover path {
+  fill: var(--meltano-blue);
+}

@@ -2,7 +2,7 @@ import React from "react";
 import clsx from "clsx";
 import MeltanoLogo from "@site/static/img/footer/meltano.svg";
 import FloatingIsland from "@site/static/img/footer/floating.png";
-import styles from "./footer.module.scss";
+import styles from "./layout.module.scss";
 
 export default function FooterLayout({ style, links, logo, copyright }) {
   return (
@@ -14,7 +14,7 @@ export default function FooterLayout({ style, links, logo, copyright }) {
       <div className="container">
         <div
           className={
-            "mb-10 flex flex-col lg:flex-row justify-between " +
+            "my-10 flex flex-col lg:flex-row justify-between " +
             styles.background
           }
         >

@@ -157,7 +157,7 @@ export default function HomepageUseCases() {
               1024: {
                 slidesPerView: 3,
               },
-              1600: {
+              1280: {
                 slidesPerView: 4,
               },
             }}

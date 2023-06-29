@@ -7,6 +7,7 @@ import FacebookLogo from "@site/static/img/footer/facebook.svg";
 import InstagramLogo from "@site/static/img/footer/instagram.svg";
 import YoutubeLogo from "@site/static/img/footer/youtube.svg";
 import CrunchbaseLogo from "@site/static/img/footer/crunchbase.svg";
+import styles from "./copyright.module.scss";
 
 export default function FooterCopyright({ copyright }) {
   return (
@@ -19,28 +20,40 @@ export default function FooterCopyright({ copyright }) {
       />
       <div className="footer-soc-wrapper flex justify-between gap-3 order-1 sm:order-2 mb-10 sm:mb-0">
         <a href="#" className="opacity-50">
-          <GithubLogo title="Github Logo" className="footer-soc-icon" />
+          <GithubLogo title="Github Logo" className={styles.footerSocIcon} />
         </a>
         <a href="#" className="opacity-50">
-          <SlackLogo title="Slack Logo" className="footer-soc-icon" />
+          <SlackLogo title="Slack Logo" className={styles.footerSocIcon} />
         </a>
         <a href="#" className="opacity-50">
-          <TwitterLogo title="Twitter Logo" className="footer-soc-icon" />
+          <TwitterLogo title="Twitter Logo" className={styles.footerSocIcon} />
         </a>
         <a href="#" className="opacity-50">
-          <LinkedinLogo title="Linkedin Logo" className="footer-soc-icon" />
+          <LinkedinLogo
+            title="Linkedin Logo"
+            className={styles.footerSocIcon}
+          />
         </a>
         <a href="#" className="opacity-50">
-          <FacebookLogo title="Facebook Logo" className="footer-soc-icon" />
+          <FacebookLogo
+            title="Facebook Logo"
+            className={styles.footerSocIcon}
+          />
         </a>
         <a href="#" className="opacity-50">
-          <InstagramLogo title="Instagram Logo" className="footer-soc-icon" />
+          <InstagramLogo
+            title="Instagram Logo"
+            className={styles.footerSocIcon}
+          />
         </a>
         <a href="#" className="opacity-50">
-          <YoutubeLogo title="Youtube Logo" className="footer-soc-icon" />
+          <YoutubeLogo title="Youtube Logo" className={styles.footerSocIcon} />
         </a>
         <a href="#" className="opacity-50">
-          <CrunchbaseLogo title="Crunchbase Logo" className="footer-soc-icon" />
+          <CrunchbaseLogo
+            title="Crunchbase Logo"
+            className={styles.footerSocIcon}
+          />
         </a>
       </div>
     </div>

@@ -11,6 +11,7 @@
   position: fixed;
   width: 800px;
   height: 800px;
+  top: -200px;
   margin-top: -200px;
   margin-right: -400px;
   opacity: 0.5;
