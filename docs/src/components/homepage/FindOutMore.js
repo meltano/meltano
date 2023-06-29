@@ -38,8 +38,8 @@ function IconLink({ Svg, title, link }) {
         target={link.target}
         className="flex flex-col text-center items-center basis-1/3 lg:basis-1/6"
       >
-        <Svg className={"mb-6 " + styles.findOutMoreSvg} role="img" />
-        <p className="p1 font-semibold">{title}</p>
+        <Svg className={"mb-6 p-2 " + styles.findOutMoreSvg} role="img" />
+        <p className={"p1 " + styles.findOutMoreTitle}>{title}</p>
       </Link>
     );
   return <div></div>;

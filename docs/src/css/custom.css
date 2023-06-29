@@ -14,6 +14,7 @@
   --docsearch-searchbox-background: transparent !important;
   --ifm-code-font-size: 95%;
   --ifm-navbar-background-color: var(--meltano-white);
+  --button-text-color: var(--meltano-white);
   --background-color: var(--meltano-white);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --docusaurus-announcement-bar-height: 60px !important;
@@ -38,6 +39,7 @@
   --meltano-blue: #18C3FA;
   --ifm-color-primary: var(--ifm-color-primary);
   --ifm-navbar-background-color: var(--meltano-black);
+  --button-text-color: var(--meltano-black);
   --background-color: var(--meltano-black);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --ifm-heading-color: var(--meltano-white);
@@ -57,6 +59,7 @@ body {
   padding: 0;
 }
 
+html,
 body,
 main,
 section {
@@ -297,7 +300,7 @@ img {
   font-weight: 500;
   font-size: 16px;
   line-height: 100%;
-  color: #fff !important;
+  color: var(--button-text-color);
   background-color: var(--meltano-blue);
   border-radius: 4.6px;
   display: flex;
@@ -520,7 +523,6 @@ main {
 
 .navbar__inner {
   width: 100%;
-  max-width: 1536px;
   padding-right: 3rem;
   padding-left: 3rem;
   margin: 0 auto;
@@ -592,6 +594,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 
@@ -601,6 +604,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 .header-docs-link:before {
@@ -609,6 +613,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 .header-changelog-link:before {
@@ -617,6 +622,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 [data-theme='dark'] .header-get-started-link:before {
@@ -625,6 +631,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 
@@ -634,6 +641,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 [data-theme='dark'] .header-docs-link:before {
@@ -642,6 +650,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 [data-theme='dark'] .header-changelog-link:before {
@@ -650,6 +659,7 @@ main {
   display: flex;
   height: 24px;
   width: 26px;
+  background-position: center center;
 }
 
 .navbar__items .navbar__link {
@@ -659,6 +669,7 @@ main {
   padding-bottom: 0;
   line-height: 1rem;
   display: flex;
+  align-items: center;
 }
 
 .navbar__inner {
@@ -670,7 +681,7 @@ main {
   display: none !important;
 }
 
-@media (min-width: 768px) {
+@media all and (min-width: 1280px) and (max-width: 1600px) {
   .navbar__inner {
     padding-right: 3rem;
     padding-left: 3rem;

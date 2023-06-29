@@ -21,7 +21,7 @@
   .navbar__inner .DocSearch-Button {
     border: none !important;
     padding: 12px 0 !important;
-    width: 39px !important;
+    width: 20px !important;
     max-width: 318px;
   }
 
@@ -45,7 +45,7 @@
   .navbar__inner .DocSearch-Button {
     border: none !important;
     padding: 12px 0 !important;
-    width: 39px !important;
+    width: 20px !important;
   }
 
   .navbar__inner .DocSearch-Button:hover {

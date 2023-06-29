@@ -38,7 +38,7 @@ ${JSON.stringify(item, null, 2)}`,
 }
 function NavbarContentLayout({ left, right }) {
   return (
-    <div className={"navbar__inner relative container"}>
+    <div className="navbar__inner relative">
       <NavbarLogo />
       <div className="navbar__items navbar__items--left">{left}</div>
       <div

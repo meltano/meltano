@@ -26,7 +26,7 @@ export default function FooterLayout({ style, links, logo, copyright }) {
           <img
             src={FloatingIsland}
             alt="Floating Island"
-            className="grow-0 ms-16 hidden xl:block"
+            className={"grow-0 ms-16 hidden xl:block " + styles.floatingIsland}
           />
         </div>
         {(logo || copyright) && (
