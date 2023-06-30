@@ -38,7 +38,11 @@ const config = {
           editUrl: "https://github.com/meltano/meltano",
         },
         blog: {
-          // showReadingTime: true,
+          routeBasePath: "/changelog",
+          blogTitle: "Changelog",
+          blogSidebarTitle: "All Releases",
+          blogDescription: "A Docusaurus powered blog!",
+          postsPerPage: 12,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
@@ -101,7 +105,7 @@ const config = {
             "aria-label": "Docs",
           },
           {
-            to: "/blog",
+            to: "/changelog",
             label: "Changelog",
             position: "left",
             className: "header-changelog-link",
