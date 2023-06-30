@@ -21,7 +21,9 @@ export default function BlogLayout(props) {
           alt="Melty"
           className={clsx(styles.melty, "-mb-16 hidden lg:block")}
         />
-        <h1 className="text-4xl md:text-6xl font-bold my-10">Changelog</h1>
+        <h1 className="text-4xl md:text-6xl font-bold mb-10 lg:mt-10">
+          Changelog
+        </h1>
         <a href="" className="btn main-btn">
           Subscribe to Updates
         </a>

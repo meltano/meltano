@@ -205,7 +205,7 @@ h6 {
   color: var(--markdown-color);
 }
 
-.markdown a {
+.markdown a:not(.btn) {
   text-decoration: underline !important;
 }
 
