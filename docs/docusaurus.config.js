@@ -43,10 +43,7 @@ const config = {
           blogSidebarTitle: "All Releases",
           blogDescription: "A Docusaurus powered blog!",
           postsPerPage: 12,
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+          showReadingTime: false,
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),

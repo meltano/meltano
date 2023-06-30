@@ -1,3 +1,11 @@
+.sidebarWrapper {
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .sidebarWrapper {
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 .sidebar {
   max-height: calc(100vh - (var(--ifm-navbar-height) + 2rem));
   overflow-y: auto;
@@ -7,15 +15,11 @@
 
 .sidebarItemTitle {
   font-size: var(--ifm-h3-font-size);
-  font-weight: var(--ifm-font-weight-bold);
+  font-weight: 700;
 }
 
 .sidebarItemList {
   font-size: 0.9rem;
-}
-
-.sidebarItem {
-  margin-top: 0.7rem;
 }
 
 .sidebarItemLink {
@@ -28,7 +32,7 @@
 }
 
 .sidebarItemLinkActive {
-  color: var(--ifm-color-primary) !important;
+  font-weight: 700;
 }
 
 @media (max-width: 996px) {

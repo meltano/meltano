@@ -13,7 +13,7 @@ function HomepageHeader() {
   return (
     <header className={styles.heroBanner}>
       <div className="container md:mt-20">
-        <h1 className="text-4xl md:text-6xl font-bold">
+        <h1 className="text-4xl md:text-6xl font-bold my-10">
           Explore <span className="brackets">using</span> Meltano
         </h1>
       </div>

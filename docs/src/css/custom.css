@@ -27,6 +27,9 @@
   --ifm-footer-title-color: var(--ifm-color-primary);
   --ifm-navbar-sidebar-width: 100%;
   --ifm-navbar-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+  --ifm-toc-border-color: rgba(0, 0, 0, 0.15);
+  --date-background: rgba(49, 23, 114, 0.15);
+  --ifm-menu-color-background-active: transparent;
 }
 
 @media all and (min-width: 768px) {
@@ -49,9 +52,21 @@
   --ifm-footer-background: var(--meltano-black);
   --ifm-navbar-link-hover-color: var(--meltano-white);
   --ifm-navbar-shadow: rgba(255, 255, 255, 0.1) 0px 1px 2px 0px;
+  --ifm-toc-border-color: rgba(255, 255, 255, 0.15) !important;
+  --date-background: rgba(255, 255, 255, 0.05)
 }
 
 /* common */
+
+html {
+  scroll-padding-top: 30px;
+}
+
+@media all and (min-width: 768px) {
+  html {
+    scroll-padding-top: 70px;
+  }
+}
 
 html,
 body {
@@ -73,7 +88,6 @@ h1 {
   font-size: 86px;
   line-height: 110%;
   letter-spacing: -0.03em;
-  margin: 38px;
 }
 
 h2 {
@@ -83,7 +97,6 @@ h2 {
   font-size: 56px;
   line-height: 110%;
   letter-spacing: -0.02em;
-  text-align: center;
   margin: 0;
 }
 
@@ -123,6 +136,56 @@ h6 {
   font-weight: 700;
   font-size: 20px;
   line-height: 130%;
+}
+
+.markdown h1 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 110%;
+  letter-spacing: -0.03em;
+}
+
+.markdown h2 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+}
+
+.markdown h3 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+}
+
+.markdown h4 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+}
+
+.markdown h5 {
+  font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 110%;
+  letter-spacing: -0.02em;
+}
+
+.markdown ul {
+  list-style-type: inherit;
+  padding-left: 1rem;
 }
 
 .p1 {
@@ -414,7 +477,7 @@ em span {
   font-style: normal;
 }
 
-@media all and (min-width: 768px) and (max-width: 1023px) {
+@media all and (min-width: 768px) and (max-width: 995px) {
   h1 {
     font-size: 72px;
   }
@@ -809,4 +872,16 @@ main {
   max-width: 500px;
   margin: 0 auto;
   margin-bottom: -4rem;
+}
+
+.table-of-contents {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.table-of-contents li {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }

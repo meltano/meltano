@@ -18,7 +18,7 @@ export default function NotFound() {
           <div className="row">
             <div className="col col--6 col--offset-3 text-center flex flex-col justify-center">
               <img src={Melty} alt="Melty" className="-mb-16 lost-melty" />
-              <h1 className="hero__title brackets text-6xl mb-10">
+              <h1 className="hero__title brackets text-6xl my-10">
                 <Translate
                   id="theme.NotFound.title"
                   description="The title of the 404 page"
