@@ -4,12 +4,14 @@ import styles from "./styles.module.css";
 
 export default function NavbarLogo() {
   return (
-    <div class="navbar__brand">
+    <div className="navbar__brand">
       <a href="https://meltano.com/">
-        <div class="navbar__logo" />
+        <div className="navbar__logo" />
       </a>
-      <Link class="navbar__brand" href="/">
-        <b class={"navbar__title text--truncate " + styles.docsLink}>Docs</b>
+      <Link className="navbar__brand" href="/">
+        <b className={"navbar__title text--truncate " + styles.docsLink}>
+          Docs
+        </b>
       </Link>
     </div>
   );
