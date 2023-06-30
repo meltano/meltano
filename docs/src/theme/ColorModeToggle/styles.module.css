@@ -67,3 +67,9 @@
   opacity: 1;
   transform: translate(32px, 4px) rotate(0deg);
 }
+
+.lightDarkToggle {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}

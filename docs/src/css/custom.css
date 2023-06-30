@@ -62,7 +62,7 @@
 
 /* common */
 
-/* html {
+html {
   scroll-padding-top: 30px;
 }
 
@@ -70,7 +70,7 @@
   html {
     scroll-padding-top: 70px;
   }
-} */
+}
 
 html,
 body {
