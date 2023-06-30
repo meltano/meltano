@@ -30,6 +30,8 @@
   --ifm-toc-border-color: rgba(0, 0, 0, 0.15);
   --date-background: rgba(49, 23, 114, 0.15);
   --ifm-menu-color-background-active: transparent;
+  --markdown-color: rgba(8, 2, 22, 0.75);
+  --markdown-h-color: #080216;
 }
 
 @media all and (min-width: 768px) {
@@ -53,7 +55,9 @@
   --ifm-navbar-link-hover-color: var(--meltano-white);
   --ifm-navbar-shadow: rgba(255, 255, 255, 0.1) 0px 1px 2px 0px;
   --ifm-toc-border-color: rgba(255, 255, 255, 0.15) !important;
-  --date-background: rgba(255, 255, 255, 0.05)
+  --date-background: rgba(255, 255, 255, 0.05);
+  --markdown-color: rgba(255, 255, 255, 0.70);
+  --markdown-h-color: #ffffff;
 }
 
 /* common */
@@ -145,6 +149,7 @@ h6 {
   font-size: 32px;
   line-height: 110%;
   letter-spacing: -0.03em;
+  color: var(--meltano-h-color);
 }
 
 .markdown h2 {
@@ -154,6 +159,7 @@ h6 {
   font-size: 26px;
   line-height: 110%;
   letter-spacing: -0.02em;
+  color: var(--meltano-h-color);
 }
 
 .markdown h3 {
@@ -163,6 +169,7 @@ h6 {
   font-size: 24px;
   line-height: 110%;
   letter-spacing: -0.02em;
+  color: var(--meltano-h-color);
 }
 
 .markdown h4 {
@@ -172,6 +179,7 @@ h6 {
   font-size: 22px;
   line-height: 110%;
   letter-spacing: -0.02em;
+  color: var(--meltano-h-color);
 }
 
 .markdown h5 {
@@ -181,11 +189,24 @@ h6 {
   font-size: 20px;
   line-height: 110%;
   letter-spacing: -0.02em;
+  color: var(--meltano-h-color);
 }
 
 .markdown ul {
   list-style-type: inherit;
   padding-left: 1rem;
+}
+
+.markdown li {
+  color: var(--markdown-color);
+}
+
+.markdown p {
+  color: var(--markdown-color);
+}
+
+.markdown a {
+  text-decoration: underline !important;
 }
 
 .p1 {
