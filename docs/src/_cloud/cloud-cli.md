@@ -2,7 +2,7 @@
 title: Cloud Command Line
 description: Interact with Meltano Cloud projects from the command line.
 layout: doc
-weight: 3
+weight: 5
 ---
 
 <div class="notification is-info">
@@ -42,6 +42,10 @@ The `delete` subcommand provides an interface to delete env vars:
 meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 ```
 
+### Reserved Variables
+
+See the [reserved variables](/cloud/platform#reserved-variables) docs for more details on variables that are reserved for use by Meltano Cloud.
+
 ## `deployment`
 
 The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
@@ -59,6 +63,11 @@ meltano-cloud deployment create --name 'my-dev-deployment' --environment 'dev' -
 ```
 
 The above example creates a new deployment named `my-dev-deployment` for the Meltano environment named `dev`, using the `develop` branch of the project's git repository. Note that the Meltano environment name must match what is in `meltano.yml`.
+
+<div class="notification is-info">
+  <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
+  Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
+</div>
 
 List deployments:
 
@@ -91,11 +100,17 @@ Selecting a default deployment can also be done interactively:
 meltano-cloud deployment use
 ```
 
-Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file.
-If you've made a change to your schedules configuration and would like them to be re-deployed to Meltano Cloud you can run the following:
+Currently Meltano Cloud doesn't automatically sync updates to [schedules](/guide/orchestration#create-a-schedule) stored in your `meltano.yml` file or changes to your tracked branch.
+If you've made a change to your schedules configuration or tracked branch and would like them to be re-deployed to Meltano Cloud you can run the following:
 
 ```sh
 meltano-cloud deployment update --name prod
+```
+
+You can then confirm the deployment is on the correct revision of your tracked branch by running the following:
+
+```sh
+meltano-cloud deployment list
 ```
 
 ## `docs`
@@ -128,6 +143,33 @@ $ meltano-cloud history --lookback 1w
 
 # Display the last hour and a half of executions
 $ meltano-cloud history --lookback 1h30m
+
+# Display the executions for the schedule named "daily"
+$ meltano-cloud history --schedule daily
+
+# Display the executions for schedules starting with "da"
+$ meltano-cloud history --schedule-prefix da
+
+# Display the executions for schedules containing the word "slack"
+# Can also use `--filter`
+$ meltano-cloud history --schedule-contains slack
+
+# Display the executions for the deployment named "prod"
+$ meltano-cloud history --deployment prod
+
+# Display the executions for deployments starting with "pr"
+$ meltano-cloud history --deployment-prefix pr
+
+# Display the executions for deployments containing the string "pr"
+$ meltano-cloud history --deployment-contains pr
+
+# Display the executions for executions that failed.
+# Options are success, failed, and running.
+$ meltano-cloud history --result failed
+
+# Display the execution history in json format
+# Options are terminal, markdown, and json
+$ meltano-cloud history --format json
 ```
 
 ## `login`

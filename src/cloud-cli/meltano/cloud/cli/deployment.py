@@ -6,26 +6,53 @@ import asyncio
 import json
 import platform
 import typing as t
+from contextlib import contextmanager
 from datetime import datetime
 from http import HTTPStatus
 
 import click
 import questionary
 import requests
-import tabulate
 from slugify import slugify
 from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.api.config import CloudConfigProject
+from meltano.cloud.api.types import CloudDeployment
+from meltano.cloud.cli.base import (
+    LimitedResult,
+    get_paginated,
+    pass_context,
+    print_formatted_list,
+    run_async,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
-    from meltano.cloud.api.types import CloudDeployment
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
 
 DEFAULT_GET_DEPLOYMENTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
+
+
+def _safe_get_response_json_dict(response: requests.Response) -> dict:
+    try:
+        response_json = response.json()
+    except json.JSONDecodeError:
+        return {}
+    if isinstance(response_json, dict):
+        return response_json
+    return {}
+
+
+@contextmanager
+def _raise_with_details():
+    try:
+        yield
+    except requests.HTTPError as ex:
+        if "detail" in _safe_get_response_json_dict(ex.response):
+            raise click.ClickException(ex.response.json()["detail"]) from ex
+        raise
 
 
 class DeploymentsCloudClient(MeltanoCloudClient):
@@ -61,7 +88,8 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         return {
             **deployment,  # type: ignore[misc]
             "default": (
-                self.config.default_deployment_name == deployment["deployment_name"]
+                self.config.internal_project_default["default_deployment_name"]
+                == deployment["deployment_name"]
             ),
         }
 
@@ -102,7 +130,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         git_rev: str,
         force: bool = False,
         preserve_git_hash: bool = False,
-    ) -> CloudDeployment:
+    ) -> CloudDeployment | None:
         """Use POST to update a Meltano Cloud deployment.
 
         Args:
@@ -135,13 +163,18 @@ class DeploymentsCloudClient(MeltanoCloudClient):
             )
         response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
         response.raise_for_status()
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
         deployment = response.json()
-        return {
-            **deployment,  # type: ignore[misc]
-            "default": (
-                self.config.default_deployment_name == deployment["deployment_name"]
-            ),
-        }
+        return CloudDeployment(
+            {
+                **deployment,  # type: ignore[misc]
+                "default": (
+                    self.config.internal_project_default["default_deployment_name"]
+                    == deployment["deployment_name"]
+                ),
+            },
+        )
 
     async def delete_deployment(self, deployment_name: str) -> None:
         """Use DELETE to delete a Meltano Cloud deployment.
@@ -173,35 +206,30 @@ async def _get_deployments(
     config: MeltanoCloudConfig,
     *,
     limit: int = DEFAULT_GET_DEPLOYMENTS_LIMIT,
-) -> list[CloudDeployment]:
-    page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[CloudDeployment] = []
-
+) -> LimitedResult[CloudDeployment]:
     async with DeploymentsCloudClient(config=config) as client:
-        while True:
-            response = await client.get_deployments(
+        results = await get_paginated(
+            lambda page_size, page_token: client.get_deployments(
                 page_size=page_size,
                 page_token=page_token,
-            )
+            ),
+            limit,
+            MAX_PAGE_SIZE,
+        )
 
-            results.extend(response["results"])
-
-            if response["pagination"] and len(results) < limit:
-                page_token = response["pagination"]["next_page_token"]
-            else:
-                break
-
-    return [
+    results.items = [
         {
             **x,  # type: ignore[misc]
-            "default": x["deployment_name"] == config.default_deployment_name,
+            "default": x["deployment_name"]
+            == config.internal_project_default["default_deployment_name"],
         }
-        for x in results[:limit]
+        for x in results.items
     ]
 
+    return results
 
-def _process_table_row(deployment: CloudDeployment) -> tuple[str, ...]:
+
+def _format_deployment(deployment: CloudDeployment) -> tuple[str, ...]:
     return (  # noqa: WPS227
         "X" if deployment["default"] else "",
         deployment["deployment_name"],
@@ -212,42 +240,6 @@ def _process_table_row(deployment: CloudDeployment) -> tuple[str, ...]:
             "%Y-%m-%d %H:%M:%S",
         ),
     )
-
-
-def _format_deployments_table(
-    deployments: list[CloudDeployment],
-    table_format: str,
-) -> str:
-    """Format the deployments as a table.
-
-    Args:
-        deployments: The deployments to format.
-
-    Returns:
-        The formatted deployments.
-    """
-    return tabulate.tabulate(
-        [_process_table_row(deployment) for deployment in deployments],
-        headers=(
-            "Default",
-            "Name",
-            "Environment",
-            "Tracked Git Rev",
-            "Current Git Hash",
-            "Last Deployed (UTC)",
-        ),
-        tablefmt=table_format,
-        # To avoid a tabulate bug (IndexError), only set colalign if there are
-        # deployments
-        colalign=("center", "left", "left") if deployments else (),
-    )
-
-
-deployment_list_formatters = {
-    "json": lambda x: json.dumps(x, indent=2),
-    "markdown": lambda x: _format_deployments_table(x, table_format="github"),
-    "terminal": lambda x: _format_deployments_table(x, table_format="rounded_outline"),
-}
 
 
 @deployment_group.command("list")
@@ -274,10 +266,20 @@ async def list_deployments(
     limit: int,
 ) -> None:
     """List Meltano Cloud deployments."""
-    click.echo(
-        deployment_list_formatters[output_format](
-            await _get_deployments(config=context.config, limit=limit),
+    results = await _get_deployments(config=context.config, limit=limit)
+    print_formatted_list(
+        results,
+        output_format,
+        _format_deployment,
+        (
+            "Default",
+            "Name",
+            "Environment",
+            "Tracked Git Rev",
+            "Current Git Hash",
+            "Last Deployed (UTC)",
         ),
+        ("center", "left", "left"),
     )
 
 
@@ -299,7 +301,7 @@ class DeploymentChoicesQuestionaryOption(click.Option):
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
-        context.deployments = asyncio.run(_get_deployments(context.config))
+        context.deployments = asyncio.run(_get_deployments(context.config)).items
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud deployment",
@@ -329,13 +331,14 @@ async def use_deployment(  # noqa: D103
 ) -> None:
     deployment_name = slugify(deployment_name)
     if context.deployments is None:  # Interactive config was not used
-        context.deployments = await _get_deployments(context.config)
+        context.deployments = (await _get_deployments(context.config)).items
         if deployment_name not in {x["deployment_name"] for x in context.deployments}:
             raise click.ClickException(
                 f"Unable to use deployment named {deployment_name!r} - no available "
                 "Meltano Cloud deployment matches name.",
             )
-    context.config.default_deployment_name = deployment_name
+
+    _set_project_default_deployment(context, deployment_name)
     context.config.write_to_file()
     click.secho(
         (
@@ -343,6 +346,21 @@ async def use_deployment(  # noqa: D103
             "deployment for future commands"
         ),
         fg="green",
+    )
+
+
+def _set_project_default_deployment(
+    context: MeltanoCloudCLIContext,
+    deployment_name: str,
+) -> None:
+    """Set the default deployment in the config for future commands.
+
+    Args:
+        context: The Cloud CLI context.
+        deployment_name: The name of the deployment to set as the default.
+    """
+    context.config.internal_project_default = CloudConfigProject(
+        default_deployment_name=deployment_name,
     )
 
 
@@ -384,14 +402,45 @@ async def create_deployment(
                 "Use `meltano cloud deployment update` to update an "
                 "existing Meltano Cloud deployment.",
             )
-        with yaspin(text="Creating deployment - this may take several minutes..."):
+        with yaspin(
+            text="Creating deployment - this may take several minutes...",
+        ), _raise_with_details():
             deployment = await client.update_deployment(
                 deployment_name=deployment_name,
                 environment_name=environment_name,
                 git_rev=git_rev,
             )
+        if deployment is None:
+            click.secho(
+                "Deployment already exists, and was not updated.",
+                fg="yellow",
+            )
+            return
+
+        new_deployment_name = deployment["deployment_name"]
+        deployments = await client.get_deployments(page_size=2)
+
+        if isinstance(deployments, dict) and deployments["results"]:
+            results = deployments["results"]
+            if isinstance(results, list) and len(results) == 1:
+                _set_project_default_deployment(context, new_deployment_name)
+                click.secho(
+                    (
+                        "Created first deployment. "
+                        f"Set {new_deployment_name!r} as the "
+                        "default Meltano Cloud deployment for future commands"
+                    ),
+                    fg="green",
+                )
+
+                return
+
         click.secho(
-            f"Created deployment {deployment['deployment_name']!r}",
+            (
+                f'Created deployment "{new_deployment_name}". '
+                "To use as default run "
+                f'"meltano cloud deployment use --name {new_deployment_name}."'
+            ),
             fg="green",
         )
 
@@ -406,7 +455,7 @@ async def create_deployment(
 @click.option(
     "--name",
     "deployment_name",
-    help="A name which uniquely identifies the new Meltano Cloud deployment",
+    help="A name which uniquely identifies the Meltano Cloud deployment to update",
     prompt=True,
 )
 @click.option(
@@ -446,17 +495,28 @@ async def update_deployment(  # noqa: D103
                         "new Meltano Cloud deployment.",
                     ) from ex
                 raise
-            updated_deployment = await client.update_deployment(
-                deployment_name=deployment_name,
-                environment_name=existing_deployment["environment_name"],
-                git_rev=existing_deployment["git_rev"],
-                force=force,
-                preserve_git_hash=preserve_git_hash,
-            )
-    click.secho(
-        f"Updated deployment {updated_deployment['deployment_name']!r}",
-        fg="green",
-    )
+            with _raise_with_details():
+                updated_deployment = await client.update_deployment(
+                    deployment_name=deployment_name,
+                    environment_name=existing_deployment["environment_name"],
+                    git_rev=existing_deployment["git_rev"],
+                    force=force,
+                    preserve_git_hash=preserve_git_hash,
+                )
+    if updated_deployment is None:
+        click.secho(
+            (
+                "Deployment already up-to-date. No changes to the Meltano "
+                "manifest were detected. Use the '--force' option to perform "
+                "an update anyway."
+            ),
+            fg="yellow",
+        )
+    else:
+        click.secho(
+            f"Updated deployment {updated_deployment['deployment_name']!r}",
+            fg="green",
+        )
 
 
 @deployment_group.command("delete")
@@ -480,5 +540,6 @@ async def delete_deployment(
                 raise click.ClickException(
                     f"Deployment {deployment_name!r} does not exist.",
                 )
-            await client.delete_deployment(deployment_name=deployment_name)
+            with _raise_with_details():
+                await client.delete_deployment(deployment_name=deployment_name)
     click.secho(f"Deleted deployment {slugify(deployment_name)!r}", fg="green")

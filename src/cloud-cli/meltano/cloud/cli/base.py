@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import platform
 import typing as t
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial, wraps
 from pathlib import Path
 
 import click
+import tabulate
 
 from meltano.cloud import __version__ as version
 from meltano.cloud.api.auth import MeltanoCloudAuth
@@ -36,6 +38,118 @@ def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
         return asyncio.run(f(*args, **kwargs))
 
     return wrapper
+
+
+T = t.TypeVar("T")
+
+
+@dataclass
+class LimitedResult(t.Generic[T]):
+    """
+    List of items, along with whether or not that list is truncated.
+
+    Used to store lists that are to be printed by `print_formatted_list`.
+    """
+
+    items: list[T] = field(default_factory=list)
+    truncated: bool = False
+
+
+def _format_table(
+    items: list[T],
+    table_format: str,
+    format_row: t.Callable[[T], tuple],
+    headers: tuple[str, ...],
+    colalign: tuple[str, ...],
+):
+    return tabulate.tabulate(
+        [format_row(item) for item in items],
+        headers=headers,
+        tablefmt=table_format,
+        floatfmt=".1f",
+        # To avoid a tabulate bug (IndexError), only set colalign if there are items
+        colalign=colalign if items else (),
+    )
+
+
+def print_limit_warning():
+    """Print a warning that items were truncated due to the --limit option."""
+    click.secho(
+        "Output truncated. To print more items, increase the limit using the --limit "
+        "option.",
+        err=True,
+        fg="yellow",
+    )
+
+
+def print_formatted_list(
+    results: LimitedResult[T],
+    output_format: str,
+    format_row: t.Callable[[T], tuple],
+    headers: tuple[str, ...],
+    colalign: tuple[str, ...],
+):
+    """
+    Format a list of items according to the chosen output format and prints it.
+
+    If the list of items is truncated, also prints a warning telling users to increase
+    their item limit.
+    """
+    if output_format == "terminal":
+        output = _format_table(
+            results.items,
+            "rounded_outline",
+            format_row,
+            headers,
+            colalign,
+        )
+    elif output_format == "markdown":
+        output = _format_table(results.items, "github", format_row, headers, colalign)
+    elif output_format == "json":
+        output = json.dumps(results.items, indent=2)
+    else:
+        raise ValueError(f"Unknown format: {output_format}")
+    click.echo(output)
+    if results.truncated:
+        print_limit_warning()
+
+
+class PaginatedCallable(t.Protocol):
+    """Type class defining a paginated function."""
+
+    async def __call__(self, page_size: int, page_token: str | None):
+        """Type signature of paginated function."""
+        pass
+
+
+async def get_paginated(
+    get_page: PaginatedCallable,
+    limit: int,
+    max_page_size: int,
+) -> LimitedResult:
+    """Repeatedly call a paginated function until the item limit is reached."""
+    page_token = None
+    results: LimitedResult = LimitedResult()
+    while True:
+        remaining = limit - len(results.items)
+        # Make the page size 1 larger than the remaining items required to reach the
+        # limit to efficiently detect whether or not there are any truncated items
+        page_size = min(remaining + 1, max_page_size)
+        response = await get_page(
+            page_size=page_size,
+            page_token=page_token,
+        )
+
+        results.items.extend(response["results"])
+
+        if response["pagination"] and len(results.items) <= limit:
+            page_token = response["pagination"]["next_page_token"]
+        else:
+            results.truncated = len(results.items) > limit
+            results.items = results.items[:limit]
+            break
+
+    return results
 
 
 @dataclass

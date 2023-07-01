@@ -60,6 +60,7 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         self.auth = MeltanoCloudAuth(self.config)
         self.api_url = self.config.base_url
         self.version = version
+        self._within_authenticated: bool = False
 
     async def __aenter__(self) -> Self:
         """Enter the client context.
@@ -131,13 +132,21 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
     async def authenticated(self) -> t.AsyncIterator[None]:
         """Provide context for API calls which require authentication.
 
+        Authorization and ID tokens may be out-of-date. In this case, requests made
+        within the context which get a 403 response will cause re-authentication, and
+        the request will be remade.
+
+        This context manager is not reentrant.
+
         Yields:
             None
         """
-        if not await self.auth.logged_in():
+        if not self.auth.has_auth_tokens():
             await self.auth.login()
+        self._within_authenticated = True
         with self.headers(self.auth.get_auth_header()):
             yield
+        self._within_authenticated = False
 
     @staticmethod
     def clean_params(params: dict) -> dict:
@@ -150,23 +159,6 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
             The cleaned params.
         """
         return {k: v for k, v in params.items() if v is not None}
-
-    def validate_response(
-        self,
-        response: ClientResponse,
-    ) -> None:
-        """Handle a response status error.
-
-        Args:
-            response: The response.
-
-        Raises:
-            MeltanoCloudError: If the response status is not OK.
-        """
-        try:
-            response.raise_for_status()
-        except ClientResponseError as e:
-            raise MeltanoCloudError(response) from e
 
     @asynccontextmanager
     async def _raw_request(
@@ -190,7 +182,29 @@ class MeltanoCloudClient:  # noqa: WPS214, WPS230
         url = urljoin(base_url if base_url else self.api_url, path)
         logger.debug("Making Cloud CLI HTTP request", method=method, url=url)
         async with self.session.request(method, url, **kwargs) as response:
-            self.validate_response(response)
+            if (
+                response.status != HTTPStatus.FORBIDDEN
+                or not self._within_authenticated
+            ):
+                try:
+                    response.raise_for_status()
+                except ClientResponseError as e:
+                    raise MeltanoCloudError(response) from e
+                yield response
+                return
+
+        logger.debug(
+            "Authentication failed with a 403, retrying after login",
+            method=method,
+            url=url,
+        )
+        await self.auth.login()
+        self.session.headers.update(self.auth.get_auth_header())
+        async with self.session.request(method, url, **kwargs) as response:
+            try:
+                response.raise_for_status()
+            except ClientResponseError as e:
+                raise MeltanoCloudError(response) from e
             yield response
 
     async def _json_request(

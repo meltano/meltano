@@ -7,6 +7,7 @@ import typing as t
 from http import HTTPStatus
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.cli.base import LimitedResult, get_paginated
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -83,13 +84,13 @@ class HistoryClient(MeltanoCloudClient):
         result_filter: str | None,
         start_time: datetime.datetime | None,
         limit: int,
-    ) -> list[CloudExecution]:
+    ) -> LimitedResult[CloudExecution]:
         """Get a Meltano project execution history in Meltano Cloud.
 
         Args:
             config: The meltano config to use
             schedule_filter: Used to filter the history by schedule name.
-            environment_filter: Used to filter the history by environment name.
+            deployment_filter: Used to filter the history by deployment name.
             result_filter: Used to filter the history by result.
             start_time: Used to filter the history by start time.
             limit: The maximum number of history items to return.
@@ -97,26 +98,16 @@ class HistoryClient(MeltanoCloudClient):
         Returns:
             The execution history.
         """
-        page_token = None
-        page_size = min(limit, cls.MAX_PAGE_SIZE)
-        results: list[CloudExecution] = []
-
         async with cls(config=config) as client:
-            while True:
-                response = await client.get_execution_history(
+            return await get_paginated(
+                lambda page_size, page_token: client.get_execution_history(
                     schedule=schedule_filter,
                     deployment=deployment_filter,
                     result=result_filter,
                     page_size=page_size,
                     page_token=page_token,
                     start_time=start_time,
-                )
-
-                results.extend(response["results"])
-
-                if response["pagination"] and len(results) < limit:
-                    page_token = response["pagination"]["next_page_token"]
-                else:
-                    break
-
-        return results[:limit]
+                ),
+                limit,
+                HistoryClient.MAX_PAGE_SIZE,
+            )

@@ -10,6 +10,7 @@ import sys
 import threading
 import typing as t
 from contextlib import contextmanager
+from functools import cached_property
 from pathlib import Path
 
 import fasteners
@@ -30,11 +31,6 @@ from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import makedirs, sanitize_filename, truthy
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint

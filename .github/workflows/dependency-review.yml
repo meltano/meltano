@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  FOSSA_CLI_VERSION: '3.6.7'
+  FOSSA_CLI_VERSION: '3.8.3'
 
 permissions:
   contents: read
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v3.5.3
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}

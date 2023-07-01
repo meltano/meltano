@@ -7,7 +7,12 @@ import typing as t
 import click
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.cli.base import (
+    get_paginated,
+    pass_context,
+    print_limit_warning,
+    run_async,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext
@@ -84,26 +89,14 @@ async def list_items(
     limit: int,
 ) -> None:
     """List Meltano Cloud config items."""
-    page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[dict[str, str]] = []
-
     async with ConfigCloudClient(config=context.config) as client:
-        while True:
-            response = await client.list_items(
-                page_token=page_token,
-                page_size=page_size,
-            )
+        results = await get_paginated(client.list_items, limit, MAX_PAGE_SIZE)
 
-            results.extend(response["results"])
-
-            if response["pagination"] and len(results) < limit:
-                page_token = response["pagination"]["next_page_token"]
-            else:
-                break
-
-    for secret in results[:limit]:
+    for secret in results.items:
         click.echo(secret["name"])
+
+    if results.truncated:
+        print_limit_warning()
 
 
 @env.command("set")

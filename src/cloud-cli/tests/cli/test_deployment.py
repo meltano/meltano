@@ -14,6 +14,7 @@ import pytest
 from click.testing import CliRunner
 from pytest_httpserver.httpserver import Response
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -100,6 +101,34 @@ class TestDeploymentCommand:
             "╰───────────┴──────────────────┴──────────────────┴──────────────────────────────────────────┴────────────────────┴───────────────────────╯\n"  # noqa: E501
         )  # noqa: E501
 
+    def test_deployment_list_table_limit(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+    ):
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            {"results": deployments, "pagination": None},
+        )
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            ("--config-path", config.config_path, "deployment", "list", "--limit", "2"),
+        )
+        assert result.exit_code == 0, result.output
+        assert result.stdout == (
+            "╭───────────┬──────────────────┬──────────────────┬──────────────────────────────────────────┬────────────────────┬───────────────────────╮\n"  # noqa: E501
+            "│  Default  │ Name             │ Environment      │ Tracked Git Rev                          │ Current Git Hash   │ Last Deployed (UTC)   │\n"  # noqa: E501
+            "├───────────┼──────────────────┼──────────────────┼──────────────────────────────────────────┼────────────────────┼───────────────────────┤\n"  # noqa: E501
+            "│           │ ultra-production │ Ultra Production │ Main                                     │ 0e3a4e1            │ 2023-05-30 16:52:44   │\n"  # noqa: E501
+            "│           │ temp             │ Ultra Production │ e219d8183ac288ea9a0de1b3b53da045c6c14570 │ e219d81            │ 2023-05-30 16:51:52   │\n"  # noqa: E501
+            "╰───────────┴──────────────────┴──────────────────┴──────────────────────────────────────────┴────────────────────┴───────────────────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == (
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
+        )
+
     def test_deployment_list_table_with_default_deployment(
         self,
         config: MeltanoCloudConfig,
@@ -110,7 +139,16 @@ class TestDeploymentCommand:
         httpserver.expect_oneshot_request(path).respond_with_json(
             {"results": deployments, "pagination": None},
         )
-        config.default_deployment_name = "legacy"
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="legacy",
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         result = CliRunner().invoke(
             cli,
@@ -137,7 +175,16 @@ class TestDeploymentCommand:
         httpserver.expect_oneshot_request(path).respond_with_json(
             {"results": deployments, "pagination": None},
         )
-        config.default_deployment_name = "temp"
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="temp",
+                    ),
+                },
+            ),
+        }
         config.write_to_file()
         result = CliRunner().invoke(
             cli,
@@ -178,8 +225,14 @@ class TestDeploymentCommand:
             "Set 'ultra-production' as the default Meltano Cloud deployment "
             "for future commands\n"
         )
+        default_org_settings = json.loads(Path(config.config_path).read_text())[
+            "organizations_defaults"
+        ][config.tenant_resource_key]
+        default_project_id = default_org_settings["default_project_id"]
         assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
+            default_org_settings["projects_defaults"][default_project_id][
+                "default_deployment_name"
+            ]
             == "ultra-production"
         )
 
@@ -218,13 +271,20 @@ class TestDeploymentCommand:
         assert (
             "Set 'legacy' as the default Meltano Cloud deployment for future commands\n"
         ) in result.stdout
+        default_org_settings = json.loads(Path(config.config_path).read_text())[
+            "organizations_defaults"
+        ][config.tenant_resource_key]
+        default_project_id = default_org_settings["default_project_id"]
+
         assert (
-            json.loads(Path(config.config_path).read_text())["default_deployment_name"]
+            default_org_settings["projects_defaults"][default_project_id][
+                "default_deployment_name"
+            ]
             == "legacy"
         )
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
-    def test_create_new_deployment(
+    def test_create_first_new_deployment(
         self,
         config: MeltanoCloudConfig,
         path: str,
@@ -241,6 +301,16 @@ class TestDeploymentCommand:
             f"{path}/ultra-production",
             "POST",
         ).respond_with_json(prepared_request)
+        httpserver.expect_oneshot_request(
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
+            "GET",
+            query_string="page_size=2",
+        ).respond_with_json(
+            {"results": [deployments[0]], "pagination": None},
+        )
         requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
         result = CliRunner().invoke(
             cli,
@@ -259,7 +329,63 @@ class TestDeploymentCommand:
         )
         assert result.exit_code == 0, result.output
         assert "Creating deployment - this may take several minutes..." in result.output
-        assert "Created deployment 'ultra-production'\n" in result.output
+        assert (
+            "Created first deployment. "
+            "Set 'ultra-production' as the "
+            "default Meltano Cloud deployment for future commands"
+        ) in result.output
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
+    def test_create_after_first_new_deployment(
+        self,
+        config: MeltanoCloudConfig,
+        path: str,
+        httpserver: HTTPServer,
+        deployments: list[CloudDeployment],
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "GET",
+        ).respond_with_response(Response(status=HTTPStatus.NOT_FOUND))
+        httpserver.expect_oneshot_request(
+            f"{path}/ultra-production",
+            "POST",
+        ).respond_with_json(prepared_request)
+        httpserver.expect_oneshot_request(
+            (
+                f"/deployments/v1/{config.tenant_resource_key}"
+                f"/{config.internal_project_id}"
+            ),
+            "GET",
+            query_string="page_size=2",
+        ).respond_with_json(
+            {"results": [deployments[0], deployments[1]], "pagination": None},
+        )
+        requests_mock.post(prepared_request["url"], json=deployments[0])  # noqa: S113
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "deployment",
+                "create",
+                "--name",
+                "ultra-production",
+                "--environment",
+                "Ultra Production",
+                "--git-rev",
+                "Main",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "Creating deployment - this may take several minutes..." in result.output
+        assert (
+            'Created deployment "ultra-production". '
+            "To use as default run "
+            '"meltano cloud deployment use --name ultra-production."'
+        ) in result.output
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
     def test_update_existing_deployment(

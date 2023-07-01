@@ -2,13 +2,8 @@
 from __future__ import annotations
 
 import re
-import sys
 from contextlib import contextmanager
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
+from functools import cached_property
 
 from meltano.core.state_store.filesystem import (
     BaseFilesystemStateStoreManager,

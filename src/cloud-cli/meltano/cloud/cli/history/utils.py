@@ -10,8 +10,6 @@ import datetime
 import re
 import typing as t
 
-import tabulate
-
 if t.TYPE_CHECKING:
     from meltano.cloud.api.types import CloudExecution
 
@@ -24,7 +22,7 @@ LOOKBACK_PATTERN = re.compile(
 UTC = datetime.timezone.utc
 
 
-def process_table_row(row: CloudExecution) -> tuple[str, ...]:
+def format_history_row(row: CloudExecution) -> tuple[str, ...]:
     """Process a table row.
 
     Args:
@@ -56,33 +54,10 @@ def process_table_row(row: CloudExecution) -> tuple[str, ...]:
     return (  # noqa: WPS227
         row["execution_id"],
         row["schedule_name"],
-        row["environment_name"],
+        row["deployment_name"],
         start_time.astimezone(UTC).strftime("%Y-%m-%d %H:%M:%S"),
         status,
         duration,
-    )
-
-
-def format_history_table(history: list[CloudExecution], table_format: str) -> str:
-    """Format the history as a table.
-
-    Args:
-        history: The history to format.
-
-    Returns:
-        The formatted history.
-    """
-    return tabulate.tabulate(
-        [process_table_row(execution) for execution in history],
-        headers=[
-            "Execution ID",
-            "Schedule Name",
-            "Deployment",
-            "Executed At (UTC)",
-            "Result",
-            "Duration",
-        ],
-        tablefmt=table_format,
     )
 
 

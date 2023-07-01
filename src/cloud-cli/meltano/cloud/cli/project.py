@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import platform
 import sys
@@ -11,10 +10,15 @@ import typing as t
 
 import click
 import questionary
-import tabulate
 
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.cli.base import (
+    LimitedResult,
+    get_paginated,
+    pass_context,
+    print_formatted_list,
+    run_async,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -83,63 +87,34 @@ async def _get_projects(
     project_id: str | None = None,
     project_name: str | None = None,
     limit: int = DEFAULT_GET_PROJECTS_LIMIT,
-) -> list[CloudProject]:
-    page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[CloudProject] = []
-
+) -> LimitedResult[CloudProject]:
     async with ProjectsCloudClient(config=config) as client:
-        while True:
-            response = await client.get_projects(
+        results = await get_paginated(
+            lambda page_size, page_token: client.get_projects(
                 project_id=project_id,
                 project_name=project_name,
                 page_size=page_size,
                 page_token=page_token,
-            )
+            ),
+            limit,
+            MAX_PAGE_SIZE,
+        )
 
-            results.extend(response["results"])
-
-            if response["pagination"] and len(results) < limit:
-                page_token = response["pagination"]["next_page_token"]
-            else:
-                break
-
-    return [
+    results.items = [
         {
             **x,  # type: ignore[misc]
             "default": x["project_id"] == _safe_get_internal_project_id(config),
         }
-        for x in results[:limit]
+        for x in results.items
     ]
+    return results
 
 
-def _process_table_row(project: CloudProject) -> tuple[str, ...]:
+def _format_project(project: dict[str, t.Any]) -> tuple[str, ...]:
     return (
         "X" if project["default"] else "",
         project["project_name"],
         project["git_repository"],
-    )
-
-
-def _format_projects_table(projects: list[CloudProject], table_format: str) -> str:
-    """Format the projects as a table.
-
-    Args:
-        projects: The projects to format.
-
-    Returns:
-        The formatted projects.
-    """
-    return tabulate.tabulate(
-        [_process_table_row(project) for project in projects],
-        headers=(
-            "Default",
-            "Name",
-            "Git Repository",
-        ),
-        tablefmt=table_format,
-        # To avoid a tabulate bug (IndexError), only set colalign if there are projects
-        colalign=("center", "left", "left") if projects else (),
     )
 
 
@@ -148,13 +123,6 @@ private_project_attributes = {"tenant_resource_key", "project_id"}
 
 def _remove_private_project_attributes(project: CloudProject) -> dict[str, t.Any]:
     return {k: v for k, v in project.items() if k not in private_project_attributes}
-
-
-project_list_formatters = {
-    "json": lambda x: json.dumps(x, indent=2),
-    "markdown": lambda x: _format_projects_table(x, table_format="github"),
-    "terminal": lambda x: _format_projects_table(x, table_format="rounded_outline"),
-}
 
 
 @project_group.command("list")
@@ -181,13 +149,17 @@ async def list_projects(
     limit: int,
 ) -> None:
     """List Meltano Cloud projects."""
-    click.echo(
-        project_list_formatters[output_format](
-            [
-                _remove_private_project_attributes(x)
-                for x in (await _get_projects(config=context.config, limit=limit))
-            ],
-        ),
+    results = await _get_projects(config=context.config, limit=limit)
+    stripped_results = LimitedResult(
+        items=[_remove_private_project_attributes(x) for x in results.items],
+        truncated=results.truncated,
+    )
+    print_formatted_list(
+        stripped_results,
+        output_format,
+        _format_project,
+        ("Default", "Name", "Git Repository"),
+        ("center", "left", "left"),
     )
 
 
@@ -232,16 +204,22 @@ class ProjectChoicesQuestionaryOption(click.Option):
             )
 
         context: MeltanoCloudCLIContext = ctx.obj
-        context.projects = asyncio.run(_get_projects(context.config))
+        context.projects = asyncio.run(_get_projects(context.config)).items
         _check_for_duplicate_project_names(context.projects)
         default_project_name = next(
             (
                 x
                 for x in context.projects
-                if x["project_id"] == context.config.default_project_id
+                if x["project_id"]
+                == context.config.internal_organization_default["default_project_id"]
             ),
             {"project_name": None},
         )["project_name"]
+        if not context.projects:
+            raise click.ClickException(
+                "No Meltano Cloud projects available to use. Please create a "
+                "project before running 'meltano cloud project use'.",
+            )
         return questionary.select(
             message="",
             qmark="Use Meltano Cloud project",
@@ -293,7 +271,7 @@ async def use_project(
         return
 
     if context.projects is None:  # Interactive config was not used
-        context.projects = await _get_projects(context.config)
+        context.projects = (await _get_projects(context.config)).items
         _check_for_duplicate_project_names(context.projects)
         if project_name not in {x["project_name"] for x in context.projects}:
             raise click.ClickException(

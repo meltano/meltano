@@ -73,13 +73,24 @@ class TestScheduleService:
 
     @pytest.mark.order(0)
     def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
-        count = 5
+        intervals = [
+            "@once",
+            "@manual",
+            "@none",
+            "@hourly",
+            "@daily",
+            "@weekly",
+            "@monthly",
+            "@yearly",
+        ]
 
         job_schedules = [
-            create_job_schedule(f"job_schedule_{idx}") for idx in range(count)
+            create_job_schedule(f"job_schedule_{interval[1:]}", interval=interval)
+            for interval in intervals
         ]
         elt_schedules = [
-            create_elt_schedule(f"elt_schedule_{idx}") for idx in range(count)
+            create_elt_schedule(f"elt_schedule_{interval[1:]}", interval=interval)
+            for interval in intervals
         ]
 
         all_schedules = job_schedules + elt_schedules
@@ -127,11 +138,16 @@ class TestScheduleService:
     def test_schedule_update(self, subject):
         schedule = subject.schedules()[0]
 
+        yearly_intervals = sum(sbj.interval == "@yearly" for sbj in subject.schedules())
+
         schedule.interval = "@yearly"
         subject.update_schedule(schedule)
 
-        # there should be only 1 element with the set interval
-        assert sum(sbj.interval == "@yearly" for sbj in subject.schedules()) == 1
+        # there should be one more schedule with the "@yearly" interval after set
+        assert (
+            sum(sbj.interval == "@yearly" for sbj in subject.schedules())
+            == yearly_intervals + 1
+        )
 
         # it should be the first element
         assert subject.schedules()[0].interval == "@yearly"

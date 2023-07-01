@@ -14,7 +14,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
-from meltano.core.schedule import Schedule
+from meltano.core.schedule import CRON_INTERVALS, Schedule
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
@@ -213,7 +213,11 @@ class ScheduleService:  # noqa: WPS214
             BadCronError: If the cron expression is invalid.
             ScheduleAlreadyExistsError: If a schedule with the same name already exists.
         """
-        if schedule.interval is not None and not croniter.is_valid(schedule.interval):
+        if (
+            schedule.interval is not None
+            and schedule.interval not in CRON_INTERVALS
+            and not croniter.is_valid(schedule.interval)
+        ):
             raise BadCronError(schedule.interval)
 
         with self.project.meltano_update() as meltano:
