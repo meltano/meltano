@@ -209,6 +209,10 @@ h6 {
   text-decoration: underline !important;
 }
 
+.markdown .btn {
+  text-align: center;
+}
+
 .p1 {
   font-family: 'Hanken Grotesk', Arial, sans-serif;
   font-style: normal;
