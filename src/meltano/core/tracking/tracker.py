@@ -133,7 +133,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(app_id="meltano", emitters=emitters)
+            self.snowplow_tracker = SnowplowTracker(
+                namespace="meltano-core",
+                app_id="meltano",
+                emitters=emitters,
+            )
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
             self.setup_exit_event()
