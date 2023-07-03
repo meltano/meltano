@@ -8,7 +8,7 @@ hidden: false
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 With Meltano Cloud, data engineers can focus on high-value data work, and organizations can manage all their pipelines in one place, scale data volumes without cost concerns, and receive professional support for connectors and the Meltano SDK.
@@ -25,6 +25,7 @@ Following the [Meltano Cloud Getting Started Guide](/cloud/getting_started) for 
 
 The following are the core concepts of Meltano Cloud.
 You can find more details on each in the [Cloud Concepts](/cloud/concepts) documentation, or follow these links to find the concept you're looking for:
+
 - [Users](/cloud/concepts#meltano-cloud-users)
 - [Organizations](/cloud/concepts#meltano-cloud-organizations)
 - [Projects](/cloud/concepts#meltano-cloud-projects)
@@ -44,7 +45,6 @@ You can find more details on each in the [Cloud Concepts](/cloud/concepts) docum
 - [Known Limitations](/cloud/known_issues)
 - [Notification Webhooks](/cloud/platform#job-or-schedule-run-notifications-via-webhook)
 - [Backfills and State](/cloud/usage#backfills-and-state)
-
 
 ## References
 

@@ -7,9 +7,8 @@ weight: 1
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
-
 
 ### Existing Meltano Project
 
@@ -25,42 +24,42 @@ Meltano Cloud connects to an existing Meltano project in your GitHub repository,
 
 3. Initialize Your Meltano Project
 
-    Using the [`init` command](/reference/command-line-interface#init) you can create the scaffolding for your project, just choose a name:
+   Using the [`init` command](/reference/command-line-interface#init) you can create the scaffolding for your project, just choose a name:
 
-    ```bash
-    meltano init <INSERT_YOUR_PROJECT_NAME>
-    ```
+   ```bash
+   meltano init <INSERT_YOUR_PROJECT_NAME>
+   ```
 
-    Commit your changes back to the GitHub repository.
+   Commit your changes back to the GitHub repository.
 
 4. Add Sample Plugins and Schedules
 
-    The following configuration snippet can be added to your `meltano.yml` file located in your new project directory.
-    The configuration includes a sample extractor and loader with an associated job and schedule:
+   The following configuration snippet can be added to your `meltano.yml` file located in your new project directory.
+   The configuration includes a sample extractor and loader with an associated job and schedule:
 
-    ```yaml
-    plugins:
-      extractors:
-      - name: tap-smoke-test
-        variant: meltano
-        pip_url: git+https://github.com/meltano/tap-smoke-test.git
-        config:
-          streams:
-          - stream_name: animals
-            input_filename: https://raw.githubusercontent.com/meltano/tap-smoke-test/main/demo-data/animals-data.jsonl
-      loaders:
-      - name: target-jsonl
-        variant: andyh1203
-        pip_url: target-jsonl
-    jobs:
-    - name: sample_job
-      tasks:
-      - tap-smoke-test target-jsonl
-    schedules:
-    - name: sample_schedule
-      interval: 0 0 * * *
-      job: sample_job
-    ```
+   ```yaml
+   plugins:
+     extractors:
+     - name: tap-smoke-test
+       variant: meltano
+       pip_url: git+https://github.com/meltano/tap-smoke-test.git
+       config:
+         streams:
+         - stream_name: animals
+           input_filename: https://raw.githubusercontent.com/meltano/tap-smoke-test/main/demo-data/animals-data.jsonl
+     loaders:
+     - name: target-jsonl
+       variant: andyh1203
+       pip_url: target-jsonl
+   jobs:
+   - name: sample_job
+     tasks:
+     - tap-smoke-test target-jsonl
+   schedules:
+   - name: sample_schedule
+     interval: 0 0 * * *
+     job: sample_job
+   ```
 
 5. Next follow the [Onboarding Guide](/cloud/onboarding/) to configure your GitHub repository with Meltano Cloud.
 

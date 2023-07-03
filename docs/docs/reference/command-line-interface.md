@@ -15,14 +15,14 @@ The following options are available for all `meltano` subcommands:
 
 ### Log Configurations
 
-* [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
-* [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
+- [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
+- [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
 ### No Color
 
 The no color configuration is available for all meltano subcommands via an environment variable:
 
-* `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
+- `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
 ## `add`
 
@@ -309,7 +309,7 @@ meltano config <plugin> set <property>.<deep>.<nesting> <value>
 
 The `config` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
 
-<br>
+<br />
 > Note: Unlike other commands like [`meltano run`](#run) and [`meltano invoke`](#invoke), the `meltano config` command ignores any configured [default environment](/concepts/environments#default-environment).
 > This is to make it easier to configure plugins' base configuration before adding environment-specific overrides.
 
@@ -680,7 +680,6 @@ meltano install --force
 
 The `install` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
-
 ## `invoke`
 
 Invoke the plugin's executable with specified arguments.
@@ -877,9 +876,7 @@ meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-s
 
 ### Using `run` with Environments
 
-
 The `run` command always requires a [Meltano Environment](https://docs.meltano.com/concepts/environments) to be set. The environment name can be provided using the `--environment` flag or with the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file.
-
 
 ## `job`
 
@@ -1431,6 +1428,7 @@ The `test` command can accept the `--environment` flag to target a specific [Mel
 ## `ui` (deprecated)
 
 The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
+
 ## `user`
 
 <div class="notification is-info">
@@ -1483,7 +1481,6 @@ meltano upgrade database # Only apply migrations to system database
 ### Using `upgrade` with Environments
 
 The `upgrade` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
-
 
 ## `version`
 

@@ -7,7 +7,7 @@ weight: 2
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 ## Prereqs
@@ -82,22 +82,24 @@ While Meltano Cloud is in Beta, it may take up to one business day for your user
   <p>Installing the Meltano Cloud <a href="#prereq-2-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
 </div>
 
-
 ### Step 3: Set default project and validate access and functionality
 
 After logging in you can explore the interface with a few different commands.
 The full list of CLI commands is in the [Cloud Docs](https://docs.meltano.com/cloud/cloud-cli).
 
 To see Meltano Cloud projects for your organizations, run:
+
 ```console
 meltano-cloud project list
 ```
+
 ```console
 Running this command will verify that your project is connected and you're properly authenticated with Meltano Cloud.
 ```
 
 You should select a project to use as default for all commands.
 You can do this by running:
+
 ```console
 meltano-cloud project use --name <project name>
 ```
@@ -112,7 +114,7 @@ To deploy a named [Meltano Environment](/concepts/environments) to Meltano Cloud
 meltano-cloud deployment create --name <deployment name> --environment <Meltano Environment name> --git-rev <the git revision to use for this deployment>
 ```
 
-For example, if you wanted to deploy the `prod` Meltano Environment as defined in your `meltano.yml` in the `main` branch of your git repo and you wanted the Meltano Cloud deployment to be named `production`,  you would run:
+For example, if you wanted to deploy the `prod` Meltano Environment as defined in your `meltano.yml` in the `main` branch of your git repo and you wanted the Meltano Cloud deployment to be named `production`, you would run:
 
 ```console
 meltano-cloud deployment create --name production --environment prod --git-rev main
@@ -124,6 +126,7 @@ meltano-cloud deployment create --name production --environment prod --git-rev m
 </div>
 
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
+
 ```console
 meltano-cloud deployment list
 ```

@@ -7,7 +7,7 @@ weight: 3
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 ## Meltano Cloud Users
@@ -24,7 +24,7 @@ Your Meltano Cloud Organization is the top-level entity associated with your pay
 
 <div class="notification is-info">
   <p>Meltano Cloud Organizations should not be confused with GitHub Organizations (or "GitHub Orgs"). Each Meltano Cloud Organization can include projects from multiple GitHub Orgs.</p>
-  <br>
+  <br />
   <p>Meltano Cloud users grant access to specific public and private repositories using the standard GitHub App authorization flow.</p>
 </div>
 

@@ -4,9 +4,10 @@ description: Details the security stature of Meltano Cloud
 layout: doc
 weight: 6
 ---
+
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 <div class="notification is-info">
@@ -51,11 +52,14 @@ You may grant the GitHub App read-only permissions to only the repositories you 
 The following permissions are provided to the Meltano Cloud GitHub App:
 
 Repository Permissions
+
 - Repository contents, commits, branches, downloads, releases, and merges (read-only)
 - Search repositories, list collaborators, and access repository metadata (read-only)
 
 Organization Permissions
+
 - Organization members and teams (read-only)
 
 Account Permissions
+
 - Manage a user's email addresses (read-only)

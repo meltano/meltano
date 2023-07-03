@@ -7,7 +7,7 @@ weight: 4
 
 <div class="notification is-info">
   <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
 </div>
 
 ## Cloud Web Dashboard
@@ -29,10 +29,11 @@ For more details on credits and pricing see the [Pricing FAQ](https://meltano.co
 
 Meltano Cloud will support state management operations similar to the Meltano Core [state](/reference/command-line-interface#state) command in GA.
 While in Beta users have a few options for migrating existing state:
+
 1. Let a full refresh run in Meltano Cloud.
-This is the easiest method but if the source has a high volume of data it could be slow and/or expensive.
-Once the job completes Meltano Cloud will maintain incremental bookmarks moving forward.
+   This is the easiest method but if the source has a high volume of data it could be slow and/or expensive.
+   Once the job completes Meltano Cloud will maintain incremental bookmarks moving forward.
 2. Configure a start date, if supported by the extractor, in your meltano.yml directly or in your Meltano Cloud environment variables by using the [meltano-cloud config](/cloud/cloud-cli#config) command with `<PLUGIN_NAME>_START_DATE=""`.
-See [the docs](/guide/configuration#configuring-settings) for more details on overriding settings using environment variables.
-Once the job completes you can remove the start date and allow the bookmarks to manage incremental syncs.
+   See [the docs](/guide/configuration#configuring-settings) for more details on overriding settings using environment variables.
+   Once the job completes you can remove the start date and allow the bookmarks to manage incremental syncs.
 3. Contact the Meltano team to get your existing state migrated to Meltano Cloud.
