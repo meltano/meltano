@@ -3196,22 +3196,18 @@ files = [
 
 [[package]]
 name = "snowplow-tracker"
-version = "0.10.0"
+version = "1.0.0"
 description = "Snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
 optional = false
 python-versions = "*"
 files = [
-    {file = "snowplow-tracker-0.10.0.tar.gz", hash = "sha256:f1889a5b1f8e3c62e70d80c8e7816ff8a3e13d0ca13ab05df374fcf4305fc98d"},
-    {file = "snowplow_tracker-0.10.0-py3-none-any.whl", hash = "sha256:d447a9ce4f45c716b16e4a8e0f9d7f34565df42f052ed9efbefa4bb1717a5c6d"},
+    {file = "snowplow-tracker-1.0.0.tar.gz", hash = "sha256:08d8a79c58f7e3e8af1f540f0a0e2492ada49f6dafed99f9d53dbf6e4ef4778d"},
+    {file = "snowplow_tracker-1.0.0-py3-none-any.whl", hash = "sha256:b44d1c17596026ae48e328c0230b28898c64b0136d9e272c3b2e3be61cea2b62"},
 ]
 
 [package.dependencies]
 requests = ">=2.25.1,<3.0"
 typing-extensions = ">=3.7.4"
-
-[package.extras]
-celery = ["celery (>=4.0)", "celery (>=4.0,<5.0)"]
-redis = ["gevent (>=21.1.2)", "redis (>=2.9.1)", "redis (>=2.9.1,<4.0)"]
 
 [[package]]
 name = "speaklater"
@@ -3900,4 +3896,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "f75f0e2a0ff39dd7eb6dfecc2c48fdecba33d62962690bf60afe1011aba7045d"
+content-hash = "e4ff39c855a26599117a9a5bfdbd27654ac8766fffaf5745be09b3d872102c61"
