@@ -590,7 +590,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             self._setting_defs = [
                 setting
                 for setting in self.setting_definitions
-                if setting.kind != SettingKind.HIDDEN or self.show_hidden
+                if not setting.hidden or self.show_hidden
             ]
 
         if extras is not None:
