@@ -32,6 +32,9 @@
   --ifm-menu-color-background-active: transparent;
   --markdown-color: rgba(8, 2, 22, 0.75);
   --markdown-h-color: #080216;
+  --ifm-breadcrumb-item-background-active: transparent;
+  --ifm-breadcrumb-color-active: var(--meltano-blue);
+  --ifm-navbar-height: 1rem;
 }
 
 @media all and (min-width: 768px) {

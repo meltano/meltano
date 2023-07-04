@@ -36,6 +36,13 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl: "https://github.com/meltano/meltano",
+          lastVersion: "current",
+          versions: {
+            current: {
+              label: "Version 2.0.0 (Latest)",
+              path: "/",
+            },
+          },
         },
         blog: {
           routeBasePath: "/changelog",
@@ -65,7 +72,7 @@ const config = {
         content: `<a href="#">⚡ New Release: Meltano Runbooks are now better than ever with conditions ⚡</a>`,
         backgroundColor: "#311772",
         textColor: "#F5F7FA",
-        isCloseable: false,
+        isCloseable: true,
       },
       // Replace with your project's social card
       image: "img/docusaurus-social-card.jpg",
@@ -108,9 +115,6 @@ const config = {
             className: "header-changelog-link",
             "aria-label": "Changelog",
           },
-          // {
-          //   type: "docsVersionDropdown",
-          // },
           {
             href: "https://github.com/facebook/docusaurus",
             label: " ",

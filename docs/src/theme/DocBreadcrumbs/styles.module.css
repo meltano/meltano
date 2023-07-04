@@ -1,0 +1,7 @@
+.breadcrumbsContainer {
+  --ifm-breadcrumb-size-multiplier: 0.8;
+  background: #ffffff;
+  height: 70px;
+  padding: 20px;
+  border-bottom: 1px solid rgba(8, 2, 22, 0.15);
+}
