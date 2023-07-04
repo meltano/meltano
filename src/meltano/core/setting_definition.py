@@ -148,6 +148,18 @@ class SettingKind(YAMLEnum):
     OBJECT = "object"
     HIDDEN = "hidden"
 
+    @classmethod
+    def get_sensitive(cls):
+        """Get the sensitive setting kinds.
+
+        Returns:
+            A set of setting kinds.
+        """
+        return {
+            cls.PASSWORD,
+            cls.OAUTH,
+        }
+
 
 ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
@@ -173,6 +185,7 @@ class SettingDefinition(NameEq, Canonical):
         protected: bool | None = None,
         env_specific: bool | None = None,
         hidden: bool | None = None,
+        sensitive: bool | None = None,
         custom: bool = False,
         value_processor=None,
         value_post_processor=None,
@@ -198,6 +211,7 @@ class SettingDefinition(NameEq, Canonical):
             protected: A protected setting cannot be changed from the UI.
             env_specific: Flag for environment-specific setting.
             hidden: Hidden setting.
+            sensitive: Sensitive setting.
             custom: Custom setting flag.
             value_processor: Used with `kind: object` to pre-process the keys
                 in a particular way.
@@ -212,6 +226,7 @@ class SettingDefinition(NameEq, Canonical):
 
         kind = SettingKind(kind) if kind else None
         hidden = hidden or kind is SettingKind.HIDDEN or None
+        sensitive = sensitive or kind in SettingKind.get_sensitive() or None
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
@@ -231,6 +246,7 @@ class SettingDefinition(NameEq, Canonical):
             protected=protected,
             env_specific=env_specific,
             hidden=hidden,
+            sensitive=sensitive,
             value_processor=value_processor,
             value_post_processor=value_post_processor,
             _custom=custom,
@@ -335,7 +351,7 @@ class SettingDefinition(NameEq, Canonical):
         Returns:
             True if setting value is redacted.
         """
-        return self.kind in {SettingKind.PASSWORD, SettingKind.OAUTH}
+        return self.sensitive
 
     def env_vars(
         self,
