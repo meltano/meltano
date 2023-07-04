@@ -190,7 +190,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         if unexpanded_value:
             current_value = value_for_display(unexpanded_value)
-            details.add_row(Text("Current Expanded Value"), Text(f"{expanded_value}"))
+            details.add_row(Text("Current expanded value"), Text(f"{expanded_value}"))
         else:
             current_value = expanded_value
 
@@ -198,7 +198,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         value_color = "yellow" if redacted_with_value else "green"
 
         details.add_row(
-            Text(f"Current Value ({label})"),
+            Text(f"Current value ({label})"),
             Text.from_markup(f"[{value_color}]{current_value}[/{value_color}]"),
         )
 
