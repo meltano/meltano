@@ -284,7 +284,11 @@ def list_settings(ctx, extras: bool):
         else:
             label = f"{get_label(config_metadata)}"
 
-        current_value = click.style(f"{value!r}", fg="green")
+        current_value = click.style(
+            f"{value!r}",
+            fg="yellow" if value is not None and setting_def.is_redacted else "green",
+        )
+
         click.echo(f" current value: {current_value}", nl=False)
 
         unexpanded_value = config_metadata.get("unexpanded_value")
