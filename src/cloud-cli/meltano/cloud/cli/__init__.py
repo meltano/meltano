@@ -11,6 +11,7 @@ from meltano.cloud.cli import (  # noqa: WPS235
     deployment,
     docs,
     history,
+    job,
     login,
     logs,
     project,
@@ -25,6 +26,7 @@ cloud.add_command(config.config)
 cloud.add_command(docs.docs)
 cloud.add_command(deployment.deployment_group)
 cloud.add_command(history.history)
+cloud.add_command(job.job_group)
 cloud.add_command(login.login)
 cloud.add_command(login.logout)
 cloud.add_command(logs.logs)
