@@ -460,7 +460,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden` (deprecated).
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password` (deprecated), `options`, `file`, `array`, `object`, and `hidden` (deprecated).
 
 ```yaml
 settings:
@@ -478,6 +478,7 @@ settings:
 
 <div class="notification is-warning">
   <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden: true</code></a>.</p>
+  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive: true</code></a>.</p>
 </div>
 
 ### `settings[*].label`
@@ -502,6 +503,15 @@ Optional. Use in combination with [`value`](#settingsvalue) to provide an unedit
 settings:
 - name: setting_name
   protected: true
+```
+
+### `settings[*].sensitive`
+Optional. Use to mark a setting as sensitive (e.g. a password or code).
+
+```yaml
+settings:
+- name: setting_name
+  sensitive: true
 ```
 
 ### `settings[*].tooltip`
