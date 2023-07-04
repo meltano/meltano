@@ -5,7 +5,6 @@ layout: doc
 weight: 4
 ---
 
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -18,8 +17,8 @@ We're going to do light-weight transformations, also called **"inline data mappi
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
-
 ## Installing the transform-field mapper
+
 To add inline data mappings, we need a new plugin. We're going to use the mapper "transform-field". To add this plugin, use the `meltano add mapper` command:
 
 <div class="termy">
@@ -27,20 +26,22 @@ To add inline data mappings, we need a new plugin. We're going to use the mapper
 $ meltano add mapper transform-field --variant=transferwise
 
 Added mapper 'transform-field' to your Meltano project
-Variant:        transferwise (default)
-Repository:     https://github.com/transferwise/pipelinewise-transform-field
-Documentation:  https://docs.meltano.com/concepts/plugins#mappers
+Variant: transferwise (default)
+Repository: https://github.com/transferwise/pipelinewise-transform-field
+Documentation: https://docs.meltano.com/concepts/plugins#mappers
 
 Installing mapper 'transform-field'...
 ---> 100%
 Installed mapper 'transform-field'
 
 To learn more about mapper 'transform-field', visit https://hub.meltano.com/mappers/transform-field--transferwise
+
 </div>
 
 We're now going to add two mapping to this mapper.
 
 ## Adding an emails-hidden mapping
+
 To add our first mapping, we're going to edit the `meltano.yml` file located inside your root project directory. Modify the block for the `transform-field` mapper as shown below:
 
 ```yaml
@@ -57,6 +58,7 @@ mappers:
               field_paths: ["author/email", "committer/email"]
               type: "HASH"
 ```
+
 Let's go through this step-by-step
 
 ```yaml
@@ -68,6 +70,7 @@ mappers:
         transformations:
           [...]
 ```
+
 These lines define the name "hide-github-mails" as the name of our mapping. We can call the mapping using this name, and ignoring any reference to the actual mapper "transform-field".
 
 ```yaml
@@ -78,6 +81,7 @@ These lines define the name "hide-github-mails" as the name of our mapping. We c
             field_paths: ["author/email", "committer/email"]
             type: "HASH"
 ```
+
 These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "HASH". Using "HASH" means we will still be able to tell whether two emails are the same, but not be able to read the email. They will be replaced with a SHA-256 hash of the email.
 
 If you open up the original record message and view the `commit` data it would first look like:
@@ -117,6 +121,7 @@ Then after the mapping does its hashing it would end up in the table with hashed
 ```
 
 ## Run the data integration pipeline
+
 Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
 
 Drop the table inside your local postgres by running a docker exec:
@@ -152,11 +157,13 @@ $ meltano run --full-refresh tap-github hide-github-mails target-postgres dbt-po
 
 2022-09-20T13:16:16.960093Z [info     ] Block run completed.           ....
 ```
+
 </div>
 <br />
 If everything was configured correctly, you should now see your data flow from your source into your destination! Take your favourite SQL tool, connect to the database using the connection details set and check the table `commits` inside the schema `tap_github`. The JSON blob inside the column `commit` should now contain no e-mail adresses but rather the hashed values for both fields.
 
 ## Next Steps
+
 There we have it, a complete ELT pipeline with inline data mappings, congratulations!
 
 One last thing for you to do: try to run the following command to celebrate:
@@ -167,5 +174,5 @@ meltano dragon
 
 Next, head over to [Part 5, scheduling of jobs](/getting-started/#schedule-pipelines-to-run-regularly).
 
-<script src="/js/termynal.js"></script>
-<script src="/js/termy_custom.js"></script>
+<script src="/util/termynal.js"></script>
+<script src="/util/termy_custom.js"></script>

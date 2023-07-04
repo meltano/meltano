@@ -5,7 +5,6 @@ layout: doc
 weight: 4
 ---
 
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -19,6 +18,7 @@ That means, in this part we're going to unleash dbt [(data build tool)](https://
 </div>
 
 ## Select more source data
+
 To get all the data from the GitHub commits, you can use the `meltano select` command:
 
 ```bash
@@ -26,6 +26,7 @@ meltano select tap-github commits "*"
 ```
 
 This will add the following line to your project file:
+
 ```yaml
       extractors:
       - name: tap-github
@@ -40,6 +41,7 @@ This will add the following line to your project file:
 To refresh your database tables after the configuration changes you can run `meltano run --full-refresh tap-github target-postgres`:
 
 <div class="termy">
+
 ```console
 $ meltano run --full-refresh tap-github target-postgres
 2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
@@ -48,7 +50,7 @@ INFO Starting sync of repository: sbalnojan/meltano-lightdash
 ---> 100%
 {"type": "SCHEMA", "stream": "commits", [...]
 
-INFO METRIC: {"type": "timer", "metric":  [...]
+INFO METRIC: {"type": "timer", "metric": [...]
 
 {"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":
 [...]
@@ -57,12 +59,15 @@ INFO METRIC: {"type": "timer", "metric":  [...]
 ...[many more records]...
 
 {"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-lightdash": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
-´´´
+
+```
+
 </div>
 
 Next, we add the dbt plugin to transform this data.
 
 ## Install and configure the Postgres-specific dbt utility
+
 dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano dbt utilities match this pattern; in this case our utility is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
 <div class="termy">
@@ -100,6 +105,7 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
 
 ## Configure dbt
+
 Configure the dbt-postgres utility to use the same configuration as our target-postgres loader using `meltano config`:
 
 <div class="termy">
@@ -122,7 +128,6 @@ $ meltano config dbt-postgres set schema analytics
 <br />
 The result of your configuration will look like this in your meltano.yml, remember that sensitive configurations are in your .env file:
 
-
 ```yaml
   utilities:
   - name: dbt-postgres
@@ -136,6 +141,7 @@ The result of your configuration will look like this in your meltano.yml, rememb
 ```
 
 ## Add our source data to dbt
+
 The EL pipeline run already added our source data into the schema `tap_github` as table `commits`. dbt will need to know where to locate this data. Let's add that to our dbt project:
 
 ```bash
@@ -157,6 +163,7 @@ sources:
 Now we're able to reference the table using the keyword "source" as you can see next.
 
 ## Add a transformed model
+
 Add a file called `authors.sql` to the folder `transform/models/tap_github` with the following contents:
 
 ```sql
@@ -179,6 +186,7 @@ from base
 This model is configured to creating a table via the `materialized='table'` configuration. The keyword `source` is used in dbt to reference the source we just created. The actual model selects the distinct author names from the commits which are wrapped into a JSON blob.
 
 ## Run the transformation process
+
 To create the actual table, we run the dbt model via `meltano invoke dbt-postgres:run`. Note this relies on previously running `meltano run --full-refresh tap-github target-postgres` to postgres your database `commits` table:
 
 <div class="termy">
@@ -282,5 +290,5 @@ There we have it, a complete ELT pipeline.
 
 Next, head over to [Part 4, Data Mappings](/getting-started/part4).
 
-<script src="/js/termynal.js"></script>
-<script src="/js/termy_custom.js"></script>
+<script src="/util/termynal.js"></script>
+<script src="/util/termy_custom.js"></script>

@@ -7,7 +7,6 @@ weight: 2
 
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
 
-
 ## Install Meltano
 
 Use the following command to check that you have a supported Python version installed:
@@ -58,7 +57,8 @@ docker.io/meltano/meltano:latest
 
 $ docker run meltano/meltano --version
 meltano, version 2.19.0
-```
+
+````
 
 </div>
 
@@ -80,7 +80,7 @@ Requirement already satisfied.
 $ pip install "meltano"
 ---> 100%
 successfully installed meltano
-```
+````
 
 </div>
 
@@ -89,10 +89,13 @@ successfully installed meltano
 {% endtabs %}
 
 ## More Information
+
 To understand details of the installation, like mounting a docker volume to work long-term with the docker image, view the [detailed installation guide](/guide/installation-guide).
+
 ## Next Steps
 
 Once you're set up, head over to the tutorial to learn [how to initialize your first project and start to import data](/getting-started/part1).
+
 <script src="/js/tabs.js"></script>
-<script src="/js/termynal.js"></script>
-<script src="/js/termy_custom.js"></script>
+<script src="/util/termynal.js"></script>
+<script src="/util/termy_custom.js"></script>

@@ -22,44 +22,44 @@ _To learn more about the different installation methods, refer to the [Installat
 
 You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
-1. Create and navigate to a directory to hold your Meltano projects:
+1.  Create and navigate to a directory to hold your Meltano projects:
 
-   ```bash
-   mkdir meltano-projects
-   cd meltano-projects
-   ```
+    ```bash
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
 
-1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
+1.  Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
-   ```bash
-   #For Windows (PowerShell): New-Alias Python3 Python
-   python3 -m pip install --user pipx
-   python3 -m pipx ensurepath
-   #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
-   source ~/.bashrc
-   ```
+    ```bash
+    #For Windows (PowerShell): New-Alias Python3 Python
+    python3 -m pip install --user pipx
+    python3 -m pipx ensurepath
+    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
+    source ~/.bashrc
+    ```
 
-   <div class="notification is-info">
-     <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-   </div>
+  <div class="notification is-info">
+    <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
+  </div>
 
-1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
+1.  Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
-   ```bash
-   pipx install meltano
-   ```
+    ```bash
+    pipx install meltano
+    ```
 
-   If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
 
-   ```bash
-   pipx install meltano --python <path to desired Python executable>
-   ```
+    ```bash
+    pipx install meltano --python <path to desired Python executable>
+    ```
 
-1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
+1.  Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
 
-   ```bash
-   meltano --version
-   ```
+    ```bash
+    meltano --version
+    ```
 
 If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
 
@@ -208,52 +208,54 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
 1.  Depending on the result, pick your next step:
 
-    - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
+            - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
-      ```bash
-      meltano add --custom extractor <tap name>
+                  ```bash
+                  meltano add --custom extractor <tap name>
 
-      # For example:
-      meltano add --custom extractor tap-covid-19
+                  # For example:
+                  meltano add --custom extractor tap-covid-19
 
-      # If you're using Docker, don't forget to mount the project directory,
-      # and ensure that interactive mode is enabled so that Meltano can ask you
-      # additional questions about the plugin and get your answers over STDIN:
-      docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
-      ```
+                  # If you're using Docker, don't forget to mount the project directory,
+                  # and ensure that interactive mode is enabled so that Meltano can ask you
+                  # additional questions about the plugin and get your answers over STDIN:
+                  docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+                  ```
 
-      Meltano will now ask you some additional questions to learn more about the plugin.
+                  Meltano will now ask you some additional questions to learn more about the plugin.
 
-      This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
+                  This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-      ```yml
-      plugins:
-        extractors:
-          - name: tap-covid-19
-            namespace: tap_covid_19
-            pip_url: tap-covid-19
-            executable: tap-covid-19
-            capabilities:
-              - catalog
-              - discover
-              - state
-            settings:
-              - name: api_token
-              - name: user_agent
-              - name: start_date
-      ```
+                  ```yml
+                  plugins:
+                    extractors:
+                      - name: tap-covid-19
+                        namespace: tap_covid_19
+                        pip_url: tap-covid-19
+                        executable: tap-covid-19
+                        capabilities:
+                          - catalog
+                          - discover
+                          - state
+                        settings:
+                          - name: api_token
+                          - name: user_agent
+                          - name: start_date
+                  ```
 
-      _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
+                  _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
 
         <div class="notification is-info">
-          <p>Once you've got the extractor working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+
+    <p>Once you've got the extractor working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
+
         </div>
 
-    - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/custom-extractor).
+            - If a Singer tap for your data source **doesn't exist yet**, learn how to build and use your own tap by following the ["Create and Use a Custom Extractor" tutorial](/tutorials/custom-extractor).
 
-    Once you've got your new tap project set up, you can add it to your Meltano project
-    as a custom plugin by following the `meltano add --custom` instructions above.
-    When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
+            Once you've got your new tap project set up, you can add it to your Meltano project
+            as a custom plugin by following the `meltano add --custom` instructions above.
+            When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
 
 1.  Optionally, verify that the extractor was installed successfully and that its executable can be invoked using [`meltano invoke`](/reference/command-line-interface#invoke):
 
@@ -279,14 +281,15 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
 
-<pre>
-extractors:
-- name: tap-example
-  config: {
-    "setting": "value",
-    "another_setting": true
-  }
-</pre>
+    <pre>
+        extractors:
+        - name: tap-example
+          config: {
+            "setting": "value",
+            "another_setting": true
+          }
+
+    </pre>
 
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
@@ -315,11 +318,12 @@ You can also optionally use the `list`, `set` and `unset` commands directly to v
 
 - Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
-    <div class="notification is-info">
-      <p>
-        <strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
-      </p>
-    </div>
+  <div class="notification is-info">
+
+      <p><strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
+          </p>
+
+  </div>
 
   ```bash
   meltano config <plugin> set <setting> <value>
@@ -560,89 +564,91 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-      ```bash
-      meltano discover loaders
-      ```
+    ```bash
+    meltano discover loaders
+    ```
 
 1.  Depending on the result, pick your next step:
 
-    - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
+            - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
-      ```bash
-      meltano add loader <plugin name>
+                  ```bash
+                  meltano add loader <plugin name>
 
-      # For this example, we'll use the default variant:
-      meltano add loader target-postgres
+                  # For this example, we'll use the default variant:
+                  meltano add loader target-postgres
 
-      # Or if you just want to use a non-default variant you can use this,
-      # selected using `--variant`:
-      meltano add loader target-postgres --variant=datamill-co
-      ```
+                  # Or if you just want to use a non-default variant you can use this,
+                  # selected using `--variant`:
+                  meltano add loader target-postgres --variant=datamill-co
+                  ```
 
-        <div class="notification is-info">
-          <p>
-            Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to <a href="https://hub.meltano.com/">MeltanoHub</a> for more help troubleshooting or join the <a href="https://meltano.com/slack">Meltano Slack workspace</a> to ask questions.
-          </p>
-        </div>
+  <div class="notification is-info">
+      <p>Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to <a href="https://hub.meltano.com/">MeltanoHub</a> for more help troubleshooting or join the <a href="https://meltano.com/slack">Meltano Slack workspace</a> to ask questions.
+      </p>
 
-      This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
+    </div>
 
-      ```yml
-      plugins:
-      loaders:
-        - name: target-postgres
-          variant: transferwise
-          pip_url: pipelinewise-target-postgres
-      ```
+                  This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-      You can now continue to step 4.
+                  ```yml
+                  plugins:
+                  loaders:
+                    - name: target-postgres
+                      variant: transferwise
+                      pip_url: pipelinewise-target-postgres
+                  ```
 
-    - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, for example, `Singer target BigQuery`.
+                  You can now continue to step 4.
+
+            - If a loader is **not yet discoverable**, find out if a Singer target for your data source already exists by checking [Singer's index of targets](https://www.singer.io/#targets) and/or doing a web search for `Singer target <data destination>`, for example, `Singer target BigQuery`.
 
 1.  Depending on the result, pick your next step:
 
-    - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
+        - If a Singer target for your data destination is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
-      ```bash
-      meltano add --custom loader <target name>
+              ```bash
+              meltano add --custom loader <target name>
 
-      # For example:
-      meltano add --custom loader target-bigquery
+              # For example:
+              meltano add --custom loader target-bigquery
 
-      # If you're using Docker, don't forget to mount the project directory,
-      # and ensure that interactive mode is enabled so that Meltano can ask you
-      # additional questions about the plugin and get your answers over STDIN:
-      docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom loader target-bigquery
-      ```
+              # If you're using Docker, don't forget to mount the project directory,
+              # and ensure that interactive mode is enabled so that Meltano can ask you
+              # additional questions about the plugin and get your answers over STDIN:
+              docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom loader target-bigquery
+              ```
 
-      Meltano will now ask you some additional questions to learn more about the plugin.
+              Meltano will now ask you some additional questions to learn more about the plugin.
 
-      This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
+              This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
-      ```yml
-      plugins:
-        loaders:
-          - name: target-bigquery
-            namespace: target_bigquery
-            pip_url: target-bigquery
-            executable: target-bigquery
-            settings:
-              - name: project_id
-              - name: dataset_id
-              - name: table_id
-      ```
+              ```yml
+              plugins:
+                loaders:
+                  - name: target-bigquery
+                    namespace: target_bigquery
+                    pip_url: target-bigquery
+                    executable: target-bigquery
+                    settings:
+                      - name: project_id
+                      - name: dataset_id
+                      - name: table_id
+              ```
 
-      _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
+              _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
 
-        <div class="notification is-info">
-          <p>Once you've got the loader working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
-        </div>
+    <div class="notification is-info">
 
-    - If a Singer target for your data source **doesn't yet exist**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+            <p>Once you've got the loader working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
 
-    Once you've got your new target project set up, you can add it to your Meltano project
-    as a custom plugin by following the `meltano add --custom` instructions above.
-    When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
+    </div>
+
+        - If a Singer target for your data source **doesn't yet exist**, learn how to build your own target by following [Singer's "Developing a Target" guide](https://github.com/singer-io/getting-started/blob/master/docs/RUNNING_AND_DEVELOPING.md#developing-a-target).
+
+        Once you've got your new target project set up, you can add it to your Meltano project
+        as a custom plugin by following the `meltano add --custom` instructions above.
+        When asked to provide a `pip install` argument, you can provide a local directory path or Git repository URL.
 
 1.  Optionally, verify that the loader was installed successfully and that its executable can be invoked using [`meltano invoke`](/reference/command-line-interface#invoke):
 
@@ -667,14 +673,16 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p><strong>What if I already have a config file for this loader?</strong></p>
   <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
-<pre>
-loaders:
-- name: target-example
-  config: {
-    "setting": "value",
-    "another_setting": true
-  }
-</pre>
+
+    <pre>
+        loaders:
+        - name: target-example
+          config: {
+            "setting": "value",
+            "another_setting": true
+          }
+    </pre>
+
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
 
@@ -693,48 +701,50 @@ You can also optionally use the `list`, `set` and `unset` commands directly to v
 
 - Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
-   ```bash
-   meltano config <plugin> list
+  ```bash
+  meltano config <plugin> list
 
-   # For example:
-   meltano config target-postgres list
-   ```
+  # For example:
+  meltano config target-postgres list
+  ```
 
 - Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
-   ```bash
-   meltano config <plugin> set <setting> <value>
+  ```bash
+  meltano config <plugin> set <setting> <value>
 
-   # For example:
-   meltano config target-postgres set user meltano
-   meltano config target-postgres set password meltano
-   meltano config target-postgres set dbname warehouse
-   meltano config target-postgres set default_target_schema public
-   ```
+  # For example:
+  meltano config target-postgres set user meltano
+  meltano config target-postgres set password meltano
+  meltano config target-postgres set dbname warehouse
+  meltano config target-postgres set default_target_schema public
+  ```
 
-   <div class="notification is-info">
-     <p>You can turn on a local postgres docker instance with these configs using <code>docker run --name postgres -e POSTGRES_PASSWORD=meltano -e POSTGRES_USER=meltano -e POSTGRES_DB=warehouse -d -p 5432:5432 postgres</code>.</p>
-   </div>
+      <div class="notification is-info">
 
-   This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
+  <p>You can turn on a local postgres docker instance with these configs using <code>docker run --name postgres -e POSTGRES_PASSWORD=meltano -e POSTGRES_USER=meltano -e POSTGRES_DB=warehouse -d -p 5432:5432 postgres</code>.</p>
 
-   ```yml
-   plugins:
-     loaders:
-       - name: target-postgres
-         variant: transferwise
-         pip_url: pipelinewise-target-postgres
-         config:
-           user: meltano
-           dbname: warehouse
-           default_target_schema: public
-   ```
+      </div>
 
-   Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+  This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-   ```bash
-   export TARGET_POSTGRES_PASSWORD=meltano
-   ```
+  ```yml
+  plugins:
+    loaders:
+      - name: target-postgres
+        variant: transferwise
+        pip_url: pipelinewise-target-postgres
+        config:
+          user: meltano
+          dbname: warehouse
+          default_target_schema: public
+  ```
+
+  Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
+
+  ```bash
+  export TARGET_POSTGRES_PASSWORD=meltano
+  ```
 
 1. Optionally, verify that the configuration looks like what the Singer target expects according to its documentation using [`meltano config <plugin>`](/reference/command-line-interface#config):
 

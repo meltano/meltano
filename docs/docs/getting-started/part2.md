@@ -5,23 +5,24 @@ layout: doc
 weight: 4
 ---
 
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
 
-In  [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
+In [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
 ## Getting your target ready
+
 We're going to load our data into a dockerized PostgreSQL database running on your laptop. View the [docker docs](https://docs.docker.com/get-docker/) if you don't yet have docker installed. To launch a local PostgreSQL container, you just need to run:
 
 ```bash
 docker run --name meltano_postgres -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password -d postgres
 ```
+
 <br />
 <div class="termy">
 
@@ -33,6 +34,7 @@ $ docker container ls
     CONTAINER ID   IMAGE      COMMAND                  CREATED         STATUS         PORTS                    NAMES
     504e2b416874   postgres   "docker-entrypoint.s…"   3 seconds ago   Up 3 seconds   0.0.0.0:5432->5432/tcp   kind_rosalind
 ```
+
 </div>
 <br />
 The container will need a few seconds to initialize. You can test the connection with your favorite SQL tool using connection data:
@@ -43,6 +45,7 @@ The container will need a few seconds to initialize. You can test the connection
 - password: password
 
 ## Add the postgres loader
+
 Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
 
 <div class="termy">
@@ -61,10 +64,12 @@ Installed loader 'target-postgres'
 
 To learn more about loader 'target-postgres', visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
+
 </div>
 <br />
 
-Use the ```meltano invoke target-postgres --help``` command to test that the installation worked.
+Use the `meltano invoke target-postgres --help` command to test that the installation worked.
+
 <div class="termy">
 
 ```console
@@ -83,11 +88,12 @@ Options:
   --version                 Display the package version.
   --help                    Show this message and exit.
 ```
+
 </div>
 
 ## Configure the target-postgres loader
-To configure the plugin, look at the options by running ```meltano config target-postgres list```:
 
+To configure the plugin, look at the options by running `meltano config target-postgres list`:
 
 <div class="termy">
 
@@ -112,6 +118,7 @@ add_record_metadata [env: TARGET_POSTGRES_ADD_RECORD_METADATA] current value: No
 
 To learn more about loader 'target-postgres' and its settings, visit https://hub.meltano.com/loaders/target-postgres--meltanolabs
 ```
+
 </div>
 <br />
 Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
@@ -130,26 +137,28 @@ $ meltano config target-postgres set add_record_metadata True
 $ meltano config target-postgres set host localhost
 &ensp;&ensp;Loader 'target-postgres' setting 'host' was set in `meltano.yml`: localhost
 ```
+
 </div>
 <br />
 This will add the non-sensitive configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-   ```yml
-   plugins:
-     loaders:
-       - name: target-postgres
-         variant: meltanolabs
-         pip_url: git+https://github.com/MeltanoLabs/target-postgres.git
-         config:
-           user: meltano
-           database: postgres
-           add_record_metadata: true
-           host: localhost
-   ```
+```yml
+plugins:
+  loaders:
+    - name: target-postgres
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/target-postgres.git
+      config:
+        user: meltano
+        database: postgres
+        add_record_metadata: true
+        host: localhost
+```
 
 Sensitive configuration information (such as `password`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control.
 
 You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
+
  <div class="termy">
 
 ```console
@@ -164,6 +173,7 @@ $ meltano config target-postgres
 &ensp;&ensp;&ensp;&ensp;"user": "meltano"
 }
 ```
+
 </div>
 
 ## Run your data integration (EL) pipeline
@@ -189,6 +199,7 @@ $ meltano run tap-github target-postgres
 2022-09-20T13:16:16.885846Z [info     ] Incremental state has been updated at 2022-09-20 13:16:16.885259.
 2022-09-20T13:16:16.960093Z [info     ] Block run completed.           ....
 ```
+
 </div>
 <br />
 If everything was configured correctly, you should now see your data flow from your source into your destination!
@@ -198,5 +209,5 @@ The postgres database should now have a schema `tap_github` with the table `comm
 
 Next, head over to [Part 3, to add inline transformations to your ingestion process](/getting-started/part3).
 
-<script src="/js/termynal.js"></script>
-<script src="/js/termy_custom.js"></script>
+<script src="/util/termynal.js"></script>
+<script src="/util/termy_custom.js"></script>

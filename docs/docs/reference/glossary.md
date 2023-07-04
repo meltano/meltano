@@ -5,6 +5,7 @@ layout: doc
 weight: 5
 ---
 
+```
 {% for item in site.data.glossary %}
 
 <h2 id="{{ item.shorthand }}">{{ item.term }}</h2>
@@ -16,3 +17,4 @@ weight: 5
 </p>
 
 {% endfor %}
+```

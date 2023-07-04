@@ -18,11 +18,15 @@ We'll assume you have [Meltano installed](/getting-started/installation) already
 
 <div class="termy">
 
-````console
+```console
 $ meltano --version
 meltano, version 2.19.0
+```
+
 </div>
+
 <br />
+
 This tutorial is written using meltano >= v2.0.0.
 
 If you don't have a GitHub account to follow along, you could either exchange the commands for a different tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
@@ -32,9 +36,9 @@ If you don't have a GitHub account to follow along, you could either exchange th
 </div>
 
 ## Create Your Meltano Project
+
 Step 1 is to create a new [Meltano project](/concepts/project) that (among other things)
 will hold the [plugins](/concepts/plugins) that implement the details of our ELT pipeline.
-
 
 1. Navigate to the directory that you'd like to hold your Meltano projects.
 
@@ -42,12 +46,13 @@ will hold the [plugins](/concepts/plugins) that implement the details of our ELT
 
 ```bash
 meltano init my-meltano-project
-````
+```
 
 <br />
+
 <div class="termy">
 
-````console
+```console
 $ meltano init my-new-project
 Created my-new-project
 Creating project files...
@@ -73,20 +78,21 @@ To learn more about Environments visit: https://docs.meltano.com/concepts/enviro
 Next steps:
   cd my-new-project
   Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
+```
 
-  </div>
+</div>
 <br />
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
-   ```yml
-   version: 1
-   default_environment: dev
-   project_id: <unique-GUID>
-   environments:
-   - name: dev
-   - name: staging
-   - name: prod
-````
+```yml
+version: 1
+default_environment: dev
+project_id: <unique-GUID>
+environments:
+- name: dev
+- name: staging
+- name: prod
+```
 
 1. Navigate to the newly created project directory:
 
@@ -123,6 +129,7 @@ To learn more about extractor 'tap-github', visit https://hub.meltano.com/extrac
 ```
 
 </div>
+
 <br />
 
 This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
@@ -142,6 +149,7 @@ $ meltano invoke tap-github --help
 ```
 
 <br />
+
 If you see the extractor's help message printed, the plugin was definitely installed successfully.
 
 <div class="termy">
@@ -181,7 +189,9 @@ meltano config tap-github set --interactive
 ```
 
 2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["sbalnojan/meltano-lightdash"]`), start_date, and your auth_token.
+
 <br />
+
 <div class="termy">
 
 ```console
@@ -210,7 +220,9 @@ $
 ```
 
 </div>
+
 <br />
+
 This will add the configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml
@@ -236,6 +248,7 @@ meltano config tap-github
 ```
 
 <br />
+
 <div class="termy">
 
 ```console
@@ -267,6 +280,7 @@ meltano select tap-github --list --all
 ```
 
 <br />
+
 <div class="termy">
 
 ```console
@@ -305,6 +319,7 @@ meltano select tap-github commits commit_timestamp
 ```
 
 <br />
+
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml
@@ -342,7 +357,9 @@ meltano select tap-github --list
 To test that the extraction process works, we add a JSON target.
 
 1. Add the JSON target using `meltano add loader target-jsonl --variant=andyh1203`.
-<br />
+
+   <br />
+
 <div class="termy">
 
 ```console
@@ -359,8 +376,10 @@ To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders
 ```
 
 </div>
+
 <br />
-This target requires zero configuration, it just outputs the data into a ```jsonl``` file.
+
+This target requires zero configuration, it just outputs the data into a `jsonl` file.
 
 ## Do a test run to verify the extraction process works
 
@@ -373,6 +392,7 @@ meltano run tap-github target-jsonl
 ```
 
 <br />
+
 <div class="termy">
 
 ```console
@@ -388,9 +408,11 @@ $ meltano run tap-github target-jsonl
 ```
 
 </div>
+
 <br />
+
 You should see data flowing from your source into the jsonl file.
-You can verify that it worked by looking inside the newly created file called ```output/commits.jsonl```.
+You can verify that it worked by looking inside the newly created file called `output/commits.jsonl`.
 
 <div class="termy">
 
@@ -400,9 +422,10 @@ $ cat output/commits.jsonl
 ```
 
 </div>
+
 ## Next Steps
 
 Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).
 
-   <script src="/js/termynal.js" data-termynal-container="#termy1|#termy2|#termy3|#termy4|#termy5|#termy6|#termy7|#termy8|#termy9|#termy10"></script>
-  <script src="/js/termy_custom.js"></script>
+  <script src="/util/termynal.js" data-termynal-container="#termy1|#termy2|#termy3|#termy4|#termy5|#termy6|#termy7|#termy8|#termy9|#termy10"></script>
+  <script src="/util/termy_custom.js"></script>
