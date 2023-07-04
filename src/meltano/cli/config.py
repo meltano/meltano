@@ -235,7 +235,12 @@ def list_settings(ctx, extras: bool):
     # regular and extra settings, since we show custom extras.
     load_extras = True if extras else None
 
-    full_config = settings.config_with_metadata(session=session, extras=load_extras)
+    full_config = settings.config_with_metadata(
+        session=session,
+        extras=load_extras,
+        redacted=True,
+    )
+
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
