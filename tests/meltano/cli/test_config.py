@@ -9,6 +9,7 @@ from mock import AsyncMock, mock
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.project import Project
+from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
 
 class TestCliConfig:
@@ -94,8 +95,45 @@ class TestCliConfig:
             == "Testing of the Meltano project configuration is not supported"
         )
 
+    @pytest.mark.usefixtures("project")
+    def test_config_list_redacted(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ):
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "secure",
+            "thisisatest",
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        result = cli_runner.invoke(cli, ["config", tap.name, "list"])
+        assert_cli_runner(result)
+
+        assert (
+            f"secure [env: TAP_MOCK_SECURE] current value: {REDACTED_VALUE} (from the "
+            "TAP_MOCK_SECURE variable in `.env`)"
+        ) in result.stdout
+
 
 class TestCliConfigSet:
+    @pytest.mark.usefixtures("project")
+    def test_config_set_redacted(self, cli_runner, tap):
+        result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "secure", "thisisatest"],
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'secure' was set in `.env`: "
+            + REDACTED_VALUE
+        ) in result.stdout
+
     @pytest.mark.usefixtures("tap")
     def test_environments_order_of_precedence(self, project: Project, cli_runner):
         # set base config in `meltano.yml`
