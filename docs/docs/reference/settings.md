@@ -30,7 +30,7 @@ to list all available settings with their names, environment variables, and curr
 
 These are settings specific to [your Meltano project](/concepts/project).
 
-### <a name="send-anonymous-usage-stats"></a>`send_anonymous_usage_stats`
+### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
 - [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
@@ -149,7 +149,8 @@ option of [`meltano` subcommands](/reference/command-line-interface), or the `ME
 <div class="notification is-warning">
   Because internal database migrations make of use of the <code>ALTER TABLE table RENAME COLUMN oldname TO newname</code> syntax starting with Meltano <code>v2.2.0</code>, the minimum required SQLite version is now <a href="https://sqlite.org/releaselog/3_25_1.html"><code>3.25.1</code></a>.
 
-  Some systems may come with an older version by default. You can run <code>sqlite3 --version</code> to check your version.
+Some systems may come with an older version by default. You can run <code>sqlite3 --version</code> to check your version.
+
 </div>
 
 #### How to use
@@ -443,6 +444,7 @@ meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
 
 export MELTANO_ELT_BUFFER_SIZE=52428800
 ```
+
 ## State Backends
 
 ### <a name="state-backend-uri"></a>`state_backend.uri`
@@ -480,7 +482,7 @@ export MELTANO_STATE_LOCK_TIMEOUT_SECONDS=720
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
 - Default: `360`
 
-Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked]((/concepts/state_backends#locking))
+Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is [locked](/concepts/state_backends#locking)
 
 #### How to use
 
@@ -491,7 +493,8 @@ export MELTANO_STATE_LOCK_RETRY_SECONDS=720
 ```
 
 ### Azure-Specific Settings
------------------------------
+
+---
 
 ### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
 
@@ -509,7 +512,8 @@ export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=h
 ```
 
 ### S3-Specific Settings
---------------------------
+
+---
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
 
@@ -557,7 +561,8 @@ export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 ```
 
 ### GCS-Specific Settings
----------------------------
+
+---
 
 ### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
 
@@ -584,7 +589,6 @@ export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` setting](#send-anonymous-usage-stats) is enabled. Events will be sent to all of these collectors.
 
 ## Feature Flags
-
 
 ### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
 

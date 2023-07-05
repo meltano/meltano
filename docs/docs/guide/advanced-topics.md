@@ -9,10 +9,10 @@ weight: 10
 
 Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras). The following extras are currently supported:
 
-* `mssql` - Support for Microsoft SQL Server
-* `s3` - Support for using S3 as a [state backend](/concepts/state_backends)
-* `gcs` - Support for using Google Cloud Storage as a [state backend](/concepts/state_backends)
-* `azure` - Support for using Azure Blob Storage as a [state backend](/concepts/state_backends)
+- `mssql` - Support for Microsoft SQL Server
+- `s3` - Support for using S3 as a [state backend](/concepts/state_backends)
+- `gcs` - Support for using Google Cloud Storage as a [state backend](/concepts/state_backends)
+- `azure` - Support for using Azure Blob Storage as a [state backend](/concepts/state_backends)
 
 ## Extension Developer Kit (EDK)
 
@@ -28,18 +28,17 @@ Meltano has traditionally assigned a plugin type to each plugin based on their f
 These plugin types were/are used in the Meltano codebase to activate plugin type specific features (i.e. piping Singer taps and targets together, running dbt deps before each run, or compiling and removing the Airflow config.cfg configuration file to avoid storing sensitive credentials).
 This approach caused some challenges around getting new features implemented and accepted by the entire user base of Meltano because only one implementation was allowed:
 
-* extractor (Singer Taps e.g. tap-github)
-* loader (Singer Targets e.g. target-snowflake)
-* transformer (dbt Adapters e.g. dbt-snowflake)
-* orchestrator (e.g. Airflow, Dagster)
-* utility (e.g. SqlFluff)
-
+- extractor (Singer Taps e.g. tap-github)
+- loader (Singer Targets e.g. target-snowflake)
+- transformer (dbt Adapters e.g. dbt-snowflake)
+- orchestrator (e.g. Airflow, Dagster)
+- utility (e.g. SqlFluff)
 
 The new approach is to group all non-EL plugins under the `utility` plugin type, leaving only the following plugin types:
 
-* extractor
-* loader
-* utility - now also including plugins previously called transformers and orchestrators
+- extractor
+- loader
+- utility - now also including plugins previously called transformers and orchestrators
 
 As part of this new approach the logic for non-EL plugin specific features has been extracted out of the Meltano codebase and into a Meltano extension.
 This allows the community to iterate on plugin features more quickly without relying on merging features into the Meltano core repository.
@@ -57,7 +56,7 @@ The Singer specification was started in 2016 by Stitch Data. It specified a data
 
 ### How does the Airbyte Connector with Meltano integration work?
 
-A community member used the Meltano Singer SDK to write tap-airbyte-wrapper. This wrapper connector calls the Docker image for a given Airbyte Source and translates the messages into a Singer-compatible format. The output of the tap is conformed to the Singer standard and then can be sent to any Singer target, many of which are listed on [MeltanoHub](hub.meltano.com/loaders/).
+A community member used the Meltano Singer SDK to write tap-airbyte-wrapper. This wrapper connector calls the Docker image for a given Airbyte Source and translates the messages into a Singer-compatible format. The output of the tap is conformed to the Singer standard and then can be sent to any Singer target, many of which are listed on [MeltanoHub](https://hub.meltano.com/loaders/).
 
 ### How do I get help if I need it?
 
@@ -97,9 +96,9 @@ It is also possible to run [Meltano on GitHub Actions](https://github.com/brookl
 
 There are several articles on the web which discuss docker-in-docker in more detail:
 
-* [Run dind without privileged access](https://zhsj.me/blog/view/dind-without-privileged)
-* [How to Run Docker in Docker](https://shisho.dev/blog/posts/docker-in-docker/)
-* [Run the Docker daemon as a non-root user](https://docs.docker.com/engine/security/rootless/)
+- [Run dind without privileged access](https://zhsj.me/blog/view/dind-without-privileged)
+- [How to Run Docker in Docker](https://shisho.dev/blog/posts/docker-in-docker/)
+- [Run the Docker daemon as a non-root user](https://docs.docker.com/engine/security/rootless/)
 
 We are interested in exploring this challenge with the community. Please share in [this discussion](https://github.com/meltano/meltano/discussions/7142) or connect with us in [Slack](https://meltano.com/slack) about your experiences with attempting to put this into production.
 
