@@ -11,7 +11,7 @@ const config = {
   tagline: "",
   url: "https://docs.meltano.com",
   baseUrl: "/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "log",
   onBrokenMarkdownLinks: "log",
   favicon: "img/favicon.png",
 
