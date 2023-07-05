@@ -2,7 +2,7 @@
 title: Code Style Guide
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
-weight: 10
+sidebar_position: 10
 hidden: true
 ---
 

@@ -2,7 +2,7 @@
 title: Documentation Development
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
-weight: 10
+sidebar_position: 10
 hidden: true
 ---
 
@@ -43,7 +43,7 @@ All pages require [front matter](https://jekyllrb.com/docs/front-matter/) to ren
 
 - `layout:` The template file to use when rendering the content. For most pages use `doc`. Custom templates can be created and placed in `_layouts`.
 - `title:` The title of the page.
-- `weight:` This controls how pages are displayed in menus and lists. The first file in each section should be named `index.md` and have a weight of `1`. All other pages within a section should have a weight of `2`. You can use additional numbers to control how pages get sorted in each section.
+- `sidebar_position:` This controls how pages are displayed in menus and lists. The first file in each section should be named `index.md` and have a weight of `1`. All other pages within a section should have a weight of `2`. You can use additional numbers to control how pages get sorted in each section.
 - **Optional** `permalink:` This allows you to set this page's URL. You can use this to override Jekyll's automatically generated URLs. Ex. `/resources/plugins`
 
 **Example:**
@@ -53,14 +53,14 @@ All pages require [front matter](https://jekyllrb.com/docs/front-matter/) to ren
 layout: doc
 title: My New Doc
 permalink: /tutorials/new-doc
-weight: 2
+sidebar_position: 2
 ---
 ```
 
 ### Add a New Section
 
 1. Create a folder named `_newsection` in the `src` directory.
-1. [Create a new file](#add_a_new_page) called `index.md`. Set the `weight:` of this page to `1` -- it'll be the home page for this section.
+1. [Create a new file](#add_a_new_page) called `index.md`. Set the `sidebar_position:` of this page to `1` -- it'll be the home page for this section.
 1. Add your [Markdown](https://github.github.com/gfm/) content. Since this is an index page it may be helpful to add some information about this new section. Create additional pages as needed and link to them from this page.
 1. Update `collections:` in `_config.yml`. Ex:
 

@@ -2,7 +2,7 @@
 title: "Getting Started (Cloud)"
 description: Cloud Getting Started Guide
 layout: doc
-weight: 1
+sidebar_position: 1
 ---
 
 <div class="notification is-info">

@@ -2,32 +2,32 @@
 title: "Connectors"
 description: Details the Meltano Connector Quality Standards
 layout: doc
-weight: 5
+sidebar_position: 5
 ---
 
 ## Connector Maintainers
 
-* **Official** -  Official connectors and tools are built, maintained, supported, and tested by Meltano.
-* **Partner** - Partner connectors and tools are built, maintained, supported, and tested by a partner organization of Meltano, including consultancies and other vendors.
-* **Community** - Community connectors and tools are built and maintained by the wider open source community.
+- **Official** - Official connectors and tools are built, maintained, supported, and tested by Meltano.
+- **Partner** - Partner connectors and tools are built, maintained, supported, and tested by a partner organization of Meltano, including consultancies and other vendors.
+- **Community** - Community connectors and tools are built and maintained by the wider open source community.
 
 ## Connector Quality
 
-* **Gold** - Connectors built on the Meltano SDK with high Meltano Cloud and self-managed usage, and broad coverage of data and features.
-* **Silver** - Connectors built on the Meltano SDK with low to medium Meltano Cloud and self-managed usage, and connectors not built on the Meltano SDK with high usage.
-* **Bronze** - Connectors not built on the Meltano SDK with low to medium Meltano Cloud and self-managed usage.
-* **No Data** - Connectors for which we have no Meltano Cloud or self-managed usage data. These may be poorly tested or out of date, and repository maintainers may be unresponsive.
+- **Gold** - Connectors built on the Meltano SDK with high Meltano Cloud and self-managed usage, and broad coverage of data and features.
+- **Silver** - Connectors built on the Meltano SDK with low to medium Meltano Cloud and self-managed usage, and connectors not built on the Meltano SDK with high usage.
+- **Bronze** - Connectors not built on the Meltano SDK with low to medium Meltano Cloud and self-managed usage.
+- **No Data** - Connectors for which we have no Meltano Cloud or self-managed usage data. These may be poorly tested or out of date, and repository maintainers may be unresponsive.
 
 ### Connector Quality Matrix
 
 To give users a better understanding of the overall quality of a connector, we have the following matrix and guidance on attributes that affect the quality rating.
 
-|         | SDK-Based | Usage Data    | Maintainer         | Repo Responsiveness  |
-|---------|-----------|---------------|--------------------|----------------|
-| Gold    | Yes       | > 5 Projects  | Official, Partner, or Community | High           |
-| Silver  | Possibly  | >= 1 Projects | Partner or Community          | Medium |
-| Bronze  | No        | >= 1 Projects | Community          | Low            |
-| No Data | No        | Unknown       | Community          | Unknown        |
+|         | SDK-Based | Usage Data    | Maintainer                      | Repo Responsiveness |
+| ------- | --------- | ------------- | ------------------------------- | ------------------- |
+| Gold    | Yes       | > 5 Projects  | Official, Partner, or Community | High                |
+| Silver  | Possibly  | >= 1 Projects | Partner or Community            | Medium              |
+| Bronze  | No        | >= 1 Projects | Community                       | Low                 |
+| No Data | No        | Unknown       | Community                       | Unknown             |
 
 For all connectors we may apply feedback we get from the community or our judgement to adjust the quality indicator of a connector.
 
@@ -74,18 +74,18 @@ To learn more about which connectors are Platinum Certified, please [reach out t
 
 Each Platinum Connector will have the following guarantees:
 
-* Built with the Meltano SDK
-* Open Source License
-* Semantic Versioning used in all releases
-* Daily integration testing
-* Priority bug fixes
-* Proactive API and changelog monitoring
+- Built with the Meltano SDK
+- Open Source License
+- Semantic Versioning used in all releases
+- Daily integration testing
+- Priority bug fixes
+- Proactive API and changelog monitoring
 
 For our Cloud Customers, we offer additional SLAs around our responsiveness and notifications for any problems with the connectors.
 [Reach out to the team](https://meltano.com/contact/) to learn more.
 
 ### Platinum Certified Connector - Release Stages
 
-* **Alpha** - Meltano Platinum Alpha Connectors are in the process of being built. The connector likely is functional but may not support all data sources or features we would want. There is also no testing in place.
-* **Beta** - Meltano Platinum Beta Connectors are complete from a data and feature perspective. When a connector is in beta we are in the process of adding our full suite of testing and monitoring around it. We are also working with open source and Cloud users to test it in production. We offer some support and SLAs for Platinum Beta Connectors on Meltano Cloud.
-* **Certified (GA)** - Meltano Platinum Certified Connectors have the full set of guarantees. Our Official GA Support SLA applies for Cloud customers.
+- **Alpha** - Meltano Platinum Alpha Connectors are in the process of being built. The connector likely is functional but may not support all data sources or features we would want. There is also no testing in place.
+- **Beta** - Meltano Platinum Beta Connectors are complete from a data and feature perspective. When a connector is in beta we are in the process of adding our full suite of testing and monitoring around it. We are also working with open source and Cloud users to test it in production. We offer some support and SLAs for Platinum Beta Connectors on Meltano Cloud.
+- **Certified (GA)** - Meltano Platinum Certified Connectors have the full set of guarantees. Our Official GA Support SLA applies for Cloud customers.

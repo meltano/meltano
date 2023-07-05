@@ -2,7 +2,7 @@
 title: Installation
 description: Learn how to install Meltano locally with Linux, macOS, Windows, or Docker.
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.

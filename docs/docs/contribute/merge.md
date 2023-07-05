@@ -2,7 +2,7 @@
 title: Pull Request Process
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
-weight: 3
+sidebar_position: 3
 hidden: true
 ---
 

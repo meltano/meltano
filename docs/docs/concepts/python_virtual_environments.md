@@ -2,8 +2,9 @@
 title: Python Virtual Environments
 description: What are Python Virtual Environments? Why should I care? How do I use them?
 layout: doc
-weight: 12
+sidebar_position: 12
 ---
+
 # What are Python Virtual Environments
 
 Python Virtual Environments, also known as a venv, are a way to allow a
@@ -15,6 +16,7 @@ If any of those dependecies are were in conflict with each other you would have 
 Python has a great technical write up at [Virtual Environments and Packages](https://docs.python.org/3/tutorial/venv.html).
 
 We're going to focus on the Meltano use case for Virtual Environments which is use for a two main purposes:
+
 1. Installing Meltano
 1. Installing Plugins (Taps, Targets, Transformers, etc)
 

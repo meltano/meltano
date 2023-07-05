@@ -2,7 +2,7 @@
 title: Settings
 description: Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
@@ -17,7 +17,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 [`meltano config meltano set <setting> <value>`](/reference/command-line-interface#config), which is used in the examples below, will automatically store configuration in `meltano.yml` or `.env` as appropriate.
 
-If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
+If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](../reference/command-line-interface#config).
 
 ## Plugin settings
 
@@ -32,8 +32,8 @@ These are settings specific to [your Meltano project](/concepts/project).
 
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
-- [`meltano init`](/reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
+- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
 - Default: `true`
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.

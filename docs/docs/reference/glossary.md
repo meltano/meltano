@@ -2,7 +2,7 @@
 title: Glossary
 description: A glossary of terms used in the Meltano documentation.
 layout: doc
-weight: 5
+sidebar_position: 5
 ---
 
 ```

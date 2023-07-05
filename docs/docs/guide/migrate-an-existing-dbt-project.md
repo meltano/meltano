@@ -4,7 +4,7 @@ description: Learn how to import an existing dbt project into your Meltano proje
 layout: doc
 redirect_from:
   - /guide/existing-dbt-project
-weight: 25
+sidebar_position: 25
 ---
 
 This guide will describe how to bring existing dbt code into the your Meltano project.
@@ -15,11 +15,9 @@ You can organize your project whatever way you chose but this guide will describ
 
 As always, we highly recommend git versioning your Meltano project prior to following this guide so you have the ability to roll back and not affect your existing Meltano project configurations.
 
-
 ### Add dbt Transformer
 
 Add your adapter-specific dbt variant (e.g. dbt-postgres) that can be found on [MeltanoHub](https://hub.meltano.com/utilities/).
-
 
 ```
 meltano add utility dbt-<adapter_name>

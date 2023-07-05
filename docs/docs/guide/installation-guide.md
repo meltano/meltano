@@ -2,7 +2,7 @@
 title: In-depth Installation
 description: Learn how to install Meltano locally with Linux, macOS, Windows, or Docker.
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 This document will get you up and running with Meltano in-depth. There is also a [short install guide for first-time Meltano users](/getting-started/installation).
@@ -111,7 +111,6 @@ Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not
 `pip` is a package installer that comes automatically with Python 3+.
 [pipx](https://pipxproject.github.io/pipx/) is a wrapper around `pip` which cleanly installs executable python tools (such as Meltano) into their own virtual environments.
 
-
 ```powershell
 # install pipx and ensure it is on the path
 python3 -m pip install --user pipx
@@ -193,7 +192,6 @@ cd yourprojectname
 Now that you're successfully running Meltano, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started).
 
 Note that wherever you are asked to run the `meltano` command, you will want to run it through `docker run` as in the snippet above.
-
 
 # Troubleshooting Installation
 

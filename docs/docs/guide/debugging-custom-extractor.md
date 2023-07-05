@@ -2,7 +2,7 @@
 title: Debug a Custom Extractor
 description: Learn how to debug a custom data extractor.
 layout: doc
-weight: 25
+sidebar_position: 25
 ---
 
 ## Add a main block in tap.py of your Custom Extractor
@@ -48,9 +48,10 @@ Add the following [launch configuration](https://code.visualstudio.com/docs/edit
 }
 
 ```
+
 ## Create a config.json to use when debugging
 
-The above launch.json specifies the location of this config as ```.secrets/config.json```.
+The above launch.json specifies the location of this config as `.secrets/config.json`.
 
 Feel free to change this but ensure the config has all the required config fields for your custom extractor to run successfully.
 

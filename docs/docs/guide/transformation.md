@@ -2,7 +2,7 @@
 title: Transform Data
 description: Transform your data with dbt
 layout: doc
-weight: 5
+sidebar_position: 5
 ---
 
 Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is the default location for your dbt configuration, models, packages, etc in order to run transformations. After installing a dbt plugin you can run an `initialize` command to automatically populate the contents of that directory.
@@ -114,7 +114,6 @@ meltano add transformer dbt-snowflake
 ```
 
 For more details on configuring a dbt `transformer` see the [Meltano Hub documentation](https://hub.meltano.com/transformers/).
-
 
 ## `dbt` Installation and Configuration (Classic)
 

@@ -2,7 +2,7 @@
 title: Orchestrate Data
 description: Learn how to schedule and orchestrate your pipelines using Meltano and Airflow.
 layout: doc
-weight: 6
+sidebar_position: 6
 ---
 
 Most data pipelines aren't run just once, but over and over again, to make sure additions and changes in the source eventually make their way to the destination.

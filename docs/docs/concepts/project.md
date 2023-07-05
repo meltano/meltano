@@ -2,7 +2,7 @@
 title: Projects
 description: At the core of the Meltano experience is your Meltano project, which represents the single source of truth regarding your ELT pipelines.
 layout: doc
-weight: 1
+sidebar_position: 1
 ---
 
 <!-- The following is reproduced in docs/src/README.md#meltano-init -->
@@ -322,7 +322,6 @@ Annotations are supported in the following locations within `meltano.yml`:
 - In an environment plugin definition
 - In a plugin setting definition
 
-
 ## `.gitignore`
 
 A newly initialized project comes with a [`.gitignore` file](https://git-scm.com/docs/gitignore) to ensure that
@@ -393,14 +392,14 @@ The remaining tables in the database are used exclusively by [Meltano UI](/guide
 
 Meltano currently supports the following databases as backends for state and configuration:
 
-* PostgreSQL
-* SQLite
-* MS SQL Server
+- PostgreSQL
+- SQLite
+- MS SQL Server
 
 PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
 
 Support for other databases is planned:
 
-* [MySQL](https://github.com/meltano/meltano/issues/6529)
+- [MySQL](https://github.com/meltano/meltano/issues/6529)
 
 If you would like to see support for a specific database, please [open an issue](https://github.com/meltano/meltano/issues/new?assignees=meltano%2Fengineering&labels=kind%2FFeature%2Cvaluestream%2FMeltano&template=feature.yml&title=feature%3A+%3Ctitle%3E)

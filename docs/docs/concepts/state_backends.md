@@ -2,7 +2,7 @@
 title: State Backends
 description: State backends are used for persisting state between pipeline runs.
 layout: doc
-weight: 3
+sidebar_position: 3
 ---
 
 Meltano is capable of running pipelines that load data incrementally.

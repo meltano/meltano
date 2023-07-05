@@ -2,12 +2,11 @@
 title: Inline Data Mapping
 description: Alter records and streams on the fly.
 layout: doc
-weight: 5
+sidebar_position: 5
 ---
 
 Meltano gives you the flexibility to alter data passing through your EL pipelines to do precisely what you need for your use case.
-Although commonly users want to replicate their data in the most raw format, using [ELT vs ETL](https://meltano.com/blog/the-benefits-of-elt-vs-etl-what-you-need-to-know/
-), there are many use cases that require minor alterations to data on the fly.
+Although commonly users want to replicate their data in the most raw format, using [ELT vs ETL](https://meltano.com/blog/the-benefits-of-elt-vs-etl-what-you-need-to-know/), there are many use cases that require minor alterations to data on the fly.
 This is where mappers, also referred to as inline stream maps, shine!
 
 # Features
@@ -154,13 +153,11 @@ plugins
 
 After running `meltano run tap-csv lower target-sqlite` the result would be:
 
-| count_t |           email            | first_name | id | last_name  |        __loaded_at         |
-|---------|----------------------------|------------|----|------------|----------------------------|
-| 0       | EBOOK0@TWITTER.COM         | ethe       | 1  | book       | 2023-03-17 16:57:19.095880 |
-
+| count_t | email              | first_name | id  | last_name | \_\_loaded_at              |
+| ------- | ------------------ | ---------- | --- | --------- | -------------------------- |
+| 0       | EBOOK0@TWITTER.COM | ethe       | 1   | book      | 2023-03-17 16:57:19.095880 |
 
 To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/meltano-map-transform/tree/main/examples).
-
 
 ## FAQs
 
@@ -176,12 +173,13 @@ Follow along with [this discussion](https://github.com/meltano/meltano/discussio
 ### When would I use standalone mapper plugins vs SDK based stream maps?
 
 It's mostly preference but here are some trade offs to consider:
+
 - Mapper plugins can only be run using `meltano run`
 - Mappers work for SDK and non-SDK connectors. If your pipeline uses 2 non-SDK connectors this is your best option.
 - SDK stream maps are part of the SDK which inherently makes them more difficult to change. If you need custom functionality then forking a mapper plugin and customizing it is you best option. Although if your behavior is generically useful, please open an issue in the [SDK repo](https://github.com/meltano/sdk) to get it added!
 - SDK stream maps avoid having to install an additional plugin into your project.
 - Mapper plugins alter data after its been extracted whereas SDK based stream maps on the tap side could alter the extraction behavior.
-Depending on your use case, for example deleting streams, it might be slightly more efficient to do it in the tap and avoid extracting unneeded data.
+  Depending on your use case, for example deleting streams, it might be slightly more efficient to do it in the tap and avoid extracting unneeded data.
 
 ### Do both my tap and target need to support SDK based stream maps?
 

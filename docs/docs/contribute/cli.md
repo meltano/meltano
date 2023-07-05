@@ -2,7 +2,7 @@
 title: CLI Development
 description: Contribute to the Meltano CLI.
 layout: doc
-weight: 10
+sidebar_position: 10
 hidden: true
 ---
 
@@ -57,7 +57,6 @@ example avoid using `-t` as a short form for `--tasks` as it may be confused wit
 Note that in documentation like guides and walkthrough the long form is always preferred. The short version alone should
 never be used in documentation.
 
-
 ### Desired verb/command linkage and structure
 
 1. Organize in a command group around a feature below the top level where possible.
@@ -78,7 +77,6 @@ meltano <feature-group> get <something>
 - Use `list` to enumerate items as in `meltano job list`
 - Use `describe` to show details about an item
 
-
 ### Global vs argument level flag casing
 
 When creating global flags, default to upper case letters for short options, and lower case letter for argument level
@@ -91,7 +89,7 @@ and an argument level option occur. e.g.
 meltano [-L/--log-level LEVEL] SOME_COMMAND [-l/--last-thing]
 ```
 
-The caveat to this is *common* and *expected* global short options. For example `-h` and `--help`.
+The caveat to this is _common_ and _expected_ global short options. For example `-h` and `--help`.
 
 ### Reusing short options
 
@@ -108,7 +106,7 @@ In scenario's like this you have three paths.
 
 1. Choose a sensible alternate when its unlikely to cause confusion with OTHER options e.g. `-k/--task` and `-t/--test`.
 2. Dropping the use of the short flag of the option you feel will be used less frequently AND the short flag is unlikely
-to cause confusion. This is a great path if the long flag is already terse.
+   to cause confusion. This is a great path if the long flag is already terse.
 3. Drop the use of the short flag all together. If these flags aren't used frequently, this is a sensible default choice.
 
 ### Expected output formats

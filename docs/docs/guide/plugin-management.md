@@ -2,7 +2,7 @@
 title: General Usage
 description: Learn how to manage your Meltano project's plugins.
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
@@ -377,20 +377,20 @@ To pin the latest version:
 
 1. Determine the latest version of the package by browsing to `https://pypi.org/project/<package>`, e.g. <https://pypi.org/project/tap-shopify>.
 
-    At the time of writing, the latest version of `tap-shopify` is `1.2.6`.
+   At the time of writing, the latest version of `tap-shopify` is `1.2.6`.
 
 1. Add an `==<version>` or `~=<version>` [version specifier](https://pip.pypa.io/en/stable/reference/pip_install/#requirement-specifiers) to the `pip_url`:
 
-    ```yaml{5,8}
-    # Before:
-    pip_url: tap-shopify
+   ```yaml{5,8}
+   # Before:
+   pip_url: tap-shopify
 
-    # After:
-    pip_url: tap-shopify==1.2.6 # Always install version 1.2.6
+   # After:
+   pip_url: tap-shopify==1.2.6 # Always install version 1.2.6
 
-    # Alternatively:
-    pip_url: tap-shopify~=1.2.6 # Install 1.2.6 or a newer version in the 1.2.x range
-    ```
+   # Alternatively:
+   pip_url: tap-shopify~=1.2.6 # Install 1.2.6 or a newer version in the 1.2.x range
+   ```
 
 ### Git repository
 
@@ -400,28 +400,28 @@ To pin the latest version:
 
 1. Determine the latest version of the package by browsing to the `https://` part of the repository URL, e.g. <https://gitlab.com/meltano/tap-gitlab> or <https://github.com/adswerve/target-bigquery>, and finding the latest Git tag.
 
-    At the time of writing, the [latest tag](https://gitlab.com/meltano/tap-gitlab/-/tags) of <https://gitlab.com/meltano/tap-gitlab> is `v0.9.11`,
-    and the [latest tag](https://github.com/adswerve/target-bigquery/tags) of <https://github.com/adswerve/target-bigquery> is`v0.10.2`.
+   At the time of writing, the [latest tag](https://gitlab.com/meltano/tap-gitlab/-/tags) of <https://gitlab.com/meltano/tap-gitlab> is `v0.9.11`,
+   and the [latest tag](https://github.com/adswerve/target-bigquery/tags) of <https://github.com/adswerve/target-bigquery> is`v0.10.2`.
 
-    If no tags are available, you can also use the SHA of the latest commit, e.g.
-    [`2657b89e8896face4ce320a03b8413bbc196cec9`](https://gitlab.com/meltano/tap-gitlab/-/commit/2657b89e8896face4ce320a03b8413bbc196cec9) or
-    [`3df97b951b7eebdfa331a1ff570f1fe3487d632f`](https://github.com/adswerve/target-bigquery/commit/3df97b951b7eebdfa331a1ff570f1fe3487d632f).
+   If no tags are available, you can also use the SHA of the latest commit, e.g.
+   [`2657b89e8896face4ce320a03b8413bbc196cec9`](https://gitlab.com/meltano/tap-gitlab/-/commit/2657b89e8896face4ce320a03b8413bbc196cec9) or
+   [`3df97b951b7eebdfa331a1ff570f1fe3487d632f`](https://github.com/adswerve/target-bigquery/commit/3df97b951b7eebdfa331a1ff570f1fe3487d632f).
 
 1. Add an `@<tag>` or `@<sha>` [Git ref specifier](https://pip.pypa.io/en/stable/reference/pip_install/#git) to the `pip_url`:
 
-    ```yaml{6-7,10-11}
-    # Before:
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
-    pip_url: git+https://github.com/adswerve/target-bigquery.git
+   ```yaml{6-7,10-11}
+   # Before:
+   pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+   pip_url: git+https://github.com/adswerve/target-bigquery.git
 
-    # After:
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@v0.9.11
-    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
+   # After:
+   pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@v0.9.11
+   pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
 
-    # Alternatively:
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@2657b89e8896face4ce320a03b8413bbc196cec9
-    pip_url: git+https://github.com/adswerve/target-bigquery.git@3df97b951b7eebdfa331a1ff570f1fe3487d632f
-    ```
+   # Alternatively:
+   pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@2657b89e8896face4ce320a03b8413bbc196cec9
+   pip_url: git+https://github.com/adswerve/target-bigquery.git@3df97b951b7eebdfa331a1ff570f1fe3487d632f
+   ```
 
 ## Installing plugins from a custom Python Package Index (PyPI)
 
@@ -455,50 +455,53 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 
 1. Modify the plugin definition's `pip_url` in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
 
-    ```yaml{5-6}
-    plugins:
-      extractors:
-      - name: tap-gitlab
-        variant: meltano
-        pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
-        # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
-    ```
+   ```yaml{5-6}
+   plugins:
+     extractors:
+     - name: tap-gitlab
+       variant: meltano
+       pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+       # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
+   ```
 
-    If your plugin source is stored in a private repository, you have two options:
+   If your plugin source is stored in a private repository, you have two options:
 
-    - Continue to authenticate over HTTP(S), and store your credentials in a [`.netrc` file](https://ec.haxx.se/usingcurl/usingcurl-netrc#the-netrc-file-format) in your home directory:
+   - Continue to authenticate over HTTP(S), and store your credentials in a [`.netrc` file](https://ec.haxx.se/usingcurl/usingcurl-netrc#the-netrc-file-format) in your home directory:
 
-      ```bash
-      machine <hostname> # e.g. gitlab.com or github.com
-      login <username>
-      password <personal-access-token-or-password>
-      ```
+     ```bash
+     machine <hostname> # e.g. gitlab.com or github.com
+     login <username>
+     password <personal-access-token-or-password>
+     ```
 
-    - Authenticate using SSH instead, and specify a `git+ssh` URL:
+   - Authenticate using SSH instead, and specify a `git+ssh` URL:
 
-      ```yaml
-      pip_url: git+ssh://git@gitlab.com/meltano/tap-gitlab.git
-      ```
+     ```yaml
+     pip_url: git+ssh://git@gitlab.com/meltano/tap-gitlab.git
+     ```
 
-      Depending on your git provider (such as Azure Repos), some `git+ssh` URLs may contain a colon. This colon can cause errors with `pip`. In this case this can be fixed by replacing the colon with a forward slash.
+     Depending on your git provider (such as Azure Repos), some `git+ssh` URLs may contain a colon. This colon can cause errors with `pip`. In this case this can be fixed by replacing the colon with a forward slash.
 
-      For example, instead of this:
-      ```
-      git+ssh://git@ssh.dev.azure.com:v3/my_org/
-      ```
-      Use this:
-      ```
-      git+ssh://git@ssh.dev.azure.com/v3/my_org/
-      ```
+     For example, instead of this:
+
+     ```
+     git+ssh://git@ssh.dev.azure.com:v3/my_org/
+     ```
+
+     Use this:
+
+     ```
+     git+ssh://git@ssh.dev.azure.com/v3/my_org/
+     ```
 
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
-    ```bash
-    meltano install <type> <name>
+   ```bash
+   meltano install <type> <name>
 
-    # For example:
-    meltano install extractor tap-gitlab
-    ```
+   # For example:
+   meltano install extractor tap-gitlab
+   ```
 
 If your fork supports additional settings, you can set them as [custom settings](/guide/configuration#custom-settings).
 
@@ -512,80 +515,80 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
 1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project):
 
-    ```yml{12-13}
-    # Before:
-    plugins:
-      loaders:
-      - name: target-postgres
-        variant: datamill-co
-        pip_url: singer-target-postgres
+   ```yml{12-13}
+   # Before:
+   plugins:
+     loaders:
+     - name: target-postgres
+       variant: datamill-co
+       pip_url: singer-target-postgres
 
-    # After:
-    plugins:
-      loaders:
-      - name: target-postgres
-        variant: meltano
-        pip_url: git+https://github.com/meltano/target-postgres.git # Optional
-    ```
+   # After:
+   plugins:
+     loaders:
+     - name: target-postgres
+       variant: meltano
+       pip_url: git+https://github.com/meltano/target-postgres.git # Optional
+   ```
 
-    If you don't know the new variant's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
-    you can remove this property entirely so that Meltano will fall back on the default.
+   If you don't know the new variant's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
+   you can remove this property entirely so that Meltano will fall back on the default.
 
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
-    ```bash
-    meltano install <type> <name>
+   ```bash
+   meltano install <type> <name>
 
-    # For example:
-    meltano install loader target-postgres
-    ```
+   # For example:
+   meltano install loader target-postgres
+   ```
 
 1. View the current configuration using [`meltano config <name> list`](/reference/command-line-interface#config) to see if it is still valid:
 
-    ```bash
-    meltano config <name> list
+   ```bash
+   meltano config <name> list
 
-    # For example:
-    meltano config target-postgres list
-    ```
+   # For example:
+   meltano config target-postgres list
+   ```
 
-    Because different variants often use different setting names,
-    you will likely see some of the settings used by the old variant show up as
-    [custom settings](/guide/configuration#custom-settings),
-    indicating that they are not supported by the new variant,
-    while settings that the new variant expects show up with a `None` or default value.
+   Because different variants often use different setting names,
+   you will likely see some of the settings used by the old variant show up as
+   [custom settings](/guide/configuration#custom-settings),
+   indicating that they are not supported by the new variant,
+   while settings that the new variant expects show up with a `None` or default value.
 
 1. Assuming at least one setting did not carry over correctly from the old variant to the new variant,
-    modify the plugin's configuration in your [`meltano.yml` project file](/concepts/project#plugin-configuration) to use the new setting names:
+   modify the plugin's configuration in your [`meltano.yml` project file](/concepts/project#plugin-configuration) to use the new setting names:
 
-    ```yml{10-13}
-    # Before:
-    config:
-      postgres_host: postgres.example.com
-      postgres_port: 5432
-      postgres_username: my_user
-      postgres_database: my_database
+   ```yml{10-13}
+   # Before:
+   config:
+     postgres_host: postgres.example.com
+     postgres_port: 5432
+     postgres_username: my_user
+     postgres_database: my_database
 
-    # After:
-    config:
-      host: postgres.example.com
-      port: 5432
-      user: my_user
-      dbname: my_database
-    ```
+   # After:
+   config:
+     host: postgres.example.com
+     port: 5432
+     user: my_user
+     dbname: my_database
+   ```
 
-    If any of the old settings are stored in [places other than `meltano.yml`](/guide/configuration#configuration-layers),
-    like a sensitive setting that may be stored in your project's [`.env` file](/concepts/project#env),
-    you can unset the old setting and set the new one using [`meltano config`](/reference/command-line-interface#config):
+   If any of the old settings are stored in [places other than `meltano.yml`](/guide/configuration#configuration-layers),
+   like a sensitive setting that may be stored in your project's [`.env` file](/concepts/project#env),
+   you can unset the old setting and set the new one using [`meltano config`](/reference/command-line-interface#config):
 
-    ```bash
-    meltano config <name> unset <old_setting>
-    meltano config <name> set <setting> <value>
+   ```bash
+   meltano config <name> unset <old_setting>
+   meltano config <name> set <setting> <value>
 
-    # For example:
-    meltano config target-postgres unset postgres_password
-    meltano config target-postgres set password my_password
-    ```
+   # For example:
+   meltano config target-postgres unset postgres_password
+   meltano config target-postgres set password my_password
+   ```
 
-    Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
-    without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).
+   Keep doing this until `meltano config <name> list` shows a valid configuration for the new variant,
+   without any of the old variant's settings remaining as [custom settings](/guide/configuration#custom-settings).

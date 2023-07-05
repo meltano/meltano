@@ -2,7 +2,7 @@
 title: Tests
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
-weight: 10
+sidebar_position: 10
 hidden: true
 ---
 
@@ -31,7 +31,7 @@ Take care to ensure that if `docker-compose` is not available, tests that rely o
 Meltano use a small homegrown framework:q! for integration tests that are generated from the markdown guides in our example library and managed via [Github Workflows](https://docs.github.com/en/actions/workflows/):
 
 - [`docs/example-library/<test-name>`](https://github.com/meltano/meltano/tree/main/docs/example-library) holds the markdown guide and the meltano YAML files. The test script is created from the markdown guide via [mdsh](https://github.com/bashup/mdsh),
-and the YAML files are used during test validation.
+  and the YAML files are used during test validation.
 - - `.github/workflows/integration_tests.yml` is the workflow definition that actually controls the execution of the tests. In order for an example guide to actually be treated as an integration test, it must be added to test matrix in [integration_tests.yml](https://github.com/meltano/meltano/tree/main/.github/workflows) workflow.
 - [`integration/validate.sh`](https://github.com/meltano/meltano/tree/main/integration/validate.sh) is the main entry point for all integration tests. It takes care of producing the script from the markdown, injecting a logging YAML, diffing the meltano yaml's, and calling the additional per-test validations when required.
 - `integration/<test-name>/validate.sh` - optional additional tests to run for a test. Often, this won't even be needed, but the ability is available if you want to run extended checks (i.e. grepping logs, running sql, etc)

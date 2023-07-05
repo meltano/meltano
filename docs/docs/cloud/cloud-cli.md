@@ -2,7 +2,7 @@
 title: Cloud Command Line
 description: Interact with Meltano Cloud projects from the command line.
 layout: doc
-weight: 5
+sidebar_position: 5
 ---
 
 <div class="notification is-info">

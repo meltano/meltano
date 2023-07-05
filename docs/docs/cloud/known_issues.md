@@ -3,7 +3,7 @@ title: "Known Limitations"
 description: Details Beta limitations for  Meltano Cloud
 layout: doc
 hidden: false
-weight: 10
+sidebar_position: 10
 ---
 
 <div class="notification is-info">

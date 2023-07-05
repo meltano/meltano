@@ -2,7 +2,7 @@
 title: Part 3 - Transformations, ELT
 description: Part 3 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: doc
-weight: 4
+sidebar_position: 4
 ---
 
 Let’s learn by example.

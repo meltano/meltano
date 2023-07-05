@@ -2,7 +2,7 @@
 title: "Concepts"
 description: Details the concepts of Meltano Cloud
 layout: doc
-weight: 3
+sidebar_position: 3
 ---
 
 <div class="notification is-info">

@@ -2,7 +2,7 @@
 title: Plugin Definition Syntax
 description: YAML syntax for defining plugins for Meltano Hub.
 layout: doc
-weight: 3
+sidebar_position: 3
 ---
 
 This document describes the syntax for defining plugins contributed to Meltano Hub.
@@ -187,7 +187,7 @@ settings_preamble: |
 
 Documentation for the next steps after installing the plugin, in Markdown format.
 
-```yaml
+````yaml
 next_steps: |
   1. Use the [meltano schedule](https://docs.meltano.com/reference/command-line-interface#schedule) command to create pipeline schedules in your project, to be run by Airflow.
 
@@ -207,7 +207,7 @@ next_steps: |
      By default, the UI will be available at at [`http://localhost:8080`](http://localhost:8080). You can change this using the `webserver.web_server_port` setting documented below.
 
   1. Start Scheduler or execute Airflow commands directly using the instructions in [the Meltano docs](https://docs.meltano.com/guide/orchestration#starting-the-airflow-scheduler).
-```
+````
 
 ## `usage`
 

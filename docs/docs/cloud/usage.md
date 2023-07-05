@@ -2,7 +2,7 @@
 title: "Usage"
 layout: doc
 hidden: false
-weight: 4
+sidebar_position: 4
 ---
 
 <div class="notification is-info">

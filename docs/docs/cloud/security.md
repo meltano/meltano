@@ -2,7 +2,7 @@
 title: "Security"
 description: Details the security stature of Meltano Cloud
 layout: doc
-weight: 6
+sidebar_position: 6
 ---
 
 <div class="notification is-info">

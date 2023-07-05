@@ -2,7 +2,7 @@
 title: Replicate Data
 description: Learn how to extract and load data using Meltano and Singer taps and targets
 layout: doc
-weight: 4
+sidebar_position: 4
 ---
 
 Meltano lets you easily extract and load data from and to databases, SaaS APIs, and file formats
@@ -66,7 +66,6 @@ meltano select <plugin> --list --all
 # For example:
 meltano select tap-gitlab --list --all
 ```
-
 
 ```bash
 meltano select <plugin> <entity> <attribute>
@@ -246,20 +245,16 @@ TAP_FOO_BAR=bar TAP_FOO_BAZ=baz meltano run ...
 
 To verify that these environment variables will be picked up by Meltano as you intended, you can test them with [`meltano config <plugin>`](/reference/command-line-interface#config) before running `meltano run`.
 
-
 ## Running pipelines with `elt`
 
 Originally the [`elt`](/reference/command-line-interface#elt) command was the only way to run pipelines but more recently the [`run`](/reference/command-line-interface#run) command has become the recommended approach for most use cases due to it's flexibility.
 Although for some use cases using the `elt` command is still preferred because it has more fine grain control for extract + load pairs.
 
-
 ### Incremental replication state (elt)
 
 For [`meltano elt`](/reference/command-line-interface#elt) the State ID has to be created and set manually using the `--state-id` argument, make sure to use a unique string identifier for the pipeline always include it since it must be present in each execution in order for incremental replication to work.
 
-
 Also note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
-
 
 ### Pipeline-specific schedule configuration
 

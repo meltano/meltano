@@ -1,7 +1,7 @@
 ---
 title: "Platform Information"
 layout: doc
-weight: 5
+sidebar_position: 5
 redirect_from:
   - /cloud/reserved_variables
 ---

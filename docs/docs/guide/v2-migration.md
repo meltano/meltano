@@ -4,7 +4,7 @@ description: Migrate existing "v1" projects to the latest version of Meltano
 layout: doc
 redirect_from:
   - /reference/v2-migration/
-weight: 20
+sidebar_position: 20
 ---
 
 _Note: This document is still a work in progress. Expect further changes, coming soon._

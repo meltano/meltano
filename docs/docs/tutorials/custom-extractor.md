@@ -2,7 +2,7 @@
 title: Create a Custom Extractor
 description: Learn how to use Meltano to create a custom data extractor.
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.

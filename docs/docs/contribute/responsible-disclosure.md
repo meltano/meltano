@@ -4,7 +4,7 @@ description: Learn how to report security vulnerabilities
 layout: doc
 redirect_from:
   - /the-project/responsible-disclosure/
-weight: 11
+sidebar_position: 11
 hidden: true
 ---
 

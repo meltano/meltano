@@ -2,7 +2,7 @@
 title: Custom errors
 description: Creating custom exceptions and errors for the Meltano codebase.
 layout: doc
-weight: 10
+sidebar_position: 10
 ---
 
 This section describes how to create custom exception classes for Meltano.

@@ -2,7 +2,7 @@
 title: Advanced Topics
 description: Learn about advanced topics in the Meltano.
 layout: doc
-weight: 10
+sidebar_position: 10
 ---
 
 ## Installing Optional Components

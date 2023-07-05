@@ -2,7 +2,7 @@
 title: Deployment in Production
 description: Learn how to deploy your ELT pipelines in production.
 layout: doc
-weight: 9
+sidebar_position: 9
 ---
 
 Once you've [set up a Meltano project](/concepts/project) and

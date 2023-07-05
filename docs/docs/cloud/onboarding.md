@@ -2,7 +2,7 @@
 title: "Onboarding"
 description: Details the onboarding process of Meltano Cloud
 layout: doc
-weight: 2
+sidebar_position: 2
 ---
 
 <div class="notification is-info">

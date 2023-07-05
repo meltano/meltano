@@ -2,7 +2,7 @@
 title: Manage Configuration
 description: Learn how to manage the configuration of your project's plugins.
 layout: doc
-weight: 3
+sidebar_position: 3
 ---
 
 Meltano is responsible for managing the configuration of all of a [project](/concepts/project)'s [plugins](/concepts/plugins).

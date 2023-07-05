@@ -2,7 +2,7 @@
 title: Part 4 - Inline Data Mapping
 description: Part 4 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: doc
-weight: 4
+sidebar_position: 4
 ---
 
 Let’s learn by example.

@@ -2,7 +2,7 @@
 title: API Development
 description: Contribute to the Meltano API.
 layout: doc
-weight: 10
+sidebar_position: 10
 hidden: true
 ---
 
@@ -37,7 +37,7 @@ For V2 of the Meltano API, we generally aim to implement and adhere to our varia
 > The methods can be either the standard methods or custom methods.
 >
 > Where API functionality naturally maps to one of the standard methods, that method **should** be used in the API design.
-> For functionality that does not naturally map to one of the standard methods,*custom methods* **may** be used.
+> For functionality that does not naturally map to one of the standard methods,_custom methods_ **may** be used.
 > Custom methods offer the same design freedom as traditional RPC APIs, which can be used to implement common programming patterns, such as database transactions or data analysis.
 
 ### Concrete methods/verbs
@@ -69,8 +69,8 @@ Where a custom verb is used, the verb will be appended to the resource as a new 
 
 API service umbrella and namespace:
 
- - `meltano/core/v2beta` (during development)
- - `meltano/core/v2`
+- `meltano/core/v2beta` (during development)
+- `meltano/core/v2`
 
 Our top-level collection is `projects/*` with an intermediate of `/envs/*` as we've opted to include support for operating on multiple projects.
 The V2 API spec is in flux, we don't yet actually have strong ties between a lot of the topics beyond this level, but as we start specing v2 we expect a grouping around the below features to evolve.
@@ -86,7 +86,7 @@ The V2 API spec is in flux, we don't yet actually have strong ties between a lot
 As a hypothetical on how the spec might evolve, we may also end up organize around a `job` as resource or the like. Nesting under a `jobs` collection might look more like:
 
 - `envs/*/jobs/*`
-  - `envs/*/jobs/run` (potentially a custom verb - need to support ad hoc `meltano run`  like invocations, where the submitting client doesn't know what the state IDs will be)
+  - `envs/*/jobs/run` (potentially a custom verb - need to support ad hoc `meltano run` like invocations, where the submitting client doesn't know what the state IDs will be)
   - `envs/*/jobs/*/runs/*`
   - `envs/*/jobs/*/schedule/*`
   - `envs/*/jobs/*/state/*`? (up for discussion whether state should be stand-alone or part of the jobs' collection.)

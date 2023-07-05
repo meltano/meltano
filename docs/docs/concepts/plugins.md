@@ -4,7 +4,7 @@ description: Meltano takes a modular approach to data engineering and EL(T), whe
 layout: doc
 redirect_from:
   - /guide/analysis
-weight: 2
+sidebar_position: 2
 ---
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
@@ -123,10 +123,12 @@ Meltano supports the following types of plugins:
 - [**File bundles**](#file-bundles) bundle files you may want in your project.
 
 These plugin types are still supported but are transitioning to being referred to as [**Utilities**](#utilities):
+
 - [**Orchestrators**](#orchestrators) orchestrate a project's scheduled pipelines.
 - [**Transformers**](#transformers) run transforms.
 
 These plugin types are deprecated:
+
 - [**Transforms**](#transforms) transform data that has been loaded into a database (data warehouse).
 
 ### Extractors
@@ -196,15 +198,18 @@ meltano config tap-gitlab set _catalog extract/tap-gitlab.catalog.json
 meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
 
 ```
+
 {% endtab %}
 
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__CATALOG=<path>
 
 # For example:
 export TAP_GITLAB__CATALOG=extract/tap-gitlab.catalog.json
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -244,14 +249,17 @@ meltano config <extractor> set _load_schema <schema>
 meltano config tap-gitlab set _load_schema gitlab_data
 
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__LOAD_SCHEMA=<schema>
 
 # For example:
 export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -307,8 +315,10 @@ meltano config tap-postgres set _metadata some_stream_id replication-key created
 meltano config tap-postgres set _metadata some_stream_id created_at is-replication-key true
 
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
 
@@ -320,6 +330,7 @@ export <EXTRACTOR>__METADATA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=INCREMENTAL
 export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_KEY=created_at
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -372,8 +383,10 @@ meltano config <extractor> set _schema <entity> <attribute> <key> <value>
 meltano config tap-postgres set _metadata some_stream_id created_at type '["string", "null"]'
 meltano config tap-postgres set _metadata some_stream_id created_at format date-time
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
 
@@ -384,6 +397,7 @@ export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 # For example:
 export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -434,14 +448,17 @@ meltano select tap-gitlab project_members "*"
 meltano select tap-gitlab commits "*"
 
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
 
 # For example:
 export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -500,8 +517,10 @@ meltano elt tap-gitlab target-jsonl --select commits
 meltano elt tap-gitlab target-jsonl --exclude project_members
 
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
 export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
@@ -509,6 +528,7 @@ export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
 # For example:
 export TAP_GITLAB__SELECT_FILTER='["commits","!project_members"]'
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -552,14 +572,17 @@ meltano config tap-gitlab set _state extract/tap-gitlab.state.json
 
 meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <EXTRACTOR>__STATE=<path>
 
 # For example:
 export TAP_GITLAB__STATE=extract/tap-gitlab.state.json
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -614,14 +637,17 @@ meltano config <loader> set _dialect <dialect>
 # For example:
 meltano config target-example-db set _dialect example-db
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <LOADER>__DIALECT=<dialect>
 
 # For example:
 export TARGET_EXAMPLE_DB__DIALECT=example-db
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -668,14 +694,17 @@ meltano config target-example-db set _target_schema '$MELTANO_LOAD_DESTINATION_S
 # If the target schema cannot be determined dynamically using a setting reference:
 meltano config target-example-db set _target_schema explicit_target_schema
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <LOADER>__TARGET_SCHEMA=<schema>
 
 # For example:
 export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -739,14 +768,17 @@ meltano config <transform> set _package_name <name>
 # For example:
 meltano config dbt-facebook-ads set _package_name facebook_ads
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <TRANSFORM>__PACKAGE_NAME=<name>
 
 # For example:
 export DBT_FACEBOOK_ADS__PACKAGE_NAME=facebook_ads
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -790,16 +822,20 @@ meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('
 {% endraw %}
 
 ```
+
 {% endtab %}
 {% tab extra_usage env %}
+
 ```bash
 export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 
 # For example:
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 ```
+
 {% endtab %}
 {% endtabs %}
+
 ### Orchestrators
 
 <div class="notification is-warning">
@@ -844,7 +880,7 @@ The file bundle itself will not be added to your [`meltano.yml` project file](pr
 - [Environment variable](/guide/configuration#configuring-settings): `<BUNDLE>__UPDATE`, e.g. `DBT__UPDATE`
 - Default: `{}` (an empty object)
 
-A file bundle's `update` [extra](/guide/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans. [Glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns are supported to allow matching of multiple files with a single path.
+A file bundle's `update` [extra](/guide/configuration#plugin-extras) holds an object mapping file paths (of files inside the bundle, relative to the project root) to booleans. [Glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) patterns are supported to allow matching of multiple files with a single path.
 
 When a file path's value is `True`, the matching files are considered to be managed by the file bundle and updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
@@ -882,15 +918,18 @@ meltano config <bundle> set _update <path> <true/false>
 meltano config --plugin-type=files dbt set _update transform/dbt_project.yml false
 meltano config --plugin-type=files dbt set _update profiles/*.yml true
 ```
+
 {% endtab %}
 
 {% tab extra_usage env %}
+
 ```bash
 export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 
 # For example:
 export DBT__UPDATE='{"transform/dbt_project.yml": false, "profiles/*.yml": true}'
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -1021,4 +1060,5 @@ call mappings that leverage the same plugin at multiple locations numerous times
 # Mask the id if the customer is in the EU region using transform-field mapper.
 $ tap-someapi fix-null-country set-region-from-country  mask-id-if-eu target-jsonl
 ```
+
 <script src="/js/tabs.js"></script>
