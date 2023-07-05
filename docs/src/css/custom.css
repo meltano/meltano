@@ -921,3 +921,9 @@ main {
   margin-top: 0;
   margin-bottom: 1rem;
 }
+
+@media all and (min-width: 768px) and (max-width: 1279px) {
+  .navbar__items--left>* {
+    padding: 0 0.1rem
+  }
+}

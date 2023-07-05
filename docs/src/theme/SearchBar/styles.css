@@ -42,18 +42,7 @@
 }
 
 @media all and (min-width: 997px) and (max-width: 1279px) {
-  .navbar__inner .DocSearch-Button {
-    border: none !important;
-    padding: 12px 0 !important;
-    width: 20px !important;
-  }
 
-  .navbar__inner .DocSearch-Button:hover {
-    box-shadow: none;
-    background: transparent;
-  }
-
-  .navbar__inner .DocSearch-Button-Placeholder,
   .navbar__inner .DocSearch-Button-Keys {
     display: none;
   }
