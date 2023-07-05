@@ -16,7 +16,7 @@ export default function BlogPostItemContainer({ children, className }) {
     <div className="flex flex-col md:flex-row">
       <div
         className={clsx(
-          "w-full md:w-24 h-16 flex flex-col px-2 py-3 text-center shrink-0",
+          "w-full md:w-24 h-16 flex flex-col px-2 py-3 margin-bottom--xl text-center shrink-0",
           styles.date
         )}
       >

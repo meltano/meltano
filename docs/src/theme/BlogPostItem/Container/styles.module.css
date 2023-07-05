@@ -12,7 +12,6 @@
 
 @media all and (min-width: 768px) {
   .date {
-    margin-bottom: 0;
     margin-right: Calc(var(--ifm-spacing-horizontal) + 10px);
     margin-left: 10px;
     position: sticky;
