@@ -33,7 +33,7 @@ export default function DocItemLayout({ children }) {
   const docTOC = useDocTOC();
   const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   return (
-    <div className="container flex flex-col px-8">
+    <div className="container flex flex-col !px-8">
       <div className="flex">
         <div className={clsx("col", !docTOC.hidden && styles.docItemCol)}>
           <DocVersionBanner />
