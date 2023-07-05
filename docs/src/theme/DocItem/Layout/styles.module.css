@@ -4,7 +4,29 @@
 }
 
 .docItemContainer {
-  padding: 0 var(--ifm-spacing-horizontal);
+  padding: 0;
+  z-index: 3;
+}
+
+.tocWrapper {
+  margin-top: -17px;
+  width: 100%;
+  transition: all 0.2s ease;
+  position: sticky;
+  top: 82px;
+  height: fit-content;
+}
+
+.tocWrapper ul {
+  padding-left: 1rem;
+}
+
+.tocWrapper ul ul {
+  list-style-type: square;
+}
+
+.tocHidden {
+  width: 1px;
 }
 
 @media (min-width: 997px) {

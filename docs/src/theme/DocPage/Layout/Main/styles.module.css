@@ -2,6 +2,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
+  position: relative;
 }
 
 .docItemWrapper {
@@ -25,14 +26,13 @@
   margin-top: -200px;
   margin-left: -400px;
   opacity: 0.5;
-  z-index: -2;
+  z-index: 0;
   pointer-events: none;
 }
 
 @media (min-width: 997px) {
   .docMainContainer {
     flex-grow: 1;
-    max-width: calc(100% - var(--doc-sidebar-width));
   }
 
   .docMainContainerEnhanced {

@@ -35,6 +35,9 @@
   --ifm-breadcrumb-item-background-active: transparent;
   --ifm-breadcrumb-color-active: var(--meltano-blue);
   --ifm-navbar-height: 1rem;
+  --ifm-menu-color-background-hover: transparent;
+  --ifm-breadcrumb-separator-size-multiplier: 2;
+  --ifm-breadcrumb-spacing: 0.7rem;
 }
 
 @media all and (min-width: 768px) {
@@ -209,6 +212,11 @@ h6 {
 }
 
 .markdown a:not(.btn) {
+  color: var(--meltano-blue)
+}
+
+.changelog-content a:not(.btn) {
+  color: var(--ifm-link-hover-color);
   text-decoration: underline !important;
 }
 

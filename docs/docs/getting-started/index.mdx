@@ -8,7 +8,7 @@ sidebar_position: 5
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
-<div class="notification is-success">
+<div className="notification is-success">
     <p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
 </div>
 
@@ -39,7 +39,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
     source ~/.bashrc
     ```
 
-  <div class="notification is-info">
+  <div className="notification is-info">
     <p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
   </div>
 
@@ -245,7 +245,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
                   _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
 
-        <div class="notification is-info">
+        <div className="notification is-info">
 
     <p>Once you've got the extractor working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
 
@@ -276,7 +276,7 @@ Chances are that the extractor you just added to your project will require some 
 
 _To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration)._
 
-<div class="notification">
+<div className="notification">
   <p><strong>What if I already have a config file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
@@ -318,7 +318,7 @@ You can also optionally use the `list`, `set` and `unset` commands directly to v
 
 - Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
-  <div class="notification is-info">
+  <div className="notification is-info">
 
       <p><strong>See <a href="https://hub.meltano.com/extractors/gitlab#private-token">MeltanoHub for details</a> on how to get a GitLab `private_token` for tap-gitlab.</strong>
           </p>
@@ -386,7 +386,7 @@ By default, Meltano will instruct extractors to extract all supported entities a
 
 _To learn more about selecting entities and attributes for extraction, refer to the [Data Integration (EL) guide](/guide/integration#selecting-entities-and-attributes-for-extraction)._
 
-<div class="notification is-info">
+<div className="notification is-info">
   <p><strong>What if I already have a catalog file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have already generated a <a href="https://hub.meltano.com/singer/spec#catalog-files">catalog file</a>.</p>
   <p>If you'd like for Meltano to use it instead of <a href="/guide/integration#extractor-catalog-generation">generating a catalog</a> based on the entity selection rules you'll be asked to specify below, you can skip this section and either set the <a href="/concepts/plugins#catalog-extra">`catalog` extractor extra</a> or use <a href="/reference/command-line-interface#elt">`meltano elt`</a>'s`--catalog` option when <a href="#run-a-data-integration-el-pipeline">running the data integration (EL) pipeline</a> later on in this guide.</p>
@@ -467,7 +467,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
 
 If the data source you'll be pulling data from is a database, such as [PostgreSQL](https://hub.meltano.com/extractors/postgres.html) or [MongoDB](https://hub.meltano.com/extractors/mongodb.html), your extractor will likely require one final setup step: setting a [replication method](/guide/integration#replication-methods) for each [selected entity (table)](#select-entities-and-attributes-to-extract).
 
-<div class="notification is-info">
+<div className="notification is-info">
   <p>
     Extractors for Software as a Service (SaaS) APIs typically hard-code the appropriate replication method for each supported entity, so if you're using one, you can skip this section and <a href="#add-a-loader-to-send-data-to-a-destination">move on to setting up a loader</a>.
   </p>
@@ -583,7 +583,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
                   meltano add loader target-postgres --variant=datamill-co
                   ```
 
-  <div class="notification is-info">
+  <div className="notification is-info">
       <p>Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to <a href="https://hub.meltano.com/">MeltanoHub</a> for more help troubleshooting or join the <a href="https://meltano.com/slack">Meltano Slack workspace</a> to ask questions.
       </p>
 
@@ -638,7 +638,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
               _To learn more about adding custom plugins, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins)._
 
-    <div class="notification is-info">
+    <div className="notification is-info">
 
             <p>Once you've got the loader working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="/concepts/plugins#discoverable-plugins">index of discoverable plugins</a> so that it can be supported out of the box for new users!</p>
 
@@ -669,7 +669,7 @@ Chances are that the loader you just added to your project will require some [co
 
 _To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration)._
 
-<div class="notification is-warning">
+<div className="notification is-warning">
   <p><strong>What if I already have a config file for this loader?</strong></p>
   <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
@@ -720,7 +720,7 @@ You can also optionally use the `list`, `set` and `unset` commands directly to v
   meltano config target-postgres set default_target_schema public
   ```
 
-      <div class="notification is-info">
+      <div className="notification is-info">
 
   <p>You can turn on a local postgres docker instance with these configs using <code>docker run --name postgres -e POSTGRES_PASSWORD=meltano -e POSTGRES_USER=meltano -e POSTGRES_DB=warehouse -d -p 5432:5432 postgres</code>.</p>
 
@@ -802,7 +802,7 @@ If you run `meltano run` at another time, it will automatically pick up where th
 Behind the scenes Meltano is tracking state using a State ID that's auto-generated based on the extractor name, loader name, and active environment name.
 To override the state and extract all data from the beginning again you can use the `--full-refresh` argument.
 
-<div class="notification is-info">
+<div className="notification is-info">
   <p><strong>What if I already have a state file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#state-files">state file</a>.</p>
   <p>If you'd like Meltano to use it instead of <a href="/guide/integration#incremental-replication-state">looking up state based on the State ID</a>, you can either use <a href="/reference/command-line-interface#state"><code>meltano state</code></a> to view and edit the state directly or set the <a href="/concepts/plugins#state-extra"><code>state</code> extractor extra</a>.</p>
@@ -863,7 +863,7 @@ schedules:
     interval: "@daily"
 ```
 
-<div class="notification is-info">
+<div className="notification is-info">
   <p>The <code>name</code> setting in schedules acts as the <code>state_id</code> so that state is preserved across scheduled executions. This should generally be a globally unique string based on the job being run (i.e. <code>gitlab-to-postgres</code> or <code>gitlab-to-postgres-prod</code> if you have multiple environemnts).</p>
 </div>
 

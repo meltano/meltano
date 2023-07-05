@@ -2,6 +2,7 @@ import React from "react";
 import Link from "@docusaurus/Link";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import { translate } from "@docusaurus/Translate";
+import clsx from "clsx";
 import IconHome from "@theme/Icon/Home";
 import styles from "./styles.module.css";
 export default function HomeBreadcrumbItem() {
@@ -14,7 +15,7 @@ export default function HomeBreadcrumbItem() {
           message: "Home page",
           description: "The ARIA label for the home page in the breadcrumbs",
         })}
-        className="breadcrumbs__link"
+        className={clsx("breadcrumbs__link", styles.breadcrumbHomeLink)}
         href={homeHref}
       >
         <IconHome className={styles.breadcrumbHomeIcon} />

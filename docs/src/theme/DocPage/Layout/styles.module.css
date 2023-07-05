@@ -8,3 +8,13 @@
   display: flex;
   flex: 1 0 auto;
 }
+
+.collapseSidebarButtonIcon {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  margin-left: -32px;
+  left: 16px;
+  top: 1rem;
+  z-index: 3;
+}

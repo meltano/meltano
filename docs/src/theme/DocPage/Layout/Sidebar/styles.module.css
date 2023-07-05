@@ -17,7 +17,7 @@
     transition: width var(--ifm-transition-fast) ease;
     clip-path: inset(0);
     z-index: 2;
-    background: #ffffff;
+    background: var(--ifm-navbar-background-color);
   }
 
   .docSidebarContainerHidden {
@@ -25,8 +25,17 @@
     cursor: pointer;
   }
 
+  .docSidebarContainerHidden nav {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .docSidebarContainerHidden nav {
+    transition: all 0.2s ease;
+  }
+
   .sidebarViewport {
-    top: 0;
+    top: 100px;
     position: sticky;
     height: 100%;
     max-height: 100vh;

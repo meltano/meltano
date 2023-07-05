@@ -12,7 +12,7 @@ import styles from "./styles.module.css";
 import DocsVersionDropdownNavbarItem from "../NavbarItem/DocsVersionDropdownNavbarItem";
 // TODO move to design system folder
 function BreadcrumbsItemLink({ children, href, isLast }) {
-  const className = "breadcrumbs__link";
+  const className = clsx("breadcrumbs__link", styles.breadcrumbLink);
   if (isLast) {
     return (
       <span className={className} itemProp="name">
@@ -42,7 +42,7 @@ function BreadcrumbsItem({ children, active, index, addMicrodata }) {
         itemProp: "itemListElement",
         itemType: "https://schema.org/ListItem",
       })}
-      className={clsx("breadcrumbs__item", {
+      className={clsx("breadcrumbs__item", styles.breadcrumbItem, {
         "breadcrumbs__item--active": active,
       })}
     >
@@ -70,7 +70,7 @@ export default function DocBreadcrumbs() {
         description: "The ARIA label for the breadcrumbs",
       })}
     >
-      <div className="container flex px-1">
+      <div className="container flex px-8">
         <ul
           className="breadcrumbs col"
           itemScope

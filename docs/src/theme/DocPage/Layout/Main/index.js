@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useDocsSidebar } from "@docusaurus/theme-common/internal";
 import DocBreadcrumbs from "@theme/DocBreadcrumbs";
 import styles from "./styles.module.css";
-
 export default function DocPageLayoutMain({
   hiddenSidebarContainer,
   children,
@@ -19,7 +18,7 @@ export default function DocPageLayoutMain({
       <DocBreadcrumbs />
       <div
         className={clsx(
-          "container padding-bottom--lg px-4",
+          "padding-bottom--lg",
           styles.docItemWrapper,
           hiddenSidebarContainer && styles.docItemWrapperEnhanced
         )}

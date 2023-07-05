@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { useWindowSize } from "@docusaurus/theme-common";
 import { useDoc } from "@docusaurus/theme-common/internal";
 import DocItemPaginator from "@theme/DocItem/Paginator";
 import DocVersionBanner from "@theme/DocVersionBanner";
-import DocVersionBadge from "@theme/DocVersionBadge";
 import DocItemFooter from "@theme/DocItem/Footer";
 import DocItemTOCMobile from "@theme/DocItem/TOC/Mobile";
 import DocItemTOCDesktop from "@theme/DocItem/TOC/Desktop";
 import DocItemContent from "@theme/DocItem/Content";
 import styles from "./styles.module.css";
+import SidebarArrow from "../../../components/SidebarArrow";
 /**
  * Decide if the toc should be rendered, on mobile or desktop viewports
  */
@@ -31,13 +31,14 @@ function useDocTOC() {
 }
 export default function DocItemLayout({ children }) {
   const docTOC = useDocTOC();
+  const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   return (
-    <div className="row flex flex-col">
+    <div className="container flex flex-col px-8">
       <div className="flex">
         <div className={clsx("col", !docTOC.hidden && styles.docItemCol)}>
           <DocVersionBanner />
           {docTOC.mobile}
-          <div className={styles.docItemContainer}>
+          <div className={clsx("padding-top--md", styles.docItemContainer)}>
             <article>
               <DocItemContent>{children}</DocItemContent>
               <DocItemFooter />
@@ -45,7 +46,26 @@ export default function DocItemLayout({ children }) {
             <DocItemPaginator />
           </div>
         </div>
-        {docTOC.desktop && <div className="col col--3">{docTOC.desktop}</div>}
+        {docTOC.desktop && (
+          <div
+            className={clsx("col col--3 w-full flex justify-end toc-wrapper")}
+          >
+            <SidebarArrow
+              className={clsx(styles.collapseSidebarButtonIcon)}
+              hiddenSidebarContainer={hiddenSidebarContainer}
+              setHiddenSidebarContainer={setHiddenSidebarContainer}
+              position="right"
+            />
+            <div
+              className={clsx(
+                styles.tocWrapper,
+                hiddenSidebarContainer && styles.tocHidden
+              )}
+            >
+              {docTOC.desktop}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
