@@ -12,7 +12,7 @@ const config = {
   url: "https://docs.meltano.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+  onBrokenMarkdownLinks: "log",
   favicon: "img/favicon.png",
 
   // Even if you don't use internalization, you can use this field to set useful
