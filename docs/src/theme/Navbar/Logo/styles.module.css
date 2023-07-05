@@ -8,16 +8,9 @@
   line-height: 1.5rem
 }
 
-
 @media all and (min-width: 768px) {
   .docsLink {
     font-size: 1.6rem;
     line-height: 1.8rem
-  }
-}
-
-@media all and (min-width: 768px) and (max-width: 1279px) {
-  .navbarBrand {
-    margin-right: 0;
   }
 }
