@@ -12,7 +12,7 @@ from time import sleep
 
 import mock
 import pytest
-from snowplow_tracker import Emitter
+from snowplow_tracker import Emitter, SelfDescribing
 
 from meltano.core.project import Project
 from meltano.core.tracking.contexts.cli import CliEvent
@@ -294,8 +294,11 @@ class TestTracker:
         assert event_summary["good"] > 0
         assert event_summary["bad"] == 0
 
-        exit_event = snowplow.good()[0]["event"]
-        assert exit_event["event_name"] == "exit_event"
+        exit_event = next(
+            x["event"]
+            for x in snowplow.good()
+            if x["event"]["event_name"] == "exit_event"
+        )
         assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
 
     @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
@@ -310,15 +313,15 @@ class TestTracker:
         passed = False
 
         class MockSnowplowTracker:
-            def track_unstruct_event(self, _, contexts):
+            def track(self, event: SelfDescribing):
                 # Can't put asserts in here because this method is executed
                 # withing a try-except block that catches all exceptions.
                 nonlocal passed
                 expected_contexts = [EnvironmentContext, ProjectContext]
                 if send_anonymous_usage_stats:
                     expected_contexts.append(ExceptionContext)
-                passed = len(set(contexts)) == len(expected_contexts) and all(
-                    isinstance(ctx, tuple(expected_contexts)) for ctx in contexts
+                passed = len(set(event.context)) == len(expected_contexts) and all(
+                    isinstance(ctx, tuple(expected_contexts)) for ctx in event.context
                 )
 
         tracker.snowplow_tracker = MockSnowplowTracker()
@@ -359,14 +362,14 @@ class TestTracker:
 
         An HTTP sever is run on another thread, which handles request sent from
         the Snowplow tracker. When `timeout_should_occur` is `False`, we check
-        that this sever is properly masqerading as a Snowplow endpoint. When
+        that this sever is properly masquerading as a Snowplow endpoint. When
         `timeout_should_occur` is `True`, we check that when the server takes
         too long to respond, we timeout and continue without raising an error.
         """
-        timeout_occured = False
+        timeout_occurred = False
 
         class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
-            def do_GET(self) -> None:  # noqa: N802
+            def do_POST(self) -> None:  # noqa: N802
                 sleep(sleep_duration)
                 self.send_response(200, "OK")
                 self.end_headers()
@@ -384,24 +387,25 @@ class TestTracker:
         )
 
         def emitter_failure_callback(_, failure_events: list):  # noqa: ARG001
-            nonlocal timeout_occured
-            # `timeout_occured` is technically a misnomer here, since there are
+            nonlocal timeout_occurred
+            # `timeout_occurred` is technically a misnomer here, since there are
             # multiple reasons for failure, but this callback doesn't let us
             # distinguish. We can rely on the `timeout_should_occur is True`
             # case to ensure that this callback won't be called for non-timeout
             # reasons.
-            timeout_occured = True
+            timeout_occurred = True
 
         tracker = Tracker(project)
         assert len(tracker.snowplow_tracker.emitters) == 1
         tracker.snowplow_tracker.emitters[0].on_failure = emitter_failure_callback
 
         tracker.track_command_event(CliEvent.started)
+        tracker.snowplow_tracker.flush()
 
         server.shutdown()
         server_thread.join()
 
-        assert timeout_occured is timeout_should_occur
+        assert timeout_occurred is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
         self,
@@ -454,16 +458,17 @@ class TestTracker:
             assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
 
             assert len(tracker.snowplow_tracker.emitters) == 2
-            assert isinstance(tracker.snowplow_tracker.emitters[0], Emitter)
-            assert (
-                tracker.snowplow_tracker.emitters[0].endpoint
-                == "https://valid.endpoint:8080/i"
+
+            emitter = tracker.snowplow_tracker.emitters[0]
+            assert isinstance(emitter, Emitter)
+            assert emitter.endpoint.startswith(
+                "https://valid.endpoint:8080/",
             )
 
-            assert isinstance(tracker.snowplow_tracker.emitters[1], Emitter)
-            assert (
-                tracker.snowplow_tracker.emitters[1].endpoint
-                == "https://other.endpoint/path/to/collector/i"
+            emitter = tracker.snowplow_tracker.emitters[1]
+            assert isinstance(emitter, Emitter)
+            assert emitter.endpoint.startswith(
+                "https://other.endpoint/path/to/collector/",
             )
         finally:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
