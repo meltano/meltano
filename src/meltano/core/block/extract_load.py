@@ -460,14 +460,16 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         """
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
-        if not self.context.force:
-            existing = JobFinder(job.job_name).latest_running(self.context.session)
-            if existing:
-                raise RunnerError(
-                    f"Another '{job.job_name}' pipeline is already running "
-                    f"which started at {existing.started_at}. To ignore this "
-                    "check use the '--force' option.",
-                )
+        if not self.context.force and (
+            existing := JobFinder(job.job_name).latest_running(
+                self.context.session,
+            )
+        ):
+            raise RunnerError(
+                f"Another '{job.job_name}' pipeline is already running "
+                f"which started at {existing.started_at}. To ignore this "
+                "check use the '--force' option.",
+            )
 
         with closing(self.context.session) as session:
             async with job.run(session):
@@ -697,8 +699,10 @@ class ELBExecutionManager:
         logger.debug("waiting for process completion or exception")
         done = await self.elb.process_wait(output_exception_future, start_idx)
 
-        output_futures_failed = first_failed_future(output_exception_future, done)
-        if output_futures_failed:
+        if output_futures_failed := first_failed_future(
+            output_exception_future,
+            done,
+        ):
             # Special behavior for a producer stdout handler raising a line
             # length limit error.
             if self.elb.head.proxy_stdout() == output_futures_failed:
@@ -808,12 +812,11 @@ def _check_exit_codes(  # noqa: WPS238
     if consumer_code:
         raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
 
-    failed_mappers = [
+    if failed_mappers := [
         {mapper_id: exit_code}
         for mapper_id, exit_code in intermediate_codes.items()
         if exit_code
-    ]
-    if failed_mappers:
+    ]:
         raise RunnerError("Mappers failed", failed_mappers)
 
 

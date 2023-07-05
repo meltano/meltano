@@ -180,8 +180,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         else:
             label = f"from {source.label}"
         expanded_value = value if value is not None else "(empty string)"
-        unexpanded_value = config_metadata.get("unexpanded_value")
-        if unexpanded_value:
+        if unexpanded_value := config_metadata.get("unexpanded_value"):
             current_value = (
                 unexpanded_value if unexpanded_value is not None else "(empty string)"
             )
@@ -214,8 +213,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                 ),
             )
 
-        docs_url = self.settings.docs_url
-        if docs_url:
+        if docs_url := self.settings.docs_url:
             post.append(
                 Text.from_markup(
                     f" To learn more about {self.settings.label} and its "

@@ -107,14 +107,11 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self.process_handle is None:
             return
 
-        try:
+        with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
-        except ProcessLookupError:
-            # Process already stopped
-            pass
         await self.process_future
         if self._stdout_future is not None:
             self._stdout_future.cancel()
@@ -198,9 +195,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         Returns:
             The stdin of the underlying process.
         """
-        if self.process_handle is None:
-            return None
-        return self.process_handle.stdin
+        return None if self.process_handle is None else self.process_handle.stdin
 
     async def close_stdin(self) -> None:
         """Close the underlying process stdin if the block is a consumer."""
@@ -328,10 +323,7 @@ class SingerBlock(InvokerBase, IOBlock):
         stream_buffer_size = self.project.settings.get("elt.buffer_size")
         line_length_limit = stream_buffer_size // 2
 
-        stdin = None
-        if self.consumer:
-            stdin = asyncio.subprocess.PIPE
-
+        stdin = asyncio.subprocess.PIPE if self.consumer else None
         try:
             self.process_handle = await self.invoker.invoke_async(
                 limit=line_length_limit,
@@ -351,15 +343,11 @@ class SingerBlock(InvokerBase, IOBlock):
         if self.process_handle is None:
             return
 
-        try:
+        with suppress(ProcessLookupError):
             if kill:
                 self.process_handle.kill()
             else:
                 self.process_handle.terminate()
-        except ProcessLookupError:
-            # Process already stopped
-            pass
-
         await self.process_future
         if self._stdout_future is not None:
             self._stdout_future.cancel()

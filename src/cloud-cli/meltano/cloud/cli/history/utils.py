@@ -69,19 +69,16 @@ def lookback_to_interval(lookback: str) -> datetime.timedelta:
 
     weeks, days, hours, minutes = m.groups()
 
-    factor: int
-    total = 0
-
-    for value, factor in (
-        (minutes, 1),
-        (hours, MINUTES_IN_HOUR),
-        (days, MINUTES_IN_DAY),
-        (weeks, MINUTES_IN_WEEK),
-    ):
-        if value is not None:
-            number = int(value[:-1])
-            total += number * factor
-
+    total = sum(
+        int(value[:-1]) * factor
+        for value, factor in (  # noqa: WPS361
+            (minutes, 1),
+            (hours, MINUTES_IN_HOUR),
+            (days, MINUTES_IN_DAY),
+            (weeks, MINUTES_IN_WEEK),
+        )
+        if value is not None
+    )
     return datetime.timedelta(minutes=total)
 
 

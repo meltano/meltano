@@ -51,8 +51,7 @@ def project_engine(
     Returns:
         The engine, and a session maker bound to the engine.
     """
-    existing_engine = _engines.get(project)
-    if existing_engine:
+    if existing_engine := _engines.get(project):
         return existing_engine
 
     engine_uri = project.settings.get("database_uri")
