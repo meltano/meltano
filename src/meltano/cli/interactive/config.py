@@ -424,16 +424,16 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             nl=False,
         )
         click.secho(
-            f"{REDACTED_VALUE if is_redacted else value!r}",
+            REDACTED_VALUE if is_redacted else f"{value!r}",
             fg="yellow" if is_redacted else "green",
         )
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            if is_redacted:
-                current_value = REDACTED_VALUE
+            current_value = REDACTED_VALUE if is_redacted else f"{value!r}"
+
             click.secho(
-                f"Current value is still: {current_value!r} (from {source.label})",
+                f"Current value is still: {current_value} (from {source.label})",
                 fg="yellow",
             )
 

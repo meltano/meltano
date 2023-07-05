@@ -284,9 +284,11 @@ def list_settings(ctx, extras: bool):
         else:
             label = f"{get_label(config_metadata)}"
 
+        redacted_with_value = value is not None and setting_def.is_redacted
+
         current_value = click.style(
-            f"{value!r}",
-            fg="yellow" if value is not None and setting_def.is_redacted else "green",
+            value if redacted_with_value else f"{value!r}",
+            fg="yellow" if redacted_with_value else "green",
         )
 
         click.echo(f" current value: {current_value}", nl=False)
