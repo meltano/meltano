@@ -28,21 +28,21 @@
   "settings": [
     {
       "name": "aws_access_key_id",
-      "kind": "password",
       "label": "Aws Access Key Id",
-      "description": "The access key for your AWS account."
+      "description": "The access key for your AWS account.",
+      "sensitive": true
     },
     {
       "name": "aws_secret_access_key",
-      "kind": "password",
       "label": "Aws Secret Access Key",
-      "description": "The secret key for your AWS account."
+      "description": "The secret key for your AWS account.",
+      "sensitive": true
     },
     {
       "name": "aws_session_token",
-      "kind": "password",
       "label": "Aws Session Token",
-      "description": "The session key for your AWS account. This is only needed when you are using temporary credentials."
+      "description": "The session key for your AWS account. This is only needed when you are using temporary credentials.",
+      "sensitive": true
     },
     {
       "name": "aws_profile",

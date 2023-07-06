@@ -191,7 +191,7 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
-- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
@@ -361,7 +361,7 @@ meltano config <plugin> set --interactive --store=dotenv
 ```
 
 ### Sensitive configuration
-Values for sensitive settings (defined as `kind: password`) are redacted in the output of the following commands:
+Values for sensitive settings (defined as `sensitive: true`) are redacted in the output of the following commands:
 
 ```bash
 meltano config <plugin> list

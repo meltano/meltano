@@ -264,7 +264,7 @@ plugins:
     - catalog
     settings:
     - name: password
-      kind: password
+      sensitive: true
     - name: my_custom_tap_username
       aliases: [custom_tap_username, username]
 ```
@@ -293,7 +293,7 @@ To see what name or alias a setting's value is being derived from, you can run `
 $ export MY_CUSTOM_TAP_USERNAME=some_username
 $ meltano config my-custom-tap list
 2022-06-22T10:00:00Z [info     ] Environment 'dev' is active
-password [env: MY_CUSTOM_TAP_PASSWORD] current value: 'some_very_secure_password' (from the MY_CUSTOM_TAP_PASSWORD variable in `.env`)
+password [env: MY_CUSTOM_TAP_PASSWORD] current value: (redacted) (from the MY_CUSTOM_TAP_PASSWORD variable in `.env`)
 my_custom_tap_username [env: MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_USERNAME] current value: 'some_username' (from the MY_CUSTOM_TAP_USERNAME variable in the environment)
 ```
 

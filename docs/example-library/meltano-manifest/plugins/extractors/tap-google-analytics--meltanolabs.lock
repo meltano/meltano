@@ -51,27 +51,27 @@
     },
     {
       "name": "oauth_credentials.client_id",
-      "kind": "password",
       "label": "OAuth Client ID",
-      "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n"
+      "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.client_secret",
-      "kind": "password",
       "label": "OAuth Client Secret",
-      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.access_token",
-      "kind": "password",
       "label": "OAuth Access Token",
-      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.refresh_token",
-      "kind": "password",
       "label": "OAuth Refresh Token",
-      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "view_id",

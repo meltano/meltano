@@ -225,21 +225,21 @@
         "settings": [
           {
             "description": "The access key for your AWS account.",
-            "kind": "password",
             "label": "Aws Access Key Id",
-            "name": "aws_access_key_id"
+            "name": "aws_access_key_id",
+            "sensitive": true
           },
           {
             "description": "The secret key for your AWS account.",
-            "kind": "password",
             "label": "Aws Secret Access Key",
-            "name": "aws_secret_access_key"
+            "name": "aws_secret_access_key",
+            "sensitive": true
           },
           {
             "description": "The session key for your AWS account. This is only needed when you are using temporary credentials.",
-            "kind": "password",
             "label": "Aws Session Token",
-            "name": "aws_session_token"
+            "name": "aws_session_token",
+            "sensitive": true
           },
           {
             "description": "The AWS credentials profile name to use. The profile must be configured and accessible.",
@@ -516,9 +516,9 @@
         ],
         "settings": [
           {
-            "kind": "password",
             "label": "API Key",
-            "name": "api_key"
+            "name": "api_key",
+            "sensitive": true
           },
           {
             "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
@@ -669,27 +669,27 @@
           },
           {
             "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
-            "kind": "password",
             "label": "OAuth Client ID",
-            "name": "oauth_credentials.client_id"
+            "name": "oauth_credentials.client_id",
+            "sensitive": true
           },
           {
             "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
             "label": "OAuth Client Secret",
-            "name": "oauth_credentials.client_secret"
+            "name": "oauth_credentials.client_secret",
+            "sensitive": true
           },
           {
             "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
             "label": "OAuth Access Token",
-            "name": "oauth_credentials.access_token"
+            "name": "oauth_credentials.access_token",
+            "sensitive": true
           },
           {
             "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
             "label": "OAuth Refresh Token",
-            "name": "oauth_credentials.refresh_token"
+            "name": "oauth_credentials.refresh_token",
+            "sensitive": true
           },
           {
             "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
@@ -802,10 +802,10 @@
           },
           {
             "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
-            "kind": "password",
             "label": "Access Token",
             "name": "private_token",
             "placeholder": "Ex. *****************",
+            "sensitive": true,
             "value": ""
           },
           {
@@ -909,9 +909,9 @@
           },
           {
             "description": "GitHub token to authenticate with.",
-            "kind": "password",
             "label": "Auth Token",
-            "name": "auth_token"
+            "name": "auth_token",
+            "sensitive": true
           },
           {
             "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits.",
@@ -1180,9 +1180,9 @@
           },
           {
             "description": "Snowflake Password",
-            "kind": "password",
             "label": "Password",
-            "name": "password"
+            "name": "password",
+            "sensitive": true
           },
           {
             "description": "Snowflake virtual warehouse name",
@@ -1687,9 +1687,9 @@
           },
           {
             "description": "Snowflake Password",
-            "kind": "password",
             "label": "Password",
-            "name": "password"
+            "name": "password",
+            "sensitive": true
           },
           {
             "description": "Snowflake virtual warehouse name",
@@ -1708,21 +1708,21 @@
           },
           {
             "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used",
-            "kind": "password",
             "label": "AWS Access Key ID",
-            "name": "aws_access_key_id"
+            "name": "aws_access_key_id",
+            "sensitive": true
           },
           {
             "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used",
-            "kind": "password",
             "label": "AWS Secret Access Key",
-            "name": "aws_secret_access_key"
+            "name": "aws_secret_access_key",
+            "sensitive": true
           },
           {
             "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used",
-            "kind": "password",
             "label": "AWS Session Token",
-            "name": "aws_session_token"
+            "name": "aws_session_token",
+            "sensitive": true
           },
           {
             "description": "AWS profile name for profile based authentication. If not provided, `AWS_PROFILE` environment variable will be used.",
@@ -1823,9 +1823,9 @@
           },
           {
             "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string.",
-            "kind": "password",
             "label": "Client Side Encryption Master Key",
-            "name": "client_side_encryption_master_key"
+            "name": "client_side_encryption_master_key",
+            "sensitive": true
           },
           {
             "description": "Required when `client_side_encryption_master_key` is defined. The name of the encrypted stage object in Snowflake that created separately and using the same encryption master key.",
@@ -2335,9 +2335,9 @@
           },
           {
             "description": "The user password to authenticate with.",
-            "kind": "password",
             "label": "Password",
-            "name": "password"
+            "name": "password",
+            "sensitive": true
           },
           {
             "description": "The user role to assume.",
@@ -2536,9 +2536,9 @@
           },
           {
             "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
-            "kind": "password",
             "label": "Secret Key",
             "name": "SECRET_KEY",
+            "sensitive": true,
             "value": "thisisnotapropersecretkey"
           }
         ],

@@ -122,7 +122,7 @@ Fill in the details for these four attributes, and set add_record_metadata to Tr
 $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
-&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: '(redacted)'
+&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: (redacted)
 $ meltano config target-postgres set database postgres
 &ensp;&ensp;Loader 'target-postgres' setting 'database' was set in `meltano.yml`: 'postgres'
 $ meltano config target-postgres set add_record_metadata True

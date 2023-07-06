@@ -50,9 +50,9 @@
     },
     {
       "name": "password",
-      "kind": "password",
       "label": "Password",
-      "description": "Snowflake Password"
+      "description": "Snowflake Password",
+      "sensitive": true
     },
     {
       "name": "warehouse",

@@ -506,7 +506,7 @@ settings:
 ```
 
 ### `settings[*].sensitive`
-Optional. Use to mark a setting as sensitive (e.g. a password or code).
+Optional. Use to mark a setting as sensitive (e.g. a password, token or code).
 
 ```yaml
 settings:

@@ -22,8 +22,8 @@
   "settings": [
     {
       "name": "api_key",
-      "kind": "password",
-      "label": "API Key"
+      "label": "API Key",
+      "sensitive": true
     },
     {
       "name": "start_date",

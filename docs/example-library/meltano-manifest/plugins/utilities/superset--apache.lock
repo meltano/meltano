@@ -40,10 +40,10 @@
     },
     {
       "name": "SECRET_KEY",
-      "kind": "password",
       "value": "thisisnotapropersecretkey",
       "label": "Secret Key",
-      "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`."
+      "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
+      "sensitive": true
     }
   ],
   "commands": {

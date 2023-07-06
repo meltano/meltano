@@ -62,8 +62,8 @@ class TestProjectFiles:
                         "settings": [
                             {
                                 "name": "token",
-                                "kind": "password",
                                 "description": "Token for the API. This is a secret.",
+                                "sensitive": True,
                             },
                         ],
                     },
@@ -156,8 +156,8 @@ class TestProjectFiles:
                         "settings": [
                             {
                                 "name": "token",
-                                "kind": "password",
                                 "description": "Token for the API. This is a secret.",
+                                "sensitive": True,
                             },
                         ],
                     },
@@ -253,8 +253,8 @@ class TestProjectFiles:
                         "settings": [
                             {
                                 "name": "token",
-                                "kind": "password",
                                 "description": "Token for the API. This is a secret.",
+                                "sensitive": True,
                             },
                         ],
                     },
@@ -379,10 +379,10 @@ class TestProjectFiles:
               - name: tap-meltano-yml # Comment on array element
                 settings:
                 - name: token
-                  kind: password
                   description: >-
                     Token for the API.
                     This is a secret.
+                  sensitive: true
 
               - name: modified-tap-subconfig-2-yml
 

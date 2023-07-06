@@ -111,7 +111,7 @@ $ meltano config dbt-postgres set port 5432
 $ meltano config dbt-postgres set user meltano
 &ensp;&ensp;Utility 'dbt-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config dbt-postgres set password password
-&ensp;&ensp;Utility 'dbt-postgres' setting 'password' was set in `.env`: 'password'
+&ensp;&ensp;Utility 'dbt-postgres' setting 'password' was set in `.env`: (redacted)
 $ meltano config dbt-postgres set dbname postgres
 &ensp;&ensp;Utility 'dbt-postgres' setting 'dbname' was set in `meltano.yml`: 'postgres'
 $ meltano config dbt-postgres set schema analytics
