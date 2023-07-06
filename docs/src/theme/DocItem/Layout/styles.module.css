@@ -8,6 +8,22 @@
   z-index: 3;
 }
 
+.tocContainer {
+  max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+.docItem {
+  transition: all 0.2s ease;
+}
+
+.tocHiddenContainer {
+  width: 1px;
+  max-width: 1px;
+  position: relative;
+  right: 0;
+}
+
 .tocWrapper {
   margin-top: -17px;
   width: 100%;
@@ -15,6 +31,14 @@
   position: sticky;
   top: 82px;
   height: fit-content;
+}
+
+.tocWrapper a {
+  color: var(--markdown-color);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
 }
 
 .tocWrapper ul {

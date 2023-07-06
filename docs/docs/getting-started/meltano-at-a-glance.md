@@ -37,7 +37,7 @@ Welcome to your Open Source DataOps Infrastructure! With Meltano you can move yo
 
 Waiting to see how Meltano works within 90 secs? We got you covered:
 
-<iframe width="800" height="632" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Core Workflow
 
@@ -55,12 +55,12 @@ Meltano allows you to do any combination of these steps inside your Meltano proj
 Here's a complete walk-through pulling data from AWS S3 and dumping it into a PostgreSQL database within 60 secs.
 
 <div class="language-bash highlighter-rouge">
-    <iframe width="800" height="632" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <iframe class="video" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 ### Transforming data
 Here's a complete walk-through extending the extract & load to include more CSVs and running a dbt-project over them to transform the data.
 
-<iframe width="800" height="632" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Orchestrating workflows
 
@@ -76,7 +76,7 @@ to add the schedule. Meltano also provides commands to start an Airflow instance
 
 Need to add additional steps to your data pipeline? Here's a complete setup also pulling in Superset as visualization tool.
 
-<iframe width="800" height="632" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video" src="https://www.youtube.com/embed/sL3RvXZOTvE" title="From 0 to DataOps - Meltano 2.0 Speedrun Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Getting Started Resources
 

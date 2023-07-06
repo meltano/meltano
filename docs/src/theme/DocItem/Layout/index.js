@@ -34,8 +34,13 @@ export default function DocItemLayout({ children }) {
   const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   return (
     <div className="container flex flex-col !px-8">
-      <div className="flex">
-        <div className={clsx("col", !docTOC.hidden && styles.docItemCol)}>
+      <div className={clsx("flex", styles.docItem)}>
+        <div
+          className={clsx(
+            "col px-0",
+            !hiddenSidebarContainer && styles.docItemCol
+          )}
+        >
           <DocVersionBanner />
           {docTOC.mobile}
           <div className={clsx("padding-top--md", styles.docItemContainer)}>
@@ -48,7 +53,11 @@ export default function DocItemLayout({ children }) {
         </div>
         {docTOC.desktop && (
           <div
-            className={clsx("col col--3 w-full flex justify-end toc-wrapper")}
+            className={clsx(
+              "col col--3 flex justify-end",
+              styles.tocContainer,
+              hiddenSidebarContainer && styles.tocHiddenContainer
+            )}
           >
             <SidebarArrow
               className={clsx(styles.collapseSidebarButtonIcon)}

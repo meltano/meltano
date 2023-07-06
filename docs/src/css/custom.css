@@ -38,7 +38,8 @@
   --ifm-menu-color-background-hover: transparent;
   --ifm-breadcrumb-separator-size-multiplier: 2;
   --ifm-breadcrumb-spacing: 0.7rem;
-  --ifm-menu-color-active: var(--meltano-blue)
+  --ifm-menu-color-active: var(--meltano-blue);
+
 }
 
 @media all and (min-width: 768px) {
@@ -932,13 +933,18 @@ main {
 }
 
 .table-of-contents {
-  padding-top: 2.5rem;
+  padding-top: 2rem;
   padding-bottom: 2.5rem;
 }
 
-.table-of-contents li {
+.table-of-contents a {
   padding-top: 0;
   padding-bottom: 0;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.video {
+  aspect-ratio: 16 / 9;
+  width: 100%;
 }

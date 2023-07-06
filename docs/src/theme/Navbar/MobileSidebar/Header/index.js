@@ -15,7 +15,7 @@ function CloseButton() {
         message: "Close navigation bar",
         description: "The ARIA label for close button of mobile sidebar",
       })}
-      className="clean-btn navbar-sidebar__close mt-12 mr-5"
+      className="clean-btn navbar-sidebar__close mt-16 mr-3"
       onClick={() => mobileSidebar.toggle()}
     >
       <IconClose color="var(--ifm-color-emphasis-600)" />
