@@ -7,17 +7,9 @@
   margin-right: 1rem;
 }
 
-@media all and (min-width: 768px) and (max-width: 1279px) {
+@media all and (min-width: 768px) and (max-width: 996px) {
   .searchBox {
     justify-content: center;
-  }
-}
-
-@media all and (min-width: 997px) and (max-width: 1279px) {
-  .searchBox {
-    border: none !important;
-    padding: 0 !important;
-    width: 20px !important;
   }
 }
 

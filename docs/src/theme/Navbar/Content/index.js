@@ -4,6 +4,7 @@ import {
   splitNavbarItems,
   useNavbarMobileSidebar,
 } from "@docusaurus/theme-common/internal";
+import clsx from "clsx";
 import NavbarItem from "@theme/NavbarItem";
 import NavbarColorModeToggle from "@theme/Navbar/ColorModeToggle";
 import SearchBar from "@theme/SearchBar";
@@ -40,9 +41,16 @@ function NavbarContentLayout({ left, right }) {
   return (
     <div className="navbar__inner relative">
       <NavbarLogo />
-      <div className="navbar__items navbar__items--left">{left}</div>
       <div
-        className={"navbar__items navbar__items--right " + styles.background}
+        className={clsx("navbar__items navbar__items--left", styles.navbarLeft)}
+      >
+        {left}
+      </div>
+      <div
+        className={clsx(
+          "navbar__items navbar__items--right",
+          styles.navbarRight
+        )}
       >
         {right}
       </div>

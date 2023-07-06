@@ -215,7 +215,7 @@ h6 {
   color: var(--meltano-blue)
 }
 
-.changelog-content a:not(.btn) {
+.changelog-content a:not(.btn) .changelog-content a:not(h2) {
   color: var(--ifm-link-hover-color);
   text-decoration: underline !important;
 }
@@ -920,10 +920,4 @@ main {
   padding-bottom: 0;
   margin-top: 0;
   margin-bottom: 1rem;
-}
-
-@media all and (min-width: 768px) and (max-width: 1279px) {
-  .navbar__items--left>* {
-    padding: 0 0.1rem
-  }
 }

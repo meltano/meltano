@@ -1,8 +1,8 @@
-.background {
+.navbarRight {
   position: relative;
 }
 
-.background:before {
+.navbarRight:before {
   content: "";
   display: block;
   background-image: url(../../../../static/img/homepage/bg-ellipse-center.svg);
@@ -17,4 +17,9 @@
   opacity: 0.5;
   z-index: -2;
   pointer-events: none;
+}
+
+.navbarLeft {
+  flex: 0 0 auto;
+  margin-right: 1rem;
 }
