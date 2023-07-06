@@ -38,6 +38,7 @@
   --ifm-menu-color-background-hover: transparent;
   --ifm-breadcrumb-separator-size-multiplier: 2;
   --ifm-breadcrumb-spacing: 0.7rem;
+  --ifm-menu-color-active: var(--meltano-blue)
 }
 
 @media all and (min-width: 768px) {
@@ -155,7 +156,7 @@ h6 {
   font-size: 32px;
   line-height: 110%;
   letter-spacing: -0.03em;
-  color: var(--meltano-h-color);
+  color: var(--ifm-color-primary);
 }
 
 .markdown h2 {
@@ -814,6 +815,26 @@ main {
 
 .navbar__logo {
   height: 1.5rem;
+}
+
+.sidebar-category-icon {
+  background-color: var(--meltano-black);
+  mask-repeat: no-repeat;
+  mask-size: cover;
+  mask-position: right;
+  width: 28px;
+  height: 28px;
+  margin-right: 0.5rem;
+  opacity: 0.75;
+}
+
+[data-theme='dark'] .sidebar-category-icon {
+  background-color: var(--meltano-white);
+}
+
+.menu__link--active .sidebar-category-icon {
+  background-color: var(--meltano-blue);
+  opacity: 1;
 }
 
 @media (min-width: 768px) {

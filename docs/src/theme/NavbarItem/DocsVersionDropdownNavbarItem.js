@@ -55,15 +55,7 @@ export default function DocsVersionDropdownNavbarItem({
   // the site with a single docs version (onlyIncludeVersions: ['1.0.0']),
   // We'd rather render a button instead of a dropdown
   if (items.length <= 1) {
-    return (
-      <DefaultNavbarItem
-        {...props}
-        mobile={mobile}
-        label={dropdownLabel}
-        to={dropdownTo}
-        isActive={dropdownActiveClassDisabled ? () => false : undefined}
-      />
-    );
+    return null;
   }
   return (
     <DropdownNavbarItem

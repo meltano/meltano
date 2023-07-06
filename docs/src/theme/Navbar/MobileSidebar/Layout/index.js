@@ -9,7 +9,7 @@ export default function NavbarMobileSidebarLayout({
 }) {
   const { shown: secondaryMenuShown } = useNavbarSecondaryMenu();
   return (
-    <div className="navbar-sidebar">
+    <div className="navbar-sidebar overflow-hidden">
       {header}
       <div
         className={clsx("navbar-sidebar__items", {

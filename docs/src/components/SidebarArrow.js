@@ -75,8 +75,7 @@ export default function SidebarArrow({
             width="31"
             height="31"
             rx="15.5"
-            // stroke="#080216"
-            stroke-opacity="0.15"
+            strokeOpacity="0.15"
             className={styles.collapseSidebarButtonIconCircle}
           />
         </svg>

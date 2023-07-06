@@ -2,6 +2,8 @@ import React from "react";
 import { useNavbarMobileSidebar } from "@docusaurus/theme-common/internal";
 import { translate } from "@docusaurus/Translate";
 import IconClose from "@theme/Icon/Close";
+import clsx from "clsx";
+import styles from "./styles.module.css";
 
 function CloseButton() {
   const mobileSidebar = useNavbarMobileSidebar();
@@ -13,7 +15,7 @@ function CloseButton() {
         message: "Close navigation bar",
         description: "The ARIA label for close button of mobile sidebar",
       })}
-      className="clean-btn navbar-sidebar__close mt-5 mr-5"
+      className="clean-btn navbar-sidebar__close mt-12 mr-5"
       onClick={() => mobileSidebar.toggle()}
     >
       <IconClose color="var(--ifm-color-emphasis-600)" />
@@ -22,7 +24,12 @@ function CloseButton() {
 }
 export default function NavbarMobileSidebarHeader() {
   return (
-    <div className="navbar-sidebar__brand">
+    <div
+      className={clsx(
+        "navbar-sidebar__brand absolute",
+        styles.closeButtonWrapper
+      )}
+    >
       <CloseButton />
     </div>
   );
