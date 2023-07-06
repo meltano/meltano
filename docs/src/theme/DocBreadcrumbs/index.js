@@ -70,7 +70,7 @@ export default function DocBreadcrumbs() {
         description: "The ARIA label for the breadcrumbs",
       })}
     >
-      <div className="container flex !px-8">
+      <div className="container flex md:!px-8">
         <ul
           className="breadcrumbs col"
           itemScope

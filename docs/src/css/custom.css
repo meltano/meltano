@@ -944,6 +944,10 @@ main {
   margin-bottom: 0.8rem;
 }
 
+.toc-book-icon path {
+  stroke: var(--ligth-button-text-color)
+}
+
 .video {
   aspect-ratio: 16 / 9;
   width: 100%;

@@ -27,7 +27,7 @@ export default function NavbarMobilePrimaryMenu() {
   const items = useNavbarItems();
   return (
     <div className="primaryWrapper h-full container flex flex-col justify-between">
-      <div className="mainNav">
+      <div className="mainNav my-10">
         <NavbarSearch className={"my-10 " + styles.sidebarSearch}>
           <SearchBar />
         </NavbarSearch>

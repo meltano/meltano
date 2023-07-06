@@ -143,7 +143,6 @@ export default function HomepageUseCases() {
           <Swiper
             modules={[Navigation, A11y]}
             slidesPerView={1}
-            // onSlideChange={() => console.log("slide change")}
             onSwiper={setSwiper}
             spaceBetween="16"
             navigation={{

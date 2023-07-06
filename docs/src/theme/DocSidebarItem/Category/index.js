@@ -114,7 +114,6 @@ export default function DocSidebarItemCategory({
     }
   }, [collapsible, expandedItem, index, setCollapsed, autoCollapseCategories]);
 
-  console.log(collapsible);
   return (
     <li
       className={clsx(

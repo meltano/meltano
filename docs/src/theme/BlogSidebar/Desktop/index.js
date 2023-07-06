@@ -3,7 +3,7 @@ import clsx from "clsx";
 import Link from "@docusaurus/Link";
 import { translate } from "@docusaurus/Translate";
 import styles from "./styles.module.css";
-export default function BlogSidebarDesktop({ sidebar, toc }) {
+export default function BlogSidebarDesktop({ sidebar }) {
   return (
     <aside className={clsx(styles.sidebarWrapper, "col col--2")}>
       <nav
@@ -31,7 +31,6 @@ export default function BlogSidebarDesktop({ sidebar, toc }) {
               >
                 {item.title}
               </Link>
-              {/* {toc} */}
             </li>
           ))}
         </ul>

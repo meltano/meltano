@@ -33,7 +33,7 @@ export default function DocItemLayout({ children }) {
   const docTOC = useDocTOC();
   const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   return (
-    <div className="container flex flex-col !px-8">
+    <div className="container flex flex-col md:!px-8">
       <div className={clsx("flex", styles.docItem)}>
         <div
           className={clsx(
@@ -46,7 +46,7 @@ export default function DocItemLayout({ children }) {
           <div className={clsx("padding-top--md", styles.docItemContainer)}>
             <article>
               <DocItemContent>{children}</DocItemContent>
-              <DocItemFooter />
+              {/* <DocItemFooter /> */}
             </article>
             <DocItemPaginator />
           </div>

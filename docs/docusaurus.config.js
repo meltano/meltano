@@ -95,7 +95,7 @@ const config = {
             "aria-label": "Tutorials",
           },
           {
-            to: "/",
+            to: "/getting-started",
             label: "Docs",
             position: "left",
             className: "header-docs-link",

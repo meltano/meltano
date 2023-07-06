@@ -30,7 +30,7 @@ export default function BlogLayout(props) {
       </div>
       <div className={clsx(styles.changelog, "container")}>
         <div className="row">
-          <BlogSidebar sidebar={sidebar} toc={toc} />
+          <BlogSidebar sidebar={sidebar} />
           <main
             className={clsx("col py-10 changelog-content", {
               "col--8": hasSidebar,
