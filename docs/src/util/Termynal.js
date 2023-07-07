@@ -1,7 +1,7 @@
 import React from "react";
 import BrowserOnly from "@docusaurus/BrowserOnly";
 
-export default function Termynal() {
+export default function Termynal(children) {
   /** Generate a terminal widget. */
   class Termynal {
     /**
@@ -317,5 +317,11 @@ export default function Termynal() {
   createTermynals();
   loadVisibleTermynals();
 
-  return <BrowserOnly>{() => <div id="#termynal" />}</BrowserOnly>;
+  return (
+    <BrowserOnly>
+      {() => {
+        children;
+      }}
+    </BrowserOnly>
+  );
 }
