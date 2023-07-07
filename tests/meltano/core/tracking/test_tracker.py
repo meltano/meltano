@@ -366,7 +366,6 @@ class TestTracker:
         `timeout_should_occur` is `True`, we check that when the server takes
         too long to respond, we timeout and continue without raising an error.
         """
-        timeout_occurred = False
 
         class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
             def do_POST(self) -> None:  # noqa: N802
@@ -379,32 +378,25 @@ class TestTracker:
             target=server.serve_forever,
             kwargs={"poll_interval": 0.1},
         )
-        server_thread.start()
 
         project.settings.set(
             "snowplow.collector_endpoints",
             f'["http://localhost:{server.server_port}"]',
         )
 
-        def emitter_failure_callback(_, failure_events: list):  # noqa: ARG001
-            nonlocal timeout_occurred
-            # `timeout_occurred` is technically a misnomer here, since there are
-            # multiple reasons for failure, but this callback doesn't let us
-            # distinguish. We can rely on the `timeout_should_occur is True`
-            # case to ensure that this callback won't be called for non-timeout
-            # reasons.
-            timeout_occurred = True
-
         tracker = Tracker(project)
         assert len(tracker.snowplow_tracker.emitters) == 1
-        tracker.snowplow_tracker.emitters[0].on_failure = emitter_failure_callback
+        tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
 
+        server_thread.start()
         tracker.track_command_event(CliEvent.started)
         tracker.snowplow_tracker.flush()
-
         server.shutdown()
         server_thread.join()
 
+        timeout_occurred = (
+            tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
+        )
         assert timeout_occurred is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
