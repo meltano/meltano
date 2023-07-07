@@ -5,7 +5,7 @@ layout: doc
 sidebar_position: 3
 ---
 
-import Termynal from '../../src/util/Termynal';
+import Termy from '../../src/utils/Termy'
 
 Let’s learn by example.
 
@@ -18,14 +18,10 @@ In Part 2, we will then place this data into a PostgreSQL database.
 
 We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
 
-<div className="termy">
-
-```console
-$ meltano --version\
-meltano, version 2.19.0
-```
-
-</div>
+<Termy options={{ lineDelay: 500 }}>
+  <div lineData={{ type: 'input' }}>meltano --version</div>
+  <div lineData={{ type: 'output' }}>meltano, version 2.19.0</div>
+</Termy>
 
 <br />
 
@@ -52,40 +48,38 @@ meltano init my-meltano-project
 
 <br />
 
-<div className="termy">
+<Termy options={{ lineDelay: 500 }}>
+  <div lineData={{ type: 'input' }}>meltano init my-new-project</div>
+  <div lineData={{ type: 'output' }}>
+    Created my-new-project
+    Creating project files...
+      my-new-project/
+      |-- .meltano
+      |-- meltano.yml
+      |-- README.md
+      |-- requirements.txt
+      |-- output/.gitignore
+      |-- .gitignore
+      |-- extract/.gitkeep
+      |-- load/.gitkeep
+      |-- transform/.gitkeep
+      |-- analyze/.gitkeep
+      |-- notebook/.gitkeep
+      |-- orchestrate/.gitkeep
+    Creating system database...  Done!
+    ... Project my-new-project has been created!
+    Meltano Environments initialized with dev, staging, and prod.
+    To learn more about Environments visit: https://docs.meltano.com/concepts/environments
+    Next steps:
+      cd my-new-project
+      Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
 
-```console
-$ meltano init my-new-project
-Created my-new-project
-Creating project files...
-  my-new-project/
-   |-- .meltano
-   |-- meltano.yml
-   |-- README.md
-   |-- requirements.txt
-   |-- output/.gitignore
-   |-- .gitignore
-   |-- extract/.gitkeep
-   |-- load/.gitkeep
-   |-- transform/.gitkeep
-   |-- analyze/.gitkeep
-   |-- notebook/.gitkeep
-   |-- orchestrate/.gitkeep
-Creating system database...  Done!
-... Project my-new-project has been created!
+  </div>
 
-Meltano Environments initialized with dev, staging, and prod.
-To learn more about Environments visit: https://docs.meltano.com/concepts/environments
-
-Next steps:
-  cd my-new-project
-  Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
-```
-
-</div>
+</Termy>
 
 <br />
-   This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
+ This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
 ```yml
 version: 1
@@ -429,5 +423,3 @@ $ cat output/commits.jsonl
 ## Next Steps
 
 Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).
-
-<Termynal/>

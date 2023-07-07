@@ -5,15 +5,13 @@ layout: doc
 sidebar_position: 4
 ---
 
-import Termynal from '../../src/util/Termynal';
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
 
 In [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
 
-<div class="notification is-success">
+<div className="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
@@ -27,7 +25,7 @@ docker run --name meltano_postgres -p 5432:5432 -e POSTGRES_USER=meltano -e POST
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```bash
 $ docker run -p 5432:5432 -e POSTGRES_USER=meltano -e POSTGRES_PASSWORD=password --name meltano_postgres -d postgres
@@ -52,7 +50,7 @@ The container will need a few seconds to initialize. You can test the connection
 
 Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano add loader target-postgres --variant=meltanolabs
@@ -74,7 +72,7 @@ To learn more about loader 'target-postgres', visit https://hub.meltano.com/load
 
 Use the `meltano invoke target-postgres --help` command to test that the installation worked.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano invoke target-postgres --help
@@ -99,7 +97,7 @@ Options:
 
 To configure the plugin, look at the options by running `meltano config target-postgres list`:
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano config target-postgres list
@@ -127,7 +125,7 @@ To learn more about loader 'target-postgres' and its settings, visit https://hub
 <br />
 Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
 
- <div class="termy">
+ <div className="termy">
 
 ```console
 $ meltano config target-postgres set user meltano
@@ -163,7 +161,7 @@ Sensitive configuration information (such as `password`) will instead be stored 
 
 You can use `meltano config target-postgres` to check the configuration, including the default settings not visible in the project file.
 
- <div class="termy">
+ <div className="termy">
 
 ```console
 $ meltano config target-postgres
@@ -186,7 +184,7 @@ Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-
 
 Run your newly added extractor and loader in a pipeline using [`meltano run`](/reference/command-line-interface#run):
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano run tap-github target-postgres
@@ -212,5 +210,3 @@ The postgres database should now have a schema `tap_github` with the table `comm
 ## Next Steps
 
 Next, head over to [Part 3, to add inline transformations to your ingestion process](/getting-started/part3).
-
-<Termynal/>

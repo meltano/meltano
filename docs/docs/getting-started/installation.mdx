@@ -5,7 +5,7 @@ layout: doc
 sidebar_position: 2
 ---
 
-import Termynal from '../../src/util/Termynal';
+import Termy from '../../src/utils/Termy'
 
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
 
@@ -33,7 +33,7 @@ Since Meltano is an application, it should always be installed into a clean virt
 
 To simplify installing Meltano into a clean virtual environment, [`pipx`](https://pypa.github.io/pipx/) can be used to install Meltano instead of `pip`. `pip` is a package installer that comes automatically with Python. `pipx` is a wrapper around pip which cleanly installs executable Python applications (such as Meltano) into their own virtual environments.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ pipx install "meltano"
@@ -51,7 +51,7 @@ We maintain [the `meltano/meltano` Docker image on Docker Hub](https://hub.docke
 
 To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v2.19.0`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.9`. To get the latest minor or patch version, omit that value from the version number, e.g. `v2` for the latest Meltano `v2.*.*` image, or `v2.19` for the latest Meltano `v2.19.*` image
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ docker pull meltano/meltano
@@ -73,11 +73,11 @@ meltano, version 2.19.0
 
 Meltano provides a Python package that can be installed using `pip`.
 
-<div class="notification is-warning">
+<div className="notification is-warning">
   <p>To avoid dependency conflicts, please ensure Meltano is installed into a clean Python virtual environment.</p>
 </div>
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ pip install --upgrade pip
@@ -103,4 +103,12 @@ Once you're set up, head over to the tutorial to learn [how to initialize your f
 
 <script src="/js/tabs.js"></script>
 
-<Termynal/>
+<Termy>
+```console
+$ pip install --upgrade pip
+Requirement already satisfied.
+$ pip install "meltano"
+---> 100%
+successfully installed meltano
+```
+</Termy>

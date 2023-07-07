@@ -5,8 +5,6 @@ layout: doc
 sidebar_position: 6
 ---
 
-import Termynal from '../../src/util/Termynal';
-
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -15,7 +13,7 @@ In parts [1](/getting-started/part1), [2](/getting-started/part2), and [3](/gett
 
 We're going to do light-weight transformations, also called **"inline data mappings"** to clean up the data before storing them anywhere. We will use these inline data mappings to hide all emails inside the JSON blob we receive. In the Meltano world, these data mappings are also called [stream maps](https://sdk.meltano.com/en/latest/stream_maps.html).
 
-<div class="notification is-success">
+<div className="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
@@ -23,7 +21,7 @@ We're going to do light-weight transformations, also called **"inline data mappi
 
 To add inline data mappings, we need a new plugin. We're going to use the mapper "transform-field". To add this plugin, use the `meltano add mapper` command:
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano add mapper transform-field --variant=transferwise
@@ -136,7 +134,7 @@ docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_gith
 
 Now we can run the full process again using the `meltano run`command. We add the parameter --full-refresh to ignore the state Meltano has stored.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano run --full-refresh tap-github hide-github-mails target-postgres dbt-postgres:run
@@ -177,5 +175,3 @@ meltano dragon
 ```
 
 Next, head over to [Part 5, scheduling of jobs](/getting-started/#schedule-pipelines-to-run-regularly).
-
-<Termynal/>
