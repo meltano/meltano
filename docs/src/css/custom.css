@@ -979,6 +979,26 @@ main {
 
 /* termynal */
 
+.termy {
+  width: 100%;
+  max-width: 100%;
+  background: var(--color-bg);
+  color: transparent;
+  font-size: 0px;
+  height: 0;
+  font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
+  border-radius: 4px;
+  padding: 75px 45px 35px;
+  position: relative;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.termy pre {
+  background: var(--color-bg);
+  color: transparent;
+}
+
 [data-termynal] {
   width: 100%;
   max-width: 100%;
@@ -1052,6 +1072,19 @@ main {
   animation: blink 1s infinite;
 }
 
+code {
+  float: none;
+  width: 100%;
+}
+
+pre {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  white-space: pre;
+  word-wrap: normal;
+  width: 100%;
+  position: relative;
+}
 
 /* Cursor animation */
 

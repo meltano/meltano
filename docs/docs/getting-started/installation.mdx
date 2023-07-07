@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 2
 ---
 
+import Termynal from '../../src/util/Termynal';
+
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
 
 ## Install Meltano
@@ -50,6 +52,7 @@ We maintain [the `meltano/meltano` Docker image on Docker Hub](https://hub.docke
 To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v2.19.0`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.9`. To get the latest minor or patch version, omit that value from the version number, e.g. `v2` for the latest Meltano `v2.*.*` image, or `v2.19` for the latest Meltano `v2.19.*` image
 
 <div class="termy">
+
 ```console
 $ docker pull meltano/meltano
 latest: Pulling from meltano/meltano
@@ -60,7 +63,7 @@ docker.io/meltano/meltano:latest
 $ docker run meltano/meltano --version
 meltano, version 2.19.0
 
-````
+```
 
 </div>
 
@@ -82,7 +85,7 @@ Requirement already satisfied.
 $ pip install "meltano"
 ---> 100%
 successfully installed meltano
-````
+```
 
 </div>
 
@@ -99,5 +102,5 @@ To understand details of the installation, like mounting a docker volume to work
 Once you're set up, head over to the tutorial to learn [how to initialize your first project and start to import data](/getting-started/part1).
 
 <script src="/js/tabs.js"></script>
-<script src="/util/termynal.js"></script>
-<script src="/util/termy_custom.js"></script>
+
+<Termynal/>

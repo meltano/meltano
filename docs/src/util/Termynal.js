@@ -1,12 +1,26 @@
 import React from "react";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 
-const Termynal = ({ children }) => {
+export default function Termynal() {
+  /** Generate a terminal widget. */
   class Termynal {
+    /**
+     * Construct the widget's settings.
+     * @param {(string|Node)=} container - Query selector or container element.
+     * @param {Object=} options - Custom settings.
+     * @param {string} options.prefix - Prefix to use for data attributes.
+     * @param {number} options.startDelay - Delay before animation, in ms.
+     * @param {number} options.typeDelay - Delay between each typed character, in ms.
+     * @param {number} options.lineDelay - Delay between each line, in ms.
+     * @param {number} options.progressLength - Number of characters displayed as progress bar.
+     * @param {string} options.progressChar – Character to use for progress bar, defaults to █.
+     * @param {number} options.progressPercent - Max percent of progress.
+     * @param {string} options.cursor – Character to use for cursor, defaults to ▋.
+     * @param {Object[]} lineData - Dynamically loaded line data objects.
+     * @param {boolean} options.noInit - Don't initialise the animation.
+     */
     constructor(container = "#termynal", options = {}) {
-      this.container =
-        typeof container === "string"
-          ? document.querySelector(container)
-          : container;
+      this.container = container;
       this.pfx = `data-${options.prefix || "ty"}`;
       this.startDelay =
         options.startDelay ||
@@ -55,11 +69,11 @@ const Termynal = ({ children }) => {
        * Calculates width and height of Termynal container.
        * If container is empty and lines are dynamically loaded, defaults to browser `auto` or CSS.
        */
-      const containerStyle = getComputedStyle(this.container);
-      this.container.style.width =
-        containerStyle.width !== "0px" ? containerStyle.width : undefined;
-      this.container.style.minHeight =
-        containerStyle.height !== "0px" ? containerStyle.height : undefined;
+      // const containerStyle = getComputedStyle(this.container);
+      // this.container.style.width =
+      //   containerStyle.width !== "0px" ? containerStyle.width : undefined;
+      // this.container.style.minHeight =
+      //   containerStyle.height !== "0px" ? containerStyle.height : undefined;
 
       this.container.setAttribute("data-termynal", "");
       this.container.innerHTML = "";
@@ -190,7 +204,6 @@ const Termynal = ({ children }) => {
       lineDelay: 500,
     });
   });
-
   const progressLiteralStart = "---> 100%";
   const promptLiteralStart = "$ ";
   const customPromptLiteralStart = "# ";
@@ -203,7 +216,7 @@ const Termynal = ({ children }) => {
   function createTermynals() {
     document.querySelectorAll(`.${termynalActivateClass}`).forEach((node) => {
       const text = node.textContent;
-      const lines = text.split("\n");
+      const lines = text.split("\\");
       const useLines = [];
       let buffer = [];
       function saveBuffer() {
@@ -304,7 +317,5 @@ const Termynal = ({ children }) => {
   createTermynals();
   loadVisibleTermynals();
 
-  return <div id="termynal">{children}</div>;
-};
-
-export default Termynal;
+  return <BrowserOnly>{() => <div id="#termynal" />}</BrowserOnly>;
+}

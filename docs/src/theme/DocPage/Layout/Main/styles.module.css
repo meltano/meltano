@@ -33,6 +33,7 @@
 @media (min-width: 997px) {
   .docMainContainer {
     flex-grow: 1;
+    width: Calc(100% - 300px);
   }
 
   .docMainContainerEnhanced {

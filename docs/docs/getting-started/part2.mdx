@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 4
 ---
 
+import Termynal from '../../src/util/Termynal';
+
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -24,6 +26,7 @@ docker run --name meltano_postgres -p 5432:5432 -e POSTGRES_USER=meltano -e POST
 ```
 
 <br />
+
 <div class="termy">
 
 ```bash
@@ -36,6 +39,7 @@ $ docker container ls
 ```
 
 </div>
+
 <br />
 The container will need a few seconds to initialize. You can test the connection with your favorite SQL tool using connection data:
 - host: localhost
@@ -209,5 +213,4 @@ The postgres database should now have a schema `tap_github` with the table `comm
 
 Next, head over to [Part 3, to add inline transformations to your ingestion process](/getting-started/part3).
 
-<script src="/util/termynal.js"></script>
-<script src="/util/termy_custom.js"></script>
+<Termynal/>

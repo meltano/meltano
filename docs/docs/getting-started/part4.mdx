@@ -2,8 +2,10 @@
 title: Part 4 - Inline Data Mapping
 description: Part 4 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
 layout: doc
-sidebar_position: 4
+sidebar_position: 6
 ---
+
+import Termynal from '../../src/util/Termynal';
 
 Let’s learn by example.
 
@@ -22,6 +24,7 @@ We're going to do light-weight transformations, also called **"inline data mappi
 To add inline data mappings, we need a new plugin. We're going to use the mapper "transform-field". To add this plugin, use the `meltano add mapper` command:
 
 <div class="termy">
+
 ```console
 $ meltano add mapper transform-field --variant=transferwise
 
@@ -33,6 +36,7 @@ Documentation: https://docs.meltano.com/concepts/plugins#mappers
 Installing mapper 'transform-field'...
 ---> 100%
 Installed mapper 'transform-field'
+```
 
 To learn more about mapper 'transform-field', visit https://hub.meltano.com/mappers/transform-field--transferwise
 
@@ -174,5 +178,4 @@ meltano dragon
 
 Next, head over to [Part 5, scheduling of jobs](/getting-started/#schedule-pipelines-to-run-regularly).
 
-<script src="/util/termynal.js"></script>
-<script src="/util/termy_custom.js"></script>
+<Termynal/>
