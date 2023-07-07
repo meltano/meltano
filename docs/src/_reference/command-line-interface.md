@@ -360,6 +360,15 @@ meltano config <plugin> set --interactive --extras
 meltano config <plugin> set --interactive --store=dotenv
 ```
 
+### Sensitive configuration
+Values for sensitive settings (defined as `kind: password`) are redacted in the output of the following commands:
+
+```bash
+meltano config <plugin> list
+meltano config set <name> <value>
+meltano config <plugin> set --interactive
+```
+
 ## `discover`
 
 Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
