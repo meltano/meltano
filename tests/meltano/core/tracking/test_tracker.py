@@ -395,9 +395,9 @@ class TestTracker:
         server_thread.join()
 
         timeout_occurred = (
-            tracker.snowplow_tracker.emitters[
+            tracker.snowplow_tracker.emitters[  # noqa: WPS219, E501
                 0
-            ].on_failure.call_count  # noqa: WPS219, E501
+            ].on_failure.call_count
             == 1
         )
         assert timeout_occurred is timeout_should_occur
