@@ -6,13 +6,14 @@ import DocPageLayoutSidebar from "@theme/DocPage/Layout/Sidebar";
 import DocPageLayoutMain from "@theme/DocPage/Layout/Main";
 import styles from "./styles.module.css";
 import SidebarArrow from "../../../components/SidebarArrow";
+import clsx from "clsx";
 export default function DocPageLayout({ children }) {
   const sidebar = useDocsSidebar();
   const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   return (
     <Layout wrapperClassName={styles.docsWrapper}>
       <BackToTopButton />
-      <div className={styles.docPage}>
+      <div className={clsx(styles.docPage, "doc-page")}>
         {sidebar && (
           <DocPageLayoutSidebar
             sidebar={sidebar.items}

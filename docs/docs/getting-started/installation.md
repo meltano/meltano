@@ -17,9 +17,11 @@ python --version
 
 Meltano supports all versions of Python that have not yet reached their end-of-life date. Refer to [the official Python documentation for when versions of Python will reach end-of-life](https://devguide.python.org/versions/).
 
-<div class="notification is-warning">
-  <p>Not all plugins support the latest versions of Python.</p>
-</div>
+:::caution
+
+Not all plugins support the latest versions of Python.
+
+:::
 
 {% tabs log %}
 

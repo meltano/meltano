@@ -12,6 +12,7 @@ function DocSidebarDesktop({ path, sidebar, isHidden }) {
     <div
       className={clsx(
         styles.sidebar,
+        "pb-24",
         hideOnScroll && styles.sidebarWithHideableNavbar,
         isHidden && styles.sidebarHidden
       )}

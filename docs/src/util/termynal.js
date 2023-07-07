@@ -279,9 +279,12 @@ class Termynal {
 /**
  * HTML API: If current script has container(s) specified, initialise Termynal.
  */
-if (document.currentScript.hasAttribute("data-termynal-container")) {
-  const containers = document.currentScript.getAttribute(
-    "data-termynal-container"
-  );
-  containers.split("|").forEach((container) => new Termynal(container));
+
+export default function Termy() {
+  if (document.currentScript.hasAttribute("data-termynal-container")) {
+    const containers = document.currentScript.getAttribute(
+      "data-termynal-container"
+    );
+    containers.split("|").forEach((container) => new Termynal(container));
+  }
 }

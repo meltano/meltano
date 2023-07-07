@@ -57,7 +57,9 @@ Here's a complete walk-through pulling data from AWS S3 and dumping it into a Po
 <div class="language-bash highlighter-rouge">
     <iframe class="video" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
+
 ### Transforming data
+
 Here's a complete walk-through extending the extract & load to include more CSVs and running a dbt-project over them to transform the data.
 
 <iframe class="video" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
