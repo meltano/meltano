@@ -26,9 +26,9 @@ export default function TOCCollapsibleCollapseButton({ collapsed, ...props }) {
             id="Vector"
             d="M12 7.29201C10.3516 5.81337 8.2144 4.99695 6 5.00001C4.948 5.00001 3.938 5.18001 3 5.51201V19.762C3.96362 19.422 4.97816 19.2489 6 19.25C8.305 19.25 10.408 20.117 12 21.542M12 7.29201C13.6483 5.81328 15.7856 4.99686 18 5.00001C19.052 5.00001 20.062 5.18001 21 5.51201V19.762C20.0364 19.422 19.0218 19.2489 18 19.25C15.7856 19.247 13.6484 20.0634 12 21.542M12 7.29201V21.542"
             stroke="white"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </g>
       </svg>

@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 4
 ---
 
+import Termynal from '../../src/util/Termynal';
+
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack. In this part, we're going to start with the data extraction process.
@@ -16,7 +18,7 @@ In Part 2, we will then place this data into a PostgreSQL database.
 
 We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano --version
@@ -31,7 +33,7 @@ This tutorial is written using meltano >= v2.0.0.
 
 If you don't have a GitHub account to follow along, you could either exchange the commands for a different tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
-<div class="notification is-success">
+<div className="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
 </div>
 
@@ -50,7 +52,7 @@ meltano init my-meltano-project
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano init my-new-project
@@ -81,6 +83,7 @@ Next steps:
 ```
 
 </div>
+
 <br />
    This action will create a new directory with, among other things, your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file). Your file will look something like this:
 
@@ -112,7 +115,7 @@ meltano add extractor tap-github --variant=meltanolabs
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano add extractor tap-github --variant=meltanolabs
@@ -152,7 +155,7 @@ $ meltano invoke tap-github --help
 
 If you see the extractor's help message printed, the plugin was definitely installed successfully.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano invoke tap-github --help
@@ -192,7 +195,7 @@ meltano config tap-github set --interactive
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano config tap-github set --interactive
@@ -249,7 +252,7 @@ meltano config tap-github
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano config tap-github
@@ -281,7 +284,7 @@ meltano select tap-github --list --all
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano select tap-github --list
@@ -360,7 +363,7 @@ To test that the extraction process works, we add a JSON target.
 
    <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano add loader target-jsonl --variant=andyh1203</span>
@@ -393,7 +396,7 @@ meltano run tap-github target-jsonl
 
 <br />
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ meltano run tap-github target-jsonl
@@ -414,7 +417,7 @@ $ meltano run tap-github target-jsonl
 You should see data flowing from your source into the jsonl file.
 You can verify that it worked by looking inside the newly created file called `output/commits.jsonl`.
 
-<div class="termy">
+<div className="termy">
 
 ```console
 $ cat output/commits.jsonl
@@ -426,3 +429,5 @@ $ cat output/commits.jsonl
 ## Next Steps
 
 Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).
+
+<Termynal/>
