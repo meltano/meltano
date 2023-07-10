@@ -36,7 +36,6 @@ function Termy({ children, options }) {
       });
 
       for (let string of lineArray) {
-        console.log(string.value);
         if (string.value === "") {
           string.value = "<br />";
         } else if (string.value === progressLiteralStart) {
