@@ -1010,7 +1010,7 @@ main {
 }
 
 [data-termynal] {
-  width: 100%;
+  width: 100% !important;
   max-width: 100%;
   background: var(--color-bg);
   color: var(--color-text);

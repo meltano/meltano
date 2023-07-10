@@ -18,9 +18,13 @@ In Part 2, we will then place this data into a PostgreSQL database.
 
 We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
 
-<Termy options={{ lineDelay: 500 }}>
-  <div lineData={{ type: 'input' }}>meltano --version</div>
-  <div lineData={{ type: 'output' }}>meltano, version 2.19.0</div>
+<Termy>
+
+```console
+$ meltano --version
+meltano, version 2.19.0
+```
+
 </Termy>
 
 <br />
@@ -48,33 +52,35 @@ meltano init my-meltano-project
 
 <br />
 
-<Termy options={{ lineDelay: 500 }}>
-  <div lineData={{ type: 'input' }}>meltano init my-new-project</div>
-  <div lineData={{ type: 'output' }}>
-    Created my-new-project
-    Creating project files...
-      my-new-project/
-      |-- .meltano
-      |-- meltano.yml
-      |-- README.md
-      |-- requirements.txt
-      |-- output/.gitignore
-      |-- .gitignore
-      |-- extract/.gitkeep
-      |-- load/.gitkeep
-      |-- transform/.gitkeep
-      |-- analyze/.gitkeep
-      |-- notebook/.gitkeep
-      |-- orchestrate/.gitkeep
-    Creating system database...  Done!
-    ... Project my-new-project has been created!
-    Meltano Environments initialized with dev, staging, and prod.
-    To learn more about Environments visit: https://docs.meltano.com/concepts/environments
-    Next steps:
-      cd my-new-project
-      Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
+<Termy>
 
-  </div>
+```console
+$ meltano init my-new-project
+Created my-new-project
+Creating project files...
+  my-new-project/
+  |-- .meltano
+  |-- meltano.yml
+  |-- README.md
+  |-- requirements.txt
+  |-- output/.gitignore
+  |-- .gitignore
+  |-- extract/.gitkeep
+  |-- load/.gitkeep
+  |-- transform/.gitkeep
+  |-- analyze/.gitkeep
+  |-- notebook/.gitkeep
+  |-- orchestrate/.gitkeep
+Creating system database...  Done!
+... Project my-new-project has been created!
+
+Meltano Environments initialized with dev, staging, and prod.
+To learn more about Environments visit: https://docs.meltano.com/concepts/environments
+
+Next steps:
+  cd my-new-project
+  Visit https://docs.meltano.com/getting-started#create-your-meltano-project to learn where to go from here.
+```
 
 </Termy>
 
@@ -109,7 +115,7 @@ meltano add extractor tap-github --variant=meltanolabs
 
 <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano add extractor tap-github --variant=meltanolabs
@@ -125,7 +131,7 @@ Installed extractor 'tap-github'
 To learn more about extractor 'tap-github', visit https://hub.meltano.com/extractors/tap-github
 ```
 
-</div>
+</Termy>
 
 <br />
 
@@ -149,7 +155,7 @@ $ meltano invoke tap-github --help
 
 If you see the extractor's help message printed, the plugin was definitely installed successfully.
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano invoke tap-github --help
@@ -173,7 +179,7 @@ Options:
   --help                    Show this message and exit.
 ```
 
-</div>
+</Termy>
 
 ### Configure the Extractor
 
@@ -189,7 +195,7 @@ meltano config tap-github set --interactive
 
 <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano config tap-github set --interactive
@@ -216,7 +222,7 @@ $
 <[... other 2 values...]
 ```
 
-</div>
+</Termy>
 
 <br />
 
@@ -246,7 +252,7 @@ meltano config tap-github
 
 <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano config tap-github
@@ -262,7 +268,7 @@ $ meltano config tap-github
 }
 ```
 
-</div>
+</Termy>
 
 ### Select Entities and Attributes to Extract
 
@@ -278,7 +284,7 @@ meltano select tap-github --list --all
 
 <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano select tap-github --list
@@ -305,7 +311,7 @@ Selected attributes:
         [selected ] teams.url
 ```
 
-</div>
+</Termy>
 
 1. Select the entities and attributes for extraction using [`meltano select`](/reference/command-line-interface#select):
 
@@ -357,7 +363,7 @@ To test that the extraction process works, we add a JSON target.
 
    <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano add loader target-jsonl --variant=andyh1203</span>
@@ -372,7 +378,7 @@ Installed loader 'target-jsonl'
 To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl--andyh1203
 ```
 
-</div>
+</Termy>
 
 <br />
 
@@ -390,7 +396,7 @@ meltano run tap-github target-jsonl
 
 <br />
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano run tap-github target-jsonl
@@ -404,21 +410,21 @@ $ meltano run tap-github target-jsonl
 2022-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
 ```
 
-</div>
+</Termy>
 
 <br />
 
 You should see data flowing from your source into the jsonl file.
 You can verify that it worked by looking inside the newly created file called `output/commits.jsonl`.
 
-<div className="termy">
+<Termy>
 
 ```console
 $ cat output/commits.jsonl
 {"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2022-09-14T12:41:21Z"}
 ```
 
-</div>
+</Termy>
 
 ## Next Steps
 

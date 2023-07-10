@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 5
 ---
 
+import Termy from '../../src/utils/Termy'
+
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
@@ -40,7 +42,7 @@ This will add the following line to your project file:
 
 To refresh your database tables after the configuration changes you can run `meltano run --full-refresh tap-github target-postgres`:
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano run --full-refresh tap-github target-postgres
@@ -62,7 +64,7 @@ INFO METRIC: {"type": "timer", "metric": [...]
 
 ```
 
-</div>
+</Termy>
 
 Next, we add the dbt plugin to transform this data.
 
@@ -70,7 +72,7 @@ Next, we add the dbt plugin to transform this data.
 
 dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platforms) depending on the database/warehouse/platform you use. Meltano dbt utilities match this pattern; in this case our utility is `dbt-postgres`. As usual, you can use the `meltano add` command to add it to your project.
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano add utility dbt-postgres
@@ -84,13 +86,13 @@ Installed utility 'dbt-postgres'
 Installed 1/1 plugins
 ```
 
-</div>
+</Termy>
 
 ## Initialize dbt
 
 Next you can run the `initialize` command to have the transformer utility populate the project scaffold for dbt.
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano invoke dbt-postgres:initialize
@@ -99,7 +101,7 @@ creating dbt profiles directory path=PosixPath('/[...]/my-meltano-project/transf
 dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath('/[...]/my-meltano-project/transform/profiles/postgres') dbt_project_dir=PosixPath('/[...]/my-meltano-project/transform')
 ```
 
-</div>
+</Termy>
 
 <br />
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
@@ -108,7 +110,7 @@ You can verify that this worked by viewing that the `transform` directory is new
 
 Configure the dbt-postgres utility to use the same configuration as our target-postgres loader using `meltano config`:
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano config dbt-postgres set host localhost
@@ -125,7 +127,7 @@ $ meltano config dbt-postgres set schema analytics
 &ensp;&ensp;Utility 'dbt-postgres' setting 'schema' was set in `meltano.yml`: 'analytics'
 ```
 
-</div>
+</Termy>
 
 <br />
 The result of your configuration will look like this in your meltano.yml, remember that sensitive configurations are in your .env file:
@@ -191,7 +193,7 @@ This model is configured to creating a table via the `materialized='table'` conf
 
 To create the actual table, we run the dbt model via `meltano invoke dbt-postgres:run`. Note this relies on previously running `meltano run --full-refresh tap-github target-postgres` to postgres your database `commits` table:
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano invoke dbt-postgres:run
@@ -223,7 +225,7 @@ Extension executing `dbt run`...
 #
 ```
 
-</div>
+</Termy>
 
 You can check the data inside the database using your favourite SQL editor. There should now be a table inside the `analytics` schema called `authors` populated with data.
 
@@ -237,7 +239,7 @@ docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_gith
 
 Run the final pipeline alltogether using the parameter `--full-refresh` to ignore the stored state:
 
-<div className="termy">
+<Termy>
 
 ```console
 $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
@@ -284,7 +286,7 @@ info     ] 12:43:21                       cmd_type=command name=dbt-postgres std
 [info     ] Block run completed.           block_type=InvokerCommand err=None set_number=1 success=True
 ```
 
-</div>
+</Termy>
 
 There we have it, a complete ELT pipeline.
 

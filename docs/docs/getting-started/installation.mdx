@@ -33,7 +33,7 @@ Since Meltano is an application, it should always be installed into a clean virt
 
 To simplify installing Meltano into a clean virtual environment, [`pipx`](https://pypa.github.io/pipx/) can be used to install Meltano instead of `pip`. `pip` is a package installer that comes automatically with Python. `pipx` is a wrapper around pip which cleanly installs executable Python applications (such as Meltano) into their own virtual environments.
 
-<div className="termy">
+<Termy>
 
 ```console
 $ pipx install "meltano"
@@ -41,7 +41,7 @@ $ pipx install "meltano"
 successfully installed meltano
 ```
 
-</div>
+</Termy>
 
 {% endtab %}
 
@@ -51,7 +51,7 @@ We maintain [the `meltano/meltano` Docker image on Docker Hub](https://hub.docke
 
 To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v2.19.0`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.9`. To get the latest minor or patch version, omit that value from the version number, e.g. `v2` for the latest Meltano `v2.*.*` image, or `v2.19` for the latest Meltano `v2.19.*` image
 
-<div className="termy">
+<Termy>
 
 ```console
 $ docker pull meltano/meltano
@@ -65,7 +65,7 @@ meltano, version 2.19.0
 
 ```
 
-</div>
+</Termy>
 
 {% endtab %}
 
@@ -77,7 +77,7 @@ Meltano provides a Python package that can be installed using `pip`.
   <p>To avoid dependency conflicts, please ensure Meltano is installed into a clean Python virtual environment.</p>
 </div>
 
-<div className="termy">
+<Termy>
 
 ```console
 $ pip install --upgrade pip
@@ -87,7 +87,7 @@ $ pip install "meltano"
 successfully installed meltano
 ```
 
-</div>
+</Termy>
 
 {% endtab %}
 
