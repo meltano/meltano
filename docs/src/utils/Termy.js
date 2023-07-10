@@ -16,7 +16,7 @@ function Termy({ children, options }) {
   const [observerTriggered, setObserverTriggered] = useState(false);
 
   const observer = useMemo(() => {
-    if (typeof window !== "undefined" && !window.IntersectionObserver) return;
+    if (typeof window === "undefined" || !window.IntersectionObserver) return;
     return new IntersectionObserver(([entry]) => {
       if (!observerTriggered && entry.isIntersecting) {
         setIntersecting(true);
