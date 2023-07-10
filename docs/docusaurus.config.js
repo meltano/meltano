@@ -41,8 +41,8 @@ const config = {
           routeBasePath: "/changelog",
           blogTitle: "Changelog",
           blogSidebarTitle: "All Releases",
-          blogDescription: "A Docusaurus powered blog!",
-          postsPerPage: 12,
+          blogDescription: "",
+          postsPerPage: 5,
           showReadingTime: false,
         },
         theme: {
