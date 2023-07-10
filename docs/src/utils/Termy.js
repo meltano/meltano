@@ -15,16 +15,15 @@ function Termy({ children, options }) {
   const [isIntersecting, setIntersecting] = useState(false);
   const [observerTriggered, setObserverTriggered] = useState(false);
 
-  const observer = useMemo(
-    () =>
-      new IntersectionObserver(([entry]) => {
-        if (!observerTriggered && entry.isIntersecting) {
-          setIntersecting(true);
-          setObserverTriggered(true);
-        }
-      }),
-    [containerRef]
-  );
+  const observer = useMemo(() => {
+    if (!window.IntersectionObserver) return;
+    return new IntersectionObserver(([entry]) => {
+      if (!observerTriggered && entry.isIntersecting) {
+        setIntersecting(true);
+        setObserverTriggered(true);
+      }
+    });
+  }, [containerRef]);
 
   useEffect(() => {
     if (containerRef.current && children) {
