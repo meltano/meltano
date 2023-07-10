@@ -19,37 +19,63 @@ export default function FooterCopyright({ copyright }) {
         dangerouslySetInnerHTML={{ __html: copyright }}
       />
       <div className="footer-soc-wrapper flex justify-between gap-3 order-1 sm:order-2 mb-10 sm:mb-0">
-        <a href="#" className="opacity-50">
+        <a
+          href="https://github.com/meltano/meltano"
+          className="opacity-50"
+          target="_blank"
+        >
           <GithubLogo title="Github Logo" className={styles.footerSocIcon} />
         </a>
-        <a href="#" className="opacity-50">
+        <a
+          href="https://meltano.com/slack"
+          className="opacity-50"
+          target="_blank"
+        >
           <SlackLogo title="Slack Logo" className={styles.footerSocIcon} />
         </a>
-        <a href="#" className="opacity-50">
+        <a
+          href="https://twitter.com/meltanodata"
+          className="opacity-50"
+          target="_blank"
+        >
           <TwitterLogo title="Twitter Logo" className={styles.footerSocIcon} />
         </a>
-        <a href="#" className="opacity-50">
+        <a
+          href="https://www.linkedin.com/company/meltano/"
+          className="opacity-50"
+          target="_blank"
+        >
           <LinkedinLogo
             title="Linkedin Logo"
             className={styles.footerSocIcon}
           />
         </a>
-        <a href="#" className="opacity-50">
+        {/* <a href="#" className="opacity-50"
+          target="_blank">
           <FacebookLogo
             title="Facebook Logo"
             className={styles.footerSocIcon}
           />
         </a>
-        <a href="#" className="opacity-50">
+        <a href="#" className="opacity-50"
+          target="_blank">
           <InstagramLogo
             title="Instagram Logo"
             className={styles.footerSocIcon}
           />
-        </a>
-        <a href="#" className="opacity-50">
+        </a> */}
+        <a
+          href="https://www.youtube.com/meltano"
+          className="opacity-50"
+          target="_blank"
+        >
           <YoutubeLogo title="Youtube Logo" className={styles.footerSocIcon} />
         </a>
-        <a href="#" className="opacity-50">
+        <a
+          href="https://www.crunchbase.com/organization/meltano"
+          className="opacity-50"
+          target="_blank"
+        >
           <CrunchbaseLogo
             title="Crunchbase Logo"
             className={styles.footerSocIcon}

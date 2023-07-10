@@ -109,14 +109,14 @@ const config = {
             "aria-label": "Changelog",
           },
           {
-            href: "https://github.com/facebook/docusaurus",
+            href: "https://github.com/meltano/meltano",
             label: " ",
             position: "right",
             className: "header-github-link",
             "aria-label": "GitHub repository",
           },
           {
-            href: "https://github.com/facebook/docusaurus",
+            href: "https://meltano.com/slack",
             label: " ",
             position: "right",
             className: "header-slack-link",
