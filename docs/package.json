@@ -1,6 +1,8 @@
 {
-  "name": "meltano-docs",
+  "name": "docs.meltano.com",
+  "license": "MIT",
   "version": "3.0.0",
+  "description": "https://meltano.com",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -13,6 +15,17 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meltano/meltano.git"
+  },
+  "keywords": [
+    "meltano"
+  ],
+  "bugs": {
+    "url": "https://github.com/meltano/meltano/issues"
+  },
+  "homepage": "https://meltano.com",
   "dependencies": {
     "@docusaurus/core": "2.4.1",
     "@docusaurus/preset-classic": "2.4.1",

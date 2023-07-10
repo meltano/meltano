@@ -1,20 +1,20 @@
-# Website
+# Meltano Documentation
+
+![Meltano Logo](https://lh4.googleusercontent.com/WHoN-WpacMaVicq-jRuIvCQjCIdPZwYOwBgd38k9JjMpX1Z7THUqowY-oRsTzGUbAvb8F4tcb9BJYyfX9MeA2ECirsWZ7XBHteDZ_y59REMwHjq1AX05U2k8H6mdI4G_olF27gadCfp1Wx7cVQ)
+
+## Contribute to the Docs
+
+Follow the steps below to work locally with this project.
+
+1. Fork, clone or download this project.
+2. Install node dependencies: `npm install`
+3. Run `npm start` to run a local development server
+4. View the docs at [http://localhost:3000](http://localhost:3000).
+5. Make changes to the content of the site and preview them at the link above.
+
+### Website
 
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
-
-### Installation
-
-```
-$ npm install
-```
-
-### Local Development
-
-```
-$ npm start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
 ### Build
 
