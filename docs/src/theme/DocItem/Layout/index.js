@@ -37,7 +37,7 @@ export default function DocItemLayout({ children }) {
       <div className={clsx("flex", styles.docItem)}>
         <div
           className={clsx(
-            "col px-0",
+            "col !px-0",
             !hiddenSidebarContainer && styles.docItemCol
           )}
         >
