@@ -244,10 +244,17 @@ h6 {
 
 .markdown pre {
   font-size: var(--ifm-code-font-size);
+  border: 1px solid var(--date-background);
+  background: var(--meltano-tabs-background-color);
+  border-radius: 5px;
 }
 
 .markdown code {
   font-size: var(--ifm-code-font-size);
+}
+
+.markdown .theme-code-block {
+  background: none;
 }
 
 .changelog-content a:not(.btn) .changelog-content a:not(h2) {
