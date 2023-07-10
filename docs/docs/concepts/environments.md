@@ -67,11 +67,12 @@ plugins:
       password: ${SNOWFLAKE_PASSWORD}
 ```
 
-<div class="notification is-info">
+:::info
+
   <p><strong>Environments vs Python Virtual Environments</strong></p>
   <p>For installable Python plugins (i.e. those with a <a href="project#plugins"><code>pip_url</code></a> property) configured across multiple Environments, the same Python virtual environment and executable are reused.</p>
   <p>To install different versions of the same plugin, you can use <a href="plugins#plugin-inheritance">plugin inheritance</a> and set a different <code>pip_url</code> in the inherited plugin.</p>
-</div>
+:::
 
 ## Inheritance
 

@@ -57,9 +57,10 @@ source .venv/meltano/bin/activate
 pip install --upgrade pip
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>Note that pip needs to be upgraded every time you make a new venv. Doing this helps avoid hard to troubleshoot issues with dependencies later.</p>
-</div>
+:::
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to
 your prompt.
@@ -79,10 +80,11 @@ the Meltano package:
 pip install meltano
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>As a reminder, we do generally recommend using `pipx` for installing python packages.
 Ensure you have `pipx` installed by reviewing the <a href="/getting-started/installation#install-pipx">Install pipx</a> instructions.</p>
-</div>
+:::
 
 # How does meltano use Virtual Environments internally?
 

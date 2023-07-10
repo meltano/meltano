@@ -5,10 +5,12 @@ layout: doc
 sidebar_position: 2
 ---
 
-<div class="notification is-info">
-  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
-</div>
+:::info
+
+<p><strong>Meltano Cloud is currently in Beta.</strong></p>
+<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+
+:::
 
 ## Prereqs
 
@@ -78,9 +80,10 @@ The login command will open a browser window which you can use to access your ac
 
 While Meltano Cloud is in Beta, it may take up to one business day for your user to be fully provisioned and added to your Meltano Cloud organization. You'll be notified via email once your newly created user has been added to your organization, at which time you can logout via `meltano-cloud logout` and then log back in to have full CLI access to your organization's Meltano Cloud resources.
 
-<div class="notification is-info">
+:::info
+
   <p>Installing the Meltano Cloud <a href="#prereq-2-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
-</div>
+:::
 
 ### Step 3: Set default project and validate access and functionality
 
@@ -120,10 +123,11 @@ For example, if you wanted to deploy the `prod` Meltano Environment as defined i
 meltano-cloud deployment create --name production --environment prod --git-rev main
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
   Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
-</div>
+:::
 
 To confirm that your deployment was created, you can view all of your Meltano Cloud deployments by running:
 

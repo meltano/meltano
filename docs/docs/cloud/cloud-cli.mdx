@@ -5,10 +5,12 @@ layout: doc
 sidebar_position: 5
 ---
 
-<div class="notification is-info">
-  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
-</div>
+:::info
+
+<p><strong>Meltano Cloud is currently in Beta.</strong></p>
+<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+
+:::
 
 ## `config`
 
@@ -64,10 +66,12 @@ meltano-cloud deployment create --name 'my-dev-deployment' --environment 'dev' -
 
 The above example creates a new deployment named `my-dev-deployment` for the Meltano environment named `dev`, using the `develop` branch of the project's git repository. Note that the Meltano environment name must match what is in `meltano.yml`.
 
-<div class="notification is-info">
+:::info
+
   <p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
   Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
-</div>
+
+:::
 
 List deployments:
 

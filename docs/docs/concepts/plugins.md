@@ -83,9 +83,10 @@ you'll need to collect and provide this metadata yourself.
 
 To learn how to add a custom plugin to your project using a [custom plugin definition](project#custom-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
 
-<div class="notification is-warning">
+:::caution
+
   <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to <a href="https://github.com/meltano/hub/issues/new">Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
-</div>
+:::
 
 ## Plugin Inheritance
 
@@ -106,11 +107,12 @@ When you add a plugin to your project using `meltano add`, the [discoverable plu
 
 Later invocations of the plugin will use this file to determine the settings, installation source, etc.
 
-<div class="notification is-info">
+:::info
+
   <p>Note that <a href="#custom-plugins">custom</a> and <a href="#plugin-inheritance">inherited</a> plugins
   do not get a lock file.
   </p>
-</div>
+:::
 
 ## Types
 
@@ -710,10 +712,11 @@ export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
 
 ### Transforms
 
-<div class="notification is-warning">
+:::caution
+
   <p> Transform plugins are being deprecated in favor of calling dbt packages directly.</p>
   <p> The transform plugin type is still supported for now but will eventually be phased out.</p>
-</div>
+:::
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
 that are used by [`meltano elt`](/reference/command-line-interface#elt) as part of [data transformation](/guide/transformation).
@@ -838,10 +841,11 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 ### Orchestrators
 
-<div class="notification is-warning">
+:::caution
+
   <p> Orchestrator plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
   <p> The orchestrator plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
-</div>
+:::
 
 Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
 
@@ -852,10 +856,11 @@ its related [file bundle](#file-bundles) will automatically be added as well.
 
 ### Transformers
 
-<div class="notification is-warning">
+:::caution
+
   <p> Transformers plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
   <p> The transformer plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
-</div>
+:::
 
 Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano run`](/reference/command-line-interface#run) as part of [data transformation](/guide/transformation).
 They are responsible for running [transforms](#transforms).
@@ -898,7 +903,8 @@ files:
     profiles/*.yml: true
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>If a file path starts with a <code>*</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>*.yml</code> to match all <code>.yml</code> files:</p>
 <pre>
 files:
@@ -906,7 +912,7 @@ files:
   update:
     '*.yml': true
 </pre>
-</div>
+:::
 
 {% endtab %}
 {% tab extra_usage terminal %}

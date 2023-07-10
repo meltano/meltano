@@ -396,14 +396,15 @@ plugins:
     # ...
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>You can further customize the appearance of your custom extractor using the following options:</p>
   <ul>
     <li>`label`</li>
     <li>`logo_url`</li>
     <li>`description`</li>
   </ul>
-</div>
+:::
 
 Any time you manually add new plugins to `meltano.yml`, you will need to rerun the
 [install](/reference/command-line-interface#install) command:

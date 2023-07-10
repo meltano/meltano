@@ -303,9 +303,10 @@ The `pip_url`, `executable`, `capabilities`, and `settings` properties
 constitute the plugin's [base plugin description](/concepts/plugins#project-plugins):
 everything Meltano needs to know in order to be able to use the package as a plugin.
 
-<div class="notification is-warning">
+:::caution
+
   <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
-</div>
+:::
 
 ### Plugin inheritance
 

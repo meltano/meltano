@@ -7,9 +7,10 @@ sidebar_position: 5
 
 Transformations in Meltano are implemented using dbt. All Meltano generated projects have a `transform/` directory, which is the default location for your dbt configuration, models, packages, etc in order to run transformations. After installing a dbt plugin you can run an `initialize` command to automatically populate the contents of that directory.
 
-<div class="notification is-info">
+:::info
+
   <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/existing-dbt-project">existing dbt project guide</a> for more details.</p>
-</div>
+:::
 
 ## Adapter-Specific dbt Transformation
 
@@ -94,10 +95,11 @@ meltano invoke dbt-snowflake:my_models
 
 ## `dbt` Installation and Configuration (Transformer Plugin Type)
 
-<div class="notification is-warning">
+:::caution
+
   <p> These instructions are the classic way of installing and running dbt as a transformer plugin type. </p>
   <p> Users can still install dbt in this manner but we are prioritizing dbt utility plugin types for new and existing users.</p>
-</div>
+:::
 
 To learn more about the dbt `transformer` plugins, please see the
 [transformers plugin](https://hub.meltano.com/transformers/) documentation on [Meltano Hub](https://hub.meltano.com).
@@ -117,10 +119,11 @@ For more details on configuring a dbt `transformer` see the [Meltano Hub documen
 
 ## `dbt` Installation and Configuration (Classic)
 
-<div class="notification is-warning">
+:::caution
+
   <p> These instructions are the classic way of installing and running dbt as a transformer plugin type. </p>
   <p> Users can still install dbt in this manner but we are prioritizing dbt utility plugin types for new and existing users.</p>
-</div>
+:::
 
 To learn more about the dbt Transformer package, please see the
 [dbt plugin](https://hub.meltano.com/transformers/dbt) documentation on [Meltano Hub](https://hub.meltano.com).
@@ -144,11 +147,12 @@ For more details, [pipeline environment variables](/guide/integration#pipeline-e
 
 ## Working with Transform Plugins
 
-<div class="notification is-danger">
+:::danger
+
   <p> <b>WARNING</b>: Transform plugins are currently de-prioritized by the Meltano project due to the difficulty of maintaining them at scale.</p>
   <p>Users can still install and maintain them as they please but many have grown outdated and unmaintained.</p>
   <p>Some users chose to install the existing transform plugins as a starting point then customize them for their own transformations.</p>
-</div>
+:::
 
 `Transform` plugins are dbt packages that reside in their own repositories.
 

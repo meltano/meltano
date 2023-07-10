@@ -6,9 +6,10 @@ hidden: true
 toc: true
 ---
 
-<div class="notification is-warning">
+:::caution
+
   <p>This is an older, hidden page for Meltano UI. The UI is deprecated. Please see our <a href="/guide/troubleshooting#meltano-ui">troubleshooting page</a> for more information.</p>
-</div>
+:::
 
 Meltano is optimized for usage through the [`meltano` CLI](/reference/command-line-interface)
 and direct changes to the [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
@@ -405,14 +406,15 @@ Meltano can send email notifications upon certain events.
 
 Your outgoing mail server can be configured using the [`mail.*` settings](#mail-server) below.
 
-<div class="notification is-info">
+:::info
+
   <p>To ease the development and testing, Meltano is preconfigured to use a local <a href="https://github.com/mailhog">MailHog</a> instance to trap all the outgoing emails.</p>
   <p>Use the following docker command to start it:</p>
 <pre>
 docker run --rm -p 1025:1025 -p 8025:8025 --name mailhog mailhog/mailhog
 </pre>
   <p>All emails sent by Meltano should now be available at <code>http://localhost:8025/</code></p>
-</div>
+:::
 
 #### How to use
 
@@ -533,11 +535,12 @@ export MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID=42
 
 Meltano ships with an OAuth Service to handle the OAuth flow in the Extractors' configuration.
 
-<div class="notification is-warning">
+:::caution
+
   <p>To run this service, you **must** have a registered OAuth application on the [Authorization server](https://www.oauth.com/oauth2-servers/definitions/#the-authorization-server).</p>
   <p>Most importantly, the Redirect URI must be set properly so that the OAuth flow can be completed.</p>
   <p>This process is specific to each Provider.</p>
-</div>
+:::
 
 The OAuth Service is bundled within Meltano, and is automatically started with [`meltano ui`](/reference/command-line-interface#ui) and mounted at `/-/oauth` for development purposes.
 
@@ -619,9 +622,10 @@ export OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET=<google-adwords-client-secret>
 
 These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#) and work with [OAuth authentication with GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html).
 
-<div class="notification is-info">
+:::info
+
   <p>These settings are used for single-sign-on using an external OAuth provider.</p>
-</div>
+:::
 
 For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
 
@@ -659,9 +663,10 @@ Start the Meltano UI.
 
 #### `setup`
 
-<div class="notification is-info">
+:::info
+
   <p>This command is only relevant for production-grade setup.</p>
-</div>
+:::
 
 Generate secrets for the [`ui.secret_key`](/reference/settings#ui-secret-key)
 and [`ui.password_salt`](/reference/settings#ui-password-salt) settings, that
@@ -670,7 +675,8 @@ specified value for the [`ui.server_name` setting](/reference/settings#ui-server
 
 In production, you will likely want to move these settings to actual environment variables, since `.env` is in `.gitignore` by default.
 
-<div class="notification is-danger">
+:::danger
+
   <p><strong>Regenerating secrets will cause the following:</strong></p>
   <p>
     <ul>
@@ -679,7 +685,7 @@ In production, you will likely want to move these settings to actual environment
     </ul>
   </p>
   <p>Use with caution!</p>
-</div>
+:::
 
 ##### How to use
 
@@ -724,7 +730,8 @@ The development build of the Meltano UI will now be available at <http://localho
 
 A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/contribute/api) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000.
 
-<div class="notification is-warning">
+:::caution
+
   <p><strong>If you're developing for the _Embed_ app (embeddable <code>iframe</code> for reports) you can toggle <code>MELTANO_EMBED</code>:</strong></p>
 
 <pre>
@@ -737,7 +744,8 @@ export MELTANO_EMBED=0
 # Start local development environment
 yarn serve
 </pre>
-</div>
+
+:::
 
 If you need to change the URL of your development environment, you can do this by updating your project's `.env` file with the following configuration:
 

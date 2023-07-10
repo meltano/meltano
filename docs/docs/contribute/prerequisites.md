@@ -51,22 +51,24 @@ environment.
 
 This means that you're ready to start Meltano CLI development. For API development, read on.
 
-<div class="notification is-warning">
+:::caution
+
   <p><strong>Metrics (anonymous usage data) tracking</strong></p>
   <p>As you contribute to Meltano, you may want to disable <a href="/reference/settings#send-anonymous-usage-stats">metrics tracking</a> globally rather than by project. You can do this by setting the environment variable `MELTANO_SEND_ANONYMOUS_USAGE_STATS` to `False`:</p>
 <pre>
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=False
 </pre>
-</div>
+:::
 
 ## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
-<div class="notification is-warning">
+:::caution
+
   <p><strong><a href="https://alembic.sqlalchemy.org/en/latest/">Alembic</a> is a full featured database migration working on top of SQLAlchemy.</strong></p>
-</div>
+:::
 
 Migrations for the system database are located inside the `meltano.migrations` module.
 
@@ -74,10 +76,11 @@ To create a new migration, use the `alembic revision -m "message"` command, then
 
 Each migration should be isolated from the `meltano` module, so **don't import any model definition inside a migration**.
 
-<div class="notification is-danger">
+:::danger
+
   <p><strong>Meltano doesn't currently support auto-generating migration from the models definition.</strong></p>
   <p></p>
-</div>
+:::
 
 To run the migrations, use `meltano upgrade` inside a Meltano project.
 

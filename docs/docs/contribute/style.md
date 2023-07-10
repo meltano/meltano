@@ -83,10 +83,11 @@ Javascript `import`s are sorted using the following pattern:
 1. Import scheme: Default imports → Partial imports
 1. Name of the module, alphabetically: 'lodash' → 'vue'
 
-<div class="notification is-warning">
+:::caution
+
   <p><strong>Tip: There should be only 2 blocks of imports with a single blank line between both blocks.
 The first rule is used to separate both blocks.</strong></p>
-</div>
+:::
 
 ```js
 import lodash from 'lodash'                  // 1: third-party, 2: default, 3: [l]odash
@@ -108,9 +109,10 @@ Python imports are sorted automatically using [`isort`](https://pycqa.github.io/
 
 Object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
 
-<div class="notification is-danger">
+:::danger
+
   <p><strong>When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.</strong></p>
-</div>
+:::
 
 ### Feature Flags
 

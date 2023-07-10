@@ -218,10 +218,11 @@ This works as Singer Targets are expected to emit [STATE messages](https://hub.m
 
 Partial state records can also be inserted manually via [`meltano state merge`](/reference/command-line-interface#state). Unlike [`meltano state merge`](/reference/command-line-interface#state),[`meltano state set`](/reference/command-line-interface#state) will insert a complete record, which causes meltano to ignore any previous state records, whether completed or partial.
 
-<div class="notification is-info">
+:::info
+
   <p><strong>Not seeing state picked up after a failed run?</strong></p>
   <p>Some loaders only emit state once their work is completely done, even if some data may have been persisted already, and if earlier state messages from the extractor could have been forwarded to Meltano. When a pipeline with such a loader fails or is otherwise interrupted, no state will have been emitted yet, and a subsequent ELT run will not be able to pick up where this run actually left off.</p>
-</div>
+:::
 
 ### Pipeline-specific configuration
 

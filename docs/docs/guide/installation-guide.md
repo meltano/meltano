@@ -7,9 +7,9 @@ sidebar_position: 2
 
 This document will get you up and running with Meltano in-depth. There is also a [short install guide for first-time Meltano users](/getting-started/installation).
 
-<div class="notification is-success">
-    <p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
-</div>
+:::tip
+<p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
+:::
 
 # Local Installation
 
@@ -25,9 +25,10 @@ Before you install Meltano, make sure you have the following requirements instal
 
 #### Python
 
-<div class="notification is-info">
+:::info
+
   <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
-</div>
+:::
 
 Use the following command to check that you have a supported Python version installed:
 
@@ -50,12 +51,13 @@ python3 -m pipx ensurepath
 source ~/.bashrc
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>Why use pipx and virtual environments?</p>
   <p>Your local environment may use a different version of Python or other dependencies that are
 difficult to manage. The pipx installer automatically creates a virtual environment and provides a
 "clean" isolated space without version conflicts or other compatibility issues.</p>
-</div>
+:::
 
 ### Install Meltano
 
@@ -94,9 +96,10 @@ Before you install Meltano, make sure you have the following requirements instal
 
 #### Python
 
-<div class="notification is-info">
+:::info
+
   <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
-</div>
+:::
 
 Use the following command to check that you have a supported Python version installed:
 
@@ -119,12 +122,13 @@ python3 -m pipx ensurepath
 RefreshEnv
 ```
 
-<div class="notification is-info">
+:::info
+
   <p>Why use pipx and virtual environments?</p>
   <p>Your local environment may use a different version of Python or other dependencies that are
 difficult to manage. The pipx installer automatically creates a virtual environment and provides a
 "clean" isolated space without version conflicts or other compatibility issues.</p>
-</div>
+:::
 
 ### Install Meltano
 
@@ -195,9 +199,10 @@ Note that wherever you are asked to run the `meltano` command, you will want to 
 
 # Troubleshooting Installation
 
-<div class="notification is-info">
+:::info
+
   <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/#get-help">Getting Help</a> on the different ways to get in touch with us.</p>
-</div>
+:::
 
 ## Upgrading Meltano Version
 

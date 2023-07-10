@@ -30,11 +30,11 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 
 If the base Meltano distribution is already installed in your environment, install the relevant extra and `pip` will install only the missing requirements.
 
-<div class="notification is-info">
-    <p>
-        State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
-    </p>
-</div>
+:::info
+<p>
+State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
+</p>
+:::
 
 ## Configuration
 

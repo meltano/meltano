@@ -5,14 +5,17 @@ layout: doc
 sidebar_position: 6
 ---
 
-<div class="notification is-info">
-  <p><strong>Meltano Cloud is currently in Beta.</strong></p>
-  <p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
-</div>
+:::info
 
-<div class="notification is-info">
+<p><strong>Meltano Cloud is currently in Beta.</strong></p>
+<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+
+:::
+
+:::info
+
   <p>Meltano Cloud is currently in Beta. Features and implementation details may change between Beta and GA.</p>
-</div>
+:::
 
 ## Securing Project Secrets
 
