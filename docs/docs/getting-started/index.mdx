@@ -279,23 +279,21 @@ Chances are that the extractor you just added to your project will require some 
 
 _To learn more about managing the configuration of your plugins, refer to the [Configuration guide](/guide/configuration)._
 
-<div className="notification">
+:::caution
+
   <p><strong>What if I already have a config file for this extractor?</strong></p>
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
 
-    <pre>
-        extractors:
-        - name: tap-example
-          config: {
-            "setting": "value",
-            "another_setting": true
-          }
-
-    </pre>
+    extractors:
+    - name: tap-example
+      config: {
+        "setting": "value",
+        "another_setting": true
+      }
 
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
-</div>
+:::
 
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
@@ -680,14 +678,12 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
 
-    <pre>
-        loaders:
-        - name: target-example
-          config: {
-            "setting": "value",
-            "another_setting": true
-          }
-    </pre>
+    loaders:
+    - name: target-example
+      config: {
+        "setting": "value",
+        "another_setting": true
+      }
 
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 :::
