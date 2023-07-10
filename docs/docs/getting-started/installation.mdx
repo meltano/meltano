@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 2
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import Termy from '@site/src/utils/Termy'
 
 Before you can use Meltano, you’ll need to get it installed. We have a [complete installation guide](/guide/installation-guide) that covers all the possibilities, virtual environments and using pipx; this guide will guide you to a fast installation that will work for the tutorial.
@@ -25,13 +27,14 @@ Not all plugins support the latest versions of Python.
 
 :::
 
-{% tabs log %}
-
-{% tab log Using pipx %}
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="pipx" label="Using pipx" default>
 
 Since Meltano is an application, it should always be installed into a clean virtual environment without any other packages installed alongside it.
 
 To simplify installing Meltano into a clean virtual environment, [`pipx`](https://pypa.github.io/pipx/) can be used to install Meltano instead of `pip`. `pip` is a package installer that comes automatically with Python. `pipx` is a wrapper around pip which cleanly installs executable Python applications (such as Meltano) into their own virtual environments.
+
+<br/>
 
 <Termy>
 
@@ -43,13 +46,14 @@ successfully installed meltano
 
 </Termy>
 
-{% endtab %}
-
-{% tab log Using Docker %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="docker" label="Using Docker">
 
 We maintain [the `meltano/meltano` Docker image on Docker Hub](https://hub.docker.com/r/meltano/meltano/tags), which comes with Python and Meltano pre-installed.
 
 To get the latest version of Meltano, pull the latest tag. Images for specific versions of Meltano are tagged `v<major>.<minor>.<patch>`, e.g. `v2.19.0`. Add a `-python3.X` suffix to the image tag to change the python version, e.g. `latest-python3.9`. To get the latest minor or patch version, omit that value from the version number, e.g. `v2` for the latest Meltano `v2.*.*` image, or `v2.19` for the latest Meltano `v2.19.*` image
+
+<br/>
 
 <Termy>
 
@@ -67,15 +71,15 @@ meltano, version 2.19.0
 
 </Termy>
 
-{% endtab %}
-
-{% tab log Using pip %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="pip" label="Using pip">
 
 Meltano provides a Python package that can be installed using `pip`.
 
-<div className="notification is-warning">
+:::caution
+
   <p>To avoid dependency conflicts, please ensure Meltano is installed into a clean Python virtual environment.</p>
-</div>
+:::
 
 <Termy>
 
@@ -89,9 +93,8 @@ successfully installed meltano
 
 </Termy>
 
-{% endtab %}
-
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 ## More Information
 

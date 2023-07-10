@@ -7,6 +7,9 @@ redirect_from:
 sidebar_position: 2
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
 where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
@@ -177,8 +180,9 @@ If the catalog does not seem to take effect, you may need to [validate the capab
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -186,8 +190,8 @@ extractors:
   catalog: extract/tap-gitlab.catalog.json
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _catalog <path>
@@ -201,9 +205,8 @@ meltano elt tap-gitlab target-jsonl --catalog extract/tap-gitlab.catalog.json
 
 ```
 
-{% endtab %}
-
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__CATALOG=<path>
@@ -212,8 +215,8 @@ export <EXTRACTOR>__CATALOG=<path>
 export TAP_GITLAB__CATALOG=extract/tap-gitlab.catalog.json
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### <a name="load-schema-extra"></a>`load_schema` extra
 
@@ -232,8 +235,9 @@ It is used as the default value for the [`target-postgres`](https://hub.meltano.
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -241,8 +245,8 @@ extractors:
   load_schema: gitlab_data
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _load_schema <schema>
@@ -252,8 +256,8 @@ meltano config tap-gitlab set _load_schema gitlab_data
 
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__LOAD_SCHEMA=<schema>
@@ -262,8 +266,8 @@ export <EXTRACTOR>__LOAD_SCHEMA=<schema>
 export TAP_GITLAB__LOAD_SCHEMA=gitlab_data
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### `metadata` extra
 
@@ -290,8 +294,9 @@ Entity and attribute names can be discovered using [`meltano select --list --all
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -304,8 +309,8 @@ extractors:
         is-replication-key: true
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _metadata <entity> <key> <value>
@@ -318,8 +323,8 @@ meltano config tap-postgres set _metadata some_stream_id created_at is-replicati
 
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__METADATA='{"<entity>": {"<key>": "<value>", "<attribute>": {"<key>": "<value>"}}}'
@@ -333,8 +338,8 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_METHOD=INCREMENTAL
 export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_KEY=created_at
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### `schema` extra
 
@@ -361,8 +366,9 @@ This allows you to define a full schema for taps such as [`tap-dynamodb`](https:
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -374,8 +380,8 @@ extractors:
         format: date-time
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _schema <entity> <attribute> <schema description>
@@ -386,8 +392,8 @@ meltano config tap-postgres set _metadata some_stream_id created_at type '["stri
 meltano config tap-postgres set _metadata some_stream_id created_at format date-time
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__SCHEMA='{"<entity>": {"<attribute>": {"<key>": "<value>"}}}'
@@ -400,8 +406,8 @@ export <EXTRACTOR>__SCHEMA_<ENTITY>_<ATTRIBUTE>_<KEY>=<value>
 export TAP_POSTGRES__SCHEMA_SOME_STREAM_ID_CREATED_AT_FORMAT=date
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### `select` extra
 
@@ -424,8 +430,9 @@ selection rules are typically specified using [`meltano select`](/reference/comm
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -435,8 +442,8 @@ extractors:
   - commits.*
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _select '["<entity>.<attribute>", ...]'
@@ -451,8 +458,8 @@ meltano select tap-gitlab commits "*"
 
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
@@ -461,8 +468,8 @@ export <EXTRACTOR>__SELECT='["<entity>.<attribute>", ...]'
 export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### <a name="select-filter-extra"></a>`select_filter` extra
 
@@ -488,8 +495,9 @@ selection filers are typically specified using [`meltano elt`](/reference/comman
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -501,8 +509,8 @@ extractors:
   - commits
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _select_filter '["<entity>", ...]'
@@ -520,8 +528,8 @@ meltano elt tap-gitlab target-jsonl --exclude project_members
 
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__SELECT_FILTER='["<entity>", ...]'
@@ -531,8 +539,8 @@ export <EXTRACTOR>__SELECT_FILTER='["!<entity>", ...]'
 export TAP_GITLAB__SELECT_FILTER='["commits","!project_members"]'
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### `state` extra
 
@@ -552,8 +560,9 @@ a state file is typically provided using [`meltano elt`](/reference/command-line
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
@@ -561,8 +570,8 @@ extractors:
   state: extract/tap-gitlab.state.json
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <extractor> set _state <path>
@@ -575,8 +584,8 @@ meltano config tap-gitlab set _state extract/tap-gitlab.state.json
 meltano elt tap-gitlab target-jsonl --state extract/tap-gitlab.state.json
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <EXTRACTOR>__STATE=<path>
@@ -585,8 +594,8 @@ export <EXTRACTOR>__STATE=<path>
 export TAP_GITLAB__STATE=extract/tap-gitlab.state.json
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 ### Loaders
 
@@ -621,8 +630,9 @@ It is used as the default value for `dbt`'s `target` setting, and should therefo
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 loaders:
@@ -630,8 +640,8 @@ loaders:
   dialect: example-db
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <loader> set _dialect <dialect>
@@ -640,8 +650,8 @@ meltano config <loader> set _dialect <dialect>
 meltano config target-example-db set _dialect example-db
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <LOADER>__DIALECT=<dialect>
@@ -650,8 +660,8 @@ export <LOADER>__DIALECT=<dialect>
 export TARGET_EXAMPLE_DB__DIALECT=example-db
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### <a name="target-schema-extra"></a>`target_schema` extra
 
@@ -673,8 +683,9 @@ It is used as the default value for `dbt`'s `source_schema` setting.
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 loaders:
@@ -684,8 +695,8 @@ loaders:
   target_schema: $MELTANO_LOAD_DESTINATION_SCHEMA # Value of `destination_schema` setting
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <loader> set _target_schema <schema>
@@ -697,8 +708,8 @@ meltano config target-example-db set _target_schema '$MELTANO_LOAD_DESTINATION_S
 meltano config target-example-db set _target_schema explicit_target_schema
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <LOADER>__TARGET_SCHEMA=<schema>
@@ -707,8 +718,8 @@ export <LOADER>__TARGET_SCHEMA=<schema>
 export TARGET_EXAMPLE_DB__TARGET_SCHEMA=explicit_target_schema
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 ### Transforms
 
@@ -752,8 +763,9 @@ It is included in the default value for `dbt`'s `models` setting: `$MELTANO_TRAN
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 transforms:
@@ -762,8 +774,8 @@ transforms:
   package_name: facebook_ads
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <transform> set _package_name <name>
@@ -772,8 +784,8 @@ meltano config <transform> set _package_name <name>
 meltano config dbt-facebook-ads set _package_name facebook_ads
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <TRANSFORM>__PACKAGE_NAME=<name>
@@ -782,8 +794,8 @@ export <TRANSFORM>__PACKAGE_NAME=<name>
 export DBT_FACEBOOK_ADS__PACKAGE_NAME=facebook_ads
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 #### `vars` extra
 
@@ -801,8 +813,9 @@ Because these variables are handled by dbt rather than Meltano, [environment var
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 {% raw %}
@@ -813,8 +826,8 @@ transforms:
 {% endraw %}
 ```
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 {% raw %}
@@ -826,8 +839,8 @@ meltano config --plugin-type=transform tap-gitlab set _vars schema "{{ env_var('
 
 ```
 
-{% endtab %}
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <TRANSFORM>__VARS='{"<key>": "<value>"}'
@@ -836,8 +849,8 @@ export <TRANSFORM>__VARS='{"<key>": "<value>"}'
 export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 ### Orchestrators
 
@@ -892,8 +905,9 @@ When a file path's value is `True`, the matching files are considered to be mana
 ##### How to use
 
 Manage this extra:
-{% tabs extra_usage %}
-{% tab extra_usage meltano.yml %}
+
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 files:
@@ -914,8 +928,8 @@ files:
 </pre>
 :::
 
-{% endtab %}
-{% tab extra_usage terminal %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
 
 ```bash
 meltano config <bundle> set _update <path> <true/false>
@@ -925,9 +939,8 @@ meltano config --plugin-type=files dbt set _update transform/dbt_project.yml fal
 meltano config --plugin-type=files dbt set _update profiles/*.yml true
 ```
 
-{% endtab %}
-
-{% tab extra_usage env %}
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
 
 ```bash
 export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
@@ -936,8 +949,8 @@ export <BUNDLE>__UPDATE='{"<path>": <true/false>}'
 export DBT__UPDATE='{"transform/dbt_project.yml": false, "profiles/*.yml": true}'
 ```
 
-{% endtab %}
-{% endtabs %}
+  </TabItem>
+</Tabs>
 
 ### Utilities
 
