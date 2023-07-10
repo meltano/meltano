@@ -1031,7 +1031,7 @@ main {
   font-size: var(--ifm-code-font-size);
   font-family: 'Fira Mono', Consolas, Menlo, Monaco, 'Courier New', Courier, monospace;
   border-radius: 4px;
-  padding: 75px 45px 35px;
+  padding: 3rem 1rem 1rem;
   position: relative;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
