@@ -57,5 +57,6 @@
   .docItemCol {
     max-width: 75% !important;
     padding: 0;
+    transition: all 0.2s ease;
   }
 }
