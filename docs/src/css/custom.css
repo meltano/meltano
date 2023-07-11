@@ -72,7 +72,7 @@
   --ifm-navbar-background-color: var(--meltano-black);
   --button-text-color: var(--meltano-black);
   --background-color: var(--meltano-black);
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.2);
   --ifm-heading-color: var(--meltano-white);
   --ligth-button-text-color: var(--meltano-white);
   --ifm-link-hover-color: var(--meltano-white);

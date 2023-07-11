@@ -17,6 +17,7 @@ Follow the steps below to work locally with this project.
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
 Add/edit category icon as a base64 svg in `_category_.json`
+To hightlight a line of code, add `==` before it, eg. `==mkdir meltano-projects`
 
 Read the [Docusaurus guides](https://docusaurus.io/docs/category/guides) for any further information.
 

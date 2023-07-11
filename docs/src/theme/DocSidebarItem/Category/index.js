@@ -161,12 +161,11 @@ export default function DocSidebarItemCategory({
             <div
               className="sidebar-category-icon"
               style={{
-                webkitMaskImage: `url(${customProps.icon})`,
+                WebkitMaskImage: `url(${customProps.icon})`,
                 maskImage: `url(${customProps.icon})`,
               }}
             />
           )}
-          {console.log(customProps?.icon)}
           {label}
         </Link>
         {href && collapsible && (
