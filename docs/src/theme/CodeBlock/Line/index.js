@@ -13,11 +13,11 @@ export default function CodeBlockLine({
   }
 
   const lineIsHighlight = line.some((l) => l.content.includes("=="));
+
   line.map((l) => {
     l.content.includes("==")
       ? (l.content = l.content.replace("==", ""))
       : l.content;
-    console.log(l.content);
     return l;
   });
 
