@@ -137,7 +137,7 @@ Secrets are shared across all deployments in your project and can be referenced 
 Secrets are configured using the Cloud CLI.
 
 ```console
-meltano-cloud config env set TAP_GITLAB_PASSWORD
+meltano-cloud config env set --key TAP_GITHUB_AUTH_TOKEN --value 'my_super_secret_auth_token'
 > Secret value: ****
 ```
 
