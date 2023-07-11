@@ -256,8 +256,24 @@ h6 {
   font-size: var(--ifm-code-font-size);
 }
 
+.markdown h1 code {
+  font-size: 32px;
+}
+
+.markdown h2 code {
+  font-size: 26px;
+}
+
 .markdown h3 code {
   font-size: 24px;
+}
+
+.markdown h4 code {
+  font-size: 22px;
+}
+
+.markdown h5 code {
+  font-size: 20px;
 }
 
 .markdown .theme-code-block {
