@@ -12,9 +12,12 @@ export default function CodeBlockLine({
     line[0].content = "";
   }
 
-  const lineIsHighlight = line.some((l) => l.content === "==");
+  const lineIsHighlight = line.some((l) => l.content.includes("=="));
   line.map((l) => {
-    l.content === "==" ? (l.content = "") : l.content;
+    l.content.includes("==")
+      ? (l.content = l.content.replace("==", ""))
+      : l.content;
+    console.log(l.content);
     return l;
   });
 

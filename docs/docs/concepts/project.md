@@ -124,21 +124,21 @@ To learn how to add an inheriting plugin to your project, refer to the [Plugin M
 
 A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/concepts/plugins#custom-plugins) that explicitly defines its [base plugin description](/concepts/plugins#project-plugins):
 
-```yaml{4-14}
+```yaml
 plugins:
   extractors:
   - name: tap-covid-19
-    namespace: tap_covid_19
-    pip_url: tap-covid-19
-    executable: tap-covid-19
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings:
-    - name: api_token
-    - name: user_agent
-    - name: start_date
+    ==namespace: tap_covid_19
+    ==pip_url: tap-covid-19
+    ==executable: tap-covid-19
+    ==capabilities:
+    ==- catalog
+    ==- discover
+    ==- state
+    ==settings:
+    ==- name: api_token
+    ==- name: user_agent
+    ==- name: start_date
 ```
 
 To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
@@ -147,10 +147,10 @@ To learn how to add a custom plugin to your project, refer to the [Plugin Manage
 
 A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/concepts/plugins#project-plugins) from the [discoverable plugin](/concepts/plugins#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
 
-```yaml{3}
+```yaml
 plugins:
   extractors:
-  - name: tap-gitlab
+  ==- name: tap-gitlab
 ```
 
 To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
@@ -160,11 +160,11 @@ To learn how to add a discoverable plugin to your project, refer to the [Plugin 
 If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 the `variant` property can be used to choose a specific one:
 
-```yaml{4}
+```yaml
 plugins:
   extractors:
   - name: tap-gitlab
-    variant: meltano
+    ==variant: meltano
 ```
 
 If no `variant` is specified, the _original_ variant supported by Meltano is used.
@@ -175,14 +175,14 @@ Note that this is not necessarily the _default_ variant that is recommended to n
 A plugin's [configuration](/guide/configuration) is stored under a `config` property.
 Values for [plugin extras](/guide/configuration#plugin-extras) are stored among the plugin's other properties, outside of the `config` object:
 
-```yaml{3-7}
+```yaml
 extractors:
 - name: tap-example
-  config:
-    # Configuration goes here!
-    example_setting: value
-  # Extras go here!
-  example_extra: value
+  ==config:
+    ==# Configuration goes here!
+    ==example_setting: value
+  ==# Extras go here!
+  ==example_extra: value
 ```
 
 #### Plugin commands
@@ -266,14 +266,14 @@ Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and
 
 [Pipeline-specific configuration](/guide/integration#pipeline-specific-configuration) can be specified using [environment variables](/guide/configuration#configuring-settings) in an `env` dictionary:
 
-```yaml{7-9}
+```yaml
 schedules:
 - name: foo-to-bar
   job: tap-foo-to-target-bat
   interval: "@hourly"
-  env:
-    TAP_FOO_BAR: bar
-    TAP_FOO_BAZ: baz
+  ==env:
+    ==TAP_FOO_BAR: bar
+    ==TAP_FOO_BAZ: baz
 ```
 
 To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/guide/orchestration).
