@@ -460,7 +460,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password` (deprecated), `options`, `file`, `array`, `object`, and `hidden` (deprecated).
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 
 ```yaml
 settings:
