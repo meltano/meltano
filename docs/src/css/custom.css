@@ -257,6 +257,10 @@ h6 {
   background-color: transparent;
 }
 
+.markdown h3 code {
+  font-size: 24px;
+}
+
 .markdown .theme-code-block {
   background: none;
 }
