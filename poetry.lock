@@ -295,13 +295,13 @@ files = [
 
 [[package]]
 name = "azure-core"
-version = "1.27.1"
+version = "1.28.0"
 description = "Microsoft Azure Core Library for Python"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "azure-core-1.27.1.zip", hash = "sha256:5975c20808fa388243f01a8b79021bfbe114f503a27c543f002c5fc8bbdd73dd"},
-    {file = "azure_core-1.27.1-py3-none-any.whl", hash = "sha256:1b4b19f455eb7b4332c6f92adc2c669353ded07c2722eb436165f0c253737792"},
+    {file = "azure-core-1.28.0.zip", hash = "sha256:e9eefc66fc1fde56dab6f04d4e5d12c60754d5a9fa49bdcfd8534fc96ed936bd"},
+    {file = "azure_core-1.28.0-py3-none-any.whl", hash = "sha256:dec36dfc8eb0b052a853f30c07437effec2f9e3e1fc8f703d9bdaa5cfc0043d9"},
 ]
 
 [package.dependencies]
@@ -3900,4 +3900,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "e4773cf381349da08a8fccf82421d4bad1da80262cdab5dabb24de1c8510590a"
+content-hash = "baa2a700fff3200be6beedefffb5c20015347dfefb8346ffb029f3b894c76d5a"
