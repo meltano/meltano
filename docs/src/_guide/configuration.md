@@ -264,6 +264,7 @@ plugins:
     - catalog
     settings:
     - name: password
+      kind: string
       sensitive: true
     - name: my_custom_tap_username
       aliases: [custom_tap_username, username]
