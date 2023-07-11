@@ -254,7 +254,6 @@ h6 {
 
 .markdown code {
   font-size: var(--ifm-code-font-size);
-  background-color: transparent;
 }
 
 .markdown h3 code {
