@@ -11,6 +11,19 @@ from pytest_structlog import StructuredLogCapture
 from meltano.cloud.api.config import MeltanoCloudConfig
 
 
+@pytest.fixture(autouse=True)
+def unset_env_vars(monkeypatch: pytest.MonkeyPatch):
+    """Unsets possible env variables set during development while using Meltano Cloud.
+
+    MeltanoCloudConfig __getattribute__ overrides the config value on get
+    to env vars if set. This causes tests to fail unless you unset the env variables.
+    """
+    monkeypatch.delenv("MELTANO_CLOUD_BASE_URL", raising=False)
+    monkeypatch.delenv("MELTANO_CLOUD_BASE_AUTH_URL", raising=False)
+    monkeypatch.delenv("MELTANO_CLOUD_APP_CLIENT_ID", raising=False)
+    monkeypatch.delenv("MELTANO_CLOUD_TENANT_RESOURCE_KEY", raising=False)
+
+
 @pytest.fixture(scope="session", autouse=True)
 def config_path(tmpdir_factory: pytest.TempdirFactory) -> Path:
     """Return the path to the test configuration file."""
@@ -91,3 +104,15 @@ def config(
     )
     config.write_to_file()
     return config
+
+
+@pytest.fixture()
+def tenant_resource_key():
+    """Return a fake tenant resource key."""
+    return "meltano-cloud-test"
+
+
+@pytest.fixture()
+def internal_project_id():
+    """Return a fake Cloud/internal project ID."""
+    return "pytest-123"

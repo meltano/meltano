@@ -628,6 +628,9 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
+To only install plugins for a particular schedule specify the `--schedule` argument.
+This can be useful in CI test workflows or for deployments that need to install plugins before every run.
+
 Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 Meltano installs plugins in parallel. The number of plugins to install in parallel defaults to the number of CPUs on the machine, but can be controlled with `--parallelism`. Use `--parallelism=1` to disable the feature and install them one at a time.
@@ -665,6 +668,7 @@ meltano install
 meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
+meltano install --schedule=<schedule_name>
 
 meltano install --parallelism=16
 meltano install --clean
@@ -1023,7 +1027,11 @@ Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passe
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
-`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), or `@yearly` (`0 0 1 1 *`).
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or one of `@manual`, `@once`, or `@none` (for schedules that are to be triggered manually).
+
+<div class="notification is-info">
+  <p><code>@manual</code>, <code>@once</code>, and <code>@none</code> are all aliases for one another. They have no functional difference, and can be used interchangeably.</p>
+</div>
 
 ```bash
 # Add a schedule

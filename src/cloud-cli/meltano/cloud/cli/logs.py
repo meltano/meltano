@@ -40,9 +40,8 @@ class LogsClient(MeltanoCloudClient):
             f"/{self.config.internal_project_id}/{execution_id}"
         )
 
-        async with self.authenticated():
-            async with self._raw_request("GET", url) as response:
-                yield response
+        async with self.authenticated(), self._raw_request("GET", url) as response:
+            yield response
 
     async def _get_logs_page(
         self,
@@ -84,9 +83,13 @@ class LogsClient(MeltanoCloudClient):
                 response = await self._get_logs_page(execution_id, page_token)
                 yield response
 
-                page_token = response.get("next_page_token")
-                if not page_token:
+                pagination = response.get("pagination") or {}
+                new_page_token = pagination.get("next_page_token")
+
+                if new_page_token == page_token:
                     break
+
+                page_token = new_page_token
 
 
 @click.group()
@@ -115,11 +118,6 @@ async def print_logs(
 @pass_context
 @run_async
 async def print_(context: MeltanoCloudCLIContext, execution_id: str) -> None:
-    """Print the logs.
-
-    Args:
-        context: The Click context.
-        execution_id: The execution identifier.
-    """
+    """Print the execution logs."""
     click.echo(f"Fetching logs for execution {execution_id}")
     await print_logs(context.config, execution_id)

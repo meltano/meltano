@@ -2,19 +2,14 @@
 
 from __future__ import annotations
 
-import sys
 import typing as t
+from functools import cached_property
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 
 class PluginSettingsService(SettingsService):  # noqa: WPS214

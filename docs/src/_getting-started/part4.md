@@ -24,7 +24,7 @@ To add inline data mappings, we need a new plugin. We're going to use the mapper
 
 <div class="termy">
 ```console
-$ meltano add mapper transform-field
+$ meltano add mapper transform-field --variant=transferwise
 
 Added mapper 'transform-field' to your Meltano project
 Variant:        transferwise (default)
@@ -35,7 +35,7 @@ Installing mapper 'transform-field'...
 ---> 100%
 Installed mapper 'transform-field'
 
-To learn more about mapper 'transform-field', visit https://docs.meltano.com/concepts/plugins#mappers
+To learn more about mapper 'transform-field', visit https://hub.meltano.com/mappers/transform-field--transferwise
 </div>
 
 We're now going to add two mapping to this mapper.
@@ -48,15 +48,14 @@ mappers:
   - name: transform-field
     variant: transferwise
     pip_url: pipelinewise-transform-field
-    executable: transform-field
-   mappings:
-    - name: hide-github-mails
-      config:
-        transformations:
-          - field_id: "commit"
-            tap_stream_name: "commits"
-            field_paths: ["author/email", "committer/email"]
-            type: "HASH"
+    mappings:
+      - name: hide-github-mails
+        config:
+          transformations:
+            - field_id: "commit"
+              tap_stream_name: "commits"
+              field_paths: ["author/email", "committer/email"]
+              type: "HASH"
 ```
 Let's go through this step-by-step
 
@@ -81,13 +80,49 @@ These lines define the name "hide-github-mails" as the name of our mapping. We c
 ```
 These lines define one transformation. We instruct to target the stream "commits", and therein the field "commit". We then use the field paths to navigate to the two emails we know are contained within this message and set the type to "HASH". Using "HASH" means we will still be able to tell whether two emails are the same, but not be able to read the email. They will be replaced with a SHA-256 hash of the email.
 
+If you open up the original record message and view the `commit` data it would first look like:
+
+```
+{
+        "author": {
+            "name": "Sven Balnojan",
+            "email": "43072233+sbalnojan@users.noreply.github.com",
+            "date": "2022-09-14T12:41:21Z"
+        },
+        "committer": {
+            "name": "GitHub",
+            "email": "noreply@github.com",
+            "date": "2022-09-14T12:41:21Z"
+        },
+        [...]
+}
+```
+
+Then after the mapping does its hashing it would end up in the table with hashed emails like the following:
+
+```
+{
+        "author": {
+            "name": "Sven Balnojan",
+            "email": "72f96bfaf82b99f5ff88d843b5042e82d02e1e35d9e50bd2fc66b7856b986e2b",
+            "date": "2022-09-14T12:41:21Z"
+        },
+        "committer": {
+            "name": "GitHub",
+            "email": "3c205d8fc749f72977b9331e3179773c315bb1f4860c366de2abe9ec9337730b",
+            "date": "2022-09-14T12:41:21Z"
+        },
+        [...]
+}
+```
+
 ## Run the data integration pipeline
 Now we're ready to run the data integration process with these modifications again. To do so, we'll need to clean up first, since we already ran the EL process in part 1. The primary key is still the same and as such the ingestion would fail.
 
 Drop the table inside your local postgres by running a docker exec:
 
 ```bash
-docker exec meltano_postgres psql -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
+docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
 ```
 
 Now we can run the full process again using the `meltano run`command. We add the parameter --full-refresh to ignore the state Meltano has stored.

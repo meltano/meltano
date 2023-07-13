@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import sys
+import typing as t
 from logging import config as logging_config
 
 import structlog
@@ -18,12 +18,6 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.project import Project
 from meltano.core.utils import get_no_color_flag
-
-if sys.version_info >= (3, 8):
-    from typing import Protocol
-else:
-    from typing_extensions import Protocol
-
 
 LEVELS = {  # noqa: WPS407
     "debug": logging.DEBUG,
@@ -108,18 +102,18 @@ def default_config(log_level: str) -> dict:
                 "propagate": True,
             },
             "snowplow_tracker.emitters": {
-                "handlers": ["console"],
                 "level": logging.ERROR,
             },
             "urllib3": {
-                "handlers": ["console"],
                 "level": logging.INFO,
-                "propagate": False,
             },
             "asyncio": {
-                "handlers": ["console"],
                 "level": logging.INFO,
-                "propagate": False,
+            },
+            # Azure HTTP logs at info level are too noisy; see
+            # https://github.com/meltano/meltano/issues/7723
+            "azure.core.pipeline.policies.http_logging_policy": {
+                "level": logging.WARNING,
             },
         },
     }
@@ -186,7 +180,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
             handler.setLevel(log_level)
 
 
-class SubprocessOutputWriter(Protocol):
+class SubprocessOutputWriter(t.Protocol):
     """A basic interface suitable for use with `capture_subprocess_output`."""
 
     def writelines(self, lines: str):

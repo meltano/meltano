@@ -1363,8 +1363,7 @@ class AutoStoreManager(SettingsStoreManager):
 
         metadata["source"] = found_source
 
-        auto_store = self.auto_store(name, setting_def=setting_def)
-        if auto_store:
+        if auto_store := self.auto_store(name, setting_def=setting_def):
             metadata["auto_store"] = auto_store
             metadata["overwritable"] = auto_store.can_overwrite(found_source)
 

@@ -3,17 +3,22 @@
 from __future__ import annotations
 
 import itertools as it
-import json
 import typing as t
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
 import click
-import tabulate
 from croniter import croniter, croniter_range
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import pass_context, run_async, shared_option
+from meltano.cloud.cli.base import (
+    LimitedResult,
+    get_paginated,
+    pass_context,
+    print_formatted_list,
+    run_async,
+    shared_option,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -150,8 +155,17 @@ async def _set_enabled_state(
 ):
     if schedule_name is None:
         raise click.UsageError("Missing option '--schedule'")
+    deployment_name = (
+        deployment_name
+        if deployment_name is not None
+        else config.internal_project_default["default_deployment_name"]
+    )
     if deployment_name is None:
-        raise click.UsageError("Missing option '--deployment'")
+        raise click.UsageError(
+            "A deployment name is required. Please specify "
+            "one with the '--deployment' option, or specify a default"
+            "deployment by running 'meltano cloud deployment use'.",
+        )
     async with SchedulesCloudClient(config=config) as client:
         await client.set_schedule_enabled(
             deployment_name=deployment_name,
@@ -228,27 +242,17 @@ async def _get_schedules(
     config: MeltanoCloudConfig,
     deployment_name: str | None,
     limit: int,
-) -> list[CloudProjectSchedule]:
-    page_token = None
-    page_size = min(limit, MAX_PAGE_SIZE)
-    results: list[CloudProjectSchedule] = []
-
+) -> LimitedResult[CloudProjectSchedule]:
     async with SchedulesCloudClient(config=config) as client:
-        while True:
-            response = await client.get_schedules(
+        return await get_paginated(
+            lambda page_size, page_token: client.get_schedules(
                 deployment_name=deployment_name,
                 page_size=page_size,
                 page_token=page_token,
-            )
-
-            results.extend(response["results"])
-
-            if response["pagination"] and len(results) < limit:
-                page_token = response["pagination"]["next_page_token"]
-            else:
-                break
-
-    return results[:limit]
+            ),
+            limit,
+            MAX_PAGE_SIZE,
+        )
 
 
 def _next_n_runs(n: int, cron_expr: str) -> tuple[datetime, ...]:
@@ -264,13 +268,15 @@ def _approx_daily_freq(
     sample_period: timedelta = timedelta_year,
     num_digits_precision: int = 1,
 ) -> str:
+    if cron_expr in {"@once", "@manual", "@none"}:
+        return "0"
     now = datetime.now(timezone.utc)
     num_runs = sum(1 for _ in croniter_range(now, now + sample_period, cron_expr))
     freq = round(num_runs / sample_period.days, num_digits_precision)
     return "< 1" if freq < 1 else str(freq)
 
 
-def _process_table_row(
+def _format_schedule(
     schedule: CloudProjectSchedule,
 ) -> tuple[str, str, str, str, bool]:
     return (
@@ -280,47 +286,6 @@ def _process_table_row(
         _approx_daily_freq(schedule["interval"]),
         schedule["enabled"],
     )
-
-
-def _format_schedules_table(
-    schedules: list[CloudProjectSchedule],
-    table_format: str,
-) -> str:
-    """Format the schedules as a table.
-
-    Args:
-        schedules: The schedules to format.
-
-    Returns:
-        The formatted schedules.
-    """
-    return tabulate.tabulate(
-        [_process_table_row(schedule) for schedule in schedules],
-        headers=(
-            "Deployment",
-            "Schedule",
-            "Interval",
-            "Runs / Day",
-            "Enabled",
-        ),
-        tablefmt=table_format,
-        floatfmt=".1f",
-        # To avoid a tabulate bug (IndexError), only set colalign if there are schedules
-        colalign=("left", "left", "left", "right", "left") if schedules else (),
-    )
-
-
-schedule_list_formatters = {
-    "json": lambda schedules: json.dumps(schedules, indent=2),
-    "markdown": lambda schedules: _format_schedules_table(
-        schedules,
-        table_format="github",
-    ),
-    "terminal": lambda schedules: _format_schedules_table(
-        schedules,
-        table_format="rounded_outline",
-    ),
-}
 
 
 @schedule_group.command("list")
@@ -348,14 +313,17 @@ async def list_schedules(
     limit: int,
 ) -> None:
     """List Meltano Cloud schedules."""
-    click.echo(
-        schedule_list_formatters[output_format](
-            await _get_schedules(
-                config=context.config,
-                deployment_name=context.deployment,
-                limit=limit,
-            ),
-        ),
+    results = await _get_schedules(
+        config=context.config,
+        deployment_name=context.deployment,
+        limit=limit,
+    )
+    print_formatted_list(
+        results,
+        output_format,
+        _format_schedule,
+        ("Deployment", "Schedule", "Interval", "Runs / Day", "Enabled"),
+        ("left", "left", "left", "right", "left"),
     )
 
 
@@ -380,7 +348,7 @@ async def describe_schedule(
     only_upcoming: bool,
     num_upcoming: int,
 ) -> None:
-    """List Meltano Cloud schedules."""
+    """Describe a Meltano Cloud schedules & list upcoming scheduled runs."""
     schedule = await _get_schedule(
         config=context.config,
         deployment_name=context.deployment,

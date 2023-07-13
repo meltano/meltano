@@ -208,9 +208,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
             The prepared request.
         """
         request = requests.Request(method, url)
-        click_context = click.get_current_context(silent=True)
-
-        if click_context:
+        if click_context := click.get_current_context(silent=True):
             request.headers["X-Meltano-Command"] = click_context.command_path
 
         return self.session.prepare_request(request)

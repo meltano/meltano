@@ -43,8 +43,43 @@ class TestLogsCommand:
                         "message": "[2023-05-01 00:00:01] Running Job...",
                     },
                 ],
+                "pagination": {
+                    "next_page_token": "abc123",
+                    "page_size": 2,
+                },
             },
         )
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_token": "abc123"},
+        ).respond_with_json(
+            {
+                "results": [
+                    {
+                        "timestamp": 1620000000,
+                        "ingestion_time": 1620000000,
+                        "message": "[2023-05-01 00:00:02] Finishing Job...",
+                    },
+                ],
+                "pagination": {
+                    "next_page_token": "def123",
+                    "page_size": 2,
+                },
+            },
+        )
+        httpserver.expect_oneshot_request(
+            path,
+            query_string={"page_token": "def123"},
+        ).respond_with_json(
+            {
+                "results": [],
+                "pagination": {
+                    "next_page_token": "def123",
+                    "page_size": 2,
+                },
+            },
+        )
+
         result = CliRunner().invoke(
             cli,
             [
@@ -59,3 +94,4 @@ class TestLogsCommand:
         assert result.exit_code == 0
         assert "[2023-05-01 00:00:00] Starting Job..." in result.output
         assert "[2023-05-01 00:00:01] Running Job..." in result.output
+        assert "[2023-05-01 00:00:02] Finishing Job..." in result.output

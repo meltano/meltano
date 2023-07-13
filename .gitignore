@@ -146,3 +146,6 @@ setup.py
 
 # Ruff
 .ruff_cache/
+
+# Flakeheaven
+.flakeheaven_cache/

@@ -30,3 +30,4 @@ scopes:
   - core
   - cli
   - deps
+  - deps-dev

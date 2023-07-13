@@ -20,8 +20,6 @@ If your data pipelines write data to a data warehouse or other production resour
 
 For example, if your production data pipelines output data to `RAW_DB`, you may want to create a new database called `STAGING_RAW_DB` or `RAW_DB_STAGING` which can be the target for the Meltano Cloud workloads during testing.
 
-The default environment name for Meltano Cloud Alpha is `'sandbox'`, but you can also submit a different environment name if you prefer.
-
 Note:
 
 - In the Beta phase, branch and environment names will be fully configurable without contacting Meltano Support.

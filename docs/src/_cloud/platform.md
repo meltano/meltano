@@ -2,6 +2,8 @@
 title: "Platform Information"
 layout: doc
 weight: 5
+redirect_from:
+  - /cloud/reserved_variables
 ---
 
 <div class="notification is-info">
@@ -12,6 +14,17 @@ weight: 5
 ## Cloud Platform
 
 Meltano Cloud currently runs on AWS.
+
+### Python Version
+
+Meltano Cloud uses Python 3.9.
+After our GA launch, we aim to support all active versions of Python that are not yet at their [end of life](https://devguide.python.org/versions/).
+
+### Run Storage
+
+Meltano Cloud enables up to 10GB of ephemeral disk storage during a run.
+
+Future plans include making this configurable.
 
 ## Region
 
@@ -55,16 +68,8 @@ SOME_OTHER_SECRET=1234asdf
 
 Then continue with encryption using the [kms-ext](https://github.com/meltano/kms-ext) utility.
 
-## Roles and Permissions
+## Job or Schedule Run Notifications via Webhook
 
-### Role descriptions
+`MELTANO_CLOUD_WEBHOOK_URL` can be set to receive notifications on success or fail of a job or schedule run.
 
-- Users with the `owner` role access can create and delete projects, as well as performing all functions of `maintaner`. Owners can also view billing history and perform other account management functions, such as adding new users.
-- Users with the `maintaner` role access can perform normal development and maintenance functions, such as updating schedules and executing jobs. Maintainers cannot add or delete projects or users.
-- Users with the `reader` role only have read-only access: for instance, to view job statuses and summary logs.
-
-### Future updates
-
-Note:
-
-- More advanced role-based access permissions may be added in future versions on Meltano Cloud.
+Currently only one webhook URL can be configured.

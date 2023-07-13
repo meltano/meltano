@@ -7,7 +7,6 @@ import json
 import locale
 import os
 import re
-import sys
 import typing as t
 import uuid
 from collections.abc import Mapping
@@ -40,11 +39,7 @@ if t.TYPE_CHECKING:
         ProjectContext,
     )
 
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
-
+from functools import cached_property
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -414,13 +409,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         except (OSError, json.JSONDecodeError):
             return TelemetrySettings(None, None, None)
 
-        missing_keys = {
+        if missing_keys := {
             "client_id",
             "project_id",
             "send_anonymous_usage_stats",
-        } - set(analytics)
-
-        if missing_keys:
+        } - set(analytics):
             logger.debug(
                 (
                     "'analytics.json' has missing keys, and will be "

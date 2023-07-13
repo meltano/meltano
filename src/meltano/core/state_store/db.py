@@ -74,10 +74,9 @@ class DBStateStoreManager(StateStoreManager):
         Args:
             state_id: the state_id to clear state for
         """
-        job_state: JobState | None = (
+        if job_state := (
             self.session.query(JobState).filter(JobState.state_id == state_id).first()
-        )
-        if job_state:
+        ):
             self.session.delete(job_state)
             self.session.commit()
 

@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import enum
-import sys
 import typing as t
 from contextlib import contextmanager, suppress
+from functools import cached_property
 
 import structlog
 
@@ -22,11 +22,6 @@ from meltano.core.plugin_discovery_service import (
 )
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.settings_service import FeatureFlags
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -117,10 +112,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             FeatureFlags.PLUGIN_LOCKS_REQUIRED.value,
             raise_error=False,
         ) as flag:
-            if flag:
-                self._prefer_source = DefinitionSource.LOCAL
-            else:
-                self._prefer_source = DefinitionSource.ANY
+            self._prefer_source = (
+                DefinitionSource.LOCAL if flag else DefinitionSource.ANY
+            )
 
     @cached_property
     def current_plugins(self):
@@ -301,13 +295,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             PluginNotFoundError: If no mapper plugin with the specified mapping
                 name is found.
         """
-        found: list[ProjectPlugin] = []
-        for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS):
-            if plugin.extra_config.get("_mapping_name") == mapping_name:
-                found.append(plugin)
-        if not found:
-            raise PluginNotFoundError(mapping_name)
-        return found
+        if found := [
+            plugin
+            for plugin in self.get_plugins_of_type(plugin_type=PluginType.MAPPERS)
+            if plugin.extra_config.get("_mapping_name") == mapping_name
+        ]:
+            return found
+        raise PluginNotFoundError(mapping_name)
 
     def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
         """Get a plugin using its PluginRef.
@@ -580,13 +574,12 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         Returns:
             First available transformer plugin.
         """
-        transformer = next(
+        if transformer := next(
             iter(self.get_plugins_of_type(plugin_type=PluginType.TRANSFORMERS)),
             None,
-        )
-        if not transformer:
-            raise PluginNotFoundError("No Plugin of type Transformer found.")
-        return transformer
+        ):
+            return transformer
+        raise PluginNotFoundError("No Plugin of type Transformer found.")
 
     @contextmanager
     def use_preferred_source(self, source: DefinitionSource) -> None:

@@ -40,7 +40,6 @@ async def run_project(
 @click.argument("job_or_schedule")
 @click.option(
     "--deployment",
-    required=True,
     help="The name of the Meltano Cloud deployment to run in.",
 )
 @pass_context
@@ -48,9 +47,20 @@ async def run_project(
 async def run(
     context: MeltanoCloudCLIContext,
     job_or_schedule: str,
-    deployment: str,
+    deployment: str | None = None,
 ) -> None:
     """Run a Meltano project in Meltano Cloud."""
+    deployment = (
+        deployment
+        if deployment is not None
+        else context.config.internal_project_default["default_deployment_name"]
+    )
+    if deployment is None:
+        raise click.UsageError(
+            "A deployment name is required. Please specify "
+            "one with the '--deployment' option, or specify a default"
+            "deployment by running 'meltano cloud deployment use'.",
+        )
     click.echo("Running a Meltano project in Meltano Cloud.")
 
     result = await run_project(

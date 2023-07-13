@@ -6,7 +6,6 @@ import signal
 import uuid
 from datetime import datetime, timedelta
 
-import psutil
 import pytest
 
 from meltano.core.job.job import (
@@ -103,7 +102,7 @@ class TestJob:
         subject = self.sample_job({"original_state": 1}).save(session)
         with pytest.raises(KeyboardInterrupt):  # noqa: PT012
             async with subject.run(session):
-                send_signal(signal.SIGINT)
+                signal.raise_signal(signal.SIGINT)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -120,7 +119,7 @@ class TestJob:
 
         with pytest.raises(SystemExit):  # noqa: PT012
             async with subject.run(session):
-                send_signal(signal.SIGTERM)
+                signal.raise_signal(signal.SIGTERM)
 
         assert subject.state is State.FAIL
         assert subject.ended_at is not None
@@ -191,15 +190,3 @@ class TestJob:
         assert job.fail_stale()
         assert job.has_error()
         assert "5 minutes" in job.payload["error"]
-
-
-def send_signal(signal: int):
-    if platform.system() == "Windows":
-        # Replace once Python 3.7 has been dropped see https://github.com/meltano/meltano/issues/6223
-        import ctypes
-
-        ucrtbase = ctypes.CDLL("ucrtbase")
-        c_raise = ucrtbase["raise"]
-        c_raise(signal)
-    else:
-        psutil.Process().send_signal(signal)

@@ -25,6 +25,8 @@ if sys.version_info >= (3, 10):
 else:
     from typing_extensions import TypeAlias
 
+from functools import cached_property
+
 from meltano import __file__ as package_root_path
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
 from meltano.core.plugin.base import PluginType
@@ -40,11 +42,6 @@ from meltano.core.utils import (
     expand_env_vars,
     get_no_color_flag,
 )
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 # NOTE: We do not use `Project(...).meltano.canonical` for 3 reasons:
 # - It will make it difficult to refactor the rest of the Meltano core to be

@@ -21,14 +21,12 @@ This page will help you figure out:
 
 If you're [containerizing your Meltano project](/guide/containerization),
 you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano project" subsections on this page.
-We also provide a [Helm Chart](https://github.com/meltano/helm-meltano) for deploying a containerized instance of the Meltano to [Kubernetes](https://kubernetes.io).
-More on that [in the Kubernetes section](#kubernetes).
 
 ## Managed Hosting Options
 
 Would you rather not be responsible for deploying your Meltano project and managing it in production?
 
-[Meltano Cloud](https://meltano.com/cloud) launches in Alpha in late 2022 and opens to the public in early 2023. [Sign up](https://meltano.com/cloud) to receive more information and reduce your self-management burden.
+[Meltano Cloud](https://meltano.com/cloud) is currently in Public Beta and will enter General Availability in Q3 2023. [Sign up](https://meltano.com/cloud) to receive more information and reduce your self-management burden.
 
 In the mean time, consider running your Meltano pipelines using a managed Airflow service like [Astronomer](https://www.astronomer.io/), [Google Cloud Composer](https://cloud.google.com/composer/), or [Amazon MWAA](https://docs.aws.amazon.com/mwaa).
 
