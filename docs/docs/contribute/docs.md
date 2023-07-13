@@ -60,7 +60,7 @@ sidebar_position: 2
 ### Add a New Section
 
 1. Create a folder named `_newsection` in the `src` directory.
-1. [Create a new file](#add_a_new_page) called `index.md`. Set the `sidebar_position:` of this page to `1` -- it'll be the home page for this section.
+1. [Create a new file](/contribute/docs#add_a_new_page) called `index.md`. Set the `sidebar_position:` of this page to `1` -- it'll be the home page for this section.
 1. Add your [Markdown](https://github.github.com/gfm/) content. Since this is an index page it may be helpful to add some information about this new section. Create additional pages as needed and link to them from this page.
 1. Update `collections:` in `_config.yml`. Ex:
 

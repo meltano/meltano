@@ -6,4 +6,4 @@ sidebar_position: 10
 hidden: true
 ---
 
-To update how [Meltano telemetry](../reference/settings#send_anonymous_usage_stats) works, or update the schemas we use for Snowplow events and contexts, refer to [the `README.md` file in the tracking module](https://github.com/meltano/meltano/blob/main/src/meltano/core/tracking/README.md).
+To update how [Meltano telemetry](/reference/settings#send_anonymous_usage_stats) works, or update the schemas we use for Snowplow events and contexts, refer to [the `README.md` file in the tracking module](https://github.com/meltano/meltano/blob/main/src/meltano/core/tracking/README.md).
