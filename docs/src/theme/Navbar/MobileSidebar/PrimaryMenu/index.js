@@ -47,37 +47,43 @@ export default function NavbarMobilePrimaryMenu() {
           <NavbarLogo />
         </div>
         <div className="footer-soc-wrapper flex justify-between gap-3 order-1 sm:order-2 mb-10">
-          <a href="#" className="opacity-50">
+          <a href="https://github.com/meltano/meltano" className="opacity-50">
             <GithubLogo title="Github Logo" className={styles.menuSocIcon} />
           </a>
-          <a href="#" className="opacity-50">
+          <a href="https://meltano.com/slack" className="opacity-50">
             <SlackLogo title="Slack Logo" className={styles.menuSocIcon} />
           </a>
-          <a href="#" className="opacity-50">
+          <a href="https://twitter.com/meltanodata" className="opacity-50">
             <TwitterLogo title="Twitter Logo" className={styles.menuSocIcon} />
           </a>
-          <a href="#" className="opacity-50">
+          <a
+            href="https://www.linkedin.com/company/meltano/"
+            className="opacity-50"
+          >
             <LinkedinLogo
               title="Linkedin Logo"
               className={styles.menuSocIcon}
             />
           </a>
-          <a href="#" className="opacity-50">
+          {/* <a href="#" className="opacity-50">
             <FacebookLogo
               title="Facebook Logo"
               className={styles.menuSocIcon}
             />
-          </a>
-          <a href="#" className="opacity-50">
+          </a> */}
+          {/* <a href="#" className="opacity-50">
             <InstagramLogo
               title="Instagram Logo"
               className={styles.menuSocIcon}
             />
-          </a>
-          <a href="#" className="opacity-50">
+          </a> */}
+          <a href="https://www.youtube.com/meltano" className="opacity-50">
             <YoutubeLogo title="Youtube Logo" className={styles.menuSocIcon} />
           </a>
-          <a href="#" className="opacity-50">
+          <a
+            href="https://www.crunchbase.com/organization/meltano"
+            className="opacity-50"
+          >
             <CrunchbaseLogo
               title="Crunchbase Logo"
               className={styles.menuSocIcon}

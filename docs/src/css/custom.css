@@ -1257,3 +1257,7 @@ pre {
 [data-theme='dark'] .meltano-tabs .tabs__item--active {
   background: var(--meltano-tabs-background-color);
 }
+
+.DocSearch-Screen-Icon {
+  display: none
+}
