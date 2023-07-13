@@ -64,6 +64,7 @@ def create_connection_url(
         host=host,
         port=port,
         database=database,
+        query={"charset": "utf8"},
     )
 
 

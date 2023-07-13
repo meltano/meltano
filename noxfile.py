@@ -73,6 +73,7 @@ def _run_pytest(session: Session) -> None:
         )
         session.run(
             "pytest",
+            "-x",  # TODO: Remove this once tests are stable
             "--cov=meltano",
             "--cov=tests",
             "tests/",
