@@ -21,7 +21,7 @@ from warnings import warn
 import structlog
 import tzlocal
 from psutil import Process
-from snowplow_tracker import Emitter, SelfDescribingJson
+from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
@@ -133,7 +133,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(app_id="meltano", emitters=emitters)
+            self.snowplow_tracker = SnowplowTracker(
+                namespace="meltano-core",
+                app_id="meltano",
+                emitters=emitters,
+            )
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
             self.setup_exit_event()
@@ -309,7 +313,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         if not self.can_track():
             return
         try:
-            self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
+            self.snowplow_tracker.track(
+                SelfDescribing(
+                    event_json=event_json,
+                    context=self.contexts,
+                ),
+            )
         except Exception as err:
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
@@ -372,18 +381,21 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             },
         )
         try:
-            self.snowplow_tracker.track_unstruct_event(
-                event_json,
-                # If tracking is disabled, then include only the minimal
-                # Snowplow contexts required
-                self.contexts
-                if self.send_anonymous_usage_stats
-                else tuple(
-                    ctx
-                    for ctx in self.contexts
-                    if isinstance(ctx, (EnvironmentContext, ProjectContext))
+            self.snowplow_tracker.track(
+                SelfDescribing(
+                    event_json=event_json,
+                    # If tracking is disabled, then include only the minimal
+                    # Snowplow contexts required
+                    context=self.contexts
+                    if self.send_anonymous_usage_stats
+                    else tuple(
+                        ctx
+                        for ctx in self.contexts
+                        if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                    ),
                 ),
             )
+            self.snowplow_tracker.flush()
         except Exception as err:
             logger.debug(
                 (
@@ -548,4 +560,5 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 },
             ),
         )
+        self.snowplow_tracker.flush()
         atexit.unregister(self.track_exit_event)
