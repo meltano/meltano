@@ -55,7 +55,7 @@ def upgrade():
 
     op.create_table(
         "plugin_settings",
-        sa.Column("label", datetime_type, nullable=True),
+        sa.Column("label", sa.String(), nullable=True),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("namespace", sa.String(255), nullable=True),
