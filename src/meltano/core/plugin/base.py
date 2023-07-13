@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections import defaultdict
 
 import yaml
 
@@ -13,7 +14,7 @@ from meltano.core.behavior.hookable import HookObject
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
-from meltano.core.setting_definition import SettingDefinition, YAMLEnum
+from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
 logger = logging.getLogger(__name__)
@@ -753,7 +754,7 @@ class StandalonePlugin(Canonical):
 
     def __init__(
         self,
-        plugin_type: PluginType,
+        plugin_type: str,
         name: str,
         namespace: str,
         variant: str | None = None,
@@ -795,7 +796,7 @@ class StandalonePlugin(Canonical):
             extras: Additional attributes to set on the plugin.
         """
         super().__init__(
-            plugin_type=plugin_type,
+            plugin_type=PluginType(plugin_type),
             name=name,
             namespace=namespace,
             variant=variant,
@@ -814,6 +815,34 @@ class StandalonePlugin(Canonical):
             env=env or {},
             extras=extras,
         )
+
+        deprecated_kind_replacements = {
+            SettingKind.HIDDEN: "hidden: true",
+        }
+
+        settings_by_deprecated_kind = defaultdict(list)
+
+        for s in self.settings:
+            if s.kind in deprecated_kind_replacements:
+                settings_by_deprecated_kind[s.kind].append(s)
+
+        if settings_by_deprecated_kind:
+            for kind, settings in settings_by_deprecated_kind.items():
+                logger.warning(
+                    f"`kind: {kind}` is deprecated for setting definitions"
+                    + (
+                        f" in favour of `{deprecated_kind_replacements[kind]}`"
+                        if deprecated_kind_replacements[kind]
+                        else ""
+                    )
+                    + ", and is currently in use by the following settings of "
+                    + f"{self.plugin_type.singular} '{self.name}': "
+                    + ", ".join([f"'{s.name}'" for s in settings])
+                    + ". "
+                    + "Please open an issue or pull request to update the plugin "
+                    + "definition on Meltano Hub at "
+                    + f"https://github.com/meltano/hub/blob/main/_data/meltano/{self.plugin_type}/{self.name}/{self.variant}.yml.",  # noqa: E501
+                )
 
     @classmethod
     def from_variant(

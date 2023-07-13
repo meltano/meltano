@@ -161,7 +161,7 @@ class SettingDefinition(NameEq, Canonical):
         aliases: list[str] | None = None,
         env: str | None = None,
         env_aliases: list[str] | None = None,
-        kind: SettingKind | None = None,
+        kind: str | None = None,
         value=None,
         label: str | None = None,
         documentation: str | None = None,
@@ -171,6 +171,7 @@ class SettingDefinition(NameEq, Canonical):
         oauth: dict | None = None,
         placeholder: str | None = None,
         env_specific: bool | None = None,
+        hidden: bool | None = None,
         custom: bool = False,
         value_processor=None,
         value_post_processor=None,
@@ -194,6 +195,7 @@ class SettingDefinition(NameEq, Canonical):
             oauth: Setting OAuth provider details.
             placeholder: A placeholder value for this setting.
             env_specific: Flag for environment-specific setting.
+            hidden: Hidden setting.
             custom: Custom setting flag.
             value_processor: Used with `kind: object` to pre-process the keys
                 in a particular way.
@@ -206,13 +208,16 @@ class SettingDefinition(NameEq, Canonical):
         options = options or []
         oauth = oauth or {}
 
+        kind = SettingKind(kind) if kind else None
+        hidden = hidden or kind is SettingKind.HIDDEN or None
+
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
             name=name,
             aliases=aliases,
             env=env,
             env_aliases=env_aliases,
-            kind=SettingKind(kind) if kind else None,
+            kind=kind,
             value=value,
             label=label,
             documentation=documentation,
@@ -222,6 +227,7 @@ class SettingDefinition(NameEq, Canonical):
             oauth=oauth,
             placeholder=placeholder,
             env_specific=env_specific,
+            hidden=hidden,
             value_processor=value_processor,
             value_post_processor=value_post_processor,
             _custom=custom,

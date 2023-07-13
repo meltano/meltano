@@ -37,7 +37,6 @@ if t.TYPE_CHECKING:
 PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
 SETTING_COLOR = "blue1"
-VALUE_COLOR = "green"
 
 HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() | safe }}[/{{ plugin_color }}] {% if environment_name %}in Environment[{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}] {% endif %}Interactively[/bold underline]
 
@@ -179,18 +178,28 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             label = f"inherited from '{self.settings.plugin.parent.name}'"
         else:
             label = f"from {source.label}"
-        expanded_value = value if value is not None else "(empty string)"
-        if unexpanded_value := config_metadata.get("unexpanded_value"):
-            current_value = (
-                unexpanded_value if unexpanded_value is not None else "(empty string)"
-            )
 
-            details.add_row(Text("Current Expanded Value"), Text(f"{expanded_value}"))
+        def value_is_defined(v=value):
+            return v is not None
+
+        def value_for_display(v=value):
+            return v if value_is_defined(v) else "(empty string)"
+
+        expanded_value = value_for_display()
+        unexpanded_value = config_metadata.get("unexpanded_value")
+
+        if unexpanded_value:
+            current_value = value_for_display(unexpanded_value)
+            details.add_row(Text("Current expanded value"), Text(f"{expanded_value}"))
         else:
-            current_value = value if value is not None else "(empty string)"
+            current_value = expanded_value
+
+        redacted_with_value = setting_def.is_redacted and value_is_defined()
+        value_color = "yellow" if redacted_with_value else "green"
+
         details.add_row(
-            Text(f"Current Value ({label})"),
-            Text.from_markup(f"[{VALUE_COLOR}]{current_value}[/{VALUE_COLOR}]"),
+            Text(f"Current value ({label})"),
+            Text.from_markup(f"[{value_color}]{current_value}[/{value_color}]"),
         )
 
         if setting_def.kind:
@@ -404,22 +413,26 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         name = metadata["name"]
         store = metadata["store"]
         is_redacted = metadata["setting"] and metadata["setting"].is_redacted
-        if is_redacted:
-            value = REDACTED_VALUE
+
         click.secho(
             (
                 f"{settings.label.capitalize()} setting '{name}' was set in "
-                f"{store.label}: {value!r}"
+                f"{store.label}: "
             ),
-            fg=VALUE_COLOR,
+            fg="green",
+            nl=False,
+        )
+        click.secho(
+            REDACTED_VALUE if is_redacted else f"{value!r}",
+            fg="yellow" if is_redacted else "green",
         )
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            if is_redacted:
-                current_value = REDACTED_VALUE
+            current_value = REDACTED_VALUE if is_redacted else f"{value!r}"
+
             click.secho(
-                f"Current value is still: {current_value!r} (from {source.label})",
+                f"Current value is still: {current_value} (from {source.label})",
                 fg="yellow",
             )
 

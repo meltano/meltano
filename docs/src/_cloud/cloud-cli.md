@@ -247,6 +247,17 @@ Running a Meltano project in Meltano Cloud.
 
 The running workload will appear in the `history` within 1-2 minutes.
 
+## `job`
+
+```sh
+# Stop a job
+meltano-cloud job stop --execution-id 15e1cbbde6b2424f86c04b237291d652
+```
+
+<div class="notification is-info">
+  <p>At the moment, executions stopped manually will be marked as <i>Failed</i> in the output of <a href="#history"><code>meltano-cloud history</code></a>. See <a href="https://github.com/meltano/meltano/issues/7697">#7697</a> for more details.</p>
+</div>
+
 ## `schedule`
 
 Prior to enabling or disabling a schedule, the project that schedule belongs to must be deployed.
