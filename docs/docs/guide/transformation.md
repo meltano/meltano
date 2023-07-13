@@ -9,7 +9,7 @@ Transformations in Meltano are implemented using dbt. All Meltano generated proj
 
 :::info
 
-  <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/existing-dbt-project">existing dbt project guide</a> for more details.</p>
+  <p>If you already have an existing dbt project that you'd like to migrate to Meltano, check out the <a href="/guide/migrate-an-existing-dbt-project">existing dbt project guide</a> for more details.</p>
 :::
 
 ## Adapter-Specific dbt Transformation

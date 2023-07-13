@@ -46,7 +46,7 @@ control. Sensitive values like passwords and tokens are most appropriately store
 
 ### Overriding discoverable plugin properties
 
-Starting with Meltano [`2.0`](/reference/v2-migration), you can override the properties of discoverable plugins, such as their [`capabilities`](/contribute/plugins#how-to-test-a-tap) and `settings_group_validation`, and extend their default [`settings`](/reference/settings):
+Starting with Meltano [`2.0`](/guide/v2-migration), you can override the properties of discoverable plugins, such as their [`capabilities`](/contribute/plugins#how-to-test-a-tap) and `settings_group_validation`, and extend their default [`settings`](/reference/settings):
 
 ```yaml
 plugins:

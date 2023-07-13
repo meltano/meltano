@@ -798,7 +798,7 @@ meltano run tap-gitlab target-postgres
 If everything was configured correctly, you should now see your data flow from your source into your destination! Check your postgres instance for the tables `warehouse.schema.commits` and `warehouse.schema.tags`.
 
 If the command failed, but it's not obvious how to resolve the issue, consider enabling [debug mode](/reference/command-line-interface#debugging) to get some more insight into what's going on behind the scenes.
-If that doesn't get you closer to a solution, learn how to [get help with your issue](/the-project/community).
+If that doesn't get you closer to a solution, [feel free to ask for assistance from our friendly Slack community](https://meltano.com/slack).
 
 If you run `meltano run` at another time, it will automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state) and you have an active environment.
 Behind the scenes Meltano is tracking state using a State ID that's auto-generated based on the extractor name, loader name, and active environment name.
