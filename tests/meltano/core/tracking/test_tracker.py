@@ -347,6 +347,7 @@ class TestTracker:
         )
         assert passed
 
+    @pytest.mark.order(0)
     @pytest.mark.parametrize(
         ("sleep_duration", "timeout_should_occur"),
         ((1.0, False), (5.0, True)),
