@@ -156,7 +156,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_DB: pytest_warehouse
         # MSSQL backend
-        MSSQL_ADDRESS: localhost
+        MSSQL_ADDRESS: "0.0.0.0"
         MSSQL_PORT: 1433
         MSSQL_USER: sa
         MSSQL_PASSWORD: Meltan0admin
