@@ -7,7 +7,7 @@
   publish = "public"
 
   # Default build command.
-  command = "npm install && npm build"
+  command = "npm install && npm run build"
 
 [[redirects]]
   from = "http://melta.no/*"
