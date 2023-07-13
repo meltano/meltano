@@ -3376,13 +3376,13 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.17.0.8"
+version = "4.17.0.9"
 description = "Typing stubs for jsonschema"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-jsonschema-4.17.0.8.tar.gz", hash = "sha256:96a56990910f405e62de58862c0bbb3ac29ee6dba6d3d99aa0ba7f874cc547de"},
-    {file = "types_jsonschema-4.17.0.8-py3-none-any.whl", hash = "sha256:f5958eb7b53217dfb5125f0412aeaef226a8a9013eac95816c95b5b523f6796b"},
+    {file = "types-jsonschema-4.17.0.9.tar.gz", hash = "sha256:ddbbf84a37ba19f486e43d2a4ab239c9e49aebb5cc99a17a5d59f54568373376"},
+    {file = "types_jsonschema-4.17.0.9-py3-none-any.whl", hash = "sha256:ec83f48c5ce5d3ea6955c3617d8c903e5ba3db8debea0c7f5c8e9bd60d782a9e"},
 ]
 
 [[package]]
@@ -3900,4 +3900,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "a9050a5faf7f18bfaf33e5d56e214004c8c92c0fff2c7112efabfc72cca28d0e"
+content-hash = "fc7cd3c05859efa709078ee23fb3bc610078c5f637a890293950a96efcd79889"
