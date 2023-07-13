@@ -424,6 +424,7 @@ class TestTracker:
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert get_source() == "env"
 
+    @pytest.mark.order(1)
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
