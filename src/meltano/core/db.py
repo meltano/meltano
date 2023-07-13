@@ -116,7 +116,7 @@ def connect(
 
 
 init_hooks = {
-    "sqlite": lambda x: x.execute("PRAGMA journal_mode=WAL"),
+    "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 
 
@@ -138,10 +138,11 @@ def init_hook(engine: Engine) -> None:
     except KeyError:
         return
 
-    try:
-        hook(engine)
-    except Exception as ex:
-        raise Exception(f"Failed to initialize database: {ex!s}") from ex
+    with engine.connect() as conn:
+        try:
+            hook(conn)
+        except Exception as ex:
+            raise Exception(f"Failed to initialize database: {ex!s}") from ex
 
 
 def ensure_schema_exists(
