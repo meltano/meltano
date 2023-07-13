@@ -14,7 +14,7 @@ from enum import Enum
 import sqlalchemy as sa
 from alembic import op
 import sqlalchemy
-from sqlalchemy import Column, MetaData, func, types
+from sqlalchemy import Column, MetaData, func, select, types
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
@@ -356,7 +356,7 @@ def upgrade():
         sa.UniqueConstraint("state_id"),
     )
     session = Session(bind=conn)
-    for state_id in {row['job_name'] for row in session.query(Job.job_name).distinct().all().mappings()}:
+    for state_id in session.execute(select(Job.job_name).distinct()).scalars():
         session.add(JobState.from_job_history(session, state_id))
     session.commit()
 
