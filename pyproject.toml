@@ -115,7 +115,7 @@ colorama = "^0.4.4"
 commitizen-version-bump = {git = "https://github.com/meltano/commitizen-version-bump.git", branch = "main"}
 coverage = {extras = ["toml"], version = "^7.2.7"}
 freezegun = "^1.2.2"
-mock = "^5.0.2"
+mock = "^5.1.0"
 mypy = "^1.4"
 pre-commit = "^2.9.2"
 pytest = "^7.4.0"
