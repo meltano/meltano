@@ -58,7 +58,11 @@ to your project and make Airflow available to use via `meltano invoke`:
 
 ```bash
 meltano add utility airflow
+meltano invoke airflow:initialize
+meltano invoke airflow users create -u admin@localhost -p password --role Admin -e admin@localhost -f admin -l admin
 ```
+
+See the Airflow docs page on [MeltanoHub](https://hub.meltano.com/utilities/airflow) for more details.
 
 ### Using an existing Airflow installation
 
