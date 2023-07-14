@@ -194,7 +194,7 @@ The postgres database should now have a schema `tap_github` with the table `comm
 
 ## Next Steps
 
-Next, head over to [Part 3, to add inline transformations to your ingestion process](/getting-started/part3).
+Next, head over to [Part 3 to add data processing to your pipeline](/getting-started/part3).
 
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>
