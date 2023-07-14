@@ -791,19 +791,28 @@
         "kind": {
           "type": "string",
           "description": "The type of value this setting contains",
-          "enum": [
-            "oauth",
-            "hidden",
-            "password",
-            "date_iso8601",
-            "file",
-            "email",
-            "integer",
-            "options",
-            "object",
-            "array",
-            "boolean",
-            "string"
+          "oneOf": [
+            {
+              "enum": [
+                "oauth",
+                "date_iso8601",
+                "file",
+                "email",
+                "integer",
+                "options",
+                "object",
+                "array",
+                "boolean",
+                "string"
+              ]
+            },
+            {
+              "enum": [
+                "hidden",
+                "password"
+              ],
+              "deprecated": true
+            }
           ]
         },
         "description": {
