@@ -57,7 +57,7 @@ and then run the following command to add the
 to your project and make Airflow available to use via `meltano invoke`:
 
 ```bash
-meltano add orchestrator airflow
+meltano add utility airflow
 ```
 
 ### Using an existing Airflow installation
