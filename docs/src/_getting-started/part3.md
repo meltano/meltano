@@ -10,7 +10,7 @@ Let’s learn by example.
 
 In parts [1](/getting-started/part1) & [2](/getting-started/part2), we extracted data from GitHub and loaded it into a (local) PostgreSQL database. Now it is time to have more fun. We decide to load all attributes from the data we selected previously, and then build a model listing the different authors of commits to our repository.
 
-That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information. 
+That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information.
 Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a Meltano plugin.
 
 Of course you can choose any other processing tool like:
