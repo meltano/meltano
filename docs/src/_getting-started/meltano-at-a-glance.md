@@ -1,8 +1,8 @@
 ---
-title: Meltano at a Glance
+title: Meltano ELT at a Glance
 description: If you want to know why you should use Meltano, here's a quick overview of the basics of all of it.
 layout: doc
-weight: 1
+weight: 5
 ---
 
 This document is intended to give you enough technical understanding of Meltano to become excited about it and wanting to use it! It's not going to teach you how to use it, we've got Tutorials & How To's for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
