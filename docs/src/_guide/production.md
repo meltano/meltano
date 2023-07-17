@@ -217,7 +217,7 @@ Specifically, you will want to configure Airflow to:
   For this to work, the [`psycopg2` package](https://pypi.org/project/psycopg2/) will
   also need to be installed alongside [`apache-airflow`](https://pypi.org/project/apache-airflow/),
   which you can realize by adding `psycopg2` to `airflow`'s `pip_url` in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) (e.g. `pip_url: psycopg2 apache-airflow`)
-  and running [`meltano install orchestrator airflow`](/reference/command-line-interface#install).
+  and running [`meltano install utility airflow`](/reference/command-line-interface#install).
 
 ### Containerized Meltano project
 
