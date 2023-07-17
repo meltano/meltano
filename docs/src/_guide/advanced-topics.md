@@ -47,6 +47,51 @@ It also allows the community to develop many variants of the wrapper logic for a
 
 The transformer and orchestrator plugin types are still supported for now but will eventually be phased out as utilities take over.
 
+## Running Custom Scripts
+
+In addition to the ability to build EDK based python utilities, Meltano also allows you to run arbitrary scripts as utilities.
+This feature is usually helpful for user who need to do very minor tasks that don't require any additional dependencies.
+It let you use Meltano in a very flexible manner to solve various use cases like set up or tear down tasks prior to running EL, interfacing with external services, etc.
+
+To run a python script, install a custom utility with a command that references the script as the executable:
+
+```yaml
+utilities:
+- name: my_script_util
+  namespace: my_script_util
+  commands:
+    run_script:
+      executable: python
+      args: my_script.py
+    run_another_script:
+      executable: python
+      args: my_other_script.py
+```
+
+You install it as a utility then can run it just like any other Meltano [plugin command](/concepts/project#plugin-commands):
+
+```bash
+meltano install utility my_script_util
+# For example
+meltano run my_script_util:run_script
+meltano invoke my_script_util:run_another_script
+```
+
+Similarly this can be used to run bash scripts as well:
+
+```yaml
+utilities:
+- name: my_script_util
+  namespace: my_script_util
+  commands:
+    ls_directory:
+      executable: /bin/bash
+      args: -c ls
+    remove_directory:
+      executable: /bin/bash
+      args: -c "rm -rf target"
+```
+
 ## Airbyte Connector Integration FAQ
 
 This FAQ section is for [tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper) which is a Singer tap which enables any Airbyte source to be used as a Meltano extractor.
