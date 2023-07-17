@@ -66,7 +66,7 @@ def snowplow_session(request) -> SnowplowMicro | None:
         # Getting the `docker_services` fixture essentially causes
         # `docker-compose up` to be run
         request.getfixturevalue("docker_services")
-        args = ("docker", "port", f"pytest{os.getpid()}_snowplow_1")
+        args = ("docker", "port", f"pytest{os.getpid()}-snowplow-1")
         proc = subprocess.run(args, capture_output=True, text=True)
         address_and_port = proc.stdout.strip().split(" -> ")[1]
         collector_endpoint = f"http://{address_and_port}"

@@ -360,6 +360,15 @@ meltano config <plugin> set --interactive --extras
 meltano config <plugin> set --interactive --store=dotenv
 ```
 
+### Sensitive configuration
+Values for sensitive settings (defined as `kind: password`) are redacted in the output of the following commands:
+
+```bash
+meltano config <plugin> list
+meltano config set <name> <value>
+meltano config <plugin> set --interactive
+```
+
 ## `discover`
 
 Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
@@ -1027,7 +1036,11 @@ Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passe
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
-`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), or `@yearly` (`0 0 1 1 *`).
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or one of `@manual`, `@once`, or `@none` (for schedules that are to be triggered manually).
+
+<div class="notification is-info">
+  <p><code>@manual</code>, <code>@once</code>, and <code>@none</code> are all aliases for one another. They have no functional difference, and can be used interchangeably.</p>
+</div>
 
 ```bash
 # Add a schedule

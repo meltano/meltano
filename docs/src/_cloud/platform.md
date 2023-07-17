@@ -15,6 +15,17 @@ redirect_from:
 
 Meltano Cloud currently runs on AWS.
 
+### Python Version
+
+Meltano Cloud uses Python 3.9.
+After our GA launch, we aim to support all active versions of Python that are not yet at their [end of life](https://devguide.python.org/versions/).
+
+### Run Storage
+
+Meltano Cloud enables up to 10GB of ephemeral disk storage during a run.
+
+Future plans include making this configurable.
+
 ## Region
 
 The primary AWS region hosting Meltano Cloud is `us-west-2` (Oregon, US).

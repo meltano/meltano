@@ -7,7 +7,6 @@ import json
 import locale
 import os
 import re
-import sys
 import typing as t
 import uuid
 from collections.abc import Mapping
@@ -21,7 +20,7 @@ from warnings import warn
 import structlog
 import tzlocal
 from psutil import Process
-from snowplow_tracker import Emitter, SelfDescribingJson
+from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.project import Project
@@ -40,11 +39,7 @@ if t.TYPE_CHECKING:
         ProjectContext,
     )
 
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
-
+from functools import cached_property
 
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
@@ -133,7 +128,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(app_id="meltano", emitters=emitters)
+            self.snowplow_tracker = SnowplowTracker(
+                namespace="meltano-core",
+                app_id="meltano",
+                emitters=emitters,
+            )
             self.snowplow_tracker.subject.set_lang(locale.getdefaultlocale()[0])
             self.snowplow_tracker.subject.set_timezone(self.timezone_name)
             self.setup_exit_event()
@@ -309,7 +308,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         if not self.can_track():
             return
         try:
-            self.snowplow_tracker.track_unstruct_event(event_json, self.contexts)
+            self.snowplow_tracker.track(
+                SelfDescribing(
+                    event_json=event_json,
+                    context=self.contexts,
+                ),
+            )
         except Exception as err:
             logger.debug(
                 "Failed to submit unstruct event to Snowplow, error",
@@ -372,18 +376,21 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             },
         )
         try:
-            self.snowplow_tracker.track_unstruct_event(
-                event_json,
-                # If tracking is disabled, then include only the minimal
-                # Snowplow contexts required
-                self.contexts
-                if self.send_anonymous_usage_stats
-                else tuple(
-                    ctx
-                    for ctx in self.contexts
-                    if isinstance(ctx, (EnvironmentContext, ProjectContext))
+            self.snowplow_tracker.track(
+                SelfDescribing(
+                    event_json=event_json,
+                    # If tracking is disabled, then include only the minimal
+                    # Snowplow contexts required
+                    context=self.contexts
+                    if self.send_anonymous_usage_stats
+                    else tuple(
+                        ctx
+                        for ctx in self.contexts
+                        if isinstance(ctx, (EnvironmentContext, ProjectContext))
+                    ),
                 ),
             )
+            self.snowplow_tracker.flush()
         except Exception as err:
             logger.debug(
                 (
@@ -414,13 +421,11 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         except (OSError, json.JSONDecodeError):
             return TelemetrySettings(None, None, None)
 
-        missing_keys = {
+        if missing_keys := {
             "client_id",
             "project_id",
             "send_anonymous_usage_stats",
-        } - set(analytics)
-
-        if missing_keys:
+        } - set(analytics):
             logger.debug(
                 (
                     "'analytics.json' has missing keys, and will be "
@@ -548,4 +553,5 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 },
             ),
         )
+        self.snowplow_tracker.flush()
         atexit.unregister(self.track_exit_event)

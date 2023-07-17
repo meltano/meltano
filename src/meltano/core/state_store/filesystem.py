@@ -431,9 +431,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         except NotADirectoryError:
             os.remove(file_or_dir_path)
         except Exception as e:
-            if self.is_file_not_found_error(e):
-                pass
-            else:
+            if not self.is_file_not_found_error(e):
                 raise e
 
     def clear(self, state_id: str):

@@ -10,6 +10,7 @@ import pytest
 from click.testing import CliRunner
 from freezegun import freeze_time
 
+from meltano.cloud.api.types import CloudConfigOrg, CloudConfigProject
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -49,6 +50,83 @@ class TestScheduleCommand:
                 assert result.exit_code == 0, result.output
                 assert not result.output
 
+    def test_schedule_enable_with_default_deployment(
+        self,
+        tenant_resource_key: str,
+        internal_project_id: str,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+    ):
+        path = (
+            f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
+            "/test-deployment/daily/enabled"
+        )
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name="test-deployment",
+                    ),
+                },
+            ),
+        }
+
+        config.write_to_file()
+        runner = CliRunner()
+        for cmd in ("enable", "disable"):
+            httpserver.expect_oneshot_request(path).respond_with_data(status=204)
+            result = runner.invoke(
+                cli,
+                (
+                    "--config-path",
+                    config.config_path,
+                    "schedule",
+                    cmd,
+                    "--schedule=daily",
+                ),
+            )
+            assert result.exit_code == 0, result.output
+            assert not result.output
+
+    def test_schedule_enable_with_missing_deployment(
+        self,
+        tenant_resource_key: str,
+        internal_project_id: str,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+    ):
+        path = (
+            f"/schedules/v1/{tenant_resource_key}/{internal_project_id}"
+            "/test-deployment/daily/enabled"
+        )
+        config.organizations_defaults = {
+            config.tenant_resource_key: CloudConfigOrg(
+                default_project_id=None,
+                projects_defaults={
+                    config.internal_project_id: CloudConfigProject(
+                        default_deployment_name=None,
+                    ),
+                },
+            ),
+        }
+        config.write_to_file()
+        runner = CliRunner()
+        for cmd in ("enable", "disable"):
+            httpserver.expect_oneshot_request(path).respond_with_data(status=204)
+            result = runner.invoke(
+                cli,
+                (
+                    "--config-path",
+                    config.config_path,
+                    "schedule",
+                    cmd,
+                    "--schedule=daily",
+                ),
+            )
+            assert result.exit_code == 2, result.output
+            assert "A deployment name is required." in result.output
+
     @pytest.fixture()
     def schedules(self) -> list[CloudProjectSchedule]:
         return [
@@ -73,7 +151,7 @@ class TestScheduleCommand:
         ]
 
     @pytest.fixture()
-    def schedules_get_reponse(
+    def schedules_get_response(
         self,
         schedules: list[CloudProjectSchedule],
         tenant_resource_key: str,
@@ -87,7 +165,7 @@ class TestScheduleCommand:
         )
 
     @freeze_time("2023-03-24 19:30:00")
-    @pytest.mark.usefixtures("schedules_get_reponse")
+    @pytest.mark.usefixtures("schedules_get_response")
     def test_schedule_list_table(self, config: MeltanoCloudConfig):
         result = CliRunner().invoke(
             cli,
@@ -104,7 +182,7 @@ class TestScheduleCommand:
             "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
         )  # noqa: E501
 
-    @pytest.mark.usefixtures("schedules_get_reponse")
+    @pytest.mark.usefixtures("schedules_get_response")
     def test_schedule_list_json(
         self,
         schedules: list[CloudProjectSchedule],
@@ -122,6 +200,64 @@ class TestScheduleCommand:
         )
         assert result.exit_code == 0, result.output
         assert json.loads(result.output) == schedules
+
+    @pytest.mark.usefixtures("schedules_get_response")
+    def test_schedule_list_limit_truncated(
+        self,
+        config: MeltanoCloudConfig,
+    ):
+        # Limit is strictly less than number of schedules
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "schedule",
+                "list",
+                "--limit=1",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert result.stdout == (
+            "╭──────────────┬────────────┬────────────┬──────────────┬───────────╮\n"
+            "│ Deployment   │ Schedule   │ Interval   │   Runs / Day │ Enabled   │\n"
+            "├──────────────┼────────────┼────────────┼──────────────┼───────────┤\n"
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *  │          1.0 │ True      │\n"
+            "╰──────────────┴────────────┴────────────┴──────────────┴───────────╯\n"
+        )
+        assert result.stderr == (
+            "Output truncated. To print more items, increase the limit using the "
+            "--limit option.\n"
+        )
+
+    @pytest.mark.usefixtures("schedules_get_response")
+    def test_schedule_list_limit_equal(
+        self,
+        config: MeltanoCloudConfig,
+    ):
+        # Limit is equal to number of schedules
+        result = CliRunner(mix_stderr=False).invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "schedule",
+                "list",
+                "--limit=3",
+            ),
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0, result.output
+        assert result.output == (
+            "╭──────────────┬────────────┬─────────────────────┬──────────────┬───────────╮\n"  # noqa: E501
+            "│ Deployment   │ Schedule   │ Interval            │   Runs / Day │ Enabled   │\n"  # noqa: E501
+            "├──────────────┼────────────┼─────────────────────┼──────────────┼───────────┤\n"  # noqa: E501
+            "│ deployment 1 │ schedule 1 │ 1 2 * * *           │          1.0 │ True      │\n"  # noqa: E501
+            "│ deployment 2 │ schedule 2 │ 15,45 */2 * * 1,3,5 │         10.3 │ False     │\n"  # noqa: E501
+            "│ deployment 3 │ schedule 3 │ 0 0 * * 1,3,5       │          < 1 │ False     │\n"  # noqa: E501
+            "╰──────────────┴────────────┴─────────────────────┴──────────────┴───────────╯\n"  # noqa: E501
+        )  # noqa: E501
+        assert result.stderr == ""
 
     @freeze_time("2023-03-24 16:00:00")
     def test_schedule_describe(

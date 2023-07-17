@@ -2,15 +2,10 @@
 
 from __future__ import annotations
 
-import sys
-
-if sys.version_info >= (3, 8):
-    from typing import TypedDict
-else:
-    from typing_extensions import TypedDict
+import typing as t
 
 
-class CloudExecution(TypedDict):
+class CloudExecution(t.TypedDict):
     """Meltano Cloud execution details."""
 
     execution_id: str
@@ -19,12 +14,12 @@ class CloudExecution(TypedDict):
     status: str
     exit_code: int
 
-    environment_name: str
+    deployment_name: str
     schedule_name: str
     job_name: str
 
 
-class CloudProjectSchedule(TypedDict):
+class CloudProjectSchedule(t.TypedDict):
     """Meltano Cloud project schedule details."""
 
     deployment_name: str
@@ -33,7 +28,7 @@ class CloudProjectSchedule(TypedDict):
     enabled: bool
 
 
-class CloudProject(TypedDict):
+class CloudProject(t.TypedDict):
     """Meltano Cloud project details."""
 
     # Tenant resource key and project ID are included to enable
@@ -49,3 +44,29 @@ class CloudProject(TypedDict):
 
     # Added client-side:
     default: bool
+
+
+class CloudDeployment(t.TypedDict):
+    """Meltano Cloud deployment details."""
+
+    deployment_name: str
+    environment_name: str
+    git_rev: str
+    git_rev_hash: str
+    last_deployed_timestamp: str
+
+    # Added client-side:
+    default: bool
+
+
+class CloudConfigProject(t.TypedDict):
+    """Meltano cloud config project settings for default deployments."""
+
+    default_deployment_name: str | None
+
+
+class CloudConfigOrg(t.TypedDict):
+    """Meltano cloud config org for storing default projects and deployments."""
+
+    default_project_id: str | None
+    projects_defaults: dict[str, CloudConfigProject]

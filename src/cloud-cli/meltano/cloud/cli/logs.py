@@ -40,9 +40,8 @@ class LogsClient(MeltanoCloudClient):
             f"/{self.config.internal_project_id}/{execution_id}"
         )
 
-        async with self.authenticated():
-            async with self._raw_request("GET", url) as response:
-                yield response
+        async with self.authenticated(), self._raw_request("GET", url) as response:
+            yield response
 
     async def _get_logs_page(
         self,
@@ -119,11 +118,6 @@ async def print_logs(
 @pass_context
 @run_async
 async def print_(context: MeltanoCloudCLIContext, execution_id: str) -> None:
-    """Print the logs.
-
-    Args:
-        context: The Click context.
-        execution_id: The execution identifier.
-    """
+    """Print the execution logs."""
     click.echo(f"Fetching logs for execution {execution_id}")
     await print_logs(context.config, execution_id)

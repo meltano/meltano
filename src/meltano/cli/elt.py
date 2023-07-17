@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import platform
 import typing as t
 from contextlib import asynccontextmanager, nullcontext, suppress
+from datetime import datetime, timezone
 
 import click
 from structlog import stdlib as structlog_stdlib
@@ -140,8 +140,8 @@ async def elt(  # WPS408
     job = Job(
         job_name=state_id
         or (
-            f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
-            f"{extractor}--{loader}"
+            f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
+            f"--{extractor}--{loader}"
         ),
     )
     _, Session = project_engine(project)  # noqa: N806
@@ -229,14 +229,12 @@ async def dump_file(context_builder, dumpable):
 async def _run_job(tracker, project, job, session, context_builder, force=False):
     fail_stale_jobs(session, job.job_name)
 
-    if not force:
-        existing = JobFinder(job.job_name).latest_running(session)
-        if existing:
-            raise CliError(
-                f"Another '{job.job_name}' pipeline is already running which "
-                f"started at {existing.started_at}. To ignore this check use "
-                "the '--force' option.",
-            )
+    if not force and (existing := JobFinder(job.job_name).latest_running(session)):
+        raise CliError(
+            f"Another '{job.job_name}' pipeline is already running which "
+            f"started at {existing.started_at}. To ignore this check use "
+            "the '--force' option.",
+        )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)

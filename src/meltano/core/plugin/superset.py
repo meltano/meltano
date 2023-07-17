@@ -80,30 +80,28 @@ class Superset(BasePlugin):
             "        setattr(module, key, value)",
         ]
 
-        custom_config_filename = invoker.plugin_config_extras["_config_path"]
-        if custom_config_filename:
+        if custom_config_filename := invoker.plugin_config_extras["_config_path"]:
             custom_config_path = invoker.project.root.joinpath(custom_config_filename)
 
-            if custom_config_path.exists():
-                config_script_lines.extend(
-                    [
-                        "from importlib.util import module_from_spec, spec_from_file_location",  # noqa: E501
-                        f'spec = spec_from_file_location("superset_config", {str(custom_config_path)!r})',  # noqa: E501
-                        "custom_config = module_from_spec(spec)",
-                        'sys.modules["superset_config"] = custom_config',
-                        "spec.loader.exec_module(custom_config)",
-                        "for key in dir(custom_config):",
-                        "    if key.isupper():",
-                        "        setattr(module, key, getattr(custom_config, key))",
-                    ],
-                )
-
-                logger.info(f"Merged in config from {custom_config_path}")
-            else:
+            if not custom_config_path.exists():
                 raise PluginExecutionError(
                     f"Could not find config file {custom_config_path}",
                 )
 
+            config_script_lines.extend(
+                [
+                    "from importlib.util import module_from_spec, spec_from_file_location",  # noqa: E501
+                    f'spec = spec_from_file_location("superset_config", {str(custom_config_path)!r})',  # noqa: E501
+                    "custom_config = module_from_spec(spec)",
+                    'sys.modules["superset_config"] = custom_config',
+                    "spec.loader.exec_module(custom_config)",
+                    "for key in dir(custom_config):",
+                    "    if key.isupper():",
+                    "        setattr(module, key, getattr(custom_config, key))",
+                ],
+            )
+
+            logger.info(f"Merged in config from {custom_config_path}")
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config_file.write("\n".join(config_script_lines))

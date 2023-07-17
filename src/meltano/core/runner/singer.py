@@ -121,13 +121,11 @@ class SingerRunner(Runner):
         # handlers raised an exception or all completed successfully.
         if output_exception_future in done:
             output_futures_done, _ = output_exception_future.result()
-            output_futures_failed = [
+            if output_futures_failed := [
                 future
                 for future in output_futures_done
                 if future.exception() is not None
-            ]
-
-            if output_futures_failed:
+            ]:
                 # If any output handler raised an exception, re-raise it.
 
                 # Special behavior for the tap stdout handler raising a line
@@ -217,16 +215,17 @@ class SingerRunner(Runner):
         if self.context.dry_run:
             return self.dry_run(tap, target)
 
-        async with tap.prepared(self.context.session):
-            async with target.prepared(self.context.session):
-                await self.invoke(
-                    tap,
-                    target,
-                    extractor_log=extractor_log,
-                    loader_log=loader_log,
-                    extractor_out=extractor_out,
-                    loader_out=loader_out,
-                )
+        async with tap.prepared(self.context.session), target.prepared(
+            self.context.session,
+        ):
+            await self.invoke(
+                tap,
+                target,
+                extractor_log=extractor_log,
+                loader_log=loader_log,
+                extractor_out=extractor_out,
+                loader_out=loader_out,
+            )
 
     def _handle_tap_line_length_limit_error(
         self,

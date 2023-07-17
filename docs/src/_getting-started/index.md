@@ -20,7 +20,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1. Create and navigate to a directory to hold your Meltano projects:
 
@@ -560,9 +560,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
     by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
 
-        ```bash
-        meltano discover loaders
-        ```
+      ```bash
+      meltano discover loaders
+      ```
 
 1.  Depending on the result, pick your next step:
 
@@ -678,7 +678,20 @@ loaders:
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 </div>
 
-1. Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
+1. The simplest way to configure a new plugin in Meltano is using `interactive`:
+
+   ```bash
+   meltano config <plugin> set --interactive
+
+   # For example:
+   meltano config target-postgres set --interactive
+   ```
+
+Follow the prompts to step through all available settings, or select an individual setting to configure.
+
+You can also optionally use the `list`, `set` and `unset` commands directly to view and change plugin configuration:
+
+- Find out what settings your loader supports using [`meltano config <plugin> list`](/reference/command-line-interface#config):
 
    ```bash
    meltano config <plugin> list
@@ -687,7 +700,7 @@ loaders:
    meltano config target-postgres list
    ```
 
-1. Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
+- Assuming the previous command listed at least one setting, set appropriate values using [`meltano config <plugin> set`](/reference/command-line-interface#config):
 
    ```bash
    meltano config <plugin> set <setting> <value>

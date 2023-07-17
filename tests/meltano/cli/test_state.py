@@ -3,7 +3,6 @@ from __future__ import annotations
 import json
 import os
 import platform
-import sys
 
 import mock
 import pytest
@@ -51,10 +50,7 @@ class TestCliState:
         ) as mock_block_parser:
             state.state_service_from_state_id(project, state_id)
             args = state_id.split(":")[1].split("-to-")
-            if sys.version_info >= (3, 8):
-                assert args in mock_block_parser.call_args.args
-            else:
-                assert args in mock_block_parser.call_args[0]
+            assert args in mock_block_parser.call_args.args
 
     @staticmethod
     def get_result_set(result):

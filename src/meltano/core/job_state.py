@@ -74,8 +74,7 @@ class JobState(SystemModel):  # noqa: WPS214
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
-        if state_job:
+        if state_job := finder.latest_with_payload(session, flags=Payload.STATE):
             incomplete_since = state_job.ended_at
             if SINGER_STATE_KEY in state_job.payload:
                 merge(state_job.payload, partial_state)

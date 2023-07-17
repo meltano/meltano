@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import os
 import platform
-import sys
 import typing as t
 import uuid
 from collections import defaultdict
 from contextlib import suppress
 from datetime import datetime
+from functools import cached_property
 from pathlib import Path
 from warnings import warn
 
@@ -20,11 +20,6 @@ from structlog.stdlib import get_logger
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 logger = get_logger(__name__)
 
