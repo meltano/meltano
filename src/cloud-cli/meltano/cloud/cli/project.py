@@ -3,22 +3,19 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
 import platform
 import sys
 import typing as t
+from http import HTTPStatus
 
 import click
 import questionary
-
+import requests
 from meltano.cloud.api.client import MeltanoCloudClient
-from meltano.cloud.cli.base import (
-    LimitedResult,
-    get_paginated,
-    pass_context,
-    print_formatted_list,
-    run_async,
-)
+from meltano.cloud.cli.base import (LimitedResult, get_paginated, pass_context,
+                                    print_formatted_list, run_async)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -322,10 +319,14 @@ async def add_project(
 ):
     """Add a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
-        response = await client.add_project(
+        prepared_request = await client.add_project(
             project_name=project_name,
             git_repository=git_repository,
             project_root_path=project_root_path,
         )
         click.echo(f"Project {project_name} created successfully.")
+        response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+        response.raise_for_status()
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
         click.echo(json.dumps(response))
