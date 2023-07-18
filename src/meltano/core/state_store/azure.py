@@ -15,7 +15,7 @@ from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 try:
     from azure.storage.blob import BlobServiceClient  # type: ignore
 except ImportError:
-    BlobServiceClient = None  # type: ignore
+    BlobServiceClient = None
 
 
 class MissingAzureError(Exception):
@@ -95,7 +95,7 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         with requires_azure():
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
-            return BlobServiceClient()  # type: ignore
+            return BlobServiceClient()
 
     @property
     def state_dir(self) -> str:

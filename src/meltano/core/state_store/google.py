@@ -15,7 +15,7 @@ from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 try:
     import google  # type: ignore
 except ImportError:
-    google = None  # type: ignore
+    google = None
 
 
 class MissingGoogleError(Exception):

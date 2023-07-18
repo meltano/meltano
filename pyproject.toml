@@ -88,7 +88,7 @@ pymssql = {version = "^2.2.5", optional = true}
 python = ">=3.7,<3.12"
 python-dotenv = "^0.21.1"
 python-gitlab = "^3.15.0"
-pyyaml = "^6.0.0"
+pyyaml = "^6.0.1"
 requests = "^2.31.0"
 rich = "^13.4.2"
 "ruamel.yaml" = "^0.17.21"
@@ -492,6 +492,8 @@ files = "src"
 plugins = [
   "sqlalchemy.ext.mypy.plugin",
 ]
+warn_unused_configs = true
+warn_unused_ignores = true
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
