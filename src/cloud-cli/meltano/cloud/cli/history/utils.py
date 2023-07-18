@@ -10,6 +10,8 @@ import datetime
 import re
 import typing as t
 
+from dateutil.parser import parse as parse_datetime
+
 if t.TYPE_CHECKING:
     from meltano.cloud.api.types import CloudExecution
 
@@ -31,10 +33,10 @@ def format_history_row(row: CloudExecution) -> tuple[str, ...]:
     Returns:
         The processed row.
     """
-    start_time = datetime.datetime.fromisoformat(row["start_time"])
+    start_time = parse_datetime(row["start_time"])
 
     if row["end_time"]:
-        end_time = datetime.datetime.fromisoformat(row["end_time"])
+        end_time = parse_datetime(row["end_time"])
         td = end_time - start_time
         sec = int(td.total_seconds())
         hours, remainder = divmod(sec, 3600)  # noqa: WPS432
