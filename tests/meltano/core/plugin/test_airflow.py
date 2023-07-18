@@ -21,7 +21,7 @@ class TestAirflow:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    @pytest.mark.asyncio  # noqa:  WPS210
+    @pytest.mark.asyncio()  # noqa:  WPS210
     async def test_before_configure(  # noqa:  WPS210
         self,
         subject,
