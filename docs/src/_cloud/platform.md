@@ -49,7 +49,7 @@ There are specific environment variables that are reserved for certain use-cases
 
 ### SSH Private Keys for Private Git Repository Package Access
 
-`GIT_SSH_PRIVATE_KEY` is a reserved variable that should be set if you have private git repositories that accessed during `meltano install` can be access via SSH.
+`GIT_SSH_PRIVATE_KEY` is a reserved variable that should be set if you have private git repositories that are accessed during `meltano install` and can be accessed via SSH.
 
 To specify it, set the ssh private key environment variable using `meltano cloud config env set`, which will look similar to this:
 
