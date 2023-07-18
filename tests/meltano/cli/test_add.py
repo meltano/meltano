@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from asserts import assert_cli_runner
+from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
@@ -17,6 +18,8 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
+
+plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
 
 
 class TestCliAdd:
@@ -28,6 +31,11 @@ class TestCliAdd:
     ):
         shutil.rmtree(".", ignore_errors=True)
         project_init_service.create_files(project)
+
+        project.refresh()
+
+        for plugin_type in PluginType:
+            project.meltano.plugins[plugin_type].clear()
 
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
@@ -426,6 +434,7 @@ class TestCliAdd:
                 "Extractor 'tap-bar' is not known to Meltano"
             ) in str(res.exception)
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_custom(self, project, cli_runner):
         pip_url = "-e path/to/tap-custom"
         executable = "tap-custom-bin"
@@ -577,7 +586,6 @@ class TestCliAdd:
         project,
         cli_runner,
     ):
-        project.refresh()
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
@@ -635,3 +643,85 @@ class TestCliAdd:
                     )
 
                 install_plugin_mock.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "ref",
+        (
+            plugin_ref,
+            (
+                "https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/"
+                f"{plugin_ref.relative_to(plugins_dir)}"
+            ),
+        ),
+        ids=(
+            "local",
+            "remote",
+        ),
+    )
+    @pytest.mark.usefixtures("reset_project_context")
+    @mock.patch("meltano.cli.add.install_plugins")
+    @mock.patch("meltano.cli.add.requests.get")
+    def test_add_from_ref(
+        self,
+        ref_request_mock,
+        install_plugin_mock,
+        ref,
+        project,
+        cli_runner,
+    ):
+        ref_request_mock.return_value.status_code = 200
+        ref_request_mock.return_value.text = plugin_ref.read_text()
+
+        install_plugin_mock.return_value = True
+
+        plugin_name = plugin_ref.parent.name
+        plugin_type = PluginType(plugin_ref.parents[1].name)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", plugin_type.singular, plugin_name, "--from-ref", ref],
+        )
+        assert_cli_runner(res)
+
+        assert f"Added {plugin_type.singular} '{plugin_name}'" in res.output
+
+        plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+        assert plugin.name == plugin_name
+        assert plugin.variant == "test"
+
+    def test_add_from_ref_local_does_not_exist(
+        self,
+        cli_runner,
+    ):
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", plugin_ref.name],
+        )
+
+        assert res.exit_code == 2
+        assert f"No such file or directory: '{plugin_ref.name}'" in res.stderr
+
+    def test_add_from_ref_local_is_directory(
+        self,
+        cli_runner,
+    ):
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", plugin_ref.parent],
+        )
+
+        assert res.exit_code == 2
+        assert f"Is a directory: '{plugin_ref.parent}'" in res.stderr
+
+    def test_add_from_ref_remote_invalid_url(
+        self,
+        cli_runner,
+    ):
+        ref = "https://:"
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", ref],
+        )
+
+        assert res.exit_code == 2
+        assert f"Invalid URL '{ref}'" in res.stderr
