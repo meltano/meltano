@@ -492,6 +492,8 @@ files = "src"
 plugins = [
   "sqlalchemy.ext.mypy.plugin",
 ]
+warn_unused_configs = true
+warn_unused_ignores = true
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
