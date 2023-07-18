@@ -53,7 +53,7 @@ In addition to the ability to build EDK based python utilities, Meltano also all
 This feature is usually helpful for user who need to do very minor tasks that don't require any additional dependencies.
 It let you use Meltano in a very flexible manner to solve various use cases like set up or tear down tasks prior to running EL, interfacing with external services, etc.
 
-To run a python script, install a custom utility with a command that references the script as the executable:
+To run a python script present at the root of your project, add a custom utility with a command that references the script as the executable:
 
 ```yaml
 utilities:
@@ -68,11 +68,11 @@ utilities:
       args: my_other_script.py
 ```
 
-You install it as a utility then can run it just like any other Meltano [plugin command](/concepts/project#plugin-commands):
+You add it to your meltano.yml as a utility then you can run it just like any other Meltano [plugin command](/concepts/project#plugin-commands).
+Running the install command is not necessary for this utility.
+See the examples below of running the sample commands:
 
 ```bash
-meltano install utility my_script_util
-# For example
 meltano run my_script_util:run_script
 meltano invoke my_script_util:run_another_script
 ```
