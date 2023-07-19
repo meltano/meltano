@@ -67,13 +67,13 @@ class ProjectsCloudClient(MeltanoCloudClient):
                 ),
             )
 
-    async def add_project(
+    async def create_project(
         self,
         project_name: str,
         git_repository: str,
         project_root_path: str | None = None,
     ):
-        """Use POST to add new Meltano Cloud project."""
+        """Use POST to create new Meltano Cloud project."""
         async with self.authenticated():
             payload = {"project_name": project_name, "git_repository": git_repository}
             if project_root_path:
@@ -313,25 +313,25 @@ async def use_project(
     )
 
 
-@project_group.command("add")
+@project_group.command("create")
 @click.option("--project-name", type=str, required=True)
 @click.option("--git-repository", type=str, required=True)
 @click.option("--project-root-path", type=str, required=False)
 @pass_context
 @run_async
-async def add_project(
+async def create_project(
     context: MeltanoCloudCLIContext,
     project_name: str,
     git_repository: str,
     project_root_path: str | None = None,
 ):
-    """Add a project to your Meltano Cloud."""
+    """Create a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
         try:
             with yaspin(
                 text="Creating project - this may take several minutes...",
             ):
-                response = await client.add_project(
+                response = await client.create_project(
                     project_name=project_name,
                     git_repository=git_repository,
                     project_root_path=project_root_path,
