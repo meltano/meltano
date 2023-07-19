@@ -83,6 +83,27 @@ def test_lookback_pattern(lookback: str):
             ),
             id="running",
         ),
+        pytest.param(
+            {
+                "execution_id": "123",
+                "start_time": "2023-07-17T18:45:49.018Z",
+                "end_time": None,
+                "status": "RUNNING",
+                "exit_code": None,
+                "deployment_name": "dev",
+                "schedule_name": "daily",
+                "job_name": "N/A",
+            },
+            (
+                "123",
+                "daily",
+                "dev",
+                "2023-07-17 18:45:49",
+                "Running",
+                "N/A",
+            ),
+            id="isodate",
+        ),
     ),
 )
 def test_table_rows(execution: dict, expected: tuple):
