@@ -12,10 +12,16 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
-from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
-from meltano.cloud.cli.base import (LimitedResult, get_paginated, pass_context,
-                                    print_formatted_list, run_async)
 from yaspin import yaspin
+
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
+from meltano.cloud.cli.base import (
+    LimitedResult,
+    get_paginated,
+    pass_context,
+    print_formatted_list,
+    run_async,
+)
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -333,7 +339,8 @@ async def add_project(
         except MeltanoCloudError as e:
             if e.response.status == HTTPStatus.CONFLICT:
                 click.secho(
-                    f"Project with name {project_name} already exists.", fg="yellow"
+                    f"Project with name {project_name} already exists.",
+                    fg="yellow",
                 )
             return None
         click.echo(f"Project {project_name} created successfully.")
