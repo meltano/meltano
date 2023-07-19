@@ -1,8 +1,0 @@
-{
-  "plugin_type": "utilities",
-  "name": "kms",
-  "namespace": "kms",
-  "label": "kms",
-  "pip_url": "git+https://github.com/meltano/kms-ext.git",
-  "executable": "kms"
-}

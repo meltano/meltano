@@ -1,0 +1,57 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 5px;
+  padding: 30px;
+  border: 1px solid rgba(8, 2, 22, 0.15);
+  background: rgba(255, 255, 255, 0.7);
+  position: relative;
+  z-index: 3;
+}
+
+[data-theme="dark"] {
+  .card {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.card:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background-image: url(../../../static/img/homepage/bg-ellipse.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 0;
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+  h3 {
+    margin-bottom: 0;
+  }
+}
+.featureSvg {
+  path {
+    stroke: var(--meltano-blue);
+  }
+}
