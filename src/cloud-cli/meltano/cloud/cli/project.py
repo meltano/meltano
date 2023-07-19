@@ -13,7 +13,7 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
-from meltano.cloud.api.client import MeltanoCloudClient
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (LimitedResult, get_paginated, pass_context,
                                     print_formatted_list, run_async)
 
@@ -72,12 +72,14 @@ class ProjectsCloudClient(MeltanoCloudClient):
             payload = {"project_name": project_name, "git_repository": git_repository}
             if project_root_path:
                 payload["project_root_path"] = project_root_path
-
-            return await self._json_request(
+            prepared_request = await self._json_request(
                 "POST",
                 f"/projects/v1/{self.config.tenant_resource_key}",
                 json=payload,
             )
+            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+            response.raise_for_status()
+            return response
 
 
 @click.group("project")
@@ -319,14 +321,19 @@ async def add_project(
 ):
     """Add a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
-        prepared_request = await client.add_project(
-            project_name=project_name,
-            git_repository=git_repository,
-            project_root_path=project_root_path,
-        )
+        try:
+            response = await client.add_project(
+                project_name=project_name,
+                git_repository=git_repository,
+                project_root_path=project_root_path,
+            )
+        except MeltanoCloudError as e:
+            if e.response.status == HTTPStatus.CONFLICT:
+                click.secho(
+                    f"Project with name {project_name} already exists.", fg="yellow"
+                )
+            return None
         click.echo(f"Project {project_name} created successfully.")
-        response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
-        response.raise_for_status()
         if response.status_code == HTTPStatus.NO_CONTENT:
             return None
-        click.echo(json.dumps(response))
+        click.echo(response.json())
