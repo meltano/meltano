@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 import logging
 import platform
 import sys
@@ -16,6 +15,7 @@ import requests
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (LimitedResult, get_paginated, pass_context,
                                     print_formatted_list, run_async)
+from yaspin import yaspin
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -322,11 +322,14 @@ async def add_project(
     """Add a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
         try:
-            response = await client.add_project(
-                project_name=project_name,
-                git_repository=git_repository,
-                project_root_path=project_root_path,
-            )
+            with yaspin(
+                text="Creating project - this may take several minutes...",
+            ):
+                response = await client.add_project(
+                    project_name=project_name,
+                    git_repository=git_repository,
+                    project_root_path=project_root_path,
+                )
         except MeltanoCloudError as e:
             if e.response.status == HTTPStatus.CONFLICT:
                 click.secho(
