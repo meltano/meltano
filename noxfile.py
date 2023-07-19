@@ -169,6 +169,7 @@ def mypy(session: Session) -> None:
         "mypy",
         "sqlalchemy2-stubs",
         "types-croniter",
+        "types-python-dateutil",
         "types-jsonschema",
         "types-psutil",
         "types-python-slugify",
