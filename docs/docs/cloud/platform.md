@@ -56,7 +56,7 @@ There are specific environment variables that are reserved for certain use-cases
 To specify it, set the ssh private key environment variable using `meltano cloud config env set`, which will look similar to this:
 
 ```sh
-meltano cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
+meltano-cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
 therearelotsofprivatekeymaterialhere
 onvariouslineslikethis
 wecanjustcopypasteasitappearsinthefile
