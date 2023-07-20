@@ -66,6 +66,15 @@ andusesinglequotesaroundthewholething
 
 Note the quotes around the key value, which permits multi-line input.
 
+Prior to setting your key via the CLI you can also validate that its formatted properly using the following command:
+
+```console
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+ssh-ed25519 AAAAB3NzaC1yc2EAAAADAQABAAABAQCwK+DnOJItBOvbGbeqr0ts00aJGdN8vqD0ppq4 your_email@example.com
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+Load key "id_ed25519": invalid format
+```
+
 ## Job or Schedule Run Notifications via Webhook
 
 `MELTANO_CLOUD_WEBHOOK_URL` can be set to receive notifications on success or fail of a job or schedule run.
