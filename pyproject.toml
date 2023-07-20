@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.19.1"
+version = "2.20.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -60,7 +60,7 @@ azure-core = {version = "^1.28.0", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
 backoff = "^2.1.2"
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
-boto3 = {version = "^1.28.3", optional = true}
+boto3 = {version = "^1.28.5", optional = true}
 cached-property = "^1" # Remove after Python 3.7 support is dropped
 check-jsonschema = "^0.22.0"
 click = "^8.1"
@@ -88,7 +88,7 @@ pymssql = {version = "^2.2.5", optional = true}
 python = ">=3.7,<3.12"
 python-dotenv = "^0.21.1"
 python-gitlab = "^3.15.0"
-pyyaml = "^6.0.0"
+pyyaml = "^6.0.1"
 requests = "^2.31.0"
 rich = "^13.4.2"
 "ruamel.yaml" = "^0.17.21"
@@ -121,7 +121,7 @@ pre-commit = "^2.9.2"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
 pytest-cov = "^4.1.0"
-pytest-docker = "^1.0"
+pytest-docker = "^2.0"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
 pytest-structlog = "^0.6"
@@ -479,7 +479,7 @@ skip_covered = true
 [tool.commitizen]
 name = "cz_version_bump"
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "2.19.1"
+version = "2.20.0"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
@@ -492,6 +492,8 @@ files = "src"
 plugins = [
   "sqlalchemy.ext.mypy.plugin",
 ]
+warn_unused_configs = true
+warn_unused_ignores = true
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
