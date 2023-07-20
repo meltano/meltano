@@ -493,17 +493,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.5"
+version = "1.28.7"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.5-py3-none-any.whl", hash = "sha256:a5c815ab81219a606f20362c9d9c190f5c224bf33c5dc4c20501036cc4a9034f"},
-    {file = "boto3-1.28.5.tar.gz", hash = "sha256:2c76db4a1208b8d09814261fc5e530fc36b3b952ef807312495e6869fa6eaad5"},
+    {file = "boto3-1.28.7-py3-none-any.whl", hash = "sha256:46803b8ae114ff139f2a87fcb5d2f5a5728f6c96fe3a2b9416a8fcbe761423ae"},
+    {file = "boto3-1.28.7.tar.gz", hash = "sha256:ef6a465d3b25b89bcd00ff69675b33917166145e544735dcb9978091f5b0b752"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.5,<1.32.0"
+botocore = ">=1.31.7,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -512,13 +512,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.5"
+version = "1.31.7"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.5-py3-none-any.whl", hash = "sha256:8aec97512587a5475036a982785e406c52efd260457b809846985f849c3d7cf3"},
-    {file = "botocore-1.31.5.tar.gz", hash = "sha256:b35114dae9c451895a11fef13d76881e2bb5428e5de8a702cc8589a28fb34c7a"},
+    {file = "botocore-1.31.7-py3-none-any.whl", hash = "sha256:f211ef5714bec8ae24b3fe737b8689611ef4d0dbea0ab46ef8328e112dd10ada"},
+    {file = "botocore-1.31.7.tar.gz", hash = "sha256:f4473f66c153c262b8262404d737f4249366daf00fb068b495577a24b830ebcb"},
 ]
 
 [package.dependencies]
@@ -527,7 +527,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = ">=1.25.4,<1.27"
 
 [package.extras]
-crt = ["awscrt (==0.16.9)"]
+crt = ["awscrt (==0.16.26)"]
 
 [[package]]
 name = "bump2version"
@@ -4032,4 +4032,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "c7f7a256bfea83cc1dbf6f3b9d7cb22002df1421cd508e2262f5748fb81384a8"
+content-hash = "9cb5fa5505240a34e6f9bef72ffd52ea286162726dbde2e2eac3d9c585bb9944"
