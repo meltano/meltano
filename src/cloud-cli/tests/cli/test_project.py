@@ -11,15 +11,13 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
-
 from meltano.cloud.cli import cloud as cli
 from meltano.cloud.cli.project import _remove_private_project_attributes  # noqa: WPS450
 
 if t.TYPE_CHECKING:
-    from pytest_httpserver import HTTPServer
-
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProject
+    from pytest_httpserver import HTTPServer
 
 
 class TestProjectCommand:
@@ -392,7 +390,7 @@ class TestProjectCommand:
         assert result.exit_code == 2
         assert "The '--name' and '--id' options are mutually exclusive" in result.output
 
-    def test_project_add(
+    def test_project_create(
         self,
         projects: list[CloudProject],
         httpserver: HTTPServer,
@@ -409,7 +407,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "add",
+                    "create",
                     "--project-name",
                     project["project_name"],
                     "--git-repository",
