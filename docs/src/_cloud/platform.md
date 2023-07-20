@@ -70,7 +70,7 @@ Prior to setting your key via the CLI you can also validate that its formatted p
 foo@bar:~$ ssh-keygen -y -f <your_key_file>
 ssh-ed25519 AAAAB3NzaC1yc2EAAAADAQABAAABAQCwK+DnOJItBOvbGbeqr0ts00aJGdN8vqD0ppq4 your_email@example.com
 foo@bar:~$ ssh-keygen -y -f <your_key_file>
-Load key "id_ed_25519": invalid format
+Load key "id_ed25519": invalid format
 ```
 
 ## Job or Schedule Run Notifications via Webhook
