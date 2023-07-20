@@ -11,13 +11,15 @@ from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
+
 from meltano.cloud.cli import cloud as cli
 from meltano.cloud.cli.project import _remove_private_project_attributes  # noqa: WPS450
 
 if t.TYPE_CHECKING:
+    from pytest_httpserver import HTTPServer
+
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProject
-    from pytest_httpserver import HTTPServer
 
 
 class TestProjectCommand:
