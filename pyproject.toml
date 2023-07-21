@@ -65,6 +65,7 @@ cached-property = "^1" # Remove after Python 3.7 support is dropped
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.1"
+click-didyoumean = "^0.3.0"
 croniter = "^1.4.1"
 email-validator = "^1.1.2"
 fasteners = "^0.18"
