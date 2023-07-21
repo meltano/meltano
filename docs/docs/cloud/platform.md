@@ -56,7 +56,7 @@ There are specific environment variables that are reserved for certain use-cases
 To specify it, set the ssh private key environment variable using `meltano cloud config env set`, which will look similar to this:
 
 ```sh
-meltano cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
+meltano-cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
 therearelotsofprivatekeymaterialhere
 onvariouslineslikethis
 wecanjustcopypasteasitappearsinthefile
@@ -65,6 +65,15 @@ andusesinglequotesaroundthewholething
 ```
 
 Note the quotes around the key value, which permits multi-line input.
+
+Prior to setting your key via the CLI you can also validate that its formatted properly using the following command:
+
+```console
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+ssh-ed25519 AAAAB3NzaC1yc2EAAAADAQABAAABAQCwK+DnOJItBOvbGbeqr0ts00aJGdN8vqD0ppq4 your_email@example.com
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+Load key "id_ed25519": invalid format
+```
 
 ## Job or Schedule Run Notifications via Webhook
 
