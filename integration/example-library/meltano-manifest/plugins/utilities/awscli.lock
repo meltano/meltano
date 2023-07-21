@@ -1,0 +1,8 @@
+{
+  "plugin_type": "utilities",
+  "name": "awscli",
+  "namespace": "awscli",
+  "label": "awscli",
+  "pip_url": "awscli==1.21.7",
+  "executable": "aws"
+}

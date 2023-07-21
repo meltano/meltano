@@ -1,0 +1,53 @@
+version: 1
+project_id: faa14098-8fdc-4336-850e-96db154b7990
+send_anonymous_usage_stats: false
+env:
+  # Level 2: top-level `env:`
+  # Inherits from terminal context
+  LEVEL_NUM: '2'                  #  '2'
+  STACKED: ${STACKED}2            # '12'
+plugins:
+  utilities:
+  - name: example
+    namespace: example
+    # Env vars in `pip_url` are expanded during `meltano install`.
+    # Note that `meltano install` runs with no active environment,
+    # so 3 and 5 are absent from the expanded string.
+    pip_url: -e env-var-in-pip-url-example-${STACKED}  # 'env-var-in-pip-url-example-124'
+    settings:
+    - name: echo_text
+      env: ECHO_TEXT
+    config:
+      echo_text: ${STACKED}
+    commands:
+      echo-stacked:
+        # Echoed text is 1234 (no environment) or 12345 (in 'prod')
+        executable: echo
+        args: "Stacked env var value is: ${STACKED}"
+      echo-config:
+        # FIXME: Should be same as echo_stacked 1234.
+        #        Currently prints partially resolved: '${STACKED}4'
+        executable: echo
+        args: "Config value is: ${ECHO_TEXT}"
+    env:
+      # Level 4: plugin-level `env:`
+      # Inherits from a environment-level `env:` if an environment is active
+      # Inherits directly from top-level `env:` if no environment is active
+      LEVEL_NUM: '4'              #    '4'
+      STACKED: ${STACKED}4        # '1234'
+environments:
+- name: prod
+  config:
+    plugins:
+      utilities:
+      - name: example
+        env:
+          # Level 5: environment-level plugin `env:`
+          # Inherits from (global) plugin-level `env:`
+          LEVEL_NUM: '5'              #     '5'
+          STACKED: ${STACKED}5        # '12345'
+  env:
+    # Level 3: environment-level `env:`
+    # Inherits from top-level `env:`
+    LEVEL_NUM: '3'                #   '3'
+    STACKED: ${STACKED}3          # '123'

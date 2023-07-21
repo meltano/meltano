@@ -1,0 +1,21 @@
+version: 1
+default_environment: dev
+project_id: abd310b5-698b-4244-a109-9490047fa2ec
+send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+    config:
+      projects: meltano/meltano
+    select:
+    - commits.*
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+environments:
+- name: dev
+- name: staging
+- name: prod
