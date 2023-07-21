@@ -9,14 +9,13 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/tutorial.svg").default,
     description: (
       <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
+        Get started with Meltano and run data pipelines with a source
         and destination of your choosing.
       </>
     ),
     link: {
-      title: "Go to Tutorial",
-      url: "#",
-      target: "_blank",
+      title: "Go to Tutorials",
+      url: "tutorials/",
     },
   },
   {
@@ -24,14 +23,12 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/book-open.svg").default,
     description: (
       <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
-        and destination of your choosing.
+        Dive into how Meltano works and how to use it to build your data-powered applications.
       </>
     ),
     link: {
       title: "Go to Docs",
-      url: "#",
-      target: "_blank",
+      url: "/guide",
     },
   },
   {
@@ -39,13 +36,12 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/hub.svg").default,
     description: (
       <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
-        and destination of your choosing.
+        Explore the library of 600+ connectors and tools within the Meltano ecosystem.
       </>
     ),
     link: {
       title: "Go to Hub",
-      url: "#",
+      url: "https://hub.meltano.com",
       target: "_blank",
     },
   },
@@ -54,13 +50,25 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/cloud.svg").default,
     description: (
       <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
-        and destination of your choosing.
+        Dive into the documentation for Meltano Cloud, the hosted version of Meltano Core.
       </>
     ),
     link: {
-      title: "Go to Cloud",
-      url: "#",
+      title: "View Cloud Docs",
+      url: "/cloud",
+    },
+  },
+  {
+    title: "SDK",
+    Svg: require("@site/static/img/homepage/sdk.svg").default,
+    description: (
+      <>
+        Build your own Meltano connector to move data from any source to any destination.
+      </>
+    ),
+    link: {
+      title: "Go to SDK",
+      url: "https://sdk.meltano.com",
       target: "_blank",
     },
   },
@@ -69,28 +77,12 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/rocket.svg").default,
     description: (
       <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
-        and destination of your choosing.
+        Explore many of the connectors built with the Meltano SDK in their home on GitHub: Meltano Labs.
       </>
     ),
     link: {
       title: "View Examples",
-      url: "#",
-      target: "_blank",
-    },
-  },
-  {
-    title: "SDK",
-    Svg: require("@site/static/img/homepage/sdk.svg").default,
-    description: (
-      <>
-        Get started with Meltano and run an EL[T] pipeline with a data source
-        and destination of your choosing.
-      </>
-    ),
-    link: {
-      title: "Go to SDK",
-      url: "#",
+      url: "https://github.com/meltanolabs/",
       target: "_blank",
     },
   },

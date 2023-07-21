@@ -31,7 +31,7 @@ export default function Home() {
       <HomepageHeader />
       <main className="mb-10">
         <HomepageFeatures />
-        <HomepageUseCases />
+        {/* <HomepageUseCases /> */}
         <HomepageFindOutMore />
       </main>
     </Layout>
