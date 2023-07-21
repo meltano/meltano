@@ -1,0 +1,114 @@
+environments:
+- name: cicd
+  annotations:
+    meltano.cloud:
+      key1: overwrite-key-1
+      environment-cicd-key1: environment-cicd-value1
+      environment-cicd-key2: environment-cicd-value2
+    airflow:
+      environment-cicd-key3: true
+      environment-cicd-key4:
+        environment-cicd-key5: {}
+        environment-cicd-key6: ["environment", "list", "values"]
+      environment-cicd-key7:
+      - environment-cicd-key8: {}
+      - null
+  config:
+    plugins:
+      extractors:
+      - name: tap-cloudwatch
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-slack
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-slack-public
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-google-analytics
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-gitlab
+        config:
+          groups: meltano
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-github
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-github-meltano
+        config:
+          start_date: ${DEFAULT_START_DATE}
+      - name: tap-github-search
+        config:
+          start_date: ${DEFAULT_START_DATE}
+          searches:
+          # In CI we dont search forks and limit orgs to save time and requests
+          - name: tap non-forks
+            query: tap- fork:false language:Python singer in:readme org:MeltanoLabs org:transferwise
+          - name: target non-forks
+            query: target- fork:false language:Python singer in:readme org:MeltanoLabs org:transferwise
+      # Reverse ETL connections:
+      - name: tap-snowflake
+        config:
+          dbname: CICD_PROD
+          user: CICD
+          role: CICD
+          warehouse: CICD
+      - name: tap-snowflake-metrics-legacy
+        config:
+          tables: CICD_PROD.${CI_BRANCH}_MELTANO_HUB.FACT_HUB_METRICS
+      - name: tap-snowflake-metrics
+        config:
+          tables: CICD_PROD.${CI_BRANCH}_MELTANO_HUB.FACT_VARIANT_HUB_METRICS
+      - name: tap-snowflake-audit
+        config:
+          tables: CICD_PROD.${CI_BRANCH}_MELTANO_HUB.HUB_METRICS_AUDIT
+      - name: tap-snowflake-singer-activity
+        config:
+          tables: CICD_PROD.${CI_BRANCH}_SLACK_NOTIFICATIONS.SLACK_ALERTS
+      loaders:
+      - name: target-snowflake
+        config:
+          dbname: CICD_RAW
+          user: CICD
+          role: CICD
+          warehouse: CICD
+          default_target_schema: ${CI_BRANCH}_${MELTANO_EXTRACT__LOAD_SCHEMA}
+      # Excluded from CI for now
+      # - name: target-apprise
+      #   config:
+      #     stream_maps:
+      #       CICD_PROD-${CI_BRANCH}_SLACK_NOTIFICATIONS-SLACK_ALERTS:
+      #         TITLE: null
+      #         title: TITLE
+      #         BODY: null
+      #         body: BODY
+      utilities:
+      - name: dbt-snowflake
+        config:
+          user: CICD
+          role: CICD
+          warehouse: CICD
+          database: CICD_PROD
+          database_prep: CICD_PREP
+          database_raw: CICD_RAW
+          source_schema_prefix: ${CI_BRANCH}_
+          target_schema_prefix: ${CI_BRANCH}_
+      - name: sqlfluff
+        config:
+          user: CICD
+          role: CICD
+          warehouse: CICD
+      - name: great_expectations
+        config:
+          prod_database: CICD_PROD
+          raw_database: CICD_RAW
+          username: CICD
+          role: CICD
+          warehouse: CICD
+  env:
+    # Required to be set in environment
+    # DEFAULT_START_DATE: "2022-04-01"
+    AIRFLOW__CORE__PLUGINS_FOLDER: $MELTANO_PROJECT_ROOT/orchestrate/plugins_local
+    AIRFLOW_VAR_OPERATOR_TYPE: bash
+    HUB_METRICS_S3_PATH: s3://devtest-meltano-bucket-01/hub_metrics/

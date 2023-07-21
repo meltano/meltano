@@ -1,0 +1,8 @@
+{
+  "plugin_type": "utilities",
+  "name": "permifrost",
+  "namespace": "permifrost",
+  "label": "permifrost",
+  "pip_url": "permifrost==0.14.0",
+  "executable": "permifrost"
+}

@@ -1,0 +1,24 @@
+version: 1
+default_environment: userdev
+annotations:
+  meltano.cloud:
+    key1: value1
+    key2: value2
+  airflow:
+    key3: true
+    key4:
+      key5: {}
+      key6: ["list", "values"]
+    key7:
+    - key8: {}
+    - null
+send_anonymous_usage_stats: false
+project_id: 20f9e32a-be7a-41c7-9847-da9712f40d23
+include_paths:
+- environments/*.meltano.yml
+- extractors.meltano.yml
+- mappers.meltano.yml
+- loaders.meltano.yml
+- orchestrators.meltano.yml
+- transformers.meltano.yml
+- utilities.meltano.yml

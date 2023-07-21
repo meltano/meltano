@@ -1,0 +1,21 @@
+version: 1
+default_environment: dev
+project_id: abd310b5-698b-4244-a109-9490047fa2ec
+send_anonymous_usage_stats: false
+environments:
+- name: dev # Use this environment when adding or experimenting with new plugins
+- name: qa
+- name: prod
+plugins:
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+jobs:
+- name: gitlab_to_jsonl
+  tasks:
+  - tap-gitlab target-jsonl
+schedules:
+- name: run_gitlab
+  interval: '@daily'
+  job: gitlab_to_jsonl

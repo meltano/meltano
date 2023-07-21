@@ -1,0 +1,49 @@
+version: 1
+default_environment: dev
+project_id: 90f75496-2018-4b3a-97ac-9662e11c0094
+send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+  loaders:
+  - name: target-postgres
+    variant: transferwise
+    pip_url: pipelinewise-target-postgres
+  transformers:
+  - name: dbt-postgres
+    variant: dbt-labs
+    pip_url: dbt-core~=1.3.0 dbt-postgres~=1.3.0
+environments:
+- name: dev
+  config:
+    plugins:
+      extractors:
+      - name: tap-gitlab
+        config:
+          projects: meltano/meltano
+          start_date: '2022-04-25T00:00:00'
+        select:
+        - commits.*
+        - '!commits.stats.commits.stats*'
+      loaders:
+      - name: target-postgres
+        config:
+          user: postgres
+          dbname: warehouse
+          default_target_schema: public
+      transformers:
+      - name: dbt-postgres
+        config:
+          host: localhost
+          user: postgres
+          port: 5432
+          dbname: warehouse
+          schema: analytics
+- name: staging
+- name: prod
+jobs:
+- name: gitlab-to-postgres
+  tasks:
+  - tap-gitlab target-postgres

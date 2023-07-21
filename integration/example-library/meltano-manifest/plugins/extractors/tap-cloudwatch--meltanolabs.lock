@@ -1,0 +1,114 @@
+{
+  "plugin_type": "extractors",
+  "name": "tap-cloudwatch",
+  "namespace": "tap_cloudwatch",
+  "variant": "meltanolabs",
+  "label": "Cloudwatch",
+  "docs": "https://deploy-preview-1125--meltano-hub.netlify.app/extractors/tap-cloudwatch--meltanolabs",
+  "repo": "https://github.com/meltanolabs/tap-cloudwatch",
+  "pip_url": "git+https://github.com/meltanolabs/tap-cloudwatch.git",
+  "executable": "tap-cloudwatch",
+  "description": "AWS Application and Infrastructure Monitoring",
+  "logo_url": "https://deploy-preview-1125--meltano-hub.netlify.app/assets/logos/extractors/cloudwatch.png",
+  "capabilities": [
+    "catalog",
+    "state",
+    "discover",
+    "about",
+    "stream-maps",
+    "schema-flattening"
+  ],
+  "settings_group_validation": [
+    [
+      "log_group_name",
+      "start_date",
+      "query"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "aws_access_key_id",
+      "kind": "password",
+      "label": "Aws Access Key Id",
+      "description": "The access key for your AWS account."
+    },
+    {
+      "name": "aws_secret_access_key",
+      "kind": "password",
+      "label": "Aws Secret Access Key",
+      "description": "The secret key for your AWS account."
+    },
+    {
+      "name": "aws_session_token",
+      "kind": "password",
+      "label": "Aws Session Token",
+      "description": "The session key for your AWS account. This is only needed when you are using temporary credentials."
+    },
+    {
+      "name": "aws_profile",
+      "kind": "string",
+      "label": "Aws Profile",
+      "description": "The AWS credentials profile name to use. The profile must be configured and accessible."
+    },
+    {
+      "name": "aws_endpoint_url",
+      "kind": "string",
+      "label": "Aws Endpoint Url",
+      "description": "The complete URL to use for the constructed client."
+    },
+    {
+      "name": "aws_region_name",
+      "kind": "string",
+      "label": "Aws Region Name",
+      "description": "The AWS region name (e.g. us-east-1) "
+    },
+    {
+      "name": "start_date",
+      "kind": "date_iso8601",
+      "label": "Start Date",
+      "description": "The earliest record date to sync"
+    },
+    {
+      "name": "log_group_name",
+      "kind": "string",
+      "label": "Log Group Name",
+      "description": "The log group on which to perform the query."
+    },
+    {
+      "name": "query",
+      "kind": "string",
+      "label": "Query",
+      "description": "The query string to use. For more information, see [CloudWatch Logs Insights Query Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html)."
+    },
+    {
+      "name": "batch_increment_s",
+      "kind": "integer",
+      "label": "Batch Increment S",
+      "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
+    }
+  ]
+}

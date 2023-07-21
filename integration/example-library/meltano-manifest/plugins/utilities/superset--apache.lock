@@ -1,0 +1,64 @@
+{
+  "plugin_type": "utilities",
+  "name": "superset",
+  "namespace": "superset",
+  "variant": "apache",
+  "label": "Superset",
+  "docs": "https://docs.meltano.com/guide/analysis",
+  "repo": "https://github.com/apache/superset",
+  "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1",
+  "settings": [
+    {
+      "name": "ui.bind_host",
+      "value": "0.0.0.0",
+      "label": "UI Bind Host",
+      "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`."
+    },
+    {
+      "name": "ui.port",
+      "value": 8088,
+      "label": "UI Port",
+      "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`."
+    },
+    {
+      "name": "ui.timeout",
+      "value": 60,
+      "label": "UI Timeout",
+      "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option"
+    },
+    {
+      "name": "ui.workers",
+      "value": 4,
+      "label": "UI Workers",
+      "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option"
+    },
+    {
+      "name": "SQLALCHEMY_DATABASE_URI",
+      "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db",
+      "label": "SQLAlchemy Database URI",
+      "description": "Superset metadata database connection string. Equivalent to the `SQLALCHEMY_DATABASE_URI` setting in `superset_config.py`.\n\nSQLite is used by default, but in production PostgreSQL or MySQL is more appropriate. See the [Superset documentation](https://superset.apache.org/docs/installation/configuring-superset/#using-a-production-metastore) for more information. To add a database driver like `psycopg2` or `mysqlclient`, refer to the [Add additional database drivers](#add-additional-database-drivers) section above.\n"
+    },
+    {
+      "name": "SECRET_KEY",
+      "kind": "password",
+      "value": "thisisnotapropersecretkey",
+      "label": "Secret Key",
+      "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`."
+    }
+  ],
+  "commands": {
+    "ui": {
+      "args": "--bind $SUPERSET_UI_BIND_HOST:$SUPERSET_UI_PORT --timeout $SUPERSET_UI_TIMEOUT --workers $SUPERSET_UI_WORKERS superset.app:create_app()",
+      "description": "Start the Superset UI. Will be available on the configured `ui.bind_host` and `ui.port`, which default to `http://localhost:8088`",
+      "executable": "gunicorn"
+    },
+    "create-admin": {
+      "args": "fab create-admin",
+      "description": "Create an admin user."
+    },
+    "load-examples": {
+      "args": "load_examples",
+      "description": "Load examples."
+    }
+  }
+}
