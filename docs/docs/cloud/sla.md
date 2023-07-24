@@ -1,7 +1,7 @@
 ---
 title: "Meltano Cloud Service Level Agreement"
 layout: doc
-hidden: true
+sidebar_class_name: hidden
 ---
 
 :::info

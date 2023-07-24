@@ -2,7 +2,7 @@
 title: Meltano UI and REST API Server (Deprecated)
 description: Reference page for the deprecated Meltano UI and REST API Server configuration settings.
 layout: doc
-hidden: true
+sidebar_class_name: hidden
 toc: true
 ---
 

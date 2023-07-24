@@ -1,7 +1,7 @@
 ---
 title: "Meltano Cloud Security Policy"
 layout: doc
-hidden: true
+sidebar_class_name: hidden
 ---
 
 :::info

@@ -14,7 +14,7 @@ const FeatureList = [
       </>
     ),
     link: {
-      title: 'Go to Tutorials',
+      title: 'View Tutorials',
       url: 'tutorials/',
     },
   },
@@ -54,7 +54,7 @@ const FeatureList = [
       </>
     ),
     link: {
-      title: 'View Cloud Docs',
+      title: 'Cloud Docs',
       url: '/cloud',
     },
   },

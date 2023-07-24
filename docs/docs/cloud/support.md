@@ -1,7 +1,7 @@
 ---
 title: "Meltano Cloud Technical Support"
 layout: doc
-hidden: true
+sidebar_class_name: hidden
 ---
 
 :::info
