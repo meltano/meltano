@@ -1,11 +1,14 @@
 ---
-title: Meltano at a Glance
+title: Meltano for ELT at a Glance
 description: If you want to know why you should use Meltano, here's a quick overview of the basics of all of it.
 layout: doc
 sidebar_position: 1
 ---
+## Meltano the Data Integration Engine for ELT?
 
-This document is intended to give you enough technical understanding of Meltano to become excited about it and wanting to use it! It's not going to teach you how to use it, we've got Tutorials & How To's for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
+While Meltano is a declarative data integration engine, made for building data-powered features fast, one of the use cases has always been to use Meltano as an ELT platform.
+
+This document is intended to give you enough technical understanding of Meltano as ELT tool to become excited about it and want to use it! It won't teach you how to use it, we've got Tutorials & How To's for that. When you're ready to start your first Meltano project, we recommend you dive right into our Tutorial.
 
 ### What users say
 
