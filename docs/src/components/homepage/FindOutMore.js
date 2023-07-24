@@ -8,7 +8,7 @@ const FindOutMoreList = [
     title: <>Visit Our Blog</>,
     Svg: require('@site/static/img/homepage/melty.svg').default,
     link: {
-      url: '#',
+      url: 'https://meltano.com/blog/',
       target: '_blank',
     },
   },
@@ -16,7 +16,7 @@ const FindOutMoreList = [
     title: <>Join Our Slack Community</>,
     Svg: require('@site/static/img/homepage/slack.svg').default,
     link: {
-      url: '#',
+      url: 'https://meltano.com/slack/',
       target: '_blank',
     },
   },
@@ -24,7 +24,7 @@ const FindOutMoreList = [
     title: <>Subscribe to our Newsletter</>,
     Svg: require('@site/static/img/homepage/subscribe.svg').default,
     link: {
-      url: '#',
+      url: 'https://meltano.com/lp/meltastic-newsletter/',
       target: '_blank',
     },
   },
