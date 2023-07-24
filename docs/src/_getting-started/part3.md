@@ -1,6 +1,6 @@
 ---
-title: Part 3 - Transformations, ELT
-description: Part 3 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
+title: Part 3 - Process data
+description: Part 3 - If you're ready to get started with Meltano, you've come to the right place!
 layout: doc
 weight: 4
 ---
@@ -8,11 +8,16 @@ weight: 4
 
 Let’s learn by example.
 
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
-
 In parts [1](/getting-started/part1) & [2](/getting-started/part2), we extracted data from GitHub and loaded it into a (local) PostgreSQL database. Now it is time to have more fun. We decide to load all attributes from the data we selected previously, and then build a model listing the different authors of commits to our repository.
 
-That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information. Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a Meltano plugin.
+That means, in this part we're going to unleash dbt [(data build tool)](https://www.getdbt.com/) onto our data to transform it into meaningful information.
+Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a Meltano plugin.
+
+Of course you can choose any other processing tool like:
+- a jupyter notebook
+- or plain Python
+
+to process your data.
 
 <div class="notification is-success">
     <p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
@@ -219,7 +224,7 @@ You can check the data inside the database using your favourite SQL editor. Ther
 
 ## Run the complete pipeline
 
-To check that everything works together as a pipeline, we clean out once more and run the whole ELT pipeline. Drop the tap_github.commits and the analytics.authors tables by running
+To check that everything works together as a pipeline, we clean out once more and run the whole pipeline. Drop the tap_github.commits and the analytics.authors tables by running
 
 ```bash
 docker exec meltano_postgres psql -d postgres -U meltano -c 'DROP TABLE tap_github.commits; DROP TABLE analytics.authors;'
@@ -276,11 +281,7 @@ info     ] 12:43:21                       cmd_type=command name=dbt-postgres std
 
 </div>
 
-There we have it, a complete ELT pipeline.
-
-## Next Steps
-
-Next, head over to [Part 4, Data Mappings](/getting-started/part4).
+There we have it, a complete data pipeline.
 
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>

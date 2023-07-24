@@ -1,6 +1,6 @@
 ---
-title: Tutorial Part 1 - Extract Data
-description: Part 1 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
+title: Tutorial Part 1 - Connect to Data
+description: Part 1 - If you're ready to get started with Meltano and connect to data, you've come to the right place!
 layout: doc
 weight: 4
 ---
@@ -8,7 +8,12 @@ weight: 4
 
 Let’s learn by example.
 
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack. In this part, we're going to start with the data extraction process.
+Throughout this tutorial, we’ll walk you through one of many applications of Meltano. All of them are about:
+- connecting to data
+- processing it
+- and finally storing it in some permanent storage or pushing it to another component
+
+In this part, we're going to start with connecting to data.
 
 We're going to take data from a "source", namely GitHub, and extract a list of commits to one repository.
 
@@ -34,7 +39,7 @@ If you don't have a GitHub account to follow along, you could either exchange th
 
 ## Create Your Meltano Project
 Step 1 is to create a new [Meltano project](/concepts/project) that (among other things)
-will hold the [plugins](/concepts/plugins) that implement the details of our ELT pipeline.
+will hold the [plugins](/concepts/plugins) that implement the details of our pipeline.
 
 
 1. Navigate to the directory that you'd like to hold your Meltano projects.

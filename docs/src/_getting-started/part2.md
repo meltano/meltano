@@ -1,14 +1,12 @@
 ---
-title: Part 2 - Loading Data, EL
-description: Part 2 - If you're ready to get started with Meltano and run an EL[T] pipeline with a data source and destination of your choosing, you've come to the right place!
+title: Part 2 - Store data
+description: Part 2 - If you're ready to get started with Meltano, you've come to the right place!
 layout: doc
 weight: 4
 ---
 
 
 Let’s learn by example.
-
-Throughout this tutorial, we’ll walk you through the creation of a end-to-end modern ELT stack.
 
 In  [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
 
@@ -196,7 +194,7 @@ The postgres database should now have a schema `tap_github` with the table `comm
 
 ## Next Steps
 
-Next, head over to [Part 3, to add inline transformations to your ingestion process](/getting-started/part3).
+Next, head over to [Part 3 to add data processing to your pipeline](/getting-started/part3).
 
 <script src="/js/termynal.js"></script>
 <script src="/js/termy_custom.js"></script>
