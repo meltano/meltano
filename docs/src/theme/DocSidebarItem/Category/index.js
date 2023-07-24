@@ -167,15 +167,17 @@ export default function DocSidebarItemCategory({
         >
           {/* eslint-disable-next-line react/prop-types */}
           {customProps?.icon && (
-            <div
-              className="sidebar-category-icon"
-              style={{
-                // eslint-disable-next-line react/prop-types
-                WebkitMaskImage: `url(${customProps.icon})`,
-                // eslint-disable-next-line react/prop-types
-                maskImage: `url(${customProps.icon})`,
-              }}
-            />
+            <div className="sidebar-category-icon-wrapper">
+              <div
+                className="sidebar-category-icon"
+                style={{
+                  // eslint-disable-next-line react/prop-types
+                  WebkitMaskImage: `url(${customProps.icon})`,
+                  // eslint-disable-next-line react/prop-types
+                  maskImage: `url(${customProps.icon})`,
+                }}
+              />
+            </div>
           )}
           {label}
         </Link>

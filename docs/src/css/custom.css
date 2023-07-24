@@ -888,13 +888,6 @@ main {
   display: none !important;
 }
 
-@media all and (min-width: 1280px) and (max-width: 1600px) {
-  .navbar__inner {
-    padding-right: 3rem;
-    padding-left: 3rem;
-  }
-}
-
 @media all and (min-width: 997px) and (max-width: 1279px) {
   .navbar__inner {
     padding-right: 0;
@@ -924,15 +917,19 @@ main {
   height: 1.5rem;
 }
 
+.sidebar-category-icon-wrapper {
+  width: 36px;
+  height: 28px;
+}
+
 .sidebar-category-icon {
   background-color: var(--meltano-black);
   mask-repeat: no-repeat;
   mask-size: cover;
   mask-position: right;
-  width: 28px;
-  height: 28px;
   margin-right: 0.5rem;
   opacity: 0.75;
+  height: 100%;
 }
 
 [data-theme='dark'] .sidebar-category-icon {
