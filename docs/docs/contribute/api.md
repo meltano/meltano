@@ -3,7 +3,7 @@ title: API Development
 description: Contribute to the Meltano API.
 layout: doc
 sidebar_position: 10
-hidden: true
+sidebar_class_name: hidden
 ---
 
 This section of the guide provides guidance on how to work with the Meltano API, which serves as the backend of Meltano and is built with the [Python framework: Flask](https://github.com/pallets/flask).

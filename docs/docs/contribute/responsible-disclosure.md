@@ -5,7 +5,7 @@ layout: doc
 redirect_from:
   - /the-project/responsible-disclosure/
 sidebar_position: 11
-hidden: true
+sidebar_class_name: hidden
 ---
 
 Please email `security@meltano.com` to report any security vulnerabilities.

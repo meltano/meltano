@@ -3,7 +3,7 @@ title: CLI Development
 description: Contribute to the Meltano CLI.
 layout: doc
 sidebar_position: 10
-hidden: true
+sidebar_class_name: hidden
 ---
 
 This section of the guide provides guidance on how to work with the Meltano CLI, which serves as the primary user interface of Meltano,

@@ -3,7 +3,7 @@ title: Prerequisites
 description: Meltano is open source software built by a growing team and a community of contributors.
 layout: doc
 sidebar_position: 2
-hidden: true
+sidebar_class_name: hidden
 ---
 
 ## Prerequisites
