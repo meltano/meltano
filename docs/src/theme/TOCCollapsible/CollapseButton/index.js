@@ -1,15 +1,17 @@
-import React from "react";
-import clsx from "clsx";
-import styles from "./styles.module.css";
+import React from 'react';
+import clsx from 'clsx';
+import styles from './styles.module.css';
+// eslint-disable-next-line react/prop-types
 export default function TOCCollapsibleCollapseButton({ collapsed, ...props }) {
   return (
     <button
       type="button"
       {...props}
       className={clsx(
-        "clean-btn",
+        'clean-btn',
         styles.tocCollapsibleButton,
         !collapsed && styles.tocCollapsibleButtonExpanded,
+        // eslint-disable-next-line react/prop-types
         props.className
       )}
     >

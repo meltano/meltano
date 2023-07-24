@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
 import {NavbarSecondaryMenuFiller} from '@docusaurus/theme-common';
+// eslint-disable-next-line react/prop-types
 function BlogSidebarMobileSecondaryMenu({sidebar}) {
   return (
     <ul className="menu__list">
+      {/* eslint-disable-next-line react/prop-types */}
       {sidebar.items.map((item) => (
         <li key={item.permalink} className="menu__list-item">
           <Link

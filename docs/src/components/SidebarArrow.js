@@ -1,13 +1,16 @@
 /* eslint-disable no-undef */
-import React, { useState, useCallback } from "react";
-import { translate } from "@docusaurus/Translate";
-import { prefersReducedMotion } from "@docusaurus/theme-common";
-import clsx from "clsx";
-import styles from "./sidebararrow.module.scss";
+import React, { useState, useCallback } from 'react';
+import { translate } from '@docusaurus/Translate';
+import { prefersReducedMotion } from '@docusaurus/theme-common';
+import clsx from 'clsx';
+import styles from './sidebararrow.module.scss';
 
 export default function SidebarArrow({
+  // eslint-disable-next-line react/prop-types
   hiddenSidebarContainer,
+  // eslint-disable-next-line react/prop-types
   setHiddenSidebarContainer,
+  // eslint-disable-next-line react/prop-types
   position,
 }) {
   const [hiddenSidebar, setHiddenSidebar] = useState(false);
@@ -29,14 +32,14 @@ export default function SidebarArrow({
       <button
         type="button"
         title={translate({
-          id: "theme.docs.sidebar.collapseButtonTitle",
-          message: "Collapse sidebar",
-          description: "The title attribute for collapse button of doc sidebar",
+          id: 'theme.docs.sidebar.collapseButtonTitle',
+          message: 'Collapse sidebar',
+          description: 'The title attribute for collapse button of doc sidebar',
         })}
         aria-label={translate({
-          id: "theme.docs.sidebar.collapseButtonAriaLabel",
-          message: "Collapse sidebar",
-          description: "The title attribute for collapse button of doc sidebar",
+          id: 'theme.docs.sidebar.collapseButtonAriaLabel',
+          message: 'Collapse sidebar',
+          description: 'The title attribute for collapse button of doc sidebar',
         })}
         className={clsx(
           hiddenSidebarContainer && styles.collapsed,
@@ -52,7 +55,7 @@ export default function SidebarArrow({
           xmlns="http://www.w3.org/2000/svg"
           className={clsx(
             styles.collapseSidebarButtonIcon,
-            position === "left"
+            position === 'left'
               ? styles.collapseSidebarButtonIconLeft
               : styles.collapseSidebarButtonIconRight
           )}

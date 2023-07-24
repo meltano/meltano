@@ -1,9 +1,10 @@
-import React from "react";
-import clsx from "clsx";
-import { useThemeConfig } from "@docusaurus/theme-common";
-import Logo from "@theme/Logo";
-import Content from "@theme/DocSidebar/Desktop/Content";
-import styles from "./styles.module.css";
+import React from 'react';
+import clsx from 'clsx';
+import { useThemeConfig } from '@docusaurus/theme-common';
+import Logo from '@theme/Logo';
+import Content from '@theme/DocSidebar/Desktop/Content';
+import styles from './styles.module.css';
+// eslint-disable-next-line react/prop-types
 function DocSidebarDesktop({ path, sidebar, isHidden }) {
   const {
     navbar: { hideOnScroll },
@@ -12,7 +13,7 @@ function DocSidebarDesktop({ path, sidebar, isHidden }) {
     <div
       className={clsx(
         styles.sidebar,
-        "pb-24",
+        'pb-24',
         hideOnScroll && styles.sidebarWithHideableNavbar,
         isHidden && styles.sidebarHidden
       )}

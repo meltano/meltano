@@ -16,15 +16,20 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {createPortal} from 'react-dom';
 import translations from '@theme/SearchTranslations';
 let DocSearchModal = null;
+// eslint-disable-next-line react/prop-types
 function Hit({hit, children}) {
+  // eslint-disable-next-line react/prop-types
   return <Link to={hit.url}>{children}</Link>;
 }
+// eslint-disable-next-line react/prop-types
 function ResultsFooter({state, onClose}) {
   const createSearchLink = useSearchLinkCreator();
   return (
+    // eslint-disable-next-line react/prop-types
     <Link to={createSearchLink(state.query)} onClick={onClose}>
       <Translate
         id="theme.SearchBar.seeAll"
+        // eslint-disable-next-line react/prop-types
         values={{count: state.context.nbHits}}>
         {'See all {count} results'}
       </Translate>
@@ -35,18 +40,21 @@ function mergeFacetFilters(f1, f2) {
   const normalize = (f) => (typeof f === 'string' ? [f] : f);
   return [...normalize(f1), ...normalize(f2)];
 }
+// eslint-disable-next-line react/prop-types
 function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
   const {siteMetadata} = useDocusaurusContext();
   const processSearchResultUrl = useSearchResultUrlProcessor();
   const contextualSearchFacetFilters = useAlgoliaContextualFacetFilters();
+  // eslint-disable-next-line react/prop-types
   const configFacetFilters = props.searchParameters?.facetFilters ?? [];
   const facetFilters = contextualSearch
     ? // Merge contextual search filters with config filters
-      mergeFacetFilters(contextualSearchFacetFilters, configFacetFilters)
+    mergeFacetFilters(contextualSearchFacetFilters, configFacetFilters)
     : // ... or use config facetFilters
-      configFacetFilters;
+    configFacetFilters;
   // We let user override default searchParameters if she wants to
   const searchParameters = {
+    // eslint-disable-next-line react/prop-types
     ...props.searchParameters,
     facetFilters,
   };
@@ -102,18 +110,20 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
     },
   }).current;
   const transformItems = useRef((items) =>
+    // eslint-disable-next-line react/prop-types
     props.transformItems
       ? // Custom transformItems
-        props.transformItems(items)
+      // eslint-disable-next-line react/prop-types
+      props.transformItems(items)
       : // Default transformItems
-        items.map((item) => ({
-          ...item,
-          url: processSearchResultUrl(item.url),
-        })),
+      items.map((item) => ({
+        ...item,
+        url: processSearchResultUrl(item.url),
+      })),
   ).current;
   const resultsFooterComponent = useMemo(
     () =>
-      // eslint-disable-next-line react/no-unstable-nested-components
+      // eslint-disable-next-line react/no-unstable-nested-components, react/display-name
       (footerProps) =>
         <ResultsFooter {...footerProps} onClose={onClose} />,
     [onClose],
@@ -143,6 +153,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
         query faster, especially on mobile. */}
         <link
           rel="preconnect"
+          // eslint-disable-next-line react/prop-types
           href={`https://${props.appId}-dsn.algolia.net`}
           crossOrigin="anonymous"
         />
@@ -169,6 +180,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
             transformItems={transformItems}
             hitComponent={Hit}
             transformSearchClient={transformSearchClient}
+            // eslint-disable-next-line react/prop-types
             {...(props.searchPagePath && {
               resultsFooterComponent,
             })}

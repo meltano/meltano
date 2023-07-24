@@ -1,19 +1,23 @@
-import React from "react";
+import React from 'react';
 import {
   useVersions,
   useActiveDocContext,
-} from "@docusaurus/plugin-content-docs/client";
-import { useDocsPreferredVersion } from "@docusaurus/theme-common";
-import { useDocsVersionCandidates } from "@docusaurus/theme-common/internal";
-import { translate } from "@docusaurus/Translate";
-import { useLocation } from "@docusaurus/router";
-import DefaultNavbarItem from "@theme/NavbarItem/DefaultNavbarItem";
-import DropdownNavbarItem from "@theme/NavbarItem/DropdownNavbarItem";
+} from '@docusaurus/plugin-content-docs/client';
+import { useDocsPreferredVersion } from '@docusaurus/theme-common';
+import { useDocsVersionCandidates } from '@docusaurus/theme-common/internal';
+import { translate } from '@docusaurus/Translate';
+import { useLocation } from '@docusaurus/router';
+// eslint-disable-next-line no-unused-vars
+import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
+import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
 const getVersionMainDoc = (version) =>
   version.docs.find((doc) => doc.id === version.mainDocId);
 export default function DocsVersionDropdownNavbarItem({
+  // eslint-disable-next-line react/prop-types
   mobile,
+  // eslint-disable-next-line react/prop-types
   docsPluginId,
+  // eslint-disable-next-line react/prop-types
   dropdownActiveClassDisabled,
   ...props
 }) {
@@ -41,11 +45,11 @@ export default function DocsVersionDropdownNavbarItem({
   const dropdownLabel =
     mobile && items.length > 1
       ? translate({
-          id: "theme.navbar.mobileVersionsDropdown.label",
-          message: "Versions",
-          description:
-            "The label for the navbar versions dropdown on mobile view",
-        })
+        id: 'theme.navbar.mobileVersionsDropdown.label',
+        message: 'Versions',
+        description:
+            'The label for the navbar versions dropdown on mobile view',
+      })
       : dropdownVersion.label;
   const dropdownTo =
     mobile && items.length > 1

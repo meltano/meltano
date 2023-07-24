@@ -1,9 +1,14 @@
-import React from "react";
+import React from 'react';
 export default function IconClose({
+  // eslint-disable-next-line react/prop-types
   width = 40,
+  // eslint-disable-next-line react/prop-types
   height = 40,
-  color = "currentColor",
+  // eslint-disable-next-line react/prop-types
+  color = 'currentColor',
+  // eslint-disable-next-line react/prop-types
   strokeWidth = 2,
+  // eslint-disable-next-line react/prop-types, no-unused-vars
   className,
   ...restProps
 }) {

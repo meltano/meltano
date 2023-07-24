@@ -1,10 +1,11 @@
-import React from "react";
-import GithubLogo from "@site/static/img/footer/github.svg";
-import Translate from "@docusaurus/Translate";
-import clsx from "clsx";
-import { ThemeClassNames } from "@docusaurus/theme-common";
-import styles from "./editthispage.module.scss";
+import React from 'react';
+import GithubLogo from '@site/static/img/footer/github.svg';
+import Translate from '@docusaurus/Translate';
+import clsx from 'clsx';
+import { ThemeClassNames } from '@docusaurus/theme-common';
+import styles from './editthispage.module.scss';
 
+// eslint-disable-next-line react/prop-types
 export default function EditThisPage({ editUrl }) {
   return (
     <a
@@ -15,7 +16,7 @@ export default function EditThisPage({ editUrl }) {
     >
       <GithubLogo
         title="Github Logo"
-        className={clsx("inline mr-2 mb-1", styles.githubIcon)}
+        className={clsx('inline mr-2 mb-1', styles.githubIcon)}
       />
       <Translate
         id="theme.common.editThisPage"

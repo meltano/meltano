@@ -6,7 +6,7 @@ import {
 } from '@docusaurus/theme-common';
 import {useNavbarMobileSidebar} from '@docusaurus/theme-common/internal';
 import DocSidebarItems from '@theme/DocSidebarItems';
-// eslint-disable-next-line react/function-component-definition
+// eslint-disable-next-line react/function-component-definition, react/prop-types
 const DocSidebarMobileSecondaryMenu = ({sidebar, path}) => {
   const mobileSidebar = useNavbarMobileSidebar();
   return (

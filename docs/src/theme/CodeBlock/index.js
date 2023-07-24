@@ -15,6 +15,7 @@ function maybeStringifyChildren(children) {
   // The children is now guaranteed to be one/more plain strings
   return Array.isArray(children) ? children.join('') : children;
 }
+// eslint-disable-next-line react/prop-types
 export default function CodeBlock({children: rawChildren, ...props}) {
   // The Prism theme on SSR is always the default theme but the site theme can
   // be in a different mode. React hydration doesn't update DOM styles that come

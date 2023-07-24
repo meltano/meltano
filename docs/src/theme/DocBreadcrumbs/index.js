@@ -1,18 +1,19 @@
-import React from "react";
-import clsx from "clsx";
-import { ThemeClassNames } from "@docusaurus/theme-common";
+import React from 'react';
+import clsx from 'clsx';
+import { ThemeClassNames } from '@docusaurus/theme-common';
 import {
   useSidebarBreadcrumbs,
   useHomePageRoute,
-} from "@docusaurus/theme-common/internal";
-import Link from "@docusaurus/Link";
-import { translate } from "@docusaurus/Translate";
-import HomeBreadcrumbItem from "@theme/DocBreadcrumbs/Items/Home";
-import styles from "./styles.module.css";
-import DocsVersionDropdownNavbarItem from "../NavbarItem/DocsVersionDropdownNavbarItem";
+} from '@docusaurus/theme-common/internal';
+import Link from '@docusaurus/Link';
+import { translate } from '@docusaurus/Translate';
+import HomeBreadcrumbItem from '@theme/DocBreadcrumbs/Items/Home';
+import styles from './styles.module.css';
+import DocsVersionDropdownNavbarItem from '../NavbarItem/DocsVersionDropdownNavbarItem';
 // TODO move to design system folder
+// eslint-disable-next-line react/prop-types
 function BreadcrumbsItemLink({ children, href, isLast }) {
-  const className = clsx("breadcrumbs__link", styles.breadcrumbLink);
+  const className = clsx('breadcrumbs__link', styles.breadcrumbLink);
   if (isLast) {
     return (
       <span className={className} itemProp="name">
@@ -34,16 +35,17 @@ function BreadcrumbsItemLink({ children, href, isLast }) {
   );
 }
 // TODO move to design system folder
+// eslint-disable-next-line react/prop-types
 function BreadcrumbsItem({ children, active, index, addMicrodata }) {
   return (
     <li
       {...(addMicrodata && {
         itemScope: true,
-        itemProp: "itemListElement",
-        itemType: "https://schema.org/ListItem",
+        itemProp: 'itemListElement',
+        itemType: 'https://schema.org/ListItem',
       })}
-      className={clsx("breadcrumbs__item", styles.breadcrumbItem, {
-        "breadcrumbs__item--active": active,
+      className={clsx('breadcrumbs__item', styles.breadcrumbItem, {
+        'breadcrumbs__item--active': active,
       })}
     >
       {children}
@@ -62,12 +64,12 @@ export default function DocBreadcrumbs() {
       className={clsx(
         ThemeClassNames.docs.docBreadcrumbs,
         styles.breadcrumbsContainer,
-        "hidden lg:block"
+        'hidden lg:block'
       )}
       aria-label={translate({
-        id: "theme.docs.breadcrumbs.navAriaLabel",
-        message: "Breadcrumbs",
-        description: "The ARIA label for the breadcrumbs",
+        id: 'theme.docs.breadcrumbs.navAriaLabel',
+        message: 'Breadcrumbs',
+        description: 'The ARIA label for the breadcrumbs',
       })}
     >
       <div className="container flex md:!px-8">

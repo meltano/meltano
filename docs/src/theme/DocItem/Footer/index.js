@@ -20,9 +20,13 @@ function TagsRow(props) {
   );
 }
 function EditMetaRow({
+  // eslint-disable-next-line react/prop-types
   editUrl,
+  // eslint-disable-next-line react/prop-types
   lastUpdatedAt,
+  // eslint-disable-next-line react/prop-types
   lastUpdatedBy,
+  // eslint-disable-next-line react/prop-types
   formattedLastUpdatedAt,
 }) {
   return (

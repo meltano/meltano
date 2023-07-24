@@ -24,9 +24,13 @@ function containsActiveItems(items, localPathname) {
   return items.some((item) => isItemActive(item, localPathname));
 }
 function DropdownNavbarItemDesktop({
+  // eslint-disable-next-line react/prop-types
   items,
+  // eslint-disable-next-line react/prop-types
   position,
+  // eslint-disable-next-line react/prop-types
   className,
+  // eslint-disable-next-line react/prop-types, no-unused-vars
   onClick,
   ...props
 }) {
@@ -59,9 +63,11 @@ function DropdownNavbarItemDesktop({
         aria-haspopup="true"
         aria-expanded={showDropdown}
         role="button"
+        // eslint-disable-next-line react/prop-types
         href={props.to ? undefined : '#'}
         className={clsx('navbar__link', className)}
         {...props}
+        // eslint-disable-next-line react/prop-types
         onClick={props.to ? undefined : (e) => e.preventDefault()}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -69,9 +75,11 @@ function DropdownNavbarItemDesktop({
             setShowDropdown(!showDropdown);
           }
         }}>
+        {/* eslint-disable-next-line react/prop-types */}
         {props.children ?? props.label}
       </NavbarNavLink>
       <ul className="dropdown__menu">
+        {/* eslint-disable-next-line react/prop-types */}
         {items.map((childItemProps, i) => (
           <NavbarItem
             isDropdownItem
@@ -85,9 +93,13 @@ function DropdownNavbarItemDesktop({
   );
 }
 function DropdownNavbarItemMobile({
+  // eslint-disable-next-line react/prop-types
   items,
+  // eslint-disable-next-line react/prop-types
   className,
+  // eslint-disable-next-line react/prop-types, no-unused-vars
   position, // Need to destructure position from props so that it doesn't get passed on.
+  // eslint-disable-next-line react/prop-types
   onClick,
   ...props
 }) {
@@ -118,9 +130,11 @@ function DropdownNavbarItemMobile({
           e.preventDefault();
           toggleCollapsed();
         }}>
+        {/* eslint-disable-next-line react/prop-types */}
         {props.children ?? props.label}
       </NavbarNavLink>
       <Collapsible lazy as="ul" className="menu__list" collapsed={collapsed}>
+        {/* eslint-disable-next-line react/prop-types */}
         {items.map((childItemProps, i) => (
           <NavbarItem
             mobile
@@ -135,6 +149,7 @@ function DropdownNavbarItemMobile({
     </li>
   );
 }
+// eslint-disable-next-line react/prop-types
 export default function DropdownNavbarItem({mobile = false, ...props}) {
   const Comp = mobile ? DropdownNavbarItemMobile : DropdownNavbarItemDesktop;
   return <Comp {...props} />;

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import {translate} from '@docusaurus/Translate';
 import IconWordWrap from '@theme/Icon/WordWrap';
 import styles from './styles.module.css';
+// eslint-disable-next-line react/prop-types
 export default function WordWrapButton({className, onClick, isEnabled}) {
   const title = translate({
     id: 'theme.CodeBlock.wordWrapToggle',

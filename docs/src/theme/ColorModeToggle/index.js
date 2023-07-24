@@ -1,17 +1,18 @@
-import React from "react";
-import clsx from "clsx";
-import styles from "./styles.module.css";
+import React from 'react';
+import clsx from 'clsx';
+import styles from './styles.module.css';
+// eslint-disable-next-line react/prop-types
 function ColorModeToggle({ className, buttonClassName, value, onChange }) {
   return (
     <div
-      className={clsx(styles.toggle, className, buttonClassName, "relative")}
+      className={clsx(styles.toggle, className, buttonClassName, 'relative')}
     >
       <label className={styles.lightDarkToggle}>
         <input
           className={styles.toggleCheckbox}
           type="checkbox"
-          checked={value === "light"}
-          onClick={() => onChange(value === "dark" ? "light" : "dark")}
+          checked={value === 'light'}
+          onClick={() => onChange(value === 'dark' ? 'light' : 'dark')}
           readOnly
         />
         <div className={styles.toggleSlot}>

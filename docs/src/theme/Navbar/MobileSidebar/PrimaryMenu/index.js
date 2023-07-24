@@ -1,19 +1,21 @@
-import React from "react";
-import { useThemeConfig } from "@docusaurus/theme-common";
-import { useNavbarMobileSidebar } from "@docusaurus/theme-common/internal";
-import NavbarItem from "@theme/NavbarItem";
-import NavbarLogo from "@theme/Navbar/Logo";
-import SearchBar from "@theme/SearchBar";
-import NavbarSearch from "@theme/Navbar/Search";
-import GithubLogo from "@site/static/img/footer/github.svg";
-import SlackLogo from "@site/static/img/footer/slack.svg";
-import TwitterLogo from "@site/static/img/footer/twitter.svg";
-import LinkedinLogo from "@site/static/img/footer/linkedin.svg";
-import FacebookLogo from "@site/static/img/footer/facebook.svg";
-import InstagramLogo from "@site/static/img/footer/instagram.svg";
-import YoutubeLogo from "@site/static/img/footer/youtube.svg";
-import CrunchbaseLogo from "@site/static/img/footer/crunchbase.svg";
-import styles from "./primarymenu.module.scss";
+import React from 'react';
+import { useThemeConfig } from '@docusaurus/theme-common';
+import { useNavbarMobileSidebar } from '@docusaurus/theme-common/internal';
+import NavbarItem from '@theme/NavbarItem';
+import NavbarLogo from '@theme/Navbar/Logo';
+import SearchBar from '@theme/SearchBar';
+import NavbarSearch from '@theme/Navbar/Search';
+import GithubLogo from '@site/static/img/footer/github.svg';
+import SlackLogo from '@site/static/img/footer/slack.svg';
+import TwitterLogo from '@site/static/img/footer/twitter.svg';
+import LinkedinLogo from '@site/static/img/footer/linkedin.svg';
+// eslint-disable-next-line no-unused-vars
+import FacebookLogo from '@site/static/img/footer/facebook.svg';
+// eslint-disable-next-line no-unused-vars
+import InstagramLogo from '@site/static/img/footer/instagram.svg';
+import YoutubeLogo from '@site/static/img/footer/youtube.svg';
+import CrunchbaseLogo from '@site/static/img/footer/crunchbase.svg';
+import styles from './primarymenu.module.scss';
 
 function useNavbarItems() {
   // TODO temporary casting until ThemeConfig type is improved
@@ -28,7 +30,7 @@ export default function NavbarMobilePrimaryMenu() {
   return (
     <div className="primaryWrapper h-full container flex flex-col justify-between">
       <div className="mainNav my-10">
-        <NavbarSearch className={"my-10 " + styles.sidebarSearch}>
+        <NavbarSearch className={'my-10 ' + styles.sidebarSearch}>
           <SearchBar />
         </NavbarSearch>
         <ul className="menu__list">

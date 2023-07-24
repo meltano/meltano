@@ -1,4 +1,7 @@
 {
+  "ignorePatterns": [
+    "src/webapp/*"
+  ],
   "env": {
     "browser": true,
     "es2021": true
@@ -7,6 +10,11 @@
     "eslint:recommended",
     "plugin:react/recommended"
   ],
+  "settings": {
+    "react": {
+      "version": "17"
+    }
+  },
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -17,7 +25,7 @@
   "rules": {
     "indent": [
       "error",
-      "space"
+      2
     ],
     "linebreak-style": [
       "error",

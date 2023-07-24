@@ -1,40 +1,40 @@
 /* eslint-disable no-undef */
-import React, { useRef, useState, useEffect } from "react";
-import styles from "./usecases.module.scss";
-import Link from "@docusaurus/Link";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, A11y } from "swiper";
-import "swiper/css";
-import "swiper/css/navigation";
+import React, { useRef, useState, useEffect } from 'react';
+import styles from './usecases.module.scss';
+import Link from '@docusaurus/Link';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, A11y } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const UseCaseList = [
   {
-    title: "Move from internal and niche APIs",
-    Svg: require("@site/static/img/homepage/move.svg").default,
+    title: 'Move from internal and niche APIs',
+    Svg: require('@site/static/img/homepage/move.svg').default,
     description: (
       <>Iterate with confidence using software development workflows.</>
     ),
     link: {
-      title: "Experience the tool",
-      url: "#",
-      target: "_blank",
+      title: 'Experience the tool',
+      url: '#',
+      target: '_blank',
     },
   },
   {
-    title: "Move data from internal databases",
-    Svg: require("@site/static/img/homepage/shield.svg").default,
+    title: 'Move data from internal databases',
+    Svg: require('@site/static/img/homepage/shield.svg').default,
     description: (
       <>Benefit from predictable pricing and lower costs at high volumes.</>
     ),
     link: {
-      title: "See it in action",
-      url: "#",
-      target: "_blank",
+      title: 'See it in action',
+      url: '#',
+      target: '_blank',
     },
   },
   {
-    title: "Move data from files and spreadsheets",
-    Svg: require("@site/static/img/homepage/slice.svg").default,
+    title: 'Move data from files and spreadsheets',
+    Svg: require('@site/static/img/homepage/slice.svg').default,
     description: (
       <>
         Meltano works with any source format and support any storage, from S3 to
@@ -42,41 +42,42 @@ const UseCaseList = [
       </>
     ),
     link: {
-      title: "Experience the tool",
-      url: "#",
-      target: "_blank",
+      title: 'Experience the tool',
+      url: '#',
+      target: '_blank',
     },
   },
   {
-    title: "Move data from SaaS applications",
-    Svg: require("@site/static/img/homepage/graph.svg").default,
+    title: 'Move data from SaaS applications',
+    Svg: require('@site/static/img/homepage/graph.svg').default,
     description: (
       <>
         Choose from our extensive library of connectors and tweak connector
+        {/* eslint-disable-next-line no-irregular-whitespace */}
         behavior without support. 
       </>
     ),
     link: {
-      title: "See it in action",
-      url: "#",
-      target: "_blank",
+      title: 'See it in action',
+      url: '#',
+      target: '_blank',
     },
   },
   {
-    title: "Move from internal and niche APIs",
-    Svg: require("@site/static/img/homepage/move.svg").default,
+    title: 'Move from internal and niche APIs',
+    Svg: require('@site/static/img/homepage/move.svg').default,
     description: (
       <>Iterate with confidence using software development workflows.</>
     ),
     link: {
-      title: "Experience the tool",
-      url: "#",
-      target: "_blank",
+      title: 'Experience the tool',
+      url: '#',
+      target: '_blank',
     },
   },
   {
-    title: "Move from internal and niche APIs",
-    Svg: require("@site/static/img/homepage/shield.svg").default,
+    title: 'Move from internal and niche APIs',
+    Svg: require('@site/static/img/homepage/shield.svg').default,
     description: (
       <>
         Get started with Meltano and run an EL[T] pipeline with a data source
@@ -84,17 +85,18 @@ const UseCaseList = [
       </>
     ),
     link: {
-      title: "See it in action",
-      url: "#",
-      target: "_blank",
+      title: 'See it in action',
+      url: '#',
+      target: '_blank',
     },
   },
 ];
 
+// eslint-disable-next-line react/prop-types
 function UseCase({ Svg, title, description, link }) {
   return (
-    <div className={"h-full " + styles.card}>
-      <div className={"text-left flex flex-col justify-between h-full"}>
+    <div className={'h-full ' + styles.card}>
+      <div className={'text-left flex flex-col justify-between h-full'}>
         <div className={styles.usecaseContent}>
           <div className={styles.header}>
             <Svg className={styles.featureSvg} role="img" />
@@ -103,11 +105,14 @@ function UseCase({ Svg, title, description, link }) {
           <p className="p2 mb-6">{description}</p>
         </div>
         <Link
+          // eslint-disable-next-line react/prop-types
           to={link.url}
+          // eslint-disable-next-line react/prop-types
           target={link.target}
-          className={"btn " + styles.button}
+          className={'btn ' + styles.button}
         >
           <span />
+          {/* eslint-disable-next-line react/prop-types */}
           {link.title}
         </Link>
       </div>
@@ -134,7 +139,7 @@ export default function HomepageUseCases() {
       <div className="container relative">
         <h2
           className={
-            "text-center font-bold pb-10 md:pb-20 " + styles.usecaseHeader
+            'text-center font-bold pb-10 md:pb-20 ' + styles.usecaseHeader
           }
         >
           Use cases

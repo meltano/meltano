@@ -1,18 +1,19 @@
-import React from "react";
-import clsx from "clsx";
+import React from 'react';
+import clsx from 'clsx';
 import {
   HtmlClassNameProvider,
   ThemeClassNames,
-} from "@docusaurus/theme-common";
+} from '@docusaurus/theme-common';
 import {
   BlogPostProvider,
   useBlogPost,
-} from "@docusaurus/theme-common/internal";
-import BlogLayout from "@theme/BlogLayout";
-import BlogPostItem from "@theme/BlogPostItem";
-import BlogPostPaginator from "@theme/BlogPostPaginator";
-import BlogPostPageMetadata from "@theme/BlogPostPage/Metadata";
-import TOC from "@theme/TOC";
+} from '@docusaurus/theme-common/internal';
+import BlogLayout from '@theme/BlogLayout';
+import BlogPostItem from '@theme/BlogPostItem';
+import BlogPostPaginator from '@theme/BlogPostPaginator';
+import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata';
+import TOC from '@theme/TOC';
+// eslint-disable-next-line react/prop-types
 function BlogPostPageContent({ sidebar, children }) {
   const { metadata, toc } = useBlogPost();
   const { nextItem, prevItem, frontMatter } = metadata;
@@ -43,8 +44,10 @@ function BlogPostPageContent({ sidebar, children }) {
   );
 }
 export default function BlogPostPage(props) {
+  // eslint-disable-next-line react/prop-types
   const BlogPostContent = props.content;
   return (
+    // eslint-disable-next-line react/prop-types
     <BlogPostProvider content={props.content} isBlogPostPage>
       <HtmlClassNameProvider
         className={clsx(
@@ -53,6 +56,7 @@ export default function BlogPostPage(props) {
         )}
       >
         <BlogPostPageMetadata />
+        {/* eslint-disable-next-line react/prop-types */}
         <BlogPostPageContent sidebar={props.sidebar}>
           <BlogPostContent />
         </BlogPostPageContent>

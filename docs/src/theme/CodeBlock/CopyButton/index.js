@@ -6,6 +6,7 @@ import {translate} from '@docusaurus/Translate';
 import IconCopy from '@theme/Icon/Copy';
 import IconSuccess from '@theme/Icon/Success';
 import styles from './styles.module.css';
+// eslint-disable-next-line react/prop-types
 export default function CopyButton({code, className}) {
   const [isCopied, setIsCopied] = useState(false);
   const copyTimeout = useRef(undefined);
@@ -23,15 +24,15 @@ export default function CopyButton({code, className}) {
       aria-label={
         isCopied
           ? translate({
-              id: 'theme.CodeBlock.copied',
-              message: 'Copied',
-              description: 'The copied button label on code blocks',
-            })
+            id: 'theme.CodeBlock.copied',
+            message: 'Copied',
+            description: 'The copied button label on code blocks',
+          })
           : translate({
-              id: 'theme.CodeBlock.copyButtonAriaLabel',
-              message: 'Copy code to clipboard',
-              description: 'The ARIA label for copy code blocks button',
-            })
+            id: 'theme.CodeBlock.copyButtonAriaLabel',
+            message: 'Copy code to clipboard',
+            description: 'The ARIA label for copy code blocks button',
+          })
       }
       title={translate({
         id: 'theme.CodeBlock.copy',

@@ -8,6 +8,7 @@ export default function AnnouncementBarContent(props) {
   return (
     <div
       {...props}
+      // eslint-disable-next-line react/prop-types
       className={clsx(styles.content, props.className)}
       // Developer provided the HTML, so assume it's safe.
       // eslint-disable-next-line react/no-danger

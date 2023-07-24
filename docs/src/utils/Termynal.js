@@ -8,7 +8,7 @@
  * @license MIT
  */
 
-"use strict";
+'use strict';
 
 /** Generate a terminal widget. */
 class Termynal {
@@ -27,12 +27,12 @@ class Termynal {
    * @param {Object[]} lineData - Dynamically loaded line data objects.
    * @param {boolean} options.noInit - Don't initialise the animation.
    */
-  constructor(container = "#termynal", options = {}) {
+  constructor(container = '#termynal', options = {}) {
     this.container =
-      typeof container === "string"
+      typeof container === 'string'
         ? document.querySelector(container)
         : container;
-    this.pfx = `data-${options.prefix || "ty"}`;
+    this.pfx = `data-${options.prefix || 'ty'}`;
     this.originalStartDelay = this.startDelay =
       options.startDelay ||
       parseFloat(this.container.getAttribute(`${this.pfx}-startDelay`)) ||
@@ -52,7 +52,7 @@ class Termynal {
     this.progressChar =
       options.progressChar ||
       this.container.getAttribute(`${this.pfx}-progressChar`) ||
-      "█";
+      '█';
     this.progressPercent =
       options.progressPercent ||
       parseFloat(this.container.getAttribute(`${this.pfx}-progressPercent`)) ||
@@ -60,7 +60,7 @@ class Termynal {
     this.cursor =
       options.cursor ||
       this.container.getAttribute(`${this.pfx}-cursor`) ||
-      "▋";
+      '▋';
     this.lineData = this.lineDataToElements(options.lineData || []);
     this.loadLines();
     if (!options.noInit) {
@@ -73,20 +73,20 @@ class Termynal {
     // Otherwise it would be changing and the user viewport would be constantly
     // moving as she/he scrolls
     const finish = this.generateFinish();
-    finish.style.visibility = "hidden";
+    finish.style.visibility = 'hidden';
     this.container.appendChild(finish);
     // Appends dynamically loaded lines to existing line elements.
     this.lines = [...this.container.querySelectorAll(`[${this.pfx}]`)].concat(
       this.lineData
     );
     for (let line of this.lines) {
-      line.style.visibility = "hidden";
+      line.style.visibility = 'hidden';
       this.container.appendChild(line);
     }
     const restart = this.generateRestart();
-    restart.style.visibility = "hidden";
+    restart.style.visibility = 'hidden';
     this.container.appendChild(restart);
-    this.container.setAttribute("data-termynal", "");
+    this.container.setAttribute('data-termynal', '');
   }
 
   /**
@@ -99,14 +99,14 @@ class Termynal {
      */
     const containerStyle = getComputedStyle(this.container);
     this.container.style.width =
-      containerStyle.width !== "0px" ? containerStyle.width : undefined;
+      containerStyle.width !== '0px' ? containerStyle.width : undefined;
     this.container.style.minHeight =
-      containerStyle.height !== "0px" ? containerStyle.height : undefined;
+      containerStyle.height !== '0px' ? containerStyle.height : undefined;
 
-    this.container.setAttribute("data-termynal", "");
-    this.container.innerHTML = "";
+    this.container.setAttribute('data-termynal', '');
+    this.container.innerHTML = '';
     for (let line of this.lines) {
-      line.style.visibility = "visible";
+      line.style.visibility = 'visible';
     }
     this.start();
   }
@@ -122,14 +122,14 @@ class Termynal {
       const type = line.getAttribute(this.pfx);
       const delay = line.getAttribute(`${this.pfx}-delay`) || this.lineDelay;
 
-      if (type == "input") {
+      if (type == 'input') {
         line.setAttribute(`${this.pfx}-cursor`, this.cursor);
         await this.type(line);
         await this._wait(delay);
-      } else if (type == "progress") {
+      } else if (type == 'progress') {
         await this.progress(line);
         await this._wait(delay);
-      } else if (type == "wait") {
+      } else if (type == 'wait') {
         await this._wait(delay);
       } else {
         this.container.appendChild(line);
@@ -139,36 +139,36 @@ class Termynal {
       line.removeAttribute(`${this.pfx}-cursor`);
     }
     this.addRestart();
-    this.finishElement.style.visibility = "hidden";
+    this.finishElement.style.visibility = 'hidden';
     this.lineDelay = this.originalLineDelay;
     this.typeDelay = this.originalTypeDelay;
     this.startDelay = this.originalStartDelay;
   }
 
   generateRestart() {
-    const restart = document.createElement("a");
+    const restart = document.createElement('a');
     restart.onclick = (e) => {
       e.preventDefault();
-      this.container.innerHTML = "";
+      this.container.innerHTML = '';
       this.init();
     };
-    restart.href = "#";
-    restart.setAttribute("data-terminal-control", "");
-    restart.innerHTML = "restart prompt ↻";
+    restart.href = '#';
+    restart.setAttribute('data-terminal-control', '');
+    restart.innerHTML = 'restart prompt ↻';
     return restart;
   }
 
   generateFinish() {
-    const finish = document.createElement("a");
+    const finish = document.createElement('a');
     finish.onclick = (e) => {
       e.preventDefault();
       this.lineDelay = 0;
       this.typeDelay = 0;
       this.startDelay = 0;
     };
-    finish.href = "#";
-    finish.setAttribute("data-terminal-control", "");
-    finish.innerHTML = "Skip to finish →";
+    finish.href = '#';
+    finish.setAttribute('data-terminal-control', '');
+    finish.innerHTML = 'Skip to finish →';
     this.finishElement = finish;
     return finish;
   }
@@ -189,7 +189,7 @@ class Termynal {
    */
   async type(line) {
     const chars = [...line.textContent];
-    line.textContent = "";
+    line.textContent = '';
     this.container.appendChild(line);
 
     for (let char of chars) {
@@ -212,7 +212,7 @@ class Termynal {
     const chars = progressChar.repeat(progressLength);
     const progressPercent =
       line.getAttribute(`${this.pfx}-progressPercent`) || this.progressPercent;
-    line.textContent = "";
+    line.textContent = '';
     this.container.appendChild(line);
 
     for (let i = 1; i < chars.length + 1; i++) {
@@ -242,9 +242,9 @@ class Termynal {
    */
   lineDataToElements(lineData) {
     return lineData.map((line) => {
-      let div = document.createElement("div");
+      let div = document.createElement('div');
       div.innerHTML = `<span ${this._attributes(line)}>${
-        line.value || ""
+        line.value || ''
       }</span>`;
 
       return div.firstElementChild;
@@ -258,16 +258,16 @@ class Termynal {
    * @returns {string} - String of attributes.
    */
   _attributes(line) {
-    let attrs = "";
+    let attrs = '';
     for (let prop in line) {
       // Custom add class
-      if (prop === "class") {
+      if (prop === 'class') {
         attrs += ` class=${line[prop]} `;
         continue;
       }
-      if (prop === "type") {
+      if (prop === 'type') {
         attrs += `${this.pfx}="${line[prop]}" `;
-      } else if (prop !== "value") {
+      } else if (prop !== 'value') {
         attrs += `${this.pfx}-${prop}="${line[prop]}" `;
       }
     }

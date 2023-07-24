@@ -2,12 +2,16 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 function MaybeLink(props) {
+  // eslint-disable-next-line react/prop-types
   if (props.href) {
     return <Link {...props} />;
   }
+  // eslint-disable-next-line react/prop-types
   return <>{props.children}</>;
 }
+// eslint-disable-next-line react/prop-types
 export default function BlogPostItemHeaderAuthor({author, className}) {
+  // eslint-disable-next-line react/prop-types
   const {name, title, url, imageURL, email} = author;
   const link = url || (email && `mailto:${email}`) || undefined;
   return (

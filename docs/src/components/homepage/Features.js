@@ -1,12 +1,12 @@
 /* eslint-disable no-undef */
-import React from "react";
-import styles from "./features.module.scss";
-import Link from "@docusaurus/Link";
+import React from 'react';
+import styles from './features.module.scss';
+import Link from '@docusaurus/Link';
 
 const FeatureList = [
   {
-    title: "Tutorial",
-    Svg: require("@site/static/img/homepage/tutorial.svg").default,
+    title: 'Tutorial',
+    Svg: require('@site/static/img/homepage/tutorial.svg').default,
     description: (
       <>
         Get started with Meltano and run data pipelines with a source
@@ -14,80 +14,81 @@ const FeatureList = [
       </>
     ),
     link: {
-      title: "Go to Tutorials",
-      url: "tutorials/",
+      title: 'Go to Tutorials',
+      url: 'tutorials/',
     },
   },
   {
-    title: "Product Docs",
-    Svg: require("@site/static/img/homepage/book-open.svg").default,
+    title: 'Product Docs',
+    Svg: require('@site/static/img/homepage/book-open.svg').default,
     description: (
       <>
         Dive into how Meltano works and how to use it to build your data-powered applications.
       </>
     ),
     link: {
-      title: "Go to Docs",
-      url: "/guide",
+      title: 'Go to Docs',
+      url: '/guide',
     },
   },
   {
-    title: "Meltano Hub",
-    Svg: require("@site/static/img/homepage/hub.svg").default,
+    title: 'Meltano Hub',
+    Svg: require('@site/static/img/homepage/hub.svg').default,
     description: (
       <>
         Explore the library of 600+ connectors and tools within the Meltano ecosystem.
       </>
     ),
     link: {
-      title: "Go to Hub",
-      url: "https://hub.meltano.com",
-      target: "_blank",
+      title: 'Go to Hub',
+      url: 'https://hub.meltano.com',
+      target: '_blank',
     },
   },
   {
-    title: "Meltano Cloud",
-    Svg: require("@site/static/img/homepage/cloud.svg").default,
+    title: 'Meltano Cloud',
+    Svg: require('@site/static/img/homepage/cloud.svg').default,
     description: (
       <>
         Dive into the documentation for Meltano Cloud, the hosted version of Meltano Core.
       </>
     ),
     link: {
-      title: "View Cloud Docs",
-      url: "/cloud",
+      title: 'View Cloud Docs',
+      url: '/cloud',
     },
   },
   {
-    title: "SDK",
-    Svg: require("@site/static/img/homepage/sdk.svg").default,
+    title: 'SDK',
+    Svg: require('@site/static/img/homepage/sdk.svg').default,
     description: (
       <>
         Build your own Meltano connector to move data from any source to any destination.
       </>
     ),
     link: {
-      title: "Go to SDK",
-      url: "https://sdk.meltano.com",
-      target: "_blank",
+      title: 'Go to SDK',
+      url: 'https://sdk.meltano.com',
+      target: '_blank',
     },
   },
   {
-    title: "SDK in Action",
-    Svg: require("@site/static/img/homepage/rocket.svg").default,
+    title: 'SDK in Action',
+    Svg: require('@site/static/img/homepage/rocket.svg').default,
     description: (
       <>
         Explore many of the connectors built with the Meltano SDK in their home on GitHub: Meltano Labs.
       </>
     ),
     link: {
-      title: "View Examples",
-      url: "https://github.com/meltanolabs/",
-      target: "_blank",
+      title: 'View Examples',
+      url: 'https://github.com/meltanolabs/',
+      target: '_blank',
     },
   },
 ];
 
+// eslint-disable-next-line react/prop-types
 function Feature({ Svg, title, description, link }) {
   return (
     <div className={styles.card}>
@@ -97,7 +98,9 @@ function Feature({ Svg, title, description, link }) {
           <h4 className="text-2xl font-semibold ms-2">{title}</h4>
         </div>
         <p className="p2 mt-3 mb-6">{description}</p>
+        {/* eslint-disable-next-line react/prop-types */}
         <Link to={link.url} target={link.target} className="btn main-btn">
+          {/* eslint-disable-next-line react/prop-types */}
           {link.title}
         </Link>
       </div>

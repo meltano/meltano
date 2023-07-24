@@ -5,9 +5,13 @@ import TOCItems from '@theme/TOCItems';
 import CollapseButton from '@theme/TOCCollapsible/CollapseButton';
 import styles from './styles.module.css';
 export default function TOCCollapsible({
+  // eslint-disable-next-line react/prop-types
   toc,
+  // eslint-disable-next-line react/prop-types
   className,
+  // eslint-disable-next-line react/prop-types
   minHeadingLevel,
+  // eslint-disable-next-line react/prop-types
   maxHeadingLevel,
 }) {
   const {collapsed, toggleCollapsed} = useCollapsible({

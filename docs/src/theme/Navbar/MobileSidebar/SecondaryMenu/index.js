@@ -1,7 +1,7 @@
-import React from "react";
-import { useThemeConfig } from "@docusaurus/theme-common";
-import { useNavbarSecondaryMenu } from "@docusaurus/theme-common/internal";
-import Translate from "@docusaurus/Translate";
+import React from 'react';
+import { useThemeConfig } from '@docusaurus/theme-common';
+import { useNavbarSecondaryMenu } from '@docusaurus/theme-common/internal';
+import Translate from '@docusaurus/Translate';
 function SecondaryMenuBackButton(props) {
   return (
     <button

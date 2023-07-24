@@ -1,8 +1,8 @@
-import React from "react";
-import clsx from "clsx";
-import { ThemeClassNames } from "@docusaurus/theme-common";
-import Translate from "@docusaurus/Translate";
-import styles from "./styles.module.css";
+import React from 'react';
+import clsx from 'clsx';
+import { ThemeClassNames } from '@docusaurus/theme-common';
+import Translate from '@docusaurus/Translate';
+import styles from './styles.module.css';
 function NoteIcon() {
   return (
     <svg viewBox="0 0 14 16">
@@ -53,10 +53,9 @@ function CautionIcon() {
     </svg>
   );
 }
-// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
 const AdmonitionConfigs = {
   note: {
-    infimaClassName: "secondary",
+    infimaClassName: 'secondary',
     iconComponent: NoteIcon,
     label: (
       <Translate
@@ -68,7 +67,7 @@ const AdmonitionConfigs = {
     ),
   },
   tip: {
-    infimaClassName: "success",
+    infimaClassName: 'success',
     iconComponent: TipIcon,
     label: (
       <Translate
@@ -80,7 +79,7 @@ const AdmonitionConfigs = {
     ),
   },
   danger: {
-    infimaClassName: "danger",
+    infimaClassName: 'danger',
     iconComponent: DangerIcon,
     label: (
       <Translate
@@ -92,7 +91,7 @@ const AdmonitionConfigs = {
     ),
   },
   info: {
-    infimaClassName: "info",
+    infimaClassName: 'info',
     iconComponent: InfoIcon,
     label: (
       <Translate
@@ -104,7 +103,7 @@ const AdmonitionConfigs = {
     ),
   },
   caution: {
-    infimaClassName: "warning",
+    infimaClassName: 'warning',
     iconComponent: CautionIcon,
     label: (
       <Translate
@@ -118,10 +117,10 @@ const AdmonitionConfigs = {
 };
 // Legacy aliases, undocumented but kept for retro-compatibility
 const aliases = {
-  secondary: "note",
-  important: "info",
-  success: "tip",
-  warning: "danger",
+  secondary: 'note',
+  important: 'info',
+  success: 'tip',
+  warning: 'danger',
 };
 function getAdmonitionConfig(unsafeType) {
   const type = aliases[unsafeType] ?? unsafeType;
@@ -140,7 +139,7 @@ function extractMDXAdmonitionTitle(children) {
   const items = React.Children.toArray(children);
   const mdxAdmonitionTitle = items.find(
     (item) =>
-      React.isValidElement(item) && item.props?.mdxType === "mdxAdmonitionTitle"
+      React.isValidElement(item) && item.props?.mdxType === 'mdxAdmonitionTitle'
   );
   const rest = <>{items.filter((item) => item !== mdxAdmonitionTitle)}</>;
   return {
@@ -166,15 +165,18 @@ export default function Admonition(props) {
     icon: iconProp,
   } = processAdmonitionProps(props);
   const typeConfig = getAdmonitionConfig(type);
+  // eslint-disable-next-line no-unused-vars
   const titleLabel = title ?? typeConfig.label;
   const { iconComponent: IconComponent } = typeConfig;
+  // eslint-disable-next-line no-unused-vars
   const icon = iconProp ?? <IconComponent />;
   return (
     <div
       className={clsx(
         ThemeClassNames.common.admonition,
+        // eslint-disable-next-line react/prop-types
         ThemeClassNames.common.admonitionType(props.type),
-        "alert",
+        'alert',
         `alert--${typeConfig.infimaClassName}`,
         styles.admonition
       )}

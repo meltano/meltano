@@ -1,23 +1,23 @@
-import React, { useEffect, useMemo } from "react";
-import clsx from "clsx";
+import React, { useEffect, useMemo } from 'react';
+import clsx from 'clsx';
 import {
   ThemeClassNames,
   useThemeConfig,
   usePrevious,
   Collapsible,
   useCollapsible,
-} from "@docusaurus/theme-common";
+} from '@docusaurus/theme-common';
 import {
   isActiveSidebarItem,
   findFirstCategoryLink,
   useDocSidebarItemsExpandedState,
   isSamePath,
-} from "@docusaurus/theme-common/internal";
-import Link from "@docusaurus/Link";
-import { translate } from "@docusaurus/Translate";
-import useIsBrowser from "@docusaurus/useIsBrowser";
-import DocSidebarItems from "@theme/DocSidebarItems";
-import styles from "./styles.module.css";
+} from '@docusaurus/theme-common/internal';
+import Link from '@docusaurus/Link';
+import { translate } from '@docusaurus/Translate';
+import useIsBrowser from '@docusaurus/useIsBrowser';
+import DocSidebarItems from '@theme/DocSidebarItems';
+import styles from './styles.module.css';
 // If we navigate to a category and it becomes active, it should automatically
 // expand itself
 function useAutoExpandActiveCategory({ isActive, collapsed, updateCollapsed }) {
@@ -51,15 +51,16 @@ function useCategoryHrefWithSSRFallback(item) {
     return findFirstCategoryLink(item);
   }, [item, isBrowser]);
 }
+// eslint-disable-next-line react/prop-types
 function CollapseButton({ categoryLabel, onClick }) {
   return (
     <button
       aria-label={translate(
         {
-          id: "theme.DocSidebarItem.toggleCollapsedCategoryAriaLabel",
-          message: "Toggle the collapsible sidebar category '{label}'",
+          id: 'theme.DocSidebarItem.toggleCollapsedCategoryAriaLabel',
+          message: 'Toggle the collapsible sidebar category \'{label}\'',
           description:
-            "The ARIA label to toggle the collapsible sidebar category",
+            'The ARIA label to toggle the collapsible sidebar category',
         },
         { label: categoryLabel }
       )}
@@ -70,13 +71,19 @@ function CollapseButton({ categoryLabel, onClick }) {
   );
 }
 export default function DocSidebarItemCategory({
+  // eslint-disable-next-line react/prop-types
   item,
+  // eslint-disable-next-line react/prop-types
   onItemClick,
+  // eslint-disable-next-line react/prop-types
   activePath,
+  // eslint-disable-next-line react/prop-types
   level,
+  // eslint-disable-next-line react/prop-types
   index,
   ...props
 }) {
+  // eslint-disable-next-line react/prop-types
   const { items, customProps, label, collapsible, className, href } = item;
   const {
     docs: {
@@ -93,6 +100,7 @@ export default function DocSidebarItemCategory({
       if (!collapsible) {
         return false;
       }
+      // eslint-disable-next-line react/prop-types
       return isActive ? false : item.collapsed;
     },
   });
@@ -119,49 +127,52 @@ export default function DocSidebarItemCategory({
       className={clsx(
         ThemeClassNames.docs.docSidebarItemCategory,
         ThemeClassNames.docs.docSidebarItemCategoryLevel(level),
-        "menu__list-item",
+        'menu__list-item',
         {
-          "menu__list-item--collapsed": collapsed,
+          'menu__list-item--collapsed': collapsed,
         },
         className
       )}
     >
       <div
-        className={clsx("menu__list-item-collapsible", {
-          "menu__list-item-collapsible--active": isCurrentPage,
+        className={clsx('menu__list-item-collapsible', {
+          'menu__list-item-collapsible--active': isCurrentPage,
         })}
       >
         <Link
-          className={clsx("menu__link", {
-            "menu__link--sublist": collapsible,
-            "menu__link--sublist-caret": !href && collapsible,
-            "menu__link--active": isActive,
+          className={clsx('menu__link', {
+            'menu__link--sublist': collapsible,
+            'menu__link--sublist-caret': !href && collapsible,
+            'menu__link--active': isActive,
           })}
           onClick={
             collapsible
               ? (e) => {
-                  onItemClick?.(item);
-                  if (href) {
-                    updateCollapsed(false);
-                  } else {
-                    e.preventDefault();
-                    updateCollapsed();
-                  }
+                onItemClick?.(item);
+                if (href) {
+                  updateCollapsed(false);
+                } else {
+                  e.preventDefault();
+                  updateCollapsed();
                 }
+              }
               : () => {
-                  onItemClick?.(item);
-                }
+                onItemClick?.(item);
+              }
           }
-          aria-current={isCurrentPage ? "page" : undefined}
+          aria-current={isCurrentPage ? 'page' : undefined}
           aria-expanded={collapsible ? !collapsed : undefined}
-          href={collapsible ? hrefWithSSRFallback ?? "#" : hrefWithSSRFallback}
+          href={collapsible ? hrefWithSSRFallback ?? '#' : hrefWithSSRFallback}
           {...props}
         >
+          {/* eslint-disable-next-line react/prop-types */}
           {customProps?.icon && (
             <div
               className="sidebar-category-icon"
               style={{
+                // eslint-disable-next-line react/prop-types
                 WebkitMaskImage: `url(${customProps.icon})`,
+                // eslint-disable-next-line react/prop-types
                 maskImage: `url(${customProps.icon})`,
               }}
             />
@@ -182,7 +193,7 @@ export default function DocSidebarItemCategory({
       <Collapsible
         lazy
         as="ul"
-        className={clsx("menu__list", styles.menuList)}
+        className={clsx('menu__list', styles.menuList)}
         collapsed={collapsed}
       >
         <DocSidebarItems

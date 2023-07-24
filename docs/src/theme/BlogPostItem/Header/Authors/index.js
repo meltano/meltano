@@ -4,6 +4,7 @@ import {useBlogPost} from '@docusaurus/theme-common/internal';
 import BlogPostItemHeaderAuthor from '@theme/BlogPostItem/Header/Author';
 import styles from './styles.module.css';
 // Component responsible for the authors layout
+// eslint-disable-next-line react/prop-types
 export default function BlogPostItemHeaderAuthors({className}) {
   const {
     metadata: {authors},

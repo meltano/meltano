@@ -13,6 +13,7 @@ function ReadMoreLabel() {
   );
 }
 export default function BlogPostItemFooterReadMoreLink(props) {
+  // eslint-disable-next-line react/prop-types
   const {blogPostTitle, ...linkProps} = props;
   return (
     <Link
