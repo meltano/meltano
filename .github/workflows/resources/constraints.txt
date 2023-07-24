@@ -1,4 +1,4 @@
 nox==2023.4.22
 nox-poetry==1.0.3
-pip==23.2
+pip==23.2.1
 poetry==1.5.1
