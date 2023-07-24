@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v2.20.0 (2023-07-19)
+
+### ✨ New
+
+- [#7733](https://github.com/meltano/meltano/issues/7733) Add setting `hidden` flag -- _**Thanks @ReubenFrankel!**_
+
+### 🐛 Fixes
+
+- [#7878](https://github.com/meltano/meltano/issues/7878) Redact sensitive values in `config list` output -- _**Thanks @ReubenFrankel!**_
+- [#7725](https://github.com/meltano/meltano/issues/7725) Restrict Azure state logging to WARNING and above -- _**Thanks @acarter24!**_
+- [#7745](https://github.com/meltano/meltano/issues/7745) Python code formatting in Custom Extractor docs -- _**Thanks @rawwar!**_
+
+### ⚡ Performance Improvements
+
+- [#7811](https://github.com/meltano/meltano/issues/7811) Optimize migration 6828cc5b1a4f_create_dedicated_state_table.py -- _**Thanks @asmisha!**_
+
+### 📚 Documentation Improvements
+
+- [#7911](https://github.com/meltano/meltano/issues/7911) Advanced docs on running custom scripts
+- [#7917](https://github.com/meltano/meltano/issues/7917) Update instructions for providing `GIT_SSH_PRIVATE_KEY`
+- [#7906](https://github.com/meltano/meltano/issues/7906) Recommend airflow utility over orchestrator
+- [#7892](https://github.com/meltano/meltano/issues/7892) Fix onboarding.md config command
+- [#7668](https://github.com/meltano/meltano/issues/7668) Document `meltano-cloud job stop`
+- [#7837](https://github.com/meltano/meltano/issues/7837) Update environment example to be more complete
+- [#7836](https://github.com/meltano/meltano/issues/7836) Add more detail for cloud history command
+- [#7817](https://github.com/meltano/meltano/issues/7817) Update Meltano Cloud notice in Deployment doc
+- [#7823](https://github.com/meltano/meltano/issues/7823) Add cloud deployment hints for common errors
+- [#7816](https://github.com/meltano/meltano/issues/7816) Remove Kubernetes reference from Production doc
+- [#7822](https://github.com/meltano/meltano/issues/7822) Fix plural deployments cli command
+- [#7807](https://github.com/meltano/meltano/issues/7807) Update schedule interval with single quotes
+- [#7795](https://github.com/meltano/meltano/issues/7795) Add note on ephemeral storage
+- [#7758](https://github.com/meltano/meltano/issues/7758) Cloud docs content and better navigation from index
+- [#7783](https://github.com/meltano/meltano/issues/7783) Part3 getting started guide dbt initialize section
+- [#7782](https://github.com/meltano/meltano/issues/7782) Use `--interactive` flag in Loader configuration section of Getting Started
+- [#7780](https://github.com/meltano/meltano/issues/7780) Fix indentation issue for code block in Getting Started
+- [#7619](https://github.com/meltano/meltano/issues/7619) 7186: change transform to utility
+- [#7765](https://github.com/meltano/meltano/issues/7765) Use tabs for meltano.yml vs meltano config or env -- _**Thanks @mjsqu!**_
+- [#7764](https://github.com/meltano/meltano/issues/7764) Explain Cloud schedule offsets
+- [#7763](https://github.com/meltano/meltano/issues/7763) Make quoting consistent for intervals
+- [#7754](https://github.com/meltano/meltano/issues/7754) Update deployment details
+- [#7753](https://github.com/meltano/meltano/issues/7753) Update `project use` to include `--name` flag
+- [#7750](https://github.com/meltano/meltano/issues/7750) Update `onboarding.md` to use `--environment` kwarg for deployments -- _**Thanks @GJMcClintock!**_
+- [#7744](https://github.com/meltano/meltano/issues/7744) Fix `mappers.md` sample command
+
 ## v2.19.1 (2023-06-02)
 
 ### 🐛 Fixes

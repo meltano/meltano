@@ -49,24 +49,29 @@ There are specific environment variables that are reserved for certain use-cases
 
 ### SSH Private Keys for Private Git Repository Package Access
 
-`GIT_SSH_PRIVATE_KEY` is a reserved variable that should be set if you have private repository packages.
+`GIT_SSH_PRIVATE_KEY` is a reserved variable that should be set if you have private git repositories that are accessed during `meltano install` and can be accessed via SSH.
 
-To encrypt, set the ssh private key env variable into your `.env` file as-is in the private key file with single quotes
-around them.
+To specify it, set the ssh private key environment variable using `meltano cloud config env set`, which will look similar to this:
 
-Example `.env` file to be encrypted:
-
-```
-GIT_SSH_PRIVATE_KEY='-----BEGIN OPENSSH PRIVATE KEY-----
+```sh
+meltano-cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
 therearelotsofprivatekeymaterialhere
 onvariouslineslikethis
 wecanjustcopypasteasitappearsinthefile
 andusesinglequotesaroundthewholething
 -----END OPENSSH PRIVATE KEY-----'
-SOME_OTHER_SECRET=1234asdf
 ```
 
-Then continue with encryption using the [kms-ext](https://github.com/meltano/kms-ext) utility.
+Note the quotes around the key value, which permits multi-line input.
+
+Prior to setting your key via the CLI you can also validate that its formatted properly using the following command:
+
+```console
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+ssh-ed25519 AAAAB3NzaC1yc2EAAAADAQABAAABAQCwK+DnOJItBOvbGbeqr0ts00aJGdN8vqD0ppq4 your_email@example.com
+foo@bar:~$ ssh-keygen -y -f <your_key_file>
+Load key "id_ed25519": invalid format
+```
 
 ## Job or Schedule Run Notifications via Webhook
 

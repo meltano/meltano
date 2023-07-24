@@ -40,7 +40,7 @@ class TestSuperset:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.asyncio  # noqa:  WPS210
+    @pytest.mark.asyncio()  # noqa:  WPS210
     async def test_hooks(  # noqa:  WPS210
         self,
         subject,

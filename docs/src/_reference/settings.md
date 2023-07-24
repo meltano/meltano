@@ -472,7 +472,7 @@ Number of seconds that a [lock for a state ID](/concepts/state_backends#locking)
 ```bash
 meltano config meltano set state_backend.lock_timeout_seconds 720
 
-export MELTANO_STATE_LOCK_TIMEOUT_SECONDS=720
+export MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS=720
 ```
 
 ### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
@@ -487,7 +487,7 @@ Number of seconds that a Meltano should wait if trying to access or modify state
 ```bash
 meltano config meltano set state_backend.lock_retry_seconds 720
 
-export MELTANO_STATE_LOCK_RETRY_SECONDS=720
+export MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS=720
 ```
 
 ### Azure-Specific Settings
@@ -495,7 +495,7 @@ export MELTANO_STATE_LOCK_RETRY_SECONDS=720
 
 ### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AZURE_CONNECTION_STRING`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING`
 - Default: None
 
 The [Azure connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to use when authenticating to Azure.
@@ -513,7 +513,7 @@ export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=h
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_ACCESS_KEY_ID`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ACCESS_KEY_ID`
 - Default: None
 
 The AWS access key ID to use when authenticating to S3.
@@ -528,7 +528,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_SECRET_ACCESS_KEY`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_SECRET_ACCESS_KEY`
 - Default: None
 
 The AWS secret access key to use when authenticating to S3.
@@ -543,7 +543,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_AWS_ENDPOINT_URL`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ENDPOINT_URL`
 - Default: None
 
 The endpoint URL to use when connecting to S3. Only necessary if using S3-compatible storage _not_ hosted by AWS (e.g. [Minio](https://min.io))
@@ -561,7 +561,7 @@ export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 
 ### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_APPLICATION_CREDENTIALS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_APPLICATION_CREDENTIALS`
 - Default: None
 
 Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
