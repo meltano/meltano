@@ -1,0 +1,51 @@
+footer {
+  background: var(--ifm-footer-background);
+  z-index: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.background:before {
+  content: "";
+  display: block;
+  background-image: url(../../../../static/img/homepage/bg-ellipse-center.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  margin-left: -400px;
+  margin-top: -400px;
+  opacity: 0.5;
+  pointer-events: all;
+  z-index: -1;
+}
+
+.meltano path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .meltano path {
+  fill: #ffffff;
+}
+
+.floatingIsland {
+  animation: floatingSpace 10s ease-in-out infinite alternate;
+}
+
+@keyframes floatingSpace {
+  0% {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-50px);
+    -webkit-transform: translateY(-50px);
+  }
+
+  100% {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+  }
+}

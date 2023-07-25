@@ -1,0 +1,26 @@
+.menuSocIcon path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .menuSocIcon path {
+  fill: #ffffff;
+}
+
+.menuSocIcon:hover path,
+[data-theme="dark"] .menuSocIcon:hover path {
+  fill: var(--meltano-blue);
+}
+
+.sidebarSearch {
+  justify-content: left;
+}
+
+.navbarSidebarBrand {
+  align-items: center;
+  box-shadow: none;
+  display: flex;
+  flex: 1;
+  height: var(--ifm-navbar-height);
+  padding: var(--ifm-navbar-padding-vertical)
+    var(--ifm-navbar-padding-horizontal);
+}

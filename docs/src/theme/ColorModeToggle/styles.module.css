@@ -1,0 +1,80 @@
+.toggle {
+  padding: 0 0 0 0.5rem;
+}
+
+.toggleCheckbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+  display: none;
+}
+
+.toggleSlot {
+  position: relative;
+  width: 56px;
+  height: 28px;
+  border-radius: 10em;
+  background-color: white;
+  transition: background-color 250ms;
+  cursor: pointer;
+}
+
+.toggleCheckbox:checked~.toggleSlot {
+  background: rgba(8, 2, 22, 0.15);
+}
+
+.toggleButton {
+  transform: translate(32px, 4px);
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  transition: background-color 250ms,
+    transform 500ms cubic-bezier(0.26, 2, 0.46, 0.71);
+  box-shadow: inset 0px 0px 0px 0.75em #080216;
+}
+
+.toggleCheckbox:checked~.toggleSlot .toggleButton {
+  background-color: #ffffff;
+  box-shadow: inset 0px 0px 0px 0.75em #ffffff;
+  transform: translate(4px, 4px) rotate(0deg);
+}
+
+.sunIconWrapper {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  transform: translate(4px, 4px);
+  transform-origin: 50% 50%;
+  transition: opacity 150ms, transform 500ms cubic-bezier(0.26, 2, 0.46, 0.71);
+}
+
+.toggleCheckbox:checked~.toggleSlot .sunIconWrapper {
+  opacity: 0;
+  transform: translate(32px, 4px) rotate(30deg);
+}
+
+.moonIconWrapper {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 0;
+  transform: translate(4px, 4px) rotate(15deg);
+  transform-origin: 50% 50%;
+  transition: opacity 150ms, transform 500ms cubic-bezier(0.26, 2.5, 0.46, 0.71);
+}
+
+.toggleCheckbox:checked~.toggleSlot .moonIconWrapper {
+  opacity: 1;
+  transform: translate(32px, 4px) rotate(0deg);
+}
+
+.lightDarkToggle {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}

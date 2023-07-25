@@ -1,0 +1,16 @@
+.breadcrumbsContainer {
+  --ifm-breadcrumb-size-multiplier: 0.8;
+  background: var(--ifm-navbar-background-color);
+  height: 70px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--ifm-toc-border-color);
+  z-index: 1;
+}
+
+.breadcrumbLink {
+  font-size: 16px;
+}
+
+/* .breadcrumbItem:not(:last-child)::after {
+  font-size: 16px;
+} */

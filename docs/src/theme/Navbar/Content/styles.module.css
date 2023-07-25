@@ -1,0 +1,25 @@
+.navbarRight {
+  position: relative;
+}
+
+.navbarRight:before {
+  content: "";
+  display: block;
+  background-image: url(../../../../static/img/homepage/bg-ellipse-center.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  top: -200px;
+  margin-top: -200px;
+  margin-right: -400px;
+  opacity: 0.5;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.navbarLeft {
+  flex: 0 0 auto;
+  margin-right: 1rem;
+}
