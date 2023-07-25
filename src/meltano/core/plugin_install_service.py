@@ -6,6 +6,7 @@ import asyncio
 import functools
 import logging
 import os
+import shlex
 import sys
 import typing as t
 from dataclasses import dataclass
@@ -496,11 +497,13 @@ def get_pip_install_args(
         FeatureFlags.STRICT_ENV_VAR_MODE,
         raise_error=False,
     ) as strict_env_var_mode:
-        return expand_env_vars(
-            plugin.pip_url,
-            env,
-            if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-        ).split(" ")
+        return shlex.split(
+            expand_env_vars(
+                plugin.pip_url,
+                env,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+            ),
+        )
 
 
 async def install_pip_plugin(
