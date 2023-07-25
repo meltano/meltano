@@ -1,0 +1,78 @@
+---
+slug: welcome-to-the-changelog
+title: Welcome to the Changelog
+---
+Welcome to the new Meltano Changelog!
+
+This is going to be our new place to share and keep a record of all of the product updates happening around the Meltano ecosystem. Previously we'd shared these in our newsletter and in Slack. We'll likely keep putting updates there, but this will be the primary destination for updates going forward.
+
+Let's dive in to what's improved over the past month or so!
+
+## ☁️ Meltano Cloud entered Public Beta
+
+Right at the end of May this year we launched Meltano Cloud into Public Beta. This was a key milestone for us at it represented the threshold where early Alpha users were seeing enough value to pay for Cloud use. And it means we can start working through our large waitlist to onboard more users.
+
+<p>
+<a href="#" className="btn main-btn">
+  Request Access to the Meltano Cloud Beta
+</a>
+</p>
+
+Since then we've:
+
+- Added the ability to cancel a running job from the CLI
+- Added syntax highlighting to the logs in the Cloud UI
+- Added support for manual, once, and none aliases for schedules. Useful for one-off runs!
+- Improved the error code response when creating or updating a deployment
+- Squashed quite a few bugs. Thanks to our early users for all of their feedback!
+
+## MeltanoHub
+
+The Meltano Community has been busy adding new connectors to MeltanoHub. In June and July so far we've had the following additions and updates:
+
+### Extractors
+
+- Updated the Google Analytics connectors and docs due to the GA4 change - [Link](https://github.com/meltano/hub/pull/1432)
+- Added the MeltanoLabs variant of tap-hubspot - [Link](https://github.com/meltano/hub/pull/1420)
+- Added the datarts-tech variant of tap-cassanda - [Link](https://github.com/meltano/hub/pull/1412)
+- Added the acarter24 variant of tap-mailchimp - [Link](https://github.com/meltano/hub/pull/1406)
+- Updated the default variant fo SaaSOptics to the datarts-tech variant - [Link](https://github.com/meltano/hub/pull/1408)
+- Updated the default variant of tap-postgres and tap-snowflake to the MeltanoLabs variant - [Link](https://github.com/meltano/hub/pull/1399)
+- Added tap-theme-parks - [Link](https://github.com/meltano/hub/pull/1400)
+- Added the sehnem variant of tap-netsuite - [Link](https://github.com/meltano/hub/pull/1403)
+- Updated the default variant of tap-recruitee to the rawwar variant - [Link](https://github.com/meltano/hub/pull/1370)
+
+### Loaders
+
+- Added a loader for Clickhouse - [Link](https://github.com/meltano/hub/pull/1382)
+- Added target-sqs and target-parquet variants from Hotglue - [Link](https://github.com/meltano/hub/pull/1375)
+- Updated the default variant of target-postgres and target-snowflake to the MeltanoLabs variant - [Link](https://github.com/meltano/hub/pull/1399)
+
+## Connectors
+
+We're continuing to invest in building first-party connectors based on the Meltano SDK.
+
+- [Postgres Extractor](https://github.com/MeltanoLabs/tap-postgres)
+- [Postgres Loader](https://github.com/MeltanoLabs/target-postgres)
+- [Universal File Extractor](https://github.com/MeltanoLabs/tap-universal-file)
+- [Hubspot Extractor](https://github.com/MeltanoLabs/tap-hubspot)
+
+We also have new extractors for Jira and Salesforce landing soon.
+
+## SDK
+
+We shipped 3 SDK releases
+
+- [v0.28.0](https://github.com/meltano/sdk/releases/tag/v0.28.0)
+- [v0.29.0](https://github.com/meltano/sdk/releases/tag/v0.29.0)
+- [v0.30.0](https://github.com/meltano/sdk/releases/tag/v0.30.0)
+
+Some highlights from these releases are:
+
+- Supporting optional headers in OAuth requests
+- Publishing the supported python version in `--about`
+- Supporting union schemas which is useful for connectors that accept mutually exclusive settings (e.g. OAuth vs API key auth)
+- Validation of a parsed/transformed record against the SCHEMA message
+- Add Apache 2.0 as an optional license when developing a connector
+
+And of course lots of fixes, under the hood changes, and improved documentation.

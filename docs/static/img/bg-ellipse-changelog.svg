@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 26.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1112 556" style="enable-background:new 0 0 1112 556;" xml:space="preserve">
+<g style="opacity:0.5;" filter="url(#filter0_f_3227_37237)">
+
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="569.6015" y1="682.8943" x2="322.2339" y2="683.3934" gradientTransform="matrix(1 0 0 -1 0 1111.1969)">
+		<stop  offset="0" style="stop-color:#3A64FA"/>
+		<stop  offset="0.9427" style="stop-color:#F963BC"/>
+	</linearGradient>
+	<path style="fill:url(#SVGID_1_);" d="M556,300c141.4,0,256,256,256,256s-114.6,0-256,0s-256,0-256,0S414.6,300,556,300z"/>
+</g>
+<defs>
+<filter id="filter0_f_3227_37237" x="0" y="0" width="1112" height="556" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="150" result="effect1_foregroundBlur_3227_37237"/>
+</filter>
+<linearGradient id="paint0_linear_3227_37237" x1="569.043" y1="704.724" x2="321.675" y2="704.225" gradientUnits="userSpaceOnUse">
+<stop stop-color="#3A64FA"/>
+<stop offset="0.942707" stop-color="#F963BC"/>
+</linearGradient>
+</defs>
+</svg>
