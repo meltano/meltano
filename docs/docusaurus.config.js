@@ -81,7 +81,7 @@ const config = {
             position: 'right',
           },
           {
-            to: '/getting-started',
+            to: '/getting-started/installation/',
             label: 'Get Started',
             position: 'left',
             className: 'header-get-started-link',
@@ -95,7 +95,7 @@ const config = {
             'aria-label': 'Tutorials',
           },
           {
-            to: '/getting-started',
+            to: '/getting-started/',
             label: 'Docs',
             position: 'left',
             className: 'header-docs-link',
