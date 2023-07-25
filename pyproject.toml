@@ -513,11 +513,8 @@ ignore_errors = true
 module = [
   "meltano.cli.*",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.connection_service",
   "meltano.core.db",
   "meltano.core.elt_context",
-  "meltano.core.extract_utils",
-  "meltano.core.extractor",
   "meltano.core.meltano_invoker",
   "meltano.core.migration_service",
   "meltano.core.models",
@@ -539,16 +536,12 @@ module = [
   # Meltano Core submodules
   "meltano.core.behavior.*",
   "meltano.core.block.*",
-  "meltano.core.compiler.*",
   "meltano.core.job.*",
-  "meltano.core.legacy_tracking.*",
   "meltano.core.logging.job_logging_service",
   "meltano.core.logging.output_logger",
   "meltano.core.logging.utils",
-  "meltano.core.m5o.*",
   "meltano.core.plugin.*",
   "meltano.core.runner.*",
-  "meltano.core.sql.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
 ]
