@@ -6,6 +6,7 @@ import yaml
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    get_pip_install_args,
 )
 
 
@@ -81,3 +82,26 @@ class TestPluginInstallService:
 
         assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
+
+    def test_get_quoted_pip_install_args(self, project):
+        with open(project.meltanofile, "w") as file:
+            file.write(
+                yaml.dump(
+                    {
+                        "plugins": {
+                            "extractors": [
+                                {
+                                    "name": "tap-gitlab",
+                                    "pip_url": "'tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git' python-json-logger",  # noqa: E501
+                                },
+                            ],
+                        },
+                    },
+                ),
+            )
+        project.refresh()
+        plugin = next(project.plugins.plugins())
+        assert get_pip_install_args(project, plugin) == [
+            "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
+            "python-json-logger",
+        ]
