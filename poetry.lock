@@ -493,17 +493,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.10"
+version = "1.28.11"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.10-py3-none-any.whl", hash = "sha256:67001b3f512cbe2e00e352c65fb443b504e5e388fee39d73bcc42da1ae87d9e3"},
-    {file = "boto3-1.28.10.tar.gz", hash = "sha256:cb8af03f553f1c7db7137bc897785baeeaa97b8fde483eb1cdb1f1ef3cec9cb7"},
+    {file = "boto3-1.28.11-py3-none-any.whl", hash = "sha256:e24460d50001b517c6734dcf1c879feb43aa2062d88d9bdbb8703c986cb05941"},
+    {file = "boto3-1.28.11.tar.gz", hash = "sha256:0fe7a35cf0041145c8eefebd3ae2ddf41baed62d7c963e5042b8ed8c297f648f"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.10,<1.32.0"
+botocore = ">=1.31.11,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -512,13 +512,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.10"
+version = "1.31.11"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.10-py3-none-any.whl", hash = "sha256:a3bfd3627a490faedf37d79373d6957936d7720888ca85466e0471cb921e4557"},
-    {file = "botocore-1.31.10.tar.gz", hash = "sha256:736a9412f405d6985570c4a87b533c2396dd8d4042d8c7a0ca14e73d4f1bcf9d"},
+    {file = "botocore-1.31.11-py3-none-any.whl", hash = "sha256:d3cbffe554c9a1ba2ac6973734c43c21b8e7985a2ac4a4c31a09811b8029445c"},
+    {file = "botocore-1.31.11.tar.gz", hash = "sha256:b17ff973bb70b02b227928c2abe4992f1cfc46d13aee0228516c8f32572b88c6"},
 ]
 
 [package.dependencies]
@@ -3091,7 +3091,8 @@ files = [
     {file = "ruamel.yaml.clib-0.2.7-cp310-cp310-win32.whl", hash = "sha256:763d65baa3b952479c4e972669f679fe490eee058d5aa85da483ebae2009d231"},
     {file = "ruamel.yaml.clib-0.2.7-cp310-cp310-win_amd64.whl", hash = "sha256:d000f258cf42fec2b1bbf2863c61d7b8918d31ffee905da62dede869254d3b8a"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:045e0626baf1c52e5527bd5db361bc83180faaba2ff586e763d3d5982a876a9e"},
-    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_12_6_arm64.whl", hash = "sha256:721bc4ba4525f53f6a611ec0967bdcee61b31df5a56801281027a3a6d1c2daf5"},
+    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:1a6391a7cabb7641c32517539ca42cf84b87b667bad38b78d4d42dd23e957c81"},
+    {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-manylinux2014_aarch64.whl", hash = "sha256:9c7617df90c1365638916b98cdd9be833d31d337dbcd722485597b43c4a215bf"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:41d0f1fa4c6830176eef5b276af04c89320ea616655d01327d5ce65e50575c94"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-win32.whl", hash = "sha256:f6d3d39611ac2e4f62c3128a9eed45f19a6608670c5a2f4f07f24e8de3441d38"},
     {file = "ruamel.yaml.clib-0.2.7-cp311-cp311-win_amd64.whl", hash = "sha256:da538167284de58a52109a9b89b8f6a53ff8437dd6dc26d33b57bf6699153122"},
@@ -3325,6 +3326,8 @@ description = "Database Abstraction Library"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
 files = [
+    {file = "SQLAlchemy-1.4.49-cp27-cp27m-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:2e126cf98b7fd38f1e33c64484406b78e937b1a280e078ef558b95bf5b6895f6"},
+    {file = "SQLAlchemy-1.4.49-cp27-cp27mu-manylinux_2_5_x86_64.manylinux1_x86_64.whl", hash = "sha256:03db81b89fe7ef3857b4a00b63dedd632d6183d4ea5a31c5d8a92e000a41fc71"},
     {file = "SQLAlchemy-1.4.49-cp310-cp310-macosx_11_0_x86_64.whl", hash = "sha256:95b9df9afd680b7a3b13b38adf6e3a38995da5e162cc7524ef08e3be4e5ed3e1"},
     {file = "SQLAlchemy-1.4.49-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a63e43bf3f668c11bb0444ce6e809c1227b8f067ca1068898f3008a273f52b09"},
     {file = "SQLAlchemy-1.4.49-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f835c050ebaa4e48b18403bed2c0fda986525896efd76c245bdd4db995e51a4c"},
@@ -4043,4 +4046,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "80273d961e2c5eec7fa26af1d353b6bd210877f93bb54fc6a442e98d51e0c58f"
+content-hash = "a6bdfe735e6746151dbdb48ed1b3ee416034f582e1ff4e0255dce4f7c8a15302"
