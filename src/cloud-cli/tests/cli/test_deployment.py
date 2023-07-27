@@ -384,7 +384,7 @@ class TestDeploymentCommand:
         assert (
             'Created deployment "ultra-production". '
             "To use as default run "
-            '"meltano cloud deployment use --name ultra-production."'
+            '"meltano cloud deployment use --name ultra-production"'
         ) in result.output
 
     @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
