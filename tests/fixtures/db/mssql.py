@@ -24,7 +24,7 @@ def recreate_database(engine, db_name):
         # DROP DATABASE IF EXISTS is not supported by SQL Server 2016 and up
         conn.execute(
             DDL(
-                "DROP DATABASE IF EXISTS %(db_name)s",  # noqa: WPS323
+                "DROP DATABASE %(db_name)s",  # noqa: WPS323
                 {"db_name": db_name},
             ),
         )
