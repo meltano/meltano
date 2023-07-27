@@ -141,6 +141,7 @@ jobs:
 
     - name: Run pytest
       env:
+        SQLALCHEMY_WARN_20: 1
         COLUMNS: 160
         PYTEST_BACKEND: ${{ matrix.backend-db }}
         # Postgres backend
