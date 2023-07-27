@@ -6,7 +6,7 @@ sidebar_position: 1
 ---
 ## Meltano the Data Integration Engine
 
-WTF is a "Data Integration Engine"? 
+WTF is a "Data Integration Engine"?
 
 Let us explain: It's like a hammer, you can build dozens of different things with a hammer, but the hammer itself doesn't really care. It's just extraordinary at hammering in nails. The hammer also doesn't care who you are, it is optimized for hammering!
 

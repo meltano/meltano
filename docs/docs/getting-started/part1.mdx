@@ -206,7 +206,7 @@ Paste the following config into the plugins section of your [`meltano.yml` proje
       - commits.sha
       - commits.commit_timestamp
 ```
-Replace TODO_PUT_YOUR_REPOSITORY_HERE with a repository you have acccess rights to.. Then create a github auth token (on github.com) and add it to your 
+Replace TODO_PUT_YOUR_REPOSITORY_HERE with a repository you have acccess rights to.. Then create a github auth token (on github.com) and add it to your
  `.env` file in the following way:
 
 ```yml
@@ -224,7 +224,7 @@ meltano invoke tap-github
 <Termy>
 
 ```console
-$ meltano invoke tap-github 
+$ meltano invoke tap-github
 2...```
 
 </Termy>
@@ -275,7 +275,7 @@ This piece of the code
       - commits.commit_timestamp
 ```
 
-tell the tap what specific pieces of data you want from this one GitHub repository. 
+tell the tap what specific pieces of data you want from this one GitHub repository.
 
 To figure out what data attributes are available, you can use the Meltano CLI:
 
@@ -320,5 +320,5 @@ Selected attributes:
 Installing and connecting data, all data integration engine use cases have that in common, but now you have to decide what you want to try out:
 
 1. Do you want to [save this data temporarily in a CSV and then run a Python script to transform it?](/getting-started/a-part2).
-2. Do you want to [replicate this pipeline for 100 customers with different credentials, and save the data into S3?](/getting-started/b-part2) 
+2. Do you want to [replicate this pipeline for 100 customers with different credentials, and save the data into S3?](/getting-started/b-part2)
 3. Do you want to [load this data into a data warehouse (postgres) and then use dbt to transform it?](/getting-started/c-part2).
