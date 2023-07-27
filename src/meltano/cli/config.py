@@ -235,7 +235,12 @@ def list_settings(ctx, extras: bool):
     # regular and extra settings, since we show custom extras.
     load_extras = True if extras else None
 
-    full_config = settings.config_with_metadata(session=session, extras=load_extras)
+    full_config = settings.config_with_metadata(
+        session=session,
+        extras=load_extras,
+        redacted=True,
+    )
+
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
@@ -279,7 +284,13 @@ def list_settings(ctx, extras: bool):
         else:
             label = f"{get_label(config_metadata)}"
 
-        current_value = click.style(f"{value!r}", fg="green")
+        redacted_with_value = value is not None and setting_def.is_redacted
+
+        current_value = click.style(
+            value if redacted_with_value else f"{value!r}",
+            fg="yellow" if redacted_with_value else "green",
+        )
+
         click.echo(f" current value: {current_value}", nl=False)
 
         unexpanded_value = config_metadata.get("unexpanded_value")

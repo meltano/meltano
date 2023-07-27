@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "2.19.1"
+version = "2.20.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -45,13 +45,14 @@ aiohttp = "^3.8.4"
 alembic = "^1.11.1"
 atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
-azure-core = {version = "^1.27.1", optional = true}
+azure-core = {version = "^1.28.0", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.26.160", optional = true}
+boto3 = {version = "^1.28.10", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.1"
-croniter = "^1.3.15"
+click-didyoumean = "^0.3.0"
+croniter = "^1.4.1"
 fasteners = "^0.18"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
@@ -66,22 +67,23 @@ psycopg2-binary = "^2.8.5"
 pyjwt = "^2.6.0"
 pymssql = {version = "^2.2.5", optional = true}
 python = ">=3.8,<3.12"
+python-dateutil = "^2.8.2"
 python-dotenv = "^0.21.1"
 python-slugify = "^8.0.1"
 python-ulid = "^1.1.0"
-pyyaml = "^6.0.0"
+pyyaml = "^6.0.1"
 questionary = "^1.10.0"
 requests = "^2.31.0"
-rich = "^13.4.1"
+rich = "^13.4.2"
 "ruamel.yaml" = "^0.17.21"
 smart-open = "^6.2.0"
-snowplow-tracker = "^0.10.0"
+snowplow-tracker = "^1.0.1"
 sqlalchemy = "^2.0.18"
-structlog = "^22.3.0"
+structlog = "^23.1.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.5.0"
 tzlocal = "^5.0.1"
-virtualenv = "^20.23.1"
+virtualenv = "^20.24.1"
 yaspin = "^2.3.0"
 
 [tool.poetry.extras]
@@ -102,11 +104,11 @@ hypothesis = "^6.70.0"
 mock = "^5.0.2"
 mypy = "^1.4.1"
 pre-commit = "^3.3.3"
-pytest = "^7.3.1"
+pytest = "^7.4.0"
 pytest-aiohttp = "^1.0.4"
-pytest-asyncio = "^0.21.0"
+pytest-asyncio = "^0.21.1"
 pytest-cov = "^4.1.0"
-pytest-docker = "^1.0"
+pytest-docker = "^2.0"
 pytest-httpserver = "^1.0.6"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
@@ -116,7 +118,7 @@ requests-mock = "^1.11.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
 sqlalchemy2-stubs = "^0.0.2a32"
 types-croniter = "^1.4.0"
-types-jsonschema = "^4.17.0.8"
+types-jsonschema = "^4.17.0.9"
 types-psutil = "^5.9.5.15"
 types-python-slugify = "^8.0.0.2"
 types-pyyaml = "^6.0.12.10"
@@ -475,7 +477,7 @@ skip_covered = true
 [tool.commitizen]
 name = "cz_version_bump"
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "2.19.1"
+version = "2.20.0"
 version_files = [
   "pyproject.toml:^version =",
   "src/cloud-cli/pyproject.toml:^version =",
@@ -500,6 +502,8 @@ exclude = [
 plugins = [
   "sqlalchemy.ext.mypy.plugin",
 ]
+warn_unused_configs = true
+warn_unused_ignores = true
 
 # The following whitelist is used to allow for incremental adoption
 # of MyPy. Modules should be removed from this whitelist as and when
@@ -510,11 +514,8 @@ ignore_errors = true
 module = [
   "meltano.cli.*",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.connection_service",
   "meltano.core.db",
   "meltano.core.elt_context",
-  "meltano.core.extract_utils",
-  "meltano.core.extractor",
   "meltano.core.meltano_invoker",
   "meltano.core.migration_service",
   "meltano.core.models",
@@ -536,16 +537,12 @@ module = [
   # Meltano Core submodules
   "meltano.core.behavior.*",
   "meltano.core.block.*",
-  "meltano.core.compiler.*",
   "meltano.core.job.*",
-  "meltano.core.legacy_tracking.*",
   "meltano.core.logging.job_logging_service",
   "meltano.core.logging.output_logger",
   "meltano.core.logging.utils",
-  "meltano.core.m5o.*",
   "meltano.core.plugin.*",
   "meltano.core.runner.*",
-  "meltano.core.sql.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
 ]

@@ -1,0 +1,57 @@
+:root {
+  --docusaurus-collapse-button-bg: transparent;
+  --docusaurus-collapse-button-bg-hover: rgb(0 0 0 / 10%);
+}
+
+[data-theme="dark"]:root {
+  --docusaurus-collapse-button-bg: rgb(255 255 255 / 5%);
+  --docusaurus-collapse-button-bg-hover: rgb(255 255 255 / 10%);
+}
+
+@media (min-width: 997px) {
+  .sidebarButtonWrapper {
+    display: block !important;
+    position: relative;
+    width: 32px;
+    margin-left: -32px;
+    left: 16px;
+    padding-top: 1.1rem;
+    border-radius: 0;
+    border: none;
+    z-index: 3;
+  }
+
+  .collapseSidebarButton {
+    position: sticky;
+    top: 117px;
+    height: 32px;
+  }
+  .collapseSidebarButtonIcon {
+    .collapseSidebarButtonIconBg {
+      fill: var(--ifm-navbar-background-color);
+    }
+    .collapseSidebarButtonIconCircle {
+      stroke: var(--ifm-link-hover-color);
+    }
+  }
+
+  .collapseSidebarButtonIconLeft {
+    transform: rotate(0);
+  }
+
+  .collapsed .collapseSidebarButtonIconLeft {
+    transform: rotate(180deg);
+  }
+
+  .collapseSidebarButtonIconRight {
+    transform: rotate(180deg);
+  }
+
+  .collapsed .collapseSidebarButtonIconRight {
+    transform: rotate(0);
+  }
+}
+
+.sidebarButtonWrapper {
+  display: none;
+}

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-LOG_FILE="./docs/example-library/meltano-run/integration-test.log"
+LOG_FILE="./integration/example-library/meltano-run/integration-test.log"
 
 # Custom validations for the `meltano-run` guide/test.
 

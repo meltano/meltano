@@ -1,0 +1,16 @@
+.docsLink {
+  color: var(--meltano-blue);
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-left: 2px solid var(--meltano-blue);
+  margin-left: 4px;
+  padding-left: 3px;
+  line-height: 1.5rem
+}
+
+@media all and (min-width: 768px) {
+  .docsLink {
+    font-size: 1.6rem;
+    line-height: 1.8rem
+  }
+}

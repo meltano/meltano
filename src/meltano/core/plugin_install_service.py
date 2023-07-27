@@ -6,6 +6,7 @@ import asyncio
 import functools
 import logging
 import os
+import shlex
 import sys
 import typing as t
 from dataclasses import dataclass
@@ -471,6 +472,34 @@ class PluginInstaller(t.Protocol):
         """
 
 
+def get_pip_install_args(
+    project: Project,
+    plugin: ProjectPlugin,
+    env: t.Mapping[str, str] | None = None,
+) -> list[str]:
+    """Get the pip install arguments for the given plugin.
+
+    Args:
+        project: Meltano Project.
+        plugin: `ProjectPlugin` to get pip install arguments for.
+        env: Optional environment variables to use when expanding the pip install args.
+
+    Returns:
+        The list of pip install arguments for the given plugin.
+    """
+    with project.settings.feature_flag(
+        FeatureFlags.STRICT_ENV_VAR_MODE,
+        raise_error=False,
+    ) as strict_env_var_mode:
+        return shlex.split(
+            expand_env_vars(
+                plugin.pip_url,
+                env,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+            ),
+        )
+
+
 async def install_pip_plugin(
     *,
     project: Project,
@@ -492,15 +521,7 @@ async def install_pip_plugin(
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
     """
-    with project.settings.feature_flag(
-        FeatureFlags.STRICT_ENV_VAR_MODE,
-        raise_error=False,
-    ) as strict_env_var_mode:
-        pip_install_args = expand_env_vars(
-            plugin.pip_url,
-            env,
-            if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-        ).split(" ")
+    pip_install_args = get_pip_install_args(project, plugin, env=env)
 
     venv_service = venv_service or VenvService(
         project,

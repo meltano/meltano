@@ -28,7 +28,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.6.1
+      uses: actions/setup-python@v4.7.0
       with:
         python-version: 3.9
         architecture: x64
@@ -97,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.8.7
+      uses: pypa/gh-action-pypi-publish@v1.8.8

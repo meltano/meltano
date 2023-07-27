@@ -1,0 +1,19 @@
+.editThisPage {
+  padding-top: 3rem;
+  padding-left: 1.5rem;
+  position: relative;
+  display: block;
+}
+
+.githubIcon path {
+  fill: #080216;
+}
+
+[data-theme="dark"] .githubIcon path {
+  fill: #ffffff;
+}
+
+.githubIcon:hover path,
+[data-theme="dark"] .githubIcon:hover path {
+  fill: var(--meltano-blue);
+}

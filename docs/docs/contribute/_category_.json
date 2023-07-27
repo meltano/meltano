@@ -1,0 +1,7 @@
+{
+  "label": "Contribute",
+  "position": 7,
+  "customProps": {
+    "icon": "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI0IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxwYXRoIHN0eWxlPSJmaWxsOiMwODAyMTY7IiBkPSJNNS40LDIuNWMtMS4xLDAtMiwwLjktMiwydjE2YzAsMC42LDAuNCwxLDEsMWMwLjYsMCwxLTAuNCwxLTF2LTVoMTMuOAoJYzAuOSwwLDEuNC0xLDAuOS0xLjdMMTYuNiw5bDMuNS00LjhjMC41LTAuNywwLTEuNy0wLjktMS43SDUuNHoiLz4KPC9zdmc+Cg=="
+  }
+}

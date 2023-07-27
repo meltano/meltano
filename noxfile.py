@@ -169,6 +169,7 @@ def mypy(session: Session) -> None:
         "boto3-stubs",
         "mypy",
         "types-croniter",
+        "types-python-dateutil",
         "types-jsonschema",
         "types-psutil",
         "types-python-slugify",
