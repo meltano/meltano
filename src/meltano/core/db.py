@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+import typing as t
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
@@ -115,8 +116,8 @@ def connect(
             time.sleep(retry_timeout)
 
 
-init_hooks = {
-    "sqlite": lambda x: x.execute("PRAGMA journal_mode=WAL"),
+init_hooks: dict[str, t.Callable[[Connection], None]] = {
+    "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 
 
@@ -133,15 +134,12 @@ def init_hook(engine: Engine) -> None:
     Raises:
         Exception: The init hook raised an exception.
     """
-    try:
-        hook = init_hooks[engine.dialect.name]
-    except KeyError:
-        return
-
-    try:
-        hook(engine)
-    except Exception as ex:
-        raise Exception(f"Failed to initialize database: {ex!s}") from ex
+    if hook := init_hooks.get(engine.dialect.name):
+        with engine.connect() as conn:
+            try:
+                hook(conn)
+            except Exception as ex:
+                raise Exception(f"Failed to initialize database: {ex!s}") from ex
 
 
 def ensure_schema_exists(

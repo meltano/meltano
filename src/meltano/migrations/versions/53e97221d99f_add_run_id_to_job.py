@@ -26,9 +26,9 @@ Session = sa.orm.sessionmaker()
 def upgrade():
     op.add_column("job", sa.Column("run_id", GUID))
 
-    metadata = sa.MetaData(bind=op.get_bind())
+    metadata = sa.MetaData()
     session = Session(bind=op.get_bind())
-    Job = sa.Table("job", metadata, autoload=True)
+    Job = sa.Table("job", metadata, autoload_with=op.get_bind())
 
     for job in session.query(Job):
         job.run_id = uuid.uuid4()
