@@ -2328,7 +2328,7 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 name = "psycopg"
 version = "3.1.9"
 description = "PostgreSQL database adapter for Python"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "psycopg-3.1.9-py3-none-any.whl", hash = "sha256:fbbac339274d8733ee70ba9822297af3e8871790a26e967b5ea53e30a4b74dcc"},
@@ -2353,7 +2353,7 @@ test = ["anyio (>=3.6.2)", "mypy (>=1.2)", "pproxy (>=2.7)", "pytest (>=6.2.5)",
 name = "psycopg-binary"
 version = "3.1.9"
 description = "PostgreSQL database adapter for Python -- C optimisation distribution"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "psycopg_binary-3.1.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:284038cbe3f5a0f3de417af9b5eaa2a9524a3a06211523cf245111c71b566506"},
@@ -2416,7 +2416,7 @@ files = [
 name = "psycopg2-binary"
 version = "2.9.6"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "psycopg2-binary-2.9.6.tar.gz", hash = "sha256:1f64dcfb8f6e0c014c7f55e51c9759f024f70ea572fbdef123f85318c297947c"},
@@ -3851,9 +3851,11 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 azure = ["azure-common", "azure-core", "azure-storage-blob"]
 gcs = ["google-cloud-storage"]
 mssql = ["pymssql"]
+postgres = ["psycopg"]
+psycopg2 = ["psycopg2-binary"]
 s3 = ["boto3"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "3ee94a7e389d5b67d1b8a6acb3d26e07200ba838e8d6239eb8b87fb818e22109"
+content-hash = "dc075b77373fab1a058edebe265442405802179f9f2c35f8794bd55e1c7f232f"
