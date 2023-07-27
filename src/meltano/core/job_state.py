@@ -29,12 +29,21 @@ class JobState(SystemModel):  # noqa: WPS214
     """
 
     __tablename__ = "state"
-    state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
+    state_id: Mapped[str] = Column(
+        types.String,
+        unique=True,
+        primary_key=True,
+        nullable=False,
+    )
 
-    updated_at = Column(types.DATETIME, onupdate=datetime.now)
+    updated_at: Mapped[datetime] = Column(types.DATETIME, onupdate=datetime.now)
 
-    partial_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
-    completed_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    partial_state: Mapped[dict[str, str]] = Column(
+        MutableDict.as_mutable(JSONEncodedDict),
+    )
+    completed_state: Mapped[dict[str, str]] = Column(
+        MutableDict.as_mutable(JSONEncodedDict),
+    )
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
