@@ -437,7 +437,7 @@ async def create_deployment(
             (
                 f'Created deployment "{new_deployment_name}". '
                 "To use as default run "
-                f'"meltano cloud deployment use --name {new_deployment_name}."'
+                f'"meltano cloud deployment use --name {new_deployment_name}"'
             ),
             fg="green",
         )
