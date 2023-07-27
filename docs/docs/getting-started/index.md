@@ -34,14 +34,14 @@ _"I love Meltano because it’s so pleasant to use with its DevOps and Everythin
 
 ### The Quick Introduction 3rd party use cases
 
-Meltano helps you to integrate 3rd party data into your already existing products. 
+Meltano helps you to integrate 3rd party data into your already existing products.
 
 The core workflow will usually involve:
 
-- **Extracting data** from data sources using our 600+ connectors loading it either into memory (e.g. using duckDB), some local storage (JSONL, CSV) or onto 
-a data lake. 
+- **Extracting data** from data sources using our 600+ connectors loading it either into memory (e.g. using duckDB), some local storage (JSONL, CSV) or onto
+a data lake.
 
-- **Processing data** Either using your already existing code base, or with a Meltano-powered Python script. 
+- **Processing data** Either using your already existing code base, or with a Meltano-powered Python script.
 
 
 ### The Quick Introduction internal data heavy internal data
@@ -50,7 +50,7 @@ Meltano helps you to integrate your own data into products.
 
 The core workflow will usually involve:
 
-- **Extracting data** from a few selected data sources. 
+- **Extracting data** from a few selected data sources.
 
 - **Replicating the same extraction process** for 100s or 1,000s of customers with slight variations, different configs, different auth credentials,...
 
