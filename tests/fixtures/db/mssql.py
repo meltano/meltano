@@ -71,6 +71,7 @@ def engine_uri(worker_id: str):
         master_engine_uri,
         isolation_level="AUTOCOMMIT",
         poolclass=NullPool,
+        future=True,
     )
     recreate_database(engine, database)
 

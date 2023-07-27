@@ -115,7 +115,7 @@ def meltano_state(project: Project, ctx: click.Context):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
     """
     _, sessionmaker = project_engine(project)
-    session = sessionmaker()
+    session = sessionmaker(future=True)
     ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
 
 
