@@ -1,0 +1,58 @@
+---
+title: B - Part 2 - Replicate pipeline
+description: Part 2 - If you're ready to get started with Meltano, you've come to the right place!
+layout: doc
+sidebar_position: 4
+---
+
+In this tutorial, we will replicate this pipeline for multiple customers with different credentials, and save the data into S3.
+
+This part covers replicating the pipeline programmatically.
+
+
+## A customer list
+Take the following content and store it as `customer_configs.csv` next to your `meltano.yml` file:
+
+```
+id,repository,auth_token
+1,sbalnojan/lightdash,ghp_XXY
+2,DouweM/tidbyt-guess-the-flag,ghp_XXZ
+3,sbalnojan/functional-data-engineering,ghp_XXS
+4,DouweM/tidbyt-homebridge-unifi,ghp_XXB
+```
+
+Also store a template `.env` files as this: 
+
+```
+TAP_GITHUB_AUTH_TOKEN=[SUBSTITUE_AUTH_TOKEN]
+TAP_GITHUB_REPOSITORIES=[SUBSTITUTE_REPOSITORIES]
+```
+
+## Use a bash script to create .env files on the fly...
+
+https://docs.meltano.com/guide/advanced-topics/#running-custom-scripts
+
+
+## Make the meltano.yml more configurable 
+
+Just delete the repositories line, then they will be loaded on the fly! 
+
+```yml
+  plugins:
+    extractors:
+    - name: tap-github
+      config:
+        start_date: '2022-01-01'
+      select:
+      - commits.url
+      - commits.sha
+      - commits.commit_timestamp
+```
+
+## Run it once
+
+...
+
+## Add some trigger 
+
+export CUST_ID=1; meltano picks up everything from here on...
