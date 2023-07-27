@@ -21,7 +21,7 @@ id,repository,auth_token
 4,DouweM/tidbyt-homebridge-unifi,ghp_XXB
 ```
 
-Also store a template `.env` files as this: 
+Also store a template `.env` files as this:
 
 ```
 TAP_GITHUB_AUTH_TOKEN=[SUBSTITUE_AUTH_TOKEN]
@@ -33,9 +33,9 @@ TAP_GITHUB_REPOSITORIES=[SUBSTITUTE_REPOSITORIES]
 https://docs.meltano.com/guide/advanced-topics/#running-custom-scripts
 
 
-## Make the meltano.yml more configurable 
+## Make the meltano.yml more configurable
 
-Just delete the repositories line, then they will be loaded on the fly! 
+Just delete the repositories line, then they will be loaded on the fly!
 
 ```yml
   plugins:
@@ -53,6 +53,6 @@ Just delete the repositories line, then they will be loaded on the fly!
 
 ...
 
-## Add some trigger 
+## Add some trigger
 
 export CUST_ID=1; meltano picks up everything from here on...
