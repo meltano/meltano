@@ -6,12 +6,12 @@ import os
 
 import pytest
 import sqlalchemy as sa
-from sqlalchemy import DDL, create_engine
+from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 from sqlalchemy.pool import NullPool
 
 
-def recreate_database(engine, db_name):
+def recreate_database(engine: sa.engine.Engine, db_name: str):
     """Drop & Create a new database.
 
     We need to use the master connection to do this.
@@ -22,20 +22,10 @@ def recreate_database(engine, db_name):
     """
     with contextlib.suppress(sa.exc.ProgrammingError), engine.begin() as conn:
         # DROP DATABASE IF EXISTS is not supported by SQL Server 2016 and up
-        conn.execute(
-            DDL(
-                "DROP DATABASE IF EXISTS %(db_name)s",  # noqa: WPS323
-                {"db_name": db_name},
-            ),
-        )
+        conn.execute(sa.text(f"DROP DATABASE IF EXISTS {db_name}"))
 
     with contextlib.suppress(sa.exc.ProgrammingError), engine.begin() as conn:
-        conn.execute(
-            DDL(
-                "CREATE DATABASE %(db_name)s",  # noqa: WPS323
-                {"db_name": db_name},
-            ),
-        )
+        conn.execute(sa.text(f"CREATE DATABASE {db_name}"))
 
 
 def create_connection_url(
