@@ -1,0 +1,83 @@
+---
+title: A - Part 2 - Store data
+description: Part 2 - If you're ready to get started with Meltano, you've come to the right place!
+layout: doc
+sidebar_position: 4
+---
+
+## Add a dummy loader to dump the data into JSON
+
+
+
+To test that the extraction process works, we add a JSON target.
+
+1. Add the JSON target using `meltano add loader target-jsonl --variant=andyh1203`.
+
+   <br />
+
+<Termy>
+
+```console
+$ meltano add loader target-jsonl --variant=andyh1203</span>
+Added loader 'target-jsonl' to your Meltano project
+Variant:        andyh1203 (default)
+Repository:     https://github.com/andyh1203/target-jsonl
+Documentation:  https://hub.meltano.com/loaders/target-jsonl--andyh1203
+
+Installing loader 'target-jsonl'...
+Installed loader 'target-jsonl'
+
+To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl--andyh1203
+```
+
+</Termy>
+
+<br />
+
+This target requires zero configuration, it just outputs the data into a `jsonl` file.
+
+## Do a test run to verify the extraction process works
+
+Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [dummy loader](#add-a-loader-to-send-data-to-a-destination) are set up, we can test run the extraction process.
+
+There's just one step here: run your newly added extractor and jsonl loader in a pipeline using [`meltano run`](/reference/command-line-interface#run):
+
+```bash
+meltano run tap-github target-jsonl
+```
+
+<br />
+
+<Termy>
+
+```console
+$ meltano run tap-github target-jsonl
+2022-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
+2022-09-19T13:53:41.062802Z [info     ] Found state from 2022-09-19 13:53:17.415907.
+2022-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
+2022-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
+2022-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
+2022-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
+2022-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2022-09-19 13:53:43.734535.
+2022-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
+```
+
+</Termy>
+
+<br />
+
+You should see data flowing from your source into the jsonl file.
+You can verify that it worked by looking inside the newly created file called `output/commits.jsonl`.
+
+<Termy>
+
+```console
+$ cat output/commits.jsonl
+{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2022-09-14T12:41:21Z"}
+```
+
+</Termy>
+
+## Next Steps
+
+Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).

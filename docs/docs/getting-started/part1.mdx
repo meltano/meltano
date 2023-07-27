@@ -1,5 +1,5 @@
 ---
-title: Tutorial Part 1 - Connect to Data
+title: Part 1 - Connect to Data
 description: Part 1 - If you're ready to get started with Meltano and connect to data, you've come to the right place!
 layout: doc
 sidebar_position: 3
@@ -21,7 +21,7 @@ We're going to take data from a "source", namely GitHub, and extract a list of c
 To test that this part works, we will dump the data into JSON files.
 In Part 2, we will then place this data into a PostgreSQL database.
 
-We'll assume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
+We'll ssume you have [Meltano installed](/getting-started/installation) already. You can tell Meltano is installed and which version by running ` meltano version`
 
 <Termy>
 
@@ -191,66 +191,49 @@ Options:
 
 The GitHub tap requires [configuration](/guide/configuration) before it can start extracting data.
 
-1. The simplest way to configure a new plugin in Meltano is using the mode `interactive`:
+Paste the following config into the plugins section of your [`meltano.yml` project file](/concepts/project#plugin-configuration) file:
 
-```bash
-meltano config tap-github set --interactive
+```yml
+  plugins:
+    extractors:
+    - name: tap-github
+      config:
+        start_date: '2022-01-01'
+        repositories:
+        - TODO_PUT_YOUR_REPOSITORY_HERE #example: sbalnojan/meltano-lightdash
+      select:
+      - commits.url
+      - commits.sha
+      - commits.commit_timestamp
+```
+Replace TODO_PUT_YOUR_REPOSITORY_HERE with a repository you have acccess rights to.. Then create a github auth token (on github.com) and add it to your 
+ `.env` file in the following way:
+
+```yml
+TAP_GITHUB_AUTH_TOKEN='ghp_XXX' # YOUR TOKEN!!!
 ```
 
-2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["sbalnojan/meltano-lightdash"]`), start_date, and your auth_token.
+And now, let's run our tap!
+
+```bash
+meltano invoke tap-github
+```
 
 <br />
 
 <Termy>
 
 ```console
-$ meltano config tap-github set --interactive
-Configuring Extractor 'tap-github' Interactively
-[...]
-Settings
- 1. additional_auth_tokens:                                                       [...]
- 2. auth_token: GitHub token to authenticate ...
- [...]
- 8. repositories: An array of strings containing the github repos to be ...
- [...]
- 11. start_date:
- [...]
-To learn more about extractor 'tap-github' and its settings, visit https://hub.meltano.com/extractors/tap-github--meltanolabs
-
-Loop through all settings (all), select a setting by number (1 - 16), or exit (e)? [all]:
-$ 2
-[...]Description:
-GitHub token to authenticate with.
-New value:
-$
-Repeat for confirmation:
-$
-<[... other 2 values...]
-```
+$ meltano invoke tap-github 
+2...```
 
 </Termy>
 
-<br />
+Let's dive into what we just did
 
-This will add the configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-```yml
-  plugins:
-    extractors:
-      - name: tap-github
-        config:
-          start_date: '2022-01-01'
-          repositories:
-          - sbalnojan/meltano-lightdash
-```
-
-It will also add your secret auth token to the file `.env`:
-
-```yml
-TAP_GITHUB_AUTH_TOKEN='ghp_XXX' # your token!
-```
-
-3. Double check the config by running [`meltano config tap-github`](/reference/command-line-interface#config):
+## Configuring a connector
+You can always check that a connector is configured correctly by running:
 
 ```bash
 meltano config tap-github
@@ -276,13 +259,25 @@ $ meltano config tap-github
 
 </Termy>
 
-### Select Entities and Attributes to Extract
+That's very useful for checking for YAML indention issues!
 
-Now that the extractor has been configured, it'll know where and how to find your data, but won't yet know which specific entities and attributes (tables and columns) you're interested in.
+## Working with env variables
+The variable `TAP_GITHUB_AUTH_TOKEN=` automatically is loaded into Meltano. Alternatively you could configure the "auth_token" attribute of the connector, b
+with environment variables you're always on the safe side for credentials and the likes.
 
-By default, Meltano will instruct extractors to extract all supported entities and attributes, but we're going to [select specific ones for this tutorial](/guide/integration#selecting-entities-and-attributes-for-extraction).
 
-1. Find out what entities and attributes are available, using [`meltano select YOUR_TAP --list --all`](/reference/command-line-interface#select):
+## Select Entities and Attributes to Extract
+This piece of the code
+```
+      select:
+      - commits.url
+      - commits.sha
+      - commits.commit_timestamp
+```
+
+tell the tap what specific pieces of data you want from this one GitHub repository. 
+
+To figure out what data attributes are available, you can use the Meltano CLI:
 
 ```bash
 meltano select tap-github --list --all
@@ -319,119 +314,11 @@ Selected attributes:
 
 </Termy>
 
-1. Select the entities and attributes for extraction using [`meltano select`](/reference/command-line-interface#select):
 
-```bash
-meltano select tap-github commits url
-meltano select tap-github commits sha
-meltano select tap-github commits commit_timestamp
-```
+## Time to decide! What do you want to build?
 
-<br />
+Installing and connecting data, all data integration engine use cases have that in common, but now you have to decide what you want to try out:
 
-This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
-
-```yml
-version: 1
-default_environment: dev
-environments:
-- name: dev
-- name: staging
-- name: prod
-project_id: YOUR_ID
-plugins:
-  extractors:
-  - name: tap-github
-    variant: meltanolabs
-    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
-    config:
-      start_date: '2022-01-01'
-      repositories:
-      - sbalnojan/meltano-lightdash
-    select:
-    - commits.url
-    - commits.sha
-    - commits.commit_timestamp
-
-```
-
-1. Run [`meltano select --list`](/reference/command-line-interface#select) to double-check your selection:
-
-```bash
-meltano select tap-github --list
-```
-
-## Add a dummy loader to dump the data into JSON
-
-To test that the extraction process works, we add a JSON target.
-
-1. Add the JSON target using `meltano add loader target-jsonl --variant=andyh1203`.
-
-   <br />
-
-<Termy>
-
-```console
-$ meltano add loader target-jsonl --variant=andyh1203</span>
-Added loader 'target-jsonl' to your Meltano project
-Variant:        andyh1203 (default)
-Repository:     https://github.com/andyh1203/target-jsonl
-Documentation:  https://hub.meltano.com/loaders/target-jsonl--andyh1203
-
-Installing loader 'target-jsonl'...
-Installed loader 'target-jsonl'
-
-To learn more about loader 'target-jsonl', visit https://hub.meltano.com/loaders/target-jsonl--andyh1203
-```
-
-</Termy>
-
-<br />
-
-This target requires zero configuration, it just outputs the data into a `jsonl` file.
-
-## Do a test run to verify the extraction process works
-
-Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [dummy loader](#add-a-loader-to-send-data-to-a-destination) are set up, we can test run the extraction process.
-
-There's just one step here: run your newly added extractor and jsonl loader in a pipeline using [`meltano run`](/reference/command-line-interface#run):
-
-```bash
-meltano run tap-github target-jsonl
-```
-
-<br />
-
-<Termy>
-
-```console
-$ meltano run tap-github target-jsonl
-2022-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
-2022-09-19T13:53:41.062802Z [info     ] Found state from 2022-09-19 13:53:17.415907.
-2022-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
-2022-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
-2022-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
-2022-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
-2022-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2022-09-19 13:53:43.734535.
-2022-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
-```
-
-</Termy>
-
-<br />
-
-You should see data flowing from your source into the jsonl file.
-You can verify that it worked by looking inside the newly created file called `output/commits.jsonl`.
-
-<Termy>
-
-```console
-$ cat output/commits.jsonl
-{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2022-09-14T12:41:21Z"}
-```
-
-</Termy>
-
-## Next Steps
-
-Next, head over to [Part 2: Loading extracted data into a target](/getting-started/part2).
+1. Do you want to [save this data temporarily in a CSV and then run a Python script to transform it?](/getting-started/a-part2).
+2. Do you want to [replicate this pipeline for 100 customers with different credentials, and save the data into S3?](/getting-started/b-part2) 
+3. Do you want to [load this data into a data warehouse (postgres) and then use dbt to transform it?](/getting-started/c-part2).
