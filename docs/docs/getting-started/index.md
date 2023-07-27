@@ -14,10 +14,10 @@ Meltano is extraordinarily great at giving you programmatic access to all the da
 
 This document is intended to give you enough technical understanding of how Meltano works in the major different use cases people use it for today:
 
-1. integrating 3rd party data sources into your existing product
-2. building data-powered products based on internal data
-3. setting up production data ingestion pipelines for machine learning
-4. integrating into an internal data stack for BI & analytics
+-  integrating 3rd party data sources into your existing product
+-  building data-powered products based on internal data
+-  setting up production data ingestion pipelines for machine learning
+-  integrating into an internal data stack for BI & analytics
 
 ### What users say
 
@@ -32,68 +32,46 @@ _"I love Meltano because it’s so pleasant to use with its DevOps and Everythin
 - **Amazing developer experience**: Developers go from start to finish on new data projects, including extraction, loading, transforming, & orchestrating data within days.
 - **Small surface area**: Features like "inline data mappings" make it easy to remove unnecessary information from your data, and help companies stay compliant to security & GDPR regulations.
 
-### The Quick Introduction 3rd party
+### The Quick Introduction 3rd party use cases
 
-## Core Workflow
+Meltano helps you to integrate 3rd party data into your already existing products. 
 
-Meltano helps you to create your end-to-end data stack within minutes. The core workflow depends on your data stack, but it will usually involve:
+The core workflow will usually involve:
 
-1. **Extracting data** from data sources & loading them into targets.
-2. **Transforming data** inside a database.
-3. **Orchestrating** the extract/load/transform process.
-4. Adding **additional steps** to the process like testing the data inside transformations with dbt tests, using Great Expectations, running analyses inside Jupyter notebooks, visualizing data with Superset etc.
+- **Extracting data** from data sources using our 600+ connectors loading it either into memory (e.g. using duckDB), some local storage (JSONL, CSV) or onto 
+a data lake. 
 
-Meltano allows you to do any combination of these steps inside your Meltano project, controlled by the Meltano CLI.
+- **Processing data** Either using your already existing code base, or with a Meltano-powered Python script. 
 
-...
-### The Quick Introduction internal data heavy
+
+### The Quick Introduction internal data heavy internal data
+
+Meltano helps you to integrate your own data into products.
+
+The core workflow will usually involve:
+
+- **Extracting data** from a few selected data sources. 
+
+- **Replicating the same extraction process** for 100s or 1,000s of customers with slight variations, different configs, different auth credentials,...
+
+- **Storing the data** in a database or a data lake.
+
 
 ...
 ### The Quick Introduction ML
 
 ...
+...
 ### The Quick Introduction internal BI
 
-
-### The Quick Introduction
-
-Waiting to see how Meltano works within 90 secs? We got you covered:
-
-<iframe class="video" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-## Core Workflow
-
+...
 Meltano helps you to create your end-to-end data stack within minutes. The core workflow depends on your data stack, but it will usually involve:
 
-1. **Extracting data** from data sources & loading them into targets.
-2. **Transforming data** inside a database.
-3. **Orchestrating** the extract/load/transform process.
-4. Adding **additional steps** to the process like testing the data inside transformations with dbt tests, using Great Expectations, running analyses inside Jupyter notebooks, visualizing data with Superset etc.
+- **Extracting data** from data sources & loading them into targets.
+- **Transforming data** inside a database.
+- **Orchestrating** the extract/load/transform process.
+- Adding **additional steps** to the process like testing the data inside transformations with dbt tests, using Great Expectations, running analyses inside Jupyter notebooks, visualizing data with Superset etc.
 
 Meltano allows you to do any combination of these steps inside your Meltano project, controlled by the Meltano CLI.
 
-### Extracting & Loading data
-
-Here's a complete walk-through pulling data from AWS S3 and dumping it into a PostgreSQL database within 60 secs.
-
-<div class="language-bash highlighter-rouge">
-    <iframe class="video" src="https://www.youtube.com/embed/htbVZIR3tbs" title="How to Use Meltano in 60 Seconds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</div>
-
-### Transforming data
-
-Here's a complete walk-through extending the extract & load to include more CSVs and running a dbt-project over them to transform the data.
-
-<iframe class="video" src="https://www.youtube.com/embed/pMZmBMeGe3U" title="How to Use Meltano in 5 Minutes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-### Getting Started Resources
-
-This was just a glance at why you should use Meltano. If you're now as excited to use Meltano as we are, we recommend you head over to the [Getting Started Tutorial](/getting-started/installation).
-
-If you cannot find an answer to your question, there's always an active [Meltano Slack Community](https://meltano.com/slack) to help you out.
-
-
-
-....
-
-While Meltano is a declarative data integration engine, made for building data-powered features fast, one of the use cases has always been to use Meltano as an ELT platform.
+<iframe class="video" src="https://www.youtube.com/embed/53WC4kTwbGU" title="From 0 to ELT in 90 seconds with Meltano, tap-gitlab, and target-postgres" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
