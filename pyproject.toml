@@ -115,7 +115,6 @@ pytest-structlog = "^0.6"
 pytest-xdist = "^3.3"
 requests-mock = "^1.11.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
-sqlalchemy2-stubs = "^0.0.2a32"
 types-croniter = "^1.4.0"
 types-jsonschema = "^4.17.0.9"
 types-psutil = "^5.9.5.15"
@@ -497,9 +496,6 @@ files = [
 ]
 exclude = [
   "src/meltano/migrations/",
-]
-plugins = [
-  "sqlalchemy.ext.mypy.plugin",
 ]
 warn_unused_configs = true
 warn_unused_ignores = true
