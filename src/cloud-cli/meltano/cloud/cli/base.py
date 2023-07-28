@@ -32,9 +32,7 @@ def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
     @wraps(f)
     def wrapper(*args, **kwargs):
         if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
-                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
-            )
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         return asyncio.run(f(*args, **kwargs))
 
     return wrapper

@@ -120,7 +120,7 @@ async def _get_projects(
 
     results.items = [
         {
-            **x,  # type: ignore[misc]
+            **x,
             "default": x["project_id"] == _safe_get_internal_project_id(config),
         }
         for x in results.items
