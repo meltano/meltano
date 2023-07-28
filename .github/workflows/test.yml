@@ -191,6 +191,13 @@ jobs:
         name: coverage-data
         path: ".coverage.*"
 
+    - name: Upload test logs
+      if: always()
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: test-logs-${{ matrix.id }}
+        path: pytest.log
+
   summary:
     runs-on: ubuntu-latest
     needs: tests
