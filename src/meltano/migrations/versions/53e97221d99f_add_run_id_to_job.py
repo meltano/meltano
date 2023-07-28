@@ -20,7 +20,7 @@ down_revision = "6ef30ab7b8e5"
 branch_labels = None
 depends_on = None
 
-Session = sa.orm.sessionmaker()
+Session = sa.orm.sessionmaker(future=True)
 
 
 def upgrade():
