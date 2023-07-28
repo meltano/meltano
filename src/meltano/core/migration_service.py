@@ -69,45 +69,43 @@ class MigrationService:
         Raises:
             MigrationError: If the upgrade fails.
         """
-        conn = self.engine.connect()
-        cfg = Config()
+        with self.engine.begin() as conn:
+            cfg = Config()
 
-        # this connection is used in `env.py` for the migrations
-        cfg.attributes["connection"] = conn
-        cfg.set_main_option("script_location", str(MIGRATION_DIR))
-        script = ScriptDirectory.from_config(cfg)
-        # let's make sure we actually need to migrate
+            # this connection is used in `env.py` for the migrations
+            cfg.attributes["connection"] = conn
+            cfg.set_main_option("script_location", str(MIGRATION_DIR))
+            script = ScriptDirectory.from_config(cfg)
+            # let's make sure we actually need to migrate
 
-        migration_logger = logging.getLogger("alembic.runtime.migration")
-        original_log_level = migration_logger.getEffectiveLevel()
-        if silent:
-            migration_logger.setLevel(logging.ERROR)
-
-        context = MigrationContext.configure(conn)
-
-        try:
-            # try to find the locked version
-            head = LOCK_PATH.open().read().strip()
-            self.ensure_migration_needed(script, context, head)
-
-            if not silent:
-                click.secho(f"Upgrading database to {head}")
-            command.upgrade(cfg, head)
-
+            migration_logger = logging.getLogger("alembic.runtime.migration")
+            original_log_level = migration_logger.getEffectiveLevel()
             if silent:
-                migration_logger.setLevel(original_log_level)
-        except FileNotFoundError as ex:
-            raise MigrationError(
-                "Cannot upgrade the system database, revision lock not found.",
-            ) from ex
-        except MigrationUneededException:
-            if not silent:
-                click.secho("System database up-to-date.")
-        except Exception as ex:
-            logging.exception(str(ex))
-            raise MigrationError(
-                "Cannot upgrade the system database. It might be corrupted or "
-                "was created before database migrations where introduced (v0.34.0)",
-            ) from ex
-        finally:
-            conn.close()
+                migration_logger.setLevel(logging.ERROR)
+
+            context = MigrationContext.configure(conn)
+
+            try:
+                # try to find the locked version
+                head = LOCK_PATH.open().read().strip()
+                self.ensure_migration_needed(script, context, head)
+
+                if not silent:
+                    click.secho(f"Upgrading database to {head}")
+                command.upgrade(cfg, head)
+
+                if silent:
+                    migration_logger.setLevel(original_log_level)
+            except FileNotFoundError as ex:
+                raise MigrationError(
+                    "Cannot upgrade the system database, revision lock not found.",
+                ) from ex
+            except MigrationUneededException:
+                if not silent:
+                    click.secho("System database up-to-date.")
+            except Exception as ex:
+                logging.exception(str(ex))
+                raise MigrationError(
+                    "Cannot upgrade the system database. It might be corrupted or "
+                    "was created before database migrations where introduced (v0.34.0)",
+                ) from ex

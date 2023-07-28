@@ -113,7 +113,7 @@ async def print_logs(
             sys.stdout.flush()
 
 
-@logs.command("print")  # type: ignore[attr-defined]
+@logs.command("print")
 @click.option("--execution-id", required=True)
 @pass_context
 @run_async

@@ -31,8 +31,8 @@ def upgrade():
         "embed_tokens", sa.Column("resource_type", sa.String(max_string_length))
     )
 
-    metadata = sa.MetaData(bind=op.get_bind())
-    Embed_Tokens = sa.Table("embed_tokens", metadata, autoload=True)
+    metadata = sa.MetaData()
+    Embed_Tokens = sa.Table("embed_tokens", metadata, autoload_with=op.get_bind())
     op.execute(Embed_Tokens.update().values({"resource_type": "report"}))
 
 

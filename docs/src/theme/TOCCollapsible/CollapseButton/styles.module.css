@@ -1,0 +1,7 @@
+.tocCollapsibleButton {
+  font-size: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.8rem;
+}

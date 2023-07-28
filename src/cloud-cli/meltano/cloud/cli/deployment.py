@@ -217,7 +217,7 @@ async def _get_deployments(
 
     results.items = [
         {
-            **x,  # type: ignore[misc]
+            **x,
             "default": x["deployment_name"]
             == config.internal_project_default["default_deployment_name"],
         }
@@ -437,7 +437,7 @@ async def create_deployment(
             (
                 f'Created deployment "{new_deployment_name}". '
                 "To use as default run "
-                f'"meltano cloud deployment use --name {new_deployment_name}."'
+                f'"meltano cloud deployment use --name {new_deployment_name}"'
             ),
             fg="green",
         )

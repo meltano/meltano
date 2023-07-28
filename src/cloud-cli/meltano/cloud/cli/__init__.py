@@ -22,17 +22,17 @@ from meltano.cloud.cli.base import cloud
 
 logger = get_logger()
 
-cloud.add_command(config.config)  # type: ignore[attr-defined]
-cloud.add_command(docs.docs)  # type: ignore[attr-defined]
-cloud.add_command(deployment.deployment_group)  # type: ignore[attr-defined]
-cloud.add_command(history.history)  # type: ignore[attr-defined]
-cloud.add_command(job.job_group)  # type: ignore[attr-defined]
-cloud.add_command(login.login)  # type: ignore[attr-defined]
-cloud.add_command(login.logout)  # type: ignore[attr-defined]
-cloud.add_command(logs.logs)  # type: ignore[attr-defined]
-cloud.add_command(project.project_group)  # type: ignore[attr-defined]
-cloud.add_command(run.run)  # type: ignore[attr-defined]
-cloud.add_command(schedule.schedule_group)  # type: ignore[attr-defined]
+cloud.add_command(config.config)
+cloud.add_command(docs.docs)
+cloud.add_command(deployment.deployment_group)
+cloud.add_command(history.history)
+cloud.add_command(job.job_group)
+cloud.add_command(login.login)
+cloud.add_command(login.logout)
+cloud.add_command(logs.logs)
+cloud.add_command(project.project_group)
+cloud.add_command(run.run)
+cloud.add_command(schedule.schedule_group)
 
 
 def main() -> int:
@@ -42,7 +42,7 @@ def main() -> int:
         The CLI exit code.
     """
     try:
-        cloud()  # type: ignore[misc]
+        cloud()
     except MeltanoCloudError as e:
         click.secho(e.response.reason, fg="red")
         return 1

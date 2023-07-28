@@ -13,6 +13,7 @@ from enum import IntFlag as EnumIntFlag
 from sqlalchemy import Column, literal, types
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import Mapped
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
@@ -99,16 +100,16 @@ class Job(SystemModel):  # noqa: WPS214
 
     __tablename__ = "runs"
 
-    id = Column(types.Integer, primary_key=True)
-    job_name = Column(types.String)
-    run_id = Column(GUID, nullable=False, default=uuid.uuid4)
-    _state = Column(name="state", type_=types.String)
-    started_at = Column(types.DateTime)
-    last_heartbeat_at = Column(types.DateTime)
-    ended_at = Column(types.DateTime)
-    payload = Column(MutableDict.as_mutable(JSONEncodedDict))
-    payload_flags = Column(IntFlag, default=0)
-    trigger = Column(types.String, default=current_trigger)
+    id: Mapped[int] = Column(types.Integer, primary_key=True)
+    job_name: Mapped[str] = Column(types.String)
+    run_id: Mapped[str] = Column(GUID, nullable=False, default=uuid.uuid4)
+    _state: Mapped[str] = Column(name="state", type_=types.String)
+    started_at: Mapped[datetime] = Column(types.DateTime)
+    last_heartbeat_at: Mapped[datetime] = Column(types.DateTime)
+    ended_at: Mapped[datetime] = Column(types.DateTime)
+    payload: Mapped[dict] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    payload_flags: Mapped[Payload] = Column(IntFlag, default=0)
+    trigger: Mapped[str] = Column(types.String, default=current_trigger)
 
     def __init__(self, **kwargs):
         """Construct a Job.
