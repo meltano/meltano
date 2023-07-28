@@ -95,7 +95,6 @@ class GUID(TypeDecorator):
 
 
 GUIDType = Annotated[uuid.UUID, mapped_column(GUID, default=uuid.uuid4)]
-JSONType = Annotated[t.Dict, mapped_column(MutableDict.as_mutable(JSONEncodedDict))]
 StateType = Annotated[
     t.Dict[str, str],
     mapped_column(MutableDict.as_mutable(JSONEncodedDict)),

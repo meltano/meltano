@@ -13,11 +13,12 @@ from enum import IntFlag as EnumIntFlag
 
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import GUIDType, IntFlag, IntPK, JSONType
+from meltano.core.sqlalchemy import GUIDType, IntFlag, IntPK, JSONEncodedDict
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
@@ -107,7 +108,7 @@ class Job(SystemModel):  # noqa: WPS214
     started_at: Mapped[t.Optional[datetime]]  # noqa: UP007
     last_heartbeat_at: Mapped[t.Optional[datetime]]  # noqa: UP007
     ended_at: Mapped[t.Optional[datetime]]  # noqa: UP007
-    payload: Mapped[t.Optional[JSONType]]  # noqa: UP007
+    payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
     trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
         default=current_trigger,
