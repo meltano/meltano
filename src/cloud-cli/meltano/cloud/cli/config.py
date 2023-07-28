@@ -338,11 +338,14 @@ def prompt_and_validate(
         value
         if value
         else click.prompt(
-            prompt_message, value_proc=VALIDATE_FUNCTION_DICT[notification_type]
+            prompt_message,
+            value_proc=VALIDATE_FUNCTION_DICT[notification_type],
         )
     )
     VALIDATE_FUNCTION_DICT[notification_type](
-        value=input_value, prompt_message=prompt_message, error_message=error_message
+        value=input_value,
+        prompt_message=prompt_message,
+        error_message=error_message,
     )
     return input_value
 
@@ -388,14 +391,14 @@ def validate_filter_dict(filter_dict: dict) -> None:
         events_set = set(filter_dict["events"])
         if not events_set.issubset(NOTIFICATION_EVENTS_SET):
             raise click.BadParameter(
-                f"Some events not supported. Supported events: {NOTIFICATION_EVENTS_SET}, events: {filter_dict['events']}"
+                f"Some events not supported. Supported events: {NOTIFICATION_EVENTS_SET}, events: {filter_dict['events']}",
             )
 
     if "status" in filter_dict:
         status_set = set(filter_dict["status"])
         if not status_set.issubset(NOTIFICATION_STATUS_FILTERS_SET):
             raise click.BadParameter(
-                f"Some status not supported. Supported status: {NOTIFICATION_STATUS_FILTERS_SET}, status: {filter_dict['status']}"
+                f"Some status not supported. Supported status: {NOTIFICATION_STATUS_FILTERS_SET}, status: {filter_dict['status']}",
             )
 
 
@@ -470,11 +473,15 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
         )
         if notification_type == "webhook":
             notification = WebhookNotificaton(
-                type=str(notification_type), filters=filter, webhook_url=validated_value
+                type=str(notification_type),
+                filters=filter,
+                webhook_url=validated_value,
             )
         elif notification_type == "email":
             notification = EmailNotification(
-                type=str(notification_type), filters=filter, email=validated_value
+                type=str(notification_type),
+                filters=filter,
+                email=validated_value,
             )
 
         async with ConfigCloudClient(config=context.config) as client:
@@ -504,10 +511,16 @@ def create_update_command(notification_type: t.Literal["webhook", "email"]):
 
     @update.command(notification_type)
     @click.option(
-        "--old", nargs=1, type=str, help=f"Old {notification_type} to be updated"
+        "--old",
+        nargs=1,
+        type=str,
+        help=f"Old {notification_type} to be updated",
     )
     @click.option(
-        "--new", nargs=1, type=str, help=f"New {notification_type} to be updated"
+        "--new",
+        nargs=1,
+        type=str,
+        help=f"New {notification_type} to be updated",
     )
     @pass_context
     @run_async
