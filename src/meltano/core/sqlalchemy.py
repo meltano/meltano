@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import typing as t
 import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, TypeDecorator
+from typing_extensions import Annotated
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -88,3 +92,13 @@ class GUID(TypeDecorator):
         if not isinstance(value, uuid.UUID):
             value = uuid.UUID(value)
         return value
+
+
+GUIDType = Annotated[uuid.UUID, mapped_column(GUID, default=uuid.uuid4)]
+JSONType = Annotated[t.Dict, mapped_column(MutableDict.as_mutable(JSONEncodedDict))]
+StateType = Annotated[
+    t.Dict[str, str],
+    mapped_column(MutableDict.as_mutable(JSONEncodedDict)),
+]
+IntPK = Annotated[int, mapped_column(primary_key=True)]
+StrPK = Annotated[str, mapped_column(primary_key=True)]

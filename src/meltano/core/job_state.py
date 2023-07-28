@@ -6,13 +6,11 @@ import typing as t
 from datetime import datetime
 from io import TextIOWrapper
 
-from sqlalchemy import Column, types
-from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, Session
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import JSONEncodedDict
+from meltano.core.sqlalchemy import StateType
 from meltano.core.utils import merge
 
 SINGER_STATE_KEY = "singer_state"
@@ -29,21 +27,14 @@ class JobState(SystemModel):  # noqa: WPS214
     """
 
     __tablename__ = "state"
-    state_id: Mapped[str] = Column(
-        types.String,
-        unique=True,
-        primary_key=True,
-        nullable=False,
+    state_id: Mapped[str] = mapped_column(unique=True, primary_key=True)
+
+    updated_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
+        onupdate=datetime.now,
     )
 
-    updated_at: Mapped[datetime] = Column(types.DATETIME, onupdate=datetime.now)
-
-    partial_state: Mapped[dict[str, str]] = Column(
-        MutableDict.as_mutable(JSONEncodedDict),
-    )
-    completed_state: Mapped[dict[str, str]] = Column(
-        MutableDict.as_mutable(JSONEncodedDict),
-    )
+    partial_state: Mapped[t.Optional[StateType]]  # noqa: UP007
+    completed_state: Mapped[t.Optional[StateType]]  # noqa: UP007
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
@@ -60,7 +51,7 @@ class JobState(SystemModel):  # noqa: WPS214
         if not isinstance(other, JobState):
             return NotImplemented
         return (
-            (self.state_id == other.state_id)  # type: ignore[return-value]
+            (self.state_id == other.state_id)
             and (self.partial_state == other.partial_state)
             and (self.completed_state == other.completed_state)
         )
