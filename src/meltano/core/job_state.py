@@ -29,15 +29,21 @@ class JobState(SystemModel):  # noqa: WPS214
     """
 
     __tablename__ = "state"
-    state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
+    state_id: Mapped[str] = Column(
+        types.String,
+        unique=True,
+        primary_key=True,
+        nullable=False,
+    )
 
-    updated_at = Column(types.DATETIME, onupdate=datetime.now)
+    updated_at: Mapped[datetime] = Column(types.DATETIME, onupdate=datetime.now)
 
-    # TODO: Figure what's the offense here
-    # Argument 1 to "as_mutable" of "Mutable" has incompatible type
-    # "type[JSONEncodedDict]"; expected "TypeEngine[<nothing>]"
-    partial_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))  # type: ignore[assignment]  # noqa: E501
-    completed_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))  # type: ignore[assignment]  # noqa: E501
+    partial_state: Mapped[dict[str, str]] = Column(
+        MutableDict.as_mutable(JSONEncodedDict),
+    )
+    completed_state: Mapped[dict[str, str]] = Column(
+        MutableDict.as_mutable(JSONEncodedDict),
+    )
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.

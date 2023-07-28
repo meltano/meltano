@@ -58,7 +58,7 @@ def project_engine(
     engine_uri = project.settings.get("database_uri")
     logging.debug(f"Creating engine '{project}@{engine_uri}'")
 
-    engine = create_engine(engine_uri, poolclass=NullPool)
+    engine = create_engine(engine_uri, poolclass=NullPool, future=True)
 
     # Connect to the database to ensure it is available.
     connect(
@@ -70,7 +70,7 @@ def project_engine(
     check_database_compatibility(engine)
     init_hook(engine)
 
-    engine_session = (engine, sessionmaker(bind=engine))
+    engine_session = (engine, sessionmaker(bind=engine, future=True))
 
     if default:
         # register the default engine
