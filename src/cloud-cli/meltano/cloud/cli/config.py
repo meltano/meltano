@@ -365,7 +365,8 @@ class FilterList(click.Option):
             try:
                 filter_obj = json.loads(item)
                 filter_list = (
-                    filter_obj if isinstance(filter_obj, list) else [filter_obj]
+                    filter_obj if isinstance(filter_obj, list) else [
+                        filter_obj]
                 )
                 for filter_dict in filter_list:
                     validate_filter_dict(filter_dict)
@@ -388,14 +389,15 @@ def validate_filter_dict(filter_dict: dict) -> None:
     NOTIFICATION_STATUS_FILTERS_SET = {"failed", "cancelled", "succeeded"}
 
     if "events" in filter_dict:
-        events_set = set(filter_dict["events"])
+        # Since set() is a group for notificaiton need to set comprehension
+        events_set = {event for event in filter_dict['events']}
         if not events_set.issubset(NOTIFICATION_EVENTS_SET):
             raise click.BadParameter(
                 f"Some events not supported. Supported events: {NOTIFICATION_EVENTS_SET}, events: {filter_dict['events']}",
             )
 
     if "status" in filter_dict:
-        status_set = set(filter_dict["status"])
+        status_set = { status for status in filter_dict["status"]}
         if not status_set.issubset(NOTIFICATION_STATUS_FILTERS_SET):
             raise click.BadParameter(
                 f"Some status not supported. Supported status: {NOTIFICATION_STATUS_FILTERS_SET}, status: {filter_dict['status']}",
@@ -427,7 +429,13 @@ def notification() -> None:
 
 @notification.group()
 def set() -> None:
-    """Commands for setting notification."""
+    """Commands for setting notification. 
+
+    This overrides pythons set function
+
+    Trying to keep similar to
+    https://docs.meltano.com/reference/command-line-interface/#config
+    """
 
 
 def create_set_command(notification_type: t.Literal["webhook", "email"]):
@@ -448,6 +456,7 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
         "--filter",
         cls=FilterList,
         multiple=True,
+        type=list,
         help="The filters to add to notification.",
         default=[],
     )
@@ -485,11 +494,15 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
             )
 
         async with ConfigCloudClient(config=context.config) as client:
-            await client.put_notification(notification=notification)
-            click.echo(f"Successfully created {notification_type} notification")
-            # TODO: Implement https://github.com/meltano/infra/issues/1791
-            # TODO: Add helpful message for ways for user to see notifications
-        set_notification.__name__ = f"set_notification_{notification_type}"  # type: ignore[valid-type]
+            try: 
+                await client.put_notification(notification=notification)
+                click.echo(
+                    f"Successfully set {notification_type} notification")
+                # TODO: Implement https://github.com/meltano/infra/issues/1791
+                # TODO: Add helpful message for ways for user to see notifications 
+            except Exception:
+                raise click.ClickException("Something went wrong setting your notification...")
+        set_notification.__name__ = f"set_notification_{notification_type}" # type: ignore[valid-type]
         return set_notification
 
 
@@ -551,9 +564,10 @@ def create_update_command(notification_type: t.Literal["webhook", "email"]):
 
         async with ConfigCloudClient(config=context.config) as client:
             await client.update_notification_key(old_key=old_key, new_key=new_key)
-            click.echo(f"Successfully updated {notification_type} notification")
+            click.echo(
+                f"Successfully updated {notification_type} notification")
 
-    update_notification.__name__ = f"update_notification_{type}"  # type: ignore[valid-type]
+    update_notification.__name__ = f"update_notification_{type}" # type: ignore[valid-type]
     return update_notification
 
 
@@ -600,10 +614,10 @@ def create_delete_command(notification_type: t.Literal["webhook", "email"]):
         )
         async with ConfigCloudClient(config=context.config) as client:
             await client.delete_notification(key=input_value)
-            click.echo(f"Successfully deleted {notification_type} notification")
+            click.echo(
+                f"Successfully deleted {notification_type} notification")
 
-    delete_notification.__name__ = f"delete_notification_{type}"  # type: ignore[valid-type]
-
+    delete_notification.__name__ = f"delete_notification_{type}" # type: ignore[valid-type]
     return delete_notification
 
 
