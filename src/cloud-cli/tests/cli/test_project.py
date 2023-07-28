@@ -392,7 +392,7 @@ class TestProjectCommand:
         assert result.exit_code == 2
         assert "The '--name' and '--id' options are mutually exclusive" in result.output
 
-    def test_project_add(
+    def test_project_create(
         self,
         projects: list[CloudProject],
         httpserver: HTTPServer,
@@ -409,7 +409,7 @@ class TestProjectCommand:
                     "--config-path",
                     config.config_path,
                     "project",
-                    "add",
+                    "create",
                     "--project-name",
                     project["project_name"],
                     "--git-repository",

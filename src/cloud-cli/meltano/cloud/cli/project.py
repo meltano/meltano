@@ -7,11 +7,14 @@ import logging
 import platform
 import sys
 import typing as t
+from http import HTTPStatus
 
 import click
 import questionary
+import requests
+from yaspin import yaspin
 
-from meltano.cloud.api.client import MeltanoCloudClient
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
     get_paginated,
@@ -64,23 +67,25 @@ class ProjectsCloudClient(MeltanoCloudClient):
                 ),
             )
 
-    async def add_project(
+    async def create_project(
         self,
         project_name: str,
         git_repository: str,
         project_root_path: str | None = None,
     ):
-        """Use POST to add new Meltano Cloud project."""
+        """Use POST to create new Meltano Cloud project."""
         async with self.authenticated():
             payload = {"project_name": project_name, "git_repository": git_repository}
             if project_root_path:
                 payload["project_root_path"] = project_root_path
-
-            return await self._json_request(
+            prepared_request = await self._json_request(
                 "POST",
                 f"/projects/v1/{self.config.tenant_resource_key}",
                 json=payload,
             )
+            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+            response.raise_for_status()
+            return response
 
 
 @click.group("project")
@@ -308,24 +313,37 @@ async def use_project(
     )
 
 
-@project_group.command("add")
+@project_group.command("create")
 @click.option("--project-name", type=str, required=True)
 @click.option("--git-repository", type=str, required=True)
 @click.option("--project-root-path", type=str, required=False)
 @pass_context
 @run_async
-async def add_project(
+async def create_project(
     context: MeltanoCloudCLIContext,
     project_name: str,
     git_repository: str,
     project_root_path: str | None = None,
 ):
-    """Add a project to your Meltano Cloud."""
+    """Create a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
-        response = await client.add_project(
-            project_name=project_name,
-            git_repository=git_repository,
-            project_root_path=project_root_path,
-        )
+        try:
+            with yaspin(
+                text="Creating project - this may take several minutes...",
+            ):
+                response = await client.create_project(
+                    project_name=project_name,
+                    git_repository=git_repository,
+                    project_root_path=project_root_path,
+                )
+        except MeltanoCloudError as e:
+            if e.response.status == HTTPStatus.CONFLICT:
+                click.secho(
+                    f"Project with name {project_name} already exists.",
+                    fg="yellow",
+                )
+            return None
         click.echo(f"Project {project_name} created successfully.")
-        click.echo(json.dumps(response))
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
+        click.echo(response.json())
