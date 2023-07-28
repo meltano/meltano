@@ -142,6 +142,7 @@ jobs:
     - name: Run pytest
       env:
         SQLALCHEMY_WARN_20: 1
+        MELTANO_CLI_LOG_LEVEL: DEBUG
         COLUMNS: 160
         PYTEST_BACKEND: ${{ matrix.backend-db }}
         # Postgres backend
