@@ -689,42 +689,44 @@ class TestCliAdd:
         assert plugin.name == plugin_name
         assert plugin.variant == "test"
 
-    def test_add_from_ref_local_does_not_exist(
+    @pytest.mark.parametrize(
+        (
+            "ref",
+            "invalid_reason",
+        ),
+        (
+            (
+                plugin_ref.name,
+                "No such file or directory: '{ref}'",
+            ),
+            (
+                plugin_ref.parent,
+                "Is a directory: '{ref}'",
+            ),
+            (
+                "https://:",
+                "Invalid URL '{ref}'",
+            ),
+        ),
+        ids=(
+            "does not exist",
+            "is directory",
+            "invalid url",
+        ),
+    )
+    def test_add_from_ref_invalid_ref(
         self,
+        ref,
+        invalid_reason,
         cli_runner,
     ):
-        res = cli_runner.invoke(
-            cli,
-            ["add", "extractor", "tap-custom", "--from-ref", plugin_ref.name],
-        )
-
-        assert res.exit_code == 2
-        assert f"No such file or directory: '{plugin_ref.name}'" in res.stderr
-
-    def test_add_from_ref_local_is_directory(
-        self,
-        cli_runner,
-    ):
-        res = cli_runner.invoke(
-            cli,
-            ["add", "extractor", "tap-custom", "--from-ref", plugin_ref.parent],
-        )
-
-        assert res.exit_code == 2
-        assert f"Is a directory: '{plugin_ref.parent}'" in res.stderr
-
-    def test_add_from_ref_remote_invalid_url(
-        self,
-        cli_runner,
-    ):
-        ref = "https://:"
         res = cli_runner.invoke(
             cli,
             ["add", "extractor", "tap-custom", "--from-ref", ref],
         )
 
         assert res.exit_code == 2
-        assert f"Invalid URL '{ref}'" in res.stderr
+        assert invalid_reason.format(ref=ref) in res.stderr
 
     @pytest.mark.parametrize(
         (
