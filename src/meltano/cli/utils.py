@@ -15,7 +15,7 @@ from click_default_group import DefaultGroup
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -281,13 +281,16 @@ def add_plugin(  # noqa: C901
             "settings": settings,
         }
 
-    if plugin_yaml:
-        plugin_definition = PluginDefinition.parse(
-            {
-                "plugin_type": plugin_type,
-                **plugin_yaml,
-            },
-        )
+    if plugin_yaml is not None:
+        try:
+            plugin_definition = PluginDefinition.parse(
+                {
+                    "plugin_type": plugin_type,
+                    **plugin_yaml,
+                },
+            )
+        except TypeError as e:
+            raise InvalidPluginDefinitionError(plugin_yaml) from e
 
         # exclude unspecified properties
         plugin_definition.extras.clear()

@@ -13,7 +13,7 @@ from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
@@ -725,3 +725,51 @@ class TestCliAdd:
 
         assert res.exit_code == 2
         assert f"Invalid URL '{ref}'" in res.stderr
+
+    @pytest.mark.parametrize(
+        (
+            "definition",
+            "invalid_reason",
+        ),
+        (
+            (
+                "test",
+                "incorrect format",
+            ),
+            (
+                {},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"test-key": "test-value"},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"name": "tap-custom"},
+                "missing properties (namespace)",
+            ),
+        ),
+        ids=(
+            "incorrect format",
+            "empty",
+            "no required properties",
+            "some required properties",
+        ),
+    )
+    def test_add_from_ref_invalid_definiton(
+        self,
+        definition,
+        invalid_reason,
+        cli_runner,
+    ):
+        with open("test.yml", "w") as f:
+            yaml.dump(definition, f)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", f.name],
+        )
+
+        assert res.exit_code == 1
+        assert isinstance(res.exception, InvalidPluginDefinitionError)
+        assert res.exception.reason == invalid_reason

@@ -40,12 +40,14 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
         if url.scheme and url.netloc:
             response = requests.get(value, timeout=REQUEST_TIMEOUT_SECONDS)
             response.raise_for_status()
-            return yaml.load(response.text)
-
-        return yaml.load(Path(value).read_text())
+            content = response.text
+        else:
+            content = Path(value).read_text()
 
     except (ValueError, FileNotFoundError, IsADirectoryError) as e:
         raise click.BadParameter(e) from e
+
+    return yaml.load(content) or {}
 
 
 @click.command(  # noqa: WPS238
