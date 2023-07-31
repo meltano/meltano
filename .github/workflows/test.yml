@@ -102,11 +102,11 @@ jobs:
         cache-dependency-path: 'poetry.lock'
 
     - name: Set up Docker Buildx
-      if: always() && ${{ matrix.backend-db == 'mssql' }}
+      if: always() && (matrix.backend-db == 'mssql')
       uses: docker/setup-buildx-action@v2.8.0
 
     - name: Get Docker
-      if: always() && ${{ matrix.backend-db == 'mssql' }}
+      if: always() && (matrix.backend-db == 'mssql')
       uses: actions-hub/docker/cli@v1.0.3
       env:
         SKIP_LOGIN: true
