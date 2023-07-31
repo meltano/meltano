@@ -17,7 +17,6 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 packages = [
-  { include = "meltano", from = "src/cloud-cli", format = "wheel" },
   { include = "meltano", from = "src", format = "wheel" },
   { include = "src", format = "sdist" },
   { include = "tests", format = "sdist"},
@@ -441,7 +440,6 @@ markers = [
 ]
 testpaths = [
   "tests/",
-  "src/cloud-cli/tests/",
 ]
 
 [tool.coverage.run]
@@ -479,7 +477,6 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version = "2.20.0"
 version_files = [
   "pyproject.toml:^version =",
-  "src/cloud-cli/pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
 ]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
