@@ -3028,13 +3028,13 @@ requests = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "rich"
-version = "13.4.2"
+version = "13.5.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.4.2-py3-none-any.whl", hash = "sha256:8f87bc7ee54675732fa66a05ebfe489e27264caeeff3728c945d25971b6485ec"},
-    {file = "rich-13.4.2.tar.gz", hash = "sha256:d653d6bccede5844304c605d5aac802c7cf9621efd700b46c7ec2b51ea914898"},
+    {file = "rich-13.5.1-py3-none-any.whl", hash = "sha256:b97381b204a206e1be618f5e1215a57174a1a7732490b3bf6668cf41d30bc72d"},
+    {file = "rich-13.5.1.tar.gz", hash = "sha256:881653ee7037803559d8eae98f145e0a4c4b0ec3ff0300d2cc8d479c71fc6819"},
 ]
 
 [package.dependencies]
@@ -4046,4 +4046,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "cb217e2a05f52ccd98209d678e00623800aacbf33bb12aa9a106377cfb895387"
+content-hash = "ce8726d0ca764e90cfef3e35c5cc7ffa0ee6cad5279e4274c28739642890a89d"
