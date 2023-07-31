@@ -127,7 +127,7 @@ jobs:
     - name: Start MSSQL Container
       if: always() && (matrix.backend-db == 'mssql')
       run: |
-        docker compose up -f .github/workflows/resources/docker-compose.mssql.yaml -d --wait --quiet-pull
+        docker compose -f .github/workflows/resources/docker-compose.mssql.yaml up -d --wait --quiet-pull
 
     - name: Check running containers
       run: |
