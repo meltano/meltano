@@ -11,7 +11,7 @@ else:
     from cached_property import cached_property
 
 from meltano.core.state_store.filesystem import (
-    BaseFilesystemStateStoreManager,
+    CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
 
@@ -46,7 +46,7 @@ def requires_boto3():
     yield
 
 
-class S3StateStoreManager(BaseFilesystemStateStoreManager):
+class S3StateStoreManager(CloudStateStoreManager):
     """State backend for S3."""
 
     label: str = "AWS S3"
@@ -121,15 +121,6 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
                 )
             session = boto3.Session()
             return session.client("s3")
-
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
     def get_state_ids(self, pattern: str | None = None):
         """Get list of state_ids stored in the backend.

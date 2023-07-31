@@ -10,7 +10,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
-from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 try:
     import google  # type: ignore
@@ -43,7 +43,7 @@ def requires_gcs():
     yield
 
 
-class GCSStateStoreManager(BaseFilesystemStateStoreManager):
+class GCSStateStoreManager(CloudStateStoreManager):
     """State backend for Google Cloud Storage."""
 
     label: str = "Google Cloud Storage"
@@ -98,15 +98,6 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
                 )
             # Use default authentication in environment
             return google.cloud.storage.Client()
-
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
     def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
         """Get list of state_ids stored in the backend.

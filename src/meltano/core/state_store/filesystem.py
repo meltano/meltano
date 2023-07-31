@@ -17,11 +17,10 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
-from smart_open import open  # type: ignore
-
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import remove_suffix
+from smart_open import open  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +75,17 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         ...
 
+    def uri_with_path(self, path: str) -> str:
+        """Build uri with the given path included.
+
+        Args:
+            path: the path to join to the uri
+
+        Returns:
+            Full URI with path included
+        """
+        return self.join_path(remove_suffix(self.uri, (self.state_dir)), path)
+
     @contextmanager
     def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
         """Get reader for given path.
@@ -88,13 +98,13 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         if self.client:
             with open(
-                self.join_path(remove_suffix(self.uri, (self.state_dir)), path),
+                self.uri_with_path(path),
                 transport_params={"client": self.client},
             ) as reader:
                 yield reader
         else:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
             ) as reader:
                 yield reader
 
@@ -110,14 +120,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         try:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
                 "w+",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:
                 yield writer
         except NotImplementedError:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
                 "w",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:
@@ -503,3 +513,39 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             if (not pattern) or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids
+
+
+class CloudStateStoreManager(BaseFilesystemStateStoreManager):
+    """Base class for cloud storage state store managers."""
+
+    def __init__(self, prefix: str | None = None, **kwargs):
+        """
+
+        Args:
+
+
+        Returns:
+
+        """
+        super().__init__(**kwargs)
+        self.prefix = prefix or self.parsed.path
+
+    @property
+    def state_dir(self) -> str:
+        """Get the prefix that state should be stored at.
+
+        Returns:
+            The relevant prefix
+        """
+        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
+
+    def uri_with_path(self, path: str) -> str:
+        """Build uri with the given path included.
+
+        Args:
+            path: the path to join to the uri
+
+        Returns:
+            Full URI with path included
+        """
+        return self.join_path(remove_suffix(self.uri, self.prefix), path)

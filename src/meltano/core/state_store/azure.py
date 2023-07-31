@@ -10,7 +10,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
-from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 try:
     from azure.storage.blob import BlobServiceClient  # type: ignore
@@ -43,7 +43,7 @@ def requires_azure():
     yield
 
 
-class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
+class AZStorageStateStoreManager(CloudStateStoreManager):
     """State backend for Azure Blob Storage."""
 
     label: str = "Azure Blob Storage"
@@ -96,15 +96,6 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
             return BlobServiceClient()
-
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
 
     def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
         """Get list of state_ids stored in the backend.
