@@ -53,7 +53,7 @@ To learn how to add a plugin to your project, refer to the [Plugin Management gu
 and other plugins have already been collected by users and [contributed](/contribute/plugins#discoverable-plugins) to [Meltano Hub](https://hub.meltano.com),
 making them supported out of the box.
 
-To find discoverable plugins, run [`meltano discover`](/reference/command-line-interface#discover) or refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc.
+To find discoverable plugins refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc., on [Meltano Hub](https://hub.meltano.com/).
 
 To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
@@ -74,8 +74,6 @@ which will be added to your project unless you explicitly select a different one
 Users who already have experience with a different variant (or have specific reasons to prefer it) can explicitly choose to add it to their project instead of the default,
 so that they get the same behavior and can use the same settings as before.
 If the variant in question is not discoverable yet, it can be added as a [custom plugin](#custom-plugins).
-
-When multiple variants of a discoverable plugin are available, [`meltano discover`](/reference/command-line-interface#discover) will list their names alongside the plugin name.
 
 To learn how to add a non-default variant of a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#variants).
 
@@ -143,7 +141,7 @@ They are responsible for pulling data out of arbitrary data sources: databases, 
 
 Meltano supports [Singer taps](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
-To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](https://hub.meltano.com/extractors/) or run [`meltano discover extractors`](/reference/command-line-interface#discover).
+To learn which extractors are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Extractors page](https://hub.meltano.com/extractors/).
 
 #### Extras
 
@@ -604,7 +602,7 @@ They are responsible for loading [extracted](#extractors) data into arbitrary da
 
 Meltano supports [Singer targets](https://singer.io): executables that implement the [Singer specification](https://hub.meltano.com/singer/spec).
 
-To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](https://hub.meltano.com/loaders/) or run [`meltano discover loaders`](/reference/command-line-interface#discover).
+To learn which loaders are [discoverable](#discoverable-plugins) and supported out of the box, refer to the [Loaders page](https://hub.meltano.com/loaders/).
 
 #### Extras
 
@@ -1005,12 +1003,6 @@ Note that mappers are currently only available when using [`meltano run`](/refer
 You can install mappers like any other other plugin using [`meltano add`](/reference/command-line-interface#add):
 
 ```bash
-
-$ meltano discover mappers
-Mappers
-transform-field
-meltano-map-transformer
-
 $ meltano add mapper transform-field
 Installing mapper 'transform-field'...
 Installed mapper 'transform-field'

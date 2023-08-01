@@ -256,7 +256,7 @@ export MELTANO_HUB_API_ROOT=false
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
-This manifest is primarily used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add). It is also used in cases where the full plugin definition is needed but no lock artifact or cached `discovery.yml` is found.
+The Hub is primarily used by [`meltano add`](/reference/command-line-interface#add) and [`meltano lock`](/reference/command-line-interface#lock). It is also used in cases where the full plugin definition is needed but no lock artifact is found.
 
 #### How to use
 
@@ -295,7 +295,7 @@ export MELTANO_HUB_URL_AUTH=false
 
 Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
 
-This manifest is used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add), among others.
+This manifest is used by [`meltano add`](/reference/command-line-interface#add), among others.
 
 To disable downloading the remote `discovery.yml` manifest and only use the project-local or packaged version,
 set this setting to `false` or any other string not starting with `http://` or `https://`.
@@ -597,4 +597,4 @@ Causes an exception to be raised if an environment variable is used within the p
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
 - Default: `False`
 
-When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` and `meltano discover` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.
+When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.
