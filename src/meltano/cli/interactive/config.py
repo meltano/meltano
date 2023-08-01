@@ -80,6 +80,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.environment_service = EnvironmentService(self.project)
         self.max_width = max_width or 75  # noqa: WPS432
         self.console = Console()
+        self.unsafe: bool = ctx.obj["unsafe"]
 
     @property
     def configurable_settings(self):
@@ -87,7 +88,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         return self.settings.config_with_metadata(
             session=self.session,
             extras=self.extras,
-            redacted=True,
+            redacted=not self.unsafe,
         )
 
     @property
@@ -194,7 +195,9 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         else:
             current_value = expanded_value
 
-        redacted_with_value = setting_def.is_redacted and value_is_defined()
+        redacted_with_value = (
+            not self.unsafe and setting_def.is_redacted and value_is_defined()
+        )
         value_color = "yellow" if redacted_with_value else "green"
 
         details.add_row(
@@ -413,7 +416,8 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         name = metadata["name"]
         store = metadata["store"]
-        is_redacted = metadata["setting"] and metadata["setting"].is_redacted
+        setting = metadata["setting"]
+        is_redacted = not self.unsafe and setting and setting.is_redacted
 
         click.secho(
             (
