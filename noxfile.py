@@ -75,6 +75,7 @@ def _run_pytest(session: Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
+            "--maxfail=10",  # TODO: Remove this once MSSQL tests are fixed
             "tests/",
             f"--randomly-seed={random_seed}",
             *session.posargs,
