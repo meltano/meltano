@@ -150,7 +150,6 @@ def mypy(session: Session) -> None:
         ".",
         "boto3-stubs",
         "mypy",
-        "sqlalchemy2-stubs",
         "types-croniter",
         "types-python-dateutil",
         "types-jsonschema",
