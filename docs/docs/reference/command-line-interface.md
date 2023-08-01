@@ -576,22 +576,22 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no-usage-stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
 ```bash
 # Format
-meltano init [project_directory] [--no_usage_stats] [--force]
+meltano init [project_directory] [--no-usage-stats] [--force]
 ```
 
-#### Parameters
+#### Positional Arguments
 
 - **project_directory** - This determines the directory path to create the project at. Can be `.` to create a project in the current directory.
 
 #### Options
 
-- **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
+- **no-usage-stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
 - **force** - This flag overwrites any existing `meltano.yml` in the project directory.
 
 #### Examples
@@ -608,12 +608,12 @@ meltano init
 meltano init demo-project
 # - OR don't share anything with the Meltano team
 #   about this specific project:
-meltano init demo-project --no_usage_stats
+meltano init demo-project --no-usage-stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
 echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
-meltano init demo-project # --no_usage_stats is implied
+meltano init demo-project # --no-usage-stats is implied
 
 # Initialize a new Meltano project in the current working directory
 meltano init .
