@@ -66,12 +66,12 @@ wrapping another application this should point the applications repository, not 
 repo: https://github.com/apache/airflow
 ```
 
-## `repo_ext`
+## `ext_repo`
 
-The URL of the plugins extensions repository itself (in GitHub, GitLab, etc.).
+The URL of the plugin's extension repository itself (in GitHub, GitLab, etc.).
 
 ```yaml
-repo_ext: https://github.com/meltano/airflow-ext
+ext_repo: https://github.com/meltano/airflow-ext
 ```
 
 ## `executable`
