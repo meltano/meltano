@@ -78,7 +78,7 @@ def engine_uri(worker_id: str):
     # Connect to the database where the tests will be run
     testing_engine_uri = create_connection_url(host, port, user, password, database)
 
-    return str(testing_engine_uri)
+    return testing_engine_uri.render_as_string(hide_password=False)
 
 
 @pytest.fixture()
