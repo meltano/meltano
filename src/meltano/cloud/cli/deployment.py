@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import platform
 import typing as t
 from contextlib import contextmanager
 from datetime import datetime
