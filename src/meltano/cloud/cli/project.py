@@ -198,11 +198,6 @@ class ProjectChoicesQuestionaryOption(click.Option):
             # The project has been specified by ID - don't prompt for a name
             return None
 
-        if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
-                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
-            )
-
         context: MeltanoCloudCLIContext = ctx.obj
         context.projects = asyncio.run(_get_projects(context.config)).items
         _check_for_duplicate_project_names(context.projects)
