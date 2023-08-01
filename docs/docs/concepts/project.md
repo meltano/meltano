@@ -367,7 +367,7 @@ If `$MELTANO_SYS_DIR_ROOT` is set, all the above mentioned paths `.meltano/*` wi
 ## System database
 
 Meltano stores various types of metadata in a project-specific system database,
-that takes the shape of a `meltano.db` SQLite database stored inside the [`.meltano` directory](#meltano-directory) by default.
+that takes the shape of a `meltano.db` SQLite database stored inside the [`.meltano` directory](#meltano-directory) by default. [Other database backends](#support-for-other-database-types) are supported as well.
 Like all files stored in the `.meltano` directory, the system database is also environment-specific.
 
 You can choose to use a different system database backend or configuration using the [`database_uri` setting](/reference/settings#database-uri).
