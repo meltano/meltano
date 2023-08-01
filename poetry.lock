@@ -2416,7 +2416,7 @@ files = [
 name = "psycopg2-binary"
 version = "2.9.6"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "psycopg2-binary-2.9.6.tar.gz", hash = "sha256:1f64dcfb8f6e0c014c7f55e51c9759f024f70ea572fbdef123f85318c297947c"},
@@ -3844,4 +3844,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "dac48fe746f6db17f7dee52f84f0b790f2c002fe059a000997459bcbc2bc6239"
+content-hash = "7ad0b80e0f908e6dff44ac96cd26d61ce409e0e16e4b47b7d292813bbcf2b739"
