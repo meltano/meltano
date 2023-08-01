@@ -131,7 +131,12 @@ def get_label(metadata) -> str:
     default="json",
 )
 @click.option("--extras", is_flag=True, help="View or list only plugin extras.")
-@click.option("--unsafe", is_flag=True, help="Expose values for sensitive settings.")
+@click.option(
+    "--safe/--unsafe",
+    default=True,
+    show_default=True,
+    help="Expose values for sensitive settings.",
+)
 @pass_project(migrate=True)
 @click.pass_context
 def config(  # noqa: WPS231
@@ -141,7 +146,7 @@ def config(  # noqa: WPS231
     plugin_name: str,
     config_format: str,
     extras: bool,
-    unsafe: bool,
+    safe: bool,
 ):
     """
     Display Meltano or plugin configuration.
@@ -185,7 +190,7 @@ def config(  # noqa: WPS231
         ctx.obj["settings"] = settings
         ctx.obj["session"] = session
         ctx.obj["invoker"] = invoker
-        ctx.obj["unsafe"] = unsafe
+        ctx.obj["safe"] = safe
 
         if ctx.invoked_subcommand is None:
             if config_format == "json":
@@ -230,7 +235,7 @@ def list_settings(ctx, extras: bool):
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
-    unsafe: bool = ctx.obj["unsafe"]
+    safe: bool = ctx.obj["safe"]
 
     printed_custom_heading = False
     printed_extra_heading = extras
@@ -242,7 +247,7 @@ def list_settings(ctx, extras: bool):
     full_config = settings.config_with_metadata(
         session=session,
         extras=load_extras,
-        redacted=not unsafe,
+        redacted=safe,
     )
 
     for name, config_metadata in full_config.items():
@@ -288,9 +293,7 @@ def list_settings(ctx, extras: bool):
         else:
             label = f"{get_label(config_metadata)}"
 
-        redacted_with_value = (
-            not unsafe and setting_def.is_redacted and value is not None
-        )
+        redacted_with_value = safe and setting_def.is_redacted and value is not None
 
         current_value = click.style(
             value if redacted_with_value else f"{value!r}",
