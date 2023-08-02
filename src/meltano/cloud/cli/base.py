@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
-import platform
 import typing as t
 from dataclasses import dataclass, field
-from functools import partial, wraps
+from functools import partial
 from pathlib import Path
 
 import click
@@ -17,26 +15,6 @@ from meltano.cloud import __version__ as version
 from meltano.cloud.api.auth import MeltanoCloudAuth
 from meltano.cloud.api.config import MeltanoCloudConfig
 from meltano.cloud.api.types import CloudDeployment, CloudProject
-
-
-def run_async(f: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
-    """Run the given async function using `asyncio.run`.
-
-    Args:
-        f: An async function.
-
-    Returns:
-        The given function wrapped so as to run within `asyncio.run`.
-    """
-
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-        return asyncio.run(f(*args, **kwargs))
-
-    return wrapper
-
 
 T = t.TypeVar("T")
 

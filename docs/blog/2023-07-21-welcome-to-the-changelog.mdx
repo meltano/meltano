@@ -26,6 +26,10 @@ Since then we've:
 - Improved the error code response when creating or updating a deployment
 - Squashed quite a few bugs. Thanks to our early users for all of their feedback!
 
+## Core
+
+We released v2.20.0 which was primarily a bugfix and documentation release. We're also incrementally starting to improve the settings definitions for plugins. We now recommend using `hidden: true` instead of `kind: hidden` on plugins. This is part of an effort to make `kind` indicate just the data type and not any sort of UX choices that may be desired.
+
 ## MeltanoHub
 
 The Meltano Community has been busy adding new connectors to MeltanoHub. In June and July so far we've had the following additions and updates:
@@ -47,6 +51,8 @@ The Meltano Community has been busy adding new connectors to MeltanoHub. In June
 - Added a loader for Clickhouse - [Link](https://github.com/meltano/hub/pull/1382)
 - Added target-sqs and target-parquet variants from Hotglue - [Link](https://github.com/meltano/hub/pull/1375)
 - Updated the default variant of target-postgres and target-snowflake to the MeltanoLabs variant - [Link](https://github.com/meltano/hub/pull/1399)
+
+We've also got an [introductory video](https://www.youtube.com/watch?v=9vEFxw-0nxI) on how to go from Zero to Snowflake with the help of target-snowflake.
 
 ## Connectors
 
