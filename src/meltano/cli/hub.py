@@ -23,7 +23,7 @@ def hub():
     """
     Interact with Meltano Hub.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
-    """
+    """  # noqa: D205
 
 
 @hub.command(
