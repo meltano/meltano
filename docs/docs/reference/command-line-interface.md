@@ -563,9 +563,9 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
 
-### Using `discover` with Environments
+### Using `environment` with Environments
 
-The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+The `environment` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ### Examples
 
@@ -582,6 +582,23 @@ meltano --environment=prod config target-postgres set batch_size_rows 50000
 # Remove an Environment
 meltano environment remove prod
 ```
+
+## `hub`
+
+Use the `hub` command to interact with the instance of Meltano Hub your Meltano project is configured to use.
+
+Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
+
+### How to use
+
+```bash
+# Check if a connection with Meltano Hub can be established
+meltano hub ping
+```
+
+### Using `environment` with Environments
+
+The `hub` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
 
 ## `init`
 
