@@ -33,7 +33,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
-- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
+- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no-usage-stats` (implies value `false`)
 - Default: `true`
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
@@ -54,7 +54,7 @@ Also refer to the Meltano data team handbook page for our ["Philosophy of Teleme
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
 
-- When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
+- When creating a new project, pass `--no-usage-stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
 - To disable tracking in all projects in one go, set the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable to `false`
 
@@ -65,7 +65,7 @@ meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
 
-meltano init --no_usage_stats demo-project
+meltano init --no-usage-stats demo-project
 ```
 
 #### Anonymization Standards

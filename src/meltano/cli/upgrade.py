@@ -43,7 +43,7 @@ def upgrade(ctx, project):
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
 @click.option(
-    "--pip_url",
+    "--pip-url",
     type=str,
     envvar="MELTANO_UPGRADE_PIP_URL",
     help="Meltano pip URL.",
@@ -114,7 +114,7 @@ def all(ctx, pip_url, force, skip_package):
 
 @upgrade.command(cls=InstrumentedCmd, short_help="Upgrade the Meltano package only.")
 @click.option(
-    "--pip_url",
+    "--pip-url",
     type=str,
     envvar="MELTANO_UPGRADE_PIP_URL",
     help="Meltano pip URL.",
