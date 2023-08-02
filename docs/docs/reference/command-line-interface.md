@@ -256,6 +256,23 @@ meltano config <plugin> set <name> "@\$a"
 meltano config <plugin> set <name> '@$a'
 ```
 
+#### Sensitive values
+By default, values for sensitive settings are redacted from the output of `meltano config` commands and replaced with `(redacted)`. If this behaviour is not desirable, you can expose them with the `--unsafe` flag instead. The default behaviour can be reaffirmed with the counterpart `--safe` flag (although functionally, this has no effect).
+
+:::caution
+  <p>The exception to this rule is <code>meltano config &lt;plugin&gt;</code> which will <b>always output unredacted values</b>, and is intended for debugging purposes only</p>
+:::
+
+```bash
+# `--safe` is the effective default, whether the flag is present or not
+meltano config --safe <plugin> list
+meltano config <plugin> list
+
+meltano config --unsafe <plugin> list
+meltano config --unsafe <plugin> set <sensitive-name> <sensitive-value>
+meltano config --unsafe <plugin> set --interactive
+```
+
 #### Nested properties
 
 Nested properties can be set (and unset) by specifying a list of property names:
