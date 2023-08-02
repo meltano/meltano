@@ -29,5 +29,6 @@ types:
 scopes:
   - core
   - cli
+  - cloud
   - deps
   - deps-dev

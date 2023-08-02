@@ -7,10 +7,11 @@ import typing as t
 
 import click
 
-from meltano.cloud.cli.base import pass_context, print_formatted_list, run_async
+from meltano.cloud.cli.base import pass_context, print_formatted_list
 from meltano.cloud.cli.history import utils
 from meltano.cloud.cli.history.client import HistoryClient
 from meltano.cloud.cli.history.utils import format_history_row
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext

@@ -12,7 +12,7 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
 from meltano.core.select_service import SelectService
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -68,7 +68,7 @@ def selection_mark(selection):
     help="Exclude all attributes that match specified pattern.",
 )
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def select(
     project: Project,
     extractor: str,
