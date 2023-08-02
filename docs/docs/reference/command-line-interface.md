@@ -256,6 +256,23 @@ meltano config <plugin> set <name> "@\$a"
 meltano config <plugin> set <name> '@$a'
 ```
 
+#### Sensitive values
+By default, values for sensitive settings are redacted from the output of `meltano config` commands and replaced with `(redacted)`. If this behaviour is not desirable, you can expose them with the `--unsafe` flag instead. The default behaviour can be reaffirmed with the counterpart `--safe` flag (although functionally, this has no effect).
+
+:::caution
+  <p>The exception to this rule is <code>meltano config &lt;plugin&gt;</code> which will <b>always output unredacted values</b>, and is intended for debugging purposes only</p>
+:::
+
+```bash
+# `--safe` is the effective default, whether the flag is present or not
+meltano config --safe <plugin> list
+meltano config <plugin> list
+
+meltano config --unsafe <plugin> list
+meltano config --unsafe <plugin> set <sensitive-name> <sensitive-value>
+meltano config --unsafe <plugin> set --interactive
+```
+
 #### Nested properties
 
 Nested properties can be set (and unset) by specifying a list of property names:
@@ -571,22 +588,22 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no-usage-stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
 ```bash
 # Format
-meltano init [project_directory] [--no_usage_stats] [--force]
+meltano init [project_directory] [--no-usage-stats] [--force]
 ```
 
-#### Parameters
+#### Positional Arguments
 
 - **project_directory** - This determines the directory path to create the project at. Can be `.` to create a project in the current directory.
 
 #### Options
 
-- **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
+- **no-usage-stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
 - **force** - This flag overwrites any existing `meltano.yml` in the project directory.
 
 #### Examples
@@ -603,12 +620,12 @@ meltano init
 meltano init demo-project
 # - OR don't share anything with the Meltano team
 #   about this specific project:
-meltano init demo-project --no_usage_stats
+meltano init demo-project --no-usage-stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
 echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
-meltano init demo-project # --no_usage_stats is implied
+meltano init demo-project # --no-usage-stats is implied
 
 # Initialize a new Meltano project in the current working directory
 meltano init .
