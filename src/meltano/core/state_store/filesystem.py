@@ -17,10 +17,11 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
+from smart_open import open  # type: ignore
+
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import remove_suffix
-from smart_open import open  # type: ignore
 
 logger = logging.getLogger(__name__)
 
