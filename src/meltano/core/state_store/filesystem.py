@@ -524,6 +524,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
 
         Args:
             prefix: the prefix to use for state storage
+            kwargs: additional kwargs to pass to parent __init__.
         """
         super().__init__(**kwargs)
         self.prefix = prefix or self.parsed.path
