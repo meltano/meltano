@@ -24,7 +24,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     import structlog
@@ -93,7 +93,7 @@ logger = structlog_stdlib.get_logger(__name__)
 )
 @click.pass_context
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def elt(  # WPS408
     project: Project,
     ctx: click.Context,

@@ -38,6 +38,9 @@ disable_existing_loggers: false
 formatters:
   default: # use a format similar to default generic python logging format
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
+  structured_colored:
+    (): meltano.core.logging.console_log_formatter
+    colors: True
   structured_plain_no_locals: # log format for structured plain text logs without colored output and without local variables
     (): meltano.core.logging.console_log_formatter
     colors: False # also disables `rich` traceback formatting
@@ -75,7 +78,7 @@ handlers:
 root:
   level: DEBUG # the root logger must always specify a level
   propagate: yes # propagate to child loggers
-  handlers: [console, meltano_log, my_info_file_handler] # by default use these three handlers
+  handlers: [console, meltano_log, my_warn_file_handler] # by default use these three handlers
 
 loggers:
   somespecific.module.logger: # if you want debug logs for a specific named logger or module

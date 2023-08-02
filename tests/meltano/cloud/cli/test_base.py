@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from meltano.cloud.cli.base import get_paginated, run_async
+from meltano.cloud.cli.base import get_paginated
+from meltano.core.utils import run_async
 
 
 @pytest.mark.parametrize(

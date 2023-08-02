@@ -17,7 +17,6 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 packages = [
-  { include = "meltano", from = "src/cloud-cli", format = "wheel" },
   { include = "meltano", from = "src", format = "wheel" },
   { include = "src", format = "sdist" },
   { include = "tests", format = "sdist"},
@@ -47,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.28.0", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.10", optional = true}
+boto3 = {version = "^1.28.16", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.1"
@@ -74,7 +73,7 @@ python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
 questionary = "^1.10.0"
 requests = "^2.31.0"
-rich = "^13.4.2"
+rich = "^13.5.1"
 "ruamel.yaml" = "^0.17.21"
 smart-open = "^6.2.0"
 snowplow-tracker = "^1.0.1"
@@ -443,7 +442,6 @@ markers = [
 ]
 testpaths = [
   "tests/",
-  "src/cloud-cli/tests/",
 ]
 
 [tool.coverage.run]
@@ -481,7 +479,6 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version = "2.20.0"
 version_files = [
   "pyproject.toml:^version =",
-  "src/cloud-cli/pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
 ]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
