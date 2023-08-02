@@ -15,6 +15,7 @@ from meltano.cli import (  # noqa: WPS235
     dragon,
     elt,
     environment,
+    hub,
     initialize,
     install,
     invoke,
@@ -48,6 +49,7 @@ cli.add_command(docs.docs)
 cli.add_command(dragon.dragon)
 cli.add_command(elt.elt)
 cli.add_command(environment.meltano_environment)
+cli.add_command(hub.hub)
 cli.add_command(initialize.init)
 cli.add_command(install.install)
 cli.add_command(invoke.invoke)
