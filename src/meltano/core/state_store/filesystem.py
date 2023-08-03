@@ -17,11 +17,10 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
-from smart_open import open  # type: ignore
-
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import remove_suffix
+from smart_open import open  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -548,3 +547,40 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
             Full URI with path included
         """
         return self.join_path(remove_suffix(self.uri, self.prefix), path)
+
+    @abstractmethod
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The next file in the backend.
+        """
+        ...
+
+    @abstractmethod
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one location to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        ...
+
+    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
+        """Get list of state_ids stored in the backend.
+
+        Args:
+            pattern: glob-style pattern to filter state_ids by
+
+        Returns:
+            List of state_ids
+        """
+        if pattern:
+            pattern_re = re.compile(pattern.replace("*", ".*"))
+        state_ids = set()
+        for filepath in self.list_all_files():
+            (state_id, filename) = filepath.split("/")[-2:]
+            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
+                state_ids.add(state_id)
+        return list(state_ids)

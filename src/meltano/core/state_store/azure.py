@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
 
 if sys.version_info >= (3, 8):
@@ -97,27 +98,6 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 return BlobServiceClient.from_connection_string(self.connection_string)
             return BlobServiceClient()
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
-        """Get list of state_ids stored in the backend.
-
-        Args:
-            pattern: glob-style pattern to filter state_ids by
-
-        Returns:
-            List of state_ids
-        """
-        if pattern:
-            pattern_re = re.compile(pattern.replace("*", ".*"))
-        state_ids = set()
-        container_client = self.client.get_container_client(self.container_name)
-        for blob in container_client.list_blobs(
-            name_starts_with=self.prefix.lstrip("/"),
-        ):
-            (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
-                state_ids.add(state_id)
-        return list(state_ids)
-
     def delete(self, file_path: str):
         """Delete the file/blob at the given path.
 
@@ -136,3 +116,29 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         except Exception as e:
             if not self.is_file_not_found_error(e):
                 raise e
+
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The next file in the backend.
+        """
+        container_client = self.client.get_container_client(self.container_name)
+        for blob in container_client.list_blobs(
+            name_starts_with=self.prefix.lstrip("/"),
+        ):
+            yield blob.name
+
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one location to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        # TODO
+        container_client = self.client.get_container_client(self.container_name)
+        container_client.start_copy_from_url(
+            src,
+            dst,
+        )
