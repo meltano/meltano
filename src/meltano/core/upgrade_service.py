@@ -38,7 +38,7 @@ class AutomaticPackageUpgradeError(Exception):
         self.instructions = instructions
 
 
-class UpgradeService:
+class UpgradeService:  # noqa: WPS214
     """Meltano upgrade service."""
 
     def __init__(self, engine: Engine, project: Project):
@@ -169,11 +169,7 @@ class UpgradeService:
         """Move cloud state files to deduplicated prefix paths.
 
         See: https://github.com/meltano/meltano/issues/7938
-
-        Raises:
-            UpgradeError: The migration failed.
         """
-
         state_service = StateService(project=self.project)
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
