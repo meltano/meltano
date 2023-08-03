@@ -166,8 +166,7 @@ class UpgradeService:
             raise UpgradeError(str(err)) from err
 
     def migrate_state(self):
-        """Migrate meltano state from duplicated prefixes to
-        non-duplicated prefixes.
+        """Move cloud state files to deduplicated prefix paths.
 
         See: https://github.com/meltano/meltano/issues/7938
 
