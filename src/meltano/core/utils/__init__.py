@@ -59,18 +59,18 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def click_run_async(func):
-    """Run decorated Click commands with `asyncio.run`.
+def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
+    """Run the given async function using `asyncio.run`.
 
     Args:
         func: The function to run asynchronously.
 
     Returns:
-        A function which runs the given function asynchronously.
+        The given function wrapped so as to run within `asyncio.run`.
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):  # noqa: WPS430
+    def wrapper(*args, **kwargs):
         return asyncio.run(func(*args, **kwargs))
 
     return wrapper

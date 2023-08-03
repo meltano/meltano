@@ -1,6 +1,5 @@
 """Meltano."""
 
-
 from __future__ import annotations
 
 # Managed by commitizen

@@ -24,9 +24,6 @@ If you are interested in another adapter, please consider contributing its defin
 To install a dbt utility to your project, run:
 
 ```bash
-# list available utilities plugins
-meltano discover utilities
-
 # install adapter-specific dbt, e.g. for snowflake
 meltano add utility dbt-snowflake
 ```

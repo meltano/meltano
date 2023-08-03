@@ -18,7 +18,7 @@ class TestCliInit:
             Project.find()
 
         # Create a project with the CLI
-        cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
+        cli_runner.invoke(cli, ["init", "test_project", "--no-usage-stats"])
 
         pushd("test_project")
         project = Project.find()
@@ -71,7 +71,7 @@ class TestCliInit:
         project_dir.mkdir()
         assert project_dir.exists()
 
-        result = cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
+        result = cli_runner.invoke(cli, ["init", "test_project", "--no_usage-stats"])
         assert "Creating project files...\n  test_project/" in result.output
         assert "cd test_project" in result.output
 

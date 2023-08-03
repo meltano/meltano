@@ -85,24 +85,7 @@ def _run_pytest(session: Session) -> None:
 
 
 @nox_session(
-    name="pytest-cloud-cli",
-    python=python_versions,
-    tags=("test", "pytest"),
-)
-def pytest_cloud_cli(session: Session) -> None:
-    """Run pytest to test the Meltano Cloud CLI.
-
-    Args:
-        session: Nox session.
-    """
-    session.install("src/cloud-cli", *pytest_deps)
-
-    with session.chdir("src/cloud-cli"):
-        _run_pytest(session)
-
-
-@nox_session(
-    name="pytest-meltano",
+    name="pytest",
     python=python_versions,
     tags=("test", "pytest"),
 )
@@ -167,7 +150,6 @@ def mypy(session: Session) -> None:
         ".",
         "boto3-stubs",
         "mypy",
-        "sqlalchemy2-stubs",
         "types-croniter",
         "types-python-dateutil",
         "types-jsonschema",
