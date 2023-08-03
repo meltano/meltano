@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-from pathlib import Path
 import signal
 import subprocess
 import sys
@@ -182,14 +181,13 @@ class UpgradeService:
             click.secho("Applying migrations to project state...", fg="blue")
             for filepath in state_service.state_store_manager.list_all_files():
                 parts = filepath.split(manager.delimiter)
-                if parts[-1] == "state.json":
-                    if filepath.count(manager.prefix) > 1:
-                        duplicated_substr = manager.delimiter.join(
-                            [manager.prefix, manager.prefix]
-                        )
-                        new_path = filepath.replace(duplicated_substr, manager.prefix)
-                        manager.copy_file(filepath, new_path)
-                        click.secho(f"Copied state from {filepath} to {new_path}")
+                if parts[-1] == "state.json" and filepath.count(manager.prefix) > 1:
+                    duplicated_substr = manager.delimiter.join(
+                        [manager.prefix, manager.prefix],
+                    )
+                    new_path = filepath.replace(duplicated_substr, manager.prefix)
+                    manager.copy_file(filepath, new_path)
+                    click.secho(f"Copied state from {filepath} to {new_path}")
 
     def upgrade(self, skip_package: bool = False, **kwargs):
         """Upgrade Meltano.

@@ -1,7 +1,6 @@
 """StateStoreManager for Azure Blob storage backend."""
 from __future__ import annotations
 
-import re
 import sys
 from collections.abc import Iterator
 from contextlib import contextmanager
