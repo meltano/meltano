@@ -378,28 +378,6 @@ meltano config <plugin> set --interactive --extras
 meltano config <plugin> set --interactive --store=dotenv
 ```
 
-## `discover`
-
-Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
-
-### How to Use
-
-```bash
-# List all available plugins
-meltano discover all
-
-# Only list available extractors
-meltano discover extractors
-
-# Only list available loaders
-meltano discover loaders
-
-```
-
-### Using `discover` with Environments
-
-The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
-
 ## `docs`
 
 Open the Meltano documentation site in the default browser.

@@ -22,9 +22,6 @@ If you previously used `dbt` or `dbt-<adapter>` ([available adapters documentati
 This is easy to do! Following the instructions from above to discover and install your chosen adapter:
 
 ```bash
-# list available utilities plugins
-meltano discover utilities
-
 # install adapter-specific dbt, e.g. for snowflake
 meltano add utility dbt-snowflake
 ```
