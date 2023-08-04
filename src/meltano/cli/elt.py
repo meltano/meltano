@@ -132,20 +132,13 @@ async def elt(  # WPS408
             "as documented here: "
             "https://docs.meltano.com/reference/command-line-interface#run",
         )
-    log = logger.bind(name="meltano")
 
     tracker: Tracker = ctx.obj["tracker"]
 
     # We no longer set a default choice for transform, so that we can detect
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
-    if transform:
-        log.warn(
-            "The --transform option is deprecated and will be removed in a future "
-            "release.",
-        )
-    else:
-        transform = "skip"
+    transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
@@ -189,6 +182,16 @@ async def elt(  # WPS408
 el: click.Command = copy.copy(elt)
 el.name = "el"
 el.deprecated = False
+el.short_help = "Run an EL pipeline to Extract and Load data."
+el.help = """Run an EL pipeline to Extract and Load.
+
+meltano el '<extractor_name>' '<loader_name>'
+
+extractor_name: extractor to be used in this pipeline.
+loader_name: loader to be used in this pipeline.
+
+\b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
+"""
 
 
 def _elt_context_builder(
@@ -305,6 +308,10 @@ async def _run_elt(
                 await _run_extract_load(log, elt_context, output_logger)
 
             if elt_context.transformer:
+                log.warn(
+                    "The option to run a transformation is deprecated and will be "
+                    "removed in a future version.",
+                )
                 await _run_transform(log, elt_context, output_logger)
             else:
                 log.info("Transformation skipped.")
