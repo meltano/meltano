@@ -1136,6 +1136,13 @@ class TestCliEltScratchpadThree:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
+                    LogEntry(
+                        "meltano",
+                        None,
+                        "The --transform option is deprecated and will be removed in a "
+                        "future release.",
+                        "warn",
+                    ),
                     LogEntry("meltano", None, "Extract & load skipped.", "info"),
                     LogEntry("meltano", None, "Running transformation...", "info"),
                     LogEntry("meltano", None, "Transformation complete!", "info"),
