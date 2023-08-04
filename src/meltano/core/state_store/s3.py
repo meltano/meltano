@@ -139,7 +139,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         Yields:
             The path to each file in the backend.
         """
-        for state_obj in self.client.list_objects_v2(
+        for state_obj in self.client.list_objects_v2(  # noqa: WPS526
             Bucket=self.bucket,
             Prefix=self.prefix,
         ).get("Contents", []):

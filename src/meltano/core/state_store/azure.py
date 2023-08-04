@@ -123,7 +123,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             The next file in the backend.
         """
         container_client = self.client.get_container_client(self.container_name)
-        for blob in container_client.list_blobs(
+        for blob in container_client.list_blobs(  # noqa: WPS526
             name_starts_with=self.prefix.lstrip("/"),
         ):
             yield blob.name
