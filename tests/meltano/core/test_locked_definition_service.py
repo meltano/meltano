@@ -4,10 +4,10 @@ import json
 
 import pytest
 
+from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import StandalonePlugin
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_discovery_service import LockedDefinitionService
 
 HTTP_STATUS_TEAPOT = 418
 

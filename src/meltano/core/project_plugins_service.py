@@ -12,10 +12,10 @@ import structlog
 
 from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.error import MeltanoError
+from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.plugin_lock_service import PluginLockService
 from meltano.core.settings_service import FeatureFlags
 

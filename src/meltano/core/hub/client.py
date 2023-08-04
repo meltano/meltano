@@ -22,7 +22,7 @@ from meltano.core.plugin import (
 )
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.factory import base_plugin_factory
-from meltano.core.plugin_discovery_service import PluginRepository
+from meltano.core.plugin_repository import PluginRepository
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project

@@ -18,11 +18,11 @@ from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import JobState
+from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.project import Project

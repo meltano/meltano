@@ -7,10 +7,10 @@ from copy import deepcopy
 import pytest
 
 from meltano.core import utils
+from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     DefinitionSource,
