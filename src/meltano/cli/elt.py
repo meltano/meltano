@@ -138,10 +138,7 @@ async def elt(  # WPS408
     # We no longer set a default choice for transform, so that we can detect
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
-    if transform:
-        logger.warn("The --transform option is deprecated.")
-    else:
-        transform = "skip"
+    transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
@@ -301,6 +298,10 @@ async def _run_elt(
                 await _run_extract_load(log, elt_context, output_logger)
 
             if elt_context.transformer:
+                log.warn(
+                    "The --transform option is deprecated and will be removed in a "
+                    "future release.",
+                )
                 await _run_transform(log, elt_context, output_logger)
             else:
                 log.info("Transformation skipped.")
