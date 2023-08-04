@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import datetime
 import logging
 import platform
@@ -46,10 +47,15 @@ logger = structlog_stdlib.get_logger(__name__)
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+    deprecated=True,
 )
 @click.argument("extractor")
 @click.argument("loader")
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]))
+@click.option(
+    "--transform",
+    type=click.Choice(["skip", "only", "run"]),
+    help="DEPRECATED",
+)
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--full-refresh",
@@ -132,7 +138,9 @@ async def elt(  # WPS408
     # We no longer set a default choice for transform, so that we can detect
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
-    if not transform:
+    if transform:
+        click.secho("The --transform option is deprecated.", fg="yellow")
+    else:
         transform = "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
@@ -172,6 +180,11 @@ async def elt(  # WPS408
         session.close()
 
     tracker.track_command_event(CliEvent.completed)
+
+
+el: click.Command = copy.copy(elt)
+el.name = "el"
+el.deprecated = False
 
 
 def _elt_context_builder(
