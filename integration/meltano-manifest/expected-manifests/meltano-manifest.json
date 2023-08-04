@@ -29,7 +29,6 @@
     "MELTANO_DATABASE_RETRY_TIMEOUT": "5",
     "MELTANO_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/meltano.db",
     "MELTANO_DEFAULT_ENVIRONMENT": "userdev",
-    "MELTANO_DISCOVERY_URL": "https://discovery.meltano.com/discovery.yml",
     "MELTANO_ELT_BUFFER_SIZE": "10485760",
     "MELTANO_EXPERIMENTAL": "false",
     "MELTANO_FF_PLUGIN_LOCKS_REQUIRED": "false",

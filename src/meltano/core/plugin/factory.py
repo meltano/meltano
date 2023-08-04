@@ -41,7 +41,7 @@ base_plugin_classes = {
 
 def base_plugin_factory(
     plugin_def: PluginDefinition,
-    variant_or_name: str | Variant,
+    variant_or_name: str | Variant | None,
 ) -> BasePlugin:
     """Return a plugin based on the given PluginDefinition and variant.
 

@@ -175,7 +175,7 @@ async def elt(  # WPS408
 
 
 def _elt_context_builder(
-    project,
+    project: Project,
     job,
     session,
     extractor,
@@ -190,7 +190,7 @@ def _elt_context_builder(
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
-        transform_name = _find_transform_for_extractor(extractor, project.plugins)
+        transform_name = _find_transform_for_extractor(project, extractor)
 
     return (
         ELTContextBuilder(project)
@@ -399,22 +399,32 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     log.info("Transformation complete!")
 
 
-def _find_transform_for_extractor(extractor: str, plugins_service):
-    discovery_service = plugins_service.discovery_service
+def _find_extractor(project: Project, extractor_name: str):
     try:
-        extractor_plugin_def = discovery_service.find_definition(
+        return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
-            extractor,
+            extractor_name,
+        )
+    except PluginNotFoundError:
+        return project.hub_service.find_definition(
+            PluginType.EXTRACTORS,
+            extractor_name,
         )
 
+
+def _find_transform_for_extractor(
+    project: Project,
+    extractor_name: str,
+):
+    try:
         # Check if there is a default transform for this extractor
-        transform_plugin_def = discovery_service.find_definition_by_namespace(
+        transform_plugin_def = project.plugins.find_plugin_by_namespace(
             PluginType.TRANSFORMS,
-            extractor_plugin_def.namespace,
+            _find_extractor(project, extractor_name).namespace,
         )
 
         # Check if the transform has been added to the project
-        transform_plugin = plugins_service.get_plugin(transform_plugin_def)
+        transform_plugin = project.plugins.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
     except PluginNotFoundError:

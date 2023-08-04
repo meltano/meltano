@@ -326,7 +326,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
 
         return base_plugin_factory(plugin, plugin.variants[0])
 
-    def get_plugins_of_type(  # noqa: WPS210
+    def get_plugins_of_type(
         self,
         plugin_type: PluginType,
     ) -> dict[str, IndexedPlugin]:

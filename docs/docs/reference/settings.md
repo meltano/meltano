@@ -44,7 +44,7 @@ We also provide some of this data back to the community via [MeltanoHub](https:/
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project. If the project ID is a UUID, then it will be sent unchanged. Otherwise, it will be [hashed](#q-what-is-a-one-way-hash-and-how-is-it-helpful), and its hash will be used to derive a UUID which will be used to uniquely identify your project.
 
-This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url).
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
@@ -286,50 +286,6 @@ meltano config meltano set hub_url_auth false
 
 export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
 export MELTANO_HUB_URL_AUTH=false
-```
-
-### <a name="discovery-url"></a>`discovery_url`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL`
-- Default: [`https://discovery.meltano.com/discovery.yml`](https://discovery.meltano.com/discovery.yml)
-
-Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
-
-This manifest is used by [`meltano add`](/reference/command-line-interface#add), among others.
-
-To disable downloading the remote `discovery.yml` manifest and only use the project-local or packaged version,
-set this setting to `false` or any other string not starting with `http://` or `https://`.
-
-#### How to use
-
-```bash
-meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
-meltano config meltano set discovery_url false
-
-export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
-export MELTANO_DISCOVERY_URL=false
-```
-
-### `discovery_url_auth`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL_AUTH`
-- Default: None
-
-The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
-
-No `Authorization` header is applied under the following conditions:
-
-- `discovery_url_auth` is not set
-- `discovery_url_auth` is set to `false`, `null` or an empty string
-
-#### How to use
-
-```bash
-meltano config meltano set discovery_url_auth "Bearer $ACCESS_TOKEN"
-meltano config meltano set discovery_url_auth false
-
-export MELTANO_DISCOVERY_URL_AUTH="Bearer $ACCESS_TOKEN"
-export MELTANO_DISCOVERY_URL_AUTH=false
 ```
 
 ## `meltano` CLI

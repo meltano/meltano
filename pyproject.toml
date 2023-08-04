@@ -511,7 +511,6 @@ module = [
   "meltano.core.meltano_invoker",
   "meltano.core.migration_service",
   "meltano.core.models",
-  "meltano.core.plugin_discovery_service",
   "meltano.core.plugin_install_service",
   "meltano.core.plugin_invoker",
   "meltano.core.plugin_test_service",
