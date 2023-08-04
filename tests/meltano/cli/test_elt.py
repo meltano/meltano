@@ -1139,8 +1139,8 @@ class TestCliEltScratchpadThree:
                     LogEntry(
                         "meltano",
                         None,
-                        "The --transform option is deprecated and will be removed in a "
-                        "future release.",
+                        "The option to run a transformation is deprecated and will be "
+                        "removed in a future version.",
                         "warn",
                     ),
                     LogEntry("meltano", None, "Extract & load skipped.", "info"),
