@@ -234,31 +234,28 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 
-        try:
-            for plugin in self.plugins(ensure_parent=False):
-                if (
-                    plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
-                    and (plugin_type is None or plugin.type == plugin_type)
-                    and (
-                        invokable is None
-                        or self.ensure_parent(plugin).is_invokable() == invokable
-                    )
-                    and (
-                        configurable is None
-                        or self.ensure_parent(plugin).is_configurable() == configurable
-                    )
-                ):
-                    return self.ensure_parent(plugin)
-                else:
-                    if plugin.type == PluginType.MAPPERS:
-                        mapping_name = plugin.extra_config.get("_mapping_name")
-                        if mapping_name == plugin_name:
-                            return self.ensure_parent(plugin)
-            raise StopIteration()
-        except StopIteration as stop:
-            raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
-            ) from stop
+        for plugin in self.plugins(ensure_parent=False):
+            if (
+                plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
+                and (plugin_type is None or plugin.type == plugin_type)
+                and (
+                    invokable is None
+                    or self.ensure_parent(plugin).is_invokable() == invokable
+                )
+                and (
+                    configurable is None
+                    or self.ensure_parent(plugin).is_configurable() == configurable
+                )
+            ):
+                return self.ensure_parent(plugin)
+            else:
+                if plugin.type == PluginType.MAPPERS:
+                    mapping_name = plugin.extra_config.get("_mapping_name")
+                    if mapping_name == plugin_name:
+                        return self.ensure_parent(plugin)
+        raise PluginNotFoundError(
+            PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
+        )
 
     def find_plugin_by_namespace(
         self,
