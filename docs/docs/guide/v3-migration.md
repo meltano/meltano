@@ -22,7 +22,7 @@ If you are already using Postgres as a backend, odds are you rely on Meltano's d
 pipx install "meltano[psycopg2]"
 ```
 
-If you are setting a Postgres backend for the first time, it's recommended to instead use the `postgres` extra and use the `postgres+psycopg` URI scheme:
+If you are setting a Postgres backend for the first time, it's recommended to instead use the `postgres` extra and use the `postgresql+psycopg` URI scheme:
 
 ```bash
 pipx install "meltano[postgres]"
