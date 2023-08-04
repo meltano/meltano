@@ -797,16 +797,20 @@ importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "click-default-group"
-version = "1.2.2"
-description = "Extends click.Group to invoke a command without explicit subcommand name"
+version = "1.2.4"
+description = "click_default_group"
 optional = false
-python-versions = "*"
+python-versions = ">=2.7"
 files = [
-    {file = "click-default-group-1.2.2.tar.gz", hash = "sha256:d9560e8e8dfa44b3562fbc9425042a0fd6d21956fcc2db0077f63f34253ab904"},
+    {file = "click_default_group-1.2.4-py2.py3-none-any.whl", hash = "sha256:9b60486923720e7fc61731bdb32b617039aba820e22e1c88766b1125592eaa5f"},
+    {file = "click_default_group-1.2.4.tar.gz", hash = "sha256:eb3f3c99ec0d456ca6cd2a7f08f7d4e91771bef51b01bdd9580cc6450fe1251e"},
 ]
 
 [package.dependencies]
 click = "*"
+
+[package.extras]
+test = ["pytest"]
 
 [[package]]
 name = "click-didyoumean"
@@ -4046,4 +4050,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "e6974c8f100f5b09937394bb7b62a4f82454f4c52d936e74fb097f65aa56a8aa"
+content-hash = "84b038f003509913f14c540ca941858a2d647de924f8331469131b45f74c7e00"
