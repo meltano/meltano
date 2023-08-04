@@ -139,7 +139,7 @@ async def elt(  # WPS408
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
     if transform:
-        click.secho("The --transform option is deprecated.", fg="yellow")
+        logger.warn("The --transform option is deprecated.")
     else:
         transform = "skip"
 
