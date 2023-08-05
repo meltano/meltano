@@ -160,7 +160,6 @@ async def el(  # WPS408
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
-    deprecated=True,
 )
 @ELOptions.extractor
 @ELOptions.loader
@@ -203,6 +202,7 @@ async def elt(  # WPS408
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    logger.warn("The `elt` command is deprecated in favor of `el`")
     await _run_el_command(
         project,
         ctx,
