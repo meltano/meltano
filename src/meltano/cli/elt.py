@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import datetime
 import logging
 import platform
@@ -43,60 +42,138 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
+class ELOptions:
+    """Namespace for all options shared by the `el` and `elt` commands."""
+
+    extractor = click.argument("extractor")
+    loader = click.argument("loader")
+    transform = click.option(
+        "--transform",
+        type=click.Choice(["skip", "only", "run"]),
+    )
+    dry = click.option("--dry", help="Do not actually run.", is_flag=True)
+    full_refresh = click.option(
+        "--full-refresh",
+        help="Perform a full refresh (ignore state left behind by any previous runs).",
+        is_flag=True,
+    )
+    select = click.option(
+        "--select",
+        "-s",
+        help="Select only these specific entities for extraction.",
+        multiple=True,
+        default=[],
+    )
+    exclude = click.option(
+        "--exclude",
+        "-e",
+        help="Exclude these specific entities from extraction.",
+        multiple=True,
+        default=[],
+    )
+    catalog = click.option("--catalog", help="Extractor catalog file.")
+    state = click.option("--state", help="Extractor state file.")
+    dump = click.option(
+        "--dump",
+        type=click.Choice(DUMPABLES.keys()),
+        help="Dump content of pipeline-specific generated file.",
+    )
+    state_id = click.option(
+        "--state-id",
+        envvar="MELTANO_STATE_ID",
+        help="A custom string to identify the job.",
+    )
+    force = click.option(
+        "--force",
+        "-f",
+        help=(
+            "Force a new run even when a pipeline with the same state ID is "
+            "already running."
+        ),
+        is_flag=True,
+    )
+
+
+@click.command(
+    cls=PartialInstrumentedCmd,
+    short_help="Run an EL pipeline to Extract and Load data.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+)
+@ELOptions.extractor
+@ELOptions.loader
+@ELOptions.dry
+@ELOptions.full_refresh
+@ELOptions.select
+@ELOptions.exclude
+@ELOptions.catalog
+@ELOptions.state
+@ELOptions.dump
+@ELOptions.state_id
+@ELOptions.force
+@click.pass_context
+@pass_project(migrate=True)
+@click_run_async
+async def el(  # WPS408
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
+):
+    """
+    Run an EL pipeline to Extract and Load data.
+
+    meltano el '<extractor_name>' '<loader_name>'
+
+    extractor_name: extractor to be used in this pipeline.
+    loader_name: loader to be used in this pipeline.
+
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
+    """
+    await _run_el_command(
+        project,
+        ctx,
+        extractor,
+        loader,
+        None,
+        dry,
+        full_refresh,
+        select,
+        exclude,
+        catalog,
+        state,
+        dump,
+        state_id,
+        force,
+    )
+
+
 @click.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
     deprecated=True,
 )
-@click.argument("extractor")
-@click.argument("loader")
-@click.option(
-    "--transform",
-    type=click.Choice(["skip", "only", "run"]),
-    help="DEPRECATED",
-)
-@click.option("--dry", help="Do not actually run.", is_flag=True)
-@click.option(
-    "--full-refresh",
-    help="Perform a full refresh (ignore state left behind by any previous runs).",
-    is_flag=True,
-)
-@click.option(
-    "--select",
-    "-s",
-    help="Select only these specific entities for extraction.",
-    multiple=True,
-    default=[],
-)
-@click.option(
-    "--exclude",
-    "-e",
-    help="Exclude these specific entities from extraction.",
-    multiple=True,
-    default=[],
-)
-@click.option("--catalog", help="Extractor catalog file.")
-@click.option("--state", help="Extractor state file.")
-@click.option(
-    "--dump",
-    type=click.Choice(DUMPABLES.keys()),
-    help="Dump content of pipeline-specific generated file.",
-)
-@click.option(
-    "--state-id",
-    envvar="MELTANO_STATE_ID",
-    help="A custom string to identify the job.",
-)
-@click.option(
-    "--force",
-    "-f",
-    help=(
-        "Force a new run even when a pipeline with the same state ID is "
-        "already running."
-    ),
-    is_flag=True,
-)
+@ELOptions.extractor
+@ELOptions.loader
+@ELOptions.transform
+@ELOptions.dry
+@ELOptions.full_refresh
+@ELOptions.select
+@ELOptions.exclude
+@ELOptions.catalog
+@ELOptions.state
+@ELOptions.dump
+@ELOptions.state_id
+@ELOptions.force
 @click.pass_context
 @pass_project(migrate=True)
 @click_run_async
@@ -126,6 +203,40 @@ async def elt(  # WPS408
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    await _run_el_command(
+        project,
+        ctx,
+        extractor,
+        loader,
+        transform,
+        dry,
+        full_refresh,
+        select,
+        exclude,
+        catalog,
+        state,
+        dump,
+        state_id,
+        force,
+    )
+
+
+async def _run_el_command(
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    transform: str | None,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
+):
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "
@@ -138,6 +249,7 @@ async def elt(  # WPS408
     # We no longer set a default choice for transform, so that we can detect
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
+    # TODO: Remove the transform option entirely in a future release
     transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
@@ -177,21 +289,6 @@ async def elt(  # WPS408
         session.close()
 
     tracker.track_command_event(CliEvent.completed)
-
-
-el: click.Command = copy.copy(elt)
-el.name = "el"
-el.deprecated = False
-el.short_help = "Run an EL pipeline to Extract and Load data."
-el.help = """Run an EL pipeline to Extract and Load.
-
-meltano el '<extractor_name>' '<loader_name>'
-
-extractor_name: extractor to be used in this pipeline.
-loader_name: loader to be used in this pipeline.
-
-\b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
-"""
 
 
 def _elt_context_builder(
