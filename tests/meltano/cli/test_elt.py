@@ -418,11 +418,11 @@ class TestCliEltScratchpadOne:
 
             full_result = result.stdout + result.stderr
 
-            # We expect a difference of 1 line because the cli emits one log
-            # line not found in the log.
+            # We expect a difference of 2 lines because the cli emits two log
+            # lines not found in the log.
             # we already test the redirect handler in test_output_logger,
             # so we'll just verify that the # of lines matches.
-            assert len(log.splitlines()) == len(full_result.splitlines()) - 1
+            assert len(log.splitlines()) == len(full_result.splitlines()) - 2
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log
@@ -1137,11 +1137,10 @@ class TestCliEltScratchpadThree:
                 result.stdout + result.stderr,
                 [
                     LogEntry(
-                        "meltano",
                         None,
-                        "The option to run a transformation is deprecated and will be "
-                        "removed in a future version.",
-                        "warn",
+                        None,
+                        "The `elt` command is deprecated in favor of `el`",
+                        "warning",
                     ),
                     LogEntry("meltano", None, "Extract & load skipped.", "info"),
                     LogEntry("meltano", None, "Running transformation...", "info"),
