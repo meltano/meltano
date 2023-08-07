@@ -343,7 +343,7 @@ async def create_project(
                     fg="yellow",
                 )
             return None
-        click.echo(f"Project {project_name} created successfully.")
+        click.echo(f"Project {project_name!r} created successfully.")
         if response.status_code == HTTPStatus.NO_CONTENT:
             return None
         click.echo(response.json())
