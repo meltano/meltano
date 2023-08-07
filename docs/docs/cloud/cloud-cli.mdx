@@ -48,6 +48,53 @@ meltano cloud config env delete TAP_GITHUB_AUTH_TOKEN
 
 See the [reserved variables](/cloud/platform#reserved-variables) docs for more details on variables that are reserved for use by Meltano Cloud.
 
+### `notification`
+
+The `notification` command provides a way for managing your [Meltano Cloud notifications](concepts#meltano-cloud-notifications).
+
+The `set` subcommand provides a way to set new, or override an existing notification for the specified value.
+
+Set notification interactively
+```sh
+meltano cloud config notification set <type>
+```
+
+Set notification non interactively
+```sh
+meltano cloud config notification set <type> --value <target_value> --filter <filter>
+````
+
+#### `options`
+
+
+`--value` (Required): The value where you want the notification to be sent.
+
+`--filter`: An optional filter you want to check against, you can supply multiple filters which will all be joined as an OR expression.
+Values within the filter are validated as an AND Expression.
+
+```sh
+meltano cloud config notification set webhook --value http://test+melty --filter '{"events": ["job_created", "job_succeeded"], "status": ["succeeded"]}' --filter '{ "status": ["failed"]}'
+```
+
+The above example reads like
+
+*Send webhook notification to test+melty if the event is of (type "job_created" OR "job_succeded" AND status "succeeded") OR (status "failed")*
+
+The `update` subcommand provides a way to update the existing value of a notification.
+
+```sh
+meltano cloud notification update webhook --old <old_url> --new <new_url>
+```
+
+The above example updates the notification that was configured to the old_url to new send notifications to the new_url.
+
+The `delete` subcommand provides a way to delete an existing notification.
+
+```
+meltano cloud notification delete webhook --value <webhook_url>
+```
+
+
 ## `deployment`
 
 The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.

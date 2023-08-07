@@ -8,7 +8,6 @@ import typing as t
 from dataclasses import asdict, dataclass
 
 import click
-import questionary
 
 from meltano.cloud.api.client import MeltanoCloudClient, json
 from meltano.cloud.api.config import (
@@ -227,25 +226,6 @@ async def delete_secret_name(
         click.echo(f"Successfully deleted config item {secret_name!r}.")
 
 
-class NotificationTypeQuestionChoices(click.Option):
-    """Click option that provides an interactive prompt for notification types."""
-
-    def prompt_for_value(self, ctx: click.Context) -> t.Any:
-        """Prompt the user to interactively select a Meltano Cloud notification type.
-
-        Args:
-            ctx: The Click context.
-
-        Returns:
-            The type of the notification
-        """
-        return questionary.select(
-            message="",
-            qmark="Choose notification type",
-            choices=["webhook", "email"],
-        ).unsafe_ask()  # Use Click's Ctrl-C handling instead of Questionary's
-
-
 def validate_notification_input(
     value: str,
     regex: str,
@@ -353,7 +333,7 @@ def prompt_and_validate(
 class FilterList(click.Option):
     """Class for filters list for notifications."""
 
-    def type_cast_value(self, ctx: click.Context, value: list) -> list:
+    def type_cast_value(self, _: click.Context, value: list) -> list:
         """Attempt to cast and validate filters parameter.
 
         Args:
@@ -371,7 +351,9 @@ class FilterList(click.Option):
                     validate_filter_dict(filter_dict)
                 filters.extend(filter_list)
             except json.JSONDecodeError:
-                raise click.BadParameter(f"Unable to parse given json: {item}")
+                raise click.BadParameter(
+                    f"Unable to parse given json: {item}",
+                ) from None
 
         return filters
 
@@ -382,24 +364,28 @@ def validate_filter_dict(filter_dict: dict) -> None:
     Args:
         filter_dict: The filter being validated
     """
-    # For list of supported events check meltano/infra/common/models/meltano_models/models.py NotificationEventTypes
+    # For list of supported events and statuses
+    # meltano/infra/common/models/meltano_models/models.py
     NOTIFICATION_EVENTS_SET = {"all"}
-    # For list of supported events check meltano/infra/common/models/meltano_models/models.py NotificationStatusfilters
     NOTIFICATION_STATUS_FILTERS_SET = {"failed", "cancelled", "succeeded"}
 
     if "events" in filter_dict:
         # Since set() is a group for notificaiton need to set comprehension
-        events_set = {event for event in filter_dict["events"]}
+        events_set = set(filter_dict["events"])
         if not events_set.issubset(NOTIFICATION_EVENTS_SET):
             raise click.BadParameter(
-                f"Some events not supported. Supported events: {NOTIFICATION_EVENTS_SET}, events: {filter_dict['events']}",
+                "Some events not supported. "
+                f"Supported events: {NOTIFICATION_EVENTS_SET}, "
+                f"events: {filter_dict['events']}",
             )
 
     if "status" in filter_dict:
-        status_set = {status for status in filter_dict["status"]}
+        status_set = set(filter_dict["status"])
         if not status_set.issubset(NOTIFICATION_STATUS_FILTERS_SET):
             raise click.BadParameter(
-                f"Some status not supported. Supported status: {NOTIFICATION_STATUS_FILTERS_SET}, status: {filter_dict['status']}",
+                "Some status not supported. "
+                f"Supported status: {NOTIFICATION_STATUS_FILTERS_SET}, "
+                f"status: {filter_dict['status']}",
             )
 
 
@@ -426,15 +412,9 @@ def notification() -> None:
     """Configure Meltano Cloud notifications."""
 
 
-@notification.group()
-def set() -> None:
-    """Commands for setting notification.
-
-    This overrides pythons set function
-
-    Trying to keep similar to
-    https://docs.meltano.com/reference/command-line-interface/#config
-    """
+@notification.group("set")
+def notification_set() -> None:
+    """Notification subcommand for setting notifications."""
 
 
 def create_set_command(notification_type: t.Literal["webhook", "email"]):
@@ -444,7 +424,7 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
         notification_type: The type of notification
     """
 
-    @set.command(notification_type)
+    @notification_set.command(notification_type)
     @click.option(
         "--value",
         nargs=1,
@@ -495,14 +475,21 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
         async with ConfigCloudClient(config=context.config) as client:
             try:
                 await client.put_notification(notification=notification)
-                click.echo(f"Successfully set {notification_type} notification")
+                click.echo(
+                    f"Successfully set {notification_type} "
+                    f"notification for {validated_value}",
+                )
                 # TODO: Implement https://github.com/meltano/infra/issues/1791
                 # TODO: Add helpful message for ways for user to see notifications
-            except Exception:
+            except Exception as e:
                 raise click.ClickException(
-                    "Something went wrong setting your notification..."
-                )
-        set_notification.__name__ = f"set_notification_{notification_type}"  # type: ignore[valid-type]
+                    f"{e}. \n\n"
+                    "Please ensure you've correctly followed instructions at: "
+                    "https://docs.meltano.com/cloud/cloud-cli\n"
+                    "If the issue persists, "
+                    "we'd be happy to help at: https://meltano.com/slack",
+                ) from None
+        set_notification.__name__ = f"set_notification_{notification_type}"
         return set_notification
 
 
@@ -512,7 +499,7 @@ create_set_command("email")
 
 @notification.group()
 def update():
-    """Notification group update command group."""
+    """Notification subcommand for updating notification."""
 
 
 def create_update_command(notification_type: t.Literal["webhook", "email"]):
@@ -527,13 +514,13 @@ def create_update_command(notification_type: t.Literal["webhook", "email"]):
         "--old",
         nargs=1,
         type=str,
-        help=f"Old {notification_type} to be updated",
+        help=f"Old {notification_type} value to be updated",
     )
     @click.option(
         "--new",
         nargs=1,
         type=str,
-        help=f"New {notification_type} to be updated",
+        help=f"New {notification_type} value",
     )
     @pass_context
     @run_async
@@ -563,10 +550,19 @@ def create_update_command(notification_type: t.Literal["webhook", "email"]):
         )
 
         async with ConfigCloudClient(config=context.config) as client:
-            await client.update_notification_key(old_key=old_key, new_key=new_key)
-            click.echo(f"Successfully updated {notification_type} notification")
+            try:
+                await client.update_notification_key(old_key=old_key, new_key=new_key)
+                click.echo(f"Successfully updated {notification_type} notification")
+            except Exception as e:
+                raise click.ClickException(
+                    f"{e}. \n\n"
+                    "Please ensure you've correctly followed instructions at: "
+                    "https://docs.meltano.com/cloud/cloud-cli\n"
+                    "If the issue persists, "
+                    "we'd be happy to help at: https://meltano.com/slack",
+                ) from None
 
-    update_notification.__name__ = f"update_notification_{type}"  # type: ignore[valid-type]
+    update_notification.__name__ = f"update_notification_{notification_type}"
     return update_notification
 
 
@@ -576,7 +572,7 @@ create_update_command("email")
 
 @notification.group()
 def delete() -> None:
-    """Notification group delete command group."""
+    """Notification subcommand for deleting notifications."""
 
 
 def create_delete_command(notification_type: t.Literal["webhook", "email"]):
@@ -591,7 +587,7 @@ def create_delete_command(notification_type: t.Literal["webhook", "email"]):
         "--value",
         nargs=1,
         type=str,
-        help=f"Old {notification_type} value to be deleted",
+        help=f"Old {notification_type} value to delete notification for",
     )
     @pass_context
     @run_async
@@ -612,10 +608,19 @@ def create_delete_command(notification_type: t.Literal["webhook", "email"]):
             error_message=f"Invalid {notification_type} value",
         )
         async with ConfigCloudClient(config=context.config) as client:
-            await client.delete_notification(key=input_value)
-            click.echo(f"Successfully deleted {notification_type} notification")
+            try:
+                await client.delete_notification(key=input_value)
+                click.echo(f"Successfully deleted {notification_type} notification")
+            except Exception as e:
+                raise click.ClickException(
+                    f"{e}. \n\n"
+                    "Please ensure you've correctly followed instructions at: "
+                    "https://docs.meltano.com/cloud/cloud-cli\n"
+                    "If the issue persists, "
+                    "we'd be happy to help at: https://meltano.com/slack",
+                ) from None
 
-    delete_notification.__name__ = f"delete_notification_{type}"  # type: ignore[valid-type]
+    delete_notification.__name__ = f"delete_notification_{notification_type}"
     return delete_notification
 
 

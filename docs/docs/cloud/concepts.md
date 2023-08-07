@@ -85,3 +85,22 @@ A Meltano Cloud pipeline is an execution of a schedule.
 Pipelines use different amount of credits depending on how frequently they are run.
 
 For more details on credits and pricing see the [Pricing FAQ](https://meltano.com/pricing/).
+
+## Meltano Cloud Notifications
+
+A Meltano cloud notification is a response to meltano cloud event.
+
+### Supported notification types
+- `webhook`
+- `email`
+
+### Supported notification filters
+- `events`
+  - `all`
+- `status`
+  - `succeeded`
+  - `failed`
+  - `cancelled`
+
+### Webhook Event schema
+**coming soon**
