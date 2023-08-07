@@ -12,6 +12,7 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
+from slugify import slugify
 from yaspin import yaspin
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
