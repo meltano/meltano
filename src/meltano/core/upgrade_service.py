@@ -181,7 +181,10 @@ class UpgradeService:  # noqa: WPS214
                     and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
                 ):
                     duplicated_substr = manager.delimiter.join(
-                        [manager.prefix.strip(manager.delimiter)] * 2,
+                        [
+                            manager.prefix.strip(manager.delimiter),
+                            manager.prefix.strip(manager.delimiter),
+                        ],
                     )
                     new_path = filepath.replace(duplicated_substr, manager.prefix)
                     new_path = new_path.replace(
