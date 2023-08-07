@@ -317,7 +317,7 @@ async def use_project(
 async def create_project(
     context: MeltanoCloudCLIContext,
     name: str,
-    git_repository: str,
+    repo_url: str,
     project_root_path: str | None = None,
 ):
     """Create a project to your Meltano Cloud."""
@@ -328,7 +328,7 @@ async def create_project(
             ):
                 response = await client.create_project(
                     project_name=name,
-                    git_repository=git_repository,
+                    git_repository=repo_url,
                     project_root_path=project_root_path,
                 )
         except MeltanoCloudError as e:
