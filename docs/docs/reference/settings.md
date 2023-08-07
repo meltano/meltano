@@ -33,7 +33,7 @@ These are settings specific to [your Meltano project](/concepts/project).
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
-- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
+- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no-usage-stats` (implies value `false`)
 - Default: `true`
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
@@ -54,7 +54,7 @@ Also refer to the Meltano data team handbook page for our ["Philosophy of Teleme
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
 
-- When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
+- When creating a new project, pass `--no-usage-stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
 - To disable tracking in all projects in one go, set the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable to `false`
 
@@ -65,7 +65,7 @@ meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
 
-meltano init --no_usage_stats demo-project
+meltano init --no-usage-stats demo-project
 ```
 
 #### Anonymization Standards
@@ -155,12 +155,17 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ```bash
-meltano config meltano set database_uri postgresql://<username>:<password>@<host>:<port>/<database>
+meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<database>
+export MELTANO_DATABASE_URI=postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-meltano run --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
+meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<port>/<database> ...
 ```
+
+:::info
+Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
+:::
+
 
 #### Targeting a PostgreSQL Schema
 
@@ -172,7 +177,7 @@ You are also able to add multiple schemas, which PostgreSQL will work through fr
 If you dont target a schema then by default PostgreSQL will try to use the `public` schema.
 
 ```bash
-postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
+postgresql+psycopg://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
 
 ### `database_max_retries`
@@ -256,7 +261,7 @@ export MELTANO_HUB_API_ROOT=false
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
-This manifest is primarily used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add). It is also used in cases where the full plugin definition is needed but no lock artifact or cached `discovery.yml` is found.
+The Hub is primarily used by [`meltano add`](/reference/command-line-interface#add) and [`meltano lock`](/reference/command-line-interface#lock). It is also used in cases where the full plugin definition is needed but no lock artifact is found.
 
 #### How to use
 
@@ -295,7 +300,7 @@ export MELTANO_HUB_URL_AUTH=false
 
 Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
 
-This manifest is used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add), among others.
+This manifest is used by [`meltano add`](/reference/command-line-interface#add), among others.
 
 To disable downloading the remote `discovery.yml` manifest and only use the project-local or packaged version,
 set this setting to `false` or any other string not starting with `http://` or `https://`.
@@ -597,4 +602,4 @@ Causes an exception to be raised if an environment variable is used within the p
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
 - Default: `False`
 
-When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` and `meltano discover` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.
+When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.

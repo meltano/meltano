@@ -6,7 +6,8 @@ import typing as t
 
 import click
 
-from meltano.cloud.cli.base import pass_context, run_async
+from meltano.cloud.cli.base import pass_context
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext

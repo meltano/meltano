@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import platform
 import typing as t
 from contextlib import contextmanager
 from datetime import datetime
@@ -24,8 +23,8 @@ from meltano.cloud.cli.base import (
     get_paginated,
     pass_context,
     print_formatted_list,
-    run_async,
 )
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -293,11 +292,6 @@ class DeploymentChoicesQuestionaryOption(click.Option):
         Returns:
             The name of the deployment to be used as the default for future commands.
         """
-        if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
-                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
-            )
-
         context: MeltanoCloudCLIContext = ctx.obj
         context.deployments = asyncio.run(_get_deployments(context.config)).items
         return questionary.select(

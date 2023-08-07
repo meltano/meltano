@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import platform
 import sys
 import typing as t
 from http import HTTPStatus
@@ -21,8 +20,8 @@ from meltano.cloud.cli.base import (
     get_paginated,
     pass_context,
     print_formatted_list,
-    run_async,
 )
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -221,11 +220,6 @@ class ProjectChoicesQuestionaryOption(click.Option):
         if "project_id" in ctx.params:
             # The project has been specified by ID - don't prompt for a name
             return None
-
-        if platform.system() == "Windows":
-            asyncio.set_event_loop_policy(
-                asyncio.WindowsSelectorEventLoopPolicy(),  # type: ignore[attr-defined]
-            )
 
         context: MeltanoCloudCLIContext = ctx.obj
         context.projects = asyncio.run(_get_projects(context.config)).items

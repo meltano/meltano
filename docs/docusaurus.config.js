@@ -208,9 +208,9 @@ const config = {
         },
       },
       algolia: {
-        appId: 'ALHYNO312B',
-        apiKey: '28f2a216e3886060fa641b7cb703de90',
-        indexName: 'documentation_search',
+        appId: 'RH6DR0I7R7',
+        apiKey: '44af7e07962ccb69a33accdb699d3347',
+        indexName: 'meltanodocs',
         // contextualSearch: true,
         // searchParameters: {},
         // searchPagePath: "search",

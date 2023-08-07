@@ -53,6 +53,11 @@ jobs:
         - { id: '15', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
         # https://github.com/meltano/meltano/issues/7813
         - { id: '16', python-version: '3.11.3', os: windows-2022,  backend-db: sqlite, nox-python: 3.11 }
+        - { id: '17', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '18', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '19', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        # https://github.com/meltano/meltano/issues/7813
+        - { id: '20', python-version: '3.11.3', os: ubuntu-latest, backend-db: postgresql_psycopg3, nox-python: 3.11 }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -73,6 +78,10 @@ jobs:
       pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
       pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
       pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
+      pytest-results-row-17: ${{ steps.append-results.outputs.pytest-results-row-17 }}
+      pytest-results-row-18: ${{ steps.append-results.outputs.pytest-results-row-18 }}
+      pytest-results-row-19: ${{ steps.append-results.outputs.pytest-results-row-19 }}
+      pytest-results-row-20: ${{ steps.append-results.outputs.pytest-results-row-20 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
@@ -101,8 +110,18 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
 
+    - name: Set up Docker Buildx
+      if: always() && (matrix.backend-db == 'mssql')
+      uses: docker/setup-buildx-action@v2.8.0
+
+    - name: Get Docker
+      if: always() && (matrix.backend-db == 'mssql')
+      uses: actions-hub/docker/cli@v1.0.3
+      env:
+        SKIP_LOGIN: true
+
     - name: Start Postgres Container
-      if: always() && (matrix.backend-db == 'postgresql')
+      if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg3')
       run: >
         docker run -d
         -p "5432:5432"
@@ -116,17 +135,8 @@ jobs:
 
     - name: Start MSSQL Container
       if: always() && (matrix.backend-db == 'mssql')
-      run: >
-        docker run -d
-        -p "1433:1433"
-        -e "SA_PASSWORD=Meltan0admin"
-        -e "ACCEPT_EULA=Y"
-        --name mssql
-        --health-cmd "/opt/mssql-tools/bin/sqlcmd -U sa -P Meltan0admin -Q 'select 1' -b -o /dev/null"
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-        mcr.microsoft.com/mssql/server:2019-latest
+      run: |
+        docker compose -f .github/workflows/resources/docker-compose.mssql.yaml up -d --wait --quiet-pull
 
     - name: Check running containers
       run: |
@@ -190,6 +200,13 @@ jobs:
       with:
         name: coverage-data
         path: ".coverage.*"
+
+    - name: Upload test logs
+      if: always()
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: test-logs-${{ matrix.id }}
+        path: pytest.log
 
   summary:
     runs-on: ubuntu-latest

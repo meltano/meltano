@@ -16,9 +16,9 @@ from meltano.cloud.cli.base import (
     get_paginated,
     pass_context,
     print_formatted_list,
-    run_async,
     shared_option,
 )
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig

@@ -367,7 +367,7 @@ If `$MELTANO_SYS_DIR_ROOT` is set, all the above mentioned paths `.meltano/*` wi
 ## System database
 
 Meltano stores various types of metadata in a project-specific system database,
-that takes the shape of a `meltano.db` SQLite database stored inside the [`.meltano` directory](#meltano-directory) by default.
+that takes the shape of a `meltano.db` SQLite database stored inside the [`.meltano` directory](#meltano-directory) by default. [Other database backends](#support-for-other-database-types) are supported as well.
 Like all files stored in the `.meltano` directory, the system database is also environment-specific.
 
 You can choose to use a different system database backend or configuration using the [`database_uri` setting](/reference/settings#database-uri).
@@ -383,11 +383,9 @@ Meltano's CLI utilizes the following tables:
 
 Meltano currently supports the following databases as backends for state and configuration:
 
-- PostgreSQL
-- SQLite
-- MS SQL Server
-
-PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
+- SQLite (supported out of the box)
+- PostgreSQL (requires the [`postgres` or `psycopg2` Python extra](/guide/advanced-topics#installing-optional-components))
+- MS SQL Server (requires the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components)
 
 Support for other databases is planned:
 

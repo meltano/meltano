@@ -11,8 +11,8 @@ from meltano.cloud.cli.base import (
     get_paginated,
     pass_context,
     print_limit_warning,
-    run_async,
 )
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.cloud.cli.base import MeltanoCloudCLIContext

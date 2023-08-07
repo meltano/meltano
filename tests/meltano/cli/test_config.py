@@ -119,6 +119,32 @@ class TestCliConfig:
             "TAP_MOCK_SECURE variable in `.env`)"
         ) in result.stdout
 
+    @pytest.mark.usefixtures("project")
+    def test_config_list_unsafe(
+        self,
+        cli_runner,
+        tap,
+        session,
+        plugin_settings_service_factory,
+    ):
+        value = "thisisatest"
+
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "secure",
+            value,
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        result = cli_runner.invoke(cli, ["config", "--unsafe", tap.name, "list"])
+        assert_cli_runner(result)
+
+        assert (
+            f"secure [env: TAP_MOCK_SECURE] current value: '{value}' (from the "
+            "TAP_MOCK_SECURE variable in `.env`)"
+        ) in result.stdout
+
 
 class TestCliConfigSet:
     @pytest.mark.usefixtures("project")
@@ -132,6 +158,20 @@ class TestCliConfigSet:
         assert (
             f"Extractor '{tap.name}' setting 'secure' was set in `.env`: "
             + REDACTED_VALUE
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_set_unsafe(self, cli_runner, tap):
+        value = "thisisatest"
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", "--unsafe", tap.name, "set", "secure", value],
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'secure' was set in `.env`: '{value}'"
         ) in result.stdout
 
     @pytest.mark.usefixtures("tap")

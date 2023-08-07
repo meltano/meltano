@@ -46,6 +46,11 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     cls=NoWindowsGlobbingGroup,
     invoke_without_command=True,
     no_args_is_help=True,
+    # For backwards compatibility, accept CLI options that use underscores
+    # instead of hyphens.
+    # https://github.com/pallets/click/issues/1123#issuecomment-589989721
+    # NOTE: This CLI option normalization applies to all subcommands.
+    context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option(

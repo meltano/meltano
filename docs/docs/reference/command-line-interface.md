@@ -256,6 +256,23 @@ meltano config <plugin> set <name> "@\$a"
 meltano config <plugin> set <name> '@$a'
 ```
 
+#### Sensitive values
+By default, values for sensitive settings are redacted from the output of `meltano config` commands and replaced with `(redacted)`. If this behaviour is not desirable, you can expose them with the `--unsafe` flag instead. The default behaviour can be reaffirmed with the counterpart `--safe` flag (although functionally, this has no effect).
+
+:::caution
+  <p>The exception to this rule is <code>meltano config &lt;plugin&gt;</code> which will <b>always output unredacted values</b>, and is intended for debugging purposes only</p>
+:::
+
+```bash
+# `--safe` is the effective default, whether the flag is present or not
+meltano config --safe <plugin> list
+meltano config <plugin> list
+
+meltano config --unsafe <plugin> list
+meltano config --unsafe <plugin> set <sensitive-name> <sensitive-value>
+meltano config --unsafe <plugin> set --interactive
+```
+
 #### Nested properties
 
 Nested properties can be set (and unset) by specifying a list of property names:
@@ -360,28 +377,6 @@ meltano config <plugin> set --interactive --extras
 # Configure specific store interactively
 meltano config <plugin> set --interactive --store=dotenv
 ```
-
-## `discover`
-
-Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
-
-### How to Use
-
-```bash
-# List all available plugins
-meltano discover all
-
-# Only list available extractors
-meltano discover extractors
-
-# Only list available loaders
-meltano discover loaders
-
-```
-
-### Using `discover` with Environments
-
-The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ## `docs`
 
@@ -546,9 +541,9 @@ Once an Environment is configured, the `--environment` option or `MELTANO_ENVIRO
 If there is a value provided for `default_environment` in your `meltano.yml`, then these commands, with the exception of [`config`](#using-config-with-environments), will be run using that Environment if no `--environment` option or `MELTANO_ENVIRONMENT` environment variable is provided.
 If you have `default_environment` set this way but would prefer to use no environment use the option `--environment=null` (or its equivalent using a space instead of an `=`: `--environment null`) or use the `--no-environment` flag.
 
-### Using `discover` with Environments
+### Using `environment` with Environments
 
-The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
+The `environment` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ### Examples
 
@@ -566,6 +561,23 @@ meltano --environment=prod config target-postgres set batch_size_rows 50000
 meltano environment remove prod
 ```
 
+## `hub`
+
+Use the `hub` command to interact with the instance of Meltano Hub your Meltano project is configured to use.
+
+Meltano will use the Meltano Hub instance at [https://hub.meltano.com](https://hub.meltano.com) by default, but you can configure your project to use a different instance of Meltano Hub by setting the [`hub_url` setting](/reference/settings/#hub_url).
+
+### How to use
+
+```bash
+# Check if a connection with Meltano Hub can be established
+meltano hub ping
+```
+
+### Using `environment` with Environments
+
+The `hub` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
+
 ## `init`
 
 Used to create a new [Meltano project](/concepts/project) at the given directory path. If the specified directory does not exist, one will be created for the project - otherwise the existing directory will be used if it is empty.
@@ -576,22 +588,22 @@ The new project directory will contain:
 - stubs for `.gitignore`, `README.md`, and `requirements.txt` for you to edit (or delete) as appropriate, and
 - empty `extract`, `load`, `transform`, `notebook`, and `orchestrate` directories for you to use (or delete) as you please.
 
-[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no_usage_stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
+[Anonymous usage statistics](/reference/settings#send-anonymous-usage-stats) are enabled by default, unless the `--no-usage-stats` flag is provided, the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable is disabled, or you set `send_anonymous_usage_stats: false` in your `meltano.yml`.
 
 ### How to use
 
 ```bash
 # Format
-meltano init [project_directory] [--no_usage_stats] [--force]
+meltano init [project_directory] [--no-usage-stats] [--force]
 ```
 
-#### Parameters
+#### Positional Arguments
 
 - **project_directory** - This determines the directory path to create the project at. Can be `.` to create a project in the current directory.
 
 #### Options
 
-- **no_usage_stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
+- **no-usage-stats** - This flag disables the [`send_anonymous_usage_stats` setting](/reference/settings#send-anonymous-usage-stats).
 - **force** - This flag overwrites any existing `meltano.yml` in the project directory.
 
 #### Examples
@@ -608,12 +620,12 @@ meltano init
 meltano init demo-project
 # - OR don't share anything with the Meltano team
 #   about this specific project:
-meltano init demo-project --no_usage_stats
+meltano init demo-project --no-usage-stats
 # - OR don't share anything with the Meltano team
 #   about any project I initialize ever:
 SHELLRC=~/.$(basename $SHELL)rc # ~/.bashrc, ~/.zshrc, etc
 echo "export MELTANO_SEND_ANONYMOUS_USAGE_STATS=0" >> $SHELLRC
-meltano init demo-project # --no_usage_stats is implied
+meltano init demo-project # --no-usage-stats is implied
 
 # Initialize a new Meltano project in the current working directory
 meltano init .

@@ -12,7 +12,7 @@ Since this also goes for [extractors](/concepts/plugins#extractors) and [loaders
 [`config.json` files](https://hub.meltano.com/singer/spec#config-files) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/reference/command-line-interface#discover)), Meltano already knows what settings it supports.
+If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins), Meltano already knows what settings it supports.
 If you're adding a [custom plugin](/concepts/plugins#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
