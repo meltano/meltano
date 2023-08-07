@@ -412,7 +412,7 @@ class TestProjectCommand:
                     "create",
                     "--name",
                     project["project_name"],
-                    "--git-repository",
+                    "--repo-url",
                     project["git_repository"],
                     "--root-path",
                     project["project_root_path"],
