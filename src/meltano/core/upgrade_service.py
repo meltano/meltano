@@ -185,7 +185,8 @@ class UpgradeService:  # noqa: WPS214
                     )
                     new_path = filepath.replace(duplicated_substr, manager.prefix)
                     new_path = new_path.replace(
-                        manager.delimiter * 2, manager.delimiter
+                        manager.delimiter * 2,
+                        manager.delimiter,
                     )
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
