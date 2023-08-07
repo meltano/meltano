@@ -53,6 +53,11 @@ jobs:
         - { id: '15', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
         # https://github.com/meltano/meltano/issues/7813
         - { id: '16', python-version: '3.11.3', os: windows-2022,  backend-db: sqlite, nox-python: 3.11 }
+        - { id: '17', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '18', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '19', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        # https://github.com/meltano/meltano/issues/7813
+        - { id: '20', python-version: '3.11.3', os: ubuntu-latest, backend-db: postgresql_psycopg3, nox-python: 3.11 }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -73,6 +78,10 @@ jobs:
       pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
       pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
       pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
+      pytest-results-row-17: ${{ steps.append-results.outputs.pytest-results-row-17 }}
+      pytest-results-row-18: ${{ steps.append-results.outputs.pytest-results-row-18 }}
+      pytest-results-row-19: ${{ steps.append-results.outputs.pytest-results-row-19 }}
+      pytest-results-row-20: ${{ steps.append-results.outputs.pytest-results-row-20 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
@@ -112,7 +121,7 @@ jobs:
         SKIP_LOGIN: true
 
     - name: Start Postgres Container
-      if: always() && (matrix.backend-db == 'postgresql')
+      if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg3')
       run: >
         docker run -d
         -p "5432:5432"
