@@ -45,7 +45,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.23.2
+    rev: 0.23.3
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -66,11 +66,25 @@ repos:
         name: shellcheck
         exclude: ^integration/mdsh$
 
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.46.0 # Keep this in sync with the eslint "additional_dependency" below!
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$
+        args: ['--fix', '--config=docs/.eslintrc.json']
+        additional_dependencies:
+          - "eslint@8.45.0" # Keep this in sync with the rev above!
+          - "eslint-config-prettier@8.8.0"
+          - "eslint-plugin-prettier@5.0.0"
+          - "eslint-plugin-react@7.33.0"
+          - "eslint-plugin-vue@9.15.1"
+          - "prettier@3.0.0"
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.277
+    rev: v0.0.281
     hooks:
     - id: ruff
-      args: [--fix, --exit-non-zero-on-fix]
+      args: [--fix, --exit-non-zero-on-fix, --show-fixes]
 
   - repo: https://github.com/psf/black
     rev: 23.7.0

@@ -60,7 +60,7 @@ MANIFEST_SCHEMA_PATH = (
     Path(package_root_path).parent / "schemas" / "meltano.schema.json"
 )
 
-Trie: TypeAlias = t.Dict[str, "Trie"]  # type: ignore
+Trie: TypeAlias = t.Dict[str, "Trie"]
 PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
 PluginsByNameByType: TypeAlias = t.Mapping[str, t.Mapping[str, t.Mapping[str, t.Any]]]
 

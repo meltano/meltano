@@ -1,0 +1,29 @@
+.date {
+  color: var(--ligth-button-text-color);
+  font-family: IBM Plex Mono;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 100%;
+  background: var(--date-background);
+  border-radius: 5px;
+  margin: 0 0 30px 0;
+  border: 1px solid var(--ifm-toc-border-color);
+}
+
+@media all and (min-width: 768px) {
+  .date {
+    margin-right: Calc(var(--ifm-spacing-horizontal) + 10px);
+    margin-left: 10px;
+    position: sticky;
+    top: 131px;
+  }
+}
+
+.month {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.year {
+  font-size: 18px;
+}

@@ -11,6 +11,7 @@ from enum import Enum, auto
 
 import click
 from click_default_group import DefaultGroup
+from click_didyoumean import DYMGroup
 
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
@@ -610,11 +611,11 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
         super().invoke(ctx)
 
 
-class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup):
+class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup, DYMGroup):
     """Click group with telemetry instrumentation and a default command."""
 
 
-class InstrumentedGroup(InstrumentedGroupMixin, click.Group):
+class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 

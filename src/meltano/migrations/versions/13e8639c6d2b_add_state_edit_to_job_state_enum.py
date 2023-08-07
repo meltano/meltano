@@ -53,7 +53,7 @@ def upgrade():
     # In postgresql, drop the created Enum type so that
     # downgrade() can re-create it.
     if conn.dialect.name == "postgresql":
-        conn.execute("DROP TYPE job_state;")
+        conn.execute(sa.text("DROP TYPE job_state;"))
 
 
 def downgrade():

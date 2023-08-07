@@ -2,8 +2,20 @@
 
 from __future__ import annotations
 
-from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+
+from sqlalchemy import MetaData, types
+from sqlalchemy.orm import DeclarativeBase
 
 SystemMetadata = MetaData()
-SystemModel = declarative_base(metadata=SystemMetadata)
+
+
+class SystemModel(DeclarativeBase):
+    """Base class for all database models."""
+
+    metadata = SystemMetadata
+    type_annotation_map = {
+        str: types.String(),
+        bool: types.Boolean(),
+        datetime: types.DateTime(),
+    }

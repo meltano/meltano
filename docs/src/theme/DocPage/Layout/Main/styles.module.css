@@ -1,0 +1,46 @@
+.docMainContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  position: relative;
+}
+
+.docItemWrapper {
+  position: relative;
+}
+
+.docItemWrapper article {
+  padding-top: 1rem;
+}
+
+.docItemWrapper:before {
+  content: "";
+  display: block;
+  background-image: url(../../../../../static/img/homepage/bg-ellipse-center.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: fixed;
+  width: 800px;
+  height: 800px;
+  top: 0px;
+  margin-top: -200px;
+  margin-left: -400px;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 997px) {
+  .docMainContainer {
+    flex-grow: 1;
+    width: Calc(100% - 300px);
+  }
+
+  .docMainContainerEnhanced {
+    max-width: calc(100% - var(--doc-sidebar-hidden-width));
+  }
+
+  .docItemWrapperEnhanced {
+    max-width: calc(var(--ifm-container-width) + var(--doc-sidebar-width)) !important;
+  }
+}

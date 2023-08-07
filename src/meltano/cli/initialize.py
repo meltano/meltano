@@ -26,7 +26,7 @@ path_type = click.Path(file_okay=False, path_type=Path)
 @click.pass_context
 @click.argument("project_directory", required=False, type=path_type)
 @click.option(
-    "--no_usage_stats",
+    "--no-usage-stats",
     help="Do not send anonymous usage stats.",
     is_flag=True,
 )
