@@ -315,9 +315,9 @@ async def use_project(
 
 
 @project_group.command("create")
-@click.option("--project-name", type=str, required=True)
-@click.option("--git-repository", type=str, required=True)
-@click.option("--project-root-path", type=str, required=False)
+@click.option("--name", type=str, prompt=True)
+@click.option("--repo-url", type=str, prompt=True)
+@click.option("--root-path", type=str, required=False)
 @pass_context
 @run_async
 async def create_project(
