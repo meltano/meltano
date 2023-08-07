@@ -420,7 +420,7 @@ class TestProjectCommand:
             )
             assert result.exit_code == 0, result.output
             assert result.output == (
-                f"Project {project['project_name']} created successfully.\n"
+                f"Project {project['project_name']!r} created successfully.\n"
                 + json.dumps(project)
                 + "\n"
             )
