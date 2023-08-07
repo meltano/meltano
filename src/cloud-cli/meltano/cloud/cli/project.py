@@ -339,7 +339,10 @@ async def create_project(
         except MeltanoCloudError as e:
             if e.response.status == HTTPStatus.CONFLICT:
                 click.secho(
-                    f"Project with name {project_name} already exists.",
+                    (
+                        f"A project named {project_name!r} (normalized to "
+                        f"{slugify(project_name)!r}) already exists."
+                    ),
                     fg="yellow",
                 )
             return None
