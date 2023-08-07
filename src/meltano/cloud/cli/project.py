@@ -316,7 +316,7 @@ async def use_project(
 @run_async
 async def create_project(
     context: MeltanoCloudCLIContext,
-    project_name: str,
+    name: str,
     git_repository: str,
     project_root_path: str | None = None,
 ):
@@ -327,7 +327,7 @@ async def create_project(
                 text="Creating project - this may take several minutes...",
             ):
                 response = await client.create_project(
-                    project_name=project_name,
+                    project_name=name,
                     git_repository=git_repository,
                     project_root_path=project_root_path,
                 )
@@ -335,12 +335,12 @@ async def create_project(
             if e.response.status == HTTPStatus.CONFLICT:
                 click.secho(
                     (
-                        f"A project named {project_name!r} (normalized to "
-                        f"{slugify(project_name)!r}) already exists."
+                        f"A project named {name!r} (normalized to "
+                        f"{slugify(name)!r}) already exists."
                     ),
                     fg="yellow",
                 )
             return None
-        click.echo(f"Project {project_name!r} created successfully.")
+        click.echo(f"Project {name!r} created successfully.")
         if response.status_code == HTTPStatus.NO_CONTENT:
             return None
