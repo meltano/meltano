@@ -176,11 +176,17 @@ class UpgradeService:  # noqa: WPS214
             click.secho("Applying migrations to project state...", fg="blue")
             for filepath in state_service.state_store_manager.list_all_files():
                 parts = filepath.split(manager.delimiter)
-                if parts[-1] == "state.json" and filepath.count(manager.prefix) > 1:
+                if (
+                    parts[-1] == "state.json"
+                    and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
+                ):
                     duplicated_substr = manager.delimiter.join(
-                        [manager.prefix, manager.prefix],
+                        [manager.prefix.strip(manager.delimiter)] * 2,
                     )
                     new_path = filepath.replace(duplicated_substr, manager.prefix)
+                    new_path = new_path.replace(
+                        manager.delimiter * 2, manager.delimiter
+                    )
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 

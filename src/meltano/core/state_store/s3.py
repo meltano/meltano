@@ -141,7 +141,6 @@ class S3StateStoreManager(CloudStateStoreManager):
         """
         for state_obj in self.client.list_objects_v2(  # noqa: WPS526
             Bucket=self.bucket,
-            Prefix=self.prefix,
         ).get("Contents", []):
             yield state_obj["Key"]
 
