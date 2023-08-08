@@ -112,8 +112,8 @@ class BlockParser:  # noqa: D101
 
             try:
                 plugin = self.project.plugins.find_plugin(parsed_name)
-            except PluginNotFoundError:
-                raise click.ClickException(f"Block {name} not found")
+            except PluginNotFoundError as e:
+                raise click.ClickException(f"Block {name} not found") from e
 
             if plugin and task_sets_service.exists(name):
                 raise click.ClickException(
