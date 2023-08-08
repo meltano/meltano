@@ -6,7 +6,6 @@ Turns string lists of plugins into `BlockSet` and `PluginCommand` instances.
 from __future__ import annotations
 
 import typing as t
-from contextlib import suppress
 
 import click
 import structlog
