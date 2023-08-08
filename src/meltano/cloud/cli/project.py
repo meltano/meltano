@@ -11,9 +11,6 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
-from slugify import slugify
-from yaspin import yaspin
-
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
@@ -22,6 +19,8 @@ from meltano.cloud.cli.base import (
     print_formatted_list,
 )
 from meltano.core.utils import run_async
+from slugify import slugify
+from yaspin import yaspin
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -318,7 +317,7 @@ async def create_project(
     context: MeltanoCloudCLIContext,
     name: str,
     repo_url: str,
-    project_root_path: str | None = None,
+    root_path: str | None = None,
 ):
     """Create a project to your Meltano Cloud."""
     async with ProjectsCloudClient(config=context.config) as client:
@@ -329,7 +328,7 @@ async def create_project(
                 response = await client.create_project(
                     project_name=name,
                     git_repository=repo_url,
-                    project_root_path=project_root_path,
+                    project_root_path=root_path,
                 )
         except MeltanoCloudError as e:
             if e.response.status == HTTPStatus.CONFLICT:
