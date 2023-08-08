@@ -428,12 +428,6 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - The `--state-id` option identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
-- The `--transform` option can be:
-
-  - `run`: run the Transforms
-  - `skip`: skip the Transforms (Default)
-  - `only`: only run the Transforms (skip the Extract and Load steps)
-
 - A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same State ID.
 
 - A `--force` flag can be passed to force a new run even when a pipeline with the same State ID is already running, which would result in an error otherwise.
@@ -549,6 +543,9 @@ meltano elt <extractor> <loader> [--transform={run,skip,only}] [--state-id TEXT]
 All the same parameters as [`meltano el`](#el) are supported, with the following additions:
 
 - The `--transform` option can be:
+  - `run`: run the Transforms
+  - `skip`: skip the Transforms (Default)
+  - `only`: only run the Transforms (skip the Extract and Load steps)
 
 #### Examples
 
