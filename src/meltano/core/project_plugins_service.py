@@ -256,10 +256,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                         all_mappings = self.find_plugins_by_mapping_name(mapping_name)
                         if len(all_mappings) > 1:
                             raise click.ClickException(
-                                (
-                                    f"Ambiguous mapping name {mapping_name}, "
-                                    "found multiple matches."
-                                )
+                                f"Ambiguous mapping name {mapping_name}, "
+                                "found multiple matches.",
                             )
                         return self.ensure_parent(plugin)
         raise PluginNotFoundError(
