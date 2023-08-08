@@ -8,6 +8,7 @@ import sys
 import typing as t
 from contextlib import contextmanager, suppress
 
+import click
 import structlog
 
 from meltano.core.environment import EnvironmentPluginConfig
@@ -252,6 +253,11 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 if plugin.type == PluginType.MAPPERS:
                     mapping_name = plugin.extra_config.get("_mapping_name")
                     if mapping_name == plugin_name:
+                        all_mappings = self.find_plugins_by_mapping_name(mapping_name)
+                        if len(all_mappings) > 1:
+                            raise click.ClickException(
+                                f"Ambiguous mapping name {mapping_name}, found multiple matches.",
+                            )
                         return self.ensure_parent(plugin)
         raise PluginNotFoundError(
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
