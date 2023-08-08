@@ -111,7 +111,7 @@ class BlockParser:  # noqa: D101
                 command_name = None
 
             try:
-                plugin = self.project.plugins.find_plugin(name)
+                plugin = self.project.plugins.find_plugin(parsed_name)
             except PluginNotFoundError:
                 raise click.ClickException(f"Block {name} not found")
 
