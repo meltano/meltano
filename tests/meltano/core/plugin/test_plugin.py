@@ -5,6 +5,7 @@ import pytest
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.plugin.requirements import PluginRequirement
+from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
 
@@ -442,13 +443,16 @@ class TestProjectPlugin:
         with pytest.raises(CyclicInheritanceError):
             plugin_three.parent = plugin_one
 
-    def test_variant(self, plugin_discovery_service):
+    def test_variant(self, project: Project):
         # Without a variant set, the "original" name is used
-        plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
+        plugin: ProjectPlugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
         assert plugin.variant == Variant.ORIGINAL_NAME
 
-        # So that the original variant is found
-        base_plugin = plugin_discovery_service.get_base_plugin(plugin)
+        base_plugin = project.hub_service.find_base_plugin(
+            PluginType.EXTRACTORS,
+            "tap-mock",
+            "singer-io",
+        )
         assert base_plugin._variant.original
 
         # Whose variant name is reflected once parent is set
@@ -463,12 +467,11 @@ class TestProjectPlugin:
         )
         assert plugin.variant == "meltano"
 
-        base_plugin = plugin_discovery_service.get_base_plugin(plugin)
+        base_plugin = project.hub_service.get_base_plugin(plugin)
         plugin.parent = base_plugin
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    @pytest.mark.usefixtures("plugin_discovery_service")
     def test_command_inheritance(self, tap, inherited_tap):
         # variants
         assert tap.all_commands["cmd"].args == "cmd meltano"

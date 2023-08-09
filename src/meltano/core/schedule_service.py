@@ -9,10 +9,10 @@ from datetime import date, datetime
 from croniter import croniter
 
 from meltano.core.error import MeltanoError
+from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
 from meltano.core.schedule import CRON_INTERVALS, Schedule
 from meltano.core.setting_definition import SettingMissingError

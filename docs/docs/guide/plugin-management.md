@@ -305,7 +305,7 @@ everything Meltano needs to know in order to be able to use the package as a plu
 
 :::caution
 
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to the <a href="https://gitlab.com/meltano/meltano/-/blob/master/src/meltano/core/bundle/discovery.yml"><code>discovery.yml</code> manifest</a> to make it discoverable and supported out of the box for new users!</p>
+  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">adding it to Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
 :::
 
 ### Plugin inheritance

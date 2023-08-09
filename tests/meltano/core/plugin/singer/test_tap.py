@@ -305,7 +305,7 @@ class TestSingerTap:
             async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
-            # When `select` isn't set in meltano.yml or discovery.yml, select all
+            # When `select` isn't set in meltano.yml or the plugin def, select all
             assert_rules(
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
@@ -315,7 +315,7 @@ class TestSingerTap:
 
             reset_catalog()
 
-            # Pretend `select` is set in discovery.yml
+            # Pretend `select` is set in the plugin definition
             monkeypatch.setitem(
                 invoker.plugin.parent._variant.extras,
                 "select",
@@ -325,7 +325,7 @@ class TestSingerTap:
             async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
-            # When `select` is set in discovery.yml, use the selection
+            # When `select` is set in the plugin definition, use the selection
             assert_rules(
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
@@ -345,7 +345,7 @@ class TestSingerTap:
             async with invoker.prepared(session):
                 subject.apply_catalog_rules(invoker)
 
-            # `select` set in meltano.yml takes precedence over discovery.yml
+            # `select` set in meltano.yml takes precedence over the plugin definition
             assert_rules(
                 ["*", [], "selected", False],
                 ["*", ["properties", "*"], "selected", False],
