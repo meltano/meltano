@@ -8,7 +8,6 @@ import sys
 import typing as t
 from contextlib import contextmanager, suppress
 
-import click
 import structlog
 
 from meltano.core.environment import EnvironmentPluginConfig
@@ -99,6 +98,23 @@ class PluginDefinitionNotFoundError(MeltanoError):
             )
 
         super().__init__(reason=reason, instruction=instruction)
+
+
+class AmbiguousMappingName(MeltanoError):
+    """Occurs when the same mapping name is used in multiple mappers."""
+
+    def __init__(self, mapping_name: str):
+        """Initialize the exception.
+
+        Args:
+            mapping_name: The name of the schedule that does not exist.
+        """
+        super().__init__(
+            reason=f"Ambiguous mapping name {mapping_name}, found multiple matches.",
+            instruction=(
+                "Alter one of the instances of this mapping name to make it distinct."
+            ),
+        )
 
 
 class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
@@ -262,10 +278,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if mapping_name == plugin_name:
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
-                raise click.ClickException(
-                    f"Ambiguous mapping name {mapping_name}, "
-                    "found multiple matches.",
-                )
+                raise AmbiguousMappingName(mapping_name)
             return self.ensure_parent(plugin)
 
     def find_plugin_by_namespace(

@@ -15,7 +15,10 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
-from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.project_plugins_service import (
+    AmbiguousMappingName,
+    PluginAlreadyAddedException
+)
 
 
 class MockIOBlock(IOBlock):
@@ -1114,13 +1117,13 @@ class TestCliRunScratchpadOne:
             "apply_catalog_rules",
         ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
-
-            result = cli_runner.invoke(cli, args, catch_exceptions=True)
-            assert result.exit_code == 1
-            assert (
-                "Error: Ambiguous mapping name mock-mapping-dupe, "
-                "found multiple matches."
-            ) in result.stderr
+            with pytest.raises(
+                AmbiguousMappingName,
+                match=(
+                    "Ambiguous mapping name mock-mapping-dupe, found multiple matches."
+                ),
+            ):
+                cli_runner.invoke(cli, args, catch_exceptions=False)
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
