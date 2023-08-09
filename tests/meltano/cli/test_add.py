@@ -274,7 +274,7 @@ class TestCliAdd:
         assert res.exception
         assert str(res.exception) == (
             "Extractor 'tap-unknown' is not known to Meltano. "
-            "Check Meltano Hub for available plugins."
+            "Check https://hub.meltano.com/ for available plugins."
         )
 
         # ensure the plugin is not present
