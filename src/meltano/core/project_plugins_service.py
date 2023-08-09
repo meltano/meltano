@@ -77,7 +77,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
         instruction = None
 
         if DefinitionSource.HUB in source:
-            instruction = "Check Meltano Hub for available plugins"
+            instruction = "Check https://hub.meltano.com/ for available plugins"
         else:
             instruction = (
                 "Try running `meltano lock --update --all` to ensure your plugins are "
