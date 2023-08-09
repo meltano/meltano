@@ -155,12 +155,17 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ```bash
-meltano config meltano set database_uri postgresql://<username>:<password>@<host>:<port>/<database>
+meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<database>
+export MELTANO_DATABASE_URI=postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-meltano run --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
+meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<port>/<database> ...
 ```
+
+:::info
+Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
+:::
+
 
 #### Targeting a PostgreSQL Schema
 
@@ -172,7 +177,7 @@ You are also able to add multiple schemas, which PostgreSQL will work through fr
 If you dont target a schema then by default PostgreSQL will try to use the `public` schema.
 
 ```bash
-postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
+postgresql+psycopg://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
 
 ### `database_max_retries`
