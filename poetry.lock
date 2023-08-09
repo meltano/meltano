@@ -313,13 +313,13 @@ files = [
 
 [[package]]
 name = "azure-core"
-version = "1.28.0"
+version = "1.29.0"
 description = "Microsoft Azure Core Library for Python"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "azure-core-1.28.0.zip", hash = "sha256:e9eefc66fc1fde56dab6f04d4e5d12c60754d5a9fa49bdcfd8534fc96ed936bd"},
-    {file = "azure_core-1.28.0-py3-none-any.whl", hash = "sha256:dec36dfc8eb0b052a853f30c07437effec2f9e3e1fc8f703d9bdaa5cfc0043d9"},
+    {file = "azure-core-1.29.0.zip", hash = "sha256:552b2010983ab3d3d35e4d4bcc7bb24fc98e40fe70fe534f5700dc90831e2396"},
+    {file = "azure_core-1.29.0-py3-none-any.whl", hash = "sha256:b591cada3644523ae61fd8f120e14e2486ac70485206355db49d7de36709303a"},
 ]
 
 [package.dependencies]
@@ -493,17 +493,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.21"
+version = "1.28.22"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.21-py3-none-any.whl", hash = "sha256:28e1ea098e43e764d990b4466e377c322b5d57829e2eb1395eca52d4209a6c11"},
-    {file = "boto3-1.28.21.tar.gz", hash = "sha256:0ad6932b2469f4fa4e63f4baf8508ccc1b1bc215b9c835df73505aa85210fc27"},
+    {file = "boto3-1.28.22-py3-none-any.whl", hash = "sha256:0c1c1d19232018ac49fd2c0a94aa0b802f5d222e89448ff50734626bce454b32"},
+    {file = "boto3-1.28.22.tar.gz", hash = "sha256:af1ce129f462cdc8dfb1a1c559d7ed725e51344fb0ae4a56d9453196bf416555"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.21,<1.32.0"
+botocore = ">=1.31.22,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -512,13 +512,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.21"
+version = "1.31.22"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.21-py3-none-any.whl", hash = "sha256:c20a5c46eaf49b18b76fdfaec5583320e18abd551b1bc3cd7b1e718372675e21"},
-    {file = "botocore-1.31.21.tar.gz", hash = "sha256:9a13736b16aea3f16829b00edfb2c656fee72ecbfe5eb396cc2f8632e31fd524"},
+    {file = "botocore-1.31.22-py3-none-any.whl", hash = "sha256:b91025ca1a16b13ae662bdb46e7c16d2c53619df23bf3583a43791519da14870"},
+    {file = "botocore-1.31.22.tar.gz", hash = "sha256:d193ab0742ddc4af3a3994af4ec993acf5ac75460f298880fe869765e7bc578d"},
 ]
 
 [package.dependencies]
@@ -4048,4 +4048,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<3.12"
-content-hash = "7c61fc4ffd16efb74bbca9f408e92402025faadef7b2765e03cc990a07d62b4f"
+content-hash = "69d6774bb522f5c65bc6c6be0cf70dfb6022b3002e4dc776bf42cf843a7f025d"
