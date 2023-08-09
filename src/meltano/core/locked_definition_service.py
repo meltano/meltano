@@ -14,6 +14,7 @@ from meltano.core.plugin_repository import PluginRepository
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
+
 class LockedDefinitionService(PluginRepository):
     """PluginRepository implementation for local files."""
 
