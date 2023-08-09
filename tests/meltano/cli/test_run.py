@@ -17,7 +17,7 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     AmbiguousMappingName,
-    PluginAlreadyAddedException
+    PluginAlreadyAddedException,
 )
 
 
