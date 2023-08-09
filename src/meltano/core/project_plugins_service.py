@@ -227,7 +227,6 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         Raises:
             PluginNotFoundError: If the plugin is not found.
-            ClickException: If and ambiguous mapping is found.
         """
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
@@ -251,18 +250,23 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             ):
                 return self.ensure_parent(plugin)
             elif plugin.type == PluginType.MAPPERS:
-                mapping_name = plugin.extra_config.get("_mapping_name")
-                if mapping_name == plugin_name:
-                    all_mappings = self.find_plugins_by_mapping_name(mapping_name)
-                    if len(all_mappings) > 1:
-                        raise click.ClickException(
-                            f"Ambiguous mapping name {mapping_name}, "
-                            "found multiple matches.",
-                        )
-                    return self.ensure_parent(plugin)
+                mapping = self._find_mapping(plugin_name, plugin)
+                if mapping:
+                    return mapping
         raise PluginNotFoundError(
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
         )
+
+    def _find_mapping(self, plugin_name: str, plugin: ProjectPlugin) -> ProjectPlugin:
+        mapping_name = plugin.extra_config.get("_mapping_name")
+        if mapping_name == plugin_name:
+            all_mappings = self.find_plugins_by_mapping_name(mapping_name)
+            if len(all_mappings) > 1:
+                raise click.ClickException(
+                    f"Ambiguous mapping name {mapping_name}, "
+                    "found multiple matches.",
+                )
+            return self.ensure_parent(plugin)
 
     def find_plugin_by_namespace(
         self,
