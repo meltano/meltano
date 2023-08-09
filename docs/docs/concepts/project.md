@@ -383,11 +383,9 @@ Meltano's CLI utilizes the following tables:
 
 Meltano currently supports the following databases as backends for state and configuration:
 
-- PostgreSQL
-- SQLite
-- MS SQL Server
-
-PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
+- SQLite (supported out of the box)
+- PostgreSQL (requires the [`postgres` or `psycopg2` Python extra](/guide/advanced-topics#installing-optional-components))
+- MS SQL Server (requires the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components)
 
 Support for other databases is planned:
 
