@@ -17,7 +17,6 @@ from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.settings_service import FeatureFlags
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -99,13 +98,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self.project = project
         self.lock_service = PluginLockService(project)
         self.locked_definition_service = LockedDefinitionService(project)
-        with self.project.settings.feature_flag(
-            FeatureFlags.PLUGIN_LOCKS_REQUIRED.value,
-            raise_error=False,
-        ) as flag:
-            self._prefer_source = (
-                DefinitionSource.LOCAL if flag else DefinitionSource.ANY
-            )
+        self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
     def current_plugins(self):

@@ -219,11 +219,6 @@
           "type": "boolean",
           "description": "Whether references to undefined environment variables cause Meltano to exit with an error.",
           "default": false
-        },
-        "plugin_locks_required": {
-          "type": "boolean",
-          "description": "Whether plugin locks are required to run a job.",
-          "default": false
         }
       }
     },

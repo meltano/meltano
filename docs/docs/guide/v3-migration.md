@@ -29,6 +29,12 @@ pipx install "meltano[postgres]"
 meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 ```
 
+### Plugin lock files are now always required
+
+Plugin [lock files](/concepts/plugins#lock-artifacts) are now always required.
+
+Before this, Meltano fell back to retrieving the plugin definition from Meltano Hub if the lock file was missing. This behavior caused issues when lock files were not deployed to production and Meltano Hub was unavailable because of network restrictions.
+
 ## Removed
 
 ## CLI and API Changes
