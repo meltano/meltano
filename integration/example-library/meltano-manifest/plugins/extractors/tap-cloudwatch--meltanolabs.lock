@@ -12,6 +12,7 @@
   "logo_url": "https://hub.meltano.com/assets/logos/extractors/cloudwatch.png",
   "capabilities": [
     "about",
+    "batch",
     "catalog",
     "discover",
     "schema-flattening",
@@ -29,13 +30,13 @@
     {
       "name": "aws_access_key_id",
       "kind": "password",
-      "label": "AWS Access Key Id",
+      "label": "AWS Access Key ID",
       "description": "The access key for your AWS account."
     },
     {
       "name": "aws_endpoint_url",
       "kind": "string",
-      "label": "AWS Endpoint Url",
+      "label": "AWS Endpoint URL",
       "description": "The complete URL to use for the constructed client."
     },
     {
@@ -63,8 +64,49 @@
       "description": "The session key for your AWS account. This is only needed when you are using temporary credentials."
     },
     {
+      "name": "batch_config.encoding.compression",
+      "kind": "options",
+      "label": "Batch Config Encoding Compression",
+      "description": "Compression format to use for batch files.",
+      "options": [
+        {
+          "label": "Gzip",
+          "value": "gzip"
+        },
+        {
+          "label": "None",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.encoding.format",
+      "kind": "options",
+      "label": "Batch Config Encoding Format",
+      "description": "Format to use for batch files.",
+      "options": [
+        {
+          "label": "Jsonl",
+          "value": "jsonl"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.storage.prefix",
+      "kind": "string",
+      "label": "Batch Config Storage Prefix",
+      "description": "Prefix to use when writing batch files."
+    },
+    {
+      "name": "batch_config.storage.root",
+      "kind": "string",
+      "label": "Batch Config Storage Root",
+      "description": "Root path to use when writing batch files."
+    },
+    {
       "name": "batch_increment_s",
       "kind": "integer",
+      "value": 3600,
       "label": "Batch Increment S",
       "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit."
     },
