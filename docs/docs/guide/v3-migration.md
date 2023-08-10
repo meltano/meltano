@@ -33,6 +33,12 @@ meltano config meltano set database_uri postgresql+psycopg://<username>:<passwor
 
 Plugin [lock files](/concepts/plugins#lock-artifacts) are now always required.
 
+To generate all lock files for your project, run:
+
+```bash
+meltano lock --all
+```
+
 Before this, Meltano fell back to retrieving the plugin definition from Meltano Hub if the lock file was missing. This behavior caused issues when lock files were not deployed to production and Meltano Hub was unavailable because of network restrictions.
 
 ## Removed
