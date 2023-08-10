@@ -418,7 +418,7 @@ root:
 
 ## `meltano elt`
 
-These settings can be used to modify the behavior of [`meltano elt`](/reference/command-line-interface#elt).
+These settings can be used to modify the behavior of [`meltano el`](/reference/command-line-interface#el) and [`meltano elt`](/reference/command-line-interface#elt).
 
 ### `elt.buffer_size`
 

@@ -44,17 +44,17 @@ the bellow in `docs/example-library/transition-from-elt-to-run/index.md`:
 ````markdown
 # Example of how to transition from `meltano elt` to `meltano run`
 
-This example shows how to transition an `elt` task with a custom state-id to a `job` executed via `run`.
+This example shows how to transition an `el` or `elt` task with a custom state-id to a `job` executed via `run`.
 To follow along with this example, download link to meltano yml to a fresh project and run:
 
 ```
 meltano install
 ```
 
-Then assuming you had an `elt` job invoked like so:
+Then assuming you had an `el` job invoked like so:
 
 ```shell
-meltano elt --state-id=my-custom-id tap-gitlab target-postgres
+meltano el --state-id=my-custom-id tap-gitlab target-postgres
 ```
 
 You would first need to rename the id to match meltano's internal pattern:
@@ -76,7 +76,7 @@ Our integration framework will then parse this markdown, searching for code fenc
 
 ```shell
 meltano install
-meltano elt --state-id=my-custom-id tap-gitlab target-postgres
+meltano el --state-id=my-custom-id tap-gitlab target-postgres
 meltano state copy my-custom-id tap-gitlab-to-target-postgres
 meltano job add my-new-job --task="tap-gitlab target-postgres"
 meltano run my-new-job
