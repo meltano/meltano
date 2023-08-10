@@ -57,9 +57,6 @@ def venv_platform_specs():
         raise Exception(f"Platform {system!r} not supported.") from ex
 
 
-PIP_PACKAGES = ("pip", "setuptools==57.5.0", "wheel")
-
-
 class VirtualEnv:
     """Info about a single virtual environment."""
 
@@ -246,7 +243,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
         try:
-            return await self._pip_install(["--upgrade", *PIP_PACKAGES])
+            return await self._pip_install(["--upgrade", "pip"])
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.",
