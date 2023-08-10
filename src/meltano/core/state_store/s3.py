@@ -151,7 +151,6 @@ class S3StateStoreManager(CloudStateStoreManager):
             src: the source path
             dst: the destination path
         """
-        # TODO
         self.client.copy_object(
             Bucket=self.bucket,
             CopySource={"Bucket": self.bucket, "Key": src},

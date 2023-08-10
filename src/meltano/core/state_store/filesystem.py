@@ -582,6 +582,8 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         state_ids = set()
         for filepath in self.list_all_files():
             (state_id, filename) = filepath.split("/")[-2:]
-            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
+            if filename == "state.json" and (
+                (not pattern) or pattern_re.match(state_id)
+            ):
                 state_ids.add(state_id)
         return list(state_ids)

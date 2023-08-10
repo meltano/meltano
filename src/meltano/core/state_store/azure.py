@@ -135,9 +135,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             src: the source path
             dst: the destination path
         """
-        # TODO
         container_client = self.client.get_container_client(self.container_name)
-        container_client.start_copy_from_url(
-            src,
-            dst,
-        )
+        src_blob_client = container_client.get_blob_client(src)
+        dst_blob_client = container_client.get_blob_client(dst)
+        dst_blob_client.start_copy_from_url(src_blob_client.url)

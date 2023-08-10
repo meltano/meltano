@@ -134,7 +134,6 @@ class GCSStateStoreManager(CloudStateStoreManager):
             src: the source path
             dst: the destination path
         """
-        # TODO
         bucket = self.client.bucket(self.bucket)
         blob = bucket.blob(src)
         bucket.copy_blob(blob, bucket, dst)
