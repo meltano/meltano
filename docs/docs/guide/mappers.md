@@ -171,7 +171,7 @@ To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/
 
 ## FAQs
 
-### Can I used standalone mapper plugins with the `meltano elt` command?
+### Can I use standalone mapper plugins with the `meltano elt` command?
 
 No, currently only `meltano run` and `meltano invoke` support standalone mapper plugins.
 
