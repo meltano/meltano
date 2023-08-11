@@ -77,14 +77,13 @@ class ProjectsCloudClient(MeltanoCloudClient):
             payload = {"project_name": project_name, "git_repository": git_repository}
             if project_root_path:
                 payload["project_root_path"] = project_root_path
-            prepared_request = await self._json_request(
+            async with self._raw_request(
                 "POST",
                 f"/projects/v1/{self.config.tenant_resource_key}",
                 json=payload,
-            )
-            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
-            response.raise_for_status()
-            return response
+            ) as response:
+                response.raise_for_status()
+                return response
 
 
 @click.group("project")
