@@ -17,6 +17,7 @@ from meltano.cloud.cli.project import _remove_private_project_attributes  # noqa
 
 if t.TYPE_CHECKING:
     from pytest_httpserver import HTTPServer
+    from requests_mock import Mocker as RequestsMocker
 
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProject
@@ -73,6 +74,21 @@ class TestProjectCommand:
     @pytest.fixture()
     def path(self, tenant_resource_key: str) -> str:
         return f"/projects/v1/{tenant_resource_key}"
+
+    @pytest.fixture()
+    def prepared_request(self, request: pytest.FixtureRequest):
+        return {
+            "method": request.param["method"],
+            "url": "https://asdf.lambda-url.us-west-2.on.aws.example.com/",
+            "params": {},
+            "headers": {
+                "Content-Type": "application/json",
+                "X-Amz-Date": "20230525T185058Z",
+                "X-Amz-Security-Token": "IQoJb3JpZ2luX2VjEOP/////////wEaCXV==",
+                "Authorization": "AWS4-HMAC-SHA256 Credential=ASI3AV1SM3BH...",
+            },
+            "data": '{"environment_name": "staging", "git_rev": "main"}',
+        }
 
     def test_project_list_table(
         self,
@@ -392,17 +408,21 @@ class TestProjectCommand:
         assert result.exit_code == 2
         assert "The '--name' and '--id' options are mutually exclusive" in result.output
 
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
     def test_project_create(
         self,
         projects: list[CloudProject],
         httpserver: HTTPServer,
         config: MeltanoCloudConfig,
+        prepared_request,
+        requests_mock: RequestsMocker,
     ):
         for project in projects[:3]:
             httpserver.expect_oneshot_request(
                 f"/projects/v1/{project['tenant_resource_key']}",
                 method="POST",
-            ).respond_with_json(project)
+            ).respond_with_json(prepared_request)
+            requests_mock.post(prepared_request["url"], json=project)  # noqa: S113
             result = CliRunner().invoke(
                 cli,
                 (
@@ -419,8 +439,7 @@ class TestProjectCommand:
                 ),
             )
             assert result.exit_code == 0, result.output
-            assert result.output == (
+            assert (
                 f"Project {project['project_name']!r} created successfully.\n"
-                + json.dumps(project)
-                + "\n"
+                in result.output
             )
