@@ -7,8 +7,14 @@ sidebar_position: 5
 
 :::info
 
-<p><strong>Meltano Cloud is currently in Beta.</strong></p>
-<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+<p>
+  <strong>Meltano Cloud is currently in Beta.</strong>
+</p>
+<p>
+  While in Beta, functionality is not guaranteed and subject to change. <br />{" "}
+  If you're interested in using Meltano Cloud please join our{" "}
+  <a href="https://meltano.com/cloud/">waitlist</a>.
+</p>
 
 :::
 
@@ -68,8 +74,12 @@ The above example creates a new deployment named `my-dev-deployment` for the Mel
 
 :::info
 
-<p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
-Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
+<p>
+  If your deployment is failing you can try running{" "}
+  <a href="/reference/command-line-interface#compile">`meltano compile`</a> to
+  confirm that your configuration files are valid. Also double check that you
+  have schedules configured, otherwise the deployment will throw an error.
+</p>
 
 :::
 
@@ -219,6 +229,14 @@ meltano cloud project list
 ╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
+The `create` subcommand creates a new Meltano Cloud project.
+
+```sh
+meltano-cloud project create --name example-project --repo-url https://github.com/meltano/squared.git --root-path "data/"
+⠋ Creating project - this may take several minutes...
+Project 'example-project' created successfully.
+```
+
 When you run the `login` command, if you only have a single project, it will be set as the default project to use for future commands. Otherwise, you will need to run `meltano cloud project use` to specify which Meltano Cloud project the other `meltano cloud` commands should operate on.
 
 When `meltano cloud project use` is not provided any argument, it will list the available projects, and have you select one interactively using the arrow keys. To select a project as the default non-interactively, use the `--name` argument:
@@ -260,7 +278,16 @@ meltano cloud job stop --execution-id 15e1cbbde6b2424f86c04b237291d652
 
 :::info
 
-  <p>At the moment, executions stopped manually will be marked as <i>Failed</i> in the output of <a href="#history"><code>meltano cloud history</code></a>. See <a href="https://github.com/meltano/meltano/issues/7697">#7697</a> for more details.</p>
+{" "}
+<p>
+  At the moment, executions stopped manually will be marked as <i>Failed</i> in
+  the output of{" "}
+  <a href="#history">
+    <code>meltano cloud history</code>
+  </a>
+  . See <a href="https://github.com/meltano/meltano/issues/7697">#7697</a> for
+  more details.
+</p>
 :::
 
 ## `schedule`
