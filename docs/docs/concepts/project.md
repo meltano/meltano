@@ -25,7 +25,7 @@ You can initialize a new Meltano project using [`meltano init`](/reference/comma
 At a minimum, a Meltano project must contain a project file named `meltano.yml`,
 which contains your project configuration and tells Meltano that a particular directory is a Meltano project.
 
-The only required property is `version`, which currently always holds the value `1`.
+The only required property is `version`, which currently always holds the value `1`. You can find a formal JSON Schema for the specification on [SchemaStore.org](https://schemastore.org) or directly in the main repository [here](https://raw.githubusercontent.com/meltano/meltano/main/src/meltano/schemas/meltano.schema.json), which can be useful for code generation by many tools like [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator) or [swagger-codegen](https://github.com/swagger-api/swagger-codegen).
 
 ### Configuration
 
