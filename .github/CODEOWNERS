@@ -12,10 +12,6 @@
 .github/actions/ @WillDaSilva @meltano/engineering
 .github/workflows/ @WillDaSilva @meltano/engineering
 
-# Discovery (End-of-Life)
-
-/src/meltano/core/bundle/discovery.yml @meltano/engineering
-
 # Docs (General)
 /docs/ @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
 /README.md @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
