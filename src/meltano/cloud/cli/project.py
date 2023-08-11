@@ -11,7 +11,7 @@ from http import HTTPStatus
 import click
 import questionary
 from slugify import slugify
-from yaspin import yaspin
+from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
