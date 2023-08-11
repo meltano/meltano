@@ -10,7 +10,6 @@ from http import HTTPStatus
 
 import click
 import questionary
-import requests
 from slugify import slugify
 from yaspin import yaspin
 
