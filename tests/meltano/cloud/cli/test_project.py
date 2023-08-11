@@ -439,7 +439,9 @@ class TestProjectCommand:
                 ),
             )
             assert result.exit_code == 0, result.output
-            assert (
-                f"Project {project['project_name']!r} created successfully.\n"
-                in result.output
+            expected = (
+                "\r\r\r⠋ Creating project - this may take several minutes...\r"
+                "                                                      "
+                f"\rProject {project['project_name']!r} created successfully.\n"
             )
+            assert result.output == expected
