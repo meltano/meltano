@@ -530,7 +530,8 @@ async def install_pip_plugin(
     pip_install_args = get_pip_install_args(project, plugin, env=env)
 
     venv_service = venv_service or VenvService(
-        project,
+        project=project,
+        python=plugin.python,
         namespace=plugin.type,
         name=plugin.venv_name,
     )

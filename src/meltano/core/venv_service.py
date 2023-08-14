@@ -10,93 +10,124 @@ import platform
 import shutil
 import subprocess
 import sys
+import typing as t
 from asyncio.subprocess import Process
-from collections import namedtuple
 from collections.abc import Iterable
+from functools import cached_property
 from pathlib import Path
 
-from meltano.core.error import AsyncSubprocessError
+from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
-
-VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
-
-POSIX = VenvSpecs(
-    lib_dir="lib",
-    bin_dir="bin",
-    site_packages_dir=os.path.join(
-        "lib",
-        f"python{'.'.join(str(part) for part in sys.version_info[:2])}",
-        "site-packages",
-    ),
-)
-
-NT = VenvSpecs(
-    lib_dir="Lib",
-    bin_dir="Scripts",
-    site_packages_dir=os.path.join("Lib", "site-packages"),
-)
-
-PLATFORM_SPECS = {"Linux": POSIX, "Darwin": POSIX, "Windows": NT}
-
-
-def venv_platform_specs():
-    """Get virtual environment sub-path info for the current platform.
-
-    Raises:
-        Exception: This platform is not supported.
-
-    Returns:
-        Virtual environment sub-path info for the current platform.
-    """
-    system = platform.system()
-    try:
-        return PLATFORM_SPECS[system]
-    except KeyError as ex:
-        raise Exception(f"Platform {system!r} not supported.") from ex
-
-
-PIP_PACKAGES = ("pip", "setuptools==57.5.0", "wheel")
 
 
 class VirtualEnv:
     """Info about a single virtual environment."""
 
-    def __init__(self, root: Path):
+    def __init__(
+        self,
+        root: Path,
+        python: Path | str | None = None,
+    ):
         """Initialize the `VirtualEnv` instance.
 
         Args:
             root: The root directory of the virtual environment.
+            python: The path to the Python executable to use, or name to find on the
+                $PATH. Defaults to the Python executable running Meltano.
         """
         self.root = root.resolve()
-        self.specs = venv_platform_specs()
+        self.python_path = self._resolve_python_path(python)
 
-    def __getattr__(self, key: str):
-        """Get a specific attribute from this instance.
+    @staticmethod
+    def _resolve_python_path(python: Path | str | None) -> str:
+        if python is None:
+            python_path = sys.executable
+        elif os.path.exists(str(python)):
+            python_path = str(python)
+        else:
+            python_path = shutil.which(python)
+            if python_path is None:
+                raise MeltanoError(f"Python executable {python!r} not found")
 
-        Used to provide `VenvSpecs` attributes for this specific virtual environment.
+        if not os.access(python_path, os.X_OK):
+            raise MeltanoError(f"{python_path!r} is not executable")
 
-        Args:
-            key: The attribute name. Must be one of the `VenvSpecs` attributes.
+        return python_path
+
+    @cached_property
+    def lib_dir(self) -> str:
+        """Return the lib directory of the virtual environment.
+
+        Raises:
+            MeltanoError: The current system is not supported.
 
         Returns:
-            The root directory of this virtual environment joined to the requested
-            platform-specific path using this platform's `VenvSpecs` instance.
+            The lib directory of the virtual environment.
         """
-        return self.root / getattr(self.specs, key)
+        if platform.system() in {"Linux", "Darwin"}:
+            return self.root / "lib"
+        elif platform.system() == "Windows":
+            return self.root / "Lib"
+        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
 
-    def __str__(self):
-        """_summary_.
+    @cached_property
+    def bin_dir(self) -> Path:
+        """Return the bin directory of the virtual environment.
+
+        Raises:
+            MeltanoError: The current system is not supported.
 
         Returns:
-            _description_.
+            The bin directory of the virtual environment.
         """
-        return str(self.root)
+        if platform.system() in {"Linux", "Darwin"}:
+            return self.root / "bin"
+        elif platform.system() == "Windows":
+            return self.root / "Scripts"
+        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
+
+    @cached_property
+    def site_packages_dir(self) -> Path:
+        """Return the site-packages directory of the virtual environment.
+
+        Raises:
+            MeltanoError: The current system is not supported.
+
+        Returns:
+            The site-packages directory of the virtual environment.
+        """
+        if platform.system() in {"Linux", "Darwin"}:
+            return (
+                self.lib_dir
+                / f"python{'.'.join(str(x) for x in self.python_version_tuple[:2])}"
+                / "site-packages"
+            )
+        elif platform.system() == "Windows":
+            return self.lib_dir / "site-packages"
+        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
+
+    @cached_property
+    def python_version_tuple(self) -> tuple[int, int, int]:
+        """Return the Python version tuple of the virtual environment.
+
+        Returns:
+            The Python version tuple of the virtual environment.
+        """
+        if self.python_path == sys.executable:
+            return sys.version_info[:3]
+        return tuple(
+            int(x)
+            for x in subprocess.run(
+                (self.python_path, "-c", "import sys; print(*sys.version_info[:3])"),
+                stdout=subprocess.PIPE,
+            ).stdout.split(b" ")
+        )
 
 
 async def exec_async(*args, **kwargs) -> Process:
-    """Run an executable asyncronously in a subprocess.
+    """Run an executable asynchronously in a subprocess.
 
     Args:
         args: Positional arguments for `asyncio.create_subprocess_exec`.
@@ -142,21 +173,34 @@ class VenvService:  # noqa: WPS214
     The methods in this class are not threadsafe.
     """
 
-    def __init__(self, project: Project, namespace: str = "", name: str = ""):
+    def __init__(
+        self,
+        *,
+        project: Project,
+        python: Path | str | None = None,
+        namespace: str = "",
+        name: str = "",
+    ):
         """Initialize the `VenvService`.
 
         Args:
             project: The Meltano project.
+            python: The path to the Python executable to use, or name to find on $PATH.
+                Defaults to the Python executable running Meltano.
             namespace: The namespace for the venv, e.g. a Plugin type.
             name: The name of the venv, e.g. a Plugin name.
         """
         self.project = project
         self.namespace = namespace
         self.name = name
-        self.venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+        self.venv = VirtualEnv(self.project.venvs_dir(namespace, name), python)
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
 
-    async def install(self, pip_install_args: list[str], clean: bool = False) -> None:
+    async def install(
+        self,
+        pip_install_args: t.Sequence[str],
+        clean: bool = False,
+    ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
 
         Args:
@@ -188,8 +232,6 @@ class VenvService:  # noqa: WPS214
         def checks():  # A generator is used to perform the checks lazily
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
-            # The deprecated `meltano_venv.pth` feature is used by this venv
-            yield self.venv.site_packages_dir.joinpath("meltano_venv.pth").exists()
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.read_fingerprint()
             yield existing_fingerprint is None
@@ -217,8 +259,12 @@ class VenvService:  # noqa: WPS214
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
 
-    async def create(self) -> Process:
+    async def create(self, *, venv_module: str = "virtualenv") -> Process:
         """Create a new virtual environment.
+
+        Args:
+            venv_module: The name of the Python module to use to create the virtual
+                environment.
 
         Raises:
             AsyncSubprocessError: The virtual environment could not be created.
@@ -228,8 +274,16 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
         try:
-            return await exec_async(sys.executable, "-m", "virtualenv", str(self.venv))
+            return await exec_async(
+                self.venv.python_path,
+                "-m",
+                venv_module,
+                str(self.venv.root),
+            )
         except AsyncSubprocessError as err:
+            if "No module named virtualenv" in await err.stderr:
+                # Fall back to using the built-in venv module
+                return await self.create(venv_module="venv")
             raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
                 err.process,
@@ -246,7 +300,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
         try:
-            return await self._pip_install(["--upgrade", *PIP_PACKAGES])
+            return await self._pip_install(("--upgrade", "pip"))
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.",
@@ -298,7 +352,7 @@ class VenvService:  # noqa: WPS214
 
     async def _pip_install(
         self,
-        pip_install_args: list[str],
+        pip_install_args: t.Sequence[str],
         clean: bool = False,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.

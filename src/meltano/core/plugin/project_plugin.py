@@ -57,6 +57,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         namespace: str | None = None,
         variant: str | None = None,
         pip_url: str | None = None,
+        python: str | None = None,
         executable: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
@@ -77,6 +78,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             namespace: Plugin namespace.
             variant: Plugin variant.
             pip_url: Plugin install pip url.
+            python: The python version to use for this plugin, specified as a path, or a
+                executable name to find within a directory in $PATH.
             executable: Executable name.
             capabilities: Capabilities.
             settings_group_validation: Settings group validation.
@@ -134,6 +137,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.python = python
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation

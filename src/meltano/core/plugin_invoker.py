@@ -131,7 +131,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
-        venv_service: VenvService | None = None,
         plugin_config_service: PluginConfigService | None = None,
         plugin_settings_service: PluginSettingsService | None = None,
     ):
@@ -144,7 +143,6 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             output_handlers: Logging and output handlers.
             run_dir: Execution directory.
             config_dir: Configuration files directory.
-            venv_service: Virtual Environment manager.
             plugin_config_service: Plugin Configuration manager.
             plugin_settings_service: Plugin Settings manager.
         """
@@ -154,10 +152,10 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self.context = context
         self.output_handlers = output_handlers
 
-        self.venv_service: VenvService | None = None
-        if plugin.pip_url or venv_service:
-            self.venv_service = venv_service or VenvService(
-                project,
+        if plugin.pip_url:
+            self.venv_service = VenvService(
+                project=project,
+                python=self.plugin.python,
                 name=plugin.venv_name,
                 namespace=plugin.type,
             )

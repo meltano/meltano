@@ -383,6 +383,15 @@
             "type": "string",
             "description": "An optional logo URL for this plugin"
           },
+          "python": {
+            "type": "string",
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ]
+          },
           "executable": {
             "type": "string",
             "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
