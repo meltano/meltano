@@ -61,10 +61,7 @@ class VirtualEnv:
         elif isinstance(python, Path):
             python_path = str(python.resolve())
         else:
-            if os.path.exists(python):
-                python_path = python
-            else:
-                python_path = shutil.which(python)
+            python_path = python if os.path.exists(python) else shutil.which(python)
 
         if python_path is None:
             raise MeltanoError(f"Python executable {python!r} was not found")
@@ -135,13 +132,20 @@ class VirtualEnv:
         """
         if self.python_path == sys.executable:
             return sys.version_info[:3]
-        return t.cast(tuple[int, int, int], tuple(
-            int(x)
-            for x in subprocess.run(
-                (self.python_path, "-c", "import sys; print(*sys.version_info[:3])"),
-                stdout=subprocess.PIPE,
-            ).stdout.split(b" ")
-        ))
+        return t.cast(
+            tuple[int, int, int],
+            tuple(
+                int(x)
+                for x in subprocess.run(
+                    (
+                        self.python_path,
+                        "-c",
+                        "import sys; print(*sys.version_info[:3])",
+                    ),
+                    stdout=subprocess.PIPE,
+                ).stdout.split(b" ")
+            ),
+        )
 
 
 async def exec_async(*args, **kwargs) -> Process:
