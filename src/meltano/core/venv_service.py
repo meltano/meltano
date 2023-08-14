@@ -25,6 +25,12 @@ logger = logging.getLogger(__name__)
 class VirtualEnv:
     """Info about a single virtual environment."""
 
+    _SUPPORTED_PLATFORMS = {
+        "Linux",
+        "Darwin",
+        "Windows",
+    }
+
     def __init__(
         self,
         root: Path,
@@ -36,20 +42,32 @@ class VirtualEnv:
             root: The root directory of the virtual environment.
             python: The path to the Python executable to use, or name to find on the
                 $PATH. Defaults to the Python executable running Meltano.
+
+        Raises:
+            MeltanoError: The current system is not supported.
         """
+        self._system = platform.system()
+        if self._system not in self._SUPPORTED_PLATFORMS:
+            raise MeltanoError(f"Platform {self._system!r} not supported.")
         self.root = root.resolve()
         self.python_path = self._resolve_python_path(python)
 
     @staticmethod
     def _resolve_python_path(python: Path | str | None) -> str:
+        python_path: str | None = None
+
         if python is None:
             python_path = sys.executable
-        elif os.path.exists(str(python)):
-            python_path = str(python)
+        elif isinstance(python, Path):
+            python_path = str(python.resolve())
         else:
-            python_path = shutil.which(python)
-            if python_path is None:
-                raise MeltanoError(f"Python executable {python!r} not found")
+            if os.path.exists(python):
+                python_path = python
+            else:
+                python_path = shutil.which(python)
+
+        if python_path is None:
+            raise MeltanoError(f"Python executable {python!r} was not found")
 
         if not os.access(python_path, os.X_OK):
             raise MeltanoError(f"{python_path!r} is not executable")
@@ -57,7 +75,7 @@ class VirtualEnv:
         return python_path
 
     @cached_property
-    def lib_dir(self) -> str:
+    def lib_dir(self) -> Path:
         """Return the lib directory of the virtual environment.
 
         Raises:
@@ -66,11 +84,11 @@ class VirtualEnv:
         Returns:
             The lib directory of the virtual environment.
         """
-        if platform.system() in {"Linux", "Darwin"}:
+        if self._system in {"Linux", "Darwin"}:
             return self.root / "lib"
-        elif platform.system() == "Windows":
+        elif self._system == "Windows":
             return self.root / "Lib"
-        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")
 
     @cached_property
     def bin_dir(self) -> Path:
@@ -82,11 +100,11 @@ class VirtualEnv:
         Returns:
             The bin directory of the virtual environment.
         """
-        if platform.system() in {"Linux", "Darwin"}:
+        if self._system in {"Linux", "Darwin"}:
             return self.root / "bin"
-        elif platform.system() == "Windows":
+        elif self._system == "Windows":
             return self.root / "Scripts"
-        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")
 
     @cached_property
     def site_packages_dir(self) -> Path:
@@ -98,15 +116,15 @@ class VirtualEnv:
         Returns:
             The site-packages directory of the virtual environment.
         """
-        if platform.system() in {"Linux", "Darwin"}:
+        if self._system in {"Linux", "Darwin"}:
             return (
                 self.lib_dir
                 / f"python{'.'.join(str(x) for x in self.python_version_tuple[:2])}"
                 / "site-packages"
             )
-        elif platform.system() == "Windows":
+        elif self._system == "Windows":
             return self.lib_dir / "site-packages"
-        raise MeltanoError(f"Platform {platform.system()!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
@@ -117,13 +135,13 @@ class VirtualEnv:
         """
         if self.python_path == sys.executable:
             return sys.version_info[:3]
-        return tuple(
+        return t.cast(tuple[int, int, int], tuple(
             int(x)
             for x in subprocess.run(
                 (self.python_path, "-c", "import sys; print(*sys.version_info[:3])"),
                 stdout=subprocess.PIPE,
             ).stdout.split(b" ")
-        )
+        ))
 
 
 async def exec_async(*args, **kwargs) -> Process:
@@ -218,7 +236,7 @@ class VenvService:  # noqa: WPS214
         await self._pip_install(pip_install_args=pip_install_args, clean=clean)
         self.write_fingerprint(pip_install_args)
 
-    def requires_clean_install(self, pip_install_args: list[str]) -> bool:
+    def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
         """Determine whether a clean install is needed.
 
         Args:
@@ -281,7 +299,8 @@ class VenvService:  # noqa: WPS214
                 str(self.venv.root),
             )
         except AsyncSubprocessError as err:
-            if "No module named virtualenv" in await err.stderr:
+            stderr = await err.stderr
+            if stderr and "No module named virtualenv" in stderr:
                 # Fall back to using the built-in venv module
                 return await self.create(venv_module="venv")
             raise AsyncSubprocessError(
@@ -319,7 +338,7 @@ class VenvService:  # noqa: WPS214
         with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
-    def write_fingerprint(self, pip_install_args: list[str]) -> None:
+    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
         """Save the fingerprint for this installation.
 
         Args:

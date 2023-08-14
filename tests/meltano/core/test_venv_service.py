@@ -4,18 +4,20 @@ import os
 import platform
 import re
 import subprocess
+import sys
 
 import mock
 import pytest
 
+from meltano.core.error import MeltanoError
 from meltano.core.project import Project
-from meltano.core.venv_service import PLATFORM_SPECS, VenvService, VirtualEnv
+from meltano.core.venv_service import VenvService, VirtualEnv
 
 
 class TestVenvService:
     @pytest.fixture()
     def subject(self, project):
-        return VenvService(project, "namespace", "name")
+        return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
         file = project.run_dir("name", "test.file.txt")
@@ -142,15 +144,71 @@ class TestVenvService:
 
 
 class TestVirtualEnv:
-    @pytest.mark.parametrize("system", ("Linux", "Darwin", "Windows"))
-    def test_cross_platform(self, system, project):
+    @pytest.mark.parametrize(
+        ("system", "lib_dir"),
+        (
+            ("Linux", "lib"),
+            ("Darwin", "lib"),
+            ("Windows", "Lib"),
+        ),
+    )
+    def test_cross_platform(self, system: str, lib_dir: str, project: Project):
         with mock.patch("platform.system", return_value=system):
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
-            assert subject.specs == PLATFORM_SPECS[system]
+            assert subject.lib_dir == subject.root / lib_dir
 
-    def test_unknown_platform(self, project):
+    def test_unknown_platform(self, project: Project):
         with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
-            Exception,
+            MeltanoError,
             match="(?i)Platform 'commodore64'.*?not supported.",
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
+
+    def test_different_python_versions(self, project: Project):
+        root = project.venvs_dir("pytest", "pytest")
+
+        assert (
+            VirtualEnv(root, python=None).python_path
+            == VirtualEnv(root).python_path
+            == VirtualEnv(root, python=sys.executable).python_path
+            == sys.executable
+        )
+
+        with mock.patch(
+            "shutil.which",
+            return_value="/usr/bin/test-python-executable",
+        ), mock.patch("os.access", return_value=True):
+            assert (
+                VirtualEnv(root, python="test-python-executable").python_path
+                == "/usr/bin/test-python-executable"
+            )
+
+        with mock.patch("os.path.exists", return_value=True), mock.patch(
+            "os.access",
+            return_value=True,
+        ):
+            assert (
+                VirtualEnv(
+                    root,
+                    python="/usr/bin/test-python-executable",
+                ).python_path
+                == "/usr/bin/test-python-executable"
+            )
+
+        with mock.patch(
+            "shutil.which",
+            return_value="/usr/bin/test-python-executable",
+        ), mock.patch(
+            "os.access",
+            return_value=False,
+        ), pytest.raises(
+            MeltanoError,
+            match="'/usr/bin/test-python-executable' is not executable",
+        ):
+            VirtualEnv(root, python="test-python-executable")
+
+        with pytest.raises(
+            MeltanoError,
+            match="Python executable 'test-python-executable' was not found",
+        ):
+            VirtualEnv(root, python="test-python-executable")

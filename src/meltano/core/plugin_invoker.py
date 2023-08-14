@@ -159,6 +159,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 name=plugin.venv_name,
                 namespace=plugin.type,
             )
+        else:
+            self.venv_service = None
+
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
