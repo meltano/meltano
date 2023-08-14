@@ -32,10 +32,7 @@ class TestCli:
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
-        project = project_init_service.init(  # noqa: DAR301
-            activate=False,
-            add_discovery=True,
-        )
+        project = project_init_service.init(activate=False)
         Project._default = None
         try:
             yield project

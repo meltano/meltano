@@ -94,11 +94,6 @@
         "$ref": "#/$defs/environments"
       }
     },
-    "discovery_url": {
-      "type": "string",
-      "description": "URL to remote manifest of Meltano plugins, used by meltano discover. Set to 'false' to disable.",
-      "default": "https://www.meltano.com/discovery.yml"
-    },
     "include_paths": {
       "type": "array",
       "description": "An array of paths (relative to the project directory) of other Meltano config files to include in the configuration.",

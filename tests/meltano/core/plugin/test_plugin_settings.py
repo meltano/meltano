@@ -43,7 +43,7 @@ def test_create(session):
 
 
 @pytest.fixture(scope="class")
-def env_var(plugin_discovery_service):  # noqa: ARG001
+def env_var():
     def _wrapper(plugin_settings_service, setting_name):
         setting_def = plugin_settings_service.find_setting(setting_name)
         return plugin_settings_service.setting_env(setting_def)
