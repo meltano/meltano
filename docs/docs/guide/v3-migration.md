@@ -55,6 +55,7 @@ meltano install
 meltano lock --all
 ```
 
+4. (Optional) Remove the `ff.plugin_locks_required` feature flag after upgrading to Meltano v3, since it has no effect in Meltano v3.
 ## Removed
 
 ## CLI and API Changes
