@@ -13,11 +13,15 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Iterable
-from functools import cached_property
 from pathlib import Path
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.project import Project
+
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+else:
+    from cached_property import cached_property
 
 logger = logging.getLogger(__name__)
 
