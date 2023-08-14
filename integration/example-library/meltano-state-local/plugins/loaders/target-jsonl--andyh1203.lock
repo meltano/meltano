@@ -1,0 +1,34 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-jsonl",
+  "namespace": "target_jsonl",
+  "variant": "andyh1203",
+  "label": "JSON Lines (JSONL)",
+  "docs": "https://hub.meltano.com/loaders/target-jsonl--andyh1203",
+  "repo": "https://github.com/andyh1203/target-jsonl",
+  "pip_url": "target-jsonl",
+  "description": "JSONL loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/jsonl.png",
+  "settings": [
+    {
+      "name": "destination_path",
+      "kind": "string",
+      "value": "output",
+      "label": "Destination Path",
+      "description": "Sets the destination path the JSONL files are written to, relative\nto the project root.\n\nThe directory needs to exist already, it will not be created\nautomatically.\n\nTo write JSONL files to the project root, set an empty string (`\"\"`).\n"
+    },
+    {
+      "name": "do_timestamp_file",
+      "kind": "boolean",
+      "value": false,
+      "label": "Include Timestamp in File Names",
+      "description": "Specifies if the files should get timestamped.\n\nBy default, the resulting file will not have a timestamp in the file name (i.e. `exchange_rate.jsonl`).\n\nIf this option gets set to `true`, the resulting file will have a timestamp associated with it (i.e. `exchange_rate-{timestamp}.jsonl`).\n"
+    },
+    {
+      "name": "custom_name",
+      "kind": "string",
+      "label": "Custom File Name Override",
+      "description": "Specifies a custom name for the filename, instead of the stream name.\n\nThe file name will be `{custom_name}-{timestamp}.jsonl`, if `do_timestamp_file` is `true`.\nOtherwise the file name will be `{custom_name}.jsonl`.\n\nIf custom name is not provided, the stream name will be used.\n"
+    }
+  ]
+}

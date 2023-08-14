@@ -11,8 +11,10 @@
   "logo_url": "https://hub.meltano.com/assets/logos/extractors/slack.png",
   "capabilities": [
     "about",
+    "batch",
     "catalog",
     "discover",
+    "schema-flattening",
     "state",
     "stream-maps"
   ],
@@ -26,7 +28,7 @@
       "name": "api_key",
       "kind": "password",
       "label": "API Key",
-      "description": "Your Slack App API key. See the Prerequisites section above for more details on obtaining it."
+      "description": "The token to authenticate against the Slack API service"
     },
     {
       "name": "auto_join_channels",
@@ -35,16 +37,71 @@
       "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages."
     },
     {
+      "name": "batch_config.encoding.compression",
+      "kind": "options",
+      "label": "Batch Config Encoding Compression",
+      "description": "Compression format to use for batch files.",
+      "options": [
+        {
+          "label": "Gzip",
+          "value": "gzip"
+        },
+        {
+          "label": "None",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.encoding.format",
+      "kind": "options",
+      "label": "Batch Config Encoding Format",
+      "description": "Format to use for batch files.",
+      "options": [
+        {
+          "label": "Jsonl",
+          "value": "jsonl"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.storage.prefix",
+      "kind": "string",
+      "label": "Batch Config Storage Prefix",
+      "description": "Prefix to use when writing batch files."
+    },
+    {
+      "name": "batch_config.storage.root",
+      "kind": "string",
+      "label": "Batch Config Storage Root",
+      "description": "Root path to use when writing batch files."
+    },
+    {
       "name": "channel_types",
       "kind": "array",
+      "value": [
+        "public_channel"
+      ],
       "label": "Channel Types",
-      "description": "An array of the types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages."
+      "description": "The types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages."
     },
     {
       "name": "excluded_channels",
       "kind": "array",
       "label": "Excluded Channels",
       "description": "A list of channel IDs that should not be retrieved. Excluding overrides a selected setting, so if a channel is included in both selected and excluded, it will be excluded."
+    },
+    {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
     },
     {
       "name": "include_admin_streams",
@@ -62,11 +119,24 @@
       "name": "start_date",
       "kind": "date_iso8601",
       "label": "Start Date",
-      "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take."
+      "description": "The earliest record date to sync"
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
     },
     {
       "name": "thread_lookback_days",
       "kind": "integer",
+      "value": 1,
       "label": "Thread Lookback Days",
       "description": "The number of days to look in the past for new thread replies to existing messages"
     }
