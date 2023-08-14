@@ -485,7 +485,8 @@ version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
   'src/webapp/package.json:^  "version":',
-  'docs/package.json:^  "version":',
+  # TODO: uncomment the following line for Meltano v3.0.0
+  # 'docs/package.json:^  "version":',
 ]
 
 [tool.mypy]
