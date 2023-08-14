@@ -78,7 +78,7 @@ You can install a standalone mapper plugin that runs between a tap and a target 
 ## SDK Stream Maps
 
 If either your tap or your target is built on the Meltano SDK then it automatically has the mapper features, or also referred to as inline stream maps, built in.
-This is the easiest way to get mapper functionality into your pipeline by avoiding some of the limitations of standalone mappers (only works with `meltano run`, requires installing another plugin, etc.).
+This is the easiest way to get mapper functionality into your pipeline by avoiding some of the limitations of standalone mappers (requires installing another plugin, isn't supported by `meltano elt`, etc.).
 The limitation is that the mapper functionality is baked into the SDK so if you ever need to make customizations its a bit less flexible relative to standalone mappers where you can create your own forks.
 
 A few example configurations using inline stream maps are:
@@ -104,8 +104,8 @@ For more details and examples refer to the [SDK documentation](https://sdk.melta
 The other way of getting mapper functionality is to use a standalone mapper plugin that is inserted between your tap and target to do the translation `meltano run tap-csv <MAPPER> target-jsonl`.
 These can be used even when your your tap and/or target are not SDK based.
 
-The limitation with this approach is that currently you can only run these using the `meltano run` command and not using `meltano elt` or `meltano invoke`.
 The advantage relative to the SDK inline stream maps is that you can fork the mapper plugin or build your own to do whatever you need.
+A limitation with this approach is that currently you can't run these with `meltano elt`.
 
 The two most common mapper plugins are:
 
@@ -120,6 +120,16 @@ meltano add mapper <mapper name>
 
 # Example
 meltano add mapper meltano-map-transformer
+```
+
+You can also debug a mapper in isolation by manually piping Singer messages into it using the following commands:
+
+```bash
+# Output raw Singer messages to a file
+meltano invoke tap-x > output.json
+
+# Pipe them into the mapper using invoke
+cat output.json | meltano invoke mapping_name
 ```
 
 #### Example
@@ -161,9 +171,9 @@ To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/
 
 ## FAQs
 
-### Can I used standalone mapper plugins with the `meltano elt` command?
+### Can I use standalone mapper plugins with the `meltano elt` command?
 
-No, currently only `meltano run` support standalone mapper plugins.
+No, currently only `meltano run` and `meltano invoke` support standalone mapper plugins.
 
 ### Can I use mapping features with the BATCH message type?
 
@@ -174,12 +184,12 @@ Follow along with [this discussion](https://github.com/meltano/meltano/discussio
 
 It's mostly preference but here are some trade offs to consider:
 
-- Mapper plugins can only be run using `meltano run`
 - Mappers work for SDK and non-SDK connectors. If your pipeline uses 2 non-SDK connectors this is your best option.
 - SDK stream maps are part of the SDK which inherently makes them more difficult to change. If you need custom functionality then forking a mapper plugin and customizing it is you best option. Although if your behavior is generically useful, please open an issue in the [SDK repo](https://github.com/meltano/sdk) to get it added!
 - SDK stream maps avoid having to install an additional plugin into your project.
 - Mapper plugins alter data after its been extracted whereas SDK based stream maps on the tap side could alter the extraction behavior.
   Depending on your use case, for example deleting streams, it might be slightly more efficient to do it in the tap and avoid extracting unneeded data.
+- Mapper plugins aren't supported by `meltano elt`
 
 ### Do both my tap and target need to support SDK based stream maps?
 

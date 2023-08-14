@@ -25,7 +25,7 @@ You can initialize a new Meltano project using [`meltano init`](/reference/comma
 At a minimum, a Meltano project must contain a project file named `meltano.yml`,
 which contains your project configuration and tells Meltano that a particular directory is a Meltano project.
 
-The only required property is `version`, which currently always holds the value `1`.
+The only required property is `version`, which currently always holds the value `1`. You can find a formal JSON Schema for the specification on [SchemaStore.org](https://schemastore.org) or directly in the main repository [here](https://raw.githubusercontent.com/meltano/meltano/main/src/meltano/schemas/meltano.schema.json), which can be useful for code generation by many tools like [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator) or [swagger-codegen](https://github.com/swagger-api/swagger-codegen).
 
 ### Configuration
 
@@ -356,9 +356,9 @@ In a newly initialized project, this directory will be included in [`.gitignore`
 While you would usually not want to modify files in this directory directly, knowing what's in there can aid in debugging:
 
 - `.meltano/meltano.db`: The default SQLite [system database](#system-database).
-- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) output logs for the specified pipeline run.
+- `.meltano/logs/elt/<state_id>/<run_id>/elt.log`, e.g. `.meltano/logs/elt/gitlab-to-postgres/<UUID>/elt.log`: [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) output logs for the specified pipeline run.
 - `.meltano/run/bin`: Symlink to the [`meltano` executable](/reference/command-line-interface) most recently used in this project.
-- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
+- `.meltano/run/elt/<state_id>/<run_id>/`, e.g. `.meltano/run/elt/gitlab-to-postgres/<UUID>/`: Directory used by [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) and [`meltano run`](/reference/command-line-interface#run) to store pipeline-specific generated plugin config files, like an [extractor](/concepts/plugins#extractors)'s `tap.config.json`, `tap.properties.json`, and `state.json`.
 - `.meltano/run/<plugin name>/`, e.g. `.meltano/run/tap-gitlab/`: Directory used by [`meltano invoke`](/reference/command-line-interface#invoke) to store generated plugin config files.
 - `.meltano/<plugin type>/<plugin name>/venv/`, e.g. `.meltano/extractors/tap-gitlab/venv/`: [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) directory that a plugin's [pip package](https://pip.pypa.io/en/stable/) was installed into by [`meltano add`](/reference/command-line-interface#add) or [`meltano install`](/reference/command-line-interface#install).
 
@@ -376,7 +376,7 @@ While you would usually not want to modify the system database directly, knowing
 
 Meltano's CLI utilizes the following tables:
 
-- `runs` table: One row for each [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
+- `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
 - `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 - `user` table: Users for [the deprecated Meltano UI](/guide/troubleshooting#meltano-ui) created using [`meltano user add`](/reference/command-line-interface#user).
 
