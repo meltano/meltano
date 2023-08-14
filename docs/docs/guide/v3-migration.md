@@ -35,23 +35,25 @@ Plugin [lock files](/concepts/plugins#lock-artifacts) are now always required.
 
 Before this, Meltano fell back to retrieving the plugin definition from Meltano Hub if the lock file was missing. This behavior caused issues when lock files were not deployed to production and Meltano Hub was unavailable because of network restrictions.
 
+#### Migration steps
+
 1. Enable the `ff.plugin_locks_required` feature flag:
 
-  ```bash
-  meltano config meltano set ff.plugin_locks_required true
-  ```
+```bash
+meltano config meltano set ff.plugin_locks_required true
+```
 
 2. Test that your project still works as expected. For example, by installing all plugins:
 
-  ```bash
-  meltano install
-  ```
+```bash
+meltano install
+```
 
 3. Generate all lock files for your project:
 
-  ```bash
-  meltano lock --all
-  ```
+```bash
+meltano lock --all
+```
 
 ## Removed
 
