@@ -37,6 +37,21 @@ class MeltanoDatabaseCompatibilityError(MeltanoError):
         super().__init__(reason, self.INSTRUCTION)
 
 
+class NullConnectionStringError(MeltanoError):
+    """Raised when the database is not compatible with Meltano."""
+
+    REASON = "The `database_uri` setting has a null value"
+    INSTRUCTION = (
+        "Verify that the `database_uri` setting points to a valid database connection "
+        "URI, or use `MELTANO_FF_STRICT_ENV_VAR_MODE=1 meltano config meltano list` "
+        "to check for missing environment variables"
+    )
+
+    def __init__(self):
+        """Initialize the exception."""
+        super().__init__(self.REASON, self.INSTRUCTION)
+
+
 def project_engine(
     project: Project,
     default: bool = False,
@@ -50,6 +65,9 @@ def project_engine(
 
     Returns:
         The engine, and a session maker bound to the engine.
+
+    Raises:
+        NullConnectionStringError: The `database_uri` setting has a null value.
     """
     existing_engine = _engines.get(project)
     if existing_engine:
@@ -57,6 +75,9 @@ def project_engine(
 
     engine_uri = project.settings.get("database_uri")
     logging.debug(f"Creating engine '{project}@{engine_uri}'")
+
+    if engine_uri is None:
+        raise NullConnectionStringError
 
     engine = create_engine(engine_uri, poolclass=NullPool)
 
