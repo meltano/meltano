@@ -434,7 +434,7 @@ pycodestyle = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=meltano --cov=tests --doctest-modules --order-scope=module -ra"
+addopts = "--cov=meltano --cov=tests --doctest-modules --order-scope=module -ra -n auto --dist=loadfile"
 asyncio_mode = "auto"
 log_cli = 1
 log_cli_format = "%(message)s"
