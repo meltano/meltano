@@ -10,8 +10,31 @@ import mock
 import pytest
 
 from meltano.core.error import MeltanoError
+from meltano.core.plugin import PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
+from meltano.core.plugin_install_service import install_pip_plugin
 from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
+
+
+def _check_venv_created_with_python(project: Project, python: str | None):
+    with mock.patch(
+        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+    ) as venv_mock:
+        VenvService(project=project)
+        venv_mock.assert_called_once_with(python)
+
+
+async def _check_venv_created_with_python_for_plugin(
+    project: Project,
+    plugin: ProjectPlugin,
+    python: str | None,
+):
+    with mock.patch(
+        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+    ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
+        await install_pip_plugin(project=project, plugin=plugin)
+        venv_mock.assert_called_once_with(python)
 
 
 class TestVenvService:
@@ -141,6 +164,50 @@ class TestVenvService:
         assert not subject.requires_clean_install(["example"])
         assert subject.requires_clean_install(["example==0.1.0"])
         assert subject.requires_clean_install(["example", "another-package"])
+
+    def test_top_level_python_setting(self, project: Project):
+        project.settings.set("python", "test-python-executable-project-level")
+        _check_venv_created_with_python(project, "test-python-executable-project-level")
+        project.settings.unset("python")
+        _check_venv_created_with_python(project, None)
+
+    async def test_plugin_python_setting(self, project: Project):
+        plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock",
+            python="test-python-executable-plugin-level",
+        )
+
+        await _check_venv_created_with_python_for_plugin(
+            project,
+            plugin,
+            "test-python-executable-plugin-level",
+        )
+
+        # Setting the project-level `python` setting should have no effect at first
+        # because the plugin-level setting takes precedence.
+        project.settings.set("python", "test-python-executable-project-level")
+
+        await _check_venv_created_with_python_for_plugin(
+            project,
+            plugin,
+            "test-python-executable-plugin-level",
+        )
+
+        # The project-level setting should have an effect after the plugin-level
+        # setting is unset
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
+
+        await _check_venv_created_with_python_for_plugin(
+            project,
+            plugin,
+            "test-python-executable-project-level",
+        )
+
+        project.settings.unset("python")
+
+        # After both the project-level and plugin-level are unset, it should be None
+        await _check_venv_created_with_python_for_plugin(project, plugin, None)
 
 
 class TestVirtualEnv:

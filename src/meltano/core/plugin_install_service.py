@@ -502,7 +502,8 @@ def get_pip_install_args(
                 plugin.pip_url,
                 env,
                 if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-            ),
+            )
+            or "",
         )
 
 
@@ -512,7 +513,6 @@ async def install_pip_plugin(
     plugin: ProjectPlugin,
     clean: bool = False,
     force: bool = False,
-    venv_service: VenvService | None = None,
     env: t.Mapping[str, str] | None = None,
     **kwargs,  # noqa: ARG001
 ):
@@ -523,20 +523,18 @@ async def install_pip_plugin(
         plugin: `ProjectPlugin` to install.
         clean: Flag to clean install.
         force: Whether to ignore the Python version required by plugins.
-        venv_service: `VenvService` instance to use when installing.
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
     """
     pip_install_args = get_pip_install_args(project, plugin, env=env)
 
-    venv_service = venv_service or VenvService(
+    await VenvService(
         project=project,
         python=plugin.python,
         namespace=plugin.type,
         name=plugin.venv_name,
-    )
-    await venv_service.install(
-        pip_install_args=["--ignore-requires-python", *pip_install_args]
+    ).install(
+        pip_install_args=("--ignore-requires-python", *pip_install_args)
         if force
         else pip_install_args,
         clean=clean,

@@ -219,7 +219,10 @@ class VenvService:  # noqa: WPS214
         self.project = project
         self.namespace = namespace
         self.name = name
-        self.venv = VirtualEnv(self.project.venvs_dir(namespace, name), python)
+        self.venv = VirtualEnv(
+            self.project.venvs_dir(namespace, name),
+            python or project.settings.get("python"),
+        )
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
 
     async def install(
