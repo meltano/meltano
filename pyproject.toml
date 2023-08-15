@@ -56,7 +56,7 @@ alembic = "^1.11.2"
 atomicwrites = "^1.2.1"
 authlib = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
-azure-core = {version = "^1.29.1", optional = true}
+azure-core = {version = "^1.29.2", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
 backoff = "^2.1.2"
 bcrypt = "^3.2.0" # Needs to be installed explicitly so it can be used as a backend for passlib
