@@ -96,7 +96,7 @@ class TestMeltanoHubService:
         hub_request_counter: Counter,
     ):
         extractors = project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
-        assert len(extractors) == 35  # noqa: WPS432
+        assert len(extractors) == 36  # noqa: WPS432
         assert len(extractors["tap-mock"].variants) == 2
         assert extractors["tap-mock"].variant_labels == [
             "meltano (default)",
