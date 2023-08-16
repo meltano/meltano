@@ -101,6 +101,3 @@ A Meltano cloud notification is a response to meltano cloud event.
   - `succeeded`
   - `failed`
   - `cancelled`
-
-### Webhook Event schema
-**coming soon**

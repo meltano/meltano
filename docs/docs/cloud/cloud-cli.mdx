@@ -52,47 +52,74 @@ See the [reserved variables](/cloud/platform#reserved-variables) docs for more d
 
 The `notification` command provides a way for managing your [Meltano Cloud notifications](concepts#meltano-cloud-notifications).
 
-The `set` subcommand provides a way to set new, or override an existing notification for the specified value.
+#### `list` 
 
-Set notification interactively
+List all notifications configured for your current default project or organization.
+
+```sh
+meltano cloud config notification list
+```
+
+#### `set` 
+
+Set a new notification or override an existing one.
+
+Interactive mode
 ```sh
 meltano cloud config notification set <type>
 ```
 
-Set notification non interactively
+Non-interactive mode:
 ```sh
-meltano cloud config notification set <type> --value <target_value> --filter <filter>
+meltano cloud config notification set <type> --recipient <target_recipient> --filter <filter>
 ````
 
-#### `options`
+**`options`**
 
 
-`--value` (Required): The value where you want the notification to be sent.
+`--recipient` (Required): The recipient to send the notification to.
 
 `--filter`: An optional filter you want to check against, you can supply multiple filters which will all be joined as an OR expression.
 Values within the filter are validated as an AND Expression.
+ 
+```sh
+meltano cloud config notification set webhook --recipient http://test+melty --filter '{"events": ["job_created", "job_succeeded"], "status": ["succeeded"]}' --filter '{ "status": ["failed"]}'
+```
+The above example sets a webhook notification to send to ﻿http://test+melty if the event is ﻿(job_created OR job_succeeded AND status = succeeded) OR status = failed.
+
+#### `update`
+
+Update an existing notification.
 
 ```sh
-meltano cloud config notification set webhook --value http://test+melty --filter '{"events": ["job_created", "job_succeeded"], "status": ["succeeded"]}' --filter '{ "status": ["failed"]}'
+meltano cloud notification update webhook --recipient <old_url> --new <new_recipient> --status <status>
 ```
 
-The above example reads like
+**`options`**
 
-*Send webhook notification to test+melty if the event is of (type "job_created" OR "job_succeded" AND status "succeeded") OR (status "failed")*
 
-The `update` subcommand provides a way to update the existing value of a notification.
+`--recipient` (Required): The recipient of the notification to update.
+
+`--new`: The new recipient value
+
+`--status`: The new status of the notification (either 'active' or 'inactive')
 
 ```sh
-meltano cloud notification update webhook --old <old_url> --new <new_url>
+meltano cloud config notification update --recipient http://test+melty --new http://test+better --status inactive
 ```
 
-The above example updates the notification that was configured to the old_url to new send notifications to the new_url.
+The above example updates the notification that was configured to send to `http://test+melty`. It changes the recipient to `http://test+better` and sets the status to inactive.
 
-The `delete` subcommand provides a way to delete an existing notification.
+#### `delete` 
+Delete an existing notification
 
 ```
-meltano cloud notification delete webhook --value <webhook_url>
+meltano cloud notification delete webhook --recipient <webhook_url>
 ```
+
+**`options`**
+
+`--recipient` (Required): The recipient of the notification you are trying to delete
 
 
 ## `deployment`

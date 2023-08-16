@@ -633,6 +633,13 @@ def create_update_command(type: t.Literal["webhook", "email"]):
             recipient: The recipient of notification to be updated
             new: The new recipient value
         """
+        if not new and not status:
+            click.echo(
+                "Nothing to update. Please provide either --new or --status "
+                "option to update the notification\n"
+            )
+            return
+
         update_recipient = prompt_and_validate(
             value=recipient,
             type=type,
