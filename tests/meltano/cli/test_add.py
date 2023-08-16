@@ -640,9 +640,6 @@ class TestCliAdd:
 
                 install_plugin_mock.assert_not_called()
 
-    # Run this test last because some other tests are affecting it in unknown ways
-    # that may cause it to fail if not run last.
-    @pytest.mark.order(-1)
     def test_add_with_python_version(self, cli_runner: CliRunner):
         with mock.patch(
             "meltano.core.venv_service.VirtualEnv._resolve_python_path",
@@ -651,7 +648,7 @@ class TestCliAdd:
             assert_cli_runner(
                 cli_runner.invoke(
                     cli,
-                    ("add", "extractor", "tap-mock", "--python", python),
+                    ("add", "extractor", "tap-that-needs-custom-python", "--python", python),
                 ),
             )
             venv_mock.assert_called_once_with(python)

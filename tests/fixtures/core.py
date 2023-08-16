@@ -114,6 +114,20 @@ def discovery():  # noqa: WPS213
 
     discovery[PluginType.EXTRACTORS].append(
         {
+            "name": "tap-that-needs-custom-python",
+            "namespace": "tap_that_needs_custom_python",
+            "variants": [
+                {
+                    "name": "meltano",
+                    "original": True,
+                    "pip_url": "tap-that-needs-custom-python",
+                },
+            ],
+        },
+    )
+
+    discovery[PluginType.EXTRACTORS].append(
+        {
             "name": "tap-mock-noinstall",
             "label": "Mock",
             "namespace": "tap_mock_noinstall",
