@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+from urllib.parse import urlparse
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
@@ -73,13 +74,24 @@ def project_engine(
     if existing_engine:
         return existing_engine
 
-    engine_uri = project.settings.get("database_uri")
-    logging.debug(f"Creating engine '{project}@{engine_uri}'")
+    database_uri = project.settings.get("database_uri")
+    parsed_database_uri = urlparse(database_uri)
+    sanitized_database_uri = parsed_database_uri._replace(  # noqa: WPS437
+        netloc="{}:{}@{}".format(
+            parsed_database_uri.username,
+            "********",
+            parsed_database_uri.hostname,
+        ),
+    ).geturl()
+    logging.debug(
+        f"Creating DB engine for project at {str(project.root)!r} "
+        f"with DB URI {sanitized_database_uri!r}",
+    )
 
-    if engine_uri is None:
+    if database_uri is None:
         raise NullConnectionStringError
 
-    engine = create_engine(engine_uri, poolclass=NullPool)
+    engine = create_engine(database_uri, poolclass=NullPool)
 
     # Connect to the database to ensure it is available.
     connect(
