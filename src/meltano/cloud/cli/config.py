@@ -14,9 +14,12 @@ from meltano.cloud.api.config import (
     MeltanoCloudProjectAmbiguityError,
     NoMeltanoCloudProjectIDError,
 )
+from meltano.cloud.api.types import CloudNotification
 from meltano.cloud.cli.base import (
+    LimitedResult,
     get_paginated,
     pass_context,
+    print_formatted_list,
     print_limit_warning,
 )
 from meltano.core.utils import run_async
@@ -76,24 +79,41 @@ class ConfigCloudClient(MeltanoCloudClient):
                 self.secrets_service_prefix + self._tenant_prefix + secret_name,
             )
 
-    def _build_notification_url(self, key: str) -> str:
+    def _build_notification_url(
+        self,
+        end_path: t.Literal["notification"] | t.Literal["notifications"],
+        key: str | None = None,
+    ) -> str:
         """Helper function to build notification url.
 
         Args:
             key: The key to use in the url
         """
-        key_hash = hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+        url = (
+            f"{self.notifications_service_prefix}/"
+            f"{self.config.tenant_resource_key}/"
+        )
+
+        if key:
+            key_hash = hashlib.sha256(key.encode("utf-8")).hexdigest()
+            url += f"{key_hash}/"
+
         try:
-            return (
-                f"{self.notifications_service_prefix}/"
-                f"{self.config.tenant_resource_key}/"
-                f"{key_hash}/notification"
-                f"?entityId={self.config.internal_project_id}"
-            )
+            return f"{url}{end_path}?entity_id={self.config.internal_project_id}"
         except (NoMeltanoCloudProjectIDError, MeltanoCloudProjectAmbiguityError):
-            return (
-                f"{self.notifications_service_prefix}/"
-                f"{self.config.tenant_resource_key}/{key_hash}/notification"
+            return f"{url}{end_path}"
+
+    async def list_notifications(
+        self,
+    ):
+        """List notifications."""
+        get_url = self._build_notification_url(end_path="notifications")
+
+        async with self.authenticated():
+            return await self._json_request(
+                "GET",
+                get_url,
             )
 
     async def put_notification(
@@ -113,7 +133,10 @@ class ConfigCloudClient(MeltanoCloudClient):
             raise TypeError("Invalid type")
 
         async with self.authenticated():
-            post_url = self._build_notification_url(input_string)
+            post_url = self._build_notification_url(
+                key=input_string,
+                end_path="notification",
+            )
             return await self._json_request(
                 "POST",
                 post_url,
@@ -122,34 +145,35 @@ class ConfigCloudClient(MeltanoCloudClient):
                 },
             )
 
-    async def update_notification_key(self, old_key: str, new_key: str):
+    async def update_notification(
+        self,
+        recipient: str,
+        new_key: str | None = None,
+        status: str | None = None,
+    ):
         """Function to update the notification key.
 
         The notification key is hash of either webhook url or email
 
         Args:
-            old_key: The old key to be changed
+            recipient: The key of notification to be updated
             new_key: The new key to be updated to
+            status: The new status to be updated to
         """
-        key_hash = hashlib.sha256(old_key.encode("utf-8")).hexdigest()
         async with self.authenticated():
-            try:
-                patch_url = (
-                    f"{self.notifications_service_prefix}/"
-                    f"{self.config.tenant_resource_key}/{key_hash}"
-                    f"/notification/key?entityId={self.config.internal_project_id}"
-                )
-            except (NoMeltanoCloudProjectIDError, MeltanoCloudProjectAmbiguityError):
-                patch_url = (
-                    f"{self.notifications_service_prefix}/"
-                    f"{self.config.tenant_resource_key}/{key_hash}/notification/key"
-                )
+            patch_url = self._build_notification_url(
+                key=recipient,
+                end_path="notification",
+            )
+            data = {}
+            if new_key:
+                data["new_key"] = new_key
+            if status:
+                data["status"] = status
             return await self._json_request(
                 "PATCH",
                 patch_url,
-                json={
-                    "new_key": new_key,
-                },
+                json=data,
             )
 
     async def delete_notification(self, key: str):
@@ -159,7 +183,7 @@ class ConfigCloudClient(MeltanoCloudClient):
             key: The key of notification to be deleted
         """
         async with self.authenticated():
-            delete_url = self._build_notification_url(key)
+            delete_url = self._build_notification_url(key=key, end_path="notification")
             return await self._json_request(
                 "DELETE",
                 delete_url,
@@ -304,7 +328,7 @@ VALIDATE_FUNCTION_DICT = {"webhook": validate_url, "email": validate_email}
 
 def prompt_and_validate(
     value: str | None,
-    notification_type: t.Literal["webhook", "email"],
+    type: t.Literal["webhook", "email"],
     prompt_message: str = "Please provide valid value.",
     error_message: str = "Value is not valid",
 ) -> str:
@@ -319,10 +343,10 @@ def prompt_and_validate(
         if value
         else click.prompt(
             prompt_message,
-            value_proc=VALIDATE_FUNCTION_DICT[notification_type],
+            value_proc=VALIDATE_FUNCTION_DICT[type],
         )
     )
-    VALIDATE_FUNCTION_DICT[notification_type](
+    VALIDATE_FUNCTION_DICT[type](
         value=input_value,
         prompt_message=prompt_message,
         error_message=error_message,
@@ -407,29 +431,92 @@ class EmailNotification:
     email: str
 
 
+def _format_notification(
+    notification: CloudNotification,
+) -> tuple[str, str, str, list]:
+    return (
+        notification["recipient"],
+        notification["type"],
+        notification["status"],
+        notification["filters"],
+    )
+
+
 @config.group()
 def notification() -> None:
     """Configure Meltano Cloud notifications."""
 
 
+@notification.command(
+    "list",
+    help=(
+        "List all configured project notifications.\n\n "
+        "To set or list notifications for another project "
+        "use 'meltano cloud project use'"
+    ),
+)
+@click.option(
+    "--format",
+    "output_format",
+    required=False,
+    default="terminal",
+    type=click.Choice(("terminal", "markdown", "json")),
+    help="The output format to use.",
+)
+@pass_context
+@run_async
+async def list_notifications(
+    context: MeltanoCloudCLIContext,
+    output_format: str,
+):
+    """List all configured notifications.
+
+    Args:
+        context: The click context
+    """
+
+    async with ConfigCloudClient(config=context.config) as client:
+        try:
+            notifications = await client.list_notifications()
+            if isinstance(notifications, list):
+                print_notifications = LimitedResult(
+                    items=notifications,
+                )
+                print_formatted_list(
+                    print_notifications,
+                    output_format,
+                    _format_notification,
+                    ("Recipient", "Type", "Status", "Filters"),
+                    ("left", "left", "left", "left"),
+                )
+        except Exception as e:
+            raise click.ClickException(
+                f"{e}. \n\n"
+                "Please ensure you've correctly followed instructions at: "
+                "https://docs.meltano.com/cloud/cloud-cli\n"
+                "If the issue persists, "
+                "we'd be happy to help at: https://meltano.com/slack",
+            ) from None
+
+
 @notification.group("set")
 def notification_set() -> None:
-    """Notification subcommand for setting notifications."""
+    """Set a meltano cloud notification."""
 
 
-def create_set_command(notification_type: t.Literal["webhook", "email"]):
+def create_set_command(type: t.Literal["webhook", "email"]):
     """Helper function create set commands for different notifications.
 
     Args:
-        notification_type: The type of notification
+        type: The type of notification
     """
 
-    @notification_set.command(notification_type)
+    @notification_set.command(type, help=f"Set a {type} notification.")
     @click.option(
-        "--value",
+        "--recipient",
         nargs=1,
         type=str,
-        help=f"{notification_type} value to be used for notification",
+        help=f"{type} recipient to receive the notification.",
     )
     @click.option(
         "--filter",
@@ -443,53 +530,56 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
     @run_async
     async def set_notification(
         context: MeltanoCloudCLIContext,
-        value: str | None,
+        recipient: str | None,
         filter: list,
     ):
         """Function to set the notification of specific type.
 
         Args:
             context: The click context
-            value: The value to set for the notification such as url or email
+            recipient: The value to set for the notification such as url or email
             filter: The list of filters to apply to the notification
         """
-        validated_value = prompt_and_validate(
-            value=value,
-            notification_type=notification_type,
-            prompt_message=f"Please provide a {notification_type} value",
-            error_message=f"Invalid {notification_type} value",
+        validated_recipient = prompt_and_validate(
+            value=recipient,
+            type=type,
+            prompt_message=f"Please provide a {type} value",
+            error_message=f"Invalid {type} value",
         )
-        if notification_type == "webhook":
+        if type == "webhook":
             notification = WebhookNotificaton(
-                type=str(notification_type),
+                type=str(type),
                 filters=filter,
-                webhook_url=validated_value,
+                webhook_url=validated_recipient,
             )
-        elif notification_type == "email":
+        elif type == "email":
             notification = EmailNotification(
-                type=str(notification_type),
+                type=str(type),
                 filters=filter,
-                email=validated_value,
+                email=validated_recipient,
             )
 
         async with ConfigCloudClient(config=context.config) as client:
             try:
                 await client.put_notification(notification=notification)
                 click.echo(
-                    f"Successfully set {notification_type} "
-                    f"notification for {validated_value}",
+                    f"Successfully set {type} "
+                    f"notification for {validated_recipient}. ",
                 )
-                # TODO: Implement https://github.com/meltano/infra/issues/1791
-                # TODO: Add helpful message for ways for user to see notifications
+                click.echo(
+                    "To see all notifications, "
+                    "run: meltano cloud config notification list",
+                )
             except Exception as e:
                 raise click.ClickException(
                     f"{e}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
+                    # TODO: Add anchor to config
                     "https://docs.meltano.com/cloud/cloud-cli\n"
                     "If the issue persists, "
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
-        set_notification.__name__ = f"set_notification_{notification_type}"
+        set_notification.__name__ = f"set_notification_{type}"
         return set_notification
 
 
@@ -499,60 +589,76 @@ create_set_command("email")
 
 @notification.group()
 def update():
-    """Notification subcommand for updating notification."""
+    """Update a meltano cloud notification."""
 
 
-def create_update_command(notification_type: t.Literal["webhook", "email"]):
+def create_update_command(type: t.Literal["webhook", "email"]):
     """Helper function to create notification update commads.
 
     Args:
-        notification_type: The notification type
+        type: The notification type
     """
 
-    @update.command(notification_type)
+    @update.command(type, help=f"Update {type} notification.")
     @click.option(
-        "--old",
+        "--recipient",
         nargs=1,
         type=str,
-        help=f"Old {notification_type} value to be updated",
+        help=f"{type} recipient notification to be updated",
     )
     @click.option(
         "--new",
         nargs=1,
         type=str,
-        help=f"New {notification_type} value",
+        help=f"New {type} recipient value",
+    )
+    @click.option(
+        "--status",
+        nargs=1,
+        type=click.Choice(["active", "inactive"]),
+        help="Notification status",
     )
     @pass_context
     @run_async
     async def update_notification(
         context: MeltanoCloudCLIContext,
-        old: str | None,
+        recipient: str,
         new: str | None,
+        status: str | None,
     ):
         """Function to create update notification commands of specific type.
 
         Args:
             context: The click context
-            old: The old value being updated
-            new: The new value being set
+            recipient: The recipient of notification to be updated
+            new: The new recipient value
         """
-        old_key = prompt_and_validate(
-            value=old,
-            notification_type=notification_type,
-            prompt_message=f"Please provide old {notification_type} value to update",
-            error_message=f"Invalid {notification_type} value",
+        update_recipient = prompt_and_validate(
+            value=recipient,
+            type=type,
+            prompt_message=(
+                f"Please provide old {type} recipient for " "notification to be updated"
+            ),
+            error_message=f"Invalid {type} value",
         )
-        new_key = prompt_and_validate(
-            value=new,
-            notification_type=notification_type,
-            prompt_message=f"Please provide new {notification_type} value to update to",
-            error_message=f"Invalid {notification_type} value",
-        )
+
+        new_key = None
+        if new:
+            new_key = prompt_and_validate(
+                value=new,
+                type=type,
+                prompt_message=f"Please provide new {type} value to update to",
+                error_message=f"Invalid {type} value",
+            )
 
         async with ConfigCloudClient(config=context.config) as client:
             try:
-                await client.update_notification_key(old_key=old_key, new_key=new_key)
-                click.echo(f"Successfully updated {notification_type} notification")
+                await client.update_notification(
+                    recipient=update_recipient,
+                    new_key=new_key,
+                    status=status,
+                )
+                click.echo(f"Successfully updated {type} notification")
             except Exception as e:
                 raise click.ClickException(
                     f"{e}. \n\n"
@@ -562,7 +668,7 @@ def create_update_command(notification_type: t.Literal["webhook", "email"]):
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
 
-    update_notification.__name__ = f"update_notification_{notification_type}"
+    update_notification.__name__ = f"update_notification_{type}"
     return update_notification
 
 
@@ -572,45 +678,47 @@ create_update_command("email")
 
 @notification.group()
 def delete() -> None:
-    """Notification subcommand for deleting notifications."""
+    """Delete a meltano cloud notification."""
 
 
-def create_delete_command(notification_type: t.Literal["webhook", "email"]):
+def create_delete_command(type: t.Literal["webhook", "email"]):
     """Helper function to create delete commands for specific type.
 
     Args:
-        notification_type: The type of notification
+        type: The type of notification
     """
 
-    @delete.command(notification_type)
+    @delete.command(type, help=f"Delete {type} notification")
     @click.option(
-        "--value",
+        "--recipient",
         nargs=1,
         type=str,
-        help=f"Old {notification_type} value to delete notification for",
+        help=f"{type} recipient to delete notification for",
     )
     @pass_context
     @run_async
     async def delete_notification(
         context: MeltanoCloudCLIContext,
-        value: str | None,
+        recipient: str | None,
     ):
-        """Function to create delete command for specific type.
+        """Delete specific notification type.
 
         Args:
             context: The click context
-            value: The value either email or url to delete
+            recipient: The recipient for notification
         """
         input_value = prompt_and_validate(
-            value=value,
-            notification_type=notification_type,
-            prompt_message=f"Please provide a {notification_type} value to delete",
-            error_message=f"Invalid {notification_type} value",
+            value=recipient,
+            type=type,
+            prompt_message=f"Please provide a {type} to delete",
+            error_message=f"Invalid {type}",
         )
         async with ConfigCloudClient(config=context.config) as client:
             try:
                 await client.delete_notification(key=input_value)
-                click.echo(f"Successfully deleted {notification_type} notification")
+                click.echo(
+                    f"Successfully deleted {type} notification for {input_value}",
+                )
             except Exception as e:
                 raise click.ClickException(
                     f"{e}. \n\n"
@@ -620,7 +728,7 @@ def create_delete_command(notification_type: t.Literal["webhook", "email"]):
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
 
-    delete_notification.__name__ = f"delete_notification_{notification_type}"
+    delete_notification.__name__ = f"delete_notification_{type}"
     return delete_notification
 
 

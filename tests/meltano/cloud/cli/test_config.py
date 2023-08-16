@@ -6,10 +6,12 @@ import hashlib
 import re
 import typing as t
 
+import pytest
 from click.testing import CliRunner
 from pytest_httpserver.httpserver import Response
 
 from meltano.cloud.api.client import HTTPStatus
+from meltano.cloud.api.types import CloudNotification
 from meltano.cloud.cli import cloud as cli
 
 if t.TYPE_CHECKING:
@@ -81,6 +83,49 @@ class TestConfigEnvCommand:
 class TestConfigNotificationCommand:
     """Tests the notification command"""
 
+    @pytest.fixture()
+    def notifications(self) -> list[CloudNotification]:
+        return [
+            {
+                "recipient": "melty@meltano+test.com",
+                "status": "active",
+                "type": "email",
+                "filters": [],
+            },
+            {
+                "recipient": "http://melty+test",
+                "status": "inactive",
+                "type": "webhook",
+                "filters": [{"events": ["all"]}],
+            },
+        ]
+
+    def test_notification_list(
+        self,
+        tenant_resource_key,
+        config: MeltanoCloudConfig,
+        httpserver: HTTPServer,
+        notifications,
+    ):
+        path = f"/notifications/v1/{tenant_resource_key}/notifications"
+        httpserver.expect_oneshot_request(path).respond_with_json(
+            notifications,
+        )
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "config",
+                "notification",
+                "list",
+            ),
+        )
+        assert result.exit_code == 0, result.output
+        assert "melty@meltano+test.com" in result.output
+        assert "http://melty+test" in result.output
+        assert "all" in result.output
+
     def test_notification_set(
         self,
         tenant_resource_key: str,
@@ -103,12 +148,12 @@ class TestConfigNotificationCommand:
                 "notification",
                 "set",
                 "webhook",
-                "--value",
+                "--recipient",
                 webhook_url,
             ),
         )
         assert result.exit_code == 0, result.output
-        assert result.output == "Successfully created webhook notification\n"
+        assert "Successfully set webhook notification" in result.output
 
     def test_notification_update(
         self,
@@ -118,7 +163,7 @@ class TestConfigNotificationCommand:
     ):
         webhook_url = "http://test+melty/cheese"
         key_hash = hashlib.sha256(webhook_url.encode("utf-8")).hexdigest()
-        path = f"/notifications/v1/{tenant_resource_key}/{key_hash}/notification/key"
+        path = f"/notifications/v1/{tenant_resource_key}/{key_hash}/notification"
         httpserver.expect_oneshot_request(path).respond_with_response(
             Response(status=HTTPStatus.NO_CONTENT),
         )
@@ -132,7 +177,7 @@ class TestConfigNotificationCommand:
                 "notification",
                 "update",
                 "webhook",
-                "--old",
+                "--recipient",
                 "http://test+melty/cheese",
                 "--new",
                 "http://testing",
@@ -163,9 +208,12 @@ class TestConfigNotificationCommand:
                 "notification",
                 "delete",
                 "webhook",
-                "--value",
+                "--recipient",
                 webhook_url,
             ),
         )
         assert result.exit_code == 0, result.output
-        assert result.output == "Successfully deleted webhook notification\n"
+        assert (
+            result.output
+            == f"Successfully deleted webhook notification for {webhook_url}\n"
+        )

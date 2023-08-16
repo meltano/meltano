@@ -70,3 +70,12 @@ class CloudConfigOrg(t.TypedDict):
 
     default_project_id: str | None
     projects_defaults: dict[str, CloudConfigProject]
+
+
+class CloudNotification(t.TypedDict):
+    """Meltano Cloud notification details."""
+
+    type: str
+    status: str
+    recipient: str
+    filters: list[dict[str, t.Any]]
