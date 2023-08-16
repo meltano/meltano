@@ -640,6 +640,7 @@ class TestCliAdd:
 
                 install_plugin_mock.assert_not_called()
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_with_python_version(self, cli_runner: CliRunner):
         with mock.patch(
             "meltano.core.venv_service.VirtualEnv._resolve_python_path",
