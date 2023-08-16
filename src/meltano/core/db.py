@@ -84,7 +84,7 @@ def project_engine(
             if parsed_db_uri.username
             else ""  # no auth case
         )
-        + parsed_db_uri.hostname,
+        + (parsed_db_uri.hostname or ""),
     ).geturl()
     logging.debug(
         f"Creating DB engine for project at {str(project.root)!r} "
