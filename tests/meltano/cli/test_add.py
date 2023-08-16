@@ -648,7 +648,13 @@ class TestCliAdd:
             assert_cli_runner(
                 cli_runner.invoke(
                     cli,
-                    ("add", "extractor", "tap-that-needs-custom-python", "--python", python),
+                    (
+                        "add",
+                        "extractor",
+                        "tap-that-needs-custom-python",
+                        "--python",
+                        python,
+                    ),
                 ),
             )
             venv_mock.assert_called_once_with(python)
