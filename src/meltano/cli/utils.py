@@ -274,7 +274,6 @@ def add_plugin(
         plugin_attrs = {
             "namespace": namespace,
             "pip_url": pip_url,
-            "python": python,
             "executable": _prompt_plugin_executable(pip_url, plugin_name),
             "capabilities": _prompt_plugin_capabilities(plugin_type),
             "settings": _prompt_plugin_settings(plugin_type),
@@ -289,6 +288,7 @@ def add_plugin(
             variant=variant,
             inherit_from=inherit_from,
             lock=lock,
+            python=python,
             **plugin_attrs,
         )
         print_added_plugin(plugin)
