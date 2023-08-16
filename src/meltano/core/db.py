@@ -75,17 +75,20 @@ def project_engine(
         return existing_engine
 
     database_uri = project.settings.get("database_uri")
-    parsed_database_uri = urlparse(database_uri)
-    sanitized_database_uri = parsed_database_uri._replace(  # noqa: WPS437
-        netloc="{}:{}@{}".format(
-            parsed_database_uri.username,
-            "********",
-            parsed_database_uri.hostname,
-        ),
+    parsed_db_uri = urlparse(database_uri)
+    sanitized_db_uri = parsed_db_uri._replace(  # noqa: WPS437
+        netloc=(
+            f"{parsed_db_uri.username}:********@"  # user:pass auth case
+            if parsed_db_uri.password
+            else "********@"  # token auth case
+            if parsed_db_uri.username
+            else ""  # no auth case
+        )
+        + parsed_db_uri.hostname,
     ).geturl()
     logging.debug(
         f"Creating DB engine for project at {str(project.root)!r} "
-        f"with DB URI {sanitized_database_uri!r}",
+        f"with DB URI {sanitized_db_uri!r}",
     )
 
     if database_uri is None:
