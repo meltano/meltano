@@ -124,7 +124,7 @@ class TestConfigNotificationCommand:
         assert result.exit_code == 0, result.output
         assert "melty@meltano+test.com" in result.output
         assert "http://melty+test" in result.output
-        assert "all" in result.output
+        assert "active" in result.output
 
     def test_notification_set(
         self,
