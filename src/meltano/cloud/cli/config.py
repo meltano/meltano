@@ -433,12 +433,11 @@ class EmailNotification:
 
 def _format_notification(
     notification: CloudNotification,
-) -> tuple[str, str, str, list]:
+) -> tuple[str, str, str]:
     return (
         notification["recipient"],
         notification["type"],
         notification["status"],
-        notification["filters"],
     )
 
 
@@ -486,8 +485,8 @@ async def list_notifications(
                     print_notifications,
                     output_format,
                     _format_notification,
-                    ("Recipient", "Type", "Status", "Filters"),
-                    ("left", "left", "left", "left"),
+                    ("Recipient", "Type", "Status"),
+                    ("left", "left", "left"),
                 )
         except Exception as e:
             raise click.ClickException(
@@ -636,7 +635,7 @@ def create_update_command(type: t.Literal["webhook", "email"]):
         if not new and not status:
             click.echo(
                 "Nothing to update. Please provide either --new or --status "
-                "option to update the notification\n"
+                "option to update the notification\n",
             )
             return
 
