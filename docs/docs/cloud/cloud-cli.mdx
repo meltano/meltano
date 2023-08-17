@@ -60,9 +60,23 @@ List all notifications configured for your current default project or organizati
 meltano cloud config notification list
 ```
 
+```
+╭─────────────────────┬─────────┬──────────┬─────────────────────────────────────╮
+│ Recipient           │ Type    │ Status   │ Filters                             │
+├─────────────────────┼─────────┼──────────┼─────────────────────────────────────┤
+│ http://melty+cheese │ webhook │ active   │ [{'events': ['all']}]               │
+│ dragon@meltano.com  │ email   │ active   │ []                                  │
+╰─────────────────────┴─────────┴──────────┴─────────────────────────────────────╯
+```
+
 #### `set` 
 
 Set a new notification or override an existing one.
+
+##### Case-Sensitivity in Values
+
+Take note that all the values in the commands and configuration settings are case-sensitive. This means job_created, Job_Created, and JOB_CREATED would be considered as different events. Please ensure to use the correct casing to avoid configuration issues or unexpected behaviors.
+
 
 Interactive mode
 ```sh
@@ -81,6 +95,9 @@ meltano cloud config notification set <type> --recipient <target_recipient> --fi
 
 `--filter`: An optional filter you want to check against, you can supply multiple filters which will all be joined as an OR expression.
 Values within the filter are validated as an AND Expression.
+
+**Notice**
+These are all canse sensitive
  
 ```sh
 meltano cloud config notification set webhook --recipient http://test+melty --filter '{"events": ["job_created", "job_succeeded"], "status": ["succeeded"]}' --filter '{ "status": ["failed"]}'

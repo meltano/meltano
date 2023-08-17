@@ -88,7 +88,7 @@ For more details on credits and pricing see the [Pricing FAQ](https://meltano.co
 
 ## Meltano Cloud Notifications
 
-A Meltano cloud notification is a response to meltano cloud event.
+A Meltano Cloud notification is a response to Meltano Cloud event.
 
 ### Supported notification types
 - `webhook`
