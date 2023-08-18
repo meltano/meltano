@@ -95,7 +95,7 @@ def mypy(session: Session) -> None:
         ".nox/",
     ]
 
-    session.install(".")
+    session.install(".[mssql,azure,gcs,s3]")
     session.install(
         "boto3-stubs[essential]",
         "mypy",

@@ -15,10 +15,12 @@ from meltano.core.state_store.filesystem import (
     InvalidStateBackendConfigurationException,
 )
 
+BOTO_INSTALLED = True
+
 try:
     import boto3
 except ImportError:
-    boto3 = None  # type: ignore
+    BOTO_INSTALLED = False
 
 
 class MissingBoto3Error(Exception):
@@ -41,7 +43,7 @@ def requires_boto3():
     Yields:
         None
     """
-    if not boto3:
+    if not BOTO_INSTALLED:
         raise MissingBoto3Error
     yield
 

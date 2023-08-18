@@ -12,10 +12,12 @@ else:
 
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 
+GOOGLE_INSTALLED = True
+
 try:
-    import google  # type: ignore
+    import google
 except ImportError:
-    google = None
+    GOOGLE_INSTALLED = False
 
 
 class MissingGoogleError(Exception):
@@ -38,7 +40,7 @@ def requires_gcs():
     Yields:
         None
     """
-    if not google:
+    if GOOGLE_INSTALLED:
         raise MissingGoogleError
     yield
 

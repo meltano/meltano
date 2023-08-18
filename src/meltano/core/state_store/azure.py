@@ -12,10 +12,12 @@ else:
 
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 
+AZURE_INSTALLED = True
+
 try:
-    from azure.storage.blob import BlobServiceClient  # type: ignore
+    from azure.storage.blob import BlobServiceClient
 except ImportError:
-    BlobServiceClient = None
+    AZURE_INSTALLED = False
 
 
 class MissingAzureError(Exception):
@@ -38,7 +40,7 @@ def requires_azure():
     Yields:
         None
     """
-    if not BlobServiceClient:
+    if not AZURE_INSTALLED:
         raise MissingAzureError
     yield
 
@@ -78,7 +80,7 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             True if error represents file not being found, else False
         """
-        from azure.core.exceptions import ResourceNotFoundError  # type: ignore
+        from azure.core.exceptions import ResourceNotFoundError
 
         return (
             isinstance(err, ResourceNotFoundError)
@@ -86,7 +88,7 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         )
 
     @cached_property
-    def client(self):
+    def client(self) -> BlobServiceClient:
         """Get an authenticated azure.storage.blob.BlobServiceClient.
 
         Returns:
