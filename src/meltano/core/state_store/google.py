@@ -15,7 +15,7 @@ from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 GOOGLE_INSTALLED = True
 
 try:
-    import google
+    import google  # type: ignore
 except ImportError:
     GOOGLE_INSTALLED = False
 
