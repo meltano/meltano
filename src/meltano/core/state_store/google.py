@@ -40,7 +40,7 @@ def requires_gcs():
     Yields:
         None
     """
-    if GOOGLE_INSTALLED:
+    if not GOOGLE_INSTALLED:
         raise MissingGoogleError
     yield
 
