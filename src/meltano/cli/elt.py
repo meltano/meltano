@@ -112,7 +112,7 @@ class ELOptions:
 @ELOptions.force
 @click.pass_context
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def el(  # WPS408
     project: Project,
     ctx: click.Context,
