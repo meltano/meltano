@@ -10,6 +10,7 @@ if sys.version_info >= (3, 8):
 else:
     from cached_property import cached_property
 
+from meltano.core.error import MeltanoError
 from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
 
 AZURE_INSTALLED = True
@@ -52,7 +53,6 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
 
     def __init__(
         self,
-        container_name: str | None = None,
         connection_string: str | None = None,
         prefix: str | None = None,
         **kwargs,
@@ -60,14 +60,23 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         """Initialize the BaseFilesystemStateStoreManager.
 
         Args:
-            container_name: the container to store state in.
             connection_string: connection string to use in authenticating to Azure
             prefix: the prefix to store state at
             kwargs: additional keyword args to pass to parent
+
+        Raises:
+            MeltanoError: If container name is not included in the URI.
         """
         super().__init__(**kwargs)
         self.connection_string = connection_string
-        self.container_name = container_name or self.parsed.hostname
+
+        if not self.parsed.hostname:
+            raise MeltanoError(
+                f"Azure state backend URI must include a container name: {self.uri}",
+                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",  # noqa: E501
+            )
+
+        self.container_name = self.parsed.hostname
         self.prefix = prefix or self.parsed.path
 
     @staticmethod
@@ -93,11 +102,18 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
 
         Returns:
             An authenticated azure.storage.blob.BlobServiceClient
+
+        Raises:
+            MeltanoError: If connection string is not provided.
         """
         with requires_azure():
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
-            return BlobServiceClient()
+
+            raise MeltanoError(
+                "Azure state backend requires a connection string",
+                "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
+            )
 
     @property
     def state_dir(self) -> str:
