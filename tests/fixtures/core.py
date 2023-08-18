@@ -1258,7 +1258,6 @@ def discovery():  # noqa: WPS213
                 "description": "PostgreSQL database loader",
                 "namespace": "target_postgres",
                 "dialect": "postgres",
-                "target_schema": "$TARGET_POSTGRES_SCHEMA",
                 "variants": [
                     {
                         "name": "transferwise",
@@ -1676,7 +1675,7 @@ def discovery():  # noqa: WPS213
                     {
                         "name": "source_schema",
                         "label": "Source Schema",
-                        "value": "$MELTANO_LOAD__TARGET_SCHEMA",
+                        "value": "$MELTANO_EXTRACT__DEFAULT_TARGET_SCHEMA",
                     },
                     {
                         "name": "target_schema",
