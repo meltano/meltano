@@ -7,7 +7,7 @@ import os
 import click
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
+from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
