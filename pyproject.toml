@@ -127,11 +127,6 @@ types-tabulate = "^0.9.0.1"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
-# The `meltano-cloud` command is equivalent to `meltano cloud`, and is only
-# provided so that if someone uses the Meltano Cloud CLI standalone, then
-# replaces it with an installation of Meltano, their old scripts that call
-# `meltano-cloud` won't break.
-meltano-cloud = "meltano.cloud.cli:main"
 
 [tool.black]
 line-length = 88
@@ -592,5 +587,3 @@ convention = "google"
 [tool.ruff.flake8-tidy-imports.banned-api]
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
-"meltano.cloud.cli.base.cloud.command".msg = "Use `click.command` and `cloud.add_command` instead"
-"meltano.cloud.cli.base.cloud.group".msg = "Use `click.group` and `cloud.add_command` instead"

@@ -33,13 +33,6 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    raise CliError(
-        "The 'meltano upgrade' command is disabled on the 'cloud' feature "
-        "branch. Please upgrade Meltano manually. Once the Cloud features "
-        "are generally available, you will no longer have to install from a "
-        "feature branch using git, and the 'meltano upgrade' command will "
-        "be restored.",
-    )
     engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
     upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
     ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
