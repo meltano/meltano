@@ -173,7 +173,7 @@ class Out:  # noqa: WPS230
             ),
             foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         )
-        handler = logging.FileHandler(self.file)
+        handler = logging.FileHandler(self.file, delay=True)
         handler.setFormatter(formatter)
         return handler
 
