@@ -402,7 +402,7 @@ class TestProjectCommand:
                 "--name",
                 "a name",
                 "--id",
-                "and an ID",
+                "01BX5ZZKBKACTAV9WEVGEMMVS1",
             ),
         )
         assert result.exit_code == 2
@@ -446,3 +446,23 @@ class TestProjectCommand:
                 f"Project {project['project_name']!r} created successfully.\n"
                 in result.output
             )
+
+    def test_project_invalid_ulid(self, config: MeltanoCloudConfig):
+        result = CliRunner().invoke(
+            cli,
+            (
+                "--config-path",
+                config.config_path,
+                "project",
+                "use",
+                "--id",
+                "not-a-valid-ulid",
+            ),
+        )
+        assert result.exit_code == 2
+        assert result.output == (
+            "Usage: cloud project use [OPTIONS]\n"
+            "Try 'cloud project use --help' for help.\n\n"
+            "Error: Invalid value for '--id': Invalid ULID value: not-a-valid-ulid\n"
+        )
+
