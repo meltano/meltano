@@ -549,7 +549,7 @@ module = [
 ]
 
 [build-system]
-requires = ["poetry-core==1.5.0"]
+requires = ["poetry-core==1.7.0"]
 build-backend = "build:api"
 backend-path = ["scripts"]
 
