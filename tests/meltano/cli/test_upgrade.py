@@ -8,6 +8,7 @@ import mock
 import pytest
 from click.testing import CliRunner
 
+import meltano
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
@@ -19,13 +20,15 @@ class TestCliUpgrade:
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        result = cli_runner.invoke(cli, ["upgrade"])
-        assert_cli_runner(result)
+        # If an editable install was used, test that it cannot be upgraded automatically
+        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+            result = cli_runner.invoke(cli, ["upgrade"])
+            assert_cli_runner(result)
 
-        assert (
-            "The `meltano` package could not be upgraded automatically" in result.stdout
-        )
-        assert "run `meltano upgrade --skip-package`" in result.stdout
+            assert (
+                "The `meltano` package could not be upgraded automatically" in result.stdout
+            )
+            assert "run `meltano upgrade --skip-package`" in result.stdout
 
         with mock.patch(
             "meltano.cli.upgrade.UpgradeService._upgrade_package",
@@ -52,13 +55,15 @@ class TestCliUpgrade:
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        result = cli_runner.invoke(cli, ["upgrade", "package"])
-        assert_cli_runner(result)
+        # If an editable install was used, test that it cannot be upgraded automatically
+        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+            result = cli_runner.invoke(cli, ["upgrade", "package"])
+            assert_cli_runner(result)
 
-        assert (
-            "The `meltano` package could not be upgraded automatically" in result.stdout
-        )
-        assert "run `meltano upgrade --skip-package`" not in result.stdout
+            assert (
+                "The `meltano` package could not be upgraded automatically" in result.stdout
+            )
+            assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")
     @pytest.mark.usefixtures("session")
