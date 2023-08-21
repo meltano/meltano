@@ -52,6 +52,8 @@ class UpgradeService:
 
         meltano_file_path = "/src/meltano/__init__.py"
         editable = meltano.__file__.endswith(meltano_file_path)
+        import warnings
+        warnings.warn(f"{meltano.__file__=}")
         if editable and not force:
             meltano_dir = meltano.__file__[: -len(meltano_file_path)]
             fail_reason = "it is installed from source"
