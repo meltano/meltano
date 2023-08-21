@@ -26,7 +26,8 @@ class TestCliUpgrade:
             assert_cli_runner(result)
 
             assert (
-                "The `meltano` package could not be upgraded automatically" in result.stdout
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
             )
             assert "run `meltano upgrade --skip-package`" in result.stdout
 
@@ -61,7 +62,8 @@ class TestCliUpgrade:
             assert_cli_runner(result)
 
             assert (
-                "The `meltano` package could not be upgraded automatically" in result.stdout
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
             )
             assert "run `meltano upgrade --skip-package`" not in result.stdout
 
