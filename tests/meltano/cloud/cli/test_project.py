@@ -465,4 +465,3 @@ class TestProjectCommand:
             "Try 'cloud project use --help' for help.\n\n"
             "Error: Invalid value for '--id': Invalid ULID value: not-a-valid-ulid\n"
         )
-

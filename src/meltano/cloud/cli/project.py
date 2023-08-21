@@ -12,8 +12,8 @@ import click
 import questionary
 import requests
 from slugify import slugify
-from yaspin import yaspin  # type: ignore
 from ulid import ULID
+from yaspin import yaspin  # type: ignore
 
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
