@@ -294,12 +294,8 @@ class VenvService:  # noqa: WPS214
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
 
-    async def create(self, *, venv_module: str = "virtualenv") -> Process:
+    async def create(self) -> Process:
         """Create a new virtual environment.
-
-        Args:
-            venv_module: The name of the Python module to use to create the virtual
-                environment.
 
         Raises:
             AsyncSubprocessError: The virtual environment could not be created.
@@ -310,16 +306,14 @@ class VenvService:  # noqa: WPS214
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
         try:
             return await exec_async(
-                self.venv.python_path,
+                sys.executable,
                 "-m",
-                venv_module,
+                "virtualenv",
+                "--python",
+                self.venv.python_path,
                 str(self.venv.root),
             )
         except AsyncSubprocessError as err:
-            stderr = await err.stderr
-            if stderr and "No module named virtualenv" in stderr:
-                # Fall back to using the built-in venv module
-                return await self.create(venv_module="venv")
             raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
                 err.process,
