@@ -158,11 +158,17 @@ class VirtualEnv:
         )
 
 
-async def exec_async(*args, **kwargs) -> Process:
+async def _extract_stderr(_):
+    return None
+
+
+async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
     """Run an executable asynchronously in a subprocess.
 
     Args:
         args: Positional arguments for `asyncio.create_subprocess_exec`.
+        extract_stderr: Async function that is provided the completed failed process,
+            and returns its error string or `None`.
         kwargs: Keyword arguments for `asyncio.create_subprocess_exec`.
 
     Raises:
@@ -174,13 +180,17 @@ async def exec_async(*args, **kwargs) -> Process:
     run = await asyncio.create_subprocess_exec(
         *args,
         stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         **kwargs,
     )
     await run.wait()
 
     if run.returncode != 0:
-        raise AsyncSubprocessError("Command failed", run)
+        raise AsyncSubprocessError(
+            "Command failed",
+            process=run,
+            stderr=await extract_stderr(run),
+        )
 
     return run
 
@@ -304,6 +314,12 @@ class VenvService:  # noqa: WPS214
             The Python process creating the virtual environment.
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
+
+        async def extract_stderr(proc: Process):
+            return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
+                "unicode_escape",
+            )
+
         try:
             return await exec_async(
                 sys.executable,
@@ -312,11 +328,13 @@ class VenvService:  # noqa: WPS214
                 "--python",
                 self.venv.python_path,
                 str(self.venv.root),
+                extract_stderr=extract_stderr,
             )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
-                err.process,
+                process=err.process,
+                stderr=await err.stderr,
             ) from err
 
     async def upgrade_pip(self) -> Process:

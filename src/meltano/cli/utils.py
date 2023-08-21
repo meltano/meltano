@@ -407,7 +407,7 @@ def install_plugins(
     parallelism=None,
     clean=False,
     force=False,
-):
+) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,
