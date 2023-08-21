@@ -92,7 +92,7 @@ class MigrationService:
 
         try:
             # try to find the locked version
-            head = LOCK_PATH.open().read().strip()
+            head = LOCK_PATH.read_text().strip()
             self.ensure_migration_needed(script, context, head)
 
             if not silent:
