@@ -6,7 +6,6 @@ from copy import deepcopy
 
 import pytest
 
-from meltano.core import utils
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
@@ -16,7 +15,6 @@ from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginDefinitionNotFoundError,
 )
-from meltano.core.settings_service import FeatureFlags
 
 
 @pytest.fixture()
@@ -128,23 +126,6 @@ class TestProjectPluginsService:
         ):
             project.plugins.get_parent(tap)
 
-    def test_ff_plugins_lock_required(
-        self,
-        project: Project,
-        monkeypatch,
-    ):
-        assert project.plugins._prefer_source == DefinitionSource.ANY
-
-        monkeypatch.setenv(
-            utils.to_env_var(
-                "meltano",
-                FeatureFlags.PLUGIN_LOCKS_REQUIRED.setting_name,
-            ),
-            "1",
-        )
-        project.refresh()
-        assert project.plugins._prefer_source == DefinitionSource.LOCAL
-
     def test_get_parent_no_lockfiles(
         self,
         project: Project,
@@ -226,3 +207,9 @@ class TestProjectPluginsService:
         ]
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")
+
+    def test_find_plugins(self, project: Project, mapper):
+        assert project.plugins.find_plugin("mock-mapping-1") == mapper
+        assert project.plugins.find_plugin("mock-mapping-0") == mapper
+        with pytest.raises(PluginNotFoundError):
+            project.plugins.find_plugin("non-existent-mapping")

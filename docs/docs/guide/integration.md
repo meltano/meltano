@@ -41,9 +41,9 @@ To save you a headache, Meltano can handle catalog generation for you, by lettin
 [entity selection](#selecting-entities-and-attributes-for-extraction), [metadata](#setting-metadata), and [schema](#overriding-schemas) rules that can be configured like any other setting,
 and are applied to the discovered catalog on the fly when the extractor is run using [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano elt`](/reference/command-line-interface#elt).
+If you'd like to manually inspect the generated catalog for debugging purposes, you can dump it to [STDOUT](<https://en.wikipedia.org/wiki/Standard_streams#Standard_output_(stdout)>) or a file using the `--dump=catalog` option on [`meltano invoke`](/reference/command-line-interface#invoke) or [`meltano el`](/reference/command-line-interface#el).
 
-Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
+Note that if you've already manually discovered a catalog and modified it to your liking, it can be provided explicitly using [`meltano el`](/reference/command-line-interface#elt)'s `--catalog` option or the [`catalog` extractor extra](/concepts/plugins#catalog-extra).
 
 In some cases, like when a tap has extra commmand line options like `--about` or `--version` that don't need a catalog, or when you only need to dump the tap configuration with `--dump=config`, Meltano avoids running discovery to save the overhead and to not require the tap to be configured with valid credentials.
 
@@ -329,8 +329,6 @@ This feature is used to dynamically configure the `target-postgres` and `target-
   - [`$MELTANO_EXTRACT__LOAD_SCHEMA`](/concepts/plugins#load-schema-extra), e.g. `tap_gitlab` for `tap-gitlab`
 - Default value for `dbt`'s `target` setting:
   - [`$MELTANO_LOAD__DIALECT`](/concepts/plugins#dialect-extra), e.g. `postgres` for `target-postgres` and `snowflake` for `target-snowflake`, which correspond to the target names in `transform/profile/profiles.yml`
-- Default value for `dbt`'s `source_schema` setting:
-  - [`$MELTANO_LOAD__TARGET_SCHEMA`](/concepts/plugins#target-schema-extra), the value of the `schema` setting for `target-postgres` and `target-snowflake`
 - Default value for `dbt`'s `models` setting:
   - [`$MELTANO_TRANSFORM__PACKAGE_NAME`](/concepts/plugins#package-name-extra)`$MELTANO_EXTRACTOR_NAMESPACE my_meltano_model`, e.g. `tap_gitlab tap_gitlab my_meltano_model` for the `tap-gitlab` transform and `tap-gitlab` extractor
 

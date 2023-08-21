@@ -11,59 +11,92 @@
   "logo_url": "https://hub.meltano.com/assets/logos/loaders/yaml.png",
   "capabilities": [
     "about",
+    "schema-flattening",
     "stream-maps"
   ],
   "settings": [
     {
       "name": "datestamp_format",
+      "kind": "string",
+      "value": "%Y-%m-%d",
       "label": "Datestamp Format",
-      "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
+      "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
     },
     {
       "name": "default_yaml_template",
+      "kind": "string",
       "label": "Default Yaml Template",
       "description": "Text string to use for a yaml template file. This text will be used to create a new file if the destination file does not exist."
     },
     {
       "name": "file_naming_scheme",
+      "kind": "string",
       "label": "File Naming Scheme",
       "description": "The scheme with which output files will be named. Naming scheme may leverage any of the following substitutions:\n - `{stream_name}`\n - `{datestamp}`\n - `{timestamp}`\n"
     },
     {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
+    },
+    {
       "name": "overwrite_behavior",
+      "kind": "string",
+      "value": "replace_records",
       "label": "Overwrite Behavior",
       "description": "Determines the overwrite behavior if destination file already exists.\nMust be one of the following string values:\n  - `append_records` (default): append records at the insertion point\n  - `replace_records`: replace all records at the insertion point\n  - `replace_file`: replace entire file using `default_yaml_template`\n"
     },
     {
       "name": "record_insert_jsonpath",
+      "kind": "string",
+      "value": "$.metrics",
       "label": "Record Insert Jsonpath",
       "description": "A jsonpath string determining the insertion point for new records.\nCurrently, this must be the path to a map key which will be populated by a list of records.  For example \"$.metrics\" will populate the file with `metrics - [{<record1>},{<record2>},...]`  For JSONPath syntax help, see - https://jsonpath.com\n"
     },
     {
       "name": "record_key_property_name",
+      "kind": "password",
       "label": "Record Key Property Name",
-      "description": "A property in the record which will be used as the dictionary key. If this property is provided, records will be written as key-value objects; if omitted, records are written as a list."
+      "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list."
     },
     {
       "name": "record_sort_property_name",
+      "kind": "string",
       "label": "Record Sort Property Name",
-      "description": "A property in the record which will be used as a sort key. If this property is omitted, records will not be sorted."
+      "description": "A property in the record which will be used as a sort key.\n\nIf this property is omitted, records will not be sorted."
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config",
+      "description": "User-defined config values to be used within map expressions."
     },
     {
       "name": "stream_maps",
       "kind": "object",
       "label": "Stream Maps",
-      "description": "Allows inline stream transformations and aliasing. For more information see - https://sdk.meltano.com/en/latest/stream_maps.html"
+      "description": "Allows inline stream transformations and aliasing. For more information see: https://sdk.meltano.com/en/latest/stream_maps.html"
     },
     {
       "name": "timestamp_format",
+      "kind": "string",
+      "value": "%Y-%m-%d.T%H%M%S",
       "label": "Timestamp Format",
-      "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
+      "description": "A python format string to use when outputting the `{timestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
     },
     {
       "name": "timestamp_timezone",
+      "kind": "string",
+      "value": "UTC",
       "label": "Timestamp Timezone",
-      "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to \"UTC\". For a list of possible values, please see -https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+      "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to 'UTC'. For a list of possible values, please see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
     }
   ]
 }

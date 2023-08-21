@@ -17,7 +17,6 @@ from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLockService
-from meltano.core.settings_service import FeatureFlags
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -87,6 +86,23 @@ class PluginDefinitionNotFoundError(MeltanoError):
         super().__init__(reason=reason, instruction=instruction)
 
 
+class AmbiguousMappingName(MeltanoError):
+    """Occurs when the same mapping name is used in multiple mappers."""
+
+    def __init__(self, mapping_name: str):
+        """Initialize the exception.
+
+        Args:
+            mapping_name: The name of the schedule that does not exist.
+        """
+        super().__init__(
+            reason=f"Ambiguous mapping name {mapping_name}, found multiple matches.",
+            instruction=(
+                "Alter one of the instances of this mapping name to make it distinct."
+            ),
+        )
+
+
 class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
     """Project Plugins Service."""
 
@@ -99,13 +115,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self.project = project
         self.lock_service = PluginLockService(project)
         self.locked_definition_service = LockedDefinitionService(project)
-        with self.project.settings.feature_flag(
-            FeatureFlags.PLUGIN_LOCKS_REQUIRED.value,
-            raise_error=False,
-        ) as flag:
-            self._prefer_source = (
-                DefinitionSource.LOCAL if flag else DefinitionSource.ANY
-            )
+        self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
     def current_plugins(self):
@@ -219,29 +229,35 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 
-        try:
-            plugin = next(
-                plugin
-                for plugin in self.plugins(ensure_parent=False)
-                if (
-                    plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
-                    and (plugin_type is None or plugin.type == plugin_type)
-                    and (
-                        invokable is None
-                        or self.ensure_parent(plugin).is_invokable() == invokable
-                    )
-                    and (
-                        configurable is None
-                        or self.ensure_parent(plugin).is_configurable() == configurable
-                    )
+        for plugin in self.plugins(ensure_parent=False):
+            if (
+                plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
+                and (plugin_type is None or plugin.type == plugin_type)
+                and (
+                    invokable is None
+                    or self.ensure_parent(plugin).is_invokable() == invokable
                 )
-            )
+                and (
+                    configurable is None
+                    or self.ensure_parent(plugin).is_configurable() == configurable
+                )
+            ):
+                return self.ensure_parent(plugin)
+            elif plugin.type == PluginType.MAPPERS:
+                mapping = self._find_mapping(plugin_name, plugin)
+                if mapping:
+                    return mapping
+        raise PluginNotFoundError(
+            PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
+        )
 
+    def _find_mapping(self, plugin_name: str, plugin: ProjectPlugin) -> ProjectPlugin:
+        mapping_name = plugin.extra_config.get("_mapping_name")
+        if mapping_name == plugin_name:
+            all_mappings = self.find_plugins_by_mapping_name(mapping_name)
+            if len(all_mappings) > 1:
+                raise AmbiguousMappingName(mapping_name)
             return self.ensure_parent(plugin)
-        except StopIteration as stop:
-            raise PluginNotFoundError(
-                PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
-            ) from stop
 
     def find_plugin_by_namespace(
         self,
