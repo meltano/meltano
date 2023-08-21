@@ -13,6 +13,7 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Iterable
+from numbers import Number
 from pathlib import Path
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
@@ -64,6 +65,11 @@ class VirtualEnv:
             python_path = sys.executable
         elif isinstance(python, Path):
             python_path = str(python.resolve())
+        elif isinstance(python, Number):
+            raise MeltanoError(
+                "Python must be specified as an executable name or path, "
+                f"not the number {python!r}"
+            )
         else:
             python_path = python if os.path.exists(python) else shutil.which(python)
 
