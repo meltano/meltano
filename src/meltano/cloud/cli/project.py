@@ -10,9 +10,7 @@ from http import HTTPStatus
 
 import click
 import questionary
-from slugify import slugify
-from yaspin import yaspin  # type: ignore
-
+import requests
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
@@ -21,6 +19,8 @@ from meltano.cloud.cli.base import (
     print_formatted_list,
 )
 from meltano.core.utils import run_async
+from slugify import slugify
+from yaspin import yaspin  # type: ignore
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
@@ -77,13 +77,14 @@ class ProjectsCloudClient(MeltanoCloudClient):
             payload = {"project_name": project_name, "git_repository": git_repository}
             if project_root_path:
                 payload["project_root_path"] = project_root_path
-            async with self._raw_request(
+            prepared_request = await self._json_request(
                 "POST",
                 f"/projects/v1/{self.config.tenant_resource_key}",
                 json=payload,
-            ) as response:
-                response.raise_for_status()
-                return response
+            )
+            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+            response.raise_for_status()
+            return response
 
 
 @click.group("project")
@@ -340,5 +341,5 @@ async def create_project(
                 )
             return None
         click.echo(f"Project {name!r} created successfully.")
-        if response.status == HTTPStatus.NO_CONTENT:
+        if response.status_code == HTTPStatus.NO_CONTENT:
             return None
