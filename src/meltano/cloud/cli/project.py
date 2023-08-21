@@ -11,6 +11,9 @@ from http import HTTPStatus
 import click
 import questionary
 import requests
+from slugify import slugify
+from yaspin import yaspin  # type: ignore
+
 from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
@@ -19,8 +22,6 @@ from meltano.cloud.cli.base import (
     print_formatted_list,
 )
 from meltano.core.utils import run_async
-from slugify import slugify
-from yaspin import yaspin  # type: ignore
 
 if t.TYPE_CHECKING:
     from meltano.cloud.api.config import MeltanoCloudConfig
