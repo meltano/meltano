@@ -68,7 +68,7 @@ class VirtualEnv:
         elif isinstance(python, Number):
             raise MeltanoError(
                 "Python must be specified as an executable name or path, "
-                f"not the number {python!r}"
+                f"not the number {python!r}",
             )
         else:
             python_path = python if os.path.exists(python) else shutil.which(python)
