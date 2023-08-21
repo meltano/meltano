@@ -194,7 +194,7 @@ class UpgradeService:  # noqa: WPS214
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, skip_package: bool = False, **kwargs):
+    def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
         """Upgrade Meltano.
 
         Args:
@@ -218,6 +218,7 @@ class UpgradeService:  # noqa: WPS214
         click.echo()
         self.migrate_database()
         click.echo()
+        self.migrate_state()
         click.echo()
         click.secho(
             "Meltano and your Meltano project have been upgraded!"
