@@ -207,7 +207,7 @@ class TestCliUpgrade:
         conn = boto3.resource("s3", region_name="us-east-1")
         bucket = conn.create_bucket(Bucket="test-state-bucket")
         for state_id in state_ids:
-            bucket.create_object(
+            bucket.put_object(
                 Key=f"some/trailing/delim/path/some/trailing/delim/path/{state_id}/state.json",  # noqa: E501
             )
         monkeypatch.setenv(
@@ -216,7 +216,7 @@ class TestCliUpgrade:
         )
         result = cli_runner.invoke(cli, ["upgrade"])
         assert_cli_runner(result)
-        keys = [s3_object.key for s3_object in conn.objects.all()]
+        keys = [s3_object.key for s3_object in bucket.objects.all()]
         for state_id in state_ids:
             key = f"some/trailing/delim/path/{state_id}/state.json"
             assert key in keys
