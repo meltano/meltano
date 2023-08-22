@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import platform
 import shutil
+import typing as t
 
 import mock
 import pytest
@@ -17,6 +18,9 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
 
 
 class TestCliAdd:
@@ -635,3 +639,22 @@ class TestCliAdd:
                     )
 
                 install_plugin_mock.assert_not_called()
+
+    def test_add_with_python_version(self, cli_runner: CliRunner):
+        with mock.patch(
+            "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+        ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
+            python = "python3.X"
+            assert_cli_runner(
+                cli_runner.invoke(
+                    cli,
+                    (
+                        "add",
+                        "extractor",
+                        "tap-that-needs-custom-python",
+                        "--python",
+                        python,
+                    ),
+                ),
+            )
+            venv_mock.assert_called_once_with(python)

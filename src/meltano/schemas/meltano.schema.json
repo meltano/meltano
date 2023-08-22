@@ -30,6 +30,15 @@
       "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
       "default": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db"
     },
+    "python": {
+      "type": "string",
+      "description": "The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment). This can be overridden on a per-plugin basis by setting the `python` property for the plugin.",
+      "examples": [
+        "/usr/bin/python3.10",
+        "python",
+        "python3.11"
+      ]
+    },
     "state_backend": {
       "type": "object",
       "description": "Configuration for state backend.",
@@ -382,6 +391,15 @@
           "logo_url": {
             "type": "string",
             "description": "An optional logo URL for this plugin"
+          },
+          "python": {
+            "type": "string",
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ]
           },
           "executable": {
             "type": "string",
