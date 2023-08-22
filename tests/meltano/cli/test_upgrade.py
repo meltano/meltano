@@ -4,8 +4,10 @@ import json
 import platform
 import shutil
 
+import boto3
 import mock
 import pytest
+from moto import mock_s3
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -197,3 +199,24 @@ class TestCliUpgrade:
     def test_upgrade_database(self, cli_runner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
+
+    @mock_s3
+    @pytest.mark.usefixtures("project")
+    def test_upgrade_state(self, cli_runner, monkeypatch):
+        state_ids = [f"dev:tap-{i}-to-target-{i}" for i in range(10)]
+        conn = boto3.resource("s3", region_name="us-east-1")
+        bucket = conn.create_bucket(Bucket="test-state-bucket")
+        for state_id in state_ids:
+            bucket.create_object(
+                Key=f"some/trailing/delim/path/some/trailing/delim/path/{state_id}/state.json",  # noqa: E501
+            )
+        monkeypatch.setenv(
+            "MELTANO_STATE_BACKEND_URI",
+            "s3://test-state-bucket/some/trailing/delim/path/",
+        )
+        result = cli_runner.invoke(cli, ["upgrade"])
+        assert_cli_runner(result)
+        keys = [s3_object.key for s3_object in conn.objects.all()]
+        for state_id in state_ids:
+            key = f"some/trailing/delim/path/{state_id}/state.json"
+            assert key in keys
