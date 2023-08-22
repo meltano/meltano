@@ -154,7 +154,7 @@ def config_schema_rules(config):
     ]
 
 
-class SingerTap(SingerPlugin):  # noqa: WPS 214
+class SingerTap(SingerPlugin):  # noqa: WPS214
     """A Plugin for Singer Taps."""
 
     __plugin_type__ = PluginType.EXTRACTORS
