@@ -62,6 +62,7 @@ pytest_deps = (
 
 def _run_pytest(session: Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    args = session.posargs or ("tests/",)
     try:
         session.env.update(
             {
@@ -75,9 +76,8 @@ def _run_pytest(session: Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
-            "tests/",
             f"--randomly-seed={random_seed}",
-            *session.posargs,
+            *args,
         )
     finally:
         if session.interactive:

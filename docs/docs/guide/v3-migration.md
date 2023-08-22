@@ -3,7 +3,6 @@ title: Meltano 3.0 Migration Guide
 description: Migrate existing "v2" projects to the latest version of Meltano
 layout: doc
 sidebar_position: 21
-sidebar_class_name: hidden
 ---
 
 _Note: This document is still a work in progress. Expect further changes, coming soon._
