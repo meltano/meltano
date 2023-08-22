@@ -218,5 +218,5 @@ class TestCliUpgrade:
         assert_cli_runner(result)
         keys = [s3_object.key for s3_object in bucket.objects.all()]
         for state_id in state_ids:
-            key = f"some/trailing/delim/path/{state_id}/state.json"
+            key = f"/some/trailing/delim/path/{state_id}/state.json"
             assert key in keys
