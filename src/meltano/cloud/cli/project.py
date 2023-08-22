@@ -192,21 +192,42 @@ async def list_projects(
     )
 
 
+def _print_projects(projects: list[CloudProject]) -> None:
+    for project in projects:
+        click.echo(
+            f"{project['project_id']}: {project['project_name']} "
+            f"({project['git_repository']!r})",
+        )
+
+
 def _check_for_duplicate_project_names(projects: list[CloudProject]) -> None:
     project_names = [x["project_name"] for x in projects]
     if len(set(project_names)) != len(project_names):
         click.secho(
-            "Error: Multiple Meltano Cloud projects have the same name. "
+            "Error: Multiple Meltano Cloud projects have the same name. If you are "
+            "trying to use a project with an unambiguous name, please select it with "
+            "the `--name` option. Otherwise, please specify the project using the "
+            "`--id` option with its internal ID, shown below. Note that these IDs may "
+            "change at any time. To avoid this issue, please use unique project names.",
+            fg="red",
+        )
+        _print_projects(projects)
+        sys.exit(1)
+
+
+def _check_for_project_name_conflict(
+    projects: list[CloudProject],
+    project_name: str,
+) -> None:
+    if [x["project_name"] for x in projects].count(project_name) > 1:
+        click.secho(
+            "Error: Multiple Meltano Cloud projects have the specified name. "
             "Please specify the project using the `--id` option with its "
             "internal ID, shown below. Note that these IDs may change at any "
             "time. To avoid this issue, please use unique project names.",
             fg="red",
         )
-        for project in projects:
-            click.echo(
-                f"{project['project_id']}: {project['project_name']} "
-                f"({project['git_repository']!r})",
-            )
+        _print_projects(projects)
         sys.exit(1)
 
 
@@ -297,7 +318,7 @@ async def use_project(
 
     if context.projects is None:  # Interactive config was not used
         context.projects = (await _get_projects(context.config)).items
-        _check_for_duplicate_project_names(context.projects)
+        _check_for_project_name_conflict(context.projects, project_name)
         if project_name not in {x["project_name"] for x in context.projects}:
             raise click.ClickException(
                 f"Unable to use project named {project_name!r} - no available "

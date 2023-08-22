@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 
 
 class TestProjectCommand:
-    """Test the logs command."""
+    """Test the project command."""
 
     @pytest.fixture()
     def projects(self, tenant_resource_key: str) -> list[CloudProject]:
@@ -365,7 +365,7 @@ class TestProjectCommand:
         )
         assert result.exit_code == 1
         assert result.output == (
-            "Error: Multiple Meltano Cloud projects have the same name. "
+            "Error: Multiple Meltano Cloud projects have the specified name. "
             "Please specify the project using the `--id` option with its "
             "internal ID, shown below. Note that these IDs may change at any "
             "time. To avoid this issue, please use unique project names.\n"
