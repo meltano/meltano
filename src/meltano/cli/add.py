@@ -53,6 +53,14 @@ if t.TYPE_CHECKING:
     ),
 )
 @click.option(
+    "--python",
+    help=(
+        "The Python version to use for the plugin. Only applies to base plugins which "
+        "have Python virtual environments, rather than inherited plugins which use the "
+        "virtual environment of their base plugin, or plugins that run in a container."
+    ),
+)
+@click.option(
     "--custom",
     is_flag=True,
     help=(
@@ -75,6 +83,7 @@ def add(  # noqa: WPS238
     inherit_from: str | None = None,
     variant: str | None = None,
     as_name: str | None = None,
+    python: str | None = None,
     **flags,
 ):
     """
@@ -121,6 +130,7 @@ def add(  # noqa: WPS238
                 add_plugin(
                     plugin_type,
                     plugin,
+                    python=python,
                     inherit_from=inherit_from,
                     variant=variant,
                     custom=flags["custom"],

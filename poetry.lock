@@ -334,17 +334,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.28.31"
+version = "1.28.32"
 description = "The AWS SDK for Python"
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.31-py3-none-any.whl", hash = "sha256:2761f3249fe25c3ec1a8cd6b95fca2317747503e6f1d127daf6a3d2cdeb25680"},
-    {file = "boto3-1.28.31.tar.gz", hash = "sha256:dc6d72470f6d8926b8cdc10ee7708d7ccdd36d6313c7aa298bc1cf6bedb8921e"},
+    {file = "boto3-1.28.32-py3-none-any.whl", hash = "sha256:ed787f250ce2562c7744395bdf32b5a7bc9184126ef50a75e97bcb66043dccf3"},
+    {file = "boto3-1.28.32.tar.gz", hash = "sha256:b505faa126db84e226f6f8d242a798fae30a725f0cac8a76c6aca9ace4e8eb28"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.31,<1.32.0"
+botocore = ">=1.31.32,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -720,13 +720,13 @@ xray = ["mypy-boto3-xray (>=1.26.0,<1.27.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.31"
+version = "1.31.32"
 description = "Low-level, data-driven core of boto 3."
 optional = true
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.31-py3-none-any.whl", hash = "sha256:1eef14ae98e8662e43f7cf6d993c732793def02644e2d489c5171d3b9269e900"},
-    {file = "botocore-1.31.31.tar.gz", hash = "sha256:950a49c5286fe1f6d72cfbe2910b9ddbdfbb907975ddc41cf38ac9709b4d1291"},
+    {file = "botocore-1.31.32-py3-none-any.whl", hash = "sha256:8992ac186988c4b4cc168e8e479e9472da1442b193c1bf7c9dcd1877ec62d23c"},
+    {file = "botocore-1.31.32.tar.gz", hash = "sha256:7a07d8dc8cc47bf23af39409ada81f388eb78233e1bb2cde0c415756da753664"},
 ]
 
 [package.dependencies]
@@ -3481,6 +3481,17 @@ files = [
 ]
 
 [[package]]
+name = "types-python-dateutil"
+version = "2.8.19.14"
+description = "Typing stubs for python-dateutil"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-python-dateutil-2.8.19.14.tar.gz", hash = "sha256:1f4f10ac98bb8b16ade9dbee3518d9ace017821d94b057a425b069f834737f4b"},
+    {file = "types_python_dateutil-2.8.19.14-py3-none-any.whl", hash = "sha256:f977b8de27787639986b4e28963263fd0e5158942b3ecef91b9335c130cb1ce9"},
+]
+
+[[package]]
 name = "types-python-slugify"
 version = "8.0.0.3"
 description = "Typing stubs for python-slugify"
@@ -3780,4 +3791,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "72b8a68b8cc8498845d0a6c5ef3a7893b58c67fb515a6e7ad1ac02dc4c4f73cb"
+content-hash = "e0fe0a513af47a6344c09b39bf96923f983fb651f6d633c3aafec40e38e99ed4"

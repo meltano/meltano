@@ -1,0 +1,9 @@
+version: 1
+default_environment: dev
+project_id: 32fa7b74-ce6d-461c-a315-af6c9c66c140
+environments:
+- name: dev
+- name: staging
+- name: prod
+send_anonymous_usage_stats: false
+python: python3.X
