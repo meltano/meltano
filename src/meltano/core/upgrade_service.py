@@ -208,6 +208,9 @@ class UpgradeService:  # noqa: WPS214
     def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
         """Upgrade Meltano.
 
+        Note: this is not actually called as part of the `meltano upgrade` command
+        but is useful for testing and debugging upgrade logic.
+
         Args:
             skip_package: Whether the Meltano package should be upgraded.
             kwargs: Keyword arguments for `UpgradeService.upgrade_package`.
