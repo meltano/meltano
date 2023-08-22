@@ -96,8 +96,30 @@ A Meltano Cloud notification is a response to Meltano Cloud event.
 
 ### Supported notification filters
 - `events`
-  - `all`
+  - `job_run`
 - `status`
   - `succeeded`
   - `failed`
   - `cancelled`
+
+
+### Event payload
+
+This is the expected payload for our notifications. Currently only job_run is supported.
+
+```json
+{
+  "id": "string",
+  "event_type": "supported notification filter event IE: job_run",
+  "idempotency_key": "string",
+  "data": {
+    "id": "string",
+    "description": "string",
+    "status": "supported notification filter status IE: succeeded",
+    "cancellation_reason": {
+      "code": "string",
+      "reason": "string"
+    } | None
+  }
+}
+```
