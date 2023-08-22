@@ -231,6 +231,8 @@ meltano cloud project list
 
 The `create` subcommand creates a new Meltano Cloud project.
 
+In order to create a project, you'll first need to grant access to the Meltano Cloud GitHub app as described in [our onboarding documentation](/cloud/onboarding#prereq-2-provide-access-to-your-repo).
+
 ```sh
 meltano-cloud project create --name example-project --repo-url https://github.com/meltano/squared.git --root-path "data/"
 ⠋ Creating project - this may take several minutes...
