@@ -6,12 +6,16 @@ import asyncio
 import logging
 import sys
 import typing as t
+from http import HTTPStatus
 
 import click
 import questionary
+import requests
+from slugify import slugify
 from ulid import ULID
+from yaspin import yaspin  # type: ignore
 
-from meltano.cloud.api.client import MeltanoCloudClient
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
     get_paginated,
@@ -92,6 +96,26 @@ class ProjectsCloudClient(MeltanoCloudClient):
                     },
                 ),
             )
+
+    async def create_project(
+        self,
+        project_name: str,
+        git_repository: str,
+        project_root_path: str | None = None,
+    ):
+        """Use POST to create new Meltano Cloud project."""
+        async with self.authenticated():
+            payload = {"project_name": project_name, "git_repository": git_repository}
+            if project_root_path:
+                payload["project_root_path"] = project_root_path
+            prepared_request = await self._json_request(
+                "POST",
+                f"/projects/v1/{self.config.tenant_resource_key}",
+                json=payload,
+            )
+            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+            response.raise_for_status()
+            return response
 
 
 @click.group("project")
@@ -334,3 +358,41 @@ async def use_project(
         ),
         fg="green",
     )
+
+
+@project_group.command("create")
+@click.option("--name", type=str, prompt=True)
+@click.option("--repo-url", type=str, prompt=True)
+@click.option("--root-path", type=str, required=False)
+@pass_context
+@run_async
+async def create_project(
+    context: MeltanoCloudCLIContext,
+    name: str,
+    repo_url: str,
+    root_path: str | None = None,
+):
+    """Create a project to your Meltano Cloud."""
+    async with ProjectsCloudClient(config=context.config) as client:
+        try:
+            with yaspin(
+                text="Creating project - this may take several minutes...",
+            ):
+                response = await client.create_project(
+                    project_name=name,
+                    git_repository=repo_url,
+                    project_root_path=root_path,
+                )
+        except MeltanoCloudError as e:
+            if e.response.status == HTTPStatus.CONFLICT:
+                click.secho(
+                    (
+                        f"A project named {name!r} (normalized to "
+                        f"{slugify(name)!r}) already exists."
+                    ),
+                    fg="yellow",
+                )
+            return None
+        click.echo(f"Project {name!r} created successfully.")
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
