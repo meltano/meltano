@@ -434,11 +434,20 @@ class EmailNotification:
 
 def _format_notification(
     notification: CloudNotification,
-) -> tuple[str, str, str]:
+) -> tuple[str, str, str, t.Union[list, t.Literal["N/A"]]]:
+    def replace_empty_with_NA(item):
+        """Local function to replace empty list with N/A."""
+        if isinstance(item, list) and not item:
+            # If a an empty list return N/A
+            return "N/A"
+        return item
+
+    filters = replace_empty_with_NA(notification["filters"])
     return (
         notification["recipient"],
         notification["type"],
         notification["status"],
+        filters
     )
 
 
@@ -485,8 +494,8 @@ async def list_notifications(
                     print_notifications,
                     output_format,
                     _format_notification,
-                    ("Recipient", "Type", "Status"),
-                    ("left", "left", "left"),
+                    ("Recipient", "Type", "Status", "Filters"),
+                    ("left", "left", "left", "left"),
                 )
         except Exception as e:
             raise click.ClickException(

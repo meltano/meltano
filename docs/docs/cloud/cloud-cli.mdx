@@ -50,7 +50,7 @@ See the [reserved variables](/cloud/platform#reserved-variables) docs for more d
 
 ### `notification`
 
-The `notification` command provides a way for managing your [Meltano Cloud notifications](concepts#meltano-cloud-notifications).
+The `notification` subcommand provides a way for managing your [Meltano Cloud notifications](concepts#meltano-cloud-notifications).
 
 #### `list`
 
@@ -58,13 +58,20 @@ List all notifications configured for your current default project or organizati
 
 ```sh
 $ meltano cloud config notification list
-╭─────────────────────┬─────────┬──────────╮
-│ Recipient           │ Type    │ Status   │
-├─────────────────────┼─────────┼──────────┤
-│ https://melty       │ webhook │ active   │
-│ dragon@meltano.com  │ email   │ active   │
-╰─────────────────────┴─────────┴──────────╯
+╭──────────────────────────┬─────────┬──────────┬─────────────────────────────────────────╮
+│ Recipient                │ Type    │ Status   │ Filters                                 │
+├──────────────────────────┼─────────┼──────────┼─────────────────────────────────────────┤
+│ dragon@meltano.com       │ email   │ active   │ N/A                                     │
+│ https://melty            │ webhook │ active   │ [{'events': ['job_run'], 'status': []}] │
+╰──────────────────────────┴─────────┴──────────┴─────────────────────────────────────────╯
 ```
+
+#### **Notification System Limitations**
+
+The notification system has a few limitations that should be taken into consideration:
+
+- **Unique Notifications**: Currently, our system permits only a single notification per recipient within each scope, 'organization' or 'project'.
+- **Notification Overwrite**: If you attempt to set another notification for the same recipient within the same scope, the new notification will overwrite the existing one. In other words, setting a second notification won't create a new notification, but rather modify the existing one.
 
 #### `set`
 
@@ -92,10 +99,14 @@ meltano cloud config notification set <type> --recipient <target_recipient> --fi
 `--filter`: An optional filter you want to check against, you can supply multiple filters which will all be joined as an OR expression.
 Values within the filter are validated as an AND Expression.
 
+**Job Failures**
+
+To subscribe only to job failures you would run
 ```sh
-meltano cloud config notification set webhook --recipient http://test+melty --filter '{"events": ["job_created", "job_succeeded"], "status": ["succeeded"]}' --filter '{ "status": ["failed"]}'
+meltano cloud config notification set webhook --recipient http://test+melty --filter '{"events": ["job_run"], "status": ["failed"]}' 
 ```
-The above example sets a webhook notification to send to ﻿http://test+melty if the event is ﻿(job_created OR job_succeeded AND status = succeeded) OR status = failed.
+
+
 
 #### `update`
 
