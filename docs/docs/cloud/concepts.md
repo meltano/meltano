@@ -105,7 +105,7 @@ A Meltano Cloud notification is a response to Meltano Cloud event.
 
 ### Event payload
 
-This is the expected payload for our notifications. Currently only job_run is supported.
+This is the expected job_run payload for our notifications. Currently only job_run is supported.
 
 ```json
 {

@@ -390,7 +390,7 @@ def validate_filter_dict(filter_dict: dict) -> None:
     """
     # For list of supported events and statuses
     # meltano/infra/common/models/meltano_models/models.py
-    NOTIFICATION_EVENTS_SET = {"all"}
+    NOTIFICATION_EVENTS_SET = {"job_run"}
     NOTIFICATION_STATUS_FILTERS_SET = {"failed", "cancelled", "succeeded"}
 
     if "events" in filter_dict:
@@ -573,7 +573,6 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                 raise click.ClickException(
                     f"{e}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
-                    # TODO: Add anchor to config
                     "https://docs.meltano.com/cloud/cloud-cli\n"
                     "If the issue persists, "
                     "we'd be happy to help at: https://meltano.com/slack",
@@ -643,7 +642,8 @@ def create_update_command(type: t.Literal["webhook", "email"]):
             value=recipient,
             type=type,
             prompt_message=(
-                f"Please provide old {type} recipient for " "notification to be updated"
+                f"Please provide old {type} recipient for "
+                "notification to be updated"
             ),
             error_message=f"Invalid {type} value",
         )

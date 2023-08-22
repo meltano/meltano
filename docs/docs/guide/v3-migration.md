@@ -56,6 +56,17 @@ meltano lock --all
 ```
 
 4. (Optional) Remove the `ff.plugin_locks_required` feature flag after upgrading to Meltano v3, since it has no effect in Meltano v3.
+
 ## Removed
+
+### Target extra setting `target_schema`
+
+In line with the deprecation of the [`meltano elt`](/reference/command-line-interface/elt command in favor of [`meltano el`](/reference/command-line-interface/elt), the `target_schema` extra setting of [loaders](/concepts/plugins#loaders) has been removed.
+
+This should impact very few users, as the `target_schema` extra setting was only used by the [`dbt` transformer](/concepts/plugins#transformers), which has been deprecated in favor of [adapter-specific dbt utilities](/guide/migrate-an-existing-dbt-project/#add-dbt-transformer).
+
+#### Migration steps
+
+1. In the configuration for the `dbt` transformer plugin, set the `source_schema` value to the appropriate environment variable for your target (e.g. [`$MELTANO_LOAD__DEFAULT_TARGET_SCHEMA`](https://hub.meltano.com/loaders/target-postgres#default_target_schema-setting) for Postgres).
 
 ## CLI and API Changes

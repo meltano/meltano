@@ -207,3 +207,9 @@ class TestProjectPluginsService:
         ]
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")
+
+    def test_find_plugins(self, project: Project, mapper):
+        assert project.plugins.find_plugin("mock-mapping-1") == mapper
+        assert project.plugins.find_plugin("mock-mapping-0") == mapper
+        with pytest.raises(PluginNotFoundError):
+            project.plugins.find_plugin("non-existent-mapping")

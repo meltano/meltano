@@ -484,7 +484,6 @@ Meltano currently knows these extras for these plugin types:
   - [`state`](/concepts/plugins#state-extra)
 - [Loaders](/concepts/plugins#loaders)
   - [`dialect`](/concepts/plugins#dialect-extra)
-  - [`target_schema`](/concepts/plugins#target-schema-extra)
 - [Transforms](/concepts/plugins#transforms)
   - [`package_name`](/concepts/plugins#package-name-extra)
   - [`vars`](/concepts/plugins#vars-extra)

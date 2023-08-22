@@ -220,6 +220,7 @@ class TestWindowsELT:
 class TestCliEltScratchpadOne:
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt(
         self,
         cli_runner,
@@ -228,12 +229,13 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        result = cli_runner.invoke(cli, ["elt"])
+        result = cli_runner.invoke(cli, [command])
         assert result.exit_code == 2
 
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
@@ -301,6 +303,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_debug_logging(
         self,
         cli_runner,
@@ -310,9 +313,10 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         monkeypatch,
+        command: str,
     ):
-        state_id = "pytest_test_elt_debug"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}_debug"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         job_logging_service.delete_all_logs(state_id)
 
@@ -418,17 +422,19 @@ class TestCliEltScratchpadOne:
 
             full_result = result.stdout + result.stderr
 
-            # We expect a difference of 1 line because the cli emits one log
-            # line not found in the log.
+            # We expect a difference of 2 lines because the cli emits two log
+            # lines not found in the log.
             # we already test the redirect handler in test_output_logger,
             # so we'll just verify that the # of lines matches.
-            assert len(log.splitlines()) == len(full_result.splitlines()) - 1
+            log_diff = 1 if command == "el" else 2
+            assert len(log.splitlines()) == len(full_result.splitlines()) - log_diff
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_failure(
         self,
         cli_runner,
@@ -437,9 +443,10 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         tap_process.wait.return_value = 1
         tap_process.stderr.readline.side_effect = (
@@ -488,6 +495,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_target_failure_before_tap_finishes(
         self,
         cli_runner,
@@ -496,9 +504,10 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail
         # before tap finishes
@@ -567,6 +576,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_target_failure_after_tap_finishes(
         self,
         cli_runner,
@@ -575,9 +585,10 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         target_process.wait.return_value = 1
         target_process.stderr.readline.side_effect = (
@@ -626,6 +637,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_and_target_failure(
         self,
         cli_runner,
@@ -634,9 +646,10 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         tap_process.wait.return_value = 1
         tap_process.stderr.readline.side_effect = (
@@ -694,6 +707,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_line_length_limit_error(
         self,
         cli_runner,
@@ -702,9 +716,10 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         job_logging_service,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
@@ -768,6 +783,7 @@ class TestCliEltScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_output_handler_error(
         self,
         cli_runner,
@@ -775,9 +791,10 @@ class TestCliEltScratchpadOne:
         target,
         tap_process,
         target_process,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        state_id = f"pytest_test_{command}"
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         exc = Exception("Failed to read from target stderr.")
         target_process.stderr.readline.side_effect = exc
@@ -812,9 +829,10 @@ class TestCliEltScratchpadOne:
                 Exception("Failed to read from target stderr."),
             )
 
-    def test_elt_already_running(self, cli_runner, tap, target, session):
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
+    def test_elt_already_running(self, cli_runner, tap, target, session, command: str):
         state_id = "already_running"
-        args = ["elt", "--state-id", state_id, tap.name, target.name]
+        args = [command, "--state-id", state_id, tap.name, target.name]
 
         existing_job = Job(job_name=state_id, state=State.RUNNING)
         existing_job.save(session)
@@ -829,20 +847,22 @@ class TestCliEltScratchpadOne:
                 result.exception,
             )
 
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_catalog(
         self,
         cli_runner,
         project,
         tap,
         target,
+        command: str,
     ):
         catalog = {"streams": []}
         with project.root.joinpath("catalog.json").open("w") as catalog_file:
             json.dump(catalog, catalog_file)
 
-        state_id = "pytest_test_elt"
+        state_id = f"pytest_test_{command}"
         args = [
-            "elt",
+            command,
             "--state-id",
             state_id,
             tap.name,
@@ -859,20 +879,22 @@ class TestCliEltScratchpadOne:
         assert json.loads(result.stdout) == catalog
 
     @pytest.mark.usefixtures("session")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_state(
         self,
         cli_runner,
         project,
         tap,
         target,
+        command: str,
     ):
         state = {"success": True}
         with project.root.joinpath("state.json").open("w") as state_file:
             json.dump(state, state_file)
 
-        state_id = "pytest_test_elt"
+        state_id = f"pytest_test_{command}"
         args = [
-            "elt",
+            command,
             "--state-id",
             state_id,
             tap.name,
@@ -893,16 +915,18 @@ class TestCliEltScratchpadOne:
             assert json.loads(result.stdout) == state
 
     @pytest.mark.usefixtures("project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_extractor_config(
         self,
         cli_runner,
         tap,
         target,
         plugin_settings_service_factory,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
+        state_id = f"pytest_test_{command}"
         args = [
-            "elt",
+            command,
             "--state-id",
             state_id,
             tap.name,
@@ -926,16 +950,18 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.usefixtures("project")
+    @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_loader_config(
         self,
         cli_runner,
         tap,
         target,
         plugin_settings_service_factory,
+        command: str,
     ):
-        state_id = "pytest_test_elt"
+        state_id = f"pytest_test_{command}"
         args = [
-            "elt",
+            command,
             "--state-id",
             state_id,
             tap.name,
@@ -1136,6 +1162,12 @@ class TestCliEltScratchpadThree:
             assert_log_lines(
                 result.stdout + result.stderr,
                 [
+                    LogEntry(
+                        None,
+                        None,
+                        "The `elt` command is deprecated in favor of `el`",
+                        "warning",
+                    ),
                     LogEntry("meltano", None, "Extract & load skipped.", "info"),
                     LogEntry("meltano", None, "Running transformation...", "info"),
                     LogEntry("meltano", None, "Transformation complete!", "info"),

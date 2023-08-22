@@ -96,7 +96,7 @@ class TestConfigNotificationCommand:
                 "recipient": "http://melty+test",
                 "status": "inactive",
                 "type": "webhook",
-                "filters": [{"events": ["all"]}],
+                "filters": [{"events": ["job_run"]}],
             },
         ]
 

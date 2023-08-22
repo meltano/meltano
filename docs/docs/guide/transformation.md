@@ -213,7 +213,9 @@ First it installs any required dbt package dependencies using `dbt deps` then it
 The `<models>` argument is populated using the Meltano transform `models` setting [documented here](https://hub.meltano.com/transformers/dbt#models).
 
 Using this method for executing transforms allows Meltano to make some assumptions about the appropriate configurations for running dbt.
-Based on the target loader you are using, Meltano is able to default your dbt transform `target` [config setting](https://hub.meltano.com/transformers/dbt#target) to the correct SQL dialect (e.g. Snowflake, Postgres, etc.). Meltano also auto populates the `source_schema` and `target_schema` [settings](https://hub.meltano.com/transformers/dbt#source-schema) using the loader schema setting from the pipeline.
+Based on the target loader you are using, Meltano is able to default your dbt transform `target` [config setting](https://hub.meltano.com/transformers/dbt#target) to the correct SQL dialect (e.g. Snowflake, Postgres, etc.).
+
+Starting with Meltano [`v3`](/guide/v3-migration), the default [`source_schema`]((https://hub.meltano.com/transformers/dbt#source-schema)) value of `$MELTANO_LOAD__TARGET_SCHEMA` will stop working since the target extra was removed. To fix this, you can set the `source_schema` value to the appropriate environment variable for your target (e.g. [`$MELTANO_LOAD__DEFAULT_TARGET_SCHEMA`](https://hub.meltano.com/loaders/target-postgres#default_target_schema-setting) for Postgres).
 
 #### Transform directly
 
@@ -233,7 +235,7 @@ meltano invoke dbt:run --models tap_gitlab.*
 
 Again, this runs all dbt models in the `/transform/models/tap_gitlab/` directory.
 
-The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explictly set by the user. This includes target dialet `DBT_TARGET`, source schema `DBT_SOURCE_SCHEMA`, target schema `DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
+The downside of running directly vs in a pipeline is that Meltano can't infer anything about how dbt should run so more settings might need to be explictly set by the user. This includes target dialet `DBT_TARGET`, target schema `DBT_TARGET_SCHEMA`, and models `DBT_MODELS`.
 
 See the [transformer docs](https://hub.meltano.com/transformers/dbt#commands) from other dbt commands.
 

@@ -83,7 +83,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
                 ),
             )
         return {
-            **deployment,  # type: ignore[misc]
+            **deployment,  # type: ignore[typeddict-item]
             "default": (
                 self.config.internal_project_default["default_deployment_name"]
                 == deployment["deployment_name"]
@@ -165,7 +165,7 @@ class DeploymentsCloudClient(MeltanoCloudClient):
         deployment = response.json()
         return CloudDeployment(
             {
-                **deployment,  # type: ignore[misc]
+                **deployment,  # type: ignore[typeddict-item]
                 "default": (
                     self.config.internal_project_default["default_deployment_name"]
                     == deployment["deployment_name"]

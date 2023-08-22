@@ -9,6 +9,7 @@ import typing as t
 
 import click
 import questionary
+from ulid import ULID
 
 from meltano.cloud.api.client import MeltanoCloudClient
 from meltano.cloud.cli.base import (
@@ -28,6 +29,35 @@ DEFAULT_GET_PROJECTS_LIMIT = 125
 MAX_PAGE_SIZE = 250
 
 logger = logging.getLogger()
+
+
+class ULIDType(click.ParamType):
+    """A ULID input type.
+
+    Examples:
+        01BX5ZZKBKACTAV9WEVGEMMVRY
+        01BX5ZZKBKACTAV9WEVGEMMVS1
+    """
+
+    name = "ulid"
+
+    def convert(
+        self,
+        value: str | ULID,
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
+    ) -> str:
+        """Try converting value to a ULID object."""
+        if isinstance(value, ULID):
+            return str(value)
+
+        if isinstance(value, str):
+            try:
+                ULID.from_str(value)
+            except ValueError:
+                self.fail(f"Invalid ULID value: {value}")
+
+        return value
 
 
 class ProjectsCloudClient(MeltanoCloudClient):
@@ -242,6 +272,7 @@ class ProjectChoicesQuestionaryOption(click.Option):
         "projects share a name."
     ),
     default=None,
+    type=ULIDType(),
 )
 @pass_context
 @run_async
