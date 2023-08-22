@@ -318,7 +318,7 @@ async def use_project(
 
     if context.projects is None:  # Interactive config was not used
         context.projects = (await _get_projects(context.config)).items
-        _check_for_project_name_conflict(context.projects, project_name)
+        _check_for_project_name_conflict(context.projects, t.cast(str, project_name))
         if project_name not in {x["project_name"] for x in context.projects}:
             raise click.ClickException(
                 f"Unable to use project named {project_name!r} - no available "
