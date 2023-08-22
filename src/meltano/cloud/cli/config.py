@@ -84,12 +84,11 @@ class ConfigCloudClient(MeltanoCloudClient):
         end_path: t.Literal["notification"] | t.Literal["notifications"],
         key: str | None = None,
     ) -> str:
-        """Helper function to build notification url.
+        """Build a notification url.
 
         Args:
             key: The key to use in the url
         """
-
         url = (
             f"{self.notifications_service_prefix}/"
             f"{self.config.tenant_resource_key}/"
@@ -151,7 +150,7 @@ class ConfigCloudClient(MeltanoCloudClient):
         new_key: str | None = None,
         status: str | None = None,
     ):
-        """Function to update the notification key.
+        """Update the notification key.
 
         The notification key is hash of either webhook url or email
 
@@ -177,13 +176,14 @@ class ConfigCloudClient(MeltanoCloudClient):
             )
 
     async def delete_notification(self, key: str):
-        """Function to delete notification by key.
+        """Delete notification by key.
 
         Args:
             key: The key of notification to be deleted
         """
         async with self.authenticated():
-            delete_url = self._build_notification_url(key=key, end_path="notification")
+            delete_url = self._build_notification_url(
+                key=key, end_path="notification")
             return await self._json_request(
                 "DELETE",
                 delete_url,
@@ -256,7 +256,7 @@ def validate_notification_input(
     prompt_message: str,
     error_message: str,
 ) -> str:
-    """Helper function to validate specific notification type input.
+    """Validate specific notification type input.
 
     Args:
         value: The value to validate
@@ -284,7 +284,7 @@ def validate_email(
     prompt_message: str = "Please provide a valid email",
     error_message: str = "Value is not a valid email",
 ) -> str:
-    """Helper function to validate email.
+    """Validate an email.
 
     Args:
         value: The value of the prompt
@@ -306,7 +306,7 @@ def validate_url(
     prompt_message: str = "Please provide a valid url",
     error_message: str = "Value is not a valid url",
 ) -> str:
-    """Helper function to validate url.
+    """Validate a url.
 
     Args:
         value: The value of the prompt
@@ -332,7 +332,7 @@ def prompt_and_validate(
     prompt_message: str = "Please provide valid value.",
     error_message: str = "Value is not valid",
 ) -> str:
-    """Function to prompt if necessary and validate input for type.
+    """Prompt if necessary and validate input for type.
 
     Args:
         value: The value to validated
@@ -369,7 +369,8 @@ class FilterList(click.Option):
             try:
                 filter_obj = json.loads(item)
                 filter_list = (
-                    filter_obj if isinstance(filter_obj, list) else [filter_obj]
+                    filter_obj if isinstance(filter_obj, list) else [
+                        filter_obj]
                 )
                 for filter_dict in filter_list:
                     validate_filter_dict(filter_dict)
@@ -383,7 +384,7 @@ class FilterList(click.Option):
 
 
 def validate_filter_dict(filter_dict: dict) -> None:
-    """Helper function to validate filters dictionary against supported values.
+    """Validate filters dictionary against supported values.
 
     Args:
         filter_dict: The filter being validated
@@ -473,7 +474,6 @@ async def list_notifications(
     Args:
         context: The click context
     """
-
     async with ConfigCloudClient(config=context.config) as client:
         try:
             notifications = await client.list_notifications()
@@ -504,7 +504,7 @@ def notification_set() -> None:
 
 
 def create_set_command(type: t.Literal["webhook", "email"]):
-    """Helper function create set commands for different notifications.
+    """Create set commands for different notifications.
 
     Args:
         type: The type of notification
@@ -532,7 +532,7 @@ def create_set_command(type: t.Literal["webhook", "email"]):
         recipient: str | None,
         filter: list,
     ):
-        """Function to set the notification of specific type.
+        """Set the notification of specific type.
 
         Args:
             context: The click context
@@ -591,7 +591,7 @@ def update():
 
 
 def create_update_command(type: t.Literal["webhook", "email"]):
-    """Helper function to create notification update commads.
+    """Create notification update commads.
 
     Args:
         type: The notification type
@@ -642,10 +642,9 @@ def create_update_command(type: t.Literal["webhook", "email"]):
             value=recipient,
             type=type,
             prompt_message=(
-                f"Please provide old {type} recipient for "
-                "notification to be updated"
+                f"Please provide old {type} recipient for notification to be updated"
             ),
-            error_message=f"Invalid {type} value",
+            error_message=f"Invalid {type} recipient",
         )
 
         new_key = None
@@ -653,8 +652,8 @@ def create_update_command(type: t.Literal["webhook", "email"]):
             new_key = prompt_and_validate(
                 value=new,
                 type=type,
-                prompt_message=f"Please provide new {type} value to update to",
-                error_message=f"Invalid {type} value",
+                prompt_message=f"Please provide new {type} recipient to update to",
+                error_message=f"Invalid {type} recipient",
             )
 
         async with ConfigCloudClient(config=context.config) as client:
@@ -716,8 +715,15 @@ def create_delete_command(type: t.Literal["webhook", "email"]):
         input_value = prompt_and_validate(
             value=recipient,
             type=type,
-            prompt_message=f"Please provide a {type} to delete",
-            error_message=f"Invalid {type}",
+            prompt_message=(
+                f"Please provide a valid {type} from the 'recipient' column "
+                "from `meltano cloud config notification list`"
+            ),
+            error_message=(
+                f"Invalid {type}. Please provide a valid {type} "
+                "from the 'recipient' column "
+                "from `meltano cloud config notification list`"
+            )
         )
         async with ConfigCloudClient(config=context.config) as client:
             try:
