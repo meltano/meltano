@@ -214,7 +214,7 @@ class TestCliUpgrade:
             "MELTANO_STATE_BACKEND_URI",
             "s3://test-state-bucket/some/trailing/delim/path/",
         )
-        result = cli_runner.invoke(cli, ["upgrade"])
+        result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
         keys = [s3_object.key for s3_object in bucket.objects.all()]
         for state_id in state_ids:
