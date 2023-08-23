@@ -67,7 +67,7 @@ Try to run the tap with the `--discover` switch, which should output a catalog o
 ###### State
 
 1. Try to run the tap connect and extract data first, watching for `STATE` messages.
-1. Do two ELT run with `target-postgres`, then validate that:
+1. Do two EL runs with `target-postgres`, then validate that:
    1. All the tables in the schema created have a PRIMARY KEY constraint. (this is important for incremental updates)
    1. There is no duplicates after multiple extractions
 

@@ -1,26 +1,21 @@
+<div align="center">
+  <picture align="center" with="600">
+    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/5394188/228290090-d8a1bfe4-988e-49ef-9f2f-a86f2b014536.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg">
+  <img alt="Meltano Logo" src="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg" width="600"/>
+  </picture>
+</div>
 
-<h1 align="center">Meltano - Extract & Load /with joy/</h1>
-<h3 align="center">CLI & version control for ELT without limitations. No more black box. Let your creativity flow.</h3>
+<h1 align="center">The declarative code-first data integration engine</h1>
+<h3 align="center">Say goodbye to writing, maintaining, and scaling your own API integrations.<br>Unlock 600+ APIs and DBs and realize your wildest data and ML-powered product ideas.</h3>
 
 <div align="center">
-<a href="https://github.com/codespaces/new?template_repository=meltano/meltano-codespace-ready">
+<a href="https://meltano.com/demo">
 <img alt="Try codespaces" src="https://img.shields.io/static/v1?label=&message=Try live demo with Codespaces&color=02a5a5&style=for-the-badge&logo=github"/>
 </a>
 </div>
 
 ---
-
-</br>
-
-<div align="center">
-  <picture align="center">
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/5394188/228290090-d8a1bfe4-988e-49ef-9f2f-a86f2b014536.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg">
-  <img alt="Meltano Logo" src="https://user-images.githubusercontent.com/5394188/228290103-94d79298-cd85-4918-862b-97add5bc7f54.svg" width="800"/>
-  </picture>
-</div>
-
-</br>
 
 <div align="center">
 <a href="https://docs.meltano.com/">

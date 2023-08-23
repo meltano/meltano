@@ -26,14 +26,38 @@ For plugin settings, refer to the specific plugin's documentation
 or use [`meltano config <plugin> list`](/reference/command-line-interface#config)
 to list all available settings with their names, environment variables, and current values.
 
+### <a name="plugin-python"></a>`python`
+
+The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
+
+If not specified, [the top-level `python` setting will be used](#project-python), or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).
+
+This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
+
+This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
+
 ## Your Meltano project
 
 These are settings specific to [your Meltano project](/concepts/project).
 
+### <a name="project-python"></a>`python`
+
+- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_PYTHON`
+
+The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
+
+If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment).
+
+[This can be overridden on a per-plugin basis by setting the `python` property for the plugin.](#plugin-python)
+
+This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
+
+This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
+
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
-- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no_usage_stats` (implies value `false`)
+- [`meltano init`](../reference/command-line-interface#init) CLI option: `--no-usage-stats` (implies value `false`)
 - Default: `true`
 
 Meltano is open source software thats free for anyone to use. The best thing a user could do to give back to the community, aside from contributing code or reporting issues, is contribute anonymous usage stats to allow the maintainers to understand how features are being utilized ultimately helping the community build a better product.
@@ -54,7 +78,7 @@ Also refer to the Meltano data team handbook page for our ["Philosophy of Teleme
 
 With all that said, if you'd still prefer to use Meltano _without_ sending the maintainers this kind of data, you're able to disable tracking entirely using one of these methods:
 
-- When creating a new project, pass `--no_usage_stats` to [`meltano init`](/reference/command-line-interface#init)
+- When creating a new project, pass `--no-usage-stats` to [`meltano init`](/reference/command-line-interface#init)
 - In an existing project, set the `send_anonymous_usage_stats` setting to `false`
 - To disable tracking in all projects in one go, set the `MELTANO_SEND_ANONYMOUS_USAGE_STATS` environment variable to `false`
 
@@ -65,7 +89,7 @@ meltano config meltano set send_anonymous_usage_stats false
 
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
 
-meltano init --no_usage_stats demo-project
+meltano init --no-usage-stats demo-project
 ```
 
 #### Anonymization Standards
@@ -418,7 +442,7 @@ root:
 
 ## `meltano elt`
 
-These settings can be used to modify the behavior of [`meltano elt`](/reference/command-line-interface#elt).
+These settings can be used to modify the behavior of [`meltano el`](/reference/command-line-interface#el) and [`meltano elt`](/reference/command-line-interface#elt).
 
 ### `elt.buffer_size`
 

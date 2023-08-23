@@ -60,7 +60,7 @@ jobs:
 To install from scratch using [pipx](https://pypa.github.io/pipx/installation/#install-pipx):
 
 ```console
-pipx install 'git+https://github.com/meltano/meltano.git@cloud#subdirectory=src/cloud-cli'
+pipx install 'git+https://github.com/meltano/meltano.git@cloud'
 ```
 
 To upgrade to the latest version:
