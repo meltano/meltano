@@ -104,22 +104,6 @@ meltano add <type> <name> --no-install
 meltano add extractor tap-spotify --no-install
 ```
 
-By default, plugins that use Python use the version of Python that was used to run Meltano. This behavior can be overridden using the `python` attribute, which can be set [for all plugins](/reference/settings#project-python), or on a [per-plugin basis](/reference/settings#plugin-python).
-
-When adding a new plugin, the Python version can be specified using the `--python` option:
-
-```bash
-meltano add <type> <name> --python <Python executable name or path>
-```
-
-For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):
-
-```bash
-meltano add extractor tap-github --python python3.12
-```
-
-Then regardless of the Python version used when the plugin is installed, `tap-gitlab` and any plugin which inherits from it will use Python 3.12.
-
 #### Parameters
 
 - `--custom`: Add a [custom plugin](/concepts/plugins#custom-plugins). The command will prompt you for the package's [base plugin description](/concepts/plugins#project-plugins) metadata.
@@ -393,28 +377,6 @@ meltano config <plugin> set --interactive --extras
 # Configure specific store interactively
 meltano config <plugin> set --interactive --store=dotenv
 ```
-
-## `discover`
-
-Lists the available [discoverable plugins](/concepts/plugins#discoverable-plugins) and their [variants](/concepts/plugins#variants).
-
-### How to Use
-
-```bash
-# List all available plugins
-meltano discover all
-
-# Only list available extractors
-meltano discover extractors
-
-# Only list available loaders
-meltano discover loaders
-
-```
-
-### Using `discover` with Environments
-
-The `discover` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ## `docs`
 
@@ -1100,7 +1062,11 @@ Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passe
 ### How to use
 
 The interval argument can be a [cron expression](https://en.wikipedia.org/wiki/Cron#CRON_expression) or one of the following presets:
-`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or `@once` (for schedules to be triggered manually through the UI).
+`@hourly` (`0 * * * *`), `@daily` (`0 0 * * *`), `@weekly` (`0 0 * * 0`), `@monthly` (`0 0 1 * *`), `@yearly` (`0 0 1 1 *`), or one of `@manual`, `@once`, or `@none` (for schedules that are to be triggered manually).
+
+<div class="notification is-info">
+  <p><code>@manual</code>, <code>@once</code>, and <code>@none</code> are all aliases for one another. They have no functional difference, and can be used interchangeably.</p>
+</div>
 
 ```bash
 # Add a schedule
@@ -1504,39 +1470,6 @@ meltano test <plugin1>:<test-name1> <plugin2>:<test-name2>
 ### Using `test` with Environments
 
 The `test` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). The [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be applied if `--environment` is not provided explicitly.
-
-## `ui` (deprecated)
-
-The Metano UI is now deprecated. For more information see our [troubleshooting page](/guide/troubleshooting#meltano-ui).
-
-## `user`
-
-:::info
-
-  <p>This command is only relevant when Meltano is run with authentication enabled.</p>
-:::
-
-### `add`
-
-Create a Meltano user account, active and ready to be used.
-
-#### --overwrite, -f
-
-Update the user instead of creating a new one.
-
-#### --role, -G
-
-Add the user to the role. Meltano ships with two built-in roles: `admin` and `regular`.
-
-#### How to use
-
-```bash
-meltano user add admin securepassword --role admin
-```
-
-### Using `user` with Environments
-
-The `user` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
 
 ## `upgrade`
 

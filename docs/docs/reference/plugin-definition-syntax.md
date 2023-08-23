@@ -495,16 +495,6 @@ settings:
 
 Optional. Use to set the input's placeholder default.
 
-### `settings[*].protected`
-
-Optional. Use in combination with [`value`](#settingsvalue) to provide an uneditable default in the UI.
-
-```yaml
-settings:
-- name: setting_name
-  protected: true
-```
-
 ### `settings[*].tooltip`
 
 Optional. Use to provide a tooltip for the setting when rendered within a UI that supports tooltips.

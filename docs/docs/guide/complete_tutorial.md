@@ -22,7 +22,7 @@ _To learn more about the different installation methods, refer to the [Installat
 
 ### Local Installation
 
-You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.7, 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
+You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.8, 3.9, 3.10, 3.11 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
 1.  Create and navigate to a directory to hold your Meltano projects:
 
@@ -168,13 +168,9 @@ which will be responsible for pulling data out of your data source.
 _To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project)._
 
 1.  Find out if an extractor for your data source is [supported out of the box](/concepts/plugins#discoverable-plugins)
-    by checking the [Extractors list](https://hub.meltano.com/extractors/) or using [`meltano discover`](/reference/command-line-interface#discover):
+    by checking the [Extractors list](https://hub.meltano.com/extractors/):
 
-    ```bash
-    meltano discover extractors
-    ```
-
-1.  Depending on the result, pick your next step:
+2.  Depending on the result, pick your next step:
 
     - If an extractor is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
@@ -209,7 +205,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
     - If an extractor is **not yet discoverable**, find out if a Singer tap for your data source already exists by checking out [MeltanoHub for Singer](https://hub.meltano.com/singer/), which is the best place to find and explore existing Singer taps and targets.
 
-1.  Depending on the result, pick your next step:
+3.  Depending on the result, pick your next step:
 
             - If a Singer tap for your data source is **available**, add it to your project as a [custom plugin](/concepts/plugins#custom-plugins) using [`meltano add --custom`](/reference/command-line-interface#add):
 
@@ -564,13 +560,9 @@ which will be responsible for loading [extracted](#add-an-extractor-to-pull-data
 _To learn more about adding plugins to your project, refer to the [Plugin Management guide](/guide/plugin-management#adding-a-plugin-to-your-project)._
 
 1.  Find out if a loader for your data destination is [supported out of the box](/concepts/plugins#discoverable-plugins)
-    by checking the [Loaders list](https://hub.meltano.com/loaders/) or using [`meltano discover`](/reference/command-line-interface#discover):
+    by checking the [Loaders list](https://hub.meltano.com/loaders/):
 
-    ```bash
-    meltano discover loaders
-    ```
-
-1.  Depending on the result, pick your next step:
+2.  Depending on the result, pick your next step:
 
             - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 

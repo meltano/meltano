@@ -56,7 +56,7 @@ There are specific environment variables that are reserved for certain use-cases
 To specify it, set the ssh private key environment variable using `meltano cloud config env set`, which will look similar to this:
 
 ```sh
-meltano-cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
+meltano cloud config env set --key GIT_SSH_PRIVATE_KEY --value '-----BEGIN OPENSSH PRIVATE KEY-----
 therearelotsofprivatekeymaterialhere
 onvariouslineslikethis
 wecanjustcopypasteasitappearsinthefile
@@ -74,9 +74,3 @@ ssh-ed25519 AAAAB3NzaC1yc2EAAAADAQABAAABAQCwK+DnOJItBOvbGbeqr0ts00aJGdN8vqD0ppq4
 foo@bar:~$ ssh-keygen -y -f <your_key_file>
 Load key "id_ed25519": invalid format
 ```
-
-## Job or Schedule Run Notifications via Webhook
-
-`MELTANO_CLOUD_WEBHOOK_URL` can be set to receive notifications on success or fail of a job or schedule run.
-
-Currently only one webhook URL can be configured.

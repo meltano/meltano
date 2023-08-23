@@ -12,7 +12,7 @@ Since this also goes for [extractors](/concepts/plugins#extractors) and [loaders
 [`config.json` files](https://hub.meltano.com/singer/spec#config-files) expected by Singer taps and targets,
 because Meltano will generate them on the fly whenever an extractor or loader is used through [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
-If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins) (that is, it shows up when you run [`meltano discover`](/reference/command-line-interface#discover)), Meltano already knows what settings it supports.
+If the plugin you'd like to use and configure is [supported out of the box](/concepts/plugins#discoverable-plugins), Meltano already knows what settings it supports.
 If you're adding a [custom plugin](/concepts/plugins#custom-plugins), on the other hand, you will be asked to provide the names of the supported configuration options yourself.
 
 You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin with their names, [environment variables](#environment-variables), and current values. [`meltano config <plugin>`](/reference/command-line-interface#config) will print the current configuration in JSON format.
@@ -31,11 +31,11 @@ To determine the values of settings, Meltano will look in 4 main places (and one
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
-3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
 4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
 5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
-   - Definitions of [discoverable plugins](/concepts/plugins#discoverable-plugins) can be found in the [`discovery.yml` manifest](/contribute/plugins#discoverable-plugins).
+   - Definitions of [discoverable plugins](/concepts/plugins#discoverable-plugins) can be found on [Meltano Hub](/contribute/plugins#discoverable-plugins).
    - [Custom plugin definitions](/concepts/project#plugins) can be found in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
    - `meltano config <plugin> list` will list the default values.
 
@@ -484,7 +484,6 @@ Meltano currently knows these extras for these plugin types:
   - [`state`](/concepts/plugins#state-extra)
 - [Loaders](/concepts/plugins#loaders)
   - [`dialect`](/concepts/plugins#dialect-extra)
-  - [`target_schema`](/concepts/plugins#target-schema-extra)
 - [Transforms](/concepts/plugins#transforms)
   - [`package_name`](/concepts/plugins#package-name-extra)
   - [`vars`](/concepts/plugins#vars-extra)
