@@ -562,7 +562,7 @@ def create_set_command(notification_type: t.Literal["webhook", "email"]):
             prompt_message=f"Please provide a {notification_type} value",
             error_message=f"Invalid {notification_type} value",
         )
-        notification_to_set: t.Union[WebhookNotificaton, EmailNotification]
+        notification_to_set: WebhookNotificaton | EmailNotification
         if notification_type == "webhook":
             notification_to_set = WebhookNotificaton(
                 type=str(notification_type),
