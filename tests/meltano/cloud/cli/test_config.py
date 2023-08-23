@@ -81,7 +81,7 @@ class TestConfigEnvCommand:
 
 
 class TestConfigNotificationCommand:
-    """Tests the notification command"""
+    """Tests the notification command."""
 
     @pytest.fixture()
     def notifications(self) -> list[CloudNotification]:
@@ -90,13 +90,13 @@ class TestConfigNotificationCommand:
                 "recipient": "melty@meltano+test.com",
                 "status": "active",
                 "type": "email",
-                "filters": [],
+                "filters": "N/A",
             },
             {
                 "recipient": "http://melty+test",
                 "status": "inactive",
                 "type": "webhook",
-                "filters": [{"events": ["job_run"]}],
+                "filters": [{"events": ["job_run"], "status": []}],
             },
         ]
 

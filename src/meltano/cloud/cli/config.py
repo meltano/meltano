@@ -314,7 +314,10 @@ def validate_url(
     Returns:
         Valid url
     """
-    url_regex = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    url_regex = (
+        r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|"
+        r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+    )
     return validate_notification_input(
         value=value,
         regex=url_regex,
@@ -436,7 +439,7 @@ def _format_notification(
     notification: CloudNotification,
 ) -> tuple[str, str, str, t.Union[list, t.Literal["N/A"]]]:
     def replace_empty_with_NA(item):
-        """Local function to replace empty list with N/A."""
+        """Replace empty list with N/A."""
         if isinstance(item, list) and not item:
             # If a an empty list return N/A
             return "N/A"
@@ -498,8 +501,9 @@ async def list_notifications(
                     ("left", "left", "left", "left"),
                 )
         except Exception as e:
+            message = str(e) if str(e) else "Internal Server Error"
             raise click.ClickException(
-                f"{e}. \n\n"
+                f"{message}. \n\n"
                 "Please ensure you've correctly followed instructions at: "
                 "https://docs.meltano.com/cloud/cloud-cli\n"
                 "If the issue persists, "
@@ -579,8 +583,9 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                     "run: meltano cloud config notification list",
                 )
             except Exception as e:
+                message = str(e) if str(e) else "Internal Server Error"
                 raise click.ClickException(
-                    f"{e}. \n\n"
+                    f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
                     "If the issue persists, "
@@ -633,7 +638,7 @@ def create_update_command(type: t.Literal["webhook", "email"]):
         new: str | None,
         status: str | None,
     ):
-        """Function to create update notification commands of specific type.
+        """Create update notification commands of specific type.
 
         Args:
             context: The click context
@@ -674,8 +679,9 @@ def create_update_command(type: t.Literal["webhook", "email"]):
                 )
                 click.echo(f"Successfully updated {type} notification")
             except Exception as e:
+                message = str(e) if str(e) else "Internal Server Error"
                 raise click.ClickException(
-                    f"{e}. \n\n"
+                    f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
                     "If the issue persists, "
@@ -696,7 +702,7 @@ def delete() -> None:
 
 
 def create_delete_command(type: t.Literal["webhook", "email"]):
-    """Helper function to create delete commands for specific type.
+    """Create delete commands for specific type.
 
     Args:
         type: The type of notification
@@ -741,8 +747,9 @@ def create_delete_command(type: t.Literal["webhook", "email"]):
                     f"Successfully deleted {type} notification for {input_value}",
                 )
             except Exception as e:
+                message = str(e) if str(e) else "Internal Server Error"
                 raise click.ClickException(
-                    f"{e}. \n\n"
+                    f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
                     "If the issue persists, "
