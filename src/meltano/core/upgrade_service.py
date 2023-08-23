@@ -14,6 +14,8 @@ from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.error import MeltanoError
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginType
+from meltano.core.state_service import StateService
+from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 
 class UpgradeError(Exception):
@@ -34,7 +36,7 @@ class AutomaticPackageUpgradeError(Exception):
         self.instructions = instructions
 
 
-class UpgradeService:
+class UpgradeService:  # noqa: WPS214
     """Meltano upgrade service."""
 
     def __init__(self, engine: Engine, project: Project):
@@ -153,8 +155,40 @@ class UpgradeService:
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def upgrade(self, skip_package: bool = False, **kwargs):
+    def migrate_state(self):
+        """Move cloud state files to deduplicated prefix paths.
+
+        See: https://github.com/meltano/meltano/issues/7938
+        """
+        state_service = StateService(project=self.project)
+        manager = state_service.state_store_manager
+        if isinstance(manager, CloudStateStoreManager):
+            click.secho("Applying migrations to project state...", fg="blue")
+            for filepath in state_service.state_store_manager.list_all_files():
+                parts = filepath.split(manager.delimiter)
+                if (
+                    parts[-1] == "state.json"
+                    and filepath.count(manager.prefix.strip(manager.delimiter)) > 1
+                ):
+                    duplicated_substr = manager.delimiter.join(
+                        [
+                            manager.prefix.strip(manager.delimiter),
+                            manager.prefix.strip(manager.delimiter),
+                        ],
+                    )
+                    new_path = filepath.replace(duplicated_substr, manager.prefix)
+                    new_path = new_path.replace(
+                        manager.delimiter * 2,
+                        manager.delimiter,
+                    )
+                    manager.copy_file(filepath, new_path)
+                    click.secho(f"Copied state from {filepath} to {new_path}")
+
+    def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
         """Upgrade Meltano.
+
+        Note: this is not actually called as part of the `meltano upgrade` command
+        but is useful for testing and debugging upgrade logic.
 
         Args:
             skip_package: Whether the Meltano package should be upgraded.
@@ -177,6 +211,7 @@ class UpgradeService:
         click.echo()
         self.migrate_database()
         click.echo()
+        self.migrate_state()
         click.echo()
         click.secho(
             "Meltano and your Meltano project have been upgraded!"

@@ -84,6 +84,7 @@ def all(ctx, pip_url, force, skip_package):
 
         click.echo()
 
+        upgrade_service.migrate_state()
         if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")

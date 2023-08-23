@@ -70,6 +70,7 @@ def _run_pytest(session: Session) -> None:
                 "COVERAGE_FILE": str(
                     root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
+                "NOX_CURRENT_SESSION": "tests",
             },
         )
         session.run(
