@@ -46,6 +46,7 @@ pytest_deps = (
     "freezegun",
     "hypothesis",
     "mock",
+    "moto",
     "pytest",
     "pytest-aiohttp",
     "pytest-asyncio",
