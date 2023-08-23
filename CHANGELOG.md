@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.0.0 (2023-XX-XX)
+
+### BREAKING CHANGES
+
+- [#8041](https://github.com/meltano/meltano/issues/8041) Remove `target_schema` loader extra
+- [#8007](https://github.com/meltano/meltano/issues/8007) Always require plugin lock files
+- [#7499](https://github.com/meltano/meltano/issues/7499) Remove API and web UI
+
+### ✨ New
+
+- [#8020](https://github.com/meltano/meltano/issues/8020) Add `python` setting
+- [#7981](https://github.com/meltano/meltano/issues/7981) Support `psycopg[binary]` under a new `postgres` extra
+- [#7963](https://github.com/meltano/meltano/issues/7963) Bump SQLAlchemy to 2.0
+- [#7846](https://github.com/meltano/meltano/issues/7846) Add aliases for the `@once` schedule interval
+
+### 🐛 Fixes
+
+- [#8042](https://github.com/meltano/meltano/issues/8042) Ensure migration lock file is closed after read
+- [#8043](https://github.com/meltano/meltano/issues/8043) Ensure elt/run log file is closed
+
+### ⚙️ Under the Hood
+
+- [#7960](https://github.com/meltano/meltano/issues/7960) Compatibility with SQLAlchemy 2
+
 ## v2.20.0 (2023-07-19)
 
 ### ✨ New
