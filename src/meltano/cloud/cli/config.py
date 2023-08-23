@@ -558,6 +558,7 @@ def create_set_command(type: t.Literal["webhook", "email"]):
             prompt_message=f"Please provide a {type} value",
             error_message=f"Invalid {type} value",
         )
+        notification: t.Union[WebhookNotificaton, EmailNotification]
         if type == "webhook":
             notification = WebhookNotificaton(
                 type=str(type),
@@ -569,6 +570,11 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                 type=str(type),
                 filters=filter,
                 email=validated_recipient,
+            )
+        else:
+            raise click.ClickException(
+                f"Invalid notification type: {type}. "
+                "Please use either 'webhook' or 'email' notification types.",
             )
 
         async with ConfigCloudClient(config=context.config) as client:
@@ -591,7 +597,9 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                     "If the issue persists, "
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
-        set_notification.__name__ = f"set_notification_{type}"
+        set_notification.__name__ = (  # type: ignore[attr-defined]
+            f"set_notification_{type}"
+        )
         return set_notification
 
 
@@ -688,7 +696,9 @@ def create_update_command(type: t.Literal["webhook", "email"]):
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
 
-    update_notification.__name__ = f"update_notification_{type}"
+    update_notification.__name__ = (  # type: ignore[attr-defined]
+        f"update_notification_{type}"
+    )
     return update_notification
 
 
@@ -756,7 +766,9 @@ def create_delete_command(type: t.Literal["webhook", "email"]):
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
 
-    delete_notification.__name__ = f"delete_notification_{type}"
+    delete_notification.__name__ = (  # type: ignore[attr-defined]
+        f"delete_notification_{type}"
+    )
     return delete_notification
 
 
