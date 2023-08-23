@@ -17,13 +17,14 @@ from meltano.cloud.cli.project import _remove_private_project_attributes  # noqa
 
 if t.TYPE_CHECKING:
     from pytest_httpserver import HTTPServer
+    from requests_mock import Mocker as RequestsMocker
 
     from meltano.cloud.api.config import MeltanoCloudConfig
     from meltano.cloud.api.types import CloudProject
 
 
 class TestProjectCommand:
-    """Test the logs command."""
+    """Test the project command."""
 
     @pytest.fixture()
     def projects(self, tenant_resource_key: str) -> list[CloudProject]:
@@ -73,6 +74,21 @@ class TestProjectCommand:
     @pytest.fixture()
     def path(self, tenant_resource_key: str) -> str:
         return f"/projects/v1/{tenant_resource_key}"
+
+    @pytest.fixture()
+    def prepared_request(self, request: pytest.FixtureRequest):
+        return {
+            "method": request.param["method"],
+            "url": "https://asdf.lambda-url.us-west-2.on.aws.example.com/",
+            "params": {},
+            "headers": {
+                "Content-Type": "application/json",
+                "X-Amz-Date": "20230525T185058Z",
+                "X-Amz-Security-Token": "IQoJb3JpZ2luX2VjEOP/////////wEaCXV==",
+                "Authorization": "AWS4-HMAC-SHA256 Credential=ASI3AV1SM3BH...",
+            },
+            "data": '{"environment_name": "staging", "git_rev": "main"}',
+        }
 
     def test_project_list_table(
         self,
@@ -365,7 +381,7 @@ class TestProjectCommand:
         )
         assert result.exit_code == 1
         assert result.output == (
-            "Error: Multiple Meltano Cloud projects have the same name. "
+            "Error: Multiple Meltano Cloud projects have the specified name. "
             "Please specify the project using the `--id` option with its "
             "internal ID, shown below. Note that these IDs may change at any "
             "time. To avoid this issue, please use unique project names.\n"
@@ -391,6 +407,45 @@ class TestProjectCommand:
         )
         assert result.exit_code == 2
         assert "The '--name' and '--id' options are mutually exclusive" in result.output
+
+    @pytest.mark.parametrize("prepared_request", ({"method": "POST"},), indirect=True)
+    def test_project_create(
+        self,
+        projects: list[CloudProject],
+        httpserver: HTTPServer,
+        config: MeltanoCloudConfig,
+        prepared_request,
+        requests_mock: RequestsMocker,
+    ):
+        for project in projects[:3]:
+            httpserver.expect_oneshot_request(
+                f"/projects/v1/{project['tenant_resource_key']}",
+                method="POST",
+            ).respond_with_json(prepared_request)
+            requests_mock.post(prepared_request["url"], json=project)  # noqa: S113
+            result = CliRunner().invoke(
+                cli,
+                (
+                    "--config-path",
+                    config.config_path,
+                    "project",
+                    "create",
+                    "--name",
+                    project["project_name"],
+                    "--repo-url",
+                    project["git_repository"],
+                    "--root-path",
+                    project["project_root_path"],
+                ),
+            )
+            assert result.exit_code == 0, result.output
+            assert (
+                "Creating project - this may take several minutes..." in result.output
+            )
+            assert (
+                f"Project {project['project_name']!r} created successfully.\n"
+                in result.output
+            )
 
     def test_project_invalid_ulid(self, config: MeltanoCloudConfig):
         result = CliRunner().invoke(

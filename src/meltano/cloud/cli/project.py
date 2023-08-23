@@ -6,12 +6,16 @@ import asyncio
 import logging
 import sys
 import typing as t
+from http import HTTPStatus
 
 import click
 import questionary
+import requests
+from slugify import slugify
 from ulid import ULID
+from yaspin import yaspin  # type: ignore
 
-from meltano.cloud.api.client import MeltanoCloudClient
+from meltano.cloud.api.client import MeltanoCloudClient, MeltanoCloudError
 from meltano.cloud.cli.base import (
     LimitedResult,
     get_paginated,
@@ -92,6 +96,26 @@ class ProjectsCloudClient(MeltanoCloudClient):
                     },
                 ),
             )
+
+    async def create_project(
+        self,
+        project_name: str,
+        git_repository: str,
+        project_root_path: str | None = None,
+    ):
+        """Use POST to create new Meltano Cloud project."""
+        async with self.authenticated():
+            payload = {"project_name": project_name, "git_repository": git_repository}
+            if project_root_path:
+                payload["project_root_path"] = project_root_path
+            prepared_request = await self._json_request(
+                "POST",
+                f"/projects/v1/{self.config.tenant_resource_key}",
+                json=payload,
+            )
+            response = requests.request(**t.cast(t.Dict[str, t.Any], prepared_request))
+            response.raise_for_status()
+            return response
 
 
 @click.group("project")
@@ -192,21 +216,42 @@ async def list_projects(
     )
 
 
+def _print_projects(projects: list[CloudProject]) -> None:
+    for project in projects:
+        click.echo(
+            f"{project['project_id']}: {project['project_name']} "
+            f"({project['git_repository']!r})",
+        )
+
+
 def _check_for_duplicate_project_names(projects: list[CloudProject]) -> None:
     project_names = [x["project_name"] for x in projects]
     if len(set(project_names)) != len(project_names):
         click.secho(
-            "Error: Multiple Meltano Cloud projects have the same name. "
+            "Error: Multiple Meltano Cloud projects have the same name. If you are "
+            "trying to use a project with an unambiguous name, please select it with "
+            "the `--name` option. Otherwise, please specify the project using the "
+            "`--id` option with its internal ID, shown below. Note that these IDs may "
+            "change at any time. To avoid this issue, please use unique project names.",
+            fg="red",
+        )
+        _print_projects(projects)
+        sys.exit(1)
+
+
+def _check_for_project_name_conflict(
+    projects: list[CloudProject],
+    project_name: str,
+) -> None:
+    if [x["project_name"] for x in projects].count(project_name) > 1:
+        click.secho(
+            "Error: Multiple Meltano Cloud projects have the specified name. "
             "Please specify the project using the `--id` option with its "
             "internal ID, shown below. Note that these IDs may change at any "
             "time. To avoid this issue, please use unique project names.",
             fg="red",
         )
-        for project in projects:
-            click.echo(
-                f"{project['project_id']}: {project['project_name']} "
-                f"({project['git_repository']!r})",
-            )
+        _print_projects(projects)
         sys.exit(1)
 
 
@@ -297,7 +342,7 @@ async def use_project(
 
     if context.projects is None:  # Interactive config was not used
         context.projects = (await _get_projects(context.config)).items
-        _check_for_duplicate_project_names(context.projects)
+        _check_for_project_name_conflict(context.projects, t.cast(str, project_name))
         if project_name not in {x["project_name"] for x in context.projects}:
             raise click.ClickException(
                 f"Unable to use project named {project_name!r} - no available "
@@ -313,3 +358,41 @@ async def use_project(
         ),
         fg="green",
     )
+
+
+@project_group.command("create")
+@click.option("--name", type=str, prompt=True)
+@click.option("--repo-url", type=str, prompt=True)
+@click.option("--root-path", type=str, required=False)
+@pass_context
+@run_async
+async def create_project(
+    context: MeltanoCloudCLIContext,
+    name: str,
+    repo_url: str,
+    root_path: str | None = None,
+):
+    """Create a project to your Meltano Cloud."""
+    async with ProjectsCloudClient(config=context.config) as client:
+        try:
+            with yaspin(
+                text="Creating project - this may take several minutes...",
+            ):
+                response = await client.create_project(
+                    project_name=name,
+                    git_repository=repo_url,
+                    project_root_path=root_path,
+                )
+        except MeltanoCloudError as e:
+            if e.response.status == HTTPStatus.CONFLICT:
+                click.secho(
+                    (
+                        f"A project named {name!r} (normalized to "
+                        f"{slugify(name)!r}) already exists."
+                    ),
+                    fg="yellow",
+                )
+            return None
+        click.echo(f"Project {name!r} created successfully.")
+        if response.status_code == HTTPStatus.NO_CONTENT:
+            return None
