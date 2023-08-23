@@ -35,7 +35,7 @@ def config() -> None:
     """Configure Meltano Cloud project settings and secrets."""
 
 
-class ConfigCloudClient(MeltanoCloudClient):
+class ConfigCloudClient(MeltanoCloudClient):  # noqa: WPS214
     """Meltano Cloud config Client."""
 
     secrets_service_prefix = "/secrets/v1/"
@@ -96,7 +96,7 @@ class ConfigCloudClient(MeltanoCloudClient):
 
         if key:
             key_hash = hashlib.sha256(key.encode("utf-8")).hexdigest()
-            url += f"{key_hash}/"
+            url = f"{url}{key_hash}/"
 
         try:
             return f"{url}{end_path}?entity_id={self.config.internal_project_id}"
@@ -136,6 +136,7 @@ class ConfigCloudClient(MeltanoCloudClient):
                 key=input_string,
                 end_path="notification",
             )
+
             return await self._json_request(
                 "POST",
                 post_url,
@@ -182,8 +183,7 @@ class ConfigCloudClient(MeltanoCloudClient):
             key: The key of notification to be deleted
         """
         async with self.authenticated():
-            delete_url = self._build_notification_url(
-                key=key, end_path="notification")
+            delete_url = self._build_notification_url(key=key, end_path="notification")
             return await self._json_request(
                 "DELETE",
                 delete_url,
@@ -316,7 +316,7 @@ def validate_url(
     """
     url_regex = (
         r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|"
-        r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        r"(?:%[0-9a-fA-F][0-9a-fA-F]))+"  # noqa: WPS360
     )
     return validate_notification_input(
         value=value,
@@ -331,25 +331,27 @@ VALIDATE_FUNCTION_DICT = {"webhook": validate_url, "email": validate_email}
 
 def prompt_and_validate(
     value: str | None,
-    type: t.Literal["webhook", "email"],
+    notification_type: t.Literal["webhook", "email"],
     prompt_message: str = "Please provide valid value.",
     error_message: str = "Value is not valid",
 ) -> str:
-    """Prompt if necessary and validate input for type.
+    """Prompt if necessary and validate input for notification_type.
 
     Args:
         value: The value to validated
-        type: the type to validate against
+        notification_type: the notification_type to validate against
+        prompt_message: The message to prompt user in case validation fails
+        error_message: The message to display to user in case validation fails
     """
     input_value = (
         value
         if value
         else click.prompt(
             prompt_message,
-            value_proc=VALIDATE_FUNCTION_DICT[type],
+            value_proc=VALIDATE_FUNCTION_DICT[notification_type],
         )
     )
-    VALIDATE_FUNCTION_DICT[type](
+    VALIDATE_FUNCTION_DICT[notification_type](
         value=input_value,
         prompt_message=prompt_message,
         error_message=error_message,
@@ -372,14 +374,13 @@ class FilterList(click.Option):
             try:
                 filter_obj = json.loads(item)
                 filter_list = (
-                    filter_obj if isinstance(filter_obj, list) else [
-                        filter_obj]
+                    filter_obj if isinstance(filter_obj, list) else [filter_obj]
                 )
                 for filter_dict in filter_list:
                     validate_filter_dict(filter_dict)
                 filters.extend(filter_list)
             except json.JSONDecodeError:
-                raise click.BadParameter(
+                raise click.BadParameter(  # noqa: WPS469
                     f"Unable to parse given json: {item}",
                 ) from None
 
@@ -437,7 +438,7 @@ class EmailNotification:
 
 def _format_notification(
     notification: CloudNotification,
-) -> tuple[str, str, str, t.Union[list, t.Literal["N/A"]]]:
+) -> tuple[str, str, str, list | t.Literal["N/A"]]:
     def replace_empty_with_NA(item):
         """Replace empty list with N/A."""
         if isinstance(item, list) and not item:
@@ -450,7 +451,7 @@ def _format_notification(
         notification["recipient"],
         notification["type"],
         notification["status"],
-        filters
+        filters,
     )
 
 
@@ -502,7 +503,7 @@ async def list_notifications(
                 )
         except Exception as e:
             message = str(e) if str(e) else "Internal Server Error"
-            raise click.ClickException(
+            raise click.ClickException(  # noqa: WPS469
                 f"{message}. \n\n"
                 "Please ensure you've correctly followed instructions at: "
                 "https://docs.meltano.com/cloud/cloud-cli\n"
@@ -516,19 +517,22 @@ def notification_set() -> None:
     """Set a meltano cloud notification."""
 
 
-def create_set_command(type: t.Literal["webhook", "email"]):
+def create_set_command(notification_type: t.Literal["webhook", "email"]):
     """Create set commands for different notifications.
 
     Args:
-        type: The type of notification
+        notifcation_type: The type of notification
     """
 
-    @notification_set.command(type, help=f"Set a {type} notification.")
+    @notification_set.command(
+        notification_type,
+        help=f"Set a {notification_type} notification.",
+    )
     @click.option(
         "--recipient",
         nargs=1,
         type=str,
-        help=f"{type} recipient to receive the notification.",
+        help=f"{notification_type} recipient to receive the notification.",
     )
     @click.option(
         "--filter",
@@ -543,7 +547,7 @@ def create_set_command(type: t.Literal["webhook", "email"]):
     async def set_notification(
         context: MeltanoCloudCLIContext,
         recipient: str | None,
-        filter: list,
+        filter: list,  # noqa: WPS125
     ):
         """Set the notification of specific type.
 
@@ -554,34 +558,29 @@ def create_set_command(type: t.Literal["webhook", "email"]):
         """
         validated_recipient = prompt_and_validate(
             value=recipient,
-            type=type,
-            prompt_message=f"Please provide a {type} value",
-            error_message=f"Invalid {type} value",
+            notification_type=notification_type,
+            prompt_message=f"Please provide a {notification_type} value",
+            error_message=f"Invalid {notification_type} value",
         )
-        notification: t.Union[WebhookNotificaton, EmailNotification]
-        if type == "webhook":
-            notification = WebhookNotificaton(
-                type=str(type),
+        notification_to_set: t.Union[WebhookNotificaton, EmailNotification]
+        if notification_type == "webhook":
+            notification_to_set = WebhookNotificaton(
+                type=str(notification_type),
                 filters=filter,
                 webhook_url=validated_recipient,
             )
-        elif type == "email":
-            notification = EmailNotification(
-                type=str(type),
+        elif notification_type == "email":
+            notification_to_set = EmailNotification(
+                type=str(notification_type),
                 filters=filter,
                 email=validated_recipient,
-            )
-        else:
-            raise click.ClickException(
-                f"Invalid notification type: {type}. "
-                "Please use either 'webhook' or 'email' notification types.",
             )
 
         async with ConfigCloudClient(config=context.config) as client:
             try:
-                await client.put_notification(notification=notification)
+                await client.put_notification(notification=notification_to_set)
                 click.echo(
-                    f"Successfully set {type} "
+                    f"Successfully set {notification_type} "
                     f"notification for {validated_recipient}. ",
                 )
                 click.echo(
@@ -590,7 +589,7 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                 )
             except Exception as e:
                 message = str(e) if str(e) else "Internal Server Error"
-                raise click.ClickException(
+                raise click.ClickException(  # noqa: WPS469
                     f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
@@ -598,7 +597,7 @@ def create_set_command(type: t.Literal["webhook", "email"]):
                     "we'd be happy to help at: https://meltano.com/slack",
                 ) from None
         set_notification.__name__ = (  # type: ignore[attr-defined]
-            f"set_notification_{type}"
+            f"set_notification_{notification_type}"
         )
         return set_notification
 
@@ -612,25 +611,28 @@ def update():
     """Update a meltano cloud notification."""
 
 
-def create_update_command(type: t.Literal["webhook", "email"]):
+def create_update_command(notification_type: t.Literal["webhook", "email"]):
     """Create notification update commads.
 
     Args:
         type: The notification type
     """
 
-    @update.command(type, help=f"Update {type} notification.")
+    @update.command(
+        notification_type,
+        help=f"Update {notification_type} notification.",
+    )
     @click.option(
         "--recipient",
         nargs=1,
         type=str,
-        help=f"{type} recipient notification to be updated",
+        help=f"{notification_type} recipient notification to be updated",
     )
     @click.option(
         "--new",
         nargs=1,
         type=str,
-        help=f"New {type} recipient value",
+        help=f"New {notification_type} recipient value",
     )
     @click.option(
         "--status",
@@ -662,20 +664,23 @@ def create_update_command(type: t.Literal["webhook", "email"]):
 
         update_recipient = prompt_and_validate(
             value=recipient,
-            type=type,
+            notification_type=notification_type,
             prompt_message=(
-                f"Please provide old {type} recipient for notification to be updated"
+                f"Please provide old {notification_type} "
+                "recipient for notification to be updated"
             ),
-            error_message=f"Invalid {type} recipient",
+            error_message=f"Invalid {notification_type} recipient",
         )
 
         new_key = None
         if new:
             new_key = prompt_and_validate(
                 value=new,
-                type=type,
-                prompt_message=f"Please provide new {type} recipient to update to",
-                error_message=f"Invalid {type} recipient",
+                notification_type=notification_type,
+                prompt_message=(
+                    f"Please provide new {notification_type} recipient to update to"
+                ),
+                error_message=f"Invalid {notification_type} recipient",
             )
 
         async with ConfigCloudClient(config=context.config) as client:
@@ -685,10 +690,10 @@ def create_update_command(type: t.Literal["webhook", "email"]):
                     new_key=new_key,
                     status=status,
                 )
-                click.echo(f"Successfully updated {type} notification")
+                click.echo(f"Successfully updated {notification_type} notification")
             except Exception as e:
                 message = str(e) if str(e) else "Internal Server Error"
-                raise click.ClickException(
+                raise click.ClickException(  # noqa: WPS469
                     f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
@@ -697,7 +702,7 @@ def create_update_command(type: t.Literal["webhook", "email"]):
                 ) from None
 
     update_notification.__name__ = (  # type: ignore[attr-defined]
-        f"update_notification_{type}"
+        f"update_notification_{notification_type}"
     )
     return update_notification
 
@@ -711,19 +716,22 @@ def delete() -> None:
     """Delete a meltano cloud notification."""
 
 
-def create_delete_command(type: t.Literal["webhook", "email"]):
+def create_delete_command(notification_type: t.Literal["webhook", "email"]):
     """Create delete commands for specific type.
 
     Args:
         type: The type of notification
     """
 
-    @delete.command(type, help=f"Delete {type} notification")
+    @delete.command(
+        notification_type,
+        help=f"Delete {notification_type} notification",
+    )
     @click.option(
         "--recipient",
         nargs=1,
         type=str,
-        help=f"{type} recipient to delete notification for",
+        help=f"{notification_type} recipient to delete notification for",
     )
     @pass_context
     @run_async
@@ -739,26 +747,29 @@ def create_delete_command(type: t.Literal["webhook", "email"]):
         """
         input_value = prompt_and_validate(
             value=recipient,
-            type=type,
+            notification_type=notification_type,
             prompt_message=(
-                f"Please provide a valid {type} from the 'recipient' column "
+                f"Please provide a valid {notification_type} "
+                "from the 'recipient' column "
                 "from `meltano cloud config notification list`"
             ),
             error_message=(
-                f"Invalid {type}. Please provide a valid {type} "
+                f"Invalid {notification_type}. "
+                f"Please provide a valid {notification_type} "
                 "from the 'recipient' column "
                 "from `meltano cloud config notification list`"
-            )
+            ),
         )
         async with ConfigCloudClient(config=context.config) as client:
             try:
                 await client.delete_notification(key=input_value)
                 click.echo(
-                    f"Successfully deleted {type} notification for {input_value}",
+                    f"Successfully deleted {notification_type} "
+                    f"notification for {input_value}",
                 )
             except Exception as e:
                 message = str(e) if str(e) else "Internal Server Error"
-                raise click.ClickException(
+                raise click.ClickException(  # noqa: WPS469
                     f"{message}. \n\n"
                     "Please ensure you've correctly followed instructions at: "
                     "https://docs.meltano.com/cloud/cloud-cli\n"
@@ -767,7 +778,7 @@ def create_delete_command(type: t.Literal["webhook", "email"]):
                 ) from None
 
     delete_notification.__name__ = (  # type: ignore[attr-defined]
-        f"delete_notification_{type}"
+        f"delete_notification_{notification_type}"
     )
     return delete_notification
 
