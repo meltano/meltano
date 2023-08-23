@@ -44,6 +44,7 @@ def tests(session: Session) -> None:
         "colorama",  # colored output in Windows
         "freezegun",
         "mock",
+        "moto",
         "pytest",
         "pytest-asyncio",
         "pytest-cov",
