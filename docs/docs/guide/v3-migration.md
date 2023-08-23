@@ -5,9 +5,7 @@ layout: doc
 sidebar_position: 21
 ---
 
-_Note: This document is still a work in progress. Expect further changes, coming soon._
-
-The following list includes all recommended migration tasks as well as breaking changes in Meltano version 3.0.
+The following list includes all recommended migration tasks as well as breaking changes in Meltano version `3.0.0`.
 
 ## Recommended
 
@@ -68,4 +66,6 @@ This should impact very few users, as the `target_schema` extra setting was only
 
 1. In the configuration for the `dbt` transformer plugin, set the `source_schema` value to the appropriate environment variable for your target (e.g. [`$MELTANO_LOAD__DEFAULT_TARGET_SCHEMA`](https://hub.meltano.com/loaders/target-postgres#default_target_schema-setting) for Postgres).
 
-## CLI and API Changes
+### The Meltano UI
+
+Before Meltano `v3.0.0`, Meltano included a web-UI that could be hosted by running `meltano ui`. In Meltano `v2.12.0`, this UI was deprecated. In Meltano `v3.0.0`, this UI has been removed. Everything that was possible through the UI is possible without it via the CLI, or by directly editing `meltano.yml`.
