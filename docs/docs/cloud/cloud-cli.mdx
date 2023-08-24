@@ -119,7 +119,7 @@ meltano-cloud config notification set webhook --recipient http://test+melty --fi
 Update an existing notification.
 
 ```sh
-meltano-cloud notification update webhook --recipient <old_url> --new <new_recipient> --status <status>
+meltano-cloud config notification update webhook --recipient <old_url> --new <new_recipient> --status <status>
 ```
 
 **`options`**
@@ -141,7 +141,7 @@ The above example updates the notification that was configured to send to `http:
 Delete an existing notification
 
 ```
-meltano-cloud notification delete webhook --recipient <webhook_url>
+meltano-cloud config notification delete webhook --recipient <webhook_url>
 ```
 
 **`options`**
