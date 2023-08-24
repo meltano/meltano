@@ -13,7 +13,7 @@ This document will get you up and running with Meltano in-depth. There is also a
 
 # Local Installation
 
-In the section below, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface) and [from your browser](/reference/ui).
+In the section below, we will install Meltano locally on your system, so that you can use it [on the command line](/reference/command-line-interface).
 
 ## Unix-like
 
@@ -36,7 +36,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
+Currently Python 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 
@@ -84,7 +84,7 @@ Now that you've installed Meltano and its requirements, you can continue setting
 
 ## Windows
 
-Please note that Windows is not fully supported yet so some features like the UI, and the ELT command may not work yet.
+Please note that Windows is not fully supported yet so some features like the ELT command may not work yet.
 See the GitHub [Windows Label](https://github.com/meltano/meltano/labels/Windows) for more information.
 
 If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
@@ -107,7 +107,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.7, 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
+Currently Python 3.8, 3.9, 3.10 and 3.11 are supported. Some plugins do not yet support Python 3.11.
 
 #### Install pipx
 
