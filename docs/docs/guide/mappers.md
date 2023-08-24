@@ -115,7 +115,6 @@ The two most common mapper plugins are:
 These can be added like any other plugin:
 
 ```bash
-meltano discover mappers
 meltano add mapper <mapper name>
 
 # Example

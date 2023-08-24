@@ -377,26 +377,15 @@ While you would usually not want to modify the system database directly, knowing
 Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
-- `user` table: Users for [the deprecated Meltano UI](/guide/troubleshooting#meltano-ui) created using [`meltano user add`](/reference/command-line-interface#user).
-
-The remaining tables in the database are used exclusively by [Meltano UI](/guide/troubleshooting#meltano-ui), mostly for authentication and authorization purposes:
-
-- `role`
-- `role_permissions`
-- `oauth`
-- `embed_tokens`
-- `subscriptions`
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).=======
 
 ### Support for other database types
 
 Meltano currently supports the following databases as backends for state and configuration:
 
-- PostgreSQL
-- SQLite
-- MS SQL Server
-
-PostgresSQL and SQLite are supported out of the box, while MS SQL Server requires installing Meltano with the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components).
+- SQLite (supported out of the box)
+- PostgreSQL (requires the [`postgres` or `psycopg2` Python extra](/guide/advanced-topics#installing-optional-components))
+- MS SQL Server (requires the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components)
 
 Support for other databases is planned:
 
