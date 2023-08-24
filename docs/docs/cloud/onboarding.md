@@ -66,7 +66,7 @@ pipx install 'git+https://github.com/meltano/meltano.git@cloud'
 To upgrade to the latest version:
 
 ```console
-pipx reinstall meltano-cloud-cli
+pipx reinstall meltano
 ```
 
 The above commands will install a `meltano-cloud` CLI command into your workstation.
@@ -85,10 +85,21 @@ While Meltano Cloud is in Beta, it may take up to one business day for your user
   <p>Installing the Meltano Cloud <a href="#prereq-2-provide-access-to-your-repo">GitHub App</a> to your organization is a separate process from granting Meltano Cloud access to use your GitHub profile for login purposes. Both the GitHub App installation for your organization <em>and</em> the OAuth grant flow for your profile must be performed in order to have full access to Meltano Cloud functionality.</p>
 :::
 
-### Step 3: Set default project and validate access and functionality
+### Step 3: Create a Project
 
 After logging in you can explore the interface with a few different commands.
 The full list of CLI commands is in the [Cloud Docs](https://docs.meltano.com/cloud/cloud-cli).
+
+To create a project, use the `meltano-cloud project create` command:
+
+```sh
+meltano-cloud project create --name example-project --repo-url https://github.com/meltano/squared.git --root-path "data/"
+⠋ Creating project - this may take several minutes...
+Project 'example-project' created successfully.
+```
+
+### Step 4: Set default project and validate access and functionality
+
 
 To see Meltano Cloud projects for your organizations, run:
 
@@ -107,7 +118,7 @@ You can do this by running:
 meltano-cloud project use --name <project name>
 ```
 
-### Step 4: Create deployments
+### Step 5: Create deployments
 
 In order for pipelines to run, they must have a [deployment](/cloud/concepts#meltano-cloud-deployments) to run in.
 
@@ -135,7 +146,7 @@ To confirm that your deployment was created, you can view all of your Meltano Cl
 meltano-cloud deployment list
 ```
 
-### Step 5: Initialize secrets
+### Step 6: Initialize secrets
 
 Secrets allow you to pass environment variables to your workloads without needing to expose them within your `meltano.yml`.
 Setting a secret in Meltano Cloud is equivalent to using a `.env` file to store environment variables at runtime.
@@ -154,7 +165,7 @@ meltano-cloud config env list
 > TAP_GITLAB_PASSWORD
 ```
 
-### Step 6: Run your workloads
+### Step 7: Run your workloads
 
 You can invoke a schedule on-demand with the `meltano-cloud run` [command](/cloud/cloud-cli#run):
 
@@ -174,7 +185,7 @@ To view logs for any completed or still-running job, you can use:
 meltano-cloud logs print --execution-id=ASDF1234...
 ```
 
-### Step 7: Enable schedules
+### Step 8: Enable schedules
 
 Your Meltano Cloud project's schedules are disabled by default.
 Use the `meltano-cloud schedule enable <SCHEDULE NAME>` [command](/cloud/cloud-cli#schedule) to enable schedules.

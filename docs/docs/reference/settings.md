@@ -26,33 +26,9 @@ For plugin settings, refer to the specific plugin's documentation
 or use [`meltano config <plugin> list`](/reference/command-line-interface#config)
 to list all available settings with their names, environment variables, and current values.
 
-### <a name="plugin-python"></a>`python`
-
-The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
-
-If not specified, [the top-level `python` setting will be used](#project-python), or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).
-
-This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
-
-This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
-
 ## Your Meltano project
 
 These are settings specific to [your Meltano project](/concepts/project).
-
-### <a name="project-python"></a>`python`
-
-- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_PYTHON`
-
-The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
-
-If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment).
-
-[This can be overridden on a per-plugin basis by setting the `python` property for the plugin.](#plugin-python)
-
-This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
-
-This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
 
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
@@ -68,7 +44,7 @@ We also provide some of this data back to the community via [MeltanoHub](https:/
 
 If enabled, Meltano will use the value of the [`project_id` setting](#project-id) to uniquely identify your project. If the project ID is a UUID, then it will be sent unchanged. Otherwise, it will be [hashed](#q-what-is-a-one-way-hash-and-how-is-it-helpful), and its hash will be used to derive a UUID which will be used to uniquely identify your project.
 
-This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url) or [`discovery_url` setting](#discovery-url).
+This project ID is also sent along when Meltano requests available plugins from the URLs identified by the [`hub_url`](#hub-url).
 
 If you'd like to send the tracking data to a different Snowplow account than the one run by the Meltano team,
 the collector endpoints can be configured using the [`snowplow.collector_endpoints` setting](#snowplowcollector_endpoints).
@@ -179,12 +155,17 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ```bash
-meltano config meltano set database_uri postgresql://<username>:<password>@<host>:<port>/<database>
+meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-export MELTANO_DATABASE_URI=postgresql://<username>:<password>@<host>:<port>/<database>
+export MELTANO_DATABASE_URI=postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
-meltano run --database-uri=postgresql://<username>:<password>@<host>:<port>/<database> ...
+meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<port>/<database> ...
 ```
+
+:::info
+Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
+:::
+
 
 #### Targeting a PostgreSQL Schema
 
@@ -196,7 +177,7 @@ You are also able to add multiple schemas, which PostgreSQL will work through fr
 If you dont target a schema then by default PostgreSQL will try to use the `public` schema.
 
 ```bash
-postgresql://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
+postgresql+psycopg://<username>:<password>@<host>:<port>/<database>?options=-csearch_path%3D<schema>
 ```
 
 ### `database_max_retries`
@@ -240,15 +221,11 @@ export MELTANO_DATABASE_RETRY_TIMEOUT=5
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_READONLY`
 - Default: `false`
 
-Enable this setting to indicate that your Meltano project is deployed as read-only,
-and to block all modifications to project files through the [CLI](/reference/command-line-interface) and [UI](/reference/command-line-interface#ui)
-in this environment.
+Enable this setting to indicate that your Meltano project is deployed as read-only, and to block all modifications to project files through the [CLI](/reference/command-line-interface) in this environment.
 
 Specifically, this prevents [adding plugins](/reference/command-line-interface#add) or [pipeline schedules](/reference/command-line-interface#schedule) to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), as well as [modifying plugin configuration](/reference/command-line-interface#config) stored in [`meltano.yml`](/concepts/project#meltano-yml-project-file) or [`.env`](/concepts/project#env).
 
-Note that [`meltano config <plugin> set`](/reference/command-line-interface#config)
-can still be used to store configuration in the [system database](/concepts/project#system-database),
-but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
+Note that [`meltano config <plugin> set`](/reference/command-line-interface#config) can still be used to store configuration in the [system database](/concepts/project#system-database), but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 #### How to use
 
@@ -284,7 +261,7 @@ export MELTANO_HUB_API_ROOT=false
 
 Where Meltano can find the Hub that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins).
 
-This manifest is primarily used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add). It is also used in cases where the full plugin definition is needed but no lock artifact or cached `discovery.yml` is found.
+The Hub is primarily used by [`meltano add`](/reference/command-line-interface#add) and [`meltano lock`](/reference/command-line-interface#lock). It is also used in cases where the full plugin definition is needed but no lock artifact is found.
 
 #### How to use
 
@@ -314,50 +291,6 @@ meltano config meltano set hub_url_auth false
 
 export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
 export MELTANO_HUB_URL_AUTH=false
-```
-
-### <a name="discovery-url"></a>`discovery_url`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL`
-- Default: [`https://discovery.meltano.com/discovery.yml`](https://discovery.meltano.com/discovery.yml)
-
-Where Meltano can find the `discovery.yml` manifest that lists all [discoverable plugins](/concepts/plugins#discoverable-plugins) that are supported out of the box.
-
-This manifest is used by [`meltano discover`](/reference/command-line-interface#discover) and [`meltano add`](/reference/command-line-interface#add), among others.
-
-To disable downloading the remote `discovery.yml` manifest and only use the project-local or packaged version,
-set this setting to `false` or any other string not starting with `http://` or `https://`.
-
-#### How to use
-
-```bash
-meltano config meltano set discovery_url https://meltano.example.com/discovery.yml
-meltano config meltano set discovery_url false
-
-export MELTANO_DISCOVERY_URL=https://meltano.example.com/discovery.yml
-export MELTANO_DISCOVERY_URL=false
-```
-
-### `discovery_url_auth`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DISCOVERY_URL_AUTH`
-- Default: None
-
-The value of the `Authorization` header sent when making a request to [`discovery_url`](#discovery-url).
-
-No `Authorization` header is applied under the following conditions:
-
-- `discovery_url_auth` is not set
-- `discovery_url_auth` is set to `false`, `null` or an empty string
-
-#### How to use
-
-```bash
-meltano config meltano set discovery_url_auth "Bearer $ACCESS_TOKEN"
-meltano config meltano set discovery_url_auth false
-
-export MELTANO_DISCOVERY_URL_AUTH="Bearer $ACCESS_TOKEN"
-export MELTANO_DISCOVERY_URL_AUTH=false
 ```
 
 ## `meltano` CLI
@@ -613,11 +546,6 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 
 ## Feature Flags
 
-### <a name="ff-enable-uvicron"></a>`ff.enable_uvicorn`
-
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_ENABLE_UVICORN`
-- Default: `False`
-
 ### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_STRICT_ENV_VAR_MODE`
@@ -630,4 +558,4 @@ Causes an exception to be raised if an environment variable is used within the p
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
 - Default: `False`
 
-When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` and `meltano discover` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.
+When this flag is enabled, plugins will only use [lock files](/concepts/plugins#lock-artifacts) to determine the settings, installation source, etc with the exception of the `meltano add` operations. This means that calling `meltano run` will fail if a lock file is not present for one of the plugins.

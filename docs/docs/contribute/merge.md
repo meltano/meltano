@@ -43,7 +43,6 @@ In general, PR titles should follow the format `<type>: <desc>`, where type is a
 
 Optionally, you may use the expanded syntax to specify a scope in the form `<type>(<scope>): <desc>`. Currently scopes are:
 
-- `ui`
 - `core`
 - `cli`
 

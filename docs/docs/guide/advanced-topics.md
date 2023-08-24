@@ -7,12 +7,23 @@ sidebar_position: 10
 
 ## Installing Optional Components
 
-Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras). The following extras are currently supported:
+Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras).
 
-- `mssql` - Support for Microsoft SQL Server as a [system database](/concepts/project/#system-database), which functions as a [state backend](/concepts/state_backends) by default.
-- `s3` - Support for using S3 as a [state backend](/concepts/state_backends)
-- `gcs` - Support for using Google Cloud Storage as a [state backend](/concepts/state_backends)
-- `azure` - Support for using Azure Blob Storage as a [state backend](/concepts/state_backends)
+### System Database
+
+The following extras add support for different [system database](/concepts/project/#system-database) types, which function as the default [state backend](/concepts/state_backends):
+
+- `mssql` - Microsoft SQL Server.
+- `psycopg2` - PostgreSQL. It uses the legacy `psycopg2` driver.
+- `postgres` - PostgreSQL. It uses the modern `psycopg` driver.
+
+### State backends
+
+The following extras add support for other [state backends](/concepts/state_backends):
+
+- `s3` - AWS S3.
+- `gcs` - Google Cloud Storage.
+- `azure` - Azure Blob Storage.
 
 ## Extension Developer Kit (EDK)
 

@@ -7,8 +7,14 @@ sidebar_position: 5
 
 :::info
 
-<p><strong>Meltano Cloud is currently in Beta.</strong></p>
-<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+<p>
+  <strong>Meltano Cloud is currently in Beta.</strong>
+</p>
+<p>
+  While in Beta, functionality is not guaranteed and subject to change. <br />{" "}
+  If you're interested in using Meltano Cloud please join our{" "}
+  <a href="https://meltano.com/cloud/">waitlist</a>.
+</p>
 
 :::
 
@@ -48,6 +54,101 @@ meltano-cloud config env delete TAP_GITHUB_AUTH_TOKEN
 
 See the [reserved variables](/cloud/platform#reserved-variables) docs for more details on variables that are reserved for use by Meltano Cloud.
 
+### `notification`
+
+The `notification` subcommand provides a way for managing your [Meltano Cloud notifications](concepts#meltano-cloud-notifications).
+
+#### `list`
+
+List all notifications configured for your current default project or organization.
+
+```sh
+$ meltano-cloud config notification list
+╭──────────────────────────┬─────────┬──────────┬─────────────────────────────────────────╮
+│ Recipient                │ Type    │ Status   │ Filters                                 │
+├──────────────────────────┼─────────┼──────────┼─────────────────────────────────────────┤
+│ dragon@meltano.com       │ email   │ active   │ N/A                                     │
+│ https://melty            │ webhook │ active   │ [{'events': ['job_run'], 'status': []}] │
+╰──────────────────────────┴─────────┴──────────┴─────────────────────────────────────────╯
+```
+
+#### **Notification System Limitations**
+
+The notification system has a few limitations that should be taken into consideration:
+
+- **Unique Notifications**: Currently, our system permits only a single notification per recipient within each scope, 'organization' or 'project'.
+- **Notification Overwrite**: If you attempt to set another notification for the same recipient within the same scope, the new notification will overwrite the existing one. In other words, setting a second notification won't create a new notification, but rather modify the existing one.
+
+#### `set`
+
+Set a new notification or override an existing one.
+
+##### Case-Sensitivity in Values
+
+Take note that all the values in the commands and configuration settings are case-sensitive. This means job_created, Job_Created, and JOB_CREATED would be considered as different events. Please ensure to use the correct casing to avoid configuration issues or unexpected behaviors.
+
+
+Interactive mode
+```sh
+meltano-cloud config notification set <type>
+```
+
+Non-interactive mode:
+```sh
+meltano-cloud config notification set <type> --recipient <target_recipient> --filter <filter>
+````
+
+**`options`**
+
+`--recipient` (Required): The recipient to send the notification to.
+
+`--filter`: An optional filter you want to check against, you can supply multiple filters which will all be joined as an OR expression.
+Values within the filter are validated as an AND Expression.
+
+**Job Failures**
+
+To subscribe only to job failures you would run
+```sh
+meltano-cloud config notification set webhook --recipient http://test+melty --filter '{"events": ["job_run"], "status": ["failed"]}'
+```
+
+
+
+#### `update`
+
+Update an existing notification.
+
+```sh
+meltano-cloud config notification update webhook --recipient <old_url> --new <new_recipient> --status <status>
+```
+
+**`options`**
+
+
+`--recipient` (Required): The recipient of the notification to update.
+
+`--new`: The new recipient value
+
+`--status`: The new status of the notification (either 'active' or 'inactive')
+
+```sh
+meltano-cloud config notification update --recipient http://test+melty --new http://test+better --status inactive
+```
+
+The above example updates the notification that was configured to send to `http://test+melty`. It changes the recipient to `http://test+better` and sets the status to inactive.
+
+#### `delete`
+Delete an existing notification
+
+```
+meltano-cloud config notification delete webhook --recipient <webhook_url>
+```
+
+**`options`**
+
+`--recipient` (Required): The recipient of the notification you are trying to delete
+
+
 ## `deployment`
 
 The `deployment` command provides an interface for managing [Meltano Cloud deployments](concepts#meltano-cloud-deployments) for your projects.
@@ -68,8 +169,12 @@ The above example creates a new deployment named `my-dev-deployment` for the Mel
 
 :::info
 
-<p>If your deployment is failing you can try running <a href="/reference/command-line-interface#compile">`meltano compile`</a> to confirm that your configuration files are valid.
-Also double check that you have schedules configured, otherwise the deployment will throw an error.</p>
+<p>
+  If your deployment is failing you can try running{" "}
+  <a href="/reference/command-line-interface#compile">`meltano compile`</a> to
+  confirm that your configuration files are valid. Also double check that you
+  have schedules configured, otherwise the deployment will throw an error.
+</p>
 
 :::
 
@@ -219,6 +324,16 @@ meltano-cloud project list
 ╰───────────┴───────────────────────────────┴──────────────────────────────────────────────────────────╯
 ```
 
+The `create` subcommand creates a new Meltano Cloud project.
+
+In order to create a project, you'll first need to grant access to the Meltano Cloud GitHub app as described in [our onboarding documentation](/cloud/onboarding#prereq-2-provide-access-to-your-repo).
+
+```sh
+meltano-cloud project create --name example-project --repo-url https://github.com/meltano/squared.git --root-path "data/"
+⠋ Creating project - this may take several minutes...
+Project 'example-project' created successfully.
+```
+
 When you run the `login` command, if you only have a single project, it will be set as the default project to use for future commands. Otherwise, you will need to run `meltano-cloud project use` to specify which Meltano Cloud project the other `meltano-cloud` commands should operate on.
 
 When `meltano-cloud project use` is not provided any argument, it will list the available projects, and have you select one interactively using the arrow keys. To select a project as the default non-interactively, use the `--name` argument:
@@ -260,7 +375,15 @@ meltano-cloud job stop --execution-id 15e1cbbde6b2424f86c04b237291d652
 
 :::info
 
-  <p>At the moment, executions stopped manually will be marked as <i>Failed</i> in the output of <a href="#history"><code>meltano-cloud history</code></a>. See <a href="https://github.com/meltano/meltano/issues/7697">#7697</a> for more details.</p>
+<p>
+  At the moment, executions stopped manually will be marked as <i>Failed</i> in
+  the output of{" "}
+  <a href="#history">
+    <code>meltano-cloud history</code>
+  </a>
+  . See <a href="https://github.com/meltano/meltano/issues/7697">#7697</a> for
+  more details.
+</p>
 :::
 
 ## `schedule`

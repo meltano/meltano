@@ -87,7 +87,7 @@ docker-compose --version
 # Add Docker Compose files to your project
 meltano add files files-docker-compose
 
-# Start the `meltano-ui` and `meltano-system-db` services in the background
+# Start the `meltano-system-db` service in the background
 docker-compose -f docker-compose.prod.yml up -d
 ```
 

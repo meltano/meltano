@@ -85,3 +85,41 @@ A Meltano Cloud pipeline is an execution of a schedule.
 Pipelines use different amount of credits depending on how frequently they are run.
 
 For more details on credits and pricing see the [Pricing FAQ](https://meltano.com/pricing/).
+
+## Meltano Cloud Notifications
+
+A Meltano Cloud notification is a response to Meltano Cloud event.
+
+### Supported notification types
+- `webhook`
+- `email`
+
+### Supported notification filters
+- `events`
+  - `job_run`
+- `status`
+  - `succeeded`
+  - `failed`
+  - `cancelled`
+
+
+### Event payload
+
+This is the expected job_run payload for our notifications. Currently only job_run is supported.
+
+```json
+{
+  "id": "string",
+  "event_type": "supported notification filter event IE: job_run",
+  "idempotency_key": "string",
+  "data": {
+    "id": "string",
+    "description": "string",
+    "status": "supported notification filter status IE: succeeded",
+    "cancellation_reason": {
+      "code": "string",
+      "reason": "string"
+    } | None
+  }
+}
+```
