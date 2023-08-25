@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Install Poetry
       env:
@@ -73,7 +73,7 @@ jobs:
     environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Download artifacts
       uses: actions/download-artifact@v3.0.2
