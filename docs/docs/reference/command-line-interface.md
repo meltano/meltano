@@ -104,22 +104,6 @@ meltano add <type> <name> --no-install
 meltano add extractor tap-spotify --no-install
 ```
 
-By default, plugins that use Python use the version of Python that was used to run Meltano. This behavior can be overridden using the `python` attribute, which can be set [for all plugins](/reference/settings#project-python), or on a [per-plugin basis](/reference/settings#plugin-python).
-
-When adding a new plugin, the Python version can be specified using the `--python` option:
-
-```bash
-meltano add <type> <name> --python <Python executable name or path>
-```
-
-For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):
-
-```bash
-meltano add extractor tap-github --python python3.12
-```
-
-Then regardless of the Python version used when the plugin is installed, `tap-gitlab` and any plugin which inherits from it will use Python 3.12.
-
 #### Parameters
 
 - `--custom`: Add a [custom plugin](/concepts/plugins#custom-plugins). The command will prompt you for the package's [base plugin description](/concepts/plugins#project-plugins) metadata.

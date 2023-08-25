@@ -46,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.32", optional = true}
+boto3 = {version = "^1.28.33", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -103,7 +103,7 @@ coverage = {extras = ["toml"], version = "^7.2.7"}
 freezegun = "^1.2.2"
 hypothesis = "^6.70.0"
 mock = "^5.0.2"
-moto = "^4.1.15"
+moto = "^4.2.0"
 mypy = "^1.4.1"
 pre-commit = "^3.3.3"
 pytest = "^7.4.0"

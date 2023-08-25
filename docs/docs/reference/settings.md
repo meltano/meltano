@@ -26,33 +26,9 @@ For plugin settings, refer to the specific plugin's documentation
 or use [`meltano config <plugin> list`](/reference/command-line-interface#config)
 to list all available settings with their names, environment variables, and current values.
 
-### <a name="plugin-python"></a>`python`
-
-The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
-
-If not specified, [the top-level `python` setting will be used](#project-python), or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).
-
-This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
-
-This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
-
 ## Your Meltano project
 
 These are settings specific to [your Meltano project](/concepts/project).
-
-### <a name="project-python"></a>`python`
-
-- [Environment variable](../guide/configuration#configuring-settings): `MELTANO_PYTHON`
-
-The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
-
-If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment).
-
-[This can be overridden on a per-plugin basis by setting the `python` property for the plugin.](#plugin-python)
-
-This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
-
-This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
 
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
