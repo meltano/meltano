@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import click
-from structlog import get_logger
-
 from meltano.cloud.api import MeltanoCloudError
-from meltano.cloud.cli import (  # noqa: WPS235
+from meltano.cloud.cli import docs  # noqa: WPS235
+from meltano.cloud.cli import (
     config,
     deployment,
-    docs,
     history,
     job,
     login,
@@ -17,8 +15,10 @@ from meltano.cloud.cli import (  # noqa: WPS235
     project,
     run,
     schedule,
+    state,
 )
 from meltano.cloud.cli.base import cloud
+from structlog import get_logger
 
 logger = get_logger()
 
@@ -33,6 +33,7 @@ cloud.add_command(logs.logs)
 cloud.add_command(project.project_group)
 cloud.add_command(run.run)
 cloud.add_command(schedule.schedule_group)
+cloud.add_command(state.state_group)
 
 
 def main() -> int:
