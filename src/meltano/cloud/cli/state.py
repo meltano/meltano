@@ -65,9 +65,9 @@ class StateCloudClient(MeltanoCloudClient):
         prepared_state_bytes.write(json.dumps(new_state_dict).encode("utf-8"))
         prepared_state_bytes.seek(0)
         return requests.post(  # noqa: S113
-            presigned_post["url"],
+            presigned_post["url"],  # type: ignore
             data=presigned_post["fields"],  # type: ignore
-            files={"file": ("state.json", prepared_state_bytes)},  # type: ignore # noqa: E501
+            files={"file": ("state.json", prepared_state_bytes)},
         )
 
     @staticmethod
