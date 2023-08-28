@@ -44,7 +44,7 @@ class StateCloudClient(MeltanoCloudClient):
                 f"state/v1/{self.config.tenant_resource_key}"
                 f"/{self.config.internal_project_id}/{state_id}",
             )
-        return requests.get(presigned_url)  # noqa: S113 # type: ignore
+        return requests.get(presigned_url)  # type: ignore # noqa: S113
 
     async def set_state(
         self,
