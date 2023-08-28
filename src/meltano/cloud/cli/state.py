@@ -80,9 +80,9 @@ class StateCloudClient(MeltanoCloudClient):
         Returns:
             Cloud-compatible state dict.
         """
-        if ("complete" in state_dict and "singer_state" in state_dict["complete"]) or (
-            "partial" in state_dict and "singer_state" in state_dict["partial"]
-        ):
+        if (
+            "completed" in state_dict and "singer_state" in state_dict["completed"]
+        ) or ("partial" in state_dict and "singer_state" in state_dict["partial"]):
             return state_dict
         elif "singer_state" in state_dict:
             return {"complete": state_dict}
@@ -124,10 +124,10 @@ async def list_state_ids(context: MeltanoCloudCLIContext):
 )
 @pass_context
 @run_async
-async def delete_state(context: MeltanoCloudCLIContext):  # noqa: D103
+async def delete_state(context: MeltanoCloudCLIContext, state_id):  # noqa: D103
     async with StateCloudClient(config=context.config) as client:
-        response = await client.delete_state()
-        click.secho(response, fg="green")
+        await client.delete_state(state_id=state_id)
+        click.secho(f"Successfully deleted state for {state_id}", fg="green")
 
 
 @state_group.command("get")
@@ -148,7 +148,7 @@ async def get_state(  # noqa: D103 E501 WPS463
         if response.status_code == HTTPStatus.NOT_FOUND:
             click.secho(f"No state found for {state_id}", fg="red")
             return
-        click.echo(response.json())
+        click.echo(response.content)
 
 
 @state_group.command("set")
