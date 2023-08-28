@@ -44,7 +44,7 @@ class StateCloudClient(MeltanoCloudClient):
                 f"state/v1/{self.config.tenant_resource_key}"
                 f"/{self.config.internal_project_id}/{state_id}",
             )
-        return requests.get(presigned_url)  # noqa: S113
+        return requests.get(presigned_url)  # noqa: S113 # type: ignore
 
     async def set_state(
         self,
@@ -66,8 +66,8 @@ class StateCloudClient(MeltanoCloudClient):
         prepared_state_bytes.seek(0)
         return requests.post(  # noqa: S113
             presigned_post["url"],
-            data=presigned_post["fields"],
-            files={"file": ("state.json", prepared_state_bytes)},
+            data=presigned_post["fields"],  # type: ignore
+            files={"file": ("state.json", prepared_state_bytes)},  # type: ignore # noqa: E501
         )
 
     @staticmethod
