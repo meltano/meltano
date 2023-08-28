@@ -74,7 +74,10 @@ class TestStateCommand:
             httpserver.expect_oneshot_request(f"{path}/{state_id}").respond_with_data(
                 mock_s3_url,
             )
-            httpserver.expect_oneshot_request(mock_s3_path).respond_with_json(
+            httpserver.expect_oneshot_request(
+                mock_s3_path,
+                method="GET",
+            ).respond_with_json(
                 mock_state,
             )
             result = CliRunner().invoke(
@@ -106,6 +109,12 @@ class TestStateCommand:
         for state_id in state_ids:
             httpserver.expect_oneshot_request(f"{path}/{state_id}").respond_with_json(
                 {"url": mock_s3_url, "fields": {"key": mock_s3_path}},
+            )
+            httpserver.expect_oneshot_request(
+                mock_s3_path,
+                method="POST",
+            ).respond_with_json(
+                mock_state,
             )
             filepath = Path(directory).joinpath(f"{state_id}.json")
             with open(filepath, "w+") as state_file:
