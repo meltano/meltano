@@ -6,10 +6,10 @@ import click
 from structlog import get_logger
 
 from meltano.cloud.api import MeltanoCloudError
-from meltano.cloud.cli import (
+from meltano.cloud.cli import (  # noqa: WPS235
     config,
     deployment,
-    docs,  # noqa: WPS235
+    docs,
     history,
     job,
     login,
