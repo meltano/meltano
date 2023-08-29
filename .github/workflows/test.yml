@@ -36,28 +36,24 @@ jobs:
         - { id: '02', python-version: '3.8',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '03', python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '04', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '05', python-version: '3.11.3', os: ubuntu-latest, backend-db: sqlite, nox-python: 3.11 }
+        - { id: '05', python-version: '3.11', os: ubuntu-latest, backend-db: sqlite }
         - { id: '06', python-version: '3.7',  os: ubuntu-latest, backend-db: postgresql }
         - { id: '07', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
         - { id: '08', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
         - { id: '09', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '10', python-version: '3.11.3', os: ubuntu-latest, backend-db: postgresql, nox-python: 3.11 }
+        - { id: '10', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
         - { id: '11', python-version: '3.7',  os: ubuntu-latest, backend-db: mssql }
         - { id: '12', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
         - { id: '13', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
         - { id: '14', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '15', python-version: '3.11.3', os: ubuntu-latest, backend-db: mssql, nox-python: 3.11 }
+        - { id: '15', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         # Windows tests for Python 3.7 is temporarily disabled - see https://github.com/meltano/meltano/issues/6479
         # - { id: '16', python-version: '3.7',  os: windows-2022,  backend-db: sqlite }
         - { id: '17', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
         - { id: '18', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
         - { id: '19', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '20', python-version: '3.11.3', os: windows-2022,  backend-db: sqlite, nox-python: 3.11 }
+        - { id: '20', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -88,7 +84,7 @@ jobs:
     env:
       PYTEST_MARKERS: not concurrent
       FORCE_COLOR: 1
-      NOXPYTHON: ${{ matrix.nox-python || matrix.python-version }}
+      NOXPYTHON: ${{ matrix.python-version }}
       NOXSESSION: tests
 
     steps:
