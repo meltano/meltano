@@ -69,7 +69,6 @@ class pass_project:  # noqa: N801
                 try:
                     migration_service = MigrationService(engine)
                     migration_service.upgrade(silent=True)
-                    migration_service.seed(project)
                 except MigrationError as err:
                     raise CliError(str(err)) from err
 

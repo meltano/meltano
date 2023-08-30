@@ -40,16 +40,13 @@ class ProjectInitService:
         self,
         *,
         activate: bool = True,
-        add_discovery: bool = False,
         force: bool = False,
     ) -> Project:
         """Initialise Meltano Project.
 
         Args:
             activate: Activate newly created project
-            add_discovery: Add discovery.yml file to created project
-            force: Whether to overwrite `meltano.yml` in the existing
-                directory.
+            force: Whether to overwrite `meltano.yml` in the existing directory.
 
         Returns:
             A new Project instance
@@ -81,7 +78,7 @@ class ProjectInitService:
         project = Project(self.project_directory)
 
         self.create_dot_meltano_dir(project)
-        self.create_files(project, add_discovery=add_discovery)
+        self.create_files(project)
 
         project.settings.set(
             "project_id",
@@ -108,19 +105,18 @@ class ProjectInitService:
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 
-    def create_files(self, project: Project, add_discovery=False):
+    def create_files(self, project: Project):
         """Create project files.
 
         Args:
             project: Meltano project context
-            add_discovery: Add discovery.yml file to created project
         """
         click.secho("Creating project files...", fg="blue")
 
         if project.root != Path.cwd():
             click.echo(f"  {self.project_directory}/")
 
-        plugin = MeltanoFilePlugin(discovery=add_discovery)
+        plugin = MeltanoFilePlugin()
 
         expected_files = plugin.files_to_create(project, [])
         created_files = plugin.create_files(project)
@@ -165,7 +161,6 @@ class ProjectInitService:
         try:
             migration_service = MigrationService(engine)
             migration_service.upgrade(silent=True)
-            migration_service.seed(project)
             click.secho("  Done!", fg="blue")
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err

@@ -49,40 +49,18 @@
     "MELTANO_DATABASE_RETRY_TIMEOUT": "5",
     "MELTANO_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/meltano.db",
     "MELTANO_DEFAULT_ENVIRONMENT": "userdev",
-    "MELTANO_DISCOVERY_URL": "https://discovery.meltano.com/discovery.yml",
     "MELTANO_ELT_BUFFER_SIZE": "10485760",
     "MELTANO_EXPERIMENTAL": "false",
-    "MELTANO_FF_ENABLE_API_SCHEDULED_JOB_LIST": "false",
-    "MELTANO_FF_ENABLE_UVICORN": "false",
     "MELTANO_FF_PLUGIN_LOCKS_REQUIRED": "false",
     "MELTANO_FF_STRICT_ENV_VAR_MODE": "false",
     "MELTANO_HUB_URL": "https://hub.meltano.com",
-    "MELTANO_MAIL_DEBUG": "false",
-    "MELTANO_MAIL_DEFAULT_SENDER": "\"Meltano\" <bot@meltano.com>",
-    "MELTANO_MAIL_PORT": "1025",
-    "MELTANO_MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID": "12751",
-    "MELTANO_MAIL_SERVER": "localhost",
-    "MELTANO_MAIL_USE_TLS": "false",
-    "MELTANO_OAUTH_SERVICE_PROVIDERS": "all",
     "MELTANO_PROJECT_ID": "20f9e32a-be7a-41c7-9847-da9712f40d23",
     "MELTANO_PROJECT_READONLY": "false",
     "MELTANO_SEND_ANONYMOUS_USAGE_STATS": "false",
     "MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS": "[\"https://sp.meltano.com\"]",
     "MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS": "1",
     "MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS": "10",
-    "MELTANO_STATE_BACKEND_URI": "systemdb",
-    "MELTANO_UI_ANALYSIS": "false",
-    "MELTANO_UI_ANONYMOUS_READONLY": "false",
-    "MELTANO_UI_AUTHENTICATION": "false",
-    "MELTANO_UI_BIND_HOST": "0.0.0.0",
-    "MELTANO_UI_BIND_PORT": "5000",
-    "MELTANO_UI_FORWARDED_ALLOW_IPS": "127.0.0.1",
-    "MELTANO_UI_NOTIFICATION": "false",
-    "MELTANO_UI_PASSWORD_SALT": "b4c124932584ad6e69f2774a0ae5c138",
-    "MELTANO_UI_READONLY": "false",
-    "MELTANO_UI_SECRET_KEY": "thisisnotapropersecretkey",
-    "MELTANO_UI_SESSION_COOKIE_SECURE": "false",
-    "MELTANO_UI_WORKERS": "4"
+    "MELTANO_STATE_BACKEND_URI": "systemdb"
   },
   "jobs": [
     {
@@ -194,12 +172,13 @@
     "extractors": [
       {
         "capabilities": [
-          "catalog",
-          "state",
-          "discover",
           "about",
-          "stream-maps",
-          "schema-flattening"
+          "batch",
+          "catalog",
+          "discover",
+          "schema-flattening",
+          "state",
+          "stream-maps"
         ],
         "config": {
           "aws_region_name": "us-west-2",
@@ -208,9 +187,10 @@
           "start_date": "${DEFAULT_START_DATE}"
         },
         "description": "AWS Application and Infrastructure Monitoring",
-        "docs": "https://deploy-preview-1125--meltano-hub.netlify.app/extractors/tap-cloudwatch--meltanolabs",
+        "docs": "https://hub.meltano.com/extractors/tap-cloudwatch--meltanolabs",
         "env": {
           "MELTANO_EXTRACT_AWS_REGION_NAME": "us-west-2",
+          "MELTANO_EXTRACT_BATCH_INCREMENT_S": "3600",
           "MELTANO_EXTRACT_LOG_GROUP_NAME": "API-Gateway-Execution-Logs_i32s35df22/prod",
           "MELTANO_EXTRACT_QUERY": "fields @timestamp, @message",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_cloudwatch",
@@ -219,6 +199,7 @@
           "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "TAP_CLOUDWATCH_AWS_REGION_NAME": "us-west-2",
+          "TAP_CLOUDWATCH_BATCH_INCREMENT_S": "3600",
           "TAP_CLOUDWATCH_LOG_GROUP_NAME": "API-Gateway-Execution-Logs_i32s35df22/prod",
           "TAP_CLOUDWATCH_QUERY": "fields @timestamp, @message",
           "TAP_CLOUDWATCH__LOAD_SCHEMA": "tap_cloudwatch",
@@ -229,7 +210,7 @@
         },
         "executable": "tap-cloudwatch",
         "label": "Cloudwatch",
-        "logo_url": "https://deploy-preview-1125--meltano-hub.netlify.app/assets/logos/extractors/cloudwatch.png",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/cloudwatch.png",
         "name": "tap-cloudwatch",
         "namespace": "tap_cloudwatch",
         "pip_url": "git+https://github.com/meltanolabs/tap-cloudwatch.git",
@@ -239,44 +220,103 @@
           {
             "description": "The access key for your AWS account.",
             "kind": "password",
-            "label": "Aws Access Key Id",
+            "label": "AWS Access Key ID",
             "name": "aws_access_key_id"
+          },
+          {
+            "description": "The complete URL to use for the constructed client.",
+            "kind": "string",
+            "label": "AWS Endpoint URL",
+            "name": "aws_endpoint_url"
+          },
+          {
+            "description": "The AWS credentials profile name to use. The profile must be configured and accessible.",
+            "kind": "string",
+            "label": "AWS Profile",
+            "name": "aws_profile"
+          },
+          {
+            "description": "The AWS region name (e.g. us-east-1) ",
+            "kind": "string",
+            "label": "AWS Region Name",
+            "name": "aws_region_name"
           },
           {
             "description": "The secret key for your AWS account.",
             "kind": "password",
-            "label": "Aws Secret Access Key",
+            "label": "AWS Secret Access Key",
             "name": "aws_secret_access_key"
           },
           {
             "description": "The session key for your AWS account. This is only needed when you are using temporary credentials.",
             "kind": "password",
-            "label": "Aws Session Token",
+            "label": "AWS Session Token",
             "name": "aws_session_token"
           },
           {
-            "description": "The AWS credentials profile name to use. The profile must be configured and accessible.",
-            "kind": "string",
-            "label": "Aws Profile",
-            "name": "aws_profile"
+            "description": "Compression format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Compression",
+            "name": "batch_config.encoding.compression",
+            "options": [
+              {
+                "label": "Gzip",
+                "value": "gzip"
+              },
+              {
+                "label": "None",
+                "value": "none"
+              }
+            ]
           },
           {
-            "description": "The complete URL to use for the constructed client.",
-            "kind": "string",
-            "label": "Aws Endpoint Url",
-            "name": "aws_endpoint_url"
+            "description": "Format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Format",
+            "name": "batch_config.encoding.format",
+            "options": [
+              {
+                "label": "Jsonl",
+                "value": "jsonl"
+              }
+            ]
           },
           {
-            "description": "The AWS region name (e.g. us-east-1) ",
+            "description": "Prefix to use when writing batch files.",
             "kind": "string",
-            "label": "Aws Region Name",
-            "name": "aws_region_name"
+            "label": "Batch Config Storage Prefix",
+            "name": "batch_config.storage.prefix"
           },
           {
-            "description": "The earliest record date to sync",
+            "description": "Root path to use when writing batch files.",
+            "kind": "string",
+            "label": "Batch Config Storage Root",
+            "name": "batch_config.storage.root"
+          },
+          {
+            "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit.",
+            "kind": "integer",
+            "label": "Batch Increment S",
+            "name": "batch_increment_s",
+            "value": 3600
+          },
+          {
+            "description": "The last record date to sync. This tap uses a 5 minute buffer to allow Cloudwatch logs to arrive in full. If you request data from current time it will automatically adjust your end_date to now - 5 mins.",
             "kind": "date_iso8601",
-            "label": "Start Date",
-            "name": "start_date"
+            "label": "End Date",
+            "name": "end_date"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
           },
           {
             "description": "The log group on which to perform the query.",
@@ -291,16 +331,10 @@
             "name": "query"
           },
           {
-            "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit.",
-            "kind": "integer",
-            "label": "Batch Increment S",
-            "name": "batch_increment_s"
-          },
-          {
-            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
-            "kind": "object",
-            "label": "Stream Maps",
-            "name": "stream_maps"
+            "description": "The earliest record date to sync",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
           },
           {
             "description": "User-defined config values to be used within map expressions.",
@@ -309,23 +343,17 @@
             "name": "stream_map_config"
           },
           {
-            "description": "'True' to enable schema flattening and automatically expand nested properties.",
-            "kind": "boolean",
-            "label": "Flattening Enabled",
-            "name": "flattening_enabled"
-          },
-          {
-            "description": "The max depth to flatten schemas.",
-            "kind": "integer",
-            "label": "Flattening Max Depth",
-            "name": "flattening_max_depth"
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
           }
         ],
         "settings_group_validation": [
           [
             "log_group_name",
-            "start_date",
-            "query"
+            "query",
+            "start_date"
           ]
         ],
         "variant": "meltanolabs"
@@ -441,6 +469,7 @@
             }
           ]
         },
+        "description": "Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)",
         "docs": "https://hub.meltano.com/extractors/tap-spreadsheets-anywhere--ets",
         "env": {
           "MELTANO_EXTRACT_TABLES": "[{\"path\": \"https://ip-ranges.amazonaws.com\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"ip_prefix\"], \"name\": \"aws_ips\", \"pattern\": \"ip-ranges.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://www.gstatic.com/ipranges\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"gcp_ips\", \"pattern\": \"cloud.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"azure_ips\", \"pattern\": \"ServiceTags_Public_20230116.json\", \"json_path\": \"values\"}]",
@@ -457,6 +486,7 @@
           "TAP_SPREADSHEETS_ANYWHERE__SELECT_FILTER": "[]"
         },
         "label": "Spreadsheets Anywhere",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/spreadsheets-anywhere.png",
         "name": "tap-spreadsheets-anywhere",
         "namespace": "tap_spreadsheets_anywhere",
         "pip_url": "git+https://github.com/ets/tap-spreadsheets-anywhere.git",
@@ -464,7 +494,7 @@
         "repo": "https://github.com/ets/tap-spreadsheets-anywhere",
         "settings": [
           {
-            "description": "An array holding json objects that each describe a set of targeted source files. See [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for details.",
+            "description": "An array holding json objects that each describe a set of targeted source files.\n\nEach object in the 'tables' array describes one or more CSV or Excel spreadsheet files that adhere to the same schema and are meant to be tapped as the source for a Singer-based data flow.\nThe available keys are:\n\n- path: A string describing the transport and bucket/root directory holding the targeted source files.\n- name: A string describing the \"table\" (aka Singer stream) into which the source data should be loaded.\n- search_prefix: (optional) This is an optional prefix to apply after the bucket that will be used to filter files in the listing request from the targeted system. This prefix potentially reduces the number of files returned from the listing request.\n- pattern: This is an escaped regular expression that the tap will use to filter the listing result set returned from the listing request. This pattern potentially reduces the number of listed files that are considered as sources for the declared table. It's a bit strange, since this is an escaped string inside of an escaped string, any backslashes in the RegEx will need to be double-escaped.\n- start_date: This is the datetime that the tap will use to filter files, based on the modified timestamp of the file.\n- key_properties: These are the \"primary keys\" of the CSV files, to be used by the target for deduplication and primary key definitions downstream in the destination.\n- format: Must be either 'csv', 'json', 'excel', or 'detect'. Note that csv can be further customized with delimiter and quotechar variables below.\n- invalid_format_action: (optional) By default, the tap will raise an exception if a source file can not be read . Set this key to \"ignore\" to skip such source files and continue the run.\n- field_names: (optional) An array holding the names of the columns in the targeted files. If not supplied, the first row of each file must hold the desired values.\n- universal_newlines: (optional) Should the source file parsers honor universal newlines). Setting this to false will instruct the parser to only consider '\\n' as a valid newline identifier.\n- sample_rate: (optional) The sampling rate to apply when reading a source file for sampling in discovery mode. A sampling rate of 1 will sample every line. A sampling rate of 10 (the default) will sample every 10th line.\n- max_sampling_read: (optional) How many lines of the source file should be sampled when in discovery mode attempting to infer a schema. The default is 1000 samples.\n- max_sampled_files: (optional) The maximum number of files in the targeted set that will be sampled. The default is 5.\n- max_records_per_run: (optional) The maximum number of records that should be written to this stream in a single sync run. The default is unlimited.\n- prefer_number_vs_integer: (optional) If the discovery mode sampling process sees only integer values for a field, should number be used anyway so that floats are not considered errors? The default is false but true can help in situations where floats only appear rarely in sources and may not be detected through discovery sampling.\n- selected: (optional) Should this table be synced. Defaults to true. Setting to false will skip this table on a sync run.\n- worksheet_name: (optional) the worksheet name to pull from in the targeted xls file(s). Only required when format is excel\n- delimiter: (optional) the delimiter to use when format is 'csv'. Defaults to a comma ',' but you can set delimiter to 'detect' to leverage the csv \"Sniffer\" for auto-detecting delimiter.\n- quotechar: (optional) the character used to surround values that may contain delimiters - defaults to a double quote '\"'\n- json_path: (optional) the JSON key under which the list of objets to use is located. Defaults to None, corresponding to an array at the top level of the JSON tree.\n\nFor example:\n\n```yaml\nconfig:\n  tables:\n  - path: s3://my-s3-bucket\n    name: target_table_name\n    pattern: subfolder/common_prefix.*\n    start_date: 2017-05-01T00:00:00Z\n    key_properties: []\n    format: csv\n    delimiter: \"|\"\n    quotechar: '\"'\n    universal_newlines: false\n    sample_rate: 10\n    max_sampling_read: 2000\n    max_sampled_files: 3\n    prefer_number_vs_integer: true\n    selected: true\n```\n\nSee the `Common Config Examples` section below for more examples or see the [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for more details.\n",
             "kind": "array",
             "label": "Tables",
             "name": "tables"
@@ -479,10 +509,12 @@
       },
       {
         "capabilities": [
-          "catalog",
-          "state",
-          "discover",
           "about",
+          "batch",
+          "catalog",
+          "discover",
+          "schema-flattening",
+          "state",
           "stream-maps"
         ],
         "config": {
@@ -495,11 +527,13 @@
           ],
           "start_date": "${DEFAULT_START_DATE}"
         },
+        "description": "Team communication tool",
         "docs": "https://hub.meltano.com/extractors/tap-slack--meltanolabs",
         "env": {
           "MELTANO_EXTRACT_AUTO_JOIN_CHANNELS": "false",
           "MELTANO_EXTRACT_CHANNEL_TYPES": "[\"private_channel\"]",
           "MELTANO_EXTRACT_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
+          "MELTANO_EXTRACT_THREAD_LOOKBACK_DAYS": "1",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_slack",
           "MELTANO_EXTRACT__METADATA": "{}",
           "MELTANO_EXTRACT__SCHEMA": "{}",
@@ -508,6 +542,7 @@
           "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_CHANNEL_TYPES": "[\"private_channel\"]",
           "TAP_SLACK_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
+          "TAP_SLACK_THREAD_LOOKBACK_DAYS": "1",
           "TAP_SLACK__LOAD_SCHEMA": "tap_slack",
           "TAP_SLACK__METADATA": "{}",
           "TAP_SLACK__SCHEMA": "{}",
@@ -515,6 +550,7 @@
           "TAP_SLACK__SELECT_FILTER": "[]"
         },
         "label": "Slack",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/slack.png",
         "name": "tap-slack",
         "namespace": "tap_slack",
         "pip_url": "git+https://github.com/MeltanoLabs/tap-slack.git",
@@ -527,27 +563,10 @@
         ],
         "settings": [
           {
+            "description": "The token to authenticate against the Slack API service",
             "kind": "password",
             "label": "API Key",
             "name": "api_key"
-          },
-          {
-            "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
-            "kind": "date_iso8601",
-            "label": "Start Date",
-            "name": "start_date"
-          },
-          {
-            "description": "The number of days to look in the past for new thread replies to existing messages",
-            "kind": "integer",
-            "label": "Thread Lookback Days",
-            "name": "thread_lookback_days"
-          },
-          {
-            "description": "The types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages.",
-            "kind": "array",
-            "label": "Channel Types",
-            "name": "channel_types"
           },
           {
             "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages.",
@@ -556,16 +575,108 @@
             "name": "auto_join_channels"
           },
           {
-            "description": "A list of channel IDs that should be retrieved. If not defined then all are selected.",
+            "description": "Compression format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Compression",
+            "name": "batch_config.encoding.compression",
+            "options": [
+              {
+                "label": "Gzip",
+                "value": "gzip"
+              },
+              {
+                "label": "None",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "description": "Format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Format",
+            "name": "batch_config.encoding.format",
+            "options": [
+              {
+                "label": "Jsonl",
+                "value": "jsonl"
+              }
+            ]
+          },
+          {
+            "description": "Prefix to use when writing batch files.",
+            "kind": "string",
+            "label": "Batch Config Storage Prefix",
+            "name": "batch_config.storage.prefix"
+          },
+          {
+            "description": "Root path to use when writing batch files.",
+            "kind": "string",
+            "label": "Batch Config Storage Root",
+            "name": "batch_config.storage.root"
+          },
+          {
+            "description": "The types of conversations the tap will attempt to extract data from. Must be one of 'public_channel', 'mpim', 'private_channel', or 'im'. Note that the Slack app must have the appropriate privileges and be a member of the conversations to sync messages.",
             "kind": "array",
-            "label": "Selected Channels",
-            "name": "selected_channels"
+            "label": "Channel Types",
+            "name": "channel_types",
+            "value": [
+              "public_channel"
+            ]
           },
           {
             "description": "A list of channel IDs that should not be retrieved. Excluding overrides a selected setting, so if a channel is included in both selected and excluded, it will be excluded.",
             "kind": "array",
             "label": "Excluded Channels",
             "name": "excluded_channels"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
+          },
+          {
+            "description": "Whether to include streams that require admin privileges or not. If the user does not have the proper scopes then the tap will throw and exception.",
+            "kind": "boolean",
+            "label": "Include Admin Streams",
+            "name": "include_admin_streams"
+          },
+          {
+            "description": "A list of channel IDs that should be retrieved. If not defined then all are selected.",
+            "kind": "array",
+            "label": "Selected Channels",
+            "name": "selected_channels"
+          },
+          {
+            "description": "The earliest record date to sync",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "The number of days to look in the past for new thread replies to existing messages",
+            "kind": "integer",
+            "label": "Thread Lookback Days",
+            "name": "thread_lookback_days",
+            "value": 1
           }
         ],
         "settings_group_validation": [
@@ -624,10 +735,11 @@
       },
       {
         "capabilities": [
+          "about",
           "catalog",
           "discover",
+          "schema-flattening",
           "state",
-          "about",
           "stream-maps"
         ],
         "config": {
@@ -635,6 +747,7 @@
           "start_date": "${DEFAULT_START_DATE}",
           "view_id": "188392047"
         },
+        "description": "App and website analytics platform hosted by Google",
         "docs": "https://hub.meltano.com/extractors/tap-google-analytics--meltanolabs",
         "env": {
           "MELTANO_EXTRACT_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
@@ -652,94 +765,121 @@
           "TAP_GOOGLE_ANALYTICS__SELECT": "[\"*.*\"]",
           "TAP_GOOGLE_ANALYTICS__SELECT_FILTER": "[]"
         },
-        "label": "Google Analytics",
+        "label": "Google Analytics (Universal Analytics API - Deprecated)",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/google-analytics.png",
         "name": "tap-google-analytics",
         "namespace": "tap_google_analytics",
-        "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git",
+        "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git@main_deprecated_ua",
         "plugin_type": "extractors",
         "repo": "https://github.com/MeltanoLabs/tap-google-analytics",
         "settings": [
           {
-            "description": "#### How to get\n\nFollow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.\n\nThis extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.\n\nTo access your Google Analytics data, the \"Analytics Reporting API\" and \"Analytics API\" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.\n\n##### Step 1: Creating Service Account Credentials\n\nAs a first step, you need to create a new project in Google Cloud Platform or use an existing one:\n\n1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).\n\n2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.\n\n  ![Screenshot of Google Service Accounts page](/assets/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)\n\n3. Click \"Create service account\"\n\n  In the Create service account window, type a name for the service account, and click `Create`.\n\n  We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.\n\n  We also do not need to grant access to any users for this service account, as we only need the key.\n\n  ![Screenshot of Google Service Account Configuration for new Account](/assets/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)\n\n  Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.\n\nMeltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.\n\n##### Step 2: Linking Credentials to Google Analytics\n\nThe newly created service account will have an email address that looks similar to:\n\n```\nservice-account-name@PROJECT-ID.iam.gserviceaccount.com\n```\n\nTo grant this service account access to your Google Analytics data, add the email address as a [new user](https://support.google.com/analytics/answer/1009702) to your Google Analytics account, property or view through the \"Admin > User Management\" page.\n\nOnly the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.\n\n![Screenshot of Google Analytics Add User](/assets/images/tap-google-analytics/03-ga-add-user.png)\n\n##### Step 3: Enabling the APIs\n\n1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.\n\n  Now enable the API using the button at the top, so that the button will say \"Disable API\" instead:\n\n  ![Screenshot of Google Analytics Reporting API](/assets/images/tap-google-analytics/04-ga-reporting-api.png)\n\n2. Next, visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable this API as well.\n\n  ![Screenshot of Google Analytics API](/assets/images/tap-google-analytics/05-ga-api.png)\n",
-            "kind": "file",
-            "label": "Client Secrets File Location",
-            "name": "key_file_location",
-            "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json"
-          },
-          {
             "description": "Follow the above steps for [Key File Location](#key-file-location) but instead of providing a path you can provide the serialized json directly. This can be useful for ephemeral runtime environments where its easier to provide an environment variable instead of a file.\n",
             "kind": "object",
-            "label": "Client Secrets JSON",
+            "label": "Client Secrets",
             "name": "client_secrets",
             "placeholder": "Ex. client_secrets.json"
-          },
-          {
-            "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
-            "kind": "password",
-            "label": "OAuth Client ID",
-            "name": "oauth_credentials.client_id"
-          },
-          {
-            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
-            "label": "OAuth Client Secret",
-            "name": "oauth_credentials.client_secret"
-          },
-          {
-            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
-            "label": "OAuth Access Token",
-            "name": "oauth_credentials.access_token"
-          },
-          {
-            "description": "See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
-            "kind": "password",
-            "label": "OAuth Refresh Token",
-            "name": "oauth_credentials.refresh_token"
-          },
-          {
-            "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
-            "label": "View ID",
-            "name": "view_id",
-            "placeholder": "Ex. 198343027"
-          },
-          {
-            "description": "Project-relative path to JSON file with the definition of the reports to be generated.\n\nSee <https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/> for valid dimensions and metrics.\n\nThe JSON structure expected is as follows:\n\n```json\n[\n  { \"name\" : \"name of stream to be used\",\n    \"dimensions\" :\n    [\n      \"Google Analytics Dimension\",\n      \"Another Google Analytics Dimension\",\n      // ... up to 7 dimensions per stream ...\n    ],\n    \"metrics\" :\n    [\n      \"Google Analytics Metric\",\n      \"Another Google Analytics Metric\",\n      // ... up to 10 metrics per stream ...\n    ]\n  },\n  // ... as many streams / reports as the user wants ...\n]\n```\n\nFor example, if you want to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:\n\n```json\n[\n  { \"name\" : \"users_per_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:users\",\n      \"ga:newUsers\"\n    ]\n  },\n  { \"name\" : \"sessions_per_country_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\",\n      \"ga:country\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:sessions\",\n      \"ga:sessionsPerUser\",\n      \"ga:avgSessionDuration\"\n    ]\n  }\n]\n```\n",
-            "label": "Reports",
-            "name": "reports",
-            "placeholder": "Ex. my_report_definition.json"
-          },
-          {
-            "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
-            "kind": "date_iso8601",
-            "label": "Start Date",
-            "name": "start_date"
           },
           {
             "description": "Date up to when historical data will be extracted.",
             "kind": "date_iso8601",
             "label": "End Date",
             "name": "end_date"
+          },
+          {
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
+          },
+          {
+            "description": "#### How to get\n\nFollow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.\n\nThis extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.\n\nTo access your Google Analytics data, the \"Analytics Reporting API\" and \"Analytics API\" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.\n\n##### Step 1: Creating Service Account Credentials\n\nAs a first step, you need to create a new project in Google Cloud Platform or use an existing one:\n\n1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).\n\n2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.\n\n  ![Screenshot of Google Service Accounts page](/assets/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)\n\n3. Click \"Create service account\"\n\n  In the Create service account window, type a name for the service account, and click `Create`.\n\n  We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.\n\n  We also do not need to grant access to any users for this service account, as we only need the key.\n\n  ![Screenshot of Google Service Account Configuration for new Account](/assets/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)\n\n  Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.\n\nMeltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.\n\n##### Step 2: Linking Credentials to Google Analytics\n\nThe newly created service account will have an email address that looks similar to:\n\n```\nservice-account-name@PROJECT-ID.iam.gserviceaccount.com\n```\n\nTo grant this service account access to your Google Analytics data, add the email address as a [new user](https://support.google.com/analytics/answer/1009702) to your Google Analytics account, property or view through the \"Admin > User Management\" page.\n\nOnly the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.\n\n![Screenshot of Google Analytics Add User](/assets/images/tap-google-analytics/03-ga-add-user.png)\n\n##### Step 3: Enabling the APIs\n\n1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.\n\n  Now enable the API using the button at the top, so that the button will say \"Disable API\" instead:\n\n  ![Screenshot of Google Analytics Reporting API](/assets/images/tap-google-analytics/04-ga-reporting-api.png)\n\n2. Next, visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable this API as well.\n\n  ![Screenshot of Google Analytics API](/assets/images/tap-google-analytics/05-ga-api.png)\n",
+            "kind": "password",
+            "label": "Key File Location",
+            "name": "key_file_location",
+            "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json"
+          },
+          {
+            "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Credentials Access Token",
+            "name": "oauth_credentials.access_token"
+          },
+          {
+            "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
+            "kind": "password",
+            "label": "OAuth Credentials Client ID",
+            "name": "oauth_credentials.client_id"
+          },
+          {
+            "description": "Google Analytics Client Secret. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Credentials Client Secret",
+            "name": "oauth_credentials.client_secret"
+          },
+          {
+            "description": "Google Analytics Refresh Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "password",
+            "label": "OAuth Credentials Refresh Token",
+            "name": "oauth_credentials.refresh_token"
+          },
+          {
+            "description": "Project-relative path to JSON file with the definition of the reports to be generated.\n\nSee <https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/> for valid dimensions and metrics.\n\nThe JSON structure expected is as follows:\n\n```json\n[\n  { \"name\" : \"name of stream to be used\",\n    \"dimensions\" :\n    [\n      \"Google Analytics Dimension\",\n      \"Another Google Analytics Dimension\",\n      // ... up to 7 dimensions per stream ...\n    ],\n    \"metrics\" :\n    [\n      \"Google Analytics Metric\",\n      \"Another Google Analytics Metric\",\n      // ... up to 10 metrics per stream ...\n    ]\n  },\n  // ... as many streams / reports as the user wants ...\n]\n```\n\nFor example, if you want to extract user stats per day in a `users_per_day` stream and session stats per day and country in a `sessions_per_country_day` stream:\n\n```json\n[\n  { \"name\" : \"users_per_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:users\",\n      \"ga:newUsers\"\n    ]\n  },\n  { \"name\" : \"sessions_per_country_day\",\n    \"dimensions\" :\n    [\n      \"ga:date\",\n      \"ga:country\"\n    ],\n    \"metrics\" :\n    [\n      \"ga:sessions\",\n      \"ga:sessionsPerUser\",\n      \"ga:avgSessionDuration\"\n    ]\n  }\n]\n```\n",
+            "kind": "string",
+            "label": "Reports",
+            "name": "reports",
+            "placeholder": "Ex. my_report_definition.json"
+          },
+          {
+            "description": "This property determines how much historical data will be extracted.Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
+            "kind": "date_iso8601",
+            "label": "Start Date",
+            "name": "start_date"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
+            "kind": "password",
+            "label": "View ID",
+            "name": "view_id",
+            "placeholder": "Ex. 198343027"
           }
         ],
         "settings_group_validation": [
           [
             "key_file_location",
-            "view_id",
-            "start_date"
+            "start_date",
+            "view_id"
           ],
           [
             "client_secrets",
-            "view_id",
-            "start_date"
+            "start_date",
+            "view_id"
           ],
           [
+            "oauth_credentials.access_token",
             "oauth_credentials.client_id",
             "oauth_credentials.client_secret",
-            "oauth_credentials.access_token",
             "oauth_credentials.refresh_token",
-            "view_id",
-            "start_date"
+            "start_date",
+            "view_id"
           ]
         ],
         "variant": "meltanolabs"
@@ -754,6 +894,7 @@
           "groups": "meltano",
           "start_date": "${DEFAULT_START_DATE}"
         },
+        "description": "Single application for the entire DevOps lifecycle",
         "docs": "https://hub.meltano.com/extractors/tap-gitlab--meltanolabs",
         "env": {
           "MELTANO_EXTRACT_API_URL": "https://gitlab.com",
@@ -782,6 +923,7 @@
           "TAP_GITLAB__SELECT_FILTER": "[]"
         },
         "label": "GitLab",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/gitlab.png",
         "name": "tap-gitlab",
         "namespace": "tap_gitlab",
         "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
@@ -801,7 +943,6 @@
             "description": "GitLab API/instance URL. When an API path is omitted, `/api/v4/` is assumed.",
             "label": "GitLab Instance",
             "name": "api_url",
-            "protected": true,
             "value": "https://gitlab.com"
           },
           {
@@ -870,44 +1011,47 @@
       },
       {
         "capabilities": [
-          "catalog",
-          "state",
-          "discover",
           "about",
-          "stream-maps",
-          "schema-flattening"
+          "catalog",
+          "discover",
+          "schema-flattening",
+          "state",
+          "stream-maps"
         ],
         "config": {
           "start_date": "${DEFAULT_START_DATE}"
         },
+        "description": "Code hosting platform",
         "docs": "https://hub.meltano.com/extractors/tap-github--meltanolabs",
         "env": {
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_github",
           "MELTANO_EXTRACT__METADATA": "{}",
           "MELTANO_EXTRACT__SCHEMA": "{}",
-          "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
+          "MELTANO_EXTRACT__SELECT": "[\"*.*\", \"!traffic_*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "TAP_GITHUB__LOAD_SCHEMA": "tap_github",
           "TAP_GITHUB__METADATA": "{}",
           "TAP_GITHUB__SCHEMA": "{}",
-          "TAP_GITHUB__SELECT": "[\"*.*\"]",
+          "TAP_GITHUB__SELECT": "[\"*.*\", \"!traffic_*.*\"]",
           "TAP_GITHUB__SELECT_FILTER": "[]"
         },
         "label": "GitHub",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
         "name": "tap-github",
         "namespace": "tap_github",
         "pip_url": "git+https://github.com/MeltanoLabs/tap-github.git",
         "plugin_type": "extractors",
         "repo": "https://github.com/MeltanoLabs/tap-github",
+        "select": [
+          "*.*",
+          "!traffic_*.*"
+        ],
         "settings": [
           {
-            "label": "User Agent",
-            "name": "user_agent"
-          },
-          {
-            "description": "The log level of the API response metrics.",
-            "label": "Metrics Log Level",
-            "name": "metrics_log_level"
+            "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits.",
+            "kind": "array",
+            "label": "Additional Auth Tokens",
+            "name": "additional_auth_tokens"
           },
           {
             "description": "GitHub token to authenticate with.",
@@ -916,22 +1060,22 @@
             "name": "auth_token"
           },
           {
-            "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits.",
-            "kind": "array",
-            "label": "Additional Auth Tokens",
-            "name": "additional_auth_tokens"
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
           },
           {
-            "description": "Add a buffer to avoid consuming all query points for the token at hand. Defaults to 1000.",
+            "description": "The max depth to flatten schemas.",
             "kind": "integer",
-            "label": "Rate Limit Buffer",
-            "name": "rate_limit_buffer"
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
           },
           {
-            "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)",
-            "kind": "array",
-            "label": "Searches",
-            "name": "searches"
+            "description": "The log level of the API response metrics.",
+            "kind": "string",
+            "label": "Metrics Log Level",
+            "name": "metrics_log_level"
           },
           {
             "description": "An array of strings containing the github organizations to be included",
@@ -940,22 +1084,28 @@
             "name": "organizations"
           },
           {
+            "description": "Add a buffer to avoid consuming all query points for the token at hand. Defaults to 1000.",
+            "kind": "integer",
+            "label": "Rate Limit Buffer",
+            "name": "rate_limit_buffer"
+          },
+          {
             "description": "An array of strings containing the github repos to be included",
             "kind": "array",
             "label": "Repositories",
             "name": "repositories"
           },
           {
-            "description": "A list of GithHub usernames.",
+            "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)",
             "kind": "array",
-            "label": "User Usernames",
-            "name": "user_usernames"
+            "label": "Searches",
+            "name": "searches"
           },
           {
-            "description": "A list of GitHub user ids.",
-            "kind": "array",
-            "label": "User IDs",
-            "name": "user_ids"
+            "description": "Set to true to skip API calls for the parent streams (such as repositories) if it is not selected but children are",
+            "kind": "boolean",
+            "label": "Skip Parent Streams",
+            "name": "skip_parent_streams"
           },
           {
             "kind": "date_iso8601",
@@ -964,19 +1114,30 @@
           },
           {
             "kind": "object",
-            "label": "Stream Maps",
-            "name": "stream_maps"
-          },
-          {
-            "kind": "object",
             "label": "Stream Map Config",
             "name": "stream_map_config"
           },
           {
-            "description": "Set to true to skip API calls for the parent streams (such as repositories) if it is not selected but children are.",
-            "kind": "boolean",
-            "label": "Skip Parent Streams",
-            "name": "skip_parent_streams"
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "kind": "string",
+            "label": "User Agent",
+            "name": "user_agent"
+          },
+          {
+            "description": "A list of GitHub user ids.",
+            "kind": "array",
+            "label": "User IDs",
+            "name": "user_ids"
+          },
+          {
+            "description": "A list of GithHub usernames.",
+            "kind": "array",
+            "label": "User Usernames",
+            "name": "user_usernames"
           }
         ],
         "settings_group_validation": [
@@ -1135,6 +1296,7 @@
           "user": "CICD",
           "warehouse": "CICD"
         },
+        "description": "For extracting data from Snowflake",
         "docs": "https://hub.meltano.com/extractors/tap-snowflake--transferwise",
         "env": {
           "MELTANO_EXTRACT_ACCOUNT": "epa06486",
@@ -1161,6 +1323,7 @@
           "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
         },
         "label": "Snowflake",
+        "logo_url": "https://hub.meltano.com/assets/logos/extractors/snowflake.png",
         "name": "tap-snowflake",
         "namespace": "tap_snowflake",
         "pip_url": "pipelinewise-tap-snowflake",
@@ -1465,22 +1628,33 @@
         },
         "capabilities": [
           "about",
+          "schema-flattening",
           "stream-maps"
         ],
         "config": {
           "file_naming_scheme": "{stream_name}.yml",
           "overwrite_behavior": "replace_records"
         },
+        "description": "For loading data into the YAML file format.",
         "docs": "https://hub.meltano.com/loaders/target-yaml--meltanolabs",
         "env": {
+          "MELTANO_LOAD_DATESTAMP_FORMAT": "%Y-%m-%d",
           "MELTANO_LOAD_FILE_NAMING_SCHEME": "{stream_name}.yml",
           "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_records",
+          "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.metrics",
+          "MELTANO_LOAD_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "MELTANO_LOAD_TIMESTAMP_TIMEZONE": "UTC",
           "MELTANO_LOAD__DIALECT": "target_yaml",
+          "TARGET_YAML_DATESTAMP_FORMAT": "%Y-%m-%d",
           "TARGET_YAML_FILE_NAMING_SCHEME": "{stream_name}.yml",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_records",
+          "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.metrics",
+          "TARGET_YAML_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "TARGET_YAML_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML__DIALECT": "target_yaml"
         },
         "label": "YAML",
+        "logo_url": "https://hub.meltano.com/assets/logos/loaders/yaml.png",
         "name": "target-yaml",
         "namespace": "target_yaml",
         "pip_url": "git+https://github.com/MeltanoLabs/target-yaml.git",
@@ -1488,55 +1662,87 @@
         "repo": "https://github.com/MeltanoLabs/target-yaml",
         "settings": [
           {
-            "description": "The scheme with which output files will be named. Naming scheme may leverage any of the following substitutions - \\n\\n- `{stream_name}`- `{datestamp}`- `{timestamp}`",
+            "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
+            "kind": "string",
+            "label": "Datestamp Format",
+            "name": "datestamp_format",
+            "value": "%Y-%m-%d"
+          },
+          {
+            "description": "Text string to use for a yaml template file. This text will be used to create a new file if the destination file does not exist.",
+            "kind": "string",
+            "label": "Default Yaml Template",
+            "name": "default_yaml_template"
+          },
+          {
+            "description": "The scheme with which output files will be named. Naming scheme may leverage any of the following substitutions:\n - `{stream_name}`\n - `{datestamp}`\n - `{timestamp}`\n",
+            "kind": "string",
             "label": "File Naming Scheme",
             "name": "file_naming_scheme"
           },
           {
-            "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
-            "label": "Datestamp Format",
-            "name": "datestamp_format"
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
           },
           {
-            "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see - https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
-            "label": "Timestamp Format",
-            "name": "timestamp_format"
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
           },
           {
-            "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to \"UTC\". For a list of possible values, please see - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-            "label": "Timestamp Timezone",
-            "name": "timestamp_timezone"
+            "description": "Determines the overwrite behavior if destination file already exists.\nMust be one of the following string values:\n  - `append_records` (default): append records at the insertion point\n  - `replace_records`: replace all records at the insertion point\n  - `replace_file`: replace entire file using `default_yaml_template`\n",
+            "kind": "string",
+            "label": "Overwrite Behavior",
+            "name": "overwrite_behavior",
+            "value": "replace_records"
           },
           {
-            "description": "Allows inline stream transformations and aliasing. For more information see - https://sdk.meltano.com/en/latest/stream_maps.html",
+            "description": "A jsonpath string determining the insertion point for new records.\nCurrently, this must be the path to a map key which will be populated by a list of records.  For example \"$.metrics\" will populate the file with `metrics - [{<record1>},{<record2>},...]`  For JSONPath syntax help, see - https://jsonpath.com\n",
+            "kind": "string",
+            "label": "Record Insert Jsonpath",
+            "name": "record_insert_jsonpath",
+            "value": "$.metrics"
+          },
+          {
+            "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list.",
+            "kind": "password",
+            "label": "Record Key Property Name",
+            "name": "record_key_property_name"
+          },
+          {
+            "description": "A property in the record which will be used as a sort key.\n\nIf this property is omitted, records will not be sorted.",
+            "kind": "string",
+            "label": "Record Sort Property Name",
+            "name": "record_sort_property_name"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Allows inline stream transformations and aliasing. For more information see: https://sdk.meltano.com/en/latest/stream_maps.html",
             "kind": "object",
             "label": "Stream Maps",
             "name": "stream_maps"
           },
           {
-            "description": "A jsonpath string determining the insertion point for new records. Currently, this must be the path to a map key which will be populated by a list of records. \\n\\nFor example \"$.metrics\" will populate the file with `metrics - [{<record1>},{<record2>},...]` \\n\\nFor JSONPath syntax help, see - https://jsonpath.com",
-            "label": "Record Insert Jsonpath",
-            "name": "record_insert_jsonpath"
+            "description": "A python format string to use when outputting the `{timestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes",
+            "kind": "string",
+            "label": "Timestamp Format",
+            "name": "timestamp_format",
+            "value": "%Y-%m-%d.T%H%M%S"
           },
           {
-            "description": "A property in the record which will be used as the dictionary key.\\n\\nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list.",
-            "label": "Record Key Property Name",
-            "name": "record_key_property_name"
-          },
-          {
-            "description": "A property in the record which will be used as a sort key.\\n\\nIf this property is omitted, records will not be sorted.",
-            "label": "Record Sort Property Name",
-            "name": "record_sort_property_name"
-          },
-          {
-            "description": "Determines the overwrite behavior if destination file already exists. Must be one of the following string values - \\n\\n- `append_records` (default) - append records at the insertion point\\n- `replace_records` - replace all records at the insertion point\\n- `replace_file` - replace entire file using `default_yaml_template`\\n",
-            "label": "Overwrite Behavior",
-            "name": "overwrite_behavior"
-          },
-          {
-            "description": "Text string to use for a yaml template file. This text will be used to create a new file if the destination file does not exist.",
-            "label": "Default Yaml Template",
-            "name": "default_yaml_template"
+            "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to 'UTC'. For a list of possible values, please see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+            "kind": "string",
+            "label": "Timestamp Timezone",
+            "name": "timestamp_timezone",
+            "value": "UTC"
           }
         ],
         "variant": "meltanolabs"
@@ -1551,26 +1757,35 @@
           "record_sort_property_name": "REPO"
         },
         "env": {
+          "MELTANO_LOAD_DATESTAMP_FORMAT": "%Y-%m-%d",
           "MELTANO_LOAD_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
           "MELTANO_LOAD_FILE_NAMING_SCHEME": "variant_metrics.yml",
           "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
           "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.metrics",
           "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "REPO",
           "MELTANO_LOAD_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "MELTANO_LOAD_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "MELTANO_LOAD_TIMESTAMP_TIMEZONE": "UTC",
           "MELTANO_LOAD__DIALECT": "target_yaml_metrics",
+          "TARGET_YAML_DATESTAMP_FORMAT": "%Y-%m-%d",
           "TARGET_YAML_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
           "TARGET_YAML_FILE_NAMING_SCHEME": "variant_metrics.yml",
+          "TARGET_YAML_METRICS_DATESTAMP_FORMAT": "%Y-%m-%d",
           "TARGET_YAML_METRICS_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano run tap-snowflake-metrics target-yaml-metrics`\nmetrics: {}\n",
           "TARGET_YAML_METRICS_FILE_NAMING_SCHEME": "variant_metrics.yml",
           "TARGET_YAML_METRICS_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_METRICS_RECORD_INSERT_JSONPATH": "$.metrics",
           "TARGET_YAML_METRICS_RECORD_KEY_PROPERTY_NAME": "REPO",
           "TARGET_YAML_METRICS_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_METRICS_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "TARGET_YAML_METRICS_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML_METRICS__DIALECT": "target_yaml_metrics",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.metrics",
           "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "REPO",
           "TARGET_YAML_RECORD_SORT_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "TARGET_YAML_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML__DIALECT": "target_yaml_metrics"
         },
         "inherit_from": "target-yaml",
@@ -1585,23 +1800,32 @@
           "record_key_property_name": "METRIC_TYPE"
         },
         "env": {
+          "MELTANO_LOAD_DATESTAMP_FORMAT": "%Y-%m-%d",
           "MELTANO_LOAD_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
           "MELTANO_LOAD_FILE_NAMING_SCHEME": "audit.yml",
           "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
           "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.audit_log",
           "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "MELTANO_LOAD_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "MELTANO_LOAD_TIMESTAMP_TIMEZONE": "UTC",
           "MELTANO_LOAD__DIALECT": "target_yaml_audit",
+          "TARGET_YAML_AUDIT_DATESTAMP_FORMAT": "%Y-%m-%d",
           "TARGET_YAML_AUDIT_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
           "TARGET_YAML_AUDIT_FILE_NAMING_SCHEME": "audit.yml",
           "TARGET_YAML_AUDIT_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_AUDIT_RECORD_INSERT_JSONPATH": "$.audit_log",
           "TARGET_YAML_AUDIT_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML_AUDIT_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "TARGET_YAML_AUDIT_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML_AUDIT__DIALECT": "target_yaml_audit",
+          "TARGET_YAML_DATESTAMP_FORMAT": "%Y-%m-%d",
           "TARGET_YAML_DEFAULT_YAML_TEMPLATE": "# This file is auto-generated by running `meltano elt tap-snowflake-audit target-yaml-audit`\naudit_log: {}\n",
           "TARGET_YAML_FILE_NAMING_SCHEME": "audit.yml",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.audit_log",
           "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
+          "TARGET_YAML_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML__DIALECT": "target_yaml_audit"
         },
         "inherit_from": "target-yaml",
@@ -1619,6 +1843,7 @@
           "user": "CICD",
           "warehouse": "CICD"
         },
+        "description": "Snowflake database loader",
         "dialect": "snowflake",
         "docs": "https://hub.meltano.com/loaders/target-snowflake--transferwise",
         "env": {
@@ -1666,6 +1891,7 @@
           "TARGET_SNOWFLAKE__TARGET_SCHEMA": "_"
         },
         "label": "Snowflake",
+        "logo_url": "https://hub.meltano.com/assets/logos/loaders/snowflake.png",
         "name": "target-snowflake",
         "namespace": "target_snowflake",
         "pip_url": "pipelinewise-target-snowflake",
@@ -1931,12 +2157,14 @@
           "stream-maps",
           "record-flattening"
         ],
-        "docs": "https://hub.meltano.com/loaders/target-apprise--AutoIDM",
+        "description": "Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS, Gotify, etc",
+        "docs": "https://hub.meltano.com/loaders/target-apprise--autoidm",
         "env": {
           "MELTANO_LOAD__DIALECT": "target_apprise",
           "TARGET_APPRISE__DIALECT": "target_apprise"
         },
         "label": "Apprise",
+        "logo_url": "https://hub.meltano.com/assets/logos/loaders/apprise.png",
         "name": "target-apprise",
         "namespace": "target_apprise",
         "pip_url": "target-apprise",
@@ -1955,16 +2183,22 @@
             "uris"
           ]
         ],
-        "variant": "AutoIDM"
+        "variant": "autoidm"
       }
     ],
     "mappers": [
       {
+        "capabilities": [
+          "stream-maps"
+        ],
+        "description": "A map transformer which implements the Stream Maps capability from Meltano's tap and target SDK.",
         "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
         "env": {
+          "MELTANO_MAP_STREAM_MAPS": "{\"gcp_ips.ipv4prefix\": null, \"gcp_ips.ipv6prefix\": null, \"gcp_ips.ipv4\": \"record.get('ipv4prefix', '')\", \"gcp_ips.ipv6\": \"record.get('ipv6prefix', '')\", \"gcp_ips.id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}",
           "MELTANO_MAP_STREAM_MAPS_GCP_IPS_ID": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
           "MELTANO_MAP_STREAM_MAPS_GCP_IPS_IPV4": "record.get('ipv4prefix', '')",
           "MELTANO_MAP_STREAM_MAPS_GCP_IPS_IPV6": "record.get('ipv6prefix', '')",
+          "MELTANO_MAP_TRANSFORMER_STREAM_MAPS": "{\"gcp_ips.ipv4prefix\": null, \"gcp_ips.ipv6prefix\": null, \"gcp_ips.ipv4\": \"record.get('ipv4prefix', '')\", \"gcp_ips.ipv6\": \"record.get('ipv6prefix', '')\", \"gcp_ips.id\": \"md5(record.get('ipv4prefix', record.get('ipv6prefix')))\"}",
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_ID": "md5(record.get('ipv4prefix', record.get('ipv6prefix')))",
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV4": "record.get('ipv4prefix', '')",
           "MELTANO_MAP_TRANSFORMER_STREAM_MAPS_GCP_IPS_IPV6": "record.get('ipv6prefix', '')",
@@ -1976,7 +2210,8 @@
           "MELTANO_MAP__MAPPING_NAME": "coalesce-gcp-ips"
         },
         "executable": "meltano-map-transform",
-        "label": "meltano-map-transformer",
+        "label": "Meltano Map Transformer",
+        "logo_url": "https://hub.meltano.com/assets/logos/mappers/meltano.png",
         "mappings": [
           {
             "config": {
@@ -1998,6 +2233,19 @@
         "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
         "plugin_type": "mappers",
         "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
+        "settings": [
+          {
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          }
+        ],
+        "settings_group_validation": [
+          [
+            "stream_maps"
+          ]
+        ],
         "variant": "meltano"
       }
     ],
@@ -2070,7 +2318,8 @@
         },
         "executable": "airflow_invoker",
         "ext_repo": "https://github.com/meltano/airflow-ext",
-        "label": "Airflow (EDK preview)",
+        "label": "Airflow",
+        "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
         "name": "airflow",
         "namespace": "airflow",
         "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
@@ -2258,6 +2507,7 @@
           "DBT_EXT_SKIP_PRE_INVOKE": "false",
           "DBT_EXT_TYPE": "snowflake",
           "DBT_PROFILES_DIR": "${MELTANO_PROJECT_ROOT}/transform/profiles/snowflake",
+          "DBT_PROJECT_DIR": "${MELTANO_PROJECT_ROOT}/transform",
           "DBT_SNOWFLAKE_ACCOUNT": "epa06486",
           "DBT_SNOWFLAKE_DATABASE": "CICD_PROD",
           "DBT_SNOWFLAKE_DATABASE_PREP": "CICD_PREP",
@@ -2267,11 +2517,13 @@
           "DBT_SNOWFLAKE_ROLE": "CICD",
           "DBT_SNOWFLAKE_SKIP_PRE_INVOKE": "false",
           "DBT_SNOWFLAKE_SOURCE_SCHEMA_PREFIX": "_",
+          "DBT_SNOWFLAKE_TARGET_PATH": "${MELTANO_PROJECT_ROOT}/.meltano/transformers/dbt/target",
           "DBT_SNOWFLAKE_TARGET_SCHEMA_PREFIX": "_",
           "DBT_SNOWFLAKE_TYPE": "snowflake",
           "DBT_SNOWFLAKE_USER": "CICD",
           "DBT_SNOWFLAKE_WAREHOUSE": "CICD",
           "DBT_SNOWFLAKE__EXT_REPO": "https://github.com/meltano/dbt-ext",
+          "DBT_TARGET_PATH": "${MELTANO_PROJECT_ROOT}/.meltano/transformers/dbt/target",
           "MELTANO_UTILIZE_ACCOUNT": "epa06486",
           "MELTANO_UTILIZE_DATABASE": "CICD_PROD",
           "MELTANO_UTILIZE_DATABASE_PREP": "CICD_PREP",
@@ -2281,6 +2533,7 @@
           "MELTANO_UTILIZE_ROLE": "CICD",
           "MELTANO_UTILIZE_SKIP_PRE_INVOKE": "false",
           "MELTANO_UTILIZE_SOURCE_SCHEMA_PREFIX": "_",
+          "MELTANO_UTILIZE_TARGET_PATH": "${MELTANO_PROJECT_ROOT}/.meltano/transformers/dbt/target",
           "MELTANO_UTILIZE_TARGET_SCHEMA_PREFIX": "_",
           "MELTANO_UTILIZE_TYPE": "snowflake",
           "MELTANO_UTILIZE_USER": "CICD",
@@ -2289,14 +2542,56 @@
         },
         "executable": "dbt_invoker",
         "ext_repo": "https://github.com/meltano/dbt-ext",
-        "label": "dbt Snowflake (EDK preview)",
+        "label": "dbt Snowflake",
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
         "name": "dbt-snowflake",
         "namespace": "dbt_snowflake",
-        "pip_url": "dbt-core~=1.3.0 dbt-snowflake~=1.3.0 git+https://github.com/meltano/dbt-ext.git@main",
+        "pip_url": "dbt-core~=1.5.2 dbt-snowflake~=1.5.2 git+https://github.com/meltano/dbt-ext.git@main",
         "plugin_type": "utilities",
         "repo": "https://github.com/dbt-labs/dbt-snowflake",
         "settings": [
+          {
+            "description": "The snowflake account to connect to.",
+            "kind": "string",
+            "label": "Account",
+            "name": "account"
+          },
+          {
+            "description": "The database to create models in.",
+            "kind": "string",
+            "label": "Database",
+            "name": "database"
+          },
+          {
+            "description": "The user password to authenticate with.",
+            "kind": "password",
+            "label": "Password",
+            "name": "password"
+          },
+          {
+            "env": "DBT_PROFILES_DIR",
+            "label": "Profiles Directory",
+            "name": "profiles_dir",
+            "value": "$MELTANO_PROJECT_ROOT/transform/profiles/snowflake"
+          },
+          {
+            "env": "DBT_PROJECT_DIR",
+            "label": "Projects Directory",
+            "name": "project_dir",
+            "value": "$MELTANO_PROJECT_ROOT/transform"
+          },
+          {
+            "description": "The user role to assume.",
+            "kind": "string",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "The schema to build models into by default.",
+            "kind": "string",
+            "label": "Schema",
+            "name": "schema"
+          },
           {
             "description": "Whether to skip pre-invoke hooks which automatically run dbt clean and deps",
             "env": "DBT_EXT_SKIP_PRE_INVOKE",
@@ -2306,27 +2601,17 @@
             "value": false
           },
           {
+            "env": "DBT_TARGET_PATH",
+            "kind": "string",
+            "label": "Target Path",
+            "name": "target_path",
+            "value": "$MELTANO_PROJECT_ROOT/.meltano/transformers/dbt/target"
+          },
+          {
             "env": "DBT_EXT_TYPE",
             "label": "dbt Profile type",
             "name": "type",
             "value": "snowflake"
-          },
-          {
-            "label": "Projects Directory",
-            "name": "project_dir",
-            "value": "$MELTANO_PROJECT_ROOT/transform"
-          },
-          {
-            "env": "DBT_PROFILES_DIR",
-            "label": "Profiles Directory",
-            "name": "profiles_dir",
-            "value": "$MELTANO_PROJECT_ROOT/transform/profiles/snowflake"
-          },
-          {
-            "description": "The snowflake account to connect to.",
-            "kind": "string",
-            "label": "Account",
-            "name": "account"
           },
           {
             "description": "The user to connect as.",
@@ -2335,34 +2620,10 @@
             "name": "user"
           },
           {
-            "description": "The user password to authenticate with.",
-            "kind": "password",
-            "label": "Password",
-            "name": "password"
-          },
-          {
-            "description": "The user role to assume.",
-            "kind": "string",
-            "label": "Role",
-            "name": "role"
-          },
-          {
             "description": "The compute warehouse to use when building models.",
             "kind": "string",
             "label": "Warehouse",
             "name": "warehouse"
-          },
-          {
-            "description": "The database to create models in.",
-            "kind": "string",
-            "label": "Database",
-            "name": "database"
-          },
-          {
-            "description": "The schema to build models into by default.",
-            "kind": "string",
-            "label": "Schema",
-            "name": "schema"
           }
         ],
         "variant": "dbt-labs"
@@ -2413,9 +2674,10 @@
           "SQLFLUFF_WAREHOUSE": "CICD"
         },
         "label": "SQLFluff",
+        "logo_url": "https://hub.meltano.com/assets/logos/utilities/sqlfluff.png",
         "name": "sqlfluff",
         "namespace": "sqlfluff",
-        "pip_url": "sqlfluff[dbt]",
+        "pip_url": "sqlfluff sqlfluff-templater-dbt dbt-core",
         "plugin_type": "utilities",
         "repo": "https://github.com/sqlfluff/sqlfluff",
         "settings": [
@@ -2483,7 +2745,8 @@
             "executable": "gunicorn"
           }
         },
-        "docs": "https://docs.meltano.com/guide/analysis",
+        "description": "A modern, enterprise-ready business intelligence web application.",
+        "docs": "https://hub.meltano.com/utilities/superset--apache",
         "env": {
           "MELTANO_UTILIZE_SECRET_KEY": "thisisnotapropersecretkey",
           "MELTANO_UTILIZE_SQLALCHEMY_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/superset/superset.db",
@@ -2499,9 +2762,10 @@
           "SUPERSET_UI_WORKERS": "4"
         },
         "label": "Superset",
+        "logo_url": "https://hub.meltano.com/assets/logos/utilities/superset.png",
         "name": "superset",
         "namespace": "superset",
-        "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1",
+        "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1 cryptography==3.4.7",
         "plugin_type": "utilities",
         "repo": "https://github.com/apache/superset",
         "settings": [
@@ -2584,9 +2848,10 @@
         },
         "executable": "great_expectations",
         "label": "Great Expectations",
+        "logo_url": "https://hub.meltano.com/assets/logos/utilities/great_expectations.png",
         "name": "great_expectations",
         "namespace": "great_expectations",
-        "pip_url": "great_expectations",
+        "pip_url": "great_expectations==0.15.50",
         "plugin_type": "utilities",
         "repo": "https://github.com/great-expectations/great_expectations",
         "requires": {

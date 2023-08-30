@@ -73,11 +73,11 @@ class Command(Canonical):
         """
         expanded = []
         for arg in shlex.split(self.args):
-            value = expand_env_vars(arg, env)
-            if not value:
-                raise UndefinedEnvVarError(name, arg)
+            if value := expand_env_vars(arg, env):
+                expanded.append(value)
 
-            expanded.append(value)
+            else:
+                raise UndefinedEnvVarError(name, arg)
 
         return expanded
 

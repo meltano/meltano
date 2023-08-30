@@ -6,17 +6,15 @@ from copy import deepcopy
 
 import pytest
 
-from meltano.core import utils
+from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_discovery_service import LockedDefinitionService
 from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginDefinitionNotFoundError,
 )
-from meltano.core.settings_service import FeatureFlags
 
 
 @pytest.fixture()
@@ -128,23 +126,6 @@ class TestProjectPluginsService:
         ):
             project.plugins.get_parent(tap)
 
-    def test_ff_plugins_lock_required(
-        self,
-        project: Project,
-        monkeypatch,
-    ):
-        assert project.plugins._prefer_source == DefinitionSource.ANY
-
-        monkeypatch.setenv(
-            utils.to_env_var(
-                "meltano",
-                FeatureFlags.PLUGIN_LOCKS_REQUIRED.setting_name,
-            ),
-            "1",
-        )
-        project.refresh()
-        assert project.plugins._prefer_source == DefinitionSource.LOCAL
-
     def test_get_parent_no_lockfiles(
         self,
         project: Project,
@@ -152,14 +133,13 @@ class TestProjectPluginsService:
         alternative_tap,
         inherited_tap,
         alternative_target,
-        plugin_discovery_service,
     ):
         # The behavior being tested here assumes that no lockfiles exist.
         shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"
         # Shadows base plugin with correct variant
         parent = project.plugins.get_parent(tap)
-        base = plugin_discovery_service.find_base_plugin(
+        base = project.hub_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
             plugin_name="tap-mock",
             variant="meltano",
@@ -174,7 +154,7 @@ class TestProjectPluginsService:
         # name="tap-mock--singer-io", inherit_from="tap-mock", variant="singer-io"
         # Inherits from base plugin with correct variant
         parent = project.plugins.get_parent(alternative_tap)
-        base = plugin_discovery_service.find_base_plugin(
+        base = project.hub_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
             plugin_name="tap-mock",
             variant="singer-io",
@@ -184,7 +164,7 @@ class TestProjectPluginsService:
 
         # name="target-mock-alternative", inherit_from="target-mock"
         # Inherits from base plugin because no plugin shadowing the base plugin exists
-        base = plugin_discovery_service.find_base_plugin(
+        base = project.hub_service.find_base_plugin(
             plugin_type=PluginType.LOADERS,
             plugin_name="target-mock",
         )

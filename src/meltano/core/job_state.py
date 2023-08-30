@@ -6,13 +6,11 @@ import typing as t
 from datetime import datetime
 from io import TextIOWrapper
 
-from sqlalchemy import Column, types
-from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped, Session
+from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import JSONEncodedDict
+from meltano.core.sqlalchemy import StateType
 from meltano.core.utils import merge
 
 SINGER_STATE_KEY = "singer_state"
@@ -29,12 +27,14 @@ class JobState(SystemModel):  # noqa: WPS214
     """
 
     __tablename__ = "state"
-    state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
+    state_id: Mapped[str] = mapped_column(unique=True, primary_key=True)
 
-    updated_at = Column(types.DATETIME, onupdate=datetime.now)
+    updated_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
+        onupdate=datetime.now,
+    )
 
-    partial_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
-    completed_state: Mapped[t.Any] = Column(MutableDict.as_mutable(JSONEncodedDict))
+    partial_state: Mapped[t.Optional[StateType]]  # noqa: UP007
+    completed_state: Mapped[t.Optional[StateType]]  # noqa: UP007
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
@@ -74,8 +74,7 @@ class JobState(SystemModel):  # noqa: WPS214
 
         # Get the state for the most recent completed job.
         # Do not consider dummy jobs create via add_state.
-        state_job = finder.latest_with_payload(session, flags=Payload.STATE)
-        if state_job:
+        if state_job := finder.latest_with_payload(session, flags=Payload.STATE):
             incomplete_since = state_job.ended_at
             if SINGER_STATE_KEY in state_job.payload:
                 merge(state_job.payload, partial_state)

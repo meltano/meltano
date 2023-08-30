@@ -455,7 +455,7 @@ Optional. Use to hide a setting.
 ```yaml
 settings:
 - name: setting_name
-  sidebar_class_name: hidden
+  hidden: true
 ```
 
 ### `settings[*].kind`
@@ -478,7 +478,7 @@ settings:
 
 :::caution
 
-  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>sidebar_class_name: hidden</code></a>.</p>
+  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden</code></a>.</p>
 :::
 
 ### `settings[*].label`

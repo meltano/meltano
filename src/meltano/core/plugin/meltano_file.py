@@ -13,9 +13,9 @@ from meltano.core.project import Project
 class MeltanoFilePlugin(FilePlugin):
     overwrite = {"meltano.yml"}
 
-    def __init__(self, discovery: bool = False):
+    def __init__(self):
+        """Initialize the MeltanoFilePlugin."""
         super().__init__(None, None)
-        self._discovery = discovery
 
     def file_contents(
         self,
@@ -29,14 +29,11 @@ class MeltanoFilePlugin(FilePlugin):
         Returns:
             A mapping.
         """
-        initialize_file = bundle.root / "initialize.yml"
-        file_contents = {
-            Path(relative_path): content
-            for relative_path, content in yaml.safe_load(initialize_file.open()).items()
-        }
-        if self._discovery:
-            file_contents["discovery.yml"] = (bundle.root / "discovery.yml").read_text()
-        return file_contents
+        with (bundle.root / "initialize.yml").open() as f:
+            return {
+                Path(relative_path): content
+                for relative_path, content in yaml.safe_load(f).items()
+            }
 
     def update_config(self, project):  # noqa: ARG002, D102
         return {}

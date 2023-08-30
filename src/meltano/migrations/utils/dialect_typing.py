@@ -29,10 +29,7 @@ def datetime_for_dialect(dialect_name: str) -> DATETIME2 | sa.DateTime:
     """
     # We need to use the DATETIME2 type for MSSQL, because the
     # default DATETIME type does not go back to the year 1.
-    if dialect_name == "mssql":
-        return DATETIME2
-
-    return sa.DateTime
+    return DATETIME2 if dialect_name == "mssql" else sa.DateTime
 
 
 def max_string_length_for_dialect(dialect_name: str) -> int | None:
@@ -46,7 +43,4 @@ def max_string_length_for_dialect(dialect_name: str) -> int | None:
     Returns:
         The maximum string length or None if there is no limit.
     """
-    if dialect_name == "mysql":
-        return 1024
-
-    return None
+    return 1024 if dialect_name == "mysql" else None

@@ -7,26 +7,31 @@ import shutil
 import boto3
 import mock
 import pytest
+from click.testing import CliRunner
 from moto import mock_s3
 
+import meltano
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
 
 class TestCliUpgrade:
     @pytest.mark.usefixtures("project")
-    def test_upgrade(self, cli_runner):
+    def test_upgrade(self, cli_runner: CliRunner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        result = cli_runner.invoke(cli, ["upgrade"])
-        assert_cli_runner(result)
+        # If an editable install was used, test that it cannot be upgraded automatically
+        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+            result = cli_runner.invoke(cli, ["upgrade"])
+            assert_cli_runner(result)
 
-        assert (
-            "The `meltano` package could not be upgraded automatically" in result.stdout
-        )
-        assert "run `meltano upgrade --skip-package`" in result.stdout
+            assert (
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
+            )
+            assert "run `meltano upgrade --skip-package`" in result.stdout
 
         with mock.patch(
             "meltano.cli.upgrade.UpgradeService._upgrade_package",
@@ -41,29 +46,32 @@ class TestCliUpgrade:
             )
 
     @pytest.mark.usefixtures("project")
-    def test_upgrade_skip_package(self, cli_runner):
+    def test_upgrade_skip_package(self, cli_runner: CliRunner):
         result = cli_runner.invoke(cli, ["upgrade", "--skip-package"])
         assert_cli_runner(result)
 
         assert "Your Meltano project has been upgraded!" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_upgrade_package(self, cli_runner):
+    def test_upgrade_package(self, cli_runner: CliRunner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        result = cli_runner.invoke(cli, ["upgrade", "package"])
-        assert_cli_runner(result)
+        # If an editable install was used, test that it cannot be upgraded automatically
+        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+            result = cli_runner.invoke(cli, ["upgrade", "package"])
+            assert_cli_runner(result)
 
-        assert (
-            "The `meltano` package could not be upgraded automatically" in result.stdout
-        )
-        assert "run `meltano upgrade --skip-package`" not in result.stdout
+            assert (
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
+            )
+            assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files(self, project, cli_runner):
+    def test_upgrade_files(self, project, cli_runner: CliRunner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -110,7 +118,7 @@ class TestCliUpgrade:
         assert "Nothing to update" in output
         assert file_path.read_text() == file_content
 
-        # Don't update file if automatic updating is disabled
+        # Don't update file if automatic updating is
         result = cli_runner.invoke(
             cli,
             [
@@ -129,6 +137,7 @@ class TestCliUpgrade:
 
         file_path.write_text("Overwritten!")
 
+        cli_runner.invoke(cli, ("lock", "airflow"))
         result = cli_runner.invoke(cli, ["upgrade", "files"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
@@ -158,7 +167,7 @@ class TestCliUpgrade:
         assert "Updated orchestrate/dags/meltano.py" in output
 
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files_glob_path(self, project, cli_runner):
+    def test_upgrade_files_glob_path(self, project, cli_runner: CliRunner):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -196,7 +205,7 @@ class TestCliUpgrade:
         assert "Updated orchestrate/dags/meltano.py" in output
 
     @pytest.mark.usefixtures("project")
-    def test_upgrade_database(self, cli_runner):
+    def test_upgrade_database(self, cli_runner: CliRunner):
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
 
