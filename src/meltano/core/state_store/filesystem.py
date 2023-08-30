@@ -302,15 +302,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             Exception: if error not indicating file is not found is thrown
         """
         logger.info(f"Writing state to {self.label}")
-        filepath = self.get_state_path(state.state_id)  # type: ignore
-        with self.acquire_lock(state.state_id):  # type: ignore
+        filepath = self.get_state_path(state.state_id)
+        with self.acquire_lock(state.state_id):
             if state.is_complete():
                 state_to_write = state
             else:
                 try:
                     with self.get_reader(filepath) as current_state_reader:
                         current_state = JobState.from_file(
-                            state.state_id,  # type: ignore
+                            state.state_id,
                             current_state_reader,
                         )
                         state_to_write = current_state.merge_partial(state)
@@ -442,9 +442,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         except NotADirectoryError:
             os.remove(file_or_dir_path)
         except Exception as e:
-            if self.is_file_not_found_error(e):
-                pass
-            else:
+            if not self.is_file_not_found_error(e):
                 raise e
 
     def clear(self, state_id: str):

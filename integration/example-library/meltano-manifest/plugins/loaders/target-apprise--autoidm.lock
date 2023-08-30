@@ -1,0 +1,30 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-apprise",
+  "namespace": "target_apprise",
+  "variant": "autoidm",
+  "label": "Apprise",
+  "docs": "https://hub.meltano.com/loaders/target-apprise--autoidm",
+  "repo": "https://github.com/AutoIDM/target-apprise",
+  "pip_url": "target-apprise",
+  "description": "Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS, Gotify, etc",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/apprise.png",
+  "capabilities": [
+    "about",
+    "stream-maps",
+    "record-flattening"
+  ],
+  "settings_group_validation": [
+    [
+      "uris"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "uris",
+      "kind": "array",
+      "label": "URIs",
+      "description": "Array of apprise URIs"
+    }
+  ]
+}

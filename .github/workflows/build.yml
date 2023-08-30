@@ -46,13 +46,6 @@ jobs:
       run: |
         poetry install
 
-    - name: Setup Node
-      uses: actions/setup-node@v3.8.1
-      with:
-        node-version: '16'
-        cache: 'yarn'
-        cache-dependency-path: src/webapp/yarn.lock
-
     - name: Freeze DB
       run: |
         poetry run scripts/alembic_freeze.py

@@ -10,7 +10,6 @@ import typing as t
 from meltano.cli import (  # noqa: WPS235
     add,
     config,
-    discovery,
     docs,
     dragon,
     elt,
@@ -27,9 +26,7 @@ from meltano.cli import (  # noqa: WPS235
     schema,
     select,
     state,
-    ui,
     upgrade,
-    user,
     validate,
 )
 from meltano.cli import compile as compile_module
@@ -44,7 +41,6 @@ if t.TYPE_CHECKING:
 cli.add_command(add.add)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
-cli.add_command(discovery.discover)
 cli.add_command(docs.docs)
 cli.add_command(dragon.dragon)
 cli.add_command(elt.el)
@@ -60,9 +56,7 @@ cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
 cli.add_command(select.select)
 cli.add_command(state.meltano_state)
-cli.add_command(ui.ui)
 cli.add_command(upgrade.upgrade)
-cli.add_command(user.user)
 cli.add_command(run.run)
 cli.add_command(validate.test)
 cli.add_command(job.job)

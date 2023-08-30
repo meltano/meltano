@@ -103,11 +103,6 @@
         "$ref": "#/$defs/environments"
       }
     },
-    "discovery_url": {
-      "type": "string",
-      "description": "URL to remote manifest of Meltano plugins, used by meltano discover. Set to 'false' to disable.",
-      "default": "https://www.meltano.com/discovery.yml"
-    },
     "include_paths": {
       "type": "array",
       "description": "An array of paths (relative to the project directory) of other Meltano config files to include in the configuration.",
@@ -229,16 +224,6 @@
       "type": "object",
       "description": "A feature flag, which can be used to enable or disable particular Meltano features.",
       "properties": {
-        "enable_uvicorn": {
-          "type": "boolean",
-          "description": "Whether to use Uvicorn rather than Gunicorn as the API server.",
-          "default": false
-        },
-        "enable_api_scheduled_job_list": {
-          "type": "boolean",
-          "description": "Whether the API includes scheduled jobs in listings.",
-          "default": false
-        },
         "strict_env_var_mode": {
           "type": "boolean",
           "description": "Whether references to undefined environment variables cause Meltano to exit with an error.",
@@ -656,11 +641,7 @@
               },
               "dialect": {
                 "type": "string",
-                "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
-              },
-              "target_schema": {
-                "type": "string",
-                "description": "The name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that transformers in the same pipeline can determine the database schema to load data from."
+                "description": "The name of the dialect of the target database, so that transformers in the same pipeline can determine the type of database to connect to."
               }
             }
           }
@@ -844,11 +825,6 @@
           "examples": [
             "https://meltano.com/"
           ]
-        },
-        "protected": {
-          "type": "boolean",
-          "description": "A protected setting cannot be changed from the UI",
-          "default": false
         },
         "env": {
           "type": "string",

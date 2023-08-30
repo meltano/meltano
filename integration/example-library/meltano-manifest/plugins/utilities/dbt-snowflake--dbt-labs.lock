@@ -3,13 +3,55 @@
   "name": "dbt-snowflake",
   "namespace": "dbt_snowflake",
   "variant": "dbt-labs",
-  "label": "dbt Snowflake (EDK preview)",
+  "label": "dbt Snowflake",
   "docs": "https://hub.meltano.com/utilities/dbt-snowflake--dbt-labs",
   "repo": "https://github.com/dbt-labs/dbt-snowflake",
-  "pip_url": "dbt-core~=1.3.0 dbt-snowflake~=1.3.0 git+https://github.com/meltano/dbt-ext.git@main",
+  "pip_url": "dbt-core~=1.5.2 dbt-snowflake~=1.5.2 git+https://github.com/meltano/dbt-ext.git@main",
   "executable": "dbt_invoker",
   "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
   "settings": [
+    {
+      "name": "account",
+      "kind": "string",
+      "label": "Account",
+      "description": "The snowflake account to connect to."
+    },
+    {
+      "name": "database",
+      "kind": "string",
+      "label": "Database",
+      "description": "The database to create models in."
+    },
+    {
+      "name": "password",
+      "kind": "password",
+      "label": "Password",
+      "description": "The user password to authenticate with."
+    },
+    {
+      "name": "profiles_dir",
+      "env": "DBT_PROFILES_DIR",
+      "value": "$MELTANO_PROJECT_ROOT/transform/profiles/snowflake",
+      "label": "Profiles Directory"
+    },
+    {
+      "name": "project_dir",
+      "env": "DBT_PROJECT_DIR",
+      "value": "$MELTANO_PROJECT_ROOT/transform",
+      "label": "Projects Directory"
+    },
+    {
+      "name": "role",
+      "kind": "string",
+      "label": "Role",
+      "description": "The user role to assume."
+    },
+    {
+      "name": "schema",
+      "kind": "string",
+      "label": "Schema",
+      "description": "The schema to build models into by default."
+    },
     {
       "name": "skip_pre_invoke",
       "env": "DBT_EXT_SKIP_PRE_INVOKE",
@@ -19,27 +61,17 @@
       "description": "Whether to skip pre-invoke hooks which automatically run dbt clean and deps"
     },
     {
+      "name": "target_path",
+      "env": "DBT_TARGET_PATH",
+      "kind": "string",
+      "value": "$MELTANO_PROJECT_ROOT/.meltano/transformers/dbt/target",
+      "label": "Target Path"
+    },
+    {
       "name": "type",
       "env": "DBT_EXT_TYPE",
       "value": "snowflake",
       "label": "dbt Profile type"
-    },
-    {
-      "name": "project_dir",
-      "value": "$MELTANO_PROJECT_ROOT/transform",
-      "label": "Projects Directory"
-    },
-    {
-      "name": "profiles_dir",
-      "env": "DBT_PROFILES_DIR",
-      "value": "$MELTANO_PROJECT_ROOT/transform/profiles/snowflake",
-      "label": "Profiles Directory"
-    },
-    {
-      "name": "account",
-      "kind": "string",
-      "label": "Account",
-      "description": "The snowflake account to connect to."
     },
     {
       "name": "user",
@@ -48,34 +80,10 @@
       "description": "The user to connect as."
     },
     {
-      "name": "password",
-      "kind": "password",
-      "label": "Password",
-      "description": "The user password to authenticate with."
-    },
-    {
-      "name": "role",
-      "kind": "string",
-      "label": "Role",
-      "description": "The user role to assume."
-    },
-    {
       "name": "warehouse",
       "kind": "string",
       "label": "Warehouse",
       "description": "The compute warehouse to use when building models."
-    },
-    {
-      "name": "database",
-      "kind": "string",
-      "label": "Database",
-      "description": "The database to create models in."
-    },
-    {
-      "name": "schema",
-      "kind": "string",
-      "label": "Schema",
-      "description": "The schema to build models into by default."
     }
   ],
   "commands": {

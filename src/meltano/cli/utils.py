@@ -95,12 +95,10 @@ def print_added_plugin(
     elif has_variant:
         click.echo(f"Variant:\t{variant_label}")
 
-    repo_url = plugin.repo
-    if repo_url:
+    if repo_url := plugin.repo:
         click.echo(f"Repository:\t{repo_url}")
 
-    docs_url = plugin.docs
-    if docs_url:
+    if docs_url := plugin.docs:
         click.echo(f"Documentation:\t{docs_url}")
 
 

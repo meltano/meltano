@@ -1,919 +1,919 @@
 # Good till the end of 2022 :)
 schedules:
 - name: fixed_schedule_2022-08-01
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-01 00:00:00
 - name: fixed_schedule_2022-08-02
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-02 00:00:00
 - name: fixed_schedule_2022-08-03
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-03 00:00:00
 - name: fixed_schedule_2022-08-04
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-04 00:00:00
 - name: fixed_schedule_2022-08-05
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-05 00:00:00
 - name: fixed_schedule_2022-08-06
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-06 00:00:00
 - name: fixed_schedule_2022-08-07
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-07 00:00:00
 - name: fixed_schedule_2022-08-08
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-08 00:00:00
 - name: fixed_schedule_2022-08-09
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-09 00:00:00
 - name: fixed_schedule_2022-08-10
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-10 00:00:00
 - name: fixed_schedule_2022-08-11
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-11 00:00:00
 - name: fixed_schedule_2022-08-12
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-12 00:00:00
 - name: fixed_schedule_2022-08-13
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-13 00:00:00
 - name: fixed_schedule_2022-08-14
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-14 00:00:00
 - name: fixed_schedule_2022-08-15
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-15 00:00:00
 - name: fixed_schedule_2022-08-16
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-16 00:00:00
 - name: fixed_schedule_2022-08-17
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-17 00:00:00
 - name: fixed_schedule_2022-08-18
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-18 00:00:00
 - name: fixed_schedule_2022-08-19
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-19 00:00:00
 - name: fixed_schedule_2022-08-20
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-20 00:00:00
 - name: fixed_schedule_2022-08-21
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-21 00:00:00
 - name: fixed_schedule_2022-08-22
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-22 00:00:00
 - name: fixed_schedule_2022-08-23
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-23 00:00:00
 - name: fixed_schedule_2022-08-24
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-24 00:00:00
 - name: fixed_schedule_2022-08-25
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-25 00:00:00
 - name: fixed_schedule_2022-08-26
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-26 00:00:00
 - name: fixed_schedule_2022-08-27
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-27 00:00:00
 - name: fixed_schedule_2022-08-28
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-28 00:00:00
 - name: fixed_schedule_2022-08-29
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-29 00:00:00
 - name: fixed_schedule_2022-08-30
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-30 00:00:00
 - name: fixed_schedule_2022-08-31
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-08-31 00:00:00
 - name: fixed_schedule_2022-09-01
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-01 00:00:00
 - name: fixed_schedule_2022-09-02
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-02 00:00:00
 - name: fixed_schedule_2022-09-03
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-03 00:00:00
 - name: fixed_schedule_2022-09-04
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-04 00:00:00
 - name: fixed_schedule_2022-09-05
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-05 00:00:00
 - name: fixed_schedule_2022-09-06
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-06 00:00:00
 - name: fixed_schedule_2022-09-07
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-07 00:00:00
 - name: fixed_schedule_2022-09-08
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-08 00:00:00
 - name: fixed_schedule_2022-09-09
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-09 00:00:00
 - name: fixed_schedule_2022-09-10
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-10 00:00:00
 - name: fixed_schedule_2022-09-11
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-11 00:00:00
 - name: fixed_schedule_2022-09-12
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-12 00:00:00
 - name: fixed_schedule_2022-09-13
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-13 00:00:00
 - name: fixed_schedule_2022-09-14
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-14 00:00:00
 - name: fixed_schedule_2022-09-15
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-15 00:00:00
 - name: fixed_schedule_2022-09-16
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-16 00:00:00
 - name: fixed_schedule_2022-09-17
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-17 00:00:00
 - name: fixed_schedule_2022-09-18
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-18 00:00:00
 - name: fixed_schedule_2022-09-19
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-19 00:00:00
 - name: fixed_schedule_2022-09-20
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-20 00:00:00
 - name: fixed_schedule_2022-09-21
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-21 00:00:00
 - name: fixed_schedule_2022-09-22
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-22 00:00:00
 - name: fixed_schedule_2022-09-23
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-23 00:00:00
 - name: fixed_schedule_2022-09-24
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-24 00:00:00
 - name: fixed_schedule_2022-09-25
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-25 00:00:00
 - name: fixed_schedule_2022-09-26
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-26 00:00:00
 - name: fixed_schedule_2022-09-27
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-27 00:00:00
 - name: fixed_schedule_2022-09-28
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-28 00:00:00
 - name: fixed_schedule_2022-09-29
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-29 00:00:00
 - name: fixed_schedule_2022-09-30
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-09-30 00:00:00
 - name: fixed_schedule_2022-10-01
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-01 00:00:00
 - name: fixed_schedule_2022-10-02
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-02 00:00:00
 - name: fixed_schedule_2022-10-03
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-03 00:00:00
 - name: fixed_schedule_2022-10-04
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-04 00:00:00
 - name: fixed_schedule_2022-10-05
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-05 00:00:00
 - name: fixed_schedule_2022-10-06
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-06 00:00:00
 - name: fixed_schedule_2022-10-07
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-07 00:00:00
 - name: fixed_schedule_2022-10-08
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-08 00:00:00
 - name: fixed_schedule_2022-10-09
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-09 00:00:00
 - name: fixed_schedule_2022-10-10
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-10 00:00:00
 - name: fixed_schedule_2022-10-11
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-11 00:00:00
 - name: fixed_schedule_2022-10-12
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-12 00:00:00
 - name: fixed_schedule_2022-10-13
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-13 00:00:00
 - name: fixed_schedule_2022-10-14
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-14 00:00:00
 - name: fixed_schedule_2022-10-15
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-15 00:00:00
 - name: fixed_schedule_2022-10-16
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-16 00:00:00
 - name: fixed_schedule_2022-10-17
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-17 00:00:00
 - name: fixed_schedule_2022-10-18
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-18 00:00:00
 - name: fixed_schedule_2022-10-19
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-19 00:00:00
 - name: fixed_schedule_2022-10-20
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-20 00:00:00
 - name: fixed_schedule_2022-10-21
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-21 00:00:00
 - name: fixed_schedule_2022-10-22
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-22 00:00:00
 - name: fixed_schedule_2022-10-23
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-23 00:00:00
 - name: fixed_schedule_2022-10-24
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-24 00:00:00
 - name: fixed_schedule_2022-10-25
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-25 00:00:00
 - name: fixed_schedule_2022-10-26
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-26 00:00:00
 - name: fixed_schedule_2022-10-27
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-27 00:00:00
 - name: fixed_schedule_2022-10-28
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-28 00:00:00
 - name: fixed_schedule_2022-10-29
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-29 00:00:00
 - name: fixed_schedule_2022-10-30
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-30 00:00:00
 - name: fixed_schedule_2022-10-31
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-10-31 00:00:00
 - name: fixed_schedule_2022-11-01
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-01 00:00:00
 - name: fixed_schedule_2022-11-02
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-02 00:00:00
 - name: fixed_schedule_2022-11-03
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-03 00:00:00
 - name: fixed_schedule_2022-11-04
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-04 00:00:00
 - name: fixed_schedule_2022-11-05
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-05 00:00:00
 - name: fixed_schedule_2022-11-06
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-06 00:00:00
 - name: fixed_schedule_2022-11-07
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-07 00:00:00
 - name: fixed_schedule_2022-11-08
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-08 00:00:00
 - name: fixed_schedule_2022-11-09
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-09 00:00:00
 - name: fixed_schedule_2022-11-10
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-10 00:00:00
 - name: fixed_schedule_2022-11-11
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-11 00:00:00
 - name: fixed_schedule_2022-11-12
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-12 00:00:00
 - name: fixed_schedule_2022-11-13
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-13 00:00:00
 - name: fixed_schedule_2022-11-14
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-14 00:00:00
 - name: fixed_schedule_2022-11-15
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-15 00:00:00
 - name: fixed_schedule_2022-11-16
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-16 00:00:00
 - name: fixed_schedule_2022-11-17
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-17 00:00:00
 - name: fixed_schedule_2022-11-18
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-18 00:00:00
 - name: fixed_schedule_2022-11-19
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-19 00:00:00
 - name: fixed_schedule_2022-11-20
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-20 00:00:00
 - name: fixed_schedule_2022-11-21
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-21 00:00:00
 - name: fixed_schedule_2022-11-22
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-22 00:00:00
 - name: fixed_schedule_2022-11-23
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-23 00:00:00
 - name: fixed_schedule_2022-11-24
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-24 00:00:00
 - name: fixed_schedule_2022-11-25
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-25 00:00:00
 - name: fixed_schedule_2022-11-26
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-26 00:00:00
 - name: fixed_schedule_2022-11-27
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-27 00:00:00
 - name: fixed_schedule_2022-11-28
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-28 00:00:00
 - name: fixed_schedule_2022-11-29
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-29 00:00:00
 - name: fixed_schedule_2022-11-30
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-11-30 00:00:00
 - name: fixed_schedule_2022-12-01
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-01 00:00:00
 - name: fixed_schedule_2022-12-02
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-02 00:00:00
 - name: fixed_schedule_2022-12-03
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-03 00:00:00
 - name: fixed_schedule_2022-12-04
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-04 00:00:00
 - name: fixed_schedule_2022-12-05
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-05 00:00:00
 - name: fixed_schedule_2022-12-06
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-06 00:00:00
 - name: fixed_schedule_2022-12-07
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-07 00:00:00
 - name: fixed_schedule_2022-12-08
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-08 00:00:00
 - name: fixed_schedule_2022-12-09
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-09 00:00:00
 - name: fixed_schedule_2022-12-10
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-10 00:00:00
 - name: fixed_schedule_2022-12-11
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-11 00:00:00
 - name: fixed_schedule_2022-12-12
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-12 00:00:00
 - name: fixed_schedule_2022-12-13
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-13 00:00:00
 - name: fixed_schedule_2022-12-14
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-14 00:00:00
 - name: fixed_schedule_2022-12-15
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-15 00:00:00
 - name: fixed_schedule_2022-12-16
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-16 00:00:00
 - name: fixed_schedule_2022-12-17
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-17 00:00:00
 - name: fixed_schedule_2022-12-18
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-18 00:00:00
 - name: fixed_schedule_2022-12-19
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-19 00:00:00
 - name: fixed_schedule_2022-12-20
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-20 00:00:00
 - name: fixed_schedule_2022-12-21
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-21 00:00:00
 - name: fixed_schedule_2022-12-22
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-22 00:00:00
 - name: fixed_schedule_2022-12-23
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-23 00:00:00
 - name: fixed_schedule_2022-12-24
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-24 00:00:00
 - name: fixed_schedule_2022-12-25
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-25 00:00:00
 - name: fixed_schedule_2022-12-26
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-26 00:00:00
 - name: fixed_schedule_2022-12-27
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-27 00:00:00
 - name: fixed_schedule_2022-12-28
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-28 00:00:00
 - name: fixed_schedule_2022-12-29
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-29 00:00:00
 - name: fixed_schedule_2022-12-30
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip
   start_date: 2022-12-30 00:00:00
 - name: fixed_schedule_2022-12-31
-  interval: '@once'
+  interval: '@daily'
   extractor: tap-with-large-config
   loader: target-with-large-config
   transform: skip

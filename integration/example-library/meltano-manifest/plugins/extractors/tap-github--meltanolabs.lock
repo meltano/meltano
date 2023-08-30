@@ -7,13 +7,15 @@
   "docs": "https://hub.meltano.com/extractors/tap-github--meltanolabs",
   "repo": "https://github.com/MeltanoLabs/tap-github",
   "pip_url": "git+https://github.com/MeltanoLabs/tap-github.git",
+  "description": "Code hosting platform",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
   "capabilities": [
-    "catalog",
-    "state",
-    "discover",
     "about",
-    "stream-maps",
-    "schema-flattening"
+    "catalog",
+    "discover",
+    "schema-flattening",
+    "state",
+    "stream-maps"
   ],
   "settings_group_validation": [
     [
@@ -34,13 +36,10 @@
   ],
   "settings": [
     {
-      "name": "user_agent",
-      "label": "User Agent"
-    },
-    {
-      "name": "metrics_log_level",
-      "label": "Metrics Log Level",
-      "description": "The log level of the API response metrics."
+      "name": "additional_auth_tokens",
+      "kind": "array",
+      "label": "Additional Auth Tokens",
+      "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits."
     },
     {
       "name": "auth_token",
@@ -49,22 +48,22 @@
       "description": "GitHub token to authenticate with."
     },
     {
-      "name": "additional_auth_tokens",
-      "kind": "array",
-      "label": "Additional Auth Tokens",
-      "description": "List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits."
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
     },
     {
-      "name": "rate_limit_buffer",
+      "name": "flattening_max_depth",
       "kind": "integer",
-      "label": "Rate Limit Buffer",
-      "description": "Add a buffer to avoid consuming all query points for the token at hand. Defaults to 1000."
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
     },
     {
-      "name": "searches",
-      "kind": "array",
-      "label": "Searches",
-      "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)"
+      "name": "metrics_log_level",
+      "kind": "string",
+      "label": "Metrics Log Level",
+      "description": "The log level of the API response metrics."
     },
     {
       "name": "organizations",
@@ -73,16 +72,48 @@
       "description": "An array of strings containing the github organizations to be included"
     },
     {
+      "name": "rate_limit_buffer",
+      "kind": "integer",
+      "label": "Rate Limit Buffer",
+      "description": "Add a buffer to avoid consuming all query points for the token at hand. Defaults to 1000."
+    },
+    {
       "name": "repositories",
       "kind": "array",
       "label": "Repositories",
       "description": "An array of strings containing the github repos to be included"
     },
     {
-      "name": "user_usernames",
+      "name": "searches",
       "kind": "array",
-      "label": "User Usernames",
-      "description": "A list of GithHub usernames."
+      "label": "Searches",
+      "description": "An array of search descriptor objects with the following properties. \"name\" - a human readable name for the search query. \"query\" -  a github search string (generally the same as would come after ?q= in the URL)"
+    },
+    {
+      "name": "skip_parent_streams",
+      "kind": "boolean",
+      "label": "Skip Parent Streams",
+      "description": "Set to true to skip API calls for the parent streams (such as repositories) if it is not selected but children are"
+    },
+    {
+      "name": "start_date",
+      "kind": "date_iso8601",
+      "label": "Start Date"
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config"
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps"
+    },
+    {
+      "name": "user_agent",
+      "kind": "string",
+      "label": "User Agent"
     },
     {
       "name": "user_ids",
@@ -91,25 +122,14 @@
       "description": "A list of GitHub user ids."
     },
     {
-      "name": "start_date",
-      "kind": "date_iso8601",
-      "label": "Start Date"
-    },
-    {
-      "name": "stream_maps",
-      "kind": "object",
-      "label": "Stream Maps"
-    },
-    {
-      "name": "stream_map_config",
-      "kind": "object",
-      "label": "Stream Map Config"
-    },
-    {
-      "name": "skip_parent_streams",
-      "kind": "boolean",
-      "label": "Skip Parent Streams",
-      "description": "Set to true to skip API calls for the parent streams (such as repositories) if it is not selected but children are."
+      "name": "user_usernames",
+      "kind": "array",
+      "label": "User Usernames",
+      "description": "A list of GithHub usernames."
     }
+  ],
+  "select": [
+    "*.*",
+    "!traffic_*.*"
   ]
 }

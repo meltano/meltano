@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.0.0 (2023-XX-XX)
+
+### BREAKING CHANGES
+
+- [#8041](https://github.com/meltano/meltano/issues/8041) Remove `target_schema` loader extra
+- [#8007](https://github.com/meltano/meltano/issues/8007) Always require plugin lock files
+- [#7499](https://github.com/meltano/meltano/issues/7499) Remove API and web UI
+- [#7656](https://github.com/meltano/meltano/issues/7656) Remove the `meltano discover` command
+
+### ✨ New
+
+- [#8020](https://github.com/meltano/meltano/issues/8020) Add [`python` setting](https://docs.meltano.com/reference/settings#python)
+- [#7997](https://github.com/meltano/meltano/issues/7997) Add [`el` command](https://docs.meltano.com/reference/command-line-interface#el) as an alias of `elt` and deprecate both `elt` and the `--transform` option
+- [#7992](https://github.com/meltano/meltano/issues/7992) Add support for mappers in the invoke command
+- [#7989](https://github.com/meltano/meltano/issues/7989) Add `meltano hub ping` command
+- [#7984](https://github.com/meltano/meltano/issues/7984) Add `meltano config --unsafe` flag -- _**Thanks @ReubenFrankel!**_
+- [#7981](https://github.com/meltano/meltano/issues/7981) Support `psycopg[binary]` under a new `postgres` extra
+- [#7963](https://github.com/meltano/meltano/issues/7963) Bump SQLAlchemy to 2.0
+- [#7932](https://github.com/meltano/meltano/issues/7932) Add "did you mean" CLI command name suggestions
+- [#7846](https://github.com/meltano/meltano/issues/7846) Add aliases for the `@once` schedule interval
+
+### 🐛 Fixes
+
+- [#8042](https://github.com/meltano/meltano/issues/8042) Ensure migration lock file is closed after read
+- [#8043](https://github.com/meltano/meltano/issues/8043) Ensure elt/run log file is closed
+- [#8031](https://github.com/meltano/meltano/issues/8031) Redact DB password from logs
+- [#8015](https://github.com/meltano/meltano/issues/8015) Display a better error message when database URI is null
+- [#7982](https://github.com/meltano/meltano/issues/7982) Use hyphens consistently for CLI options
+- [#7947](https://github.com/meltano/meltano/issues/7947) Support [PEP 440 direct references](https://peps.python.org/pep-0440/#direct-references) in `pip_url`
+
+### ⚙️ Under the Hood
+
+- [#7964](https://github.com/meltano/meltano/issues/7964) Replace deprecated `locale.getdefaultlocale` with `locale.getlocale` -- _**Thanks @AmirAflak!**_
+- [#7960](https://github.com/meltano/meltano/issues/7960) Compatibility with SQLAlchemy 2
+
+### 📚 Documentation Improvements
+
+- [#8011](https://github.com/meltano/meltano/issues/8011) Add JSON Schema information -- _**Thanks @anden-akkio!**_
+- [#7991](https://github.com/meltano/meltano/issues/7991) Fix cloud install git URL
+- [#7975](https://github.com/meltano/meltano/issues/7975) Link `mssql` additional component to system database explanation
+- [#7979](https://github.com/meltano/meltano/issues/7979) Correct `repo_ext` to `ext_repo` for plugin definition syntax -- _**Thanks @ReubenFrankel!**_
+- [#7953](https://github.com/meltano/meltano/issues/7953) Update tagline in readme
+- [#7951](https://github.com/meltano/meltano/issues/7951) Update changelog
+- [#7950](https://github.com/meltano/meltano/issues/7950) Fix logging example -- _**Thanks @aminebeh!**_
+- [#7948](https://github.com/meltano/meltano/issues/7948) Update docusaurus.config.js -- _**Thanks @gridig!**_
+- [#7945](https://github.com/meltano/meltano/issues/7945) Douwe fixes
+- [#7944](https://github.com/meltano/meltano/issues/7944) Quick doc fixes
+- [#7936](https://github.com/meltano/meltano/issues/7936) Migrate Meltano docs to Docusaurus
+- [#7902](https://github.com/meltano/meltano/issues/7902) Remove ELT messaging, move things around
+- [#7931](https://github.com/meltano/meltano/issues/7931) Cloud docs ssh key validate tip
+- [#7930](https://github.com/meltano/meltano/issues/7930) Meltano cloud to meltano-cloud
+- [#7926](https://github.com/meltano/meltano/issues/7926) Fix state backend env vars in examples
+
 ## v2.20.0 (2023-07-19)
 
 ### ✨ New

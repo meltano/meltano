@@ -27,11 +27,6 @@ from pathlib import Path
 import flatten_dict
 from requests.auth import HTTPBasicAuth
 
-if sys.version_info >= (3, 8):
-    from typing import Protocol, runtime_checkable
-else:
-    from typing_extensions import Protocol, runtime_checkable
-
 from meltano.core.error import MeltanoError
 
 logger = logging.getLogger(__name__)
@@ -64,18 +59,18 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def click_run_async(func):
-    """Run decorated Click commands with `asyncio.run`.
+def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
+    """Run the given async function using `asyncio.run`.
 
     Args:
         func: The function to run asynchronously.
 
     Returns:
-        A function which runs the given function asynchronously.
+        The given function wrapped so as to run within `asyncio.run`.
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):  # noqa: WPS430
+    def wrapper(*args, **kwargs):
         return asyncio.run(func(*args, **kwargs))
 
     return wrapper
@@ -369,7 +364,7 @@ def iso8601_datetime(d):
     raise ValueError(f"{d} is not a valid UTC date.")
 
 
-class _GetItemProtocol(Protocol):
+class _GetItemProtocol(t.Protocol):
     def __getitem__(self, key: str) -> str:
         ...  # noqa: WPS428
 
@@ -743,8 +738,8 @@ class MergeStrategy(t.NamedTuple):
     ]
 
 
-@runtime_checkable
-class Extendable(Protocol):
+@t.runtime_checkable
+class Extendable(t.Protocol):
     """A type protocol for types which have an `extend` method."""
 
     def extend(self, x: t.Any) -> None:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 import yaml
 
@@ -9,13 +11,16 @@ from meltano.core.plugin_install_service import (
     get_pip_install_args,
 )
 
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
 
 class TestPluginInstallService:
     @pytest.fixture(
         params=({}, {"parallelism": -1}, {"parallelism": 2}),
         ids=("default", "-p=-1", "-p=2"),
     )
-    def subject(self, project, request):
+    def subject(self, project: Project, request):
         with open(project.meltanofile, "w") as file:
             file.write(
                 yaml.dump(
@@ -24,6 +29,7 @@ class TestPluginInstallService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
+                                    "namespace": "tap_gitlab",
                                     "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
                                 },
                                 {
@@ -34,6 +40,7 @@ class TestPluginInstallService:
                             "loaders": [
                                 {
                                     "name": "target-csv",
+                                    "namespace": "target_csv",
                                     "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
                                 },
                             ],
@@ -92,6 +99,7 @@ class TestPluginInstallService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
+                                    "namespace": "tap_gitlab",
                                     "pip_url": "'tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git' python-json-logger",  # noqa: E501
                                 },
                             ],

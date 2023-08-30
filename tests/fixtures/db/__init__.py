@@ -6,7 +6,6 @@ import warnings
 from contextlib import closing
 
 import pytest
-from _pytest.monkeypatch import MonkeyPatch  # noqa: WPS436
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
@@ -19,7 +18,7 @@ from meltano.core.project import Project
 def engine_uri_env(engine_uri: str) -> t.Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
-    monkeypatch = MonkeyPatch()
+    monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
     try:
         yield
@@ -45,15 +44,15 @@ def vacuum_db(engine_sessionmaker):
         logging.debug("Cleaning system database...")
         engine, _ = engine_sessionmaker
         close_all_sessions()
-        metadata = MetaData(bind=engine)
-        metadata.reflect()
-        metadata.drop_all()
+        metadata = MetaData()
+        metadata.reflect(bind=engine)
+        metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope="class")
 def engine_sessionmaker(engine_uri):
-    engine = create_engine(engine_uri, poolclass=NullPool)
-    return (engine, sessionmaker(bind=engine))
+    engine = create_engine(engine_uri, poolclass=NullPool, future=True)
+    return (engine, sessionmaker(bind=engine, future=True))
 
 
 @pytest.fixture()

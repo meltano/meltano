@@ -1,0 +1,39 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-sqlite",
+  "namespace": "target_sqlite",
+  "variant": "meltanolabs",
+  "label": "SQLite",
+  "docs": "https://hub.meltano.com/loaders/target-sqlite--meltanolabs",
+  "repo": "https://github.com/MeltanoLabs/target-sqlite",
+  "pip_url": "git+https://github.com/MeltanoLabs/target-sqlite.git",
+  "description": "SQLite database loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/sqlite.png",
+  "settings_group_validation": [
+    [
+      "batch_size"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "database",
+      "value": "warehouse",
+      "label": "Database Name",
+      "description": "Name of the SQLite database file to be used or created, relative to the project root.\n\nThe `.db` extension is optional and will be added automatically when omitted.\n"
+    },
+    {
+      "name": "batch_size",
+      "kind": "integer",
+      "value": 50,
+      "label": "Batch Size",
+      "description": "How many records are sent to SQLite at a time."
+    },
+    {
+      "name": "timestamp_column",
+      "value": "__loaded_at",
+      "label": "Timestamp Column",
+      "description": "Name of the column used for recording the timestamp when data are loaded to SQLite."
+    }
+  ],
+  "dialect": "sqlite"
+}
