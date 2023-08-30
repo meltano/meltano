@@ -10,11 +10,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#8041](https://github.com/meltano/meltano/issues/8041) Remove `target_schema` loader extra
 - [#8007](https://github.com/meltano/meltano/issues/8007) Always require plugin lock files
 - [#7499](https://github.com/meltano/meltano/issues/7499) Remove API and web UI
+- [#7656](https://github.com/meltano/meltano/issues/7656) Remove the `meltano discover` command
 
 ### ✨ New
 
-- [#8020](https://github.com/meltano/meltano/issues/8020) Add `python` setting
-- [#7997](https://github.com/meltano/meltano/issues/7997) Add `el` command as an alias of `elt` and depecrate both `elt` and the `--transform` option
+- [#8020](https://github.com/meltano/meltano/issues/8020) Add [`python` setting](https://docs.meltano.com/reference/settings#python)
+- [#7997](https://github.com/meltano/meltano/issues/7997) Add [`el` command](https://docs.meltano.com/reference/command-line-interface#el) as an alias of `elt` and deprecate both `elt` and the `--transform` option
 - [#7992](https://github.com/meltano/meltano/issues/7992) Add support for mappers in the invoke command
 - [#7989](https://github.com/meltano/meltano/issues/7989) Add `meltano hub ping` command
 - [#7984](https://github.com/meltano/meltano/issues/7984) Add `meltano config --unsafe` flag -- _**Thanks @ReubenFrankel!**_
@@ -30,7 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#8031](https://github.com/meltano/meltano/issues/8031) Redact DB password from logs
 - [#8015](https://github.com/meltano/meltano/issues/8015) Display a better error message when database URI is null
 - [#7982](https://github.com/meltano/meltano/issues/7982) Use hyphens consistently for CLI options
-- [#7947](https://github.com/meltano/meltano/issues/7947) Support PEP 440 direct references in `pip_url`
+- [#7947](https://github.com/meltano/meltano/issues/7947) Support [PEP 440 direct references](https://peps.python.org/pep-0440/#direct-references) in `pip_url`
 
 ### ⚙️ Under the Hood
 
@@ -50,7 +51,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#7945](https://github.com/meltano/meltano/issues/7945) Douwe fixes
 - [#7944](https://github.com/meltano/meltano/issues/7944) Quick doc fixes
 - [#7936](https://github.com/meltano/meltano/issues/7936) Migrate Meltano docs to Docusaurus
-- [#7902](https://github.com/meltano/meltano/issues/7902) Rm ELT messaging, move things around
+- [#7902](https://github.com/meltano/meltano/issues/7902) Remove ELT messaging, move things around
 - [#7931](https://github.com/meltano/meltano/issues/7931) Cloud docs ssh key validate tip
 - [#7930](https://github.com/meltano/meltano/issues/7930) Meltano cloud to meltano-cloud
 - [#7926](https://github.com/meltano/meltano/issues/7926) Fix state backend env vars in examples
