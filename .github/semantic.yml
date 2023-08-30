@@ -27,7 +27,6 @@ types:
 # e.g. for a PR title/commit message of "feat(awesome-feature): add some stuff",
 #      the scope would be "awesome-feature"
 scopes:
-  - ui
   - core
   - cli
   - cloud

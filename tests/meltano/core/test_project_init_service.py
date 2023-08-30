@@ -34,17 +34,14 @@ def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
     if create_project_dir:
         project_dir.mkdir()
 
-    ProjectInitService(project_dir.relative_to(Path.cwd())).init(
-        activate=False,
-        add_discovery=False,
-    )
+    ProjectInitService(project_dir.relative_to(Path.cwd())).init(activate=False)
 
     shutil.rmtree(project_dir)
 
     if create_project_dir:
         project_dir.mkdir()
 
-    ProjectInitService(project_dir.absolute()).init(activate=False, add_discovery=False)
+    ProjectInitService(project_dir.absolute()).init(activate=False)
 
 
 def test_project_init_non_empty_directory(tmp_path: Path, pushd):
@@ -54,7 +51,7 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
 
     project_dir = projects_dir.joinpath("test_project")
     project_dir.joinpath("test").mkdir(parents=True)
-    ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+    ProjectInitService(project_dir).init(activate=False)
 
 
 def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
@@ -73,13 +70,9 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
             "Use `--force` to overwrite it."
         ),
     ):
-        ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+        ProjectInitService(project_dir).init(activate=False)
 
-    ProjectInitService(project_dir).init(
-        activate=False,
-        add_discovery=False,
-        force=True,
-    )
+    ProjectInitService(project_dir).init(activate=False, force=True)
 
 
 def test_project_init_no_write_permission(tmp_path: Path, pushd):
@@ -100,7 +93,7 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
         ProjectInitServiceError,
         match="Permission denied to create 'test_project'",
     ):
-        ProjectInitService(project_dir).init(activate=False, add_discovery=False)
+        ProjectInitService(project_dir).init(activate=False)
 
 
 def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
@@ -122,4 +115,4 @@ def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
         ProjectInitServiceError,
         match="Could not create directory 'test_project'.",
     ):
-        project_init_service.init(activate=False, add_discovery=False)
+        project_init_service.init(activate=False)

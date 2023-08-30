@@ -3,11 +3,12 @@
   "name": "airflow",
   "namespace": "airflow",
   "variant": "apache",
-  "label": "Airflow (EDK preview)",
+  "label": "Airflow",
   "docs": "https://hub.meltano.com/utilities/airflow--apache",
   "repo": "https://github.com/apache/airflow",
   "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
   "executable": "airflow_invoker",
+  "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
   "settings": [
     {
       "name": "database.sql_alchemy_conn",
@@ -82,6 +83,10 @@
     }
   ],
   "commands": {
+    "create-admin": {
+      "args": "users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.org",
+      "description": "Create an Airflow user with admin privileges."
+    },
     "describe": {
       "args": "describe",
       "description": "Describe the Airflow Extension",
@@ -91,10 +96,6 @@
       "args": "initialize",
       "description": "Initialize the Airflow Extension which will seed the database, create the default airflow.cfg, and deploy the Meltano DAG orchestrator.",
       "executable": "airflow_extension"
-    },
-    "create-admin": {
-      "args": "users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.org",
-      "description": "Create an Airflow user with admin privileges."
     },
     "ui": {
       "args": "webserver",

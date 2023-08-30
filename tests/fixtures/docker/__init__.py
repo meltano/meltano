@@ -8,6 +8,13 @@ import pytest
 
 from .snowplow import SnowplowMicro, snowplow, snowplow_optional, snowplow_session
 
+__all__ = [
+    "SnowplowMicro",
+    "snowplow",
+    "snowplow_optional",
+    "snowplow_session",
+]
+
 
 # Originally defined by `pytest-docker`. Overridden to provide a custom location.
 @pytest.fixture(scope="session")

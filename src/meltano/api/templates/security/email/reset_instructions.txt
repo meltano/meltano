@@ -1,3 +1,0 @@
-{{ _('Click the link below to reset your password:') }}
-
-{{ reset_link }}

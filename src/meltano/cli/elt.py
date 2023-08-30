@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import platform
 import typing as t
 from contextlib import asynccontextmanager, nullcontext, suppress
+from datetime import datetime, timezone
 
 import click
 from structlog import stdlib as structlog_stdlib
@@ -24,7 +24,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     import structlog
@@ -112,7 +112,7 @@ class ELOptions:
 @ELOptions.force
 @click.pass_context
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def el(  # WPS408
     project: Project,
     ctx: click.Context,
@@ -175,7 +175,7 @@ async def el(  # WPS408
 @ELOptions.force
 @click.pass_context
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def elt(  # WPS408
     project: Project,
     ctx: click.Context,
@@ -257,8 +257,8 @@ async def _run_el_command(
     job = Job(
         job_name=state_id
         or (
-            f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
-            f"{extractor}--{loader}"
+            f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
+            f"--{extractor}--{loader}"
         ),
     )
     _, Session = project_engine(project)  # noqa: N806
@@ -292,7 +292,7 @@ async def _run_el_command(
 
 
 def _elt_context_builder(
-    project,
+    project: Project,
     job,
     session,
     extractor,
@@ -307,7 +307,7 @@ def _elt_context_builder(
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
-        transform_name = _find_transform_for_extractor(extractor, project.plugins)
+        transform_name = _find_transform_for_extractor(project, extractor)
 
     return (
         ELTContextBuilder(project)
@@ -346,14 +346,12 @@ async def dump_file(context_builder, dumpable):
 async def _run_job(tracker, project, job, session, context_builder, force=False):
     fail_stale_jobs(session, job.job_name)
 
-    if not force:
-        existing = JobFinder(job.job_name).latest_running(session)
-        if existing:
-            raise CliError(
-                f"Another '{job.job_name}' pipeline is already running which "
-                f"started at {existing.started_at}. To ignore this check use "
-                "the '--force' option.",
-            )
+    if not force and (existing := JobFinder(job.job_name).latest_running(session)):
+        raise CliError(
+            f"Another '{job.job_name}' pipeline is already running which "
+            f"started at {existing.started_at}. To ignore this check use "
+            "the '--force' option.",
+        )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
@@ -522,22 +520,32 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     log.info("Transformation complete!")
 
 
-def _find_transform_for_extractor(extractor: str, plugins_service):
-    discovery_service = plugins_service.discovery_service
+def _find_extractor(project: Project, extractor_name: str):
     try:
-        extractor_plugin_def = discovery_service.find_definition(
+        return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
-            extractor,
+            extractor_name,
+        )
+    except PluginNotFoundError:
+        return project.hub_service.find_definition(
+            PluginType.EXTRACTORS,
+            extractor_name,
         )
 
+
+def _find_transform_for_extractor(
+    project: Project,
+    extractor_name: str,
+):
+    try:
         # Check if there is a default transform for this extractor
-        transform_plugin_def = discovery_service.find_definition_by_namespace(
+        transform_plugin_def = project.plugins.find_plugin_by_namespace(
             PluginType.TRANSFORMS,
-            extractor_plugin_def.namespace,
+            _find_extractor(project, extractor_name).namespace,
         )
 
         # Check if the transform has been added to the project
-        transform_plugin = plugins_service.get_plugin(transform_plugin_def)
+        transform_plugin = project.plugins.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
     except PluginNotFoundError:

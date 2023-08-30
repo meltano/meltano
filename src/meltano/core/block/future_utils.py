@@ -28,11 +28,9 @@ def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
     """
     if exception_future in done:
         futures_done, _ = exception_future.result()
-        futures_failed = [
+        if futures_failed := [
             future for future in futures_done if future.exception() is not None
-        ]
-
-        if futures_failed:
+        ]:
             return futures_failed.pop()
 
 

@@ -9,36 +9,21 @@
 - @edgarrmondragon @WillDaSilva
 
 # CI
-
 .github/actions/ @WillDaSilva @meltano/engineering
 .github/workflows/ @WillDaSilva @meltano/engineering
 
-# Discovery (End-of-Life)
-
-/src/meltano/core/bundle/discovery.yml @meltano/engineering
-
-# Web App and API owners
-
-/src/webapp/ @cjohnhanson
-/src/meltano/api/ @cjohnhanson
-
 # Docs (General)
-
 /docs/ @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
 /README.md @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
-
 /CONTRIBUTING.md @sbalnojan @tayloramurphy @meltano/engineering
 
 # Integration tests
-
 /docs/example-library/ @meltano/product @meltano/engineering
 
 # Release Ops (see `/.bumpversion.cfg` for list of bumped files)
-
 /CHANGELOG.md @meltano/engineering
 /docs/package.json @meltano/engineering
 /pyproject.toml @meltano/engineering
 /src/meltano/__init__.py @meltano/engineering
-/src/webapp/package.json @meltano/engineering

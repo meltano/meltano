@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+import typing as t
 from urllib.parse import urlparse
 
 from sqlalchemy import create_engine
@@ -70,8 +71,7 @@ def project_engine(
     Raises:
         NullConnectionStringError: The `database_uri` setting has a null value.
     """
-    existing_engine = _engines.get(project)
-    if existing_engine:
+    if existing_engine := _engines.get(project):
         return existing_engine
 
     database_uri = project.settings.get("database_uri")
@@ -94,7 +94,7 @@ def project_engine(
     if database_uri is None:
         raise NullConnectionStringError
 
-    engine = create_engine(database_uri, poolclass=NullPool)
+    engine = create_engine(database_uri, poolclass=NullPool, future=True)
 
     # Connect to the database to ensure it is available.
     connect(
@@ -106,7 +106,7 @@ def project_engine(
     check_database_compatibility(engine)
     init_hook(engine)
 
-    engine_session = (engine, sessionmaker(bind=engine))
+    engine_session = (engine, sessionmaker(bind=engine, future=True))
 
     if default:
         # register the default engine
@@ -152,8 +152,8 @@ def connect(
             time.sleep(retry_timeout)
 
 
-init_hooks = {
-    "sqlite": lambda x: x.execute("PRAGMA journal_mode=WAL"),
+init_hooks: dict[str, t.Callable[[Connection], None]] = {
+    "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 
 
@@ -170,15 +170,12 @@ def init_hook(engine: Engine) -> None:
     Raises:
         Exception: The init hook raised an exception.
     """
-    try:
-        hook = init_hooks[engine.dialect.name]
-    except KeyError:
-        return
-
-    try:
-        hook(engine)
-    except Exception as ex:
-        raise Exception(f"Failed to initialize database: {ex!s}") from ex
+    if hook := init_hooks.get(engine.dialect.name):
+        with engine.connect() as conn:
+            try:
+                hook(conn)
+            except Exception as ex:
+                raise Exception(f"Failed to initialize database: {ex!s}") from ex
 
 
 def ensure_schema_exists(

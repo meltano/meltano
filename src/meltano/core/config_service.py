@@ -4,20 +4,15 @@ from __future__ import annotations
 
 import logging
 import os
-import sys
 import typing as t
 from contextlib import contextmanager
+from functools import cached_property
 
 import yaml
 
 from meltano.core import bundle
 from meltano.core.meltano_file import MeltanoFile
 from meltano.core.setting_definition import SettingDefinition
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project

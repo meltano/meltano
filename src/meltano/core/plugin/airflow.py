@@ -11,10 +11,9 @@ from packaging.version import Version
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
+from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
-
-from . import BasePlugin, PluginType
 
 
 class AirflowInvoker(PluginInvoker):
