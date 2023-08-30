@@ -46,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.33", optional = true}
+boto3 = {version = "^1.28.37", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -82,7 +82,7 @@ structlog = "^23.1.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.5.0"
 tzlocal = "^5.0.1"
-virtualenv = "^20.24.3"
+virtualenv = "^20.24.4"
 yaspin = "^2.3.0"
 
 [tool.poetry.extras]
