@@ -55,7 +55,7 @@ croniter = "^1.4.1"
 fasteners = "^0.18"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
-importlib-resources = "^5.12.0"
+importlib-resources = "^6.0.1"
 jinja2 = "^3.1.2"
 jsonschema = "^4.17"
 packaging = "^23.0"
