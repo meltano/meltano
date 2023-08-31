@@ -52,8 +52,8 @@ def main():  # noqa: WPS213
                     ),
                 )
 
-    # ghcr.io: publish `latest` for ALL version
-    # docker.io: only publish `latest` for non-pre-releases
+    # ghcr.io: publish `latest` for ALL versions
+    # docker.io: only publish `latest` for final releases
     if not version.is_prerelease or args.registry == "ghcr.io":
         tags.append(f"latest-python{args.python_version}")
 
