@@ -104,6 +104,7 @@ jobs:
         # Nox uses pip, so we cache with pip
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
+        check-latest: true
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
