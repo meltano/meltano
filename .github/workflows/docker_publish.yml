@@ -90,7 +90,6 @@ jobs:
         fi
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
-      if: ${{ env.IMAGE_TAGS != '' }}}
       uses: ./.github/actions/docker-build-scan-push
       with:
         push: ${{ env.dry_run == 'false' }}
