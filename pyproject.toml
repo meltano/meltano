@@ -46,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.37", optional = true}
+boto3 = {version = "^1.28.38", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -55,7 +55,7 @@ croniter = "^1.4.1"
 fasteners = "^0.18"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
-importlib-resources = "^5.12.0"
+importlib-resources = "^6.0.1"
 jinja2 = "^3.1.2"
 jsonschema = "^4.17"
 packaging = "^23.0"
@@ -67,7 +67,7 @@ pyjwt = "^2.6.0"
 pymssql = {version = "^2.2.8", optional = true}
 python = ">=3.8,<3.12"
 python-dateutil = "^2.8.2"
-python-dotenv = "^0.21.1"
+python-dotenv = "^1.0.0"
 python-slugify = "^8.0.1"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
@@ -96,7 +96,7 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.3.0"
-boto3-stubs = {extras = ["essential"], version = "1.26.61"}
+boto3-stubs = {extras = ["essential"], version = "1.28.38"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.2.7"}
