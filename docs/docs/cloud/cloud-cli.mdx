@@ -456,3 +456,43 @@ meltano cloud schedule describe --deployment staging --schedule schedule_4 --num
 ```
 
 If a schedule is disabled, it will never have any upcoming scheduled runs.
+
+## `state`
+
+The `state` command provides a subset of functionality from the [Meltano Core state command](/reference/command-line-interface#state) to manage [job state](/guide/integration#incremental-replication-state) for Cloud jobs.
+
+The `list` subcommand prints State IDs for which state is being stored in Meltano Cloud.
+
+```sh
+meltano-cloud state list
+
+dev:tap-github-to-target-postgres
+prod:tap-github-to-target-postgres
+dev:tap-hubspot-to-target-snowflake
+```
+
+The `get` subcommand prints Singer state for a provided State ID.
+
+```sh
+meltano-cloud state get --state-id dev:tap-github-to-target-postgres
+
+{"completed": {"singer_state": "bookmarks": [{"stream-1": "bookmark-1"}, {"stream-2": "bookmark-2"}]}}
+```
+
+The `set` subcommand creates or replaces Singer state for a provided State ID with the contents of a provided `.json` file.
+
+```sh
+meltano-cloud state set --state-id dev:tap-github-to-target-postgres --file-path local_state.json
+
+Successfully set state for dev:tap-github-to-target-postgres
+```
+
+The `delete` subcommand clears Singer state for the provided State ID.
+
+```sh
+meltano-cloud state delete --state-id dev:tap-github-to-target-postgres
+
+Successfully deleted state for dev:tap-github-to-target-postgres
+```
+
+Note that State IDs are of the form `{Meltano environment}:{extractor name}-to-{loader name}`.
