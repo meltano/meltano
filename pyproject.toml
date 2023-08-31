@@ -67,7 +67,7 @@ pyjwt = "^2.6.0"
 pymssql = {version = "^2.2.8", optional = true}
 python = ">=3.8,<3.12"
 python-dateutil = "^2.8.2"
-python-dotenv = "^0.21.1"
+python-dotenv = "^1.0.0"
 python-slugify = "^8.0.1"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
