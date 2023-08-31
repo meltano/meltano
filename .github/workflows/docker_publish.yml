@@ -25,19 +25,13 @@ on:
 jobs:
   build_meltano_image:
     runs-on: ubuntu-latest
+    env:
+      DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
 
     strategy:
       fail-fast: false
       matrix:
-        include:
-        - python-version: "3.8"
-          is-default-python: false
-        - python-version: "3.9"
-          is-default-python: true # will be used in 'latest' images
-        - python-version: "3.10"
-          is-default-python: false
-        - python-version: "3.11"
-          is-default-python: false
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
     - name: Set the workflow inputs
@@ -62,28 +56,20 @@ jobs:
         poetry version --short
         echo "release-version=$(poetry version --short)" >> $GITHUB_OUTPUT
 
+    - name: Generate tags
+      id: generate-tags
+      run: >
+        python scripts/generate_docker_tags.py
+        --git-sha ${{ github.sha }}
+        -v ${{ steps.get-meltano-version.outputs.release-version }}
+        -p ${{ matrix.python-version }}
+        -d ${{ env.DEFAULT_PYTHON }}
+        -r ${{ env.registry }}
+        > tags
+
     - name: Assemble image tags
       id: assemble-tags
       run: |
-        MELTANO_VERSION="${{ steps.get-meltano-version.outputs.release-version }}"
-        MELTANO_VERSION_ARRAY=(${MELTANO_VERSION//./ })
-        MELTANO_VERSION_MAJOR="${MELTANO_VERSION_ARRAY[0]}"
-        MELTANO_VERSION_MAJOR_MINOR="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}"
-        MELTANO_VERSION_MAJOR_MINOR_PATCH="${MELTANO_VERSION_ARRAY[0]}.${MELTANO_VERSION_ARRAY[1]}.${MELTANO_VERSION_ARRAY[2]}"
-
-        # To save space, only publish the `latest` tag for each images to the GitHub registry
-        if [[ "${{ env.registry }}" != "ghcr.io" ]]; then
-          echo "v${MELTANO_VERSION_MAJOR}-python${{ matrix.python-version }}" >> tags
-          echo "v${MELTANO_VERSION_MAJOR_MINOR}-python${{ matrix.python-version }}" >> tags
-          echo "v${MELTANO_VERSION_MAJOR_MINOR_PATCH}-python${{ matrix.python-version }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "SHA-${{ github.sha }}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR_MINOR}" >> tags
-          [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "v${MELTANO_VERSION_MAJOR_MINOR_PATCH}" >> tags
-        fi
-        echo "latest-python${{ matrix.python-version }}" >> tags
-        [[ "${{ matrix.is-default-python }}" == "true" ]] && echo "latest" >> tags
-
         echo "If this is not a dry run, the image will be published with the following tags:"
         cat tags
 
