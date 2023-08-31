@@ -31,7 +31,8 @@ def main():  # noqa: WPS213
     version = Version(args.package_version)
     tags = []
 
-    # To save space, only publish the `latest` tag for each images to the GitHub registry  # noqa: E501
+    # To save space, only publish the `latest` tag for each
+    # images to the GitHub registry
     if args.registry != "ghcr.io":
         tags.append(f"v{version}-python{args.python_version}")
 
