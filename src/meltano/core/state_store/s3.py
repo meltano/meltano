@@ -1,12 +1,12 @@
 """StateStoreManager for S3 cloud storage backend."""
 from __future__ import annotations
 
-import re
+from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cached_property
 
 from meltano.core.state_store.filesystem import (
-    BaseFilesystemStateStoreManager,
+    CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
 )
 
@@ -41,7 +41,7 @@ def requires_boto3():
     yield
 
 
-class S3StateStoreManager(BaseFilesystemStateStoreManager):
+class S3StateStoreManager(CloudStateStoreManager):
     """State backend for S3."""
 
     label: str = "AWS S3"
@@ -117,41 +117,6 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
             session = boto3.Session()
             return session.client("s3")
 
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
-
-    def get_state_ids(self, pattern: str | None = None):
-        """Get list of state_ids stored in the backend.
-
-        Args:
-            pattern: glob-style pattern to filter state_ids by
-
-        Returns:
-            List of state_ids
-        """
-        if pattern:
-            pattern_re = re.compile(pattern.replace("*", ".*"))
-        state_ids = set()
-        for state_obj in self.client.list_objects_v2(
-            Bucket=self.bucket,
-            Prefix=self.prefix,
-        ).get("Contents", []):
-            (state_id, filename) = state_obj["Key"].split("/")[-2:]
-            if filename == "state.json":
-                if not pattern:
-                    state_ids.add(
-                        state_id.replace(self.prefix, "").replace("/state.json", ""),
-                    )
-                elif pattern_re.match(state_id):
-                    state_ids.add(state_id)
-        return list(state_ids)
-
     def delete(self, file_path: str):
         """Delete the file/blob at the given path.
 
@@ -161,4 +126,28 @@ class S3StateStoreManager(BaseFilesystemStateStoreManager):
         self.client.delete_objects(
             Bucket=self.bucket,
             Delete={"Objects": [{"Key": file_path}]},
+        )
+
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The path to each file in the backend.
+        """
+        for state_obj in self.client.list_objects_v2(  # noqa: WPS526
+            Bucket=self.bucket,
+        ).get("Contents", []):
+            yield state_obj["Key"]
+
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one path to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        self.client.copy_object(
+            Bucket=self.bucket,
+            CopySource={"Bucket": self.bucket, "Key": src},
+            Key=dst,
         )

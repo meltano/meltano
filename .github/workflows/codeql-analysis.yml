@@ -8,7 +8,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ "main", "cloud" ]
+    branches: [ "main" ]
     paths:
       - .github/workflows/codeql-analysis.yml
       - '**.py'  # Any Python file
@@ -39,7 +39,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

@@ -407,7 +407,7 @@ class Manifest:  # noqa: WPS214
             del manifest["environments"]
 
         # The include paths have already been resolved, and so are removed to
-        # avoid ambiguity. If this information is of interest, it cloud be
+        # avoid ambiguity. If this information is of interest, it could be
         # re-added into an annotation.
         with suppress(KeyError):
             del manifest["include_paths"]

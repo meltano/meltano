@@ -19,14 +19,7 @@ repos:
         language: python
         pass_filenames: false
         additional_dependencies:
-          - "poetry==1.5.1"
-      - id: check-subproject-deps
-        name: ensure subproject deps are included in the root project deps
-        entry: python scripts/check_subproject_deps.py
-        language: python
-        files: ^src/.+?/pyproject\.toml$
-        additional_dependencies:
-          - "tomli==2.0.1"
+          - "poetry==1.6.1"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
@@ -45,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.24.1
+    rev: 0.26.3
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -67,7 +60,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.47.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.48.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -81,7 +74,7 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.284
+    rev: v0.0.286
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
