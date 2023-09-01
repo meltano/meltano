@@ -22,16 +22,12 @@ class IndexedPlugin:
         Returns:
             A list of variant labels.
         """
-        result = []
         variants = deepcopy(self.variants)
         default_variant = variants.pop(self.default_variant)
-        result.append(f"{default_variant.name} (default)")
-
-        for variant in variants.values():
-            # Add here any other variant metadata like maintenance status, etc.
-            result.append(variant.name)
-
-        return result
+        return [
+            f"{default_variant.name} (default)",
+            *(variant.name for variant in variants.values()),
+        ]
 
 
 @dataclass

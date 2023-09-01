@@ -18,7 +18,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -71,7 +71,7 @@ logger = structlog.getLogger(__name__)
 )
 @pass_project(migrate=True)
 @click.pass_context
-@click_run_async
+@run_async
 async def run(
     ctx: click.Context,
     project: Project,

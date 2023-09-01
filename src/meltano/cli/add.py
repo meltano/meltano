@@ -19,7 +19,6 @@ from meltano.cli.utils import (
     install_plugins,
 )
 from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin_discovery_service import REQUEST_TIMEOUT_SECONDS
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
@@ -38,7 +37,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     try:
         url = urlparse(value)
         if url.scheme and url.netloc:
-            response = requests.get(value, timeout=REQUEST_TIMEOUT_SECONDS)
+            response = requests.get(value, timeout=10)
             response.raise_for_status()
             content = response.text
         else:
@@ -83,6 +82,14 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     help="Reference a plugin defintion to add from.",
 )
 @click.option(
+    "--python",
+    help=(
+        "The Python version to use for the plugin. Only applies to base plugins which "
+        "have Python virtual environments, rather than inherited plugins which use the "
+        "virtual environment of their base plugin, or plugins that run in a container."
+    ),
+)
+@click.option(
     "--custom",
     is_flag=True,
     help=(
@@ -106,6 +113,7 @@ def add(  # noqa: WPS238
     variant: str | None = None,
     as_name: str | None = None,
     plugin_yaml: dict | None = None,
+    python: str | None = None,
     **flags,
 ):
     """
@@ -152,6 +160,7 @@ def add(  # noqa: WPS238
                 add_plugin(
                     plugin_type,
                     plugin,
+                    python=python,
                     inherit_from=inherit_from,
                     variant=variant,
                     custom=flags["custom"],

@@ -66,13 +66,12 @@ class CliContext(SelfDescribingJson):
         Returns:
             A CLI context.
         """
-        options = {}
-        for key, val in ctx.params.items():
-            if isinstance(val, (bool, int, float)) or val is None:
-                options[key] = val
-            else:
-                options[key] = hash_sha256(repr(val))
-
+        options = {
+            key: val
+            if isinstance(val, (bool, int, float)) or val is None
+            else hash_sha256(repr(val))
+            for key, val in ctx.params.items()
+        }
         return cls(
             command=ctx.command.name,
             parent_command_hint=ctx.parent.command.name if ctx.parent else None,

@@ -76,6 +76,17 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         ...
 
+    def uri_with_path(self, path: str) -> str:
+        """Build uri with the given path included.
+
+        Args:
+            path: the path to join to the uri
+
+        Returns:
+            Full URI with path included
+        """
+        return self.join_path(remove_suffix(self.uri, (self.state_dir)), path)
+
     @contextmanager
     def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
         """Get reader for given path.
@@ -88,13 +99,13 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         if self.client:
             with open(
-                self.join_path(remove_suffix(self.uri, (self.state_dir)), path),
+                self.uri_with_path(path),
                 transport_params={"client": self.client},
             ) as reader:
                 yield reader
         else:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
             ) as reader:
                 yield reader
 
@@ -110,14 +121,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         try:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
                 "w+",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:
                 yield writer
         except NotImplementedError:
             with open(
-                self.join_path(remove_suffix(self.uri, self.state_dir), path),
+                self.uri_with_path(path),
                 "w",
                 transport_params={"client": self.client} if self.client else {},
             ) as writer:
@@ -291,15 +302,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             Exception: if error not indicating file is not found is thrown
         """
         logger.info(f"Writing state to {self.label}")
-        filepath = self.get_state_path(state.state_id)  # type: ignore
-        with self.acquire_lock(state.state_id):  # type: ignore
+        filepath = self.get_state_path(state.state_id)
+        with self.acquire_lock(state.state_id):
             if state.is_complete():
                 state_to_write = state
             else:
                 try:
                     with self.get_reader(filepath) as current_state_reader:
                         current_state = JobState.from_file(
-                            state.state_id,  # type: ignore
+                            state.state_id,
                             current_state_reader,
                         )
                         state_to_write = current_state.merge_partial(state)
@@ -431,9 +442,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         except NotADirectoryError:
             os.remove(file_or_dir_path)
         except Exception as e:
-            if self.is_file_not_found_error(e):
-                pass
-            else:
+            if not self.is_file_not_found_error(e):
                 raise e
 
     def clear(self, state_id: str):
@@ -503,3 +512,76 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             if (not pattern) or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids
+
+
+class CloudStateStoreManager(BaseFilesystemStateStoreManager):
+    """Base class for cloud storage state store managers."""
+
+    def __init__(self, prefix: str | None = None, **kwargs):
+        """Initialize the CloudStateStoreManager.
+
+        Args:
+            prefix: the prefix to use for state storage
+            kwargs: additional kwargs to pass to parent __init__.
+        """
+        super().__init__(**kwargs)
+        self.prefix = prefix or self.parsed.path
+
+    @property
+    def state_dir(self) -> str:
+        """Get the prefix that state should be stored at.
+
+        Returns:
+            The relevant prefix
+        """
+        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
+
+    def uri_with_path(self, path: str) -> str:
+        """Build uri with the given path included.
+
+        Args:
+            path: the path to join to the uri
+
+        Returns:
+            Full URI with path included
+        """
+        return self.join_path(remove_suffix(self.uri, self.prefix), path)
+
+    @abstractmethod
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The next file in the backend.
+        """
+        ...
+
+    @abstractmethod
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one location to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        ...
+
+    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
+        """Get list of state_ids stored in the backend.
+
+        Args:
+            pattern: glob-style pattern to filter state_ids by
+
+        Returns:
+            List of state_ids
+        """
+        if pattern:
+            pattern_re = re.compile(pattern.replace("*", ".*"))
+        state_ids = set()
+        for filepath in self.list_all_files():
+            (state_id, filename) = filepath.split("/")[-2:]
+            if filename == "state.json" and (
+                (not pattern) or pattern_re.match(state_id)
+            ):
+                state_ids.add(state_id)
+        return list(state_ids)

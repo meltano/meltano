@@ -1,0 +1,28 @@
+{
+  "plugin_type": "utilities",
+  "name": "great_expectations",
+  "namespace": "great_expectations",
+  "variant": "great-expectations",
+  "label": "Great Expectations",
+  "docs": "https://hub.meltano.com/utilities/great_expectations--great-expectations",
+  "repo": "https://github.com/great-expectations/great_expectations",
+  "pip_url": "great_expectations==0.15.50",
+  "executable": "great_expectations",
+  "logo_url": "https://hub.meltano.com/assets/logos/utilities/great_expectations.png",
+  "settings": [
+    {
+      "name": "ge_home",
+      "env": "GE_HOME",
+      "value": "$MELTANO_PROJECT_ROOT/utilities/great_expectations",
+      "label": "Great Expectations Home Directory"
+    }
+  ],
+  "requires": {
+    "files": [
+      {
+        "name": "files-great-expectations",
+        "variant": "meltano"
+      }
+    ]
+  }
+}

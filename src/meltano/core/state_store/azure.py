@@ -1,21 +1,16 @@
 """StateStoreManager for Azure Blob storage backend."""
 from __future__ import annotations
 
-import re
-import sys
+from collections.abc import Iterator
 from contextlib import contextmanager
+from functools import cached_property
 
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
-
-from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 try:
     from azure.storage.blob import BlobServiceClient  # type: ignore
 except ImportError:
-    BlobServiceClient = None  # type: ignore
+    BlobServiceClient = None
 
 
 class MissingAzureError(Exception):
@@ -43,7 +38,7 @@ def requires_azure():
     yield
 
 
-class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
+class AZStorageStateStoreManager(CloudStateStoreManager):
     """State backend for Azure Blob Storage."""
 
     label: str = "Azure Blob Storage"
@@ -95,37 +90,7 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         with requires_azure():
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
-            return BlobServiceClient()  # type: ignore
-
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
-
-    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
-        """Get list of state_ids stored in the backend.
-
-        Args:
-            pattern: glob-style pattern to filter state_ids by
-
-        Returns:
-            List of state_ids
-        """
-        if pattern:
-            pattern_re = re.compile(pattern.replace("*", ".*"))
-        state_ids = set()
-        container_client = self.client.get_container_client(self.container_name)
-        for blob in container_client.list_blobs(
-            name_starts_with=self.prefix.lstrip("/"),
-        ):
-            (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
-                state_ids.add(state_id)
-        return list(state_ids)
+            return BlobServiceClient()
 
     def delete(self, file_path: str):
         """Delete the file/blob at the given path.
@@ -145,3 +110,27 @@ class AZStorageStateStoreManager(BaseFilesystemStateStoreManager):
         except Exception as e:
             if not self.is_file_not_found_error(e):
                 raise e
+
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The next file in the backend.
+        """
+        container_client = self.client.get_container_client(self.container_name)
+        for blob in container_client.list_blobs(  # noqa: WPS526
+            name_starts_with=self.prefix.lstrip("/"),
+        ):
+            yield blob.name
+
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one location to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        container_client = self.client.get_container_client(self.container_name)
+        src_blob_client = container_client.get_blob_client(src)
+        dst_blob_client = container_client.get_blob_client(dst)
+        dst_blob_client.start_copy_from_url(src_blob_client.url)

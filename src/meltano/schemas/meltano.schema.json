@@ -30,6 +30,15 @@
       "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
       "default": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/meltano.db"
     },
+    "python": {
+      "type": "string",
+      "description": "The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment). This can be overridden on a per-plugin basis by setting the `python` property for the plugin.",
+      "examples": [
+        "/usr/bin/python3.10",
+        "python",
+        "python3.11"
+      ]
+    },
     "state_backend": {
       "type": "object",
       "description": "Configuration for state backend.",
@@ -93,11 +102,6 @@
       "items": {
         "$ref": "#/$defs/environments"
       }
-    },
-    "discovery_url": {
-      "type": "string",
-      "description": "URL to remote manifest of Meltano plugins, used by meltano discover. Set to 'false' to disable.",
-      "default": "https://www.meltano.com/discovery.yml"
     },
     "include_paths": {
       "type": "array",
@@ -220,16 +224,6 @@
       "type": "object",
       "description": "A feature flag, which can be used to enable or disable particular Meltano features.",
       "properties": {
-        "enable_uvicorn": {
-          "type": "boolean",
-          "description": "Whether to use Uvicorn rather than Gunicorn as the API server.",
-          "default": false
-        },
-        "enable_api_scheduled_job_list": {
-          "type": "boolean",
-          "description": "Whether the API includes scheduled jobs in listings.",
-          "default": false
-        },
         "strict_env_var_mode": {
           "type": "boolean",
           "description": "Whether references to undefined environment variables cause Meltano to exit with an error.",
@@ -382,6 +376,15 @@
           "logo_url": {
             "type": "string",
             "description": "An optional logo URL for this plugin"
+          },
+          "python": {
+            "type": "string",
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ]
           },
           "executable": {
             "type": "string",
@@ -638,11 +641,7 @@
               },
               "dialect": {
                 "type": "string",
-                "description": "The name of the dialect of the target database, so that transformers in the same pipeline and Meltano UI's Analysis feature can determine the type of database to connect to."
-              },
-              "target_schema": {
-                "type": "string",
-                "description": "The name of the database schema the loader has been configured to load data into (assuming the destination supports schemas), so that transformers in the same pipeline can determine the database schema to load data from."
+                "description": "The name of the dialect of the target database, so that transformers in the same pipeline can determine the type of database to connect to."
               }
             }
           }
@@ -826,11 +825,6 @@
           "examples": [
             "https://meltano.com/"
           ]
-        },
-        "protected": {
-          "type": "boolean",
-          "description": "A protected setting cannot be changed from the UI",
-          "default": false
         },
         "env": {
           "type": "string",

@@ -70,7 +70,7 @@ class ProjectAddService:
             default_variant=Variant.DEFAULT_NAME,
         )
 
-        with self.project.plugins.use_preferred_source(~DefinitionSource.DISCOVERY):
+        with self.project.plugins.use_preferred_source(DefinitionSource.ANY):
             self.project.plugins.ensure_parent(plugin)
 
             # If we are inheriting from a base plugin definition,

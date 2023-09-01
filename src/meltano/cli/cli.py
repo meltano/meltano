@@ -10,7 +10,6 @@ from pathlib import Path
 
 import click
 
-import meltano
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
@@ -47,6 +46,11 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     cls=NoWindowsGlobbingGroup,
     invoke_without_command=True,
     no_args_is_help=True,
+    # For backwards compatibility, accept CLI options that use underscores
+    # instead of hyphens.
+    # https://github.com/pallets/click/issues/1123#issuecomment-589989721
+    # NOTE: This CLI option normalization applies to all subcommands.
+    context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
 @click.option("--log-level", type=click.Choice(LEVELS.keys()))
 @click.option(
@@ -67,7 +71,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
-@click.version_option(version=meltano.__version__, prog_name="meltano")
+@click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(  # noqa: C901,WPS231
     ctx: click.Context,

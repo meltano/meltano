@@ -1,0 +1,265 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-snowflake",
+  "namespace": "target_snowflake",
+  "variant": "transferwise",
+  "label": "Snowflake",
+  "docs": "https://hub.meltano.com/loaders/target-snowflake--transferwise",
+  "repo": "https://github.com/transferwise/pipelinewise-target-snowflake",
+  "pip_url": "pipelinewise-target-snowflake",
+  "description": "Snowflake database loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/snowflake.png",
+  "settings_group_validation": [
+    [
+      "account",
+      "dbname",
+      "user",
+      "password",
+      "warehouse",
+      "file_format",
+      "default_target_schema"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "account",
+      "label": "Account",
+      "description": "Snowflake account name (i.e. `rtXXXXX.eu-central-1`)",
+      "placeholder": "E.g. rtXXXXX.eu-central-1"
+    },
+    {
+      "name": "dbname",
+      "aliases": [
+        "database"
+      ],
+      "label": "Database Name",
+      "description": "Snowflake Database name"
+    },
+    {
+      "name": "user",
+      "aliases": [
+        "username"
+      ],
+      "label": "User",
+      "description": "Snowflake User"
+    },
+    {
+      "name": "password",
+      "kind": "password",
+      "label": "Password",
+      "description": "Snowflake Password"
+    },
+    {
+      "name": "warehouse",
+      "label": "Warehouse",
+      "description": "Snowflake virtual warehouse name"
+    },
+    {
+      "name": "file_format",
+      "label": "File Format",
+      "description": "The Snowflake file format object name which needs to be manually created as part of the [requirements](#requirements) section of the docs. Has to be the fully qualified name including the schema. Refer to the [Snowflake docs](https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements) for more details."
+    },
+    {
+      "name": "role",
+      "label": "Role",
+      "description": "Snowflake role to use. If not defined then the user's default role will be used."
+    },
+    {
+      "name": "aws_access_key_id",
+      "kind": "password",
+      "label": "AWS Access Key ID",
+      "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used"
+    },
+    {
+      "name": "aws_secret_access_key",
+      "kind": "password",
+      "label": "AWS Secret Access Key",
+      "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used"
+    },
+    {
+      "name": "aws_session_token",
+      "kind": "password",
+      "label": "AWS Session Token",
+      "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used"
+    },
+    {
+      "name": "aws_profile",
+      "label": "AWS Profile",
+      "description": "AWS profile name for profile based authentication. If not provided, `AWS_PROFILE` environment variable will be used."
+    },
+    {
+      "name": "default_target_schema",
+      "aliases": [
+        "schema"
+      ],
+      "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+      "label": "Default Target Schema",
+      "description": "Note `$MELTANO_EXTRACT__LOAD_SCHEMA` [will expand to](https://docs.meltano.com/guide/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](https://docs.meltano.com/concepts/plugins#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/extractors/gitlab). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.\n\nName of the schema where the tables will be created, without database\nprefix. If `schema_mapping` is not defined then every stream sent by the tap is\nloaded into this schema.\n",
+      "value_processor": "upcase_string"
+    },
+    {
+      "name": "s3_bucket",
+      "label": "S3 Bucket",
+      "description": "S3 Bucket name"
+    },
+    {
+      "name": "s3_key_prefix",
+      "label": "S3 Key Prefix",
+      "description": "A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket."
+    },
+    {
+      "name": "s3_endpoint_url",
+      "label": "S3 Endpoint URL",
+      "description": "The complete URL to use for the constructed client. This is allowing to use non-native s3 account."
+    },
+    {
+      "name": "s3_region_name",
+      "label": "S3 Region Name",
+      "description": "Default region when creating new connections"
+    },
+    {
+      "name": "s3_acl",
+      "label": "S3 ACL",
+      "description": "S3 ACL name to set on the uploaded files"
+    },
+    {
+      "name": "stage",
+      "label": "Stage",
+      "description": "Named external stage name created at pre-requirements section. Has to be a fully qualified name including the schema name"
+    },
+    {
+      "name": "batch_size_rows",
+      "kind": "integer",
+      "value": 100000,
+      "label": "Batch Size Rows",
+      "description": "Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Snowflake."
+    },
+    {
+      "name": "batch_wait_limit_seconds",
+      "kind": "integer",
+      "label": "Batch Wait Limit Seconds",
+      "description": "Maximum time to wait for batch to reach batch_size_rows."
+    },
+    {
+      "name": "flush_all_streams",
+      "kind": "boolean",
+      "value": false,
+      "label": "Flush All Streams",
+      "description": "Flush and load every stream into Snowflake when one batch is full. Warning: This may trigger the COPY command to use files with low number of records, and may cause performance problems."
+    },
+    {
+      "name": "parallelism",
+      "kind": "integer",
+      "value": 0,
+      "label": "Parallelism",
+      "description": "The number of threads used to flush tables. 0 will create a thread for each stream, up to parallelism_max. -1 will create a thread for each CPU core. Any other positive number will create that number of threads, up to parallelism_max."
+    },
+    {
+      "name": "parallelism_max",
+      "kind": "integer",
+      "value": 16,
+      "label": "Parallelism Max",
+      "description": "Max number of parallel threads to use when flushing tables."
+    },
+    {
+      "name": "default_target_schema_select_permission",
+      "label": "Default Target Schema Select Permission",
+      "description": "Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly."
+    },
+    {
+      "name": "schema_mapping",
+      "kind": "object",
+      "label": "Schema Mapping",
+      "description": "Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.\n\nIf the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.\n\nNote, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.\n"
+    },
+    {
+      "name": "disable_table_cache",
+      "kind": "boolean",
+      "value": false,
+      "label": "Disable Table Cache",
+      "description": "By default the connector caches the available table structures in Snowflake at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With `disable_table_cache` option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime."
+    },
+    {
+      "name": "client_side_encryption_master_key",
+      "kind": "password",
+      "label": "Client Side Encryption Master Key",
+      "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string."
+    },
+    {
+      "name": "client_side_encryption_stage_object",
+      "label": "Client Side Encryption Stage Object",
+      "description": "Required when `client_side_encryption_master_key` is defined. The name of the encrypted stage object in Snowflake that created separately and using the same encryption master key."
+    },
+    {
+      "name": "add_metadata_columns",
+      "kind": "boolean",
+      "value": false,
+      "label": "Add Metadata Columns",
+      "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in snowflake etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Snowflake."
+    },
+    {
+      "name": "hard_delete",
+      "kind": "boolean",
+      "value": false,
+      "label": "Hard Delete",
+      "description": "When `hard_delete` option is true then DELETE SQL commands will be performed in Snowflake to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well."
+    },
+    {
+      "name": "data_flattening_max_level",
+      "kind": "integer",
+      "value": 0,
+      "label": "Data Flattening Max Level",
+      "description": "Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off."
+    },
+    {
+      "name": "primary_key_required",
+      "kind": "boolean",
+      "value": true,
+      "label": "Primary Key Required",
+      "description": "Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined."
+    },
+    {
+      "name": "validate_records",
+      "kind": "boolean",
+      "value": false,
+      "label": "Validate Records",
+      "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Snowflake. Enabling this option will detect invalid records earlier but could cause performance degradation."
+    },
+    {
+      "name": "temp_dir",
+      "label": "Temporary Directory",
+      "description": "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages."
+    },
+    {
+      "name": "no_compression",
+      "kind": "boolean",
+      "value": false,
+      "label": "No Compression",
+      "description": "Generate uncompressed CSV files when loading to Snowflake. Normally, by default GZIP compressed files are generated."
+    },
+    {
+      "name": "query_tag",
+      "label": "Query Tag",
+      "description": "Optional string to tag executed queries in Snowflake. Replaces tokens\n\n`schema` and `table` with the appropriate values. The tags are displayed in the\noutput of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.\n"
+    },
+    {
+      "name": "archive_load_files",
+      "kind": "boolean",
+      "value": false,
+      "label": "Archive Load Files",
+      "description": "When enabled, the files loaded to Snowflake will also be stored in\n`archive_load_files_s3_bucket` under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/.\n\nAll archived files will have tap, schema, table and archived-by as S3 metadata keys.\n\nWhen incremental replication is used, the archived files will also have\nthe following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.\n"
+    },
+    {
+      "name": "archive_load_files_s3_prefix",
+      "label": "Archive Load Files S3 Prefix",
+      "description": "When `archive_load_files` is enabled, the archived files will be placed in the archive S3 bucket under this prefix."
+    },
+    {
+      "name": "archive_load_files_s3_bucket",
+      "label": "Archive Load Files S3 Bucket",
+      "description": "When archive_load_files is enabled, the archived files will be placed in this bucket."
+    }
+  ],
+  "dialect": "snowflake",
+  "target_schema": "$TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA"
+}

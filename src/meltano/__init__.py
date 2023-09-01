@@ -1,7 +1,6 @@
 """Meltano."""
 
-
 from __future__ import annotations
 
 # Managed by commitizen
-__version__ = "2.19.1"
+__version__ = "3.0.0rc0"

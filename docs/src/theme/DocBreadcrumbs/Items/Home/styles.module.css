@@ -1,0 +1,12 @@
+.breadcrumbHomeIcon {
+  position: relative;
+  top: 4px;
+  vertical-align: top;
+  height: 1.3rem;
+  width: 1.3rem;
+}
+
+.breadcrumbHomeLink {
+  padding: 0;
+  margin-right: 0.7rem;
+}

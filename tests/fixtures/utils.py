@@ -24,7 +24,7 @@ def cd(path: Path) -> Path:
 @contextmanager
 def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:
     project_init_service = ProjectInitService(name)
-    blank_project = project_init_service.init(add_discovery=False)
+    blank_project = project_init_service.init()
     logging.debug(f"Created new project at {blank_project.root}")
     os.remove(blank_project.meltanofile)
     compatible_copy_tree(source, blank_project.root)

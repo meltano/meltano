@@ -6,7 +6,6 @@ Turns string lists of plugins into `BlockSet` and `PluginCommand` instances.
 from __future__ import annotations
 
 import typing as t
-from contextlib import suppress
 
 import click
 import structlog
@@ -111,9 +110,10 @@ class BlockParser:  # noqa: D101
                 parsed_name = name
                 command_name = None
 
-            plugin = self._find_plugin_or_mapping(parsed_name)
-            if plugin is None:
-                raise click.ClickException(f"Block {name} not found")
+            try:
+                plugin = self.project.plugins.find_plugin(parsed_name)
+            except PluginNotFoundError as e:
+                raise click.ClickException(f"Block {name} not found") from e
 
             if plugin and task_sets_service.exists(name):
                 raise click.ClickException(
@@ -213,35 +213,6 @@ class BlockParser:  # noqa: D101
                     "Unknown command type or bad block sequence at index "
                     f"{cur + 1}, starting block '{plugin.name}'",  # noqa: WPS237
                 )
-
-    def _find_plugin_or_mapping(self, name: str) -> ProjectPlugin | None:
-        """Find a plugin by name OR by mapping name.
-
-        Args:
-            name: Name of the plugin or mapping.
-
-        Returns:
-            The actual plugin.
-
-        Raises:
-            ClickException: If mapping name returns multiple matches.
-        """
-        with suppress(PluginNotFoundError):
-            return self.project.plugins.find_plugin(name)
-
-        mapper = None
-
-        with suppress(PluginNotFoundError):
-            mapper = self.project.plugins.find_plugins_by_mapping_name(name)
-
-        if mapper is None:
-            return None
-
-        if len(mapper) > 1:
-            raise click.ClickException(
-                f"Ambiguous mapping name {name}, found multiple matches.",
-            )
-        return mapper[0] if mapper else None
 
     def _find_next_elb_set(  # noqa: WPS231, WPS213
         self,

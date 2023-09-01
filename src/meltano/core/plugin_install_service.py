@@ -6,18 +6,13 @@ import asyncio
 import functools
 import logging
 import os
+import shlex
 import sys
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
+from functools import cached_property
 from multiprocessing import cpu_count
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-    from typing import Protocol
-else:
-    from cached_property import cached_property
-    from typing_extensions import Protocol
 
 from meltano.core.error import (
     AsyncSubprocessError,
@@ -454,7 +449,7 @@ class PluginInstallService:  # noqa: WPS214
             }
 
 
-class PluginInstaller(Protocol):
+class PluginInstaller(t.Protocol):
     """Prototype function for plugin installation.
 
     All plugin installation functions must support at least the specified
@@ -477,13 +472,41 @@ class PluginInstaller(Protocol):
         """
 
 
+def get_pip_install_args(
+    project: Project,
+    plugin: ProjectPlugin,
+    env: t.Mapping[str, str] | None = None,
+) -> list[str]:
+    """Get the pip install arguments for the given plugin.
+
+    Args:
+        project: Meltano Project.
+        plugin: `ProjectPlugin` to get pip install arguments for.
+        env: Optional environment variables to use when expanding the pip install args.
+
+    Returns:
+        The list of pip install arguments for the given plugin.
+    """
+    with project.settings.feature_flag(
+        FeatureFlags.STRICT_ENV_VAR_MODE,
+        raise_error=False,
+    ) as strict_env_var_mode:
+        return shlex.split(
+            expand_env_vars(
+                plugin.pip_url,
+                env,
+                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+            )
+            or "",
+        )
+
+
 async def install_pip_plugin(
     *,
     project: Project,
     plugin: ProjectPlugin,
     clean: bool = False,
     force: bool = False,
-    venv_service: VenvService | None = None,
     env: t.Mapping[str, str] | None = None,
     **kwargs,  # noqa: ARG001
 ):
@@ -494,27 +517,18 @@ async def install_pip_plugin(
         plugin: `ProjectPlugin` to install.
         clean: Flag to clean install.
         force: Whether to ignore the Python version required by plugins.
-        venv_service: `VenvService` instance to use when installing.
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
     """
-    with project.settings.feature_flag(
-        FeatureFlags.STRICT_ENV_VAR_MODE,
-        raise_error=False,
-    ) as strict_env_var_mode:
-        pip_install_args = expand_env_vars(
-            plugin.pip_url,
-            env,
-            if_missing=EnvVarMissingBehavior(strict_env_var_mode),
-        ).split(" ")
+    pip_install_args = get_pip_install_args(project, plugin, env=env)
 
-    venv_service = venv_service or VenvService(
-        project,
+    await VenvService(
+        project=project,
+        python=plugin.python,
         namespace=plugin.type,
         name=plugin.venv_name,
-    )
-    await venv_service.install(
-        pip_install_args=["--ignore-requires-python", *pip_install_args]
+    ).install(
+        pip_install_args=("--ignore-requires-python", *pip_install_args)
         if force
         else pip_install_args,
         clean=clean,

@@ -71,8 +71,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
     state_id_re = re.compile(
         r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$",
     )
-    match = state_id_re.match(state_id)
-    if match:
+    if match := state_id_re.match(state_id):
         # If the state_id matches convention (i.e., job has been run via "meltano run"),
         # try parsing into BlockSet.
         # This way, we get BlockSet validation and raise an error if no
@@ -116,7 +115,7 @@ def meltano_state(project: Project, ctx: click.Context):
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
     """
     _, sessionmaker = project_engine(project)
-    session = sessionmaker()
+    session = sessionmaker(future=True)
     ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
 
 
@@ -129,8 +128,7 @@ def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
     Optionally pass a glob-style pattern to filter state_ids by.
     """
     state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
-    states = state_service.list_state(pattern)
-    if states:
+    if states := state_service.list_state(pattern):
         for state_id, state in states.items():
             if state:
                 try:

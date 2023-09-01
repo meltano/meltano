@@ -1,0 +1,106 @@
+{
+  "plugin_type": "utilities",
+  "name": "airflow",
+  "namespace": "airflow",
+  "variant": "apache",
+  "label": "Airflow",
+  "docs": "https://hub.meltano.com/utilities/airflow--apache",
+  "repo": "https://github.com/apache/airflow",
+  "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+  "executable": "airflow_invoker",
+  "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
+  "settings": [
+    {
+      "name": "database.sql_alchemy_conn",
+      "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
+      "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db",
+      "label": "SQL Alchemy Connection"
+    },
+    {
+      "name": "core.dags_folder",
+      "env": "AIRFLOW__CORE__DAGS_FOLDER",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/dags",
+      "label": "DAGs Folder"
+    },
+    {
+      "name": "core.plugins_folder",
+      "env": "AIRFLOW__CORE__PLUGINS_FOLDER",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/plugins",
+      "label": "Plugins Folder"
+    },
+    {
+      "name": "core.load_examples",
+      "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
+      "value": false,
+      "label": "Load Examples"
+    },
+    {
+      "name": "core.dags_are_paused_at_creation",
+      "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
+      "value": false,
+      "label": "Pause DAGs at Creation"
+    },
+    {
+      "name": "webserver.web_server_port",
+      "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
+      "value": 8080,
+      "label": "Webserver Port"
+    },
+    {
+      "name": "logging.base_log_folder",
+      "env": "AIRFLOW__LOGGING__BASE_LOG_FOLDER",
+      "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs",
+      "label": "Base Log Folder",
+      "description": "The folder where airflow should store its log files. This path must be absolute. There are a few existing\nconfigurations that assume this is set to the default. If you choose to override this you may need to update\nthe dag_processor_manager_log_location and child_process_log_directory settings as well.\n"
+    },
+    {
+      "name": "logging.dag_processor_manager_log_location",
+      "env": "AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION",
+      "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
+      "label": "Dag Processor Manager Log Location",
+      "description": "Where to send dag parser logs.\n"
+    },
+    {
+      "name": "scheduler.child_process_log_directory",
+      "env": "AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY",
+      "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/scheduler",
+      "label": "Child Process Log Directory",
+      "description": "Where to send the logs of each scheduler process.\n"
+    },
+    {
+      "name": "extension.airflow_home",
+      "env": "AIRFLOW_HOME",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow",
+      "label": "Airflow Home",
+      "description": "The directory where Airflow will store its configuration, logs, and other files.\n"
+    },
+    {
+      "name": "extension.airflow_config",
+      "env": "AIRFLOW_CONFIG",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg",
+      "label": "Airflow Home",
+      "description": "The path where the Airflow configuration file will be stored.\n"
+    }
+  ],
+  "commands": {
+    "create-admin": {
+      "args": "users create --username admin --firstname FIRST_NAME --lastname LAST_NAME --role Admin --email admin@example.org",
+      "description": "Create an Airflow user with admin privileges."
+    },
+    "describe": {
+      "args": "describe",
+      "description": "Describe the Airflow Extension",
+      "executable": "airflow_extension"
+    },
+    "initialize": {
+      "args": "initialize",
+      "description": "Initialize the Airflow Extension which will seed the database, create the default airflow.cfg, and deploy the Meltano DAG orchestrator.",
+      "executable": "airflow_extension"
+    },
+    "ui": {
+      "args": "webserver",
+      "description": "Start the Airflow webserver."
+    }
+  },
+  "ext_repo": "https://github.com/meltano/airflow-ext"
+}

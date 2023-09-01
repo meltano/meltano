@@ -25,6 +25,8 @@ if sys.version_info >= (3, 10):
 else:
     from typing_extensions import TypeAlias
 
+from functools import cached_property
+
 from meltano import __file__ as package_root_path
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
 from meltano.core.plugin.base import PluginType
@@ -40,11 +42,6 @@ from meltano.core.utils import (
     expand_env_vars,
     get_no_color_flag,
 )
-
-if sys.version_info >= (3, 8):
-    from functools import cached_property
-else:
-    from cached_property import cached_property
 
 # NOTE: We do not use `Project(...).meltano.canonical` for 3 reasons:
 # - It will make it difficult to refactor the rest of the Meltano core to be
@@ -63,7 +60,7 @@ MANIFEST_SCHEMA_PATH = (
     Path(package_root_path).parent / "schemas" / "meltano.schema.json"
 )
 
-Trie: TypeAlias = t.Dict[str, "Trie"]  # type: ignore
+Trie: TypeAlias = t.Dict[str, "Trie"]
 PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
 PluginsByNameByType: TypeAlias = t.Mapping[str, t.Mapping[str, t.Mapping[str, t.Any]]]
 
@@ -106,12 +103,13 @@ class YamlLimitedSafeLoader(type):
         return super().__new__(
             cls,
             name,
-            (yaml.SafeLoader, *bases),
+            tuple({yaml.SafeLoader, *bases}),
             {**namespace, "yaml_implicit_resolvers": implicit_resolvers},
         )
 
 
 class YamlNoTimestampSafeLoader(
+    yaml.SafeLoader,
     metaclass=YamlLimitedSafeLoader,
     do_not_resolve={"tag:yaml.org,2002:timestamp"},
 ):
@@ -409,7 +407,7 @@ class Manifest:  # noqa: WPS214
             del manifest["environments"]
 
         # The include paths have already been resolved, and so are removed to
-        # avoid ambiguity. If this information is of interest, it cloud be
+        # avoid ambiguity. If this information is of interest, it could be
         # re-added into an annotation.
         with suppress(KeyError):
             del manifest["include_paths"]

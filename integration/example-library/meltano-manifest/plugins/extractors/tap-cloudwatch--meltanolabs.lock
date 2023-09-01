@@ -1,0 +1,162 @@
+{
+  "plugin_type": "extractors",
+  "name": "tap-cloudwatch",
+  "namespace": "tap_cloudwatch",
+  "variant": "meltanolabs",
+  "label": "Cloudwatch",
+  "docs": "https://hub.meltano.com/extractors/tap-cloudwatch--meltanolabs",
+  "repo": "https://github.com/meltanolabs/tap-cloudwatch",
+  "pip_url": "git+https://github.com/meltanolabs/tap-cloudwatch.git",
+  "executable": "tap-cloudwatch",
+  "description": "AWS Application and Infrastructure Monitoring",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/cloudwatch.png",
+  "capabilities": [
+    "about",
+    "batch",
+    "catalog",
+    "discover",
+    "schema-flattening",
+    "state",
+    "stream-maps"
+  ],
+  "settings_group_validation": [
+    [
+      "log_group_name",
+      "query",
+      "start_date"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "aws_access_key_id",
+      "kind": "password",
+      "label": "AWS Access Key ID",
+      "description": "The access key for your AWS account."
+    },
+    {
+      "name": "aws_endpoint_url",
+      "kind": "string",
+      "label": "AWS Endpoint URL",
+      "description": "The complete URL to use for the constructed client."
+    },
+    {
+      "name": "aws_profile",
+      "kind": "string",
+      "label": "AWS Profile",
+      "description": "The AWS credentials profile name to use. The profile must be configured and accessible."
+    },
+    {
+      "name": "aws_region_name",
+      "kind": "string",
+      "label": "AWS Region Name",
+      "description": "The AWS region name (e.g. us-east-1) "
+    },
+    {
+      "name": "aws_secret_access_key",
+      "kind": "password",
+      "label": "AWS Secret Access Key",
+      "description": "The secret key for your AWS account."
+    },
+    {
+      "name": "aws_session_token",
+      "kind": "password",
+      "label": "AWS Session Token",
+      "description": "The session key for your AWS account. This is only needed when you are using temporary credentials."
+    },
+    {
+      "name": "batch_config.encoding.compression",
+      "kind": "options",
+      "label": "Batch Config Encoding Compression",
+      "description": "Compression format to use for batch files.",
+      "options": [
+        {
+          "label": "Gzip",
+          "value": "gzip"
+        },
+        {
+          "label": "None",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.encoding.format",
+      "kind": "options",
+      "label": "Batch Config Encoding Format",
+      "description": "Format to use for batch files.",
+      "options": [
+        {
+          "label": "Jsonl",
+          "value": "jsonl"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.storage.prefix",
+      "kind": "string",
+      "label": "Batch Config Storage Prefix",
+      "description": "Prefix to use when writing batch files."
+    },
+    {
+      "name": "batch_config.storage.root",
+      "kind": "string",
+      "label": "Batch Config Storage Root",
+      "description": "Root path to use when writing batch files."
+    },
+    {
+      "name": "batch_increment_s",
+      "kind": "integer",
+      "value": 3600,
+      "label": "Batch Increment S",
+      "description": "The size of the time window to query by, default 3,600 seconds (i.e. 1 hour). If the result set for a batch is greater than the max limit of 10,000 records then the tap will query the same window again where >= the most recent record received. This means that the same data is potentially being scanned >1 times but < 2 times, depending on the amount the results set went over the 10k max. For example a batch window with 15k records would scan the 15k once, receiving 10k results, then scan ~5k again to get the rest. The net result is the same data was scanned ~1.5 times for that batch. To avoid this you should set the batch window to avoid exceeding the 10k limit."
+    },
+    {
+      "name": "end_date",
+      "kind": "date_iso8601",
+      "label": "End Date",
+      "description": "The last record date to sync. This tap uses a 5 minute buffer to allow Cloudwatch logs to arrive in full. If you request data from current time it will automatically adjust your end_date to now - 5 mins."
+    },
+    {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "log_group_name",
+      "kind": "string",
+      "label": "Log Group Name",
+      "description": "The log group on which to perform the query."
+    },
+    {
+      "name": "query",
+      "kind": "string",
+      "label": "Query",
+      "description": "The query string to use. For more information, see [CloudWatch Logs Insights Query Syntax](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html)."
+    },
+    {
+      "name": "start_date",
+      "kind": "date_iso8601",
+      "label": "Start Date",
+      "description": "The earliest record date to sync"
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
+    }
+  ]
+}

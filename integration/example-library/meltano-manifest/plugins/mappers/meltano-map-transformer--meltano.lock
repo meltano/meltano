@@ -1,0 +1,29 @@
+{
+  "plugin_type": "mappers",
+  "name": "meltano-map-transformer",
+  "namespace": "meltano_map_transformer",
+  "variant": "meltano",
+  "label": "Meltano Map Transformer",
+  "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
+  "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
+  "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+  "executable": "meltano-map-transform",
+  "description": "A map transformer which implements the Stream Maps capability from Meltano's tap and target SDK.",
+  "logo_url": "https://hub.meltano.com/assets/logos/mappers/meltano.png",
+  "capabilities": [
+    "stream-maps"
+  ],
+  "settings_group_validation": [
+    [
+      "stream_maps"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html)."
+    }
+  ]
+}

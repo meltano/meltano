@@ -1,0 +1,25 @@
+.changelog {
+}
+.changelogHeader {
+  background-image: url(../../../static/img/bg-ellipse-changelog.svg);
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+@media all and (min-width: 678px) {
+  .changelogHeader {
+    background-size: contain;
+  }
+}
+
+.melty {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+  margin-bottom: -2rem;
+}
+
+.toc > div {
+  top: calc(var(--ifm-navbar-height) + 4.7rem);
+}

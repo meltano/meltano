@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob._models import BlobProperties
+from azure.storage.blob._models import BlobProperties  # noqa: WPS436
 from boto3 import client
 from botocore.stub import Stubber
 from dateutil.tz import tzutc
@@ -472,7 +472,6 @@ class TestS3StateStoreManager:
                 },
             ],
             "Name": subject.bucket,
-            "Prefix": subject.prefix,
             "Delimiter": "",
             "MaxKeys": 1000,
             "EncodingType": "url",
@@ -482,7 +481,7 @@ class TestS3StateStoreManager:
             stubber.add_response(
                 "list_objects_v2",
                 response,
-                expected_params={"Bucket": subject.bucket, "Prefix": subject.prefix},
+                expected_params={"Bucket": subject.bucket},
             )
             assert set(subject.get_state_ids()) == {"state_id_1", "state_id_2"}
 

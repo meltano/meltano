@@ -32,10 +32,7 @@ class TestCli:
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
-        project = project_init_service.init(  # noqa: DAR301
-            activate=False,
-            add_discovery=True,
-        )
+        project = project_init_service.init(activate=False)
         Project._default = None
         try:
             yield project
@@ -64,7 +61,7 @@ class TestCli:
         project = test_cli_project
 
         pushd(project.root)
-        cli_runner.invoke(cli, ["discover"])
+        cli_runner.invoke(cli, ["hub", "ping"])
 
         assert Project._default is not None
         assert Project._default.root == project.root
@@ -87,7 +84,7 @@ class TestCli:
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
         assert Project._default is None
         pushd(test_cli_project.root)
-        cli_runner.invoke(cli, ["discover"])
+        cli_runner.invoke(cli, ["hub", "ping"])
         assert Project._default.readonly
 
     @pytest.mark.order(2)
@@ -100,7 +97,7 @@ class TestCli:
         test_cli_project.settings.set("project_readonly", True)
         assert Project._default is None
         pushd(test_cli_project.root)
-        cli_runner.invoke(cli, ["discover"])
+        cli_runner.invoke(cli, ["hub", "ping"])
         assert Project._default.readonly
 
     def test_environment_precedence(
@@ -200,7 +197,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["--environment", "null", "discover"],
+            ["--environment", "null", "hub", "ping"],
         )
         assert Project._default.environment is None
 
@@ -214,7 +211,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["--environment", "NULL", "discover"],
+            ["--environment", "NULL", "hub", "ping"],
         )
         assert Project._default.environment is None
 
@@ -228,7 +225,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["--no-environment", "discover"],
+            ["--no-environment", "hub", "ping"],
         )
         assert Project._default.environment is None
 
@@ -242,7 +239,7 @@ class TestCli:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
-            ["--no-environment", "--environment", "null", "discover"],
+            ["--no-environment", "--environment", "null", "hub", "ping"],
         )
         assert Project._default.environment is None
 

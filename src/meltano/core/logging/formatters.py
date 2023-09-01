@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 import typing as t
 from types import TracebackType
 
@@ -13,13 +12,6 @@ from rich.traceback import Traceback, install
 from structlog.types import Processor
 
 from meltano.core.utils import get_no_color_flag
-
-if t.TYPE_CHECKING:
-    if sys.version_info >= (3, 8):
-        from typing import Literal
-    else:
-        from typing_extensions import Literal
-
 
 install(suppress=[click])
 
@@ -34,7 +26,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = (
 
 
 def rich_exception_formatter_factory(
-    color_system: Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
+    color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
     no_color: bool | None = None,
     show_locals: bool = False,
 ) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:

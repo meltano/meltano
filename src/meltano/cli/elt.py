@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 import platform
 import typing as t
 from contextlib import asynccontextmanager, nullcontext, suppress
+from datetime import datetime, timezone
 
 import click
 from structlog import stdlib as structlog_stdlib
@@ -24,7 +24,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import click_run_async
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     import structlog
@@ -42,58 +42,140 @@ DUMPABLES = {
 logger = structlog_stdlib.get_logger(__name__)
 
 
+class ELOptions:
+    """Namespace for all options shared by the `el` and `elt` commands."""
+
+    extractor = click.argument("extractor")
+    loader = click.argument("loader")
+    transform = click.option(
+        "--transform",
+        type=click.Choice(["skip", "only", "run"]),
+    )
+    dry = click.option("--dry", help="Do not actually run.", is_flag=True)
+    full_refresh = click.option(
+        "--full-refresh",
+        help="Perform a full refresh (ignore state left behind by any previous runs).",
+        is_flag=True,
+    )
+    select = click.option(
+        "--select",
+        "-s",
+        help="Select only these specific entities for extraction.",
+        multiple=True,
+        default=[],
+    )
+    exclude = click.option(
+        "--exclude",
+        "-e",
+        help="Exclude these specific entities from extraction.",
+        multiple=True,
+        default=[],
+    )
+    catalog = click.option("--catalog", help="Extractor catalog file.")
+    state = click.option("--state", help="Extractor state file.")
+    dump = click.option(
+        "--dump",
+        type=click.Choice(DUMPABLES.keys()),
+        help="Dump content of pipeline-specific generated file.",
+    )
+    state_id = click.option(
+        "--state-id",
+        envvar="MELTANO_STATE_ID",
+        help="A custom string to identify the job.",
+    )
+    force = click.option(
+        "--force",
+        "-f",
+        help=(
+            "Force a new run even when a pipeline with the same state ID is "
+            "already running."
+        ),
+        is_flag=True,
+    )
+
+
+@click.command(
+    cls=PartialInstrumentedCmd,
+    short_help="Run an EL pipeline to Extract and Load data.",
+    environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
+)
+@ELOptions.extractor
+@ELOptions.loader
+@ELOptions.dry
+@ELOptions.full_refresh
+@ELOptions.select
+@ELOptions.exclude
+@ELOptions.catalog
+@ELOptions.state
+@ELOptions.dump
+@ELOptions.state_id
+@ELOptions.force
+@click.pass_context
+@pass_project(migrate=True)
+@run_async
+async def el(  # WPS408
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
+):
+    """
+    Run an EL pipeline to Extract and Load data.
+
+    meltano el '<extractor_name>' '<loader_name>'
+
+    extractor_name: extractor to be used in this pipeline.
+    loader_name: loader to be used in this pipeline.
+
+    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
+    """
+    await _run_el_command(
+        project,
+        ctx,
+        extractor,
+        loader,
+        None,
+        dry,
+        full_refresh,
+        select,
+        exclude,
+        catalog,
+        state,
+        dump,
+        state_id,
+        force,
+    )
+
+
 @click.command(
     cls=PartialInstrumentedCmd,
     short_help="Run an ELT pipeline to Extract, Load, and Transform data.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
-@click.argument("extractor")
-@click.argument("loader")
-@click.option("--transform", type=click.Choice(["skip", "only", "run"]))
-@click.option("--dry", help="Do not actually run.", is_flag=True)
-@click.option(
-    "--full-refresh",
-    help="Perform a full refresh (ignore state left behind by any previous runs).",
-    is_flag=True,
-)
-@click.option(
-    "--select",
-    "-s",
-    help="Select only these specific entities for extraction.",
-    multiple=True,
-    default=[],
-)
-@click.option(
-    "--exclude",
-    "-e",
-    help="Exclude these specific entities from extraction.",
-    multiple=True,
-    default=[],
-)
-@click.option("--catalog", help="Extractor catalog file.")
-@click.option("--state", help="Extractor state file.")
-@click.option(
-    "--dump",
-    type=click.Choice(DUMPABLES.keys()),
-    help="Dump content of pipeline-specific generated file.",
-)
-@click.option(
-    "--state-id",
-    envvar="MELTANO_STATE_ID",
-    help="A custom string to identify the job.",
-)
-@click.option(
-    "--force",
-    "-f",
-    help=(
-        "Force a new run even when a pipeline with the same state ID is "
-        "already running."
-    ),
-    is_flag=True,
-)
+@ELOptions.extractor
+@ELOptions.loader
+@ELOptions.transform
+@ELOptions.dry
+@ELOptions.full_refresh
+@ELOptions.select
+@ELOptions.exclude
+@ELOptions.catalog
+@ELOptions.state
+@ELOptions.dump
+@ELOptions.state_id
+@ELOptions.force
 @click.pass_context
 @pass_project(migrate=True)
-@click_run_async
+@run_async
 async def elt(  # WPS408
     project: Project,
     ctx: click.Context,
@@ -120,6 +202,41 @@ async def elt(  # WPS408
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
+    logger.warn("The `elt` command is deprecated in favor of `el`")
+    await _run_el_command(
+        project,
+        ctx,
+        extractor,
+        loader,
+        transform,
+        dry,
+        full_refresh,
+        select,
+        exclude,
+        catalog,
+        state,
+        dump,
+        state_id,
+        force,
+    )
+
+
+async def _run_el_command(
+    project: Project,
+    ctx: click.Context,
+    extractor: str,
+    loader: str,
+    transform: str | None,
+    dry: bool,
+    full_refresh: bool,
+    select: list[str],
+    exclude: list[str],
+    catalog: str,
+    state: str,
+    dump: str,
+    state_id: str,
+    force: bool,
+):
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "
@@ -132,16 +249,16 @@ async def elt(  # WPS408
     # We no longer set a default choice for transform, so that we can detect
     # explicit usages of the `--transform` option if transform is `None` we
     # still need manually default to skip after firing the tracking event above
-    if not transform:
-        transform = "skip"
+    # TODO: Remove the transform option entirely in a future release
+    transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     job = Job(
         job_name=state_id
         or (
-            f'{datetime.datetime.utcnow().strftime("%Y-%m-%dT%H%M%S")}--'
-            f"{extractor}--{loader}"
+            f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
+            f"--{extractor}--{loader}"
         ),
     )
     _, Session = project_engine(project)  # noqa: N806
@@ -175,7 +292,7 @@ async def elt(  # WPS408
 
 
 def _elt_context_builder(
-    project,
+    project: Project,
     job,
     session,
     extractor,
@@ -190,7 +307,7 @@ def _elt_context_builder(
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
-        transform_name = _find_transform_for_extractor(extractor, project.plugins)
+        transform_name = _find_transform_for_extractor(project, extractor)
 
     return (
         ELTContextBuilder(project)
@@ -229,14 +346,12 @@ async def dump_file(context_builder, dumpable):
 async def _run_job(tracker, project, job, session, context_builder, force=False):
     fail_stale_jobs(session, job.job_name)
 
-    if not force:
-        existing = JobFinder(job.job_name).latest_running(session)
-        if existing:
-            raise CliError(
-                f"Another '{job.job_name}' pipeline is already running which "
-                f"started at {existing.started_at}. To ignore this check use "
-                "the '--force' option.",
-            )
+    if not force and (existing := JobFinder(job.job_name).latest_running(session)):
+        raise CliError(
+            f"Another '{job.job_name}' pipeline is already running which "
+            f"started at {existing.started_at}. To ignore this check use "
+            "the '--force' option.",
+        )
 
     async with job.run(session):
         job_logging_service = JobLoggingService(project)
@@ -288,6 +403,10 @@ async def _run_elt(
                 await _run_extract_load(log, elt_context, output_logger)
 
             if elt_context.transformer:
+                log.warn(
+                    "The option to run a transformation is deprecated and will be "
+                    "removed in a future version.",
+                )
                 await _run_transform(log, elt_context, output_logger)
             else:
                 log.info("Transformation skipped.")
@@ -401,22 +520,32 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     log.info("Transformation complete!")
 
 
-def _find_transform_for_extractor(extractor: str, plugins_service):
-    discovery_service = plugins_service.discovery_service
+def _find_extractor(project: Project, extractor_name: str):
     try:
-        extractor_plugin_def = discovery_service.find_definition(
+        return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
-            extractor,
+            extractor_name,
+        )
+    except PluginNotFoundError:
+        return project.hub_service.find_definition(
+            PluginType.EXTRACTORS,
+            extractor_name,
         )
 
+
+def _find_transform_for_extractor(
+    project: Project,
+    extractor_name: str,
+):
+    try:
         # Check if there is a default transform for this extractor
-        transform_plugin_def = discovery_service.find_definition_by_namespace(
+        transform_plugin_def = project.plugins.find_plugin_by_namespace(
             PluginType.TRANSFORMS,
-            extractor_plugin_def.namespace,
+            _find_extractor(project, extractor_name).namespace,
         )
 
         # Check if the transform has been added to the project
-        transform_plugin = plugins_service.get_plugin(transform_plugin_def)
+        transform_plugin = project.plugins.get_plugin(transform_plugin_def)
 
         return transform_plugin.name
     except PluginNotFoundError:

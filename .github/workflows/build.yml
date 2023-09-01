@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Install Poetry
       env:
@@ -45,13 +45,6 @@ jobs:
       # Required to run `alembic_freeze.py`
       run: |
         poetry install
-
-    - name: Setup Node
-      uses: actions/setup-node@v3.7.0
-      with:
-        node-version: '16'
-        cache: 'yarn'
-        cache-dependency-path: src/webapp/yarn.lock
 
     - name: Freeze DB
       run: |
@@ -80,7 +73,7 @@ jobs:
     environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Download artifacts
       uses: actions/download-artifact@v3.0.2
@@ -104,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.8.8
+      uses: pypa/gh-action-pypi-publish@v1.8.10

@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from . import main
+from meltano.cli import main
 
 main()
