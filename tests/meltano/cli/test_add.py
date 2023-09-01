@@ -689,6 +689,7 @@ class TestCliAdd:
         assert plugin.name == plugin_name
         assert plugin.variant == "test"
 
+    @pytest.mark.usefixtures("reset_project_context")
     @pytest.mark.parametrize(
         (
             "ref",
