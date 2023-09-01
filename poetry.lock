@@ -2732,13 +2732,13 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-docker"
-version = "2.0.0"
+version = "2.0.1"
 description = "Simple pytest fixtures for Docker and Docker Compose based tests"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "pytest-docker-2.0.0.tar.gz", hash = "sha256:3cc03a5b0f080807a49504197c16763811ba45863f26ae52c4411e499d4a2a86"},
-    {file = "pytest_docker-2.0.0-py3-none-any.whl", hash = "sha256:12c42c17de7cb26f166a578f5a415399e6f2b8bcb5c5321f054a5d4551a7ecc7"},
+    {file = "pytest-docker-2.0.1.tar.gz", hash = "sha256:1c17e9202a566f85ed5ef269fe2815bd4899e90eb639622e5d14277372ca7524"},
+    {file = "pytest_docker-2.0.1-py3-none-any.whl", hash = "sha256:7103f97b8c479c826b63d73cfb83383dc1970d35105ed1ce78a722c90c7fe650"},
 ]
 
 [package.dependencies]
