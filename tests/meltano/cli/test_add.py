@@ -24,6 +24,10 @@ if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
+fails_on_windows = pytest.mark.xfail(
+    platform.system() == "Windows",
+    reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
+)
 
 
 class TestCliAdd:
@@ -204,16 +208,13 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}",
         }
 
+    @fails_on_windows
     def test_add_files_with_updates(
         self,
         project: Project,
         cli_runner,
         plugin_settings_service_factory,
     ):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
         shutil.rmtree("plugins/files", ignore_errors=True)
@@ -260,11 +261,8 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
+    @fails_on_windows
     def test_add_files_that_already_exists(self, project: Project, cli_runner):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
@@ -699,9 +697,10 @@ class TestCliAdd:
                 plugin_ref.name,
                 "No such file or directory: '{ref}'",
             ),
-            (
+            pytest.param(
                 plugin_ref.parent,
                 "Is a directory: '{ref}'",
+                marks=fails_on_windows,
             ),
             (
                 "https://:",
