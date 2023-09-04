@@ -103,7 +103,7 @@ coverage = {extras = ["toml"], version = "^7.2.7"}
 freezegun = "^1.2.2"
 hypothesis = "^6.84.0"
 mock = "^5.0.2"
-moto = "^4.2.0"
+moto = "^4.2.2"
 mypy = "^1.4.1"
 pre-commit = "^3.3.3"
 pytest = "^7.4.0"
