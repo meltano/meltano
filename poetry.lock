@@ -139,13 +139,13 @@ frozenlist = ">=1.1.0"
 
 [[package]]
 name = "alembic"
-version = "1.11.3"
+version = "1.12.0"
 description = "A database migration tool for SQLAlchemy."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "alembic-1.11.3-py3-none-any.whl", hash = "sha256:d6c96c2482740592777c400550a523bc7a9aada4e210cae2e733354ddae6f6f8"},
-    {file = "alembic-1.11.3.tar.gz", hash = "sha256:3db4ce81a9072e1b5aa44c2d202add24553182672a12daf21608d6f62a8f9cf9"},
+    {file = "alembic-1.12.0-py3-none-any.whl", hash = "sha256:03226222f1cf943deee6c85d9464261a6c710cd19b4fe867a3ad1f25afda610f"},
+    {file = "alembic-1.12.0.tar.gz", hash = "sha256:8e7645c32e4f200675e69f0745415335eb59a3663f5feb487abfa0b30c45888b"},
 ]
 
 [package.dependencies]
@@ -334,17 +334,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.28.39"
+version = "1.28.40"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.39-py3-none-any.whl", hash = "sha256:48d1ea0918088df0e59a37a88ce53de7f4500108638c81255f5b1cb8edea28f4"},
-    {file = "boto3-1.28.39.tar.gz", hash = "sha256:3ac38ad8afafc6ed6c8dd6cc58ddd22b6352c6a413b969aef928c6aacf555c56"},
+    {file = "boto3-1.28.40-py3-none-any.whl", hash = "sha256:bd7c760afb195eaeaab907dc6b2c21fa64ddbba3fed4a869e80d820ddbd6cc70"},
+    {file = "boto3-1.28.40.tar.gz", hash = "sha256:6ff9a5b815e106656596064d51c9b6ba97a307807baa5f89634384b7d3f7ecc6"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.39,<1.32.0"
+botocore = ">=1.31.40,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -736,13 +736,13 @@ xray = ["mypy-boto3-xray (>=1.28.0,<1.29.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.39"
+version = "1.31.40"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.39-py3-none-any.whl", hash = "sha256:8ce716925284c1c0d04c796016a1e0e9c29ca3e196afefacacc16bc4e80c978f"},
-    {file = "botocore-1.31.39.tar.gz", hash = "sha256:61aefac8b44f86a4581d4128cce30806f633357e8d8efc4f73367a8e62009e70"},
+    {file = "botocore-1.31.40-py3-none-any.whl", hash = "sha256:df766969f0d9ef9eda1a9c9946e0e173c10199f37a9e4c92861f11ddb5c9e702"},
+    {file = "botocore-1.31.40.tar.gz", hash = "sha256:ce22a82ef8674f49691477d09558992cc87e7331f65c6a5b0da897ab192240ca"},
 ]
 
 [package.dependencies]
@@ -1633,13 +1633,13 @@ test = ["objgraph", "psutil"]
 
 [[package]]
 name = "hypothesis"
-version = "6.82.6"
+version = "6.84.0"
 description = "A library for property-based testing"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.82.6-py3-none-any.whl", hash = "sha256:e99c445140e43f1cceda07b569f2f2d920d95435c6b0e6b507b35b01bb025e9d"},
-    {file = "hypothesis-6.82.6.tar.gz", hash = "sha256:f52ac4180a16208224e3d648fbf0fef8b9ca24863ba4b41bfef30a78c42646bd"},
+    {file = "hypothesis-6.84.0-py3-none-any.whl", hash = "sha256:d91a48fd896666d9ab04590bdd840eb97c8a04db16d7dd6c79a47df8ed412a79"},
+    {file = "hypothesis-6.84.0.tar.gz", hash = "sha256:446ecc9665a23fc67a6d32bafbe4233d77fef10eb90d4ede8ab1e76474a63215"},
 ]
 
 [package.dependencies]
@@ -1947,13 +1947,13 @@ test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "moto"
-version = "4.2.0"
+version = "4.2.2"
 description = ""
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "moto-4.2.0-py2.py3-none-any.whl", hash = "sha256:e4835912f05627b6a53b938562b717122230fb038d023819133f8526f60ed0a7"},
-    {file = "moto-4.2.0.tar.gz", hash = "sha256:00fbae396fc48c3596e47b4e3267c1a41ca01c968de023beb68e774c63910b58"},
+    {file = "moto-4.2.2-py2.py3-none-any.whl", hash = "sha256:2a9cbcd9da1a66b23f95d62ef91968284445233a606b4de949379395056276fb"},
+    {file = "moto-4.2.2.tar.gz", hash = "sha256:ee34c4c3f53900d953180946920c9dba127a483e2ed40e6dbf93d4ae2e760e7c"},
 ]
 
 [package.dependencies]
@@ -3923,4 +3923,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "acc7a734d7d18b3be240a217129ad58821165922c106ffe5889a0b530070fc85"
+content-hash = "9efded6dfcb628b1bbd91915f75e5e00c30f7c269fd27ec48273ce21a74313ab"
