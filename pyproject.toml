@@ -477,7 +477,6 @@ changelog_merge_prerelease = true
 version = "3.5.0a3"
 version_files = [
   "pyproject.toml:^version =",
-  "src/meltano/__init__.py:^__version__ =",
   'docs/package.json:^  "version":',
 ]
 
