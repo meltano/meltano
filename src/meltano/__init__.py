@@ -2,5 +2,8 @@
 
 from __future__ import annotations
 
-# Managed by commitizen
-__version__ = "3.3.1"
+from importlib import metadata
+
+__version__ = metadata.version(__package__)
+
+del annotations, metadata
