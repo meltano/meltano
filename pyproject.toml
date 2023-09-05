@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "3.0.0rc0"
+version = "3.0.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -96,7 +96,7 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.3.0"
-boto3-stubs = {extras = ["essential"], version = "1.28.39"}
+boto3-stubs = {extras = ["essential"], version = "1.28.40"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.2.7"}
@@ -105,8 +105,8 @@ hypothesis = "^6.84.0"
 mock = "^5.0.2"
 moto = "^4.2.2"
 mypy = "^1.4.1"
-pre-commit = "^3.3.3"
-pytest = "^7.4.0"
+pre-commit = "^3.4.0"
+pytest = "^7.4.1"
 pytest-aiohttp = "^1.0.4"
 pytest-asyncio = "^0.21.1"
 pytest-cov = "^4.1.0"
@@ -473,7 +473,7 @@ skip_covered = true
 [tool.commitizen]
 name = "cz_version_bump"
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "3.0.0rc0"
+version = "3.0.0"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
