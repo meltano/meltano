@@ -35,29 +35,24 @@ jobs:
         - { id: '01', python-version: '3.8',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '02', python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite }
         - { id: '03', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '04', python-version: '3.11.3', os: ubuntu-latest, backend-db: sqlite, nox-python: 3.11 }
+        - { id: '04', python-version: '3.11', os: ubuntu-latest, backend-db: sqlite }
         - { id: '05', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
         - { id: '06', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
         - { id: '07', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '08', python-version: '3.11.3', os: ubuntu-latest, backend-db: postgresql, nox-python: 3.11 }
+        - { id: '08', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
         - { id: '09', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
         - { id: '10', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
         - { id: '11', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '12', python-version: '3.11.3', os: ubuntu-latest, backend-db: mssql, nox-python: 3.11 }
+        - { id: '12', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
         - { id: '13', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
         - { id: '14', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
         - { id: '15', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '16', python-version: '3.11.3', os: windows-2022,  backend-db: sqlite, nox-python: 3.11 }
+        - { id: '16', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
         - { id: '17', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '18', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '19', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        # https://github.com/meltano/meltano/issues/7813
-        - { id: '20', python-version: '3.11.3', os: ubuntu-latest, backend-db: postgresql_psycopg3, nox-python: 3.11 }
+        - { id: '20', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -88,11 +83,11 @@ jobs:
     env:
       PYTEST_MARKERS: not concurrent
       FORCE_COLOR: 1
-      NOXPYTHON: ${{ matrix.nox-python || matrix.python-version }}
+      NOXPYTHON: ${{ matrix.python-version }}
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Install Poetry
       env:
@@ -109,10 +104,11 @@ jobs:
         # Nox uses pip, so we cache with pip
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
+        check-latest: true
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v2.8.0
+      uses: docker/setup-buildx-action@v2.10.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
@@ -246,7 +242,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Install Poetry
       env:
@@ -296,7 +292,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v3.5.3
+      uses: actions/checkout@v3.6.0
 
     - name: Install Poetry
       env:

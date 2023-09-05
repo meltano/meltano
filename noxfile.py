@@ -46,6 +46,7 @@ pytest_deps = (
     "freezegun",
     "hypothesis",
     "mock",
+    "moto",
     "pytest",
     "pytest-aiohttp",
     "pytest-asyncio",
@@ -62,6 +63,7 @@ pytest_deps = (
 
 def _run_pytest(session: Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    args = session.posargs or ("tests/",)
     try:
         session.env.update(
             {
@@ -69,15 +71,15 @@ def _run_pytest(session: Session) -> None:
                 "COVERAGE_FILE": str(
                     root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
+                "NOX_CURRENT_SESSION": "tests",
             },
         )
         session.run(
             "pytest",
             "--cov=meltano",
             "--cov=tests",
-            "tests/",
             f"--randomly-seed={random_seed}",
-            *session.posargs,
+            *args,
         )
     finally:
         if session.interactive:

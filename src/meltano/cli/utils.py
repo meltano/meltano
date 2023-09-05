@@ -256,6 +256,8 @@ def _prompt_plugin_settings(plugin_type):
 def add_plugin(
     plugin_type: PluginType,
     plugin_name: str,
+    *,
+    python: str | None = None,
     add_service: ProjectAddService,
     variant=None,
     inherit_from=None,
@@ -263,21 +265,19 @@ def add_plugin(
     lock=True,
 ):
     """Add Plugin to given Project."""
-    plugin_attrs = {}
     if custom:
+        # XXX: For backwards compatibility, the namespace must be prompted for first.
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
         pip_url = _prompt_plugin_pip_url(plugin_name)
-        executable = _prompt_plugin_executable(pip_url, plugin_name)
-        capabilities = _prompt_plugin_capabilities(plugin_type)
-        settings = _prompt_plugin_settings(plugin_type)
-
         plugin_attrs = {
             "namespace": namespace,
             "pip_url": pip_url,
-            "executable": executable,
-            "capabilities": capabilities,
-            "settings": settings,
+            "executable": _prompt_plugin_executable(pip_url, plugin_name),
+            "capabilities": _prompt_plugin_capabilities(plugin_type),
+            "settings": _prompt_plugin_settings(plugin_type),
         }
+    else:
+        plugin_attrs = {}
 
     try:
         plugin = add_service.add(
@@ -286,6 +286,7 @@ def add_plugin(
             variant=variant,
             inherit_from=inherit_from,
             lock=lock,
+            python=python,
             **plugin_attrs,
         )
         print_added_plugin(plugin)
@@ -404,7 +405,7 @@ def install_plugins(
     parallelism=None,
     clean=False,
     force=False,
-):
+) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,

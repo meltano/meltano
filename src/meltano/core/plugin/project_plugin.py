@@ -57,6 +57,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         namespace: str | None = None,
         variant: str | None = None,
         pip_url: str | None = None,
+        python: str | None = None,
         executable: str | None = None,
         capabilities: list | None = None,
         settings_group_validation: list | None = None,
@@ -77,6 +78,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             namespace: Plugin namespace.
             variant: Plugin variant.
             pip_url: Plugin install pip url.
+            python: The python version to use for this plugin, specified as a path, or a
+                executable name to find within a directory in $PATH.
             executable: Executable name.
             capabilities: Capabilities.
             settings_group_validation: Settings group validation.
@@ -110,6 +113,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 namespace,
                 variant=variant,
                 pip_url=pip_url,
+                python=python,
                 executable=executable,
                 capabilities=capabilities,
                 settings_group_validation=settings_group_validation,
@@ -134,6 +138,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.python = python
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation
@@ -148,6 +153,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
                 "description",
                 self.VARIANT_ATTR,
                 "pip_url",
+                "python",
                 "executable",
                 "capabilities",
                 "settings_group_validation",
@@ -183,7 +189,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             )
 
     @property
-    def parent(self) -> ProjectPlugin:
+    def parent(self) -> ProjectPlugin | None:
         """Plugins parent.
 
         Returns:
@@ -239,7 +245,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
             Dictionary of supported commands, including those inherited from
             the parent plugin.
         """
-        return {**self._parent.all_commands, **self.commands}
+        return {**(self._parent.all_commands if self._parent else {}), **self.commands}
 
     @property
     def test_commands(self) -> dict[str, Command]:
@@ -276,7 +282,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         prefixes = [self.name, self.namespace]
 
         if for_writing:
-            prefixes.extend(self._parent.env_prefixes(for_writing=True))
+            if self._parent:
+                prefixes.extend(self._parent.env_prefixes(for_writing=True))
             prefixes.append(f"meltano_{self.type.verb}")  # MELTANO_EXTRACT_...
 
         return uniques_in(prefixes)
@@ -319,11 +326,15 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """
         # New setting definitions override old ones
         new_setting_names = {setting.name for setting in self.settings}
-        existing_settings = [
-            setting
-            for setting in self._parent.all_settings
-            if setting.name not in new_setting_names
-        ]
+        existing_settings = (
+            [
+                setting
+                for setting in self._parent.all_settings
+                if setting.name not in new_setting_names
+            ]
+            if self._parent
+            else []
+        )
         existing_settings.extend(self.settings)
 
         return [
@@ -338,7 +349,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         Returns:
             A list of extra SettingDefinitions, including those defined by the parent.
         """
-        existing_settings = self._parent.extra_settings
+        existing_settings = self._parent.extra_settings if self._parent else []
         return [
             *existing_settings,
             *SettingDefinition.from_missing(existing_settings, self.extra_config),
@@ -402,7 +413,11 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         plugin_types = plugin_types or list(PluginType)
         return {
             plugin_type: [
-                *self._parent.all_requires.get(plugin_type, []),
+                *(
+                    self._parent.all_requires.get(plugin_type, [])
+                    if self._parent
+                    else []
+                ),
                 *self.requires.get(plugin_type, []),
             ]
             for plugin_type in plugin_types

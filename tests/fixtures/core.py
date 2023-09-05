@@ -44,6 +44,17 @@ def discovery():  # noqa: WPS213
     return {
         PluginType.EXTRACTORS: [
             {
+                "name": "tap-that-needs-custom-python",
+                "namespace": "tap_that_needs_custom_python",
+                "variants": [
+                    {
+                        "name": "meltano",
+                        "original": True,
+                        "pip_url": "tap-that-needs-custom-python",
+                    },
+                ],
+            },
+            {
                 "name": "tap-google-analytics",
                 "label": "Google Analytics",
                 "description": "App and website analytics platform hosted by Google",

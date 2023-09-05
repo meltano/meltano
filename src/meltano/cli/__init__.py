@@ -32,7 +32,6 @@ from meltano.cli import (  # noqa: WPS235
 from meltano.cli import compile as compile_module
 from meltano.cli.cli import cli
 from meltano.cli.utils import CliError
-from meltano.cloud.cli import cloud
 from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.logging import setup_logging
 
@@ -40,7 +39,6 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
 
 cli.add_command(add.add)
-cli.add_command(cloud)
 cli.add_command(compile_module.compile_command)
 cli.add_command(config.config)
 cli.add_command(docs.docs)

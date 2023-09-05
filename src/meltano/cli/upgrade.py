@@ -7,7 +7,7 @@ import os
 import click
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, InstrumentedCmd, InstrumentedDefaultGroup
+from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
 from meltano.core.db import project_engine
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.upgrade_service import UpgradeService
@@ -33,13 +33,6 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    raise CliError(
-        "The 'meltano upgrade' command is disabled on the 'cloud' feature "
-        "branch. Please upgrade Meltano manually. Once the Cloud features "
-        "are generally available, you will no longer have to install from a "
-        "feature branch using git, and the 'meltano upgrade' command will "
-        "be restored.",
-    )
     engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
     upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
     ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
@@ -91,6 +84,7 @@ def all(ctx, pip_url, force, skip_package):
 
         click.echo()
 
+        upgrade_service.migrate_state()
         if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")

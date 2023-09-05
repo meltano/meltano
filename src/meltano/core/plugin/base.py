@@ -261,6 +261,7 @@ class Variant(NameEq, Canonical):
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
+        python: str | None = None,
         executable: str | None = None,
         description: str | None = None,
         logo_url: str | None = None,
@@ -281,6 +282,8 @@ class Variant(NameEq, Canonical):
             docs: The documentation URL.
             repo: The repository URL.
             pip_url: The pip URL.
+            python: The path to the Python executable to use, or name to find on the
+                $PATH. Defaults to the Python executable running Meltano.
             executable: The executable name.
             description: The description of the plugin.
             logo_url: The logo URL of the plugin.
@@ -299,6 +302,7 @@ class Variant(NameEq, Canonical):
             docs=docs,
             repo=repo,
             pip_url=pip_url,
+            python=python,
             executable=executable,
             description=description,
             logo_url=logo_url,
@@ -321,6 +325,7 @@ class PluginDefinition(PluginRef):
         name: str,
         namespace: str,
         *,
+        python: str | None = None,
         variant: str | None = None,
         variants: list | None = None,
         is_default_variant: bool | None = None,
@@ -332,6 +337,8 @@ class PluginDefinition(PluginRef):
             plugin_type: The type of the plugin.
             name: The name of the plugin.
             namespace: The namespace of the plugin.
+            python: The path to the Python executable to use, or name to find on the
+                $PATH. Defaults to the Python executable running Meltano.
             variant: The variant of the plugin.
             variants: The variants of the plugin.
             is_default_variant: Whether the variant is the default one.
@@ -363,9 +370,10 @@ class PluginDefinition(PluginRef):
 
         # Attributes will be listed in meltano.yml in this order:
         self.namespace = namespace
+        self.python = python
         self.set_presentation_attrs(extras)
         self.extras = extras
-        self.variants = list(map(Variant.parse, variants))
+        self.variants = [Variant.parse(x) for x in variants]
         self.is_default_variant = is_default_variant
 
     def __iter__(self):
@@ -479,6 +487,7 @@ class PluginDefinition(PluginRef):
             docs=plugin.docs,
             repo=plugin.repo,
             pip_url=plugin.pip_url,
+            python=plugin.python,
             executable=plugin.executable,
             description=plugin.description,
             logo_url=plugin.logo_url,
@@ -762,6 +771,7 @@ class StandalonePlugin(Canonical):
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
+        python: str | None = None,
         executable: str | None = None,
         description: str | None = None,
         logo_url: str | None = None,
@@ -784,6 +794,8 @@ class StandalonePlugin(Canonical):
             docs: The documentation URL of the plugin.
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
+            python: The path to the Python executable to use, or name to find on the
+                $PATH. Defaults to the Python executable running Meltano.
             executable: The executable of the plugin.
             description: The description of the plugin.
             logo_url: The logo URL of the plugin.
@@ -804,6 +816,7 @@ class StandalonePlugin(Canonical):
             docs=docs,
             repo=repo,
             pip_url=pip_url,
+            python=python,
             executable=executable,
             description=description,
             logo_url=logo_url,
@@ -868,6 +881,7 @@ class StandalonePlugin(Canonical):
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,
+            python=plugin_def.python,
             executable=variant.executable,
             description=variant.description,
             logo_url=variant.logo_url,

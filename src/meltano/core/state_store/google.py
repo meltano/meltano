@@ -1,11 +1,11 @@
 """StateStoreManager for Google Cloud storage backend."""
 from __future__ import annotations
 
-import re
+from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cached_property
 
-from meltano.core.state_store.filesystem import BaseFilesystemStateStoreManager
+from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 try:
     import google  # type: ignore
@@ -38,7 +38,7 @@ def requires_gcs():
     yield
 
 
-class GCSStateStoreManager(BaseFilesystemStateStoreManager):
+class GCSStateStoreManager(CloudStateStoreManager):
     """State backend for Google Cloud Storage."""
 
     label: str = "Google Cloud Storage"
@@ -94,33 +94,6 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
             # Use default authentication in environment
             return google.cloud.storage.Client()
 
-    @property
-    def state_dir(self) -> str:
-        """Get the prefix that state should be stored at.
-
-        Returns:
-            The relevant prefix
-        """
-        return self.prefix.lstrip(self.delimiter).rstrip(self.delimiter)
-
-    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
-        """Get list of state_ids stored in the backend.
-
-        Args:
-            pattern: glob-style pattern to filter state_ids by
-
-        Returns:
-            List of state_ids
-        """
-        if pattern:
-            pattern_re = re.compile(pattern.replace("*", ".*"))
-        state_ids = set()
-        for blob in self.client.list_blobs(bucket_or_name=self.bucket):
-            (state_id, filename) = blob.name.split("/")[-2:]
-            if filename == "state.json" and (not pattern) or pattern_re.match(state_id):
-                state_ids.add(state_id)
-        return list(state_ids)
-
     def delete(self, file_path: str):
         """Delete the file/blob at the given path.
 
@@ -139,3 +112,23 @@ class GCSStateStoreManager(BaseFilesystemStateStoreManager):
                 ...
             else:
                 raise e
+
+    def list_all_files(self) -> Iterator[str]:
+        """List all files in the backend.
+
+        Yields:
+            The next file in the backend.
+        """
+        for blob in self.client.list_blobs(bucket_or_name=self.bucket):  # noqa: WPS526
+            yield blob.name
+
+    def copy_file(self, src: str, dst: str) -> None:
+        """Copy a file from one location to another.
+
+        Args:
+            src: the source path
+            dst: the destination path
+        """
+        bucket = self.client.bucket(self.bucket)
+        blob = bucket.blob(src)
+        bucket.copy_blob(blob, bucket, dst)

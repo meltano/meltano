@@ -28,7 +28,7 @@ See related issue: [#6853](https://github.com/meltano/meltano/issues/6853).
 Meltano cloud will have support for automatic deployments in GA but currently users need to manually request a re-deployment of a project when new commits are added to the git repository.
 
 ```bash
-meltano cloud deployment update --name prod
+meltano-cloud deployment update --name prod
 ```
 
 See the [deployments CLI reference](/cloud/cloud-cli#deployment).

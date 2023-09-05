@@ -1,0 +1,78 @@
+---
+slug: 2023-08-24-updates-and-changes
+title: August Updates and Changes
+---
+
+The team has been heads down this month bringing improvements and squashing bugs to all things Meltano.
+Let's take a look at some of the bigger items we shipped recently!
+
+## ☁️ Meltano Cloud
+
+### 🚀 Automated deployments
+
+Now when you set your deployment to track a git branch, any new commits that appear on that branch will automatically be deployed in Meltano Cloud.
+Previously users had to complete an additional manual step to get any new committed changes deployed.
+
+Static deployments are still possible by referencing a particular git hash.
+
+### 🚨 Custom Notifications
+
+Cloud customers now have greater flexibility over their notifications.
+With the updated [`config` CLI command](https://docs.meltano.com/cloud/cloud-cli#notification), you can specify exactly how you want to receive notifications.
+Email and webhooks are the initially supported destinations and the payload of the notification can be filtered to exactly how you want it - failures only, successes only, or anything!
+
+```bash
+meltano cloud config notification set
+```
+
+### ➕ Add new projects from the CLI
+
+New projects can now easily be [added from the CLI](https://docs.meltano.com/cloud/cloud-cli#project) to your Meltano Cloud account.
+This simplifies onboarding for new users as well as our power users that have 10s or 100s of projects they need to onboard.
+
+
+## Meltano Core
+
+[v2.20.0](https://github.com/meltano/meltano/releases/tag/v2.20.0) of Meltano Core was released. This was mostly a bug, performance, and doc update release.
+
+## MeltanoHub
+
+We added a "Most Popular" listing to the Extractors page. [Check it out](https://hub.meltano.com/extractors)!
+
+The Meltano Team and Community have also been busy adding new connectors and utilities to the Hub.
+Many of the new connectors are related to our recent blog post about how [LLMs are mostly data pipelines](https://meltano.com/blog/llm-apps-are-mostly-data-pipelines/).
+
+### Extractors
+
+- Added the MeltanoLabs variant of tap-jira - [Link](https://github.com/MeltanoLabs/tap-jira)
+- Added the MeltanoLabs variant of tap-mysql. This tap is still under active development. - [Link](https://hub.meltano.com/extractors/tap-mysql--meltanolabs/)
+- Added the MeltanoLabs variant of tap-beautifulsoup - [Link](https://hub.meltano.com/extractors/tap-beautifulsoup)
+- Added the sehnem variant of tap-shopify which supports accessing data via graphql - [Link](https://hub.meltano.com/extractors/tap-shopify--sehnem/)
+
+
+### Mappers
+
+- Added the map-gpt-embeddings mapper. This can be used to connect to OpenAI to generate embeddings for any data from an extractor - [Link](https://hub.meltano.com/mappers/map-gpt-embeddings)
+
+
+### Loaders
+
+- Added the MeltanoLabs variant of target-pinecone which is a Vector Database for storing embeddings. - [Link](https://hub.meltano.com/loaders/target-pinecone)
+
+### Utilities
+
+- Added Tableau utility which can be used to trigger a refresh of Tableu data source - [Link](https://hub.meltano.com/utilities/tableau)
+- Added the dbt Artifacts utility which can be used to process dbt-generated artifacts for other use cases such as model lineage - [Link](https://hub.meltano.com/utilities/dbt-artifacts)
+
+
+## SDK
+
+We shipped 2 releases of the SDK:
+
+- [v0.31.0](https://github.com/meltano/sdk/releases/tag/v0.31.0)
+- [v0.31.1](https://github.com/meltano/sdk/releases/tag/v0.31.1)
+
+Highlights include:
+
+* Improved connection handling in SQL targets by sharing a connector instance among stream sinks
+* Expose builtin `add_record_metadata` and `batch_config` target settings

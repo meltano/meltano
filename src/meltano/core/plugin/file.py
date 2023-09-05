@@ -67,7 +67,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
             A dictionary of file names and their contents.
         """
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
-        bundle_dir = venv.site_packages_dir.joinpath("bundle")
+        bundle_dir = venv.site_packages_dir / "bundle"
 
         return {
             path.relative_to(bundle_dir): path.read_text()
@@ -121,10 +121,11 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         """
 
         def with_update_header(content: str, relative_path: PathLike):
-            if any(relative_path.match(path) for path in paths_to_update):
-                content = "\n\n".join([self.update_file_header(relative_path), content])
-
-            return content
+            return (
+                "\n\n".join([self.update_file_header(relative_path), content])
+                if any(relative_path.match(path) for path in paths_to_update)
+                else content
+            )
 
         return {
             relative_path: with_update_header(content, relative_path)
