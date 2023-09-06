@@ -31,10 +31,7 @@ Meltano Cloud connects to an existing Meltano project in your GitHub repository,
    ```bash
    meltano init <INSERT_YOUR_PROJECT_NAME>
    cd <INSERT_YOUR_PROJECT_NAME>
-   meltano lock --update --all
    ```
-
-   Commit your changes back to the GitHub repository.
 
 4. Add Sample Plugins and Schedules
 
@@ -65,6 +62,15 @@ Meltano Cloud connects to an existing Meltano project in your GitHub repository,
      job: sample_job
    ```
 
-5. Next follow the [Onboarding Guide](/cloud/onboarding/) to configure your GitHub repository with Meltano Cloud.
+5. Lock your new plugins and commit the changes
+
+   ```bash
+   meltano lock --update --all
+   ```
+
+   Commit your changes back to the GitHub repository.
+
+
+6. Next follow the [Onboarding Guide](/cloud/onboarding/) to configure your GitHub repository with Meltano Cloud.
 
 Once your Meltano Cloud project is set up you can explore the Meltano Core [getting started guide](/getting-started/part1) to learn how to customize your project.
