@@ -58,7 +58,7 @@ meltano add extractor tap-gitlab
 meltano add loader target-postgres
 ```
 
-Without a `--custom` or `--inherit-from` option, this will add the
+Without a `--custom`, `--inherit-from` or `--from-ref` option, this will add the
 [discoverable plugin](/concepts/plugins#discoverable-plugins) with the provided name
 to your [`meltano.yml` project file](/concepts/project#plugins)
 using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions).
