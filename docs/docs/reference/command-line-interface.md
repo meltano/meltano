@@ -86,6 +86,33 @@ meltano add --custom extractor tap-covid-19
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
+To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
+
+```bash
+meltano add --from-ref <ref> <type> <name>
+
+# For example:
+# URL
+meltano add extractor tap-spotify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-spotify/matatika.yml
+
+# Absolute local path
+meltano add extractor tap-spotify --from-ref /path/to/my/meltano/project/tap-spotify--matatika.yml
+
+# Relative local path
+meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+
+# The plugin name specified in the command is superseded by the value in the
+# plugin definition file - using the same name is just a formality
+meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
+
+# The above also applies to the plugin variant, if provided
+meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
+```
+
+:::note
+  Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties.
+:::
+
 To add a plugin [inheriting from](/concepts/plugins#plugin-inheritance) an existing one using an [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), use the `--inherit-from` option:
 
 ```bash
@@ -131,6 +158,8 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--no-install`: Do not install the plugin after adding it to the project.
+
+- `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 ### Using `add` with Environments
 
