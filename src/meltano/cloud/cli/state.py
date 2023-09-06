@@ -125,6 +125,7 @@ async def list_state_ids(context: MeltanoCloudCLIContext):
 @pass_context
 @run_async
 async def delete_state(context: MeltanoCloudCLIContext, state_id):  # noqa: D103
+    """Delete state for the given state ID."""
     async with StateCloudClient(config=context.config) as client:
         await client.delete_state(state_id=state_id)
         click.secho(f"Successfully deleted state for {state_id}", fg="green")
@@ -143,6 +144,7 @@ async def get_state(  # noqa: D103 E501 WPS463
     context: MeltanoCloudCLIContext,
     state_id: str,
 ):
+    """Get state for the given state ID."""
     async with StateCloudClient(config=context.config) as client:
         response = await client.get_state(state_id=state_id)
         if response.status_code == HTTPStatus.NOT_FOUND:
@@ -169,6 +171,10 @@ async def set_state(  # noqa: D103
     state_id: str,
     file_path: str,
 ):
+    """Replace state for the given state ID with the contents of the given file path.
+
+    Overwrites existing state, if any is found.
+    """
     async with StateCloudClient(config=context.config) as client:
         await client.set_state(
             state_filepath=Path(file_path),
