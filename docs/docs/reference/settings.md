@@ -179,11 +179,19 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ```bash
+PostgreSQL
 meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
 export MELTANO_DATABASE_URI=postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
 
 meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<port>/<database> ...
+
+SQL SERVER (MSSQL)
+meltano config meltano set database_uri mssql+pymssql://<username>:<password>@<host>:<port>/<database>
+
+export MELTANO_DATABASE_URI=mssql+pymssql://<username>:<password>@<host>:<port>/<database>
+
+meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<database> ...
 ```
 
 :::info
