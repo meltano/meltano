@@ -30,6 +30,8 @@ Meltano Cloud connects to an existing Meltano project in your GitHub repository,
 
    ```bash
    meltano init <INSERT_YOUR_PROJECT_NAME>
+   cd <INSERT_YOUR_PROJECT_NAME>
+   meltano lock --update --all
    ```
 
    Commit your changes back to the GitHub repository.
