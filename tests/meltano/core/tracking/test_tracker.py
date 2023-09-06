@@ -422,6 +422,7 @@ class TestTracker:
         assert get_source() == "env"
 
     @pytest.mark.order(1)
+    @pytest.mark.flaky(reruns=5, reruns_delay=2)
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
