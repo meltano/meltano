@@ -17,6 +17,7 @@ from meltano.cloud.cli import (  # noqa: WPS235
     project,
     run,
     schedule,
+    state,
 )
 from meltano.cloud.cli.base import cloud
 
@@ -33,6 +34,7 @@ cloud.add_command(logs.logs)
 cloud.add_command(project.project_group)
 cloud.add_command(run.run)
 cloud.add_command(schedule.schedule_group)
+cloud.add_command(state.state_group)
 
 
 def main() -> int:
