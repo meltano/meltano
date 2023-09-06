@@ -46,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.40", optional = true}
+boto3 = {version = "^1.28.41", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -96,12 +96,12 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.3.0"
-boto3-stubs = {extras = ["essential"], version = "1.28.40"}
+boto3-stubs = {extras = ["essential"], version = "1.28.41"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
-coverage = {extras = ["toml"], version = "^7.2.7"}
+coverage = {extras = ["toml"], version = "^7.3.1"}
 freezegun = "^1.2.2"
-hypothesis = "^6.84.0"
+hypothesis = "^6.84.2"
 mock = "^5.0.2"
 moto = "^4.2.2"
 mypy = "^1.4.1"
@@ -114,6 +114,7 @@ pytest-docker = "^2.0"
 pytest-httpserver = "^1.0.6"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
+pytest-rerunfailures = "^12.0"
 pytest-structlog = "^0.6"
 pytest-xdist = "^3.3"
 requests-mock = "^1.11.0"
