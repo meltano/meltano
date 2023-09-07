@@ -106,16 +106,16 @@ class TestProjectCommand:
         )
         assert result.exit_code == 0, result.output
         assert result.output == (
-            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────╮\n"  # noqa: E501
-            "│  Default  │ Name                            │ Git Repository                                 │\n"  # noqa: E501
-            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┤\n"  # noqa: E501
-            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │\n"  # noqa: E501
-            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │\n"  # noqa: E501
-            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │\n"  # noqa: E501
-            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │\n"  # noqa: E501
-            "│           │ 01GWQRDA1HZNTSW7JK0KNGCYS9      │ Really? A ULID for your project name?          │\n"  # noqa: E501
-            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
-        )  # noqa: E501
+            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────┬─────────────╮\n"  # noqa: E501
+            "│  Default  │ Name                            │ Git Repository                                 │ Root Path   │\n"  # noqa: E501
+            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┼─────────────┤\n"  # noqa: E501
+            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │ information │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │ .           │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │ .           │\n"  # noqa: E501
+            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │ .           │\n"  # noqa: E501
+            "│           │ 01GWQRDA1HZNTSW7JK0KNGCYS9      │ Really? A ULID for your project name?          │ .           │\n"  # noqa: E501
+            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────┴─────────────╯\n"  # noqa: E501
+        )
 
     def test_project_list_table_limit(
         self,
@@ -133,15 +133,15 @@ class TestProjectCommand:
         )
         assert result.exit_code == 0, result.output
         assert result.output == (
-            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────╮\n"  # noqa: E501
-            "│  Default  │ Name                            │ Git Repository                                 │\n"  # noqa: E501
-            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┤\n"  # noqa: E501
-            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │\n"  # noqa: E501
-            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │\n"  # noqa: E501
-            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │\n"  # noqa: E501
-            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │\n"  # noqa: E501
-            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
-        )  # noqa: E501
+            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────┬─────────────╮\n"  # noqa: E501
+            "│  Default  │ Name                            │ Git Repository                                 │ Root Path   │\n"  # noqa: E501
+            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┼─────────────┤\n"  # noqa: E501
+            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │ information │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │ .           │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │ .           │\n"  # noqa: E501
+            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │ .           │\n"  # noqa: E501
+            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────┴─────────────╯\n"  # noqa: E501
+        )
         assert result.stderr == (
             "Output truncated. To print more items, increase the limit using the "
             "--limit option.\n"
@@ -164,16 +164,16 @@ class TestProjectCommand:
         )
         assert result.exit_code == 0, result.output
         assert result.output == (
-            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────╮\n"  # noqa: E501
-            "│  Default  │ Name                            │ Git Repository                                 │\n"  # noqa: E501
-            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┤\n"  # noqa: E501
-            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │\n"  # noqa: E501
-            "│     X     │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │\n"  # noqa: E501
-            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │\n"  # noqa: E501
-            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │\n"  # noqa: E501
-            "│           │ 01GWQRDA1HZNTSW7JK0KNGCYS9      │ Really? A ULID for your project name?          │\n"  # noqa: E501
-            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────╯\n"  # noqa: E501
-        )  # noqa: E501
+            "╭───────────┬─────────────────────────────────┬────────────────────────────────────────────────┬─────────────╮\n"  # noqa: E501
+            "│  Default  │ Name                            │ Git Repository                                 │ Root Path   │\n"  # noqa: E501
+            "├───────────┼─────────────────────────────────┼────────────────────────────────────────────────┼─────────────┤\n"  # noqa: E501
+            "│           │ Meltano Cubed                   │ https://github.com/meltano/cubed.git           │ information │\n"  # noqa: E501
+            "│     X     │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box.git   │ .           │\n"  # noqa: E501
+            "│           │ Post-Modern Data Stack in a Box │ https://github.com/meltano/pmds-in-a-box-2.git │ .           │\n"  # noqa: E501
+            "│           │ Stranger in a Strange Org       │ https://github.com/onatlem/grok.git            │ .           │\n"  # noqa: E501
+            "│           │ 01GWQRDA1HZNTSW7JK0KNGCYS9      │ Really? A ULID for your project name?          │ .           │\n"  # noqa: E501
+            "╰───────────┴─────────────────────────────────┴────────────────────────────────────────────────┴─────────────╯\n"  # noqa: E501
+        )
 
     def test_project_list_json(
         self,

@@ -168,6 +168,7 @@ def _format_project(project: dict[str, t.Any]) -> tuple[str, ...]:
         "X" if project["default"] else "",
         project["project_name"],
         project["git_repository"],
+        project["project_root_path"],
     )
 
 
@@ -211,8 +212,8 @@ async def list_projects(
         stripped_results,
         output_format,
         _format_project,
-        ("Default", "Name", "Git Repository"),
-        ("center", "left", "left"),
+        ("Default", "Name", "Git Repository", "Root Path"),
+        ("center", "left", "left", "left"),
     )
 
 
