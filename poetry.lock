@@ -2677,13 +2677,13 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pytest-aiohttp"
-version = "1.0.4"
+version = "1.0.5"
 description = "Pytest plugin for aiohttp support"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-aiohttp-1.0.4.tar.gz", hash = "sha256:39ff3a0d15484c01d1436cbedad575c6eafbf0f57cdf76fb94994c97b5b8c5a4"},
-    {file = "pytest_aiohttp-1.0.4-py3-none-any.whl", hash = "sha256:1d2dc3a304c2be1fd496c0c2fb6b31ab60cd9fc33984f761f951f8ea1eb4ca95"},
+    {file = "pytest-aiohttp-1.0.5.tar.gz", hash = "sha256:880262bc5951e934463b15e3af8bb298f11f7d4d3ebac970aab425aff10a780a"},
+    {file = "pytest_aiohttp-1.0.5-py3-none-any.whl", hash = "sha256:63a5360fd2f34dda4ab8e6baee4c5f5be4cd186a403cabd498fced82ac9c561e"},
 ]
 
 [package.dependencies]
@@ -3938,4 +3938,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "f8e3952e36e6dac426a57a3c2ffceb49b9c6bb3187a6c39918a028c37cbb1164"
+content-hash = "0023439e260185f37e338d5c6fc0bbcbf33050afe62b38b0c74f580703765d8b"
