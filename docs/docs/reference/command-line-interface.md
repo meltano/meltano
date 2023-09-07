@@ -126,7 +126,7 @@ meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
 Using `--from-ref` allows you to add a plugin before it is avilable on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
 
 :::note
-  Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties.
+  Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
