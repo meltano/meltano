@@ -49,13 +49,14 @@ def _prompt_for_confirmation(prompt):
 
     def _prompt_callback(ctx, param, value):  # noqa: ARG001
         if not value:
-            click.confirm(prompt)
+            ctx.abort()
 
     return click.option(
         "--force",
         is_flag=True,
         expose_value=False,
         callback=_prompt_callback,
+        prompt=prompt,
         help="Don't prompt for confirmation.",
     )
 
