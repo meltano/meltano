@@ -269,3 +269,18 @@ class TestCliState:
                 assert_cli_runner(result)
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
+
+    def test_clear_prompt(self, state_service, cli_runner, state_ids):
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            for state_id in state_ids:
+                result = cli_runner.invoke(cli, ["state", "clear", state_id], input="n")
+                assert result.exit_code == 1
+
+                job_state = state_service.get_state(state_id)
+                assert "singer_state" in job_state
+
+                result = cli_runner.invoke(cli, ["state", "clear", state_id], input="y")
+                assert_cli_runner(result)
+
+                job_state = state_service.get_state(state_id)
+                assert (not job_state) or (not job_state.get("singer_state"))
