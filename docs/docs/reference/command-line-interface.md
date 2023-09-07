@@ -86,6 +86,15 @@ meltano add --custom extractor tap-covid-19
 docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
 ```
 
+To add a plugin [inheriting from](/concepts/plugins#plugin-inheritance) an existing one using an [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), use the `--inherit-from` option:
+
+```bash
+meltano add <type> <name> --inherit-from <existing-name>
+
+# For example:
+meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
+```
+
 To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
 
 ```bash
@@ -117,15 +126,6 @@ meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
 :::note
   Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties.
 :::
-
-To add a plugin [inheriting from](/concepts/plugins#plugin-inheritance) an existing one using an [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), use the `--inherit-from` option:
-
-```bash
-meltano add <type> <name> --inherit-from <existing-name>
-
-# For example:
-meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
-```
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
