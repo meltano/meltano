@@ -10,10 +10,11 @@ import pytest
 import yaml
 
 from asserts import assert_cli_runner
+from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
@@ -21,6 +22,12 @@ from meltano.core.project_init_service import ProjectInitService
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
+
+plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
+fails_on_windows = pytest.mark.xfail(
+    platform.system() == "Windows",
+    reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
+)
 
 
 class TestCliAdd:
@@ -32,6 +39,11 @@ class TestCliAdd:
     ):
         shutil.rmtree(".", ignore_errors=True)
         project_init_service.create_files(project)
+
+        project.refresh()
+
+        for plugin_type in PluginType:
+            project.meltano.plugins[plugin_type].clear()
 
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
@@ -196,16 +208,13 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}",
         }
 
+    @fails_on_windows
     def test_add_files_with_updates(
         self,
         project: Project,
         cli_runner,
         plugin_settings_service_factory,
     ):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
         shutil.rmtree("plugins/files", ignore_errors=True)
@@ -252,11 +261,8 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
+    @fails_on_windows
     def test_add_files_that_already_exists(self, project: Project, cli_runner):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
@@ -426,6 +432,7 @@ class TestCliAdd:
                 "Extractor 'tap-bar' is not known to Meltano"
             ) in str(res.exception)
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_custom(self, project: Project, cli_runner):
         pip_url = "-e path/to/tap-custom"
         executable = "tap-custom-bin"
@@ -576,7 +583,6 @@ class TestCliAdd:
         project: Project,
         cli_runner,
     ):
-        project.refresh()
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
@@ -634,6 +640,140 @@ class TestCliAdd:
                     )
 
                 install_plugin_mock.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "ref",
+        (
+            plugin_ref,
+            (
+                "https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/"
+                f"{plugin_ref.relative_to(plugins_dir)}"
+            ),
+        ),
+        ids=(
+            "local",
+            "remote",
+        ),
+    )
+    @pytest.mark.usefixtures("reset_project_context")
+    @mock.patch("meltano.cli.add.install_plugins")
+    @mock.patch("meltano.cli.add.requests.get")
+    def test_add_from_ref(
+        self,
+        ref_request_mock,
+        install_plugin_mock,
+        ref,
+        project,
+        cli_runner,
+    ):
+        ref_request_mock.return_value.status_code = 200
+        ref_request_mock.return_value.text = plugin_ref.read_text()
+
+        install_plugin_mock.return_value = True
+
+        plugin_name = plugin_ref.parent.name
+        plugin_type = PluginType(plugin_ref.parents[1].name)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", plugin_type.singular, plugin_name, "--from-ref", ref],
+        )
+        assert_cli_runner(res)
+
+        assert f"Added {plugin_type.singular} '{plugin_name}'" in res.output
+
+        plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+        assert plugin.name == plugin_name
+        assert plugin.variant == "test"
+
+    @pytest.mark.usefixtures("reset_project_context")
+    @pytest.mark.parametrize(
+        (
+            "ref",
+            "invalid_reason",
+        ),
+        (
+            (
+                plugin_ref.name,
+                "No such file or directory: '{ref}'",
+            ),
+            pytest.param(
+                plugin_ref.parent,
+                "Is a directory: '{ref}'",
+                marks=fails_on_windows,
+            ),
+            (
+                "https://:",
+                "Invalid URL '{ref}'",
+            ),
+        ),
+        ids=(
+            "does not exist",
+            "is directory",
+            "invalid url",
+        ),
+    )
+    def test_add_from_ref_invalid_ref(
+        self,
+        ref,
+        invalid_reason,
+        cli_runner,
+    ):
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", ref],
+        )
+
+        assert res.exit_code == 2
+        assert invalid_reason.format(ref=ref) in res.stderr
+
+    @pytest.mark.parametrize(
+        (
+            "definition",
+            "invalid_reason",
+        ),
+        (
+            (
+                "test",
+                "incorrect format",
+            ),
+            (
+                {},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"test-key": "test-value"},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"name": "tap-custom"},
+                "missing properties (namespace)",
+            ),
+        ),
+        ids=(
+            "incorrect format",
+            "empty",
+            "no required properties",
+            "some required properties",
+        ),
+    )
+    def test_add_from_ref_invalid_definiton(
+        self,
+        definition,
+        invalid_reason,
+        cli_runner,
+    ):
+        with open("test.yml", "w") as f:
+            yaml.dump(definition, f)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", f.name],
+        )
+
+        assert res.exit_code == 1
+        assert isinstance(res.exception, InvalidPluginDefinitionError)
+        assert res.exception.reason == invalid_reason
 
     def test_add_with_python_version(self, cli_runner: CliRunner):
         with mock.patch(

@@ -19,6 +19,7 @@ if t.TYPE_CHECKING:
 
 
 current_dir = Path(__file__).parent
+plugins_dir = current_dir / "plugins"
 
 
 class MeltanoCliRunner(CliRunner):

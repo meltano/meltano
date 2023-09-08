@@ -46,7 +46,7 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.3", optional = true}
 azure-storage-blob = {version = "^12.14.1", optional = true}
-boto3 = {version = "^1.28.40", optional = true}
+boto3 = {version = "^1.28.42", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -75,7 +75,7 @@ questionary = "^2.0.0"
 requests = "^2.31.0"
 rich = "^13.5.2"
 "ruamel.yaml" = "^0.17.21"
-smart-open = "^6.2.0"
+smart-open = "^6.4.0"
 snowplow-tracker = "^1.0.1"
 sqlalchemy = "^2.0.19"
 structlog = "^23.1.0"
@@ -96,24 +96,25 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.3.0"
-boto3-stubs = {extras = ["essential"], version = "1.28.40"}
+boto3-stubs = {extras = ["essential"], version = "1.28.42"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
-coverage = {extras = ["toml"], version = "^7.2.7"}
+coverage = {extras = ["toml"], version = "^7.3.1"}
 freezegun = "^1.2.2"
-hypothesis = "^6.84.0"
+hypothesis = "^6.84.2"
 mock = "^5.0.2"
 moto = "^4.2.2"
 mypy = "^1.4.1"
 pre-commit = "^3.4.0"
-pytest = "^7.4.1"
-pytest-aiohttp = "^1.0.4"
+pytest = "^7.4.2"
+pytest-aiohttp = "^1.0.5"
 pytest-asyncio = "^0.21.1"
 pytest-cov = "^4.1.0"
 pytest-docker = "^2.0"
 pytest-httpserver = "^1.0.6"
 pytest-order = "^1.0"
 pytest-randomly = "^3.12"
+pytest-rerunfailures = "^12.0"
 pytest-structlog = "^0.6"
 pytest-xdist = "^3.3"
 requests-mock = "^1.11.0"
