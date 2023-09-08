@@ -15,7 +15,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "2.1.0"
+      placeholder: "3.0.0"
     validations:
       required: true
   - type: dropdown
@@ -39,7 +39,6 @@ body:
       label: Bug scope
       description: Functionality this bug affects
       options:
-        - API
         - CLI (options, error messages, logging, etc.)
         - Configuration (settings parsing, validation, etc.)
         - Other
