@@ -5,12 +5,17 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cached_property
 
-from meltano.core.state_store.filesystem import CloudStateStoreManager
+from meltano.core.error import MeltanoError
+from meltano.core.state_store.filesystem import (
+    CloudStateStoreManager,
+)
+
+AZURE_INSTALLED = True
 
 try:
-    from azure.storage.blob import BlobServiceClient  # type: ignore
+    from azure.storage.blob import BlobServiceClient
 except ImportError:
-    BlobServiceClient = None
+    AZURE_INSTALLED = False
 
 
 class MissingAzureError(Exception):
@@ -33,7 +38,7 @@ def requires_azure():
     Yields:
         None
     """
-    if not BlobServiceClient:
+    if not AZURE_INSTALLED:
         raise MissingAzureError
     yield
 
@@ -45,7 +50,6 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
 
     def __init__(
         self,
-        container_name: str | None = None,
         connection_string: str | None = None,
         prefix: str | None = None,
         **kwargs,
@@ -53,14 +57,23 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         """Initialize the BaseFilesystemStateStoreManager.
 
         Args:
-            container_name: the container to store state in.
             connection_string: connection string to use in authenticating to Azure
             prefix: the prefix to store state at
             kwargs: additional keyword args to pass to parent
+
+        Raises:
+            MeltanoError: If container name is not included in the URI.
         """
         super().__init__(**kwargs)
         self.connection_string = connection_string
-        self.container_name = container_name or self.parsed.hostname
+
+        if not self.parsed.hostname:
+            raise MeltanoError(
+                f"Azure state backend URI must include a container name: {self.uri}",
+                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",  # noqa: E501
+            )
+
+        self.container_name = self.parsed.hostname
         self.prefix = prefix or self.parsed.path
 
     @staticmethod
@@ -73,7 +86,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         Returns:
             True if error represents file not being found, else False
         """
-        from azure.core.exceptions import ResourceNotFoundError  # type: ignore
+        from azure.core.exceptions import ResourceNotFoundError
 
         return (
             isinstance(err, ResourceNotFoundError)
@@ -81,16 +94,23 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
-    def client(self):
+    def client(self) -> BlobServiceClient:
         """Get an authenticated azure.storage.blob.BlobServiceClient.
 
         Returns:
             An authenticated azure.storage.blob.BlobServiceClient
+
+        Raises:
+            MeltanoError: If connection string is not provided.
         """
         with requires_azure():
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
-            return BlobServiceClient()
+
+            raise MeltanoError(
+                "Azure state backend requires a connection string",
+                "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
+            )
 
     def delete(self, file_path: str):
         """Delete the file/blob at the given path.

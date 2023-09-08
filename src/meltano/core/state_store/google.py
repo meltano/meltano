@@ -7,10 +7,12 @@ from functools import cached_property
 
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
+GOOGLE_INSTALLED = True
+
 try:
     import google  # type: ignore
 except ImportError:
-    google = None
+    GOOGLE_INSTALLED = False
 
 
 class MissingGoogleError(Exception):
@@ -33,7 +35,7 @@ def requires_gcs():
     Yields:
         None
     """
-    if not google:
+    if not GOOGLE_INSTALLED:
         raise MissingGoogleError
     yield
 

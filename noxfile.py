@@ -156,7 +156,7 @@ def mypy(session: Session) -> None:
         session: Nox session.
     """
     session.install(
-        ".",
+        ".[mssql,azure,gcs,s3]",
         "boto3-stubs",
         "mypy",
         "types-croniter",
