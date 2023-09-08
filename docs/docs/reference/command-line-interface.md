@@ -58,7 +58,7 @@ meltano add extractor tap-gitlab
 meltano add loader target-postgres
 ```
 
-Without a `--custom` or `--inherit-from` option, this will add the
+Without a `--custom`, `--inherit-from` or `--from-ref` option, this will add the
 [discoverable plugin](/concepts/plugins#discoverable-plugins) with the provided name
 to your [`meltano.yml` project file](/concepts/project#plugins)
 using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions).
@@ -94,6 +94,40 @@ meltano add <type> <name> --inherit-from <existing-name>
 # For example:
 meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
+
+To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
+
+```bash
+meltano add --from-ref <ref> <type> <name>
+
+# For example:
+# URL
+meltano add extractor tap-spotify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-spotify/matatika.yml
+
+# Absolute local path
+meltano add extractor tap-spotify --from-ref /path/to/my/meltano/project/tap-spotify--matatika.yml
+
+# Relative local path
+meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+
+# The plugin name specified in the command is superseded by the value in the
+# plugin definition file - using the same name is just a formality
+meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
+
+# The above also applies to the plugin variant, if provided
+meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
+
+# Once added, the custom plugin defintion can be updated by removing the plugin
+# and re-adding it with the same `meltano add --from-ref` command
+meltano remove extractor tap-spotify
+meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+```
+
+Using `--from-ref` allows you to add a plugin before it is avilable on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
+
+:::note
+  Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
+:::
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
@@ -131,6 +165,8 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--no-install`: Do not install the plugin after adding it to the project.
+
+- `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 ### Using `add` with Environments
 

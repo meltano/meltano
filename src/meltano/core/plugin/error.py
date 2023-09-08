@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import inspect
+
+from meltano.core.plugin.base import PluginDefinition
+
 from . import PluginRef
 
 
@@ -56,3 +60,27 @@ class PluginExecutionError(Exception):
 
 class PluginLacksCapabilityError(Exception):
     """Base exception when a plugin lacks a requested capability."""
+
+
+class InvalidPluginDefinitionError(Exception):
+    """Base exception when a plugin definition is invalid."""
+
+    def __init__(self, definition=None):
+        """Construct a new "InvalidPluginDefinitionError instance.
+
+        Args:
+            definition: Plugin definition.
+        """
+        fullargspec = inspect.getfullargspec(PluginDefinition.__init__)  # noqa: WPS609
+        _, _plugin_type, *required_properties = fullargspec.args
+
+        if isinstance(definition, dict):
+            missing_properties = ", ".join(
+                [p for p in required_properties if p not in definition],
+            )
+            self.reason = f"missing properties ({missing_properties})"
+        else:
+            self.reason = "incorrect format"
+
+    def __str__(self):
+        return f"Plugin definition is invalid: {self.reason}"

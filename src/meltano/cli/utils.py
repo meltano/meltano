@@ -15,8 +15,8 @@ from click_didyoumean import DYMGroup
 
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.base import PluginDefinition, PluginType
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -253,7 +253,7 @@ def _prompt_plugin_settings(plugin_type):
     return settings
 
 
-def add_plugin(
+def add_plugin(  # noqa: C901
     plugin_type: PluginType,
     plugin_name: str,
     *,
@@ -263,6 +263,7 @@ def add_plugin(
     inherit_from=None,
     custom=False,
     lock=True,
+    plugin_yaml=None,
 ):
     """Add Plugin to given Project."""
     if custom:
@@ -278,6 +279,25 @@ def add_plugin(
         }
     else:
         plugin_attrs = {}
+
+    if plugin_yaml is not None:
+        try:
+            plugin_definition = PluginDefinition.parse(
+                {
+                    "plugin_type": plugin_type,
+                    **plugin_yaml,
+                },
+            )
+        except TypeError as e:
+            raise InvalidPluginDefinitionError(plugin_yaml) from e
+
+        # exclude unspecified properties
+        plugin_definition.extras.clear()
+
+        plugin_attrs = plugin_definition.canonical()
+
+        plugin_name = plugin_attrs.pop("name")
+        variant = plugin_attrs.pop("variant")
 
     try:
         plugin = add_service.add(

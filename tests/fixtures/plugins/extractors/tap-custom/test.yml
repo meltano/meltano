@@ -1,0 +1,31 @@
+capabilities:
+- catalog
+- discover
+- state
+- about
+- stream-maps
+description: Custom extractor for testing
+domain_url: https://meltano.com/
+keywords:
+- custom
+- test
+label: Custom
+logo_url: /assets/logos/extractors/custom.png
+maintenance_status: development
+name: tap-custom
+namespace: tap_custom
+pip_url: git+https://github.com/MeltanoLabs/tap-custom.git
+quality: gold
+repo: https://github.com/MeltanoLabs/tap-custom
+settings:
+- description: Username
+  label: Username
+  name: username
+- description: Password
+  label: Password
+  name: password
+  sensitive: true
+settings_group_validation:
+- - username
+  - password
+variant: test

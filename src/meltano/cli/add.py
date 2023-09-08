@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import typing as t
+from pathlib import Path
+from urllib.parse import urlparse
 
 import click
+import requests
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -19,11 +22,31 @@ from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
+
+
+def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
+    if not value:
+        return
+
+    try:
+        url = urlparse(value)
+        if url.scheme and url.netloc:
+            response = requests.get(value, timeout=10)
+            response.raise_for_status()
+            content = response.text
+        else:
+            content = Path(value).read_text()
+
+    except (ValueError, FileNotFoundError, IsADirectoryError) as e:
+        raise click.BadParameter(e) from e
+
+    return yaml.load(content) or {}
 
 
 @click.command(  # noqa: WPS238
@@ -51,6 +74,12 @@ if t.TYPE_CHECKING:
         "discoverable plugin to your project with a different name. "
         "Usage:\b\n\nadd <type> <inherit-from> --as <name>"
     ),
+)
+@click.option(
+    "--from-ref",
+    "plugin_yaml",
+    callback=_load_yaml_from_ref,
+    help="Reference a plugin defintion to add from.",
 )
 @click.option(
     "--python",
@@ -83,6 +112,7 @@ def add(  # noqa: WPS238
     inherit_from: str | None = None,
     variant: str | None = None,
     as_name: str | None = None,
+    plugin_yaml: dict | None = None,
     python: str | None = None,
     **flags,
 ):
@@ -135,6 +165,7 @@ def add(  # noqa: WPS238
                     variant=variant,
                     custom=flags["custom"],
                     add_service=add_service,
+                    plugin_yaml=plugin_yaml,
                 ),
             )
         except Exception:
