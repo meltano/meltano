@@ -3764,13 +3764,13 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "virtualenv"
-version = "20.24.4"
+version = "20.24.5"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.24.4-py3-none-any.whl", hash = "sha256:29c70bb9b88510f6414ac3e55c8b413a1f96239b6b789ca123437d5e892190cb"},
-    {file = "virtualenv-20.24.4.tar.gz", hash = "sha256:772b05bfda7ed3b8ecd16021ca9716273ad9f4467c801f27e83ac73430246dca"},
+    {file = "virtualenv-20.24.5-py3-none-any.whl", hash = "sha256:b80039f280f4919c77b30f1c23294ae357c4c8701042086e3fc005963e4e537b"},
+    {file = "virtualenv-20.24.5.tar.gz", hash = "sha256:e8361967f6da6fbdf1426483bfe9fca8287c242ac0bc30429905721cefbff752"},
 ]
 
 [package.dependencies]
@@ -3948,4 +3948,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "6d0f6499e0ea5b580f137302d1bb4f25d680da879c9ed3c6f6c6e553a15171fd"
+content-hash = "5620462b8abce8332ae0e22109c0ad145bc7be2fef096ecb822ef404f5448577"
