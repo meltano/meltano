@@ -60,13 +60,13 @@ const config = {
         disableSwitch: false,
         respectPrefersColorScheme: true,
       },
-      announcementBar: {
-        id: 'meltano_docs_announcment',
-        content: '<a href="https://meltano.com/blog/introducing-meltano-cloud-you-build-the-pipelines-we-manage-the-infrastructure/">⚡ Meltano Cloud is now in Public Beta: you define the pipeline, we manage the infra. Sign up now and claim your 100 free credits! ⚡</a>',
-        backgroundColor: '#311772',
-        textColor: '#F5F7FA',
-        isCloseable: true,
-      },
+      // announcementBar: {
+      //   id: 'meltano_docs_announcment',
+      //   content: '<a href="https://meltano.com/blog/introducing-meltano-cloud-you-build-the-pipelines-we-manage-the-infrastructure/">⚡ Meltano Cloud is now in Public Beta: you define the pipeline, we manage the infra. Sign up now and claim your 100 free credits! ⚡</a>',
+      //   backgroundColor: '#311772',
+      //   textColor: '#F5F7FA',
+      //   isCloseable: true,
+      // },
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
