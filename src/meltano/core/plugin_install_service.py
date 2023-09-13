@@ -379,9 +379,9 @@ class PluginInstallService:  # noqa: WPS214
                 reason=reason,
                 status=PluginInstallStatus.ERROR,
                 message=(
-                    f"{plugin.type.descriptor} '{plugin.name}' "
+                    f"{plugin.type.descriptor.capitalize()} '{plugin.name}' "
                     f"could not be installed: {err}"
-                ).capitalize(),
+                ),
                 details=await err.stderr,
             )
             self.status_cb(state)

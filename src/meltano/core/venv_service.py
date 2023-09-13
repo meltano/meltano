@@ -7,6 +7,7 @@ import hashlib
 import logging
 import os
 import platform
+import shlex
 import shutil
 import subprocess
 import sys
@@ -212,7 +213,7 @@ def fingerprint(pip_install_args: Iterable[str]) -> str:
 class VenvService:  # noqa: WPS214
     """Manages virtual environments.
 
-    The methods in this class are not threadsafe.
+    The methods in this class are not thread-safe.
     """
 
     def __init__(
@@ -252,7 +253,8 @@ class VenvService:  # noqa: WPS214
             pip_install_args: Arguments passed to `pip install`.
             clean: Whether to not attempt to use an existing virtual environment.
         """
-        if not clean and self.requires_clean_install(pip_install_args):
+        current_fingerprint = fingerprint(pip_install_args)
+        if not clean and self.requires_clean_install(current_fingerprint):
             logger.debug(
                 f"Packages for '{self.namespace}/{self.name}' have changed so "
                 "performing a clean install.",
@@ -260,15 +262,19 @@ class VenvService:  # noqa: WPS214
             clean = True
 
         self.clean_run_files()
-        await self._pip_install(pip_install_args=pip_install_args, clean=clean)
-        self.write_fingerprint(pip_install_args)
 
-    def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
+        await self._pip_install(
+            pip_install_args=pip_install_args,
+            clean=clean,
+            plugin_fingerprint=current_fingerprint,
+        )
+        self.write_fingerprint(current_fingerprint)
+
+    def requires_clean_install(self, plugin_fingerprint: str) -> bool:
         """Determine whether a clean install is needed.
 
         Args:
-            pip_install_args: The arguments being passed to `pip install`, used
-                for fingerprinting the installation.
+            plugin_fingerprint: The fingerprint of the plugin being installed.
 
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
@@ -280,7 +286,7 @@ class VenvService:  # noqa: WPS214
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(pip_install_args)
+            yield existing_fingerprint != plugin_fingerprint
 
         return any(checks())
 
@@ -367,14 +373,14 @@ class VenvService:  # noqa: WPS214
         with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
-    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
+    def write_fingerprint(self, plugin_fingerprint: str) -> None:
         """Save the fingerprint for this installation.
 
         Args:
-            pip_install_args: The arguments being passed to `pip install`.
+            plugin_fingerprint: The fingerprint of the plugin being installed.
         """
         with open(self.plugin_fingerprint_path, "w") as fingerprint_file:
-            fingerprint_file.write(fingerprint(pip_install_args))
+            fingerprint_file.write(plugin_fingerprint)
 
     def exec_path(self, executable: str) -> Path:
         """Return the absolute path for the given executable in the virtual environment.
@@ -402,12 +408,15 @@ class VenvService:  # noqa: WPS214
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
+        *,
+        plugin_fingerprint: str | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
 
         Args:
             pip_install_args: The arguments to pass to `pip install`.
             clean: Whether the installation should be done in a clean venv.
+            plugin_fingerprint: The fingerprint of the plugin being installed.
 
         Raises:
             AsyncSubprocessError: The command failed.
@@ -420,7 +429,7 @@ class VenvService:  # noqa: WPS214
             await self.create()
             await self.upgrade_pip()
 
-        pip_install_args_str = " ".join(pip_install_args)
+        pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
             f"Upgrading with args {pip_install_args_str!r} in existing"
             if "--upgrade" in pip_install_args
@@ -430,15 +439,24 @@ class VenvService:  # noqa: WPS214
             f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",
         )
 
+        pip_logs_dir = self.project.logs_dir("pip").resolve()
+        if plugin_fingerprint:
+            pip_log_path = pip_logs_dir / f"pip-{plugin_fingerprint}.log"
+        else:
+            pip_log_path = pip_logs_dir / "pip.log"
+
         try:
             return await exec_async(
                 str(self.exec_path("python")),
                 "-m",
                 "pip",
                 "install",
+                "--log",
+                str(pip_log_path),
                 *pip_install_args,
             )
         except AsyncSubprocessError as err:
+            logger.info("Logged pip install output to %s", pip_log_path)  # noqa: WPS323
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.",
                 err.process,
