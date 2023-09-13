@@ -241,6 +241,12 @@ class VenvService:  # noqa: WPS214
             python or project.settings.get("python"),
         )
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
+        self.pip_log_path = self.project.logs_dir(
+            "pip",
+            self.namespace,
+            self.name,
+            "pip.log",
+        ).resolve()
 
     async def install(
         self,
@@ -253,8 +259,7 @@ class VenvService:  # noqa: WPS214
             pip_install_args: Arguments passed to `pip install`.
             clean: Whether to not attempt to use an existing virtual environment.
         """
-        current_fingerprint = fingerprint(pip_install_args)
-        if not clean and self.requires_clean_install(current_fingerprint):
+        if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
                 f"Packages for '{self.namespace}/{self.name}' have changed so "
                 "performing a clean install.",
@@ -263,18 +268,15 @@ class VenvService:  # noqa: WPS214
 
         self.clean_run_files()
 
-        await self._pip_install(
-            pip_install_args=pip_install_args,
-            clean=clean,
-            plugin_fingerprint=current_fingerprint,
-        )
-        self.write_fingerprint(current_fingerprint)
+        await self._pip_install(pip_install_args=pip_install_args, clean=clean)
+        self.write_fingerprint(pip_install_args)
 
-    def requires_clean_install(self, plugin_fingerprint: str) -> bool:
+    def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
         """Determine whether a clean install is needed.
 
         Args:
-            plugin_fingerprint: The fingerprint of the plugin being installed.
+            pip_install_args: The arguments being passed to `pip install`, used
+                for fingerprinting the installation.
 
         Returns:
             Whether virtual environment doesn't exist or can't be reused.
@@ -286,7 +288,7 @@ class VenvService:  # noqa: WPS214
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != plugin_fingerprint
+            yield existing_fingerprint != fingerprint(pip_install_args)
 
         return any(checks())
 
@@ -373,14 +375,14 @@ class VenvService:  # noqa: WPS214
         with open(self.plugin_fingerprint_path) as fingerprint_file:
             return fingerprint_file.read()
 
-    def write_fingerprint(self, plugin_fingerprint: str) -> None:
+    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
         """Save the fingerprint for this installation.
 
         Args:
-            plugin_fingerprint: The fingerprint of the plugin being installed.
+            pip_install_args: The arguments being passed to `pip install`.
         """
         with open(self.plugin_fingerprint_path, "w") as fingerprint_file:
-            fingerprint_file.write(plugin_fingerprint)
+            fingerprint_file.write(fingerprint(pip_install_args))
 
     def exec_path(self, executable: str) -> Path:
         """Return the absolute path for the given executable in the virtual environment.
@@ -408,15 +410,12 @@ class VenvService:  # noqa: WPS214
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
-        *,
-        plugin_fingerprint: str | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
 
         Args:
             pip_install_args: The arguments to pass to `pip install`.
             clean: Whether the installation should be done in a clean venv.
-            plugin_fingerprint: The fingerprint of the plugin being installed.
 
         Raises:
             AsyncSubprocessError: The command failed.
@@ -439,12 +438,6 @@ class VenvService:  # noqa: WPS214
             f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",
         )
 
-        pip_logs_dir = self.project.logs_dir("pip").resolve()
-        if plugin_fingerprint:
-            pip_log_path = pip_logs_dir / f"pip-{plugin_fingerprint}.log"
-        else:
-            pip_log_path = pip_logs_dir / "pip.log"
-
         try:
             return await exec_async(
                 str(self.exec_path("python")),
@@ -452,11 +445,14 @@ class VenvService:  # noqa: WPS214
                 "pip",
                 "install",
                 "--log",
-                str(pip_log_path),
+                str(self.pip_log_path),
                 *pip_install_args,
             )
         except AsyncSubprocessError as err:
-            logger.info("Logged pip install output to %s", pip_log_path)  # noqa: WPS323
+            logger.info(
+                "Logged pip install output to %s",  # noqa: WPS323
+                self.pip_log_path,
+            )
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.",
                 err.process,
