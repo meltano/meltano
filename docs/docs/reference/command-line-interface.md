@@ -13,6 +13,10 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 The following options are available for all `meltano` subcommands:
 
+### Directory Configurations
+
+- [`--cwd`](/reference/settings#clicwd) - Path to the specific directory which contains the [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+
 ### Log Configurations
 
 - [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.

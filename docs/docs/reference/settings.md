@@ -405,6 +405,21 @@ root:
   handlers: [console, file]
 ```
 
+### <a name="cli-cwd"></a>`cli.cwd`
+
+- `meltano` CLI option: `--cwd`
+- Default: `Current directory`
+
+With `--cwd` option you can configure meltano as if had been started in a specified directory.
+
+#### How to use
+
+Specify path to a directory which contains a valid [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+
+```bash
+meltano --cwd = /path/to/meltano_yml
+```
+
 ## `meltano elt`
 
 These settings can be used to modify the behavior of [`meltano el`](/reference/command-line-interface#el) and [`meltano elt`](/reference/command-line-interface#elt).
