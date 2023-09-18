@@ -40,7 +40,10 @@ updates:
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
-      default:
+      development-dependencies:
+        dependency-type: development
+      runtime-dependencies:
+        dependency-type: production
         update-types:
         - "minor"
         - "patch"
