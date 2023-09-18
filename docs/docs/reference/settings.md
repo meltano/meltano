@@ -198,7 +198,6 @@ meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<
 Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
 :::
 
-
 #### Targeting a PostgreSQL Schema
 
 When using PostgreSQL as your [system database](/concepts/project#system-database), you can choose the target schema within that database by adding
@@ -417,7 +416,7 @@ With `--cwd` option you can configure meltano as if had been started in a specif
 Specify path to a directory which contains a valid [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 ```bash
-meltano --cwd = /path/to/meltano_yml
+meltano --cwd = /path/containing/meltano_yml
 ```
 
 ## `meltano elt`

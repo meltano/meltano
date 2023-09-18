@@ -11,11 +11,11 @@ For a better understanding of command line documentation syntax, the [docopt](ht
 
 ## Global Configuration
 
-The following options are available for all `meltano` subcommands:
+The following CLI options are available for the top-level `meltano` command:
 
-### Directory Configurations
+### Current Working Directory Configuration
 
-- [`--cwd`](/reference/settings#clicwd) - Path to the specific directory which contains the [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+- [`--cwd`](/reference/settings#clicwd) - Path to a directory containing a [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file). Meltano will run as if it were started within that directory.
 
 ### Log Configurations
 
