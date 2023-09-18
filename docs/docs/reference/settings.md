@@ -409,14 +409,14 @@ root:
 - `meltano` CLI option: `--cwd`
 - Default: `Current directory`
 
-With `--cwd` option you can configure meltano as if had been started in a specified directory.
+With `--cwd` option you can run Meltano as if had been started in a specified directory.
 
 #### How to use
 
-Specify path to a directory which contains a valid [ `meltano.yml` project file](/concepts/project#meltano-yml-project-file).
+Specify path to a directory which contains a valid [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
 ```bash
-meltano --cwd = /path/containing/meltano_yml
+meltano --cwd '/path/containing/meltano_yml'
 ```
 
 ## `meltano elt`
