@@ -795,12 +795,14 @@ class TestCliAdd:
             venv_mock.assert_called_once_with(python)
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner):
-            with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
-                install_plugin_mock.return_value = True
-                cli_runner.invoke(cli, ["add", "transform", "tap-google-analytics", "--force"])
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            cli_runner.invoke(
+                cli, ["add", "transform", "tap-google-analytics", "--force"]
+            )
 
-                install_plugin_mock.assert_called_once_with(
-                    project,
-                    ["tap-google-analytics"],
-                    force=True,
-                )
+            install_plugin_mock.assert_called_once_with(
+                project,
+                ["tap-google-analytics"],
+                force=True,
+            )
