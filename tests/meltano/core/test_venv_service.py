@@ -105,6 +105,11 @@ class TestVenvService:
                 == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
             )
 
+        # ensure that log file was created and is not empty
+        assert subject.pip_log_path.exists()
+        assert subject.pip_log_path.is_file()
+        assert subject.pip_log_path.stat().st_size > 0
+
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: VenvService):

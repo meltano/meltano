@@ -735,26 +735,8 @@ If the plugin you are trying to install declares that it does not support the ve
 
 :::info
 
-  <p>If you're using a custom Docker image, make sure `python3-venv` is installed:</p>
-<pre>
-FROM ubuntu:20.04
+Meltano stores package installation logs in `.meltano/logs/pip/{plugin_type}/{plugin_name}/pip.log`. This can be useful for debugging installation issues.
 
-RUN apt-get update && \
- apt-get install -y -q \
- gcc \
- sqlite3 \
- libsqlite3-dev \
- python3 \
- python3-pip \
- python3-venv # Add this line
-
-RUN pip3 install meltano
-
-WORKDIR /meltano
-COPY meltano.yml meltano.yml
-RUN mkdir .meltano/ && meltano install
-
-</pre>
 :::
 
 ### How to Use
