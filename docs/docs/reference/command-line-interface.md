@@ -59,6 +59,8 @@ meltano add <type> <name>
 
 # For example:
 meltano add extractor tap-gitlab
+# Or you can also add a package forcefully using --force flag
+meltano add extractor tap-gitlab --force
 meltano add loader target-postgres
 ```
 
@@ -66,6 +68,8 @@ Without a `--custom`, `--inherit-from` or `--from-ref` option, this will add the
 [discoverable plugin](/concepts/plugins#discoverable-plugins) with the provided name
 to your [`meltano.yml` project file](/concepts/project#plugins)
 using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions).
+
+The `--force` will ignore the required Python version declared by the plugins.
 
 If multiple [variants](/concepts/plugins#variants) of the discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
 
