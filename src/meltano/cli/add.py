@@ -103,8 +103,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     help="Do not install the plugin after adding it to the project.",
 )
 @click.option(
-    "--force",
-    "-f",
+    "--force-install",
     is_flag=True,
     help="Ignore the required Python version declared by the plugins.",
 )
@@ -197,7 +196,7 @@ def add(  # noqa: WPS238
             project,
             plugins,
             reason=PluginInstallReason.ADD,
-            force=flags.get("force", False),
+            force=flags.get("force_install", False),
         )
 
         if not success:

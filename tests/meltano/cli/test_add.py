@@ -802,7 +802,7 @@ class TestCliAdd:
                 install_plugin_mock.return_value = True
                 res = cli_runner.invoke(
                     cli, 
-                    ["add", "extractor", "tap-gitlab", "--force"],
+                    ["add", "extractor", "tap-gitlab", "--force-install"],
                 )
                 tap_gitlab = project.plugins.find_plugin(
                     "tap-gitlab",
