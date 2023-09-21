@@ -809,11 +809,11 @@ class TestCliAdd:
                     PluginType.EXTRACTORS,
                 )
 
-                assert_cli_runner(res)
-                assert tap_gitlab
-                install_plugin_mock.assert_called_once_with(
-                    project,
-                    [tap_gitlab],
-                    reason=PluginInstallReason.ADD,
-                    force=True,
-                )
+            assert_cli_runner(res)
+            assert tap_gitlab
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap_gitlab],
+                reason=PluginInstallReason.ADD,
+                force=True,
+            )
