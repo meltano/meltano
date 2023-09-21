@@ -798,22 +798,22 @@ class TestCliAdd:
             venv_mock.assert_called_once_with(python)
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner):
-            with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
-                install_plugin_mock.return_value = True
-                res = cli_runner.invoke(
-                    cli, 
-                    ["add", "extractor", "tap-gitlab", "--force-install"],
-                )
-                tap_gitlab = project.plugins.find_plugin(
-                    "tap-gitlab",
-                    PluginType.EXTRACTORS,
-                )
-
-            assert_cli_runner(res)
-            assert tap_gitlab
-            install_plugin_mock.assert_called_once_with(
-                project,
-                [tap_gitlab],
-                reason=PluginInstallReason.ADD,
-                force=True,
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-gitlab", "--force-install"],
             )
+            tap_gitlab = project.plugins.find_plugin(
+                "tap-gitlab",
+                PluginType.EXTRACTORS,
+            )
+
+        assert_cli_runner(res)
+        assert tap_gitlab
+        install_plugin_mock.assert_called_once_with(
+            project,
+            [tap_gitlab],
+            reason=PluginInstallReason.ADD,
+            force=True,
+        )
