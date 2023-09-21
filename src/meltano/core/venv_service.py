@@ -7,6 +7,7 @@ import hashlib
 import logging
 import os
 import platform
+import shlex
 import shutil
 import subprocess
 import sys
@@ -212,7 +213,7 @@ def fingerprint(pip_install_args: Iterable[str]) -> str:
 class VenvService:  # noqa: WPS214
     """Manages virtual environments.
 
-    The methods in this class are not threadsafe.
+    The methods in this class are not thread-safe.
     """
 
     def __init__(
@@ -240,6 +241,12 @@ class VenvService:  # noqa: WPS214
             python or project.settings.get("python"),
         )
         self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
+        self.pip_log_path = self.project.logs_dir(
+            "pip",
+            self.namespace,
+            self.name,
+            "pip.log",
+        ).resolve()
 
     async def install(
         self,
@@ -260,6 +267,7 @@ class VenvService:  # noqa: WPS214
             clean = True
 
         self.clean_run_files()
+
         await self._pip_install(pip_install_args=pip_install_args, clean=clean)
         self.write_fingerprint(pip_install_args)
 
@@ -420,7 +428,7 @@ class VenvService:  # noqa: WPS214
             await self.create()
             await self.upgrade_pip()
 
-        pip_install_args_str = " ".join(pip_install_args)
+        pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
             f"Upgrading with args {pip_install_args_str!r} in existing"
             if "--upgrade" in pip_install_args
@@ -436,9 +444,15 @@ class VenvService:  # noqa: WPS214
                 "-m",
                 "pip",
                 "install",
+                "--log",
+                str(self.pip_log_path),
                 *pip_install_args,
             )
         except AsyncSubprocessError as err:
+            logger.info(
+                "Logged pip install output to %s",  # noqa: WPS323
+                self.pip_log_path,
+            )
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.",
                 err.process,

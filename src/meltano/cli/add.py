@@ -193,7 +193,12 @@ def add(  # noqa: WPS238
     tracker.track_command_event(CliEvent.inflight)
 
     if not flags.get("no_install"):
-        success = install_plugins(project, plugins, reason=PluginInstallReason.ADD, force=flags.get("force", False))
+        success = install_plugins(
+            project,
+            plugins,
+            reason=PluginInstallReason.ADD,
+            force=flags.get("force", False),
+        )
 
         if not success:
             tracker.track_command_event(CliEvent.failed)
