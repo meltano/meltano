@@ -185,7 +185,7 @@ class TestProjectPluginsService:
     def test_update_plugin(self, project: Project, tap):
         # update a tap with a random value
         tap.config["test"] = 42
-        outdated = project.plugins.update_plugin(tap)
+        tap, outdated = project.plugins.update_plugin(tap)
         assert (
             project.plugins.get_plugin(tap).config["test"]
             == 42  # noqa: WPS432 (OK magic number)
