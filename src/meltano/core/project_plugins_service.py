@@ -394,19 +394,25 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             plugin: The plugin to update.
 
         Returns:
-            The outdated plugin.
+            A tuple containing the updated and outdated plugins.
+
+        Raises:
+            PluginNotFoundError: If the plugin is not found.
         """
         with self.update_plugins() as plugins:
             # find the proper plugin to update
-            idx, outdated = next(
-                (idx, plg)
-                for idx, plg in enumerate(plugins[plugin.type])
-                if plg == plugin
-            )
+            try:
+                idx, outdated = next(
+                    (idx, plg)
+                    for idx, plg in enumerate(plugins[plugin.type])
+                    if plg == plugin
+                )
 
-            plugins[plugin.type][idx] = plugin
+                plugins[plugin.type][idx] = plugin
 
-            return outdated
+                return plugin, outdated
+            except StopIteration as stop:
+                raise PluginNotFoundError(plugin) from stop
 
     def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
         """Update a plugin configuration inside a Meltano environment.

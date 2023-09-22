@@ -50,6 +50,7 @@ class ProjectAddService:
         plugin_name: str,
         *,
         lock: bool = True,
+        update=False,
         **attrs: t.Any,
     ) -> ProjectPlugin:
         """Add a new plugin to the project.
@@ -58,6 +59,7 @@ class ProjectAddService:
             plugin_type: The type of the plugin to add.
             plugin_name: The name of the plugin to add.
             lock: Whether to generate a lockfile for the plugin.
+            update: Whether to update the plugin.
             attrs: Additional attributes to add to the plugin.
 
         Returns:
@@ -80,26 +82,18 @@ class ProjectAddService:
                 plugin.variant = parent.variant
                 plugin.pip_url = parent.pip_url
 
-            added = self.add_plugin(plugin)
+            if update:
+                plugin, _outdated = self.project.plugins.update_plugin(plugin)
+            else:
+                plugin = self.project.plugins.add_to_file(plugin)
 
-            if lock and not added.is_custom():
+            if lock and not plugin.is_custom():
                 self.project.plugins.lock_service.save(
-                    added,
-                    exists_ok=plugin.inherit_from is not None,
+                    plugin,
+                    exists_ok=update or plugin.inherit_from is not None,
                 )
 
-            return added
-
-    def add_plugin(self, plugin: ProjectPlugin) -> ProjectPlugin:
-        """Add a plugin to the project.
-
-        Args:
-            plugin: The plugin to add.
-
-        Returns:
-            The added plugin.
-        """
-        return self.project.plugins.add_to_file(plugin)
+            return plugin
 
     def add_required(  # noqa: WPS210
         self,

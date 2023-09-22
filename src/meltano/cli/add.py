@@ -98,6 +98,11 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     ),
 )
 @click.option(
+    "--update",
+    is_flag=True,
+    help="Update an existing plugin.",
+)
+@click.option(
     "--no-install",
     is_flag=True,
     help="Do not install the plugin after adding it to the project.",
@@ -169,6 +174,7 @@ def add(  # noqa: WPS238
                     inherit_from=inherit_from,
                     variant=variant,
                     custom=flags["custom"],
+                    update=flags["update"],
                     add_service=add_service,
                     plugin_yaml=plugin_yaml,
                 ),
