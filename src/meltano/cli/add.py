@@ -102,6 +102,11 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     is_flag=True,
     help="Do not install the plugin after adding it to the project.",
 )
+@click.option(
+    "--force-install",
+    is_flag=True,
+    help="Ignore the required Python version declared by the plugins.",
+)
 @pass_project()
 @click.pass_context
 def add(  # noqa: WPS238
@@ -187,7 +192,12 @@ def add(  # noqa: WPS238
     tracker.track_command_event(CliEvent.inflight)
 
     if not flags.get("no_install"):
-        success = install_plugins(project, plugins, reason=PluginInstallReason.ADD)
+        success = install_plugins(
+            project,
+            plugins,
+            reason=PluginInstallReason.ADD,
+            force=flags.get("force_install", False),
+        )
 
         if not success:
             tracker.track_command_event(CliEvent.failed)

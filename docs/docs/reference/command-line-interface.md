@@ -40,6 +40,7 @@ Specifically, it will:
 4. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
    1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
    2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
+5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -59,6 +60,8 @@ meltano add <type> <name>
 
 # For example:
 meltano add extractor tap-gitlab
+# You can ignore the required Python declared by a plugin by using --force-install flag
+meltano add extractor tap-gitlab --force-install
 meltano add loader target-postgres
 ```
 
@@ -171,6 +174,8 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--no-install`: Do not install the plugin after adding it to the project.
 
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
+
+- `--force-install`: Ignore the required Python version declared by the plugins.
 
 ### Using `add` with Environments
 
