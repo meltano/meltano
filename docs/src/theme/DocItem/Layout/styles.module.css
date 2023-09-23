@@ -53,6 +53,19 @@
   width: 1px;
 }
 
+ul,
+ol {
+  padding-left: 1rem;
+}
+
+ol {
+  list-style: decimal;
+}
+
+ol ol {
+  list-style: upper-roman;
+}
+
 @media (min-width: 997px) {
   .docItemCol {
     max-width: 75% !important;
