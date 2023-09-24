@@ -34,7 +34,7 @@ defined as follows for use in `meltano`.
   or task. Sub-commands take the form of parameters, but require additional arguments or options themselves.
 - Arguments are positional parameters that are passed to a command. Arguments do not require additional options or
   arguments - otherwise they would be considered a sub-command.
-- Options (switch, option flags, or flags) are options that alter the behavior (e.g. `--dry-run/--verbose`) or named
+- Options (switch, option flags, or flags) are options that alter the behavior (e.g. `--dry-run`) or named
   input options (e.g. `--tasks=`). They come in two forms. A long form: `--option-name`, and a short form: `-o`.
 
 Given a command like `meltano job set JOB_NAME --tasks=[<task>...]`:

@@ -58,7 +58,6 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=str,
     help="Path to a python logging yaml config file.",
 )
-@click.option("-v", "--verbose", count=True, help="Not used.")
 @click.option("--environment", help="Meltano environment name.")
 @click.option(
     "--no-environment",
