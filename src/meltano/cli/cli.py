@@ -76,7 +76,6 @@ def cli(  # noqa: C901,WPS231
     ctx: click.Context,
     log_level: str,
     log_config: str,
-    verbose: int,
     environment: str,
     no_environment: bool,
     cwd: Path | None,
