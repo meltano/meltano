@@ -198,6 +198,15 @@ class TestProjectPluginsService:
             == {}  # noqa: WPS520 (OK compare with falsy)
         )
 
+    def test_update_plugin_not_found(self, project: Project):
+        nonexistent_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+        )
+
+        with pytest.raises(PluginNotFoundError):
+            project.plugins.update_plugin(nonexistent_plugin)
+
     def test_find_plugins_by_mapping_name(self, project: Project, mapper):
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
             mapper,

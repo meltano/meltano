@@ -817,3 +817,24 @@ class TestCliAdd:
             reason=PluginInstallReason.ADD,
             force=True,
         )
+
+    def test_add_update(self, cli_runner):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock" in res.stdout
+
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-mock", "--update"],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert "Updated extractor 'tap-mock" in res.stdout
+
+    def test_add_update_not_in_project(self, cli_runner):
+        res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock", "--update"])
+
+        assert res.exit_code == 1
+        assert res.exception
+        assert str(res.exception) == "Extractor 'tap-mock' is not known to Meltano"
