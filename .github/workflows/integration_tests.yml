@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.0.0
+      uses: actions/checkout@v4.1.0
 
     - name: Install Poetry
       env:
