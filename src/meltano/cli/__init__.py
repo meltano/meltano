@@ -7,6 +7,9 @@ import os
 import sys
 import typing as t
 
+from meltano import (
+    __version__,
+)
 from meltano.cli import (  # noqa: WPS235
     add,
     config,
@@ -97,6 +100,8 @@ def _run_cli():
     Raises:
         KeyboardInterrupt: if caught.
     """
+    logger.debug(f"meltano, version : {__version__}")
+    logger.debug(f"operating system : {os.name}")
     try:
         try:  # noqa: WPS225, WPS505
             cli(obj={"project": None})
