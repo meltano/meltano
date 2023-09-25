@@ -19,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### 📚 Documentation Improvements
 
-- [#8178](https://github.com/meltano/meltano/issues/8178) Fix bug 8174 -- _**Thanks @gridig!**_
+- [#8178](https://github.com/meltano/meltano/issues/8178) Top-level ordered lists are now rendered correctly in docs
 - [#8156](https://github.com/meltano/meltano/issues/8156) Added docs for --cwd CLI option -- _**Thanks @XshubhamX!**_
 - [#8143](https://github.com/meltano/meltano/issues/8143) Remove Cloud announcement banner
 - [#8113](https://github.com/meltano/meltano/issues/8113) Update Cloud "Getting Started" guide to include the lock command
