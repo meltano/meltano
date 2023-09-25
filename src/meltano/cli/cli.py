@@ -58,7 +58,6 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=str,
     help="Path to a python logging yaml config file.",
 )
-@click.option("-v", "--verbose", count=True, help="Not used.")
 @click.option("--environment", help="Meltano environment name.")
 @click.option(
     "--no-environment",
@@ -77,7 +76,6 @@ def cli(  # noqa: C901,WPS231
     ctx: click.Context,
     log_level: str,
     log_config: str,
-    verbose: int,
     environment: str,
     no_environment: bool,
     cwd: Path | None,
@@ -95,7 +93,6 @@ def cli(  # noqa: C901,WPS231
     if log_config:
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
-    ctx.obj["verbosity"] = verbose
     ctx.obj["explicit_no_environment"] = no_environment
 
     no_color = get_no_color_flag()
