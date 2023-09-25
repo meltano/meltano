@@ -818,6 +818,7 @@ class TestCliAdd:
             force=True,
         )
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_update(self, cli_runner):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -832,6 +833,7 @@ class TestCliAdd:
             assert res.exit_code == 0, res.stdout
             assert "Updated extractor 'tap-mock" in res.stdout
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_update_not_in_project(self, cli_runner):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock", "--update"])
 
