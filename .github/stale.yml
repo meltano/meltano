@@ -3,5 +3,8 @@
 
 _extends: .github
 
+# Wait 18 months until marking as stale, instead of the usual 12 months
+daysUntilStale: 548
+
 # In most cases, this file should not be updated.
 # Updates to the stale bot config should be shared by all Meltano GitHub repositories.

@@ -9,12 +9,12 @@ from datetime import date, datetime
 from croniter import croniter
 
 from meltano.core.error import MeltanoError
+from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project
-from meltano.core.schedule import Schedule
+from meltano.core.schedule import CRON_INTERVALS, Schedule
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
@@ -127,12 +127,12 @@ class ScheduleService:  # noqa: WPS214
         )
 
         schedule = Schedule(
-            name,
-            extractor,
-            loader,
-            transform,
-            interval,
-            start_date,
+            name=name,
+            extractor=extractor,
+            loader=loader,
+            transform=transform,
+            interval=interval,
+            start_date=start_date,
             env=env,
         )
         return self.add_schedule(schedule)
@@ -149,9 +149,14 @@ class ScheduleService:  # noqa: WPS214
         Returns:
             The added schedule.
         """
-        schedule = Schedule(name=name, job=job, interval=interval, env=env)
-        self.add_schedule(schedule)
-        return schedule
+        return self.add_schedule(
+            Schedule(
+                name=name,
+                job=job,
+                interval=interval,
+                env=env,
+            ),
+        )
 
     def remove(self, name) -> str:
         """Remove a schedule from the project.
@@ -210,7 +215,7 @@ class ScheduleService:  # noqa: WPS214
         """
         if (
             schedule.interval is not None
-            and schedule.interval != "@once"
+            and schedule.interval not in CRON_INTERVALS
             and not croniter.is_valid(schedule.interval)
         ):
             raise BadCronError(schedule.interval)

@@ -82,7 +82,7 @@ class TestProjectFiles:
                     "extractor": "tap-meltano-yml",
                     "loader": "target-meltano-yml",
                     "transform": "skip",
-                    "interval": "@once",
+                    "interval": "@daily",
                     "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: WPS432
                 },
             ],
@@ -183,7 +183,7 @@ class TestProjectFiles:
                     "loader": "target-meltano-yml",
                     "transform": "skip",
                     "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
-                    "interval": "@once",
+                    "interval": "@daily",
                 },
                 {
                     "name": "test-subconfig-2-yml",
@@ -191,7 +191,7 @@ class TestProjectFiles:
                     "loader": "target-subconfig-2-yml",
                     "transform": "skip",
                     "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
-                    "interval": "@once",
+                    "interval": "@daily",
                 },
                 {
                     "name": "test-subconfig-1-yml",
@@ -199,7 +199,7 @@ class TestProjectFiles:
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
                     "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
-                    "interval": "@once",
+                    "interval": "@daily",
                 },
             ],
             "environments": [
@@ -276,7 +276,7 @@ class TestProjectFiles:
             "schedules": [
                 {
                     "extractor": "tap-meltano-yml",
-                    "interval": "@once",
+                    "interval": "@daily",
                     "loader": "target-meltano-yml",
                     "name": "modified-test-meltano-yml",
                     "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
@@ -284,7 +284,7 @@ class TestProjectFiles:
                 },
                 {
                     "extractor": "tap-subconfig-2-yml",
-                    "interval": "@once",
+                    "interval": "@daily",
                     "loader": "target-subconfig-2-yml",
                     "name": "test-subconfig-2-yml",
                     "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
@@ -292,7 +292,7 @@ class TestProjectFiles:
                 },
                 {
                     "extractor": "tap-subconfig-1-yml",
-                    "interval": "@once",
+                    "interval": "@daily",
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
                     "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
@@ -356,7 +356,7 @@ class TestProjectFiles:
               loader: target-meltano-yml
               transform: only  # Only update dbt models
               start_date: 2020-08-05 00:00:00
-              interval: '@once' # Run only once
+              interval: '@daily' # Run daily
 
             jobs:  # My jobs
             # An EL job with mapping
@@ -414,7 +414,7 @@ class TestProjectFiles:
               loader: target-subconfig-2-yml
               transform: skip
               start_date: 2020-08-04 00:00:00
-              interval: '@once' # Run only once
+              interval: '@daily' # Run daily
 
             environments:
             # Subconfig 2 Environments

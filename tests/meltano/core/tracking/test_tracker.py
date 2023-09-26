@@ -5,7 +5,7 @@ import logging
 import subprocess
 import typing as t
 import uuid
-from contextlib import contextmanager, suppress
+from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
 from time import sleep
@@ -44,10 +44,7 @@ def check_analytics_json(project: Project) -> None:
 
 @contextmanager
 def delete_analytics_json(project: Project) -> None:
-    # After Python 3.7 support is dropped, use `.unlink(missing_ok=True)`
-    # instead of a suppression.
-    with suppress(FileNotFoundError):
-        (project.meltano_dir() / "analytics.json").unlink()
+    (project.meltano_dir() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
     finally:
@@ -425,6 +422,7 @@ class TestTracker:
         assert get_source() == "env"
 
     @pytest.mark.order(1)
+    @pytest.mark.flaky(reruns=5, reruns_delay=2)
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,

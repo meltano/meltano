@@ -49,8 +49,7 @@ class DbtRunner(Runner):
             return_when=asyncio.ALL_COMPLETED,
         )
 
-        exitcode = handle.returncode
-        if exitcode:
+        if exitcode := handle.returncode:
             command = kwargs["command"] or args[0]
             raise RunnerError(
                 f"`dbt {command}` failed",

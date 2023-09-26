@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 import yaml
 
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    get_pip_install_args,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class TestPluginInstallService:
@@ -14,7 +20,7 @@ class TestPluginInstallService:
         params=({}, {"parallelism": -1}, {"parallelism": 2}),
         ids=("default", "-p=-1", "-p=2"),
     )
-    def subject(self, project, request):
+    def subject(self, project: Project, request):
         with open(project.meltanofile, "w") as file:
             file.write(
                 yaml.dump(
@@ -23,6 +29,7 @@ class TestPluginInstallService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
+                                    "namespace": "tap_gitlab",
                                     "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
                                 },
                                 {
@@ -33,6 +40,7 @@ class TestPluginInstallService:
                             "loaders": [
                                 {
                                     "name": "target-csv",
+                                    "namespace": "target_csv",
                                     "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
                                 },
                             ],
@@ -81,3 +89,27 @@ class TestPluginInstallService:
 
         assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
+
+    def test_get_quoted_pip_install_args(self, project):
+        with open(project.meltanofile, "w") as file:
+            file.write(
+                yaml.dump(
+                    {
+                        "plugins": {
+                            "extractors": [
+                                {
+                                    "name": "tap-gitlab",
+                                    "namespace": "tap_gitlab",
+                                    "pip_url": "'tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git' python-json-logger",  # noqa: E501
+                                },
+                            ],
+                        },
+                    },
+                ),
+            )
+        project.refresh()
+        plugin = next(project.plugins.plugins())
+        assert get_pip_install_args(project, plugin) == [
+            "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
+            "python-json-logger",
+        ]

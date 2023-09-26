@@ -1,0 +1,30 @@
+{
+  "plugin_type": "extractors",
+  "name": "tap-spreadsheets-anywhere",
+  "namespace": "tap_spreadsheets_anywhere",
+  "variant": "ets",
+  "label": "Spreadsheets Anywhere",
+  "docs": "https://hub.meltano.com/extractors/tap-spreadsheets-anywhere--ets",
+  "repo": "https://github.com/ets/tap-spreadsheets-anywhere",
+  "pip_url": "git+https://github.com/ets/tap-spreadsheets-anywhere.git",
+  "description": "Data extractor for CSV and Excel files from any smart_open supported transport (S3, SFTP, localhost, etc...)",
+  "logo_url": "https://hub.meltano.com/assets/logos/extractors/spreadsheets-anywhere.png",
+  "capabilities": [
+    "catalog",
+    "discover",
+    "state"
+  ],
+  "settings_group_validation": [
+    [
+      "tables"
+    ]
+  ],
+  "settings": [
+    {
+      "name": "tables",
+      "kind": "array",
+      "label": "Tables",
+      "description": "An array holding json objects that each describe a set of targeted source files.\n\nEach object in the 'tables' array describes one or more CSV or Excel spreadsheet files that adhere to the same schema and are meant to be tapped as the source for a Singer-based data flow.\nThe available keys are:\n\n- path: A string describing the transport and bucket/root directory holding the targeted source files.\n- name: A string describing the \"table\" (aka Singer stream) into which the source data should be loaded.\n- search_prefix: (optional) This is an optional prefix to apply after the bucket that will be used to filter files in the listing request from the targeted system. This prefix potentially reduces the number of files returned from the listing request.\n- pattern: This is an escaped regular expression that the tap will use to filter the listing result set returned from the listing request. This pattern potentially reduces the number of listed files that are considered as sources for the declared table. It's a bit strange, since this is an escaped string inside of an escaped string, any backslashes in the RegEx will need to be double-escaped.\n- start_date: This is the datetime that the tap will use to filter files, based on the modified timestamp of the file.\n- key_properties: These are the \"primary keys\" of the CSV files, to be used by the target for deduplication and primary key definitions downstream in the destination.\n- format: Must be either 'csv', 'json', 'excel', or 'detect'. Note that csv can be further customized with delimiter and quotechar variables below.\n- invalid_format_action: (optional) By default, the tap will raise an exception if a source file can not be read . Set this key to \"ignore\" to skip such source files and continue the run.\n- field_names: (optional) An array holding the names of the columns in the targeted files. If not supplied, the first row of each file must hold the desired values.\n- universal_newlines: (optional) Should the source file parsers honor universal newlines). Setting this to false will instruct the parser to only consider '\\n' as a valid newline identifier.\n- sample_rate: (optional) The sampling rate to apply when reading a source file for sampling in discovery mode. A sampling rate of 1 will sample every line. A sampling rate of 10 (the default) will sample every 10th line.\n- max_sampling_read: (optional) How many lines of the source file should be sampled when in discovery mode attempting to infer a schema. The default is 1000 samples.\n- max_sampled_files: (optional) The maximum number of files in the targeted set that will be sampled. The default is 5.\n- max_records_per_run: (optional) The maximum number of records that should be written to this stream in a single sync run. The default is unlimited.\n- prefer_number_vs_integer: (optional) If the discovery mode sampling process sees only integer values for a field, should number be used anyway so that floats are not considered errors? The default is false but true can help in situations where floats only appear rarely in sources and may not be detected through discovery sampling.\n- selected: (optional) Should this table be synced. Defaults to true. Setting to false will skip this table on a sync run.\n- worksheet_name: (optional) the worksheet name to pull from in the targeted xls file(s). Only required when format is excel\n- delimiter: (optional) the delimiter to use when format is 'csv'. Defaults to a comma ',' but you can set delimiter to 'detect' to leverage the csv \"Sniffer\" for auto-detecting delimiter.\n- quotechar: (optional) the character used to surround values that may contain delimiters - defaults to a double quote '\"'\n- json_path: (optional) the JSON key under which the list of objets to use is located. Defaults to None, corresponding to an array at the top level of the JSON tree.\n\nFor example:\n\n```yaml\nconfig:\n  tables:\n  - path: s3://my-s3-bucket\n    name: target_table_name\n    pattern: subfolder/common_prefix.*\n    start_date: 2017-05-01T00:00:00Z\n    key_properties: []\n    format: csv\n    delimiter: \"|\"\n    quotechar: '\"'\n    universal_newlines: false\n    sample_rate: 10\n    max_sampling_read: 2000\n    max_sampled_files: 3\n    prefer_number_vs_integer: true\n    selected: true\n```\n\nSee the `Common Config Examples` section below for more examples or see the [repo README](https://github.com/ets/tap-spreadsheets-anywhere) for more details.\n"
+    }
+  ]
+}

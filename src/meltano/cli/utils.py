@@ -11,11 +11,12 @@ from enum import Enum, auto
 
 import click
 from click_default_group import DefaultGroup
+from click_didyoumean import DYMGroup
 
 from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
-from meltano.core.plugin import PluginType
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.base import PluginDefinition, PluginType
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
@@ -94,12 +95,10 @@ def print_added_plugin(
     elif has_variant:
         click.echo(f"Variant:\t{variant_label}")
 
-    repo_url = plugin.repo
-    if repo_url:
+    if repo_url := plugin.repo:
         click.echo(f"Repository:\t{repo_url}")
 
-    docs_url = plugin.docs
-    if docs_url:
+    if docs_url := plugin.docs:
         click.echo(f"Documentation:\t{docs_url}")
 
 
@@ -254,31 +253,51 @@ def _prompt_plugin_settings(plugin_type):
     return settings
 
 
-def add_plugin(
+def add_plugin(  # noqa: C901
     plugin_type: PluginType,
     plugin_name: str,
+    *,
+    python: str | None = None,
     add_service: ProjectAddService,
     variant=None,
     inherit_from=None,
     custom=False,
     lock=True,
+    plugin_yaml=None,
 ):
     """Add Plugin to given Project."""
-    plugin_attrs = {}
     if custom:
+        # XXX: For backwards compatibility, the namespace must be prompted for first.
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
         pip_url = _prompt_plugin_pip_url(plugin_name)
-        executable = _prompt_plugin_executable(pip_url, plugin_name)
-        capabilities = _prompt_plugin_capabilities(plugin_type)
-        settings = _prompt_plugin_settings(plugin_type)
-
         plugin_attrs = {
             "namespace": namespace,
             "pip_url": pip_url,
-            "executable": executable,
-            "capabilities": capabilities,
-            "settings": settings,
+            "executable": _prompt_plugin_executable(pip_url, plugin_name),
+            "capabilities": _prompt_plugin_capabilities(plugin_type),
+            "settings": _prompt_plugin_settings(plugin_type),
         }
+    else:
+        plugin_attrs = {}
+
+    if plugin_yaml is not None:
+        try:
+            plugin_definition = PluginDefinition.parse(
+                {
+                    "plugin_type": plugin_type,
+                    **plugin_yaml,
+                },
+            )
+        except TypeError as e:
+            raise InvalidPluginDefinitionError(plugin_yaml) from e
+
+        # exclude unspecified properties
+        plugin_definition.extras.clear()
+
+        plugin_attrs = plugin_definition.canonical()
+
+        plugin_name = plugin_attrs.pop("name")
+        variant = plugin_attrs.pop("variant")
 
     try:
         plugin = add_service.add(
@@ -287,6 +306,7 @@ def add_plugin(
             variant=variant,
             inherit_from=inherit_from,
             lock=lock,
+            python=python,
             **plugin_attrs,
         )
         print_added_plugin(plugin)
@@ -405,7 +425,7 @@ def install_plugins(
     parallelism=None,
     clean=False,
     force=False,
-):
+) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,
@@ -612,11 +632,11 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
         super().invoke(ctx)
 
 
-class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup):
+class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup, DYMGroup):
     """Click group with telemetry instrumentation and a default command."""
 
 
-class InstrumentedGroup(InstrumentedGroupMixin, click.Group):
+class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 

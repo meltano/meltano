@@ -3,20 +3,31 @@ from __future__ import annotations
 import os
 import platform
 import shutil
+import typing as t
 
 import mock
 import pytest
 import yaml
 
 from asserts import assert_cli_runner
+from fixtures.cli import plugins_dir
 from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
-from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
+
+plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
+fails_on_windows = pytest.mark.xfail(
+    platform.system() == "Windows",
+    reason="Fails on Windows: https://github.com/meltano/meltano/issues/3444",
+)
 
 
 class TestCliAdd:
@@ -28,6 +39,11 @@ class TestCliAdd:
     ):
         shutil.rmtree(".", ignore_errors=True)
         project_init_service.create_files(project)
+
+        project.refresh()
+
+        for plugin_type in PluginType:
+            project.meltano.plugins[plugin_type].clear()
 
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
@@ -56,7 +72,7 @@ class TestCliAdd:
         plugin_name,
         default_variant,
         required_plugin_refs,
-        project,
+        project: Project,
         cli_runner,
     ):
         # ensure the plugin is not present
@@ -105,7 +121,7 @@ class TestCliAdd:
                 install_plugin_mock.assert_called()
 
     @pytest.mark.order(1)
-    def test_add_multiple(self, project, cli_runner):
+    def test_add_multiple(self, project: Project, cli_runner):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             cli_runner.invoke(cli, ["add", "extractors", "tap-gitlab"])
@@ -144,6 +160,7 @@ class TestCliAdd:
                 project,
                 [tap_gitlab, tap_adwords, tap_facebook],
                 reason=PluginInstallReason.ADD,
+                force=False,
             )
 
     @pytest.mark.order(1)
@@ -168,7 +185,7 @@ class TestCliAdd:
             assert "variant: singer-io" in res.stdout
 
     @pytest.mark.order(2)
-    def test_add_transform(self, project, cli_runner):
+    def test_add_transform(self, project: Project, cli_runner):
         # adding Transforms requires the legacy 'dbt' Transformer
         cli_runner.invoke(cli, ["add", "transformer", "dbt"])
         cli_runner.invoke(cli, ["install", "transformer", "dbt"])
@@ -192,16 +209,13 @@ class TestCliAdd:
             "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}",
         }
 
+    @fails_on_windows
     def test_add_files_with_updates(
         self,
-        project,
+        project: Project,
         cli_runner,
         plugin_settings_service_factory,
     ):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
         # if plugin is locked, we actually wouldn't expect it to update.
         # So we must remove lockfile
         shutil.rmtree("plugins/files", ignore_errors=True)
@@ -230,7 +244,7 @@ class TestCliAdd:
             "This file is managed by the 'airflow' file bundle" in file_path.read_text()
         )
 
-    def test_add_files_without_updates(self, project, cli_runner):
+    def test_add_files_without_updates(self, project: Project, cli_runner):
         result = cli_runner.invoke(cli, ["add", "files", "docker-compose"])
         output = result.stdout + result.stderr
         assert_cli_runner(result)
@@ -248,11 +262,8 @@ class TestCliAdd:
         # File does not have "managed" header
         assert "This file is managed" not in file_path.read_text()
 
-    def test_add_files_that_already_exists(self, project, cli_runner):
-        if platform.system() == "Windows":
-            pytest.xfail(
-                "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
-            )
+    @fails_on_windows
+    def test_add_files_that_already_exists(self, project: Project, cli_runner):
         # dbt lockfile was created in an upstream test. Need to remove.
         shutil.rmtree(project.root_dir("plugins/files"), ignore_errors=True)
         project.root_dir("transform/dbt_project.yml").write_text("Exists!")
@@ -274,7 +285,7 @@ class TestCliAdd:
         assert res.exception
         assert str(res.exception) == (
             "Extractor 'tap-unknown' is not known to Meltano. "
-            "Run `meltano discover extractor` to explore available plugins."
+            "Check https://hub.meltano.com/ for available plugins."
         )
 
         # ensure the plugin is not present
@@ -282,7 +293,7 @@ class TestCliAdd:
             project.plugins.find_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
-    def test_add_fails(self, project, cli_runner):
+    def test_add_fails(self, project: Project, cli_runner):
         result = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
         output = result.stdout + result.stderr
 
@@ -294,7 +305,7 @@ class TestCliAdd:
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
-    def test_add_variant(self, project, cli_runner):
+    def test_add_variant(self, project: Project, cli_runner):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
@@ -317,10 +328,9 @@ class TestCliAdd:
 
     def test_add_inherited(
         self,
-        project,
+        project: Project,
         tap,
         cli_runner,
-        plugin_discovery_service,
     ):
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
@@ -348,7 +358,7 @@ class TestCliAdd:
             )
             assert inherited.inherit_from == "tap-mock"
             assert inherited.variant == "meltano"
-            assert inherited.parent == plugin_discovery_service.find_base_plugin(
+            assert inherited.parent == project.hub_service.find_base_plugin(
                 plugin_type=PluginType.EXTRACTORS,
                 plugin_name="tap-mock",
                 variant="meltano",
@@ -379,13 +389,10 @@ class TestCliAdd:
             )
             assert inherited_variant.inherit_from == "tap-mock"
             assert inherited_variant.variant == "singer-io"
-            assert (
-                inherited_variant.parent
-                == plugin_discovery_service.find_base_plugin(
-                    plugin_type=PluginType.EXTRACTORS,
-                    plugin_name="tap-mock",
-                    variant="singer-io",
-                )
+            assert inherited_variant.parent == project.hub_service.find_base_plugin(
+                plugin_type=PluginType.EXTRACTORS,
+                plugin_name="tap-mock",
+                variant="singer-io",
             )
 
             # Inheriting from a ProjectPlugin using --inherit-from
@@ -426,7 +433,8 @@ class TestCliAdd:
                 "Extractor 'tap-bar' is not known to Meltano"
             ) in str(res.exception)
 
-    def test_add_custom(self, project, cli_runner):
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_custom(self, project: Project, cli_runner):
         pip_url = "-e path/to/tap-custom"
         executable = "tap-custom-bin"
         stdin = os.linesep.join(
@@ -470,9 +478,10 @@ class TestCliAdd:
                 project,
                 [plugin],
                 reason=PluginInstallReason.ADD,
+                force=False,
             )
 
-    def test_add_custom_no_install(self, project, cli_runner):
+    def test_add_custom_no_install(self, project: Project, cli_runner):
         executable = "tap-custom-noinstall"
         stdin = os.linesep.join(
             # namespace, pip_url, executable, capabilities, settings
@@ -519,10 +528,10 @@ class TestCliAdd:
                 project,
                 [plugin],
                 reason=PluginInstallReason.ADD,
+                force=False,
             )
 
-    @pytest.mark.usefixtures("plugin_discovery_service")
-    def test_add_custom_variant(self, project, cli_runner):
+    def test_add_custom_variant(self, project: Project, cli_runner):
         with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
@@ -574,10 +583,9 @@ class TestCliAdd:
         plugin_name,
         default_variant,
         required_plugin_refs,
-        project,
+        project: Project,
         cli_runner,
     ):
-        project.refresh()
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
@@ -635,3 +643,177 @@ class TestCliAdd:
                     )
 
                 install_plugin_mock.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "ref",
+        (
+            plugin_ref,
+            (
+                "https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/"
+                f"{plugin_ref.relative_to(plugins_dir)}"
+            ),
+        ),
+        ids=(
+            "local",
+            "remote",
+        ),
+    )
+    @pytest.mark.usefixtures("reset_project_context")
+    @mock.patch("meltano.cli.add.install_plugins")
+    @mock.patch("meltano.cli.add.requests.get")
+    def test_add_from_ref(
+        self,
+        ref_request_mock,
+        install_plugin_mock,
+        ref,
+        project,
+        cli_runner,
+    ):
+        ref_request_mock.return_value.status_code = 200
+        ref_request_mock.return_value.text = plugin_ref.read_text()
+
+        install_plugin_mock.return_value = True
+
+        plugin_name = plugin_ref.parent.name
+        plugin_type = PluginType(plugin_ref.parents[1].name)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", plugin_type.singular, plugin_name, "--from-ref", ref],
+        )
+        assert_cli_runner(res)
+
+        assert f"Added {plugin_type.singular} '{plugin_name}'" in res.output
+
+        plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+        assert plugin.name == plugin_name
+        assert plugin.variant == "test"
+
+    @pytest.mark.usefixtures("reset_project_context")
+    @pytest.mark.parametrize(
+        (
+            "ref",
+            "invalid_reason",
+        ),
+        (
+            (
+                plugin_ref.name,
+                "No such file or directory: '{ref}'",
+            ),
+            pytest.param(
+                plugin_ref.parent,
+                "Is a directory: '{ref}'",
+                marks=fails_on_windows,
+            ),
+            (
+                "https://:",
+                "Invalid URL '{ref}'",
+            ),
+        ),
+        ids=(
+            "does not exist",
+            "is directory",
+            "invalid url",
+        ),
+    )
+    def test_add_from_ref_invalid_ref(
+        self,
+        ref,
+        invalid_reason,
+        cli_runner,
+    ):
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", ref],
+        )
+
+        assert res.exit_code == 2
+        assert invalid_reason.format(ref=ref) in res.stderr
+
+    @pytest.mark.parametrize(
+        (
+            "definition",
+            "invalid_reason",
+        ),
+        (
+            (
+                "test",
+                "incorrect format",
+            ),
+            (
+                {},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"test-key": "test-value"},
+                "missing properties (name, namespace)",
+            ),
+            (
+                {"name": "tap-custom"},
+                "missing properties (namespace)",
+            ),
+        ),
+        ids=(
+            "incorrect format",
+            "empty",
+            "no required properties",
+            "some required properties",
+        ),
+    )
+    def test_add_from_ref_invalid_definiton(
+        self,
+        definition,
+        invalid_reason,
+        cli_runner,
+    ):
+        with open("test.yml", "w") as f:
+            yaml.dump(definition, f)
+
+        res = cli_runner.invoke(
+            cli,
+            ["add", "extractor", "tap-custom", "--from-ref", f.name],
+        )
+
+        assert res.exit_code == 1
+        assert isinstance(res.exception, InvalidPluginDefinitionError)
+        assert res.exception.reason == invalid_reason
+
+    def test_add_with_python_version(self, cli_runner: CliRunner):
+        with mock.patch(
+            "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+        ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
+            python = "python3.X"
+            assert_cli_runner(
+                cli_runner.invoke(
+                    cli,
+                    (
+                        "add",
+                        "extractor",
+                        "tap-that-needs-custom-python",
+                        "--python",
+                        python,
+                    ),
+                ),
+            )
+            venv_mock.assert_called_once_with(python)
+
+    def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-gitlab", "--force-install"],
+            )
+            tap_gitlab = project.plugins.find_plugin(
+                "tap-gitlab",
+                PluginType.EXTRACTORS,
+            )
+
+        assert_cli_runner(res)
+        assert tap_gitlab
+        install_plugin_mock.assert_called_once_with(
+            project,
+            [tap_gitlab],
+            reason=PluginInstallReason.ADD,
+            force=True,
+        )

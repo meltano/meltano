@@ -4,19 +4,21 @@ from __future__ import annotations
 import asyncio
 import os
 import signal
+import typing as t
 import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta
 from enum import Enum
 from enum import IntFlag as EnumIntFlag
 
-from sqlalchemy import Column, literal, types
+from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import Mapped, mapped_column
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import GUID, IntFlag, JSONEncodedDict
+from meltano.core.sqlalchemy import GUIDType, IntFlag, IntPK, JSONEncodedDict
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
@@ -99,16 +101,18 @@ class Job(SystemModel):  # noqa: WPS214
 
     __tablename__ = "runs"
 
-    id = Column(types.Integer, primary_key=True)
-    job_name = Column(types.String)
-    run_id = Column(GUID, nullable=False, default=uuid.uuid4)
-    _state = Column(name="state", type_=types.String)
-    started_at = Column(types.DateTime)
-    last_heartbeat_at = Column(types.DateTime)
-    ended_at = Column(types.DateTime)
-    payload = Column(MutableDict.as_mutable(JSONEncodedDict))
-    payload_flags = Column(IntFlag, default=0)
-    trigger = Column(types.String, default=current_trigger)
+    id: Mapped[IntPK]
+    job_name: Mapped[t.Optional[str]]  # noqa: UP007
+    run_id: Mapped[GUIDType]
+    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP007
+    started_at: Mapped[t.Optional[datetime]]  # noqa: UP007
+    last_heartbeat_at: Mapped[t.Optional[datetime]]  # noqa: UP007
+    ended_at: Mapped[t.Optional[datetime]]  # noqa: UP007
+    payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
+    payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
+    trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
+        default=current_trigger,
+    )
 
     def __init__(self, **kwargs):
         """Construct a Job.

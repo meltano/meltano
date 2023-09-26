@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from meltano.core.error import MeltanoError
 from meltano.core.project import Project
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
@@ -55,6 +56,24 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     assert az_state_store.container_name == "some_container"
     assert az_state_store.prefix == "/some/path"
     assert az_state_store.connection_string == "SOME_CONNECTION_STRING"
+
+    # Azure, missing container name
+    project.settings.set(["state_backend", "uri"], "azure://")
+    project.settings.set(
+        ["state_backend", "azure", "connection_string"],
+        "SOME_CONNECTION_STRING",
+    )
+    with pytest.raises(MeltanoError):
+        state_store_manager_from_project_settings(project.settings)
+
+    # Azure, missing connection string
+    project.settings.set(["state_backend", "uri"], "azure://some_container/some/path")
+    project.settings.unset(["state_backend", "azure", "connection_string"])
+    az_state_store: AZStorageStateStoreManager = (
+        state_store_manager_from_project_settings(project.settings)
+    )
+    with pytest.raises(MeltanoError):
+        _ = az_state_store.client  # noqa: WPS122
 
     # GCS
     project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")

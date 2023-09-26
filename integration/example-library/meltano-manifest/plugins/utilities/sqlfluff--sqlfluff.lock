@@ -1,0 +1,25 @@
+{
+  "plugin_type": "utilities",
+  "name": "sqlfluff",
+  "namespace": "sqlfluff",
+  "variant": "sqlfluff",
+  "label": "SQLFluff",
+  "docs": "https://hub.meltano.com/utilities/sqlfluff--sqlfluff",
+  "repo": "https://github.com/sqlfluff/sqlfluff",
+  "pip_url": "sqlfluff sqlfluff-templater-dbt dbt-core",
+  "logo_url": "https://hub.meltano.com/assets/logos/utilities/sqlfluff.png",
+  "commands": {
+    "fix": {
+      "args": "fix",
+      "description": "Automatically fix SQL files according to your defined rules."
+    },
+    "fix-force": {
+      "args": "fix --force",
+      "description": "Automatically fix SQL files according to your defined rules (does not ask for confirmation)."
+    },
+    "lint": {
+      "args": "lint",
+      "description": "Lint SQL in transform models."
+    }
+  }
+}

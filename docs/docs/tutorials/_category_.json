@@ -1,0 +1,7 @@
+{
+  "label": "Tutorials",
+  "position": 4,
+  "customProps": {
+    "icon": "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgMjQgMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDI0IDI0OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+CjxwYXRoIHN0eWxlPSJmaWxsOiMwODAyMTY7IiBkPSJNNCw0LjVjMC0xLjcsMS4zLTMsMy0zaDEwYzEuNywwLDMsMS4zLDMsM3YxNmMwLDEuMi0xLjQsMS45LTIuNCwxLjJsLTUuNi00CglsLTUuNiw0Yy0xLDAuNy0yLjQsMC0yLjQtMS4yVjQuNXoiLz4KPC9zdmc+Cg=="
+  }
+}

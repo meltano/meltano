@@ -1,0 +1,75 @@
+.docItemContainer header+*,
+.docItemContainer article>*:first-child {
+  margin-top: 0;
+}
+
+.docItemContainer {
+  padding: 0;
+  z-index: 3;
+}
+
+.tocContainer {
+  max-width: 100%;
+  transition: all 0.2s ease;
+}
+
+.docItem {
+  transition: all 0.2s ease;
+}
+
+.tocHiddenContainer {
+  width: 1px;
+  max-width: 1px;
+  position: relative;
+  right: 0;
+}
+
+.tocWrapper {
+  margin-top: -17px;
+  width: 100%;
+  transition: all 0.2s ease;
+  position: sticky;
+  top: 82px;
+  height: fit-content;
+}
+
+.tocWrapper a {
+  color: var(--markdown-color);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 130%;
+}
+
+.tocWrapper ul {
+  padding-left: 1rem;
+}
+
+.tocWrapper ul ul {
+  list-style-type: square;
+}
+
+.tocHidden {
+  width: 1px;
+}
+
+ul,
+ol {
+  padding-left: 1rem;
+}
+
+ol {
+  list-style: decimal;
+}
+
+ol ol {
+  list-style: upper-roman;
+}
+
+@media (min-width: 997px) {
+  .docItemCol {
+    max-width: 75% !important;
+    padding: 0;
+    transition: all 0.2s ease;
+  }
+}

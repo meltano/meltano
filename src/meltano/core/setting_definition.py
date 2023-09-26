@@ -182,7 +182,6 @@ class SettingDefinition(NameEq, Canonical):
         options: list | None = None,
         oauth: dict | None = None,
         placeholder: str | None = None,
-        protected: bool | None = None,
         env_specific: bool | None = None,
         hidden: bool | None = None,
         sensitive: bool | None = None,
@@ -208,7 +207,6 @@ class SettingDefinition(NameEq, Canonical):
             options: Setting options.
             oauth: Setting OAuth provider details.
             placeholder: A placeholder value for this setting.
-            protected: A protected setting cannot be changed from the UI.
             env_specific: Flag for environment-specific setting.
             hidden: Hidden setting.
             sensitive: Sensitive setting.
@@ -243,7 +241,6 @@ class SettingDefinition(NameEq, Canonical):
             options=options,
             oauth=oauth,
             placeholder=placeholder,
-            protected=protected,
             env_specific=env_specific,
             hidden=hidden,
             sensitive=sensitive,

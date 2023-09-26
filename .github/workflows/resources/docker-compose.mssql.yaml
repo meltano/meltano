@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Meltan0admin
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-U", "sa", "-P", "Meltan0admin", "-Q", "select 1", "-b", "-o", "/dev/null" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

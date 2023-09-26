@@ -33,9 +33,9 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    engine, _ = project_engine(project)
-    upgrade_service = UpgradeService(engine, project)
-    ctx.obj["upgrade_service"] = upgrade_service
+    engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
+    upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
+    ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
 
 
 @upgrade.command(  # noqa: WPS125
@@ -43,7 +43,7 @@ def upgrade(ctx, project):
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
 @click.option(
-    "--pip_url",
+    "--pip-url",
     type=str,
     envvar="MELTANO_UPGRADE_PIP_URL",
     help="Meltano pip URL.",
@@ -74,7 +74,6 @@ def all(ctx, pip_url, force, skip_package):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    project = ctx.obj["project"]
     upgrade_service = ctx.obj["upgrade_service"]
 
     if skip_package:
@@ -85,12 +84,13 @@ def all(ctx, pip_url, force, skip_package):
 
         click.echo()
 
+        upgrade_service.migrate_state()
         if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")
     else:
-        package_upgraded = upgrade_service.upgrade_package(pip_url=pip_url, force=force)
-        if package_upgraded:
+        project = ctx.obj["project"]
+        if upgrade_service.upgrade_package(pip_url=pip_url, force=force):
             # Shell out instead of calling `upgrade_service` methods to
             # ensure the latest code is used.
             click.echo()
@@ -114,7 +114,7 @@ def all(ctx, pip_url, force, skip_package):
 
 @upgrade.command(cls=InstrumentedCmd, short_help="Upgrade the Meltano package only.")
 @click.option(
-    "--pip_url",
+    "--pip-url",
     type=str,
     envvar="MELTANO_UPGRADE_PIP_URL",
     help="Meltano pip URL.",

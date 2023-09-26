@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import logging
 import time
+import typing as t
+from urllib.parse import urlparse
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Connection, Engine
@@ -37,6 +39,21 @@ class MeltanoDatabaseCompatibilityError(MeltanoError):
         super().__init__(reason, self.INSTRUCTION)
 
 
+class NullConnectionStringError(MeltanoError):
+    """Raised when the database is not compatible with Meltano."""
+
+    REASON = "The `database_uri` setting has a null value"
+    INSTRUCTION = (
+        "Verify that the `database_uri` setting points to a valid database connection "
+        "URI, or use `MELTANO_FF_STRICT_ENV_VAR_MODE=1 meltano config meltano list` "
+        "to check for missing environment variables"
+    )
+
+    def __init__(self):
+        """Initialize the exception."""
+        super().__init__(self.REASON, self.INSTRUCTION)
+
+
 def project_engine(
     project: Project,
     default: bool = False,
@@ -50,15 +67,34 @@ def project_engine(
 
     Returns:
         The engine, and a session maker bound to the engine.
+
+    Raises:
+        NullConnectionStringError: The `database_uri` setting has a null value.
     """
-    existing_engine = _engines.get(project)
-    if existing_engine:
+    if existing_engine := _engines.get(project):
         return existing_engine
 
-    engine_uri = project.settings.get("database_uri")
-    logging.debug(f"Creating engine '{project}@{engine_uri}'")
+    database_uri = project.settings.get("database_uri")
+    parsed_db_uri = urlparse(database_uri)
+    sanitized_db_uri = parsed_db_uri._replace(  # noqa: WPS437
+        netloc=(
+            f"{parsed_db_uri.username}:********@"  # user:pass auth case
+            if parsed_db_uri.password
+            else "********@"  # token auth case
+            if parsed_db_uri.username
+            else ""  # no auth case
+        )
+        + (parsed_db_uri.hostname or ""),
+    ).geturl()
+    logging.debug(
+        f"Creating DB engine for project at {str(project.root)!r} "
+        f"with DB URI {sanitized_db_uri!r}",
+    )
 
-    engine = create_engine(engine_uri, poolclass=NullPool)
+    if database_uri is None:
+        raise NullConnectionStringError
+
+    engine = create_engine(database_uri, poolclass=NullPool, future=True)
 
     # Connect to the database to ensure it is available.
     connect(
@@ -70,7 +106,7 @@ def project_engine(
     check_database_compatibility(engine)
     init_hook(engine)
 
-    engine_session = (engine, sessionmaker(bind=engine))
+    engine_session = (engine, sessionmaker(bind=engine, future=True))
 
     if default:
         # register the default engine
@@ -116,8 +152,8 @@ def connect(
             time.sleep(retry_timeout)
 
 
-init_hooks = {
-    "sqlite": lambda x: x.execute("PRAGMA journal_mode=WAL"),
+init_hooks: dict[str, t.Callable[[Connection], None]] = {
+    "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 
 
@@ -134,15 +170,12 @@ def init_hook(engine: Engine) -> None:
     Raises:
         Exception: The init hook raised an exception.
     """
-    try:
-        hook = init_hooks[engine.dialect.name]
-    except KeyError:
-        return
-
-    try:
-        hook(engine)
-    except Exception as ex:
-        raise Exception(f"Failed to initialize database: {ex!s}") from ex
+    if hook := init_hooks.get(engine.dialect.name):
+        with engine.connect() as conn:
+            try:
+                hook(conn)
+            except Exception as ex:
+                raise Exception(f"Failed to initialize database: {ex!s}") from ex
 
 
 def ensure_schema_exists(

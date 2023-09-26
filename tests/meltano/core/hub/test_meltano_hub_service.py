@@ -9,7 +9,7 @@ from requests import HTTPError, Response
 from requests.adapters import BaseAdapter
 
 from meltano.cli import cli
-from meltano.cli.discovery import discover
+from meltano.cli.hub import hub
 from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
@@ -96,7 +96,7 @@ class TestMeltanoHubService:
         hub_request_counter: Counter,
     ):
         extractors = project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
-        assert len(extractors) == 35  # noqa: WPS432
+        assert len(extractors) == 9
         assert len(extractors["tap-mock"].variants) == 2
         assert extractors["tap-mock"].variant_labels == [
             "meltano (default)",
@@ -130,12 +130,12 @@ class TestMeltanoHubService:
     def test_request_headers(self, project: Project):
         with mock.patch("click.get_current_context") as get_context:
             get_context.return_value = click.Context(
-                discover,
-                info_name="discover",
+                hub,
+                info_name="hub",
                 parent=click.Context(cli, info_name="meltano"),
             )
             request = project.hub_service._build_request("GET", "https://example.com")
-            assert request.headers["X-Meltano-Command"] == "meltano discover"
+            assert request.headers["X-Meltano-Command"] == "meltano hub"
 
         with mock.patch("click.get_current_context") as get_context:
             get_context.return_value = None

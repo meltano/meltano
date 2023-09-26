@@ -1,4 +1,11 @@
-"""Nox configuration."""
+"""Nox configuration.
+
+- Run `nox -l` to list the sessions Nox can run.
+- Run `nox -t lint` to run linting.
+- Run `nox -t test` to run tests.
+- Run `nox` to run all sessions.
+- Run `nox -s <session name>` to run a particular session.
+"""
 
 from __future__ import annotations
 
@@ -6,71 +13,113 @@ import os
 import sys
 from pathlib import Path
 from random import randint
-from textwrap import dedent
+
+from nox import Session
 
 try:
-    from nox_poetry import Session
     from nox_poetry import session as nox_session
 except ImportError:
-    message = f"""\
-    Nox failed to import the 'nox-poetry' package.
-    Please install it using the following command:
-    {sys.executable} -m pip install nox-poetry"""
-    raise SystemExit(dedent(message)) from None
+    raise SystemExit(
+        "Nox failed to import the 'nox-poetry' package. Please install it "
+        f"using the following command: {sys.executable} -m pip install nox-poetry",
+    ) from None
 
+# NOTE: The module docstring above is printed when `nox -l` is run.
 
-package = "meltano"
-python_versions = ["3.11", "3.10", "3.9", "3.8", "3.7"]
+# Dependencies for tests and type checking are defined in `pyproject.toml`, and
+# locked in `poetry.lock`. The various Nox sessions defined here install the
+# subset of them they require.
+
+# We use `nox-poetry` to ensure the version installed is consistent with
+# `poetry.lock`. The single source of truth for our Python test and type checking
+# dependencies is `pyproject.toml`. Other linting and checks are performed by
+# `pre-commit`, where each check specifies its own dependencies. There should be
+# no duplicated dependencies between `pyproject.toml` and
+# `.pre-commit-config.yaml`.
+
+root_path = Path(__file__).parent
+python_versions = ("3.8", "3.9", "3.10", "3.11")
 main_python_version = "3.10"
-locations = "src", "tests", "noxfile.py"
+pytest_deps = (
+    "backoff",
+    "colorama",  # colored output in Windows
+    "freezegun",
+    "hypothesis",
+    "mock",
+    "moto",
+    "pytest",
+    "pytest-aiohttp",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pytest-docker",
+    "pytest-httpserver",
+    "pytest-order",
+    "pytest-randomly",
+    "pytest-rerunfailures",
+    "pytest-xdist",
+    "requests-mock",
+    "pytest-structlog",
+)
 
 
-@nox_session(python=python_versions)
-def tests(session: Session) -> None:
-    """Execute pytest tests and compute coverage.
+def _run_pytest(session: Session) -> None:
+    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    args = session.posargs or ("tests/",)
+    try:
+        session.env.update(
+            {
+                "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
+                "COVERAGE_FILE": str(
+                    root_path / f".coverage.{random_seed:010}.{session.name}",
+                ),
+                "NOX_CURRENT_SESSION": "tests",
+            },
+        )
+        session.run(
+            "pytest",
+            "--cov=meltano",
+            "--cov=tests",
+            f"--randomly-seed={random_seed}",
+            *args,
+        )
+    finally:
+        if session.interactive:
+            session.notify("coverage", posargs=[])
+
+
+@nox_session(
+    name="pytest",
+    python=python_versions,
+    tags=("test", "pytest"),
+)
+def pytest_meltano(session: Session) -> None:
+    """Run pytest to test Meltano.
 
     Args:
         session: Nox session.
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
+    extras = ["azure", "gcs", "s3"]
 
     if backend_db == "mssql":
-        session.install(".[mssql,azure,gcs,s3]")
+        extras.append("mssql")
+    elif backend_db == "postgresql":
+        extras.append("psycopg2")
+    elif backend_db == "postgresql_psycopg3":
+        extras.append("postgres")
 
-    else:
-        session.install(".[azure,gcs,s3]")
-
-    session.install(
-        "colorama",  # colored output in Windows
-        "freezegun",
-        "mock",
-        "pytest",
-        "pytest-asyncio",
-        "pytest-cov",
-        "pytest-docker",
-        "pytest-order",
-        "pytest-randomly",
-        "pytest-structlog",
-        "pytest-xdist",
-        "requests-mock",
-    )
-
-    session.run(
-        "pytest",
-        f"--randomly-seed={randint(0, 2**32-1)}",  # noqa: S311, WPS432
-        *session.posargs,
-        env={"NOX_CURRENT_SESSION": "tests"},
-    )
+    session.install(f".[{','.join(extras)}]", *pytest_deps)
+    _run_pytest(session)
 
 
 @nox_session(python=main_python_version)
 def coverage(session: Session) -> None:
-    """Upload coverage data.
+    """Combine and report previously generated coverage data.
 
     Args:
         session: Nox session.
     """
-    args = session.posargs or ["report"]
+    args = session.posargs or ("report",)
 
     session.install("coverage[toml]")
 
@@ -80,30 +129,43 @@ def coverage(session: Session) -> None:
     session.run("coverage", *args)
 
 
-@nox_session(python=main_python_version)
+@nox_session(
+    name="pre-commit",
+    python=main_python_version,
+    tags=("lint",),
+)
+def pre_commit(session: Session) -> None:
+    """Run pre-commit linting and auto-fixes.
+
+    Args:
+        session: Nox session.
+    """
+    args = session.posargs or ("run", "--all-files")
+    session.install("pre-commit")
+    session.run("pre-commit", *args)
+
+
+@nox_session(
+    python=main_python_version,
+    tags=("lint",),
+)
 def mypy(session: Session) -> None:
     """Run mypy type checking.
 
     Args:
         session: Nox session.
     """
-    args = session.posargs or [
-        "src/meltano",
-        "--exclude",
-        "src/meltano/migrations/",
-        "--exclude",
-        ".nox/",
-    ]
-
-    session.install(".")
     session.install(
-        "boto3-stubs[essential]",
+        ".[mssql,azure,gcs,s3]",
+        "boto3-stubs",
         "mypy",
-        "sqlalchemy2-stubs",
         "types-croniter",
+        "types-python-dateutil",
         "types-jsonschema",
         "types-psutil",
+        "types-python-slugify",
         "types-PyYAML",
         "types-requests",
+        "types-tabulate",
     )
-    session.run("mypy", *args)
+    session.run("mypy", *session.posargs)

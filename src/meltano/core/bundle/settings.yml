@@ -26,16 +26,14 @@ settings:
   kind: boolean
   value: false
   env_specific: true
-- name: discovery_url
-  value: https://discovery.meltano.com/discovery.yml
 - name: hub_api_root
 - name: hub_url
   value: https://hub.meltano.com
 - name: hub_url_auth
-- name: discovery_url_auth
 - name: elt.buffer_size
   kind: integer
   value: 10485760 # 10 MiB
+- name: python
 
 # State backend settings
 - name: state_backend.uri
@@ -91,139 +89,12 @@ settings:
 - name: cli.log_config
   value: logging.yaml
 
-# UI server
-- name: ui.bind_host
-  value: "0.0.0.0"
-  env_specific: true
-- name: ui.bind_port
-  kind: integer
-  value: 5000
-  env_specific: true
-- name: ui.server_name
-  env_specific: true
-- name: ui.session_cookie_domain
-  env_specific: true
-- name: ui.session_cookie_secure
-  kind: boolean
-  value: false
-  env_specific: true
-- name: ui.secret_key
-  value: thisisnotapropersecretkey
-  env_specific: true
-- name: ui.password_salt
-  value: b4c124932584ad6e69f2774a0ae5c138
-  env_specific: true
-- name: ui.workers
-  kind: integer
-  value: 4
-  env_specific: true
-- name: ui.forwarded_allow_ips
-  value: "127.0.0.1"
-  env_specific: true
-
-# UI features
-- name: ui.readonly
-  kind: boolean
-  value: false
-  env_specific: true
-- name: ui.authentication
-  kind: boolean
-  value: false
-  env_specific: true
-- name: ui.anonymous_readonly
-  kind: boolean
-  value: false
-  env_specific: true
-- name: ui.notification
-  kind: boolean
-  value: false
-  env_specific: true
-- name: ui.analysis
-  kind: boolean
-  value: false
-
-# UI customization
-- name: ui.logo_url
-
-# Mail server
-- name: mail.server
-  value: localhost
-  env: MAIL_SERVER
-  env_specific: true
-- name: mail.port
-  kind: integer
-  value: 1025
-  env: MAIL_PORT
-  env_specific: true
-- name: mail.default_sender
-  value: '"Meltano" <bot@meltano.com>'
-  env: MAIL_DEFAULT_SENDER
-  env_specific: true
-- name: mail.use_tls
-  kind: boolean
-  value: false
-  env: MAIL_USE_TLS
-  env_specific: true
-- name: mail.username
-  env: MAIL_USERNAME
-  env_specific: true
-- name: mail.password
-  sensitive: true
-  env: MAIL_PASSWORD
-  env_specific: true
-- name: mail.debug
-  kind: boolean
-  value: false
-  env: MAIL_DEBUG
-  env_specific: true
-- name: mail.sendgrid_unsubscribe_group_id
-  kind: integer
-  value: 12751
-  env: MAIL_SENDGRID_UNSUBSCRIBE_GROUP_ID
-  env_specific: true
-
-# OAuth Service
-- name: oauth_service.url
-- name: oauth_service.providers
-  value: all
-- name: oauth_service.facebook.client_id
-  env: OAUTH_FACEBOOK_CLIENT_ID
-  env_specific: true
-- name: oauth_service.facebook.client_secret
-  sensitive: true
-  env: OAUTH_FACEBOOK_CLIENT_SECRET
-  env_specific: true
-- name: oauth_service.google_adwords.client_id
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-  env_specific: true
-- name: oauth_service.google_adwords.client_secret
-  sensitive: true
-  env: OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-  env_specific: true
-
-# OAuth Single-Sign-On
-- name: oauth.gitlab.client_id
-  env: OAUTH_GITLAB_CLIENT_ID
-  env_specific: true
-- name: oauth.gitlab.client_secret
-  sensitive: true
-  env: OAUTH_GITLAB_CLIENT_SECRET
-  env_specific: true
-
 # Snowplow Tracking
 - name: snowplow.collector_endpoints
   kind: array
   value: ["https://sp.meltano.com"]
 
 # Feature Flags
-# Control whether to use Uvicorn rather than Gunicorn as the API server.
-- name: ff.enable_uvicorn
-  kind: boolean
-  value: False
-# Control whether the API includes scheduled jobs in listings.
-- name: ff.enable_api_scheduled_job_list
-  kind: boolean
-  value: False
 # Global "experimental" flag.
 - name: experimental
   kind: boolean
@@ -233,6 +104,7 @@ settings:
   kind: boolean
   value: False
 # Whether invoke, and run operations if a plugin is not custom or it is not locked.
+# Deprecated since 3.0
 - name: ff.plugin_locks_required
   kind: boolean
   value: false
