@@ -353,13 +353,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.28.54"
-description = "Type annotations for boto3 1.28.54 generated with mypy-boto3-builder 7.19.0"
+version = "1.28.55"
+description = "Type annotations for boto3 1.28.55 generated with mypy-boto3-builder 7.19.0"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "boto3-stubs-1.28.54.tar.gz", hash = "sha256:cb6f6a6cca4826c2b5d61b0a3fcf9cb84d7924c120b7e1c670f08e21cc010425"},
-    {file = "boto3_stubs-1.28.54-py3-none-any.whl", hash = "sha256:a58a6ebd0767d7aa1f4ab6f3eec93388b20afff5c5b25c8fe8f866d85eda6f67"},
+    {file = "boto3-stubs-1.28.55.tar.gz", hash = "sha256:5121b26e4c4bb8adc7ac1a19dd27d3bfe236b18bec2ace5f987b9df6e2511cd3"},
+    {file = "boto3_stubs-1.28.55-py3-none-any.whl", hash = "sha256:530437c949b35e70613667d50c04ff3a41512ad03c3295851cc2c58a7309928d"},
 ]
 
 [package.dependencies]
@@ -410,7 +410,7 @@ backup-gateway = ["mypy-boto3-backup-gateway (>=1.28.0,<1.29.0)"]
 backupstorage = ["mypy-boto3-backupstorage (>=1.28.0,<1.29.0)"]
 batch = ["mypy-boto3-batch (>=1.28.0,<1.29.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.28.0,<1.29.0)"]
-boto3 = ["boto3 (==1.28.54)", "botocore (==1.31.54)"]
+boto3 = ["boto3 (==1.28.55)", "botocore (==1.31.55)"]
 braket = ["mypy-boto3-braket (>=1.28.0,<1.29.0)"]
 budgets = ["mypy-boto3-budgets (>=1.28.0,<1.29.0)"]
 ce = ["mypy-boto3-ce (>=1.28.0,<1.29.0)"]
@@ -3664,13 +3664,13 @@ files = [
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.5"
+version = "2.31.0.6"
 description = "Typing stubs for requests"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "types-requests-2.31.0.5.tar.gz", hash = "sha256:e4153c2a4e48dcc661600fa5f199b483cdcbd21965de0b5e2df26e93343c0f57"},
-    {file = "types_requests-2.31.0.5-py3-none-any.whl", hash = "sha256:e2523825754b2832e04cdc1e731423390e731457890113a201ebca8ad9b40427"},
+    {file = "types-requests-2.31.0.6.tar.gz", hash = "sha256:cd74ce3b53c461f1228a9b783929ac73a666658f223e28ed29753771477b3bd0"},
+    {file = "types_requests-2.31.0.6-py3-none-any.whl", hash = "sha256:a2db9cb228a81da8348b49ad6db3f5519452dd20a9c1e1a868c83c5fe88fd1a9"},
 ]
 
 [package.dependencies]
@@ -3951,4 +3951,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "9a4d69e3bc49db1ae4dec7009daf6921b22d2634639ed1aca9cdb8704dd316e4"
+content-hash = "ffad7dd6bac588dcfa752e000585687aff1146f885ffb883d87206b053c112d5"
