@@ -229,13 +229,13 @@ aio = ["aiohttp (>=3.0)"]
 
 [[package]]
 name = "azure-storage-blob"
-version = "12.18.1"
+version = "12.18.2"
 description = "Microsoft Azure Blob Storage Client Library for Python"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "azure-storage-blob-12.18.1.tar.gz", hash = "sha256:d3265c2403c28d8881326c365e9cf7ed2ad55fdac98404eae753548702b31ba2"},
-    {file = "azure_storage_blob-12.18.1-py3-none-any.whl", hash = "sha256:00b92568e91d608c04dfd4814c3b180818e690023493bb984c22dfc1a8a96e55"},
+    {file = "azure-storage-blob-12.18.2.tar.gz", hash = "sha256:e11935348981ffc005b848b55db25c04f2d1f90e1ee33000659906b763cf14c8"},
+    {file = "azure_storage_blob-12.18.2-py3-none-any.whl", hash = "sha256:ffd864bf9abf33dfc72c6ef37899a19bd9d585a946a2c61e288b4420c035df3a"},
 ]
 
 [package.dependencies]
@@ -334,17 +334,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.28.53"
+version = "1.28.54"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.53-py3-none-any.whl", hash = "sha256:dc2da9aff7de359774030a243a09b74568664117e2afb77c6e4b90572ae3a6c3"},
-    {file = "boto3-1.28.53.tar.gz", hash = "sha256:b95b0cc39f08402029c3a2bb141e1775cfa46576ebe9f9916f79bde90e27f53f"},
+    {file = "boto3-1.28.54-py3-none-any.whl", hash = "sha256:3cb2aee317a1b8686e3b23674e4099b8ff7451bd8acc61b9719acff86fa024d1"},
+    {file = "boto3-1.28.54.tar.gz", hash = "sha256:22e37d8c4f2d97b5e5c6ccc1d9edc7760717990b0ba8b8ea17a58cc87e57c5c9"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.53,<1.32.0"
+botocore = ">=1.31.54,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -353,13 +353,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.28.53"
-description = "Type annotations for boto3 1.28.53 generated with mypy-boto3-builder 7.19.0"
+version = "1.28.54"
+description = "Type annotations for boto3 1.28.54 generated with mypy-boto3-builder 7.19.0"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "boto3-stubs-1.28.53.tar.gz", hash = "sha256:453fb59aae740be06ac7baedfcdcaeb6644ac6a4f1382cb6a6c529ba1a94d9a2"},
-    {file = "boto3_stubs-1.28.53-py3-none-any.whl", hash = "sha256:ea9341e0864df79385a72e1d5f2f24a79ad5d4a8fe33154dc82bf53f14752b04"},
+    {file = "boto3-stubs-1.28.54.tar.gz", hash = "sha256:cb6f6a6cca4826c2b5d61b0a3fcf9cb84d7924c120b7e1c670f08e21cc010425"},
+    {file = "boto3_stubs-1.28.54-py3-none-any.whl", hash = "sha256:a58a6ebd0767d7aa1f4ab6f3eec93388b20afff5c5b25c8fe8f866d85eda6f67"},
 ]
 
 [package.dependencies]
@@ -410,7 +410,7 @@ backup-gateway = ["mypy-boto3-backup-gateway (>=1.28.0,<1.29.0)"]
 backupstorage = ["mypy-boto3-backupstorage (>=1.28.0,<1.29.0)"]
 batch = ["mypy-boto3-batch (>=1.28.0,<1.29.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.28.0,<1.29.0)"]
-boto3 = ["boto3 (==1.28.53)", "botocore (==1.31.53)"]
+boto3 = ["boto3 (==1.28.54)", "botocore (==1.31.54)"]
 braket = ["mypy-boto3-braket (>=1.28.0,<1.29.0)"]
 budgets = ["mypy-boto3-budgets (>=1.28.0,<1.29.0)"]
 ce = ["mypy-boto3-ce (>=1.28.0,<1.29.0)"]
@@ -736,13 +736,13 @@ xray = ["mypy-boto3-xray (>=1.28.0,<1.29.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.53"
+version = "1.31.54"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.53-py3-none-any.whl", hash = "sha256:aa647f94039d21de97c969df21ce8c5186b68234eb5c53148f0d8bbd708e375d"},
-    {file = "botocore-1.31.53.tar.gz", hash = "sha256:905580ea724d74f11652bab63fcec6bf0d32f1cf8b2963f7388efc0ea406b69b"},
+    {file = "botocore-1.31.54-py3-none-any.whl", hash = "sha256:71fdb337ddcdb6bf378e1211cba9ce754c35f12b1524c7d0c0c147b2310356c7"},
+    {file = "botocore-1.31.54.tar.gz", hash = "sha256:c98e78a9490c4166b205f87912b46770e156bfe7d53bae54ccbd49c68a336ec6"},
 ]
 
 [package.dependencies]
@@ -3606,13 +3606,13 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.19.0.0"
+version = "4.19.0.3"
 description = "Typing stubs for jsonschema"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "types-jsonschema-4.19.0.0.tar.gz", hash = "sha256:55ba17305fa35c674389a5c47f98b4c314441bdeadaf8541144acdf14dc5c4b0"},
-    {file = "types_jsonschema-4.19.0.0-py3-none-any.whl", hash = "sha256:c7d9553807c31a572bdbdc4e18ab1b2afa648e588aeca52fa931605b0fc1150e"},
+    {file = "types-jsonschema-4.19.0.3.tar.gz", hash = "sha256:e0fc0f5d51fd0988bf193be42174a5376b0096820ff79505d9c1b66de23f0581"},
+    {file = "types_jsonschema-4.19.0.3-py3-none-any.whl", hash = "sha256:5cedbb661e5ca88d95b94b79902423e3f97a389c245e5fe0ab384122f27d56b9"},
 ]
 
 [package.dependencies]
@@ -3951,4 +3951,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.12"
-content-hash = "3dfaa3eed58edc0d414ff8c519e71389833daca68df002fe259f07ae1886551c"
+content-hash = "9a4d69e3bc49db1ae4dec7009daf6921b22d2634639ed1aca9cdb8704dd316e4"
