@@ -501,7 +501,7 @@ Optional. Use to mark a setting as sensitive (e.g. a password, token or code).
 ```yaml
 settings:
 - name: setting_name
-   kind: string
+  kind: string
   sensitive: true
 ```
 
