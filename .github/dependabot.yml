@@ -6,6 +6,7 @@ updates:
       interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
@@ -21,6 +22,7 @@ updates:
       interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
@@ -37,6 +39,7 @@ updates:
       interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
