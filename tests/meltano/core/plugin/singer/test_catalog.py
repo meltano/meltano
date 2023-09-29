@@ -418,6 +418,246 @@ JSON_SCHEMA = """
 }
 """
 
+# Duplicate CATALOG, but change the stream ID to Unique.Entities.Name
+# to test that it is properly escaped
+ESCAPED_CATALOG = """
+{
+  "streams": [
+    {
+      "tap_stream_id": "Unique.Entities.Name",
+      "stream": "entities",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "balance": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unsupported": {
+            "type": "null"
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "content": {"type": ["string", "null"]},
+              "hash": {"type": "string"},
+              "timestamp": {"type": "string", "format": "date-time"}
+            },
+            "required": ["hash"]
+          }
+        }
+      },
+      "metadata": [
+        {
+          "breadcrumb": [
+            "properties",
+            "id"
+          ],
+          "metadata": {
+            "inclusion": "automatic"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "code"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "name"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "created_at"
+          ],
+          "metadata": {
+            "inclusion": "automatic"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "active"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "balance"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "unsupported"
+          ],
+          "metadata": {
+            "inclusion": "unsupported"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "content"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "hash"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "timestamp"
+          ],
+          "metadata": {
+            "inclusion": "available",
+            "selected-by-default": true
+          }
+        },
+        {
+          "breadcrumb": [],
+          "metadata": {
+            "table-key-properties": ["id"],
+            "valid-replication-keys": ["created_at"],
+            "forced-replication-method": "INCREMENTAL"
+          }
+        }
+      ]
+    }
+  ]
+}
+"""
+
+ESCAPED_JSON_SCHEMA = """
+{
+  "streams": [
+    {
+      "tap_stream_id": "Unique.Entities.Name",
+      "stream": "entities",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "anyOf": [
+              {"type": "string", "format": "date-time"},
+              {"type": ["string", "null"]}
+            ]
+          },
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "balance": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "content": {"type": ["string", "null"]},
+              "hash": {"type": "string"}
+            },
+            "required": ["hash"]
+          }
+        }
+      }
+    }
+  ]
+}
+"""
+
+
 EMPTY_STREAM_SCHEMA = """
 {
   "streams": [
@@ -699,7 +939,11 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(
-            ["UniqueEntitiesName.name", "UniqueEntitiesName.code", "*.payload.content"],
+            [
+                "UniqueEntitiesName.code",
+                "UniqueEntitiesName.name",
+                "*.payload.content",
+            ],
         )
         visit(catalog, selector)
 
@@ -707,6 +951,39 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, lister)
 
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
+
+    @pytest.mark.parametrize(
+        ("catalog", "attrs"),
+        (
+            (
+                "ESCAPED_CATALOG",
+                {
+                    "id",
+                    "code",
+                    "name",
+                    "created_at",
+                    "payload.content",
+                    "payload.timestamp",
+                },
+            ),
+            ("ESCAPED_JSON_SCHEMA", CATALOG_PROPERTIES),
+        ),
+        indirect=["catalog"],
+    )
+    def test_select_escaped(self, catalog, attrs):
+        selector = SelectExecutor(
+            [
+                "Unique\\.Entities\\.Name.code",
+                "Unique\\.Entities\\.Name.name",
+                "*.payload.content",
+            ],
+        )
+        visit(catalog, selector)
+
+        lister = ListSelectedExecutor()
+        visit(catalog, lister)
+
+        assert lister.selected_properties["Unique.Entities.Name"] == attrs
 
     @pytest.mark.parametrize(
         ("catalog", "attrs"),
