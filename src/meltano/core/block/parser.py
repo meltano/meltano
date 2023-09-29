@@ -70,6 +70,7 @@ class BlockParser:  # noqa: D101
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
+        merge_state: bool | None = False,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -84,6 +85,7 @@ class BlockParser:  # noqa: D101
             force: Whether to force a run if a job is already running (applies
                 to all found sets).
             state_id_suffix: State ID suffix to use.
+            merge_state: Whether to merge state at end of run.
 
         Raises:
             ClickException: If a block name is not found.
@@ -98,6 +100,7 @@ class BlockParser:  # noqa: D101
         self._plugins: list[ProjectPlugin] = []
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
+        self._merge_state = merge_state
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
 
@@ -237,6 +240,7 @@ class BlockParser:  # noqa: D101
             .with_full_refresh(self._full_refresh)
             .with_no_state_update(self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
+            .with_merge_state(self._merge_state)
         )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:

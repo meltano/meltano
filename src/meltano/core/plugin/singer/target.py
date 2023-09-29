@@ -161,7 +161,9 @@ class SingerTarget(SingerPlugin):
         if not elt_context or not elt_context.job or not elt_context.session:
             return
 
-        incomplete_state = elt_context.full_refresh and elt_context.select_filter
+        incomplete_state = (
+            elt_context.full_refresh and elt_context.select_filter
+        ) or elt_context.merge_state
         payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
 
         plugin_invoker.add_output_handler(

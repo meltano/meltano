@@ -70,6 +70,12 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
+@click.option(
+    "--merge-state",
+    is_flag=True,
+    default=False,
+    help="Merges State at the end of the run",
+)
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(  # noqa: C901,WPS231
@@ -79,6 +85,7 @@ def cli(  # noqa: C901,WPS231
     environment: str,
     no_environment: bool,
     cwd: Path | None,
+    merge_state: bool,
 ):  # noqa: WPS231
     """
     Your CLI for ELT+
@@ -94,7 +101,7 @@ def cli(  # noqa: C901,WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["explicit_no_environment"] = no_environment
-
+    ctx.obj["explicit_merge_state"] = merge_state
     no_color = get_no_color_flag()
     if no_color:
         ctx.color = False

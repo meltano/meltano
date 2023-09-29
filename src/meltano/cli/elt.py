@@ -92,6 +92,11 @@ class ELOptions:
         ),
         is_flag=True,
     )
+    merge_state = click.option(
+        "--merge-state",
+        is_flag=True,
+        help="Merges State at the end of the run",
+    )
 
 
 @click.command(
@@ -110,6 +115,7 @@ class ELOptions:
 @ELOptions.dump
 @ELOptions.state_id
 @ELOptions.force
+@ELOptions.merge_state
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -127,6 +133,7 @@ async def el(  # WPS408
     dump: str,
     state_id: str,
     force: bool,
+    merge_state: bool,
 ):
     """
     Run an EL pipeline to Extract and Load data.
@@ -153,6 +160,7 @@ async def el(  # WPS408
         dump,
         state_id,
         force,
+        merge_state,
     )
 
 
@@ -173,6 +181,7 @@ async def el(  # WPS408
 @ELOptions.dump
 @ELOptions.state_id
 @ELOptions.force
+@ELOptions.merge_state
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -191,6 +200,7 @@ async def elt(  # WPS408
     dump: str,
     state_id: str,
     force: bool,
+    merge_state: bool,
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -218,6 +228,7 @@ async def elt(  # WPS408
         dump,
         state_id,
         force,
+        merge_state,
     )
 
 
@@ -236,6 +247,7 @@ async def _run_el_command(
     dump: str,
     state_id: str,
     force: bool,
+    merge_state: bool,
 ):
     if platform.system() == "Windows":
         raise CliError(
@@ -276,6 +288,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
+            merge_state=merge_state,
         )
 
         if dump:
@@ -303,6 +316,7 @@ def _elt_context_builder(
     select_filter=None,
     catalog=None,
     state=None,
+    merge_state=False,
 ):
     select_filter = select_filter or []
     transform_name = None
@@ -322,6 +336,7 @@ def _elt_context_builder(
         .with_select_filter(select_filter)
         .with_catalog(catalog)
         .with_state(state)
+        .with_merge_state(merge_state)
     )
 
 
