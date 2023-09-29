@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.1.0 (2023-09-26)
+
+### ✨ New
+
+- [#8169](https://github.com/meltano/meltano/issues/8169) Added `--force-install` CLI flag for meltano `add` command. -- _**Thanks @XshubhamX!**_
+- [#8145](https://github.com/meltano/meltano/issues/8145) Save pip logs to a file in the system directory
+- [#7907](https://github.com/meltano/meltano/issues/7907) Add plugin from ref -- _**Thanks @ReubenFrankel!**_
+
+### 🐛 Fixes
+
+- [#8179](https://github.com/meltano/meltano/issues/8179) Removed the `--verbose` option from CLI, which no longer had any effect -- _**Thanks @arorarohan981!**_
+- [#8044](https://github.com/meltano/meltano/issues/8044) Better error message when Azure connection string is missing
+- [#8115](https://github.com/meltano/meltano/issues/8115) Do not perform destructive state ops when answering 'no' in prompt
+
+### 📚 Documentation Improvements
+
+- [#8178](https://github.com/meltano/meltano/issues/8178) Top-level ordered lists are now rendered correctly in docs
+- [#8156](https://github.com/meltano/meltano/issues/8156) Added docs for --cwd CLI option -- _**Thanks @XshubhamX!**_
+- [#8143](https://github.com/meltano/meltano/issues/8143) Remove Cloud announcement banner
+- [#8113](https://github.com/meltano/meltano/issues/8113) Update Cloud "Getting Started" guide to include the lock command
+- [#8111](https://github.com/meltano/meltano/issues/8111) Add example of database URI for SQL Server -- _**Thanks @wesseljt!**_
+- [#8087](https://github.com/meltano/meltano/issues/8087) Add cloud state command
+
 ## v3.0.0 (2023-09-05)
 
 ### BREAKING CHANGES
