@@ -1237,7 +1237,7 @@ pre {
 @media all and (min-width: 640px) {
   .meltano-tabs .tabs__item {
     padding: 1rem 2rem;
-    max-width: 150px;
+    max-width: 175px;
     min-width: 150px;
   }
 }
