@@ -88,14 +88,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 #### How to use
 
 <Tabs className="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="meltano init" label="meltano init" default>
-
-```bash
-meltano init --no-usage-stats demo-project
-```
-
-</TabItem>
-  <TabItem className="meltano-tab-content" value="terminal" label="terminal" default>
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
 meltano config meltano set send_anonymous_usage_stats false
@@ -109,6 +102,13 @@ export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
 ```
 
   </TabItem>
+  <TabItem className="meltano-tab-content" value="meltano init" label="meltano init" default>
+
+```bash
+meltano init --no-usage-stats demo-project
+```
+
+</TabItem>
 </Tabs>
 
 #### Anonymization Standards
@@ -172,7 +172,7 @@ Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_
 #### How to use
 
 <Tabs className="meltano-tabs">
-  <TabItem className="meltano-tab-content" value="terminal" label="terminal" default>
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
 meltano config meltano set project_id '<unique identifier>'
