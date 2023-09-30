@@ -1228,7 +1228,7 @@ pre {
   line-height: 170%;
   border-top: 1px solid var(--ifm-toc-border-color);
   border-right: 1px solid var(--ifm-toc-border-color);
-  border-bottom: none;
+  border-bottom: 1px ;
   width: 100%;
   max-width: 110px;
   min-width: 110px;
@@ -1243,7 +1243,7 @@ pre {
 }
 
 .meltano-tabs .tabs__item--active {
-  border-bottom: none;
+  border-bottom: 1px solid var(--ifm-menu-color-active);
   background: var(--meltano-tabs-background-color);
 }
 
