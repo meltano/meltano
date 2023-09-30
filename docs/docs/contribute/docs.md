@@ -24,8 +24,6 @@ Follow the steps below to work locally with this project.
 1. View the docs at [http://localhost:3000](http://localhost:3000).
 1. Make changes to the content of the site and preview them at the link above.
 
-**Note:** Changes to `_config.yml` require you to stop the Jekyll server (`^C`) and restart it with `bundle exec jekyll serve`.
-
 ### <a name="add_a_new_page"></a>Add a New Page
 
 You can add `.md` and `.html` files to this project to be rendered. Most pages are written in [Markdown](https://github.github.com/gfm/).
