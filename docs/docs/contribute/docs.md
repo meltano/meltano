@@ -17,11 +17,12 @@ We recognize that not everything will fall into the four categories and welcome 
 
 Follow the steps below to work locally with this project.
 
+1. Make sure you have a nodejs environment (>v16) set up locally.
 1. Fork, clone or download this project.
-2. Install node dependencies: `npm install`
-3. Run `npm start` to run a local development server
-4. View the docs at [http://localhost:3000](http://localhost:3000).
-5. Make changes to the content of the site and preview them at the link above.
+1. Install node dependencies: `npm install`
+1. Run `npm start` to run a local development server
+1. View the docs at [http://localhost:3000](http://localhost:3000).
+1. Make changes to the content of the site and preview them at the link above.
 
 **Note:** Changes to `_config.yml` require you to stop the Jekyll server (`^C`) and restart it with `bundle exec jekyll serve`.
 
