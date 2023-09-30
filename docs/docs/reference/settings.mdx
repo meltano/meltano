@@ -87,7 +87,7 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" groupId="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -171,7 +171,7 @@ Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -209,7 +209,7 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ###### PostgreSQL
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -235,7 +235,7 @@ meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<po
 
 
 ###### SQL Server (MSSQL)
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -288,7 +288,7 @@ Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -317,7 +317,7 @@ Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -348,7 +348,7 @@ Note that [`meltano config <plugin> set`](/reference/command-line-interface#conf
 #### How to use
 
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -376,7 +376,7 @@ If provided, this setting overrides the [`hub_url`](#hub-url).
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -406,7 +406,7 @@ The Hub is primarily used by [`meltano add`](/reference/command-line-interface#a
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -437,7 +437,7 @@ No `Authorization` header is applied under the following conditions:
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -471,7 +471,7 @@ The granularity of CLI logging. Ignored if a local logging config is found.
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -505,7 +505,7 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -605,7 +605,7 @@ With a default buffer size of 10MiB, the maximum message size would therefore be
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -633,7 +633,7 @@ URI for the [state backend](/concepts/state_backends) where you'd like Meltano t
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -659,7 +659,7 @@ Number of seconds that a [lock for a state ID](/concepts/state_backends#locking)
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -685,7 +685,7 @@ Number of seconds that a Meltano should wait if trying to access or modify state
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -715,7 +715,7 @@ The [Azure connection string](https://learn.microsoft.com/en-us/azure/storage/co
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -745,7 +745,7 @@ The AWS access key ID to use when authenticating to S3.
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -771,7 +771,7 @@ The AWS secret access key to use when authenticating to S3.
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -797,7 +797,7 @@ The endpoint URL to use when connecting to S3. Only necessary if using S3-compat
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
@@ -827,7 +827,7 @@ Path to the [credential file](https://cloud.google.com/docs/authentication/appli
 
 #### How to use
 
-<Tabs className="meltano-tabs">
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
 ```bash
