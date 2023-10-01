@@ -83,7 +83,10 @@ class ProjectAddService:
                 plugin.pip_url = parent.pip_url
 
             if update:
-                plugin, _outdated = self.project.plugins.update_plugin(plugin)
+                plugin, _outdated = self.project.plugins.update_plugin(
+                    plugin,
+                    keep_config=True,
+                )
             else:
                 plugin = self.project.plugins.add_to_file(plugin)
 

@@ -387,11 +387,13 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin):
+    def update_plugin(self, plugin: ProjectPlugin, keep_config=False):
         """Update a plugin.
 
         Args:
             plugin: The plugin to update.
+            keep_config: Whether to keep the previous configuration for the updated
+                plugin.
 
         Returns:
             A tuple containing the updated and outdated plugins.
@@ -407,6 +409,9 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                     for idx, plg in enumerate(plugins[plugin.type])
                     if plg == plugin
                 )
+
+                if keep_config:
+                    plugin.config_with_extras = outdated.config_with_extras
 
                 plugins[plugin.type][idx] = plugin
 

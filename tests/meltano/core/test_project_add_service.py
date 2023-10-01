@@ -188,6 +188,13 @@ class TestProjectAddService:
         project: Project,
         hub_request_counter: Counter,
     ):
+        target.config = {
+            "username": "meltano",
+            "password": "meltano",
+        }
+
+        project.plugins.update_plugin(target)
+
         updated_attrs = {
             "label": "Mock",
             "description": "Mock target",
@@ -215,6 +222,7 @@ class TestProjectAddService:
 
         assert updated in project.meltano["plugins"][target.type]
         assert updated.canonical().items() >= updated_attrs.items()
+        assert updated.config_with_extras
 
     @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
     def test_add_update_custom(
@@ -228,6 +236,11 @@ class TestProjectAddService:
             PluginType.EXTRACTORS,
             "tap-custom",
             namespace="tap_custom",
+            config={
+                "username": "meltano",
+                "password": "meltano",
+                "start_date": "2023-01-01",
+            },
         )
 
         updated_attrs = {
@@ -254,3 +267,4 @@ class TestProjectAddService:
 
         assert updated in project.meltano["plugins"][custom_plugin.type]
         assert updated.canonical().items() >= updated_attrs.items()
+        assert updated.config_with_extras
