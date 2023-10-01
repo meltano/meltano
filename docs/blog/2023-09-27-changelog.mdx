@@ -1,0 +1,38 @@
+---
+slug: 2023-09-23-updates-and-changes
+title: September Updates and Changes
+---
+
+## ☁️ Meltano Cloud
+
+### 🏃 Run State
+
+With Meltano Core you're able to easily manage the state of your incremental runs using the `meltano state` command. Most of this functionality was ported to Meltano Cloud so that you can control your runs as you see fit. If you need to clear state to run a backfill, that's as easy as `meltano cloud state delete --state-id <id>`. Read more about the command in our [Cloud docs](https://docs.meltano.com/cloud/cloud-cli#state).
+
+### ✅ SOC2 Type 1 Audit Passed
+
+We're extremely proud to announce that we've passed our SOC2 Type 1 Audit. Read more about this milestone in our [blog post](https://meltano.com/blog/soc-2-for-meltano-cloud/).
+
+## Meltano 3.0
+
+We released v3.0 of Meltano Core! Checkout this [blog post](https://meltano.com/blog/meltano-3-0/) for more details on new features and any breaking changes.
+
+We also released the first [patch release (v3.1)](https://github.com/meltano/meltano/releases/tag/v3.1.0) of Meltano which includes a number of community contributions.
+
+## MeltanoHub
+
+- The `python` setting is now supported in the metadata of all connectors. This is a new feature enabled in Meltano 3.0. Checkout the [docs for more information](https://docs.meltano.com/reference/settings/#python).
+
+### Extractors
+
+- Added the danielptv variant of tap-db2 based on the SDK - [Hub Link](https://hub.meltano.com/extractors/tap-db2--danielptv/)
+- Added the Meltano Labs variant of tap-salesforce based on the SDK - [Hub Link](https://hub.meltano.com/extractors/tap-salesforce)
+- Added the felippecaso variant of tap-applehealth based on the SDK - [Hub Link](https://hub.meltano.com/extractors/tap-applehealth)
+- Added the Matatika variant of tap-capsulecrm - [Hub Link](https://hub.meltano.com/extractors/tap-capsulecrm)
+- Added the Meltano Labs variant of tap-bigquery - [Hub Link](https://hub.meltano.com/extractors/tap-bigquery--meltanolabs/)
+
+## SDK
+
+We shipped 1 release of the SDK:
+
+- 0.32.0 https://github.com/meltano/sdk/releases
