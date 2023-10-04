@@ -5,6 +5,10 @@ layout: doc
 sidebar_position: 3
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
 As part of Meltano's vision to enable data teams to operate with best practices, **Environments** allows
 you to define custom layers of configuration within your project. That way, You can run the same commands against multiple environments,
 by passing a single environment variable or CLI option.
@@ -109,14 +113,23 @@ The full ID when a suffix is present is `<environment_name>:<tap_name>-to-<targe
 
 To use an environment, you can pass the option `--environment=<ENV>` to the CLI command, or set the `MELTANO_ENVIRONMENT=<ENV>` variable.
 
-```shell
-# Using the CLI option
-meltano --environment=dev run tap-github target-sqlite
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
 
-# Using env vars
+```bash
+meltano --environment=dev run tap-github target-sqlite
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_ENVIRONMENT=dev
 meltano run tap-github target-sqlite
 ```
+
+  </TabItem>
+</Tabs>
 
 Once activated, Plugins and other processes invoked by Meltano can access the current environment via the `MELTANO_ENVIRONMENT` environment variable available in every Plugins execution environment.
 If no environment is active, the `MELTANO_ENVIRONMENT` is populated with an empty string.
