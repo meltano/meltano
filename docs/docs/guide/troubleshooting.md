@@ -8,6 +8,9 @@ redirect_from:
 sidebar_position: 25
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 If you have a question about Meltano, are having trouble getting it to work, or have any kind of feedback, you can:
 
 <div class="columns is-multiline is-centered">
@@ -51,11 +54,29 @@ When you are trying to troubleshoot an issue the Meltano logs should be your fir
 
 If you have a failure using Meltano's execution commands (`invoke`, `elt`, `run`, or `test`) or you're experienced general unexpected behavior, you can learn more about what’s happening behind the scenes by setting Meltano’s [`cli.log_level` setting](/reference/settings#clilog_level) to debug, using the `MELTANO_CLI_LOG_LEVEL` environment variable or the `--log-level` CLI option:
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set cli log_level debug
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
 ```bash
 export MELTANO_CLI_LOG_LEVEL=debug
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
+
+```bash
 meltano --log-level=debug <command> ...
 ```
+
+  </TabItem>
+</Tabs>
 
 In debug mode, Meltano will log additional information about the environment and arguments used to invoke your components (Singer taps and targets, dbt, Airflow, etc.), including the paths to the generated config, catalog, state files, etc. for you to review.
 
