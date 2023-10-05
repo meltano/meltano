@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import platform
+from signal import SIGTERM
 
 import pytest
 from mock import AsyncMock, mock
@@ -70,8 +71,8 @@ class TestCliConfig:
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
-        mock_invoke.wait = AsyncMock(return_value=-1)
-        mock_invoke.returncode = -1
+        mock_invoke.wait = AsyncMock(return_value=-SIGTERM)
+        mock_invoke.returncode = -SIGTERM
         payload = json.dumps({"type": "RECORD"}).encode()
         mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
