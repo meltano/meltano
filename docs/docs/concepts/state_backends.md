@@ -99,7 +99,9 @@ Meltano supports service-specific endpoint URLs via:
 * The `AWS_ENDPOINT_URL_S3` environment variable.
 * The Meltano [`state_backend.s3.endpoint_url`](/reference/settings#state_backends3endpoint_url) setting.
 
+:::info
 The `AWS_IGNORE_CONFIGURED_ENDPOINT_URLS` environment variable won't have any effect if `state_backend.s3.endpoint_url` is not null.
+:::
 
 For reference, read the [AWS documentation on service-specific endpoints](https://docs.aws.amazon.com/sdkref/latest/guide/feature-ss-endpoints.html).
 
