@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 import typing as t
 
+import moto
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -10,6 +11,7 @@ from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
 
+from meltano.core import job_state
 from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
@@ -129,20 +131,49 @@ class TestGCSStateBackend:
 
 
 class TestS3StateBackend:
-    def test_manager_from_settings(self, project: Project) -> None:
+    @pytest.fixture()
+    def bucket(self) -> str:
+        return "some_bucket"
+
+    @pytest.fixture()
+    def prefix(self) -> str:
+        return "some/path"
+
+    @pytest.fixture()
+    def aws_access_key_id(self) -> str:
+        return "aws_access_key_id"
+
+    @pytest.fixture()
+    def aws_secret_access_key(self) -> str:
+        return "aws_secret_access_key"
+
+    @pytest.fixture()
+    def s3_uri(
+        self,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+    ) -> str:
+        return f"s3://{aws_access_key_id}:{aws_secret_access_key}@{bucket}/{prefix}"
+
+    def test_manager_from_settings(
+        self,
+        project: Project,
+        bucket: str,
+        prefix: str,
+        aws_access_key_id: str,
+        aws_secret_access_key: str,
+        s3_uri: str,
+    ) -> None:
         # AWS S3 (credentials in URI)
-        project.settings.set(
-            ["state_backend", "uri"],
-            "s3://aws_access_key_id:aws_secret_access_key@some_bucket/some/path",
-        )
+        project.settings.set(["state_backend", "uri"], s3_uri)
         s3_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(s3_state_store, S3StateStoreManager)
-        assert s3_state_store.bucket == "some_bucket"
-        assert s3_state_store.prefix == "/some/path"
-        assert s3_state_store.aws_access_key_id == "aws_access_key_id"
-        assert (
-            s3_state_store.aws_secret_access_key == "aws_secret_access_key"  # noqa: S105
-        )
+        assert s3_state_store.bucket == bucket
+        assert s3_state_store.prefix == f"/{prefix}"
+        assert s3_state_store.aws_access_key_id == aws_access_key_id
+        assert s3_state_store.aws_secret_access_key == aws_secret_access_key
 
         # AWS S3 (credentials provided directly)
         project.settings.set(
@@ -165,3 +196,68 @@ class TestS3StateBackend:
         assert (
             s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )
+
+    def test_get(
+        self,
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        s3_uri: str,
+    ) -> None:
+        project.settings.set(["state_backend", "uri"], s3_uri)
+
+        s3_state_store = state_store_manager_from_project_settings(project.settings)
+        assert isinstance(s3_state_store, S3StateStoreManager)
+
+        state_id = "test_state_id"
+        state = job_state.JobState(state_id=state_id, completed_state={"key": "value"})
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            s3_state_store.client.create_bucket(Bucket=bucket)
+
+            state_key = f"{prefix}/{state_id}/state.json"
+            s3_state_store.client.put_object(
+                Bucket=bucket,
+                Key=state_key,
+                Body=state.json(),
+                ContentType="application/json",
+            )
+
+            assert s3_state_store.get(state_id=state_id) == state
+
+    def test_set(
+        self,
+        project: Project,
+        monkeypatch: pytest.MonkeyPatch,
+        bucket: str,
+        prefix: str,
+        s3_uri: str,
+    ) -> None:
+        project.settings.set(["state_backend", "uri"], s3_uri)
+
+        s3_state_store = state_store_manager_from_project_settings(project.settings)
+        assert isinstance(s3_state_store, S3StateStoreManager)
+
+        state_id = "test_state_id"
+        state = job_state.JobState(state_id=state_id, completed_state={"key": "value"})
+
+        with moto.mock_aws():
+            monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+            monkeypatch.delenv("AWS_PROFILE", raising=False)
+            s3_state_store.client.create_bucket(Bucket=bucket)
+
+            s3_state_store.set(state)
+
+            state_key = f"{prefix}/{state_id}/state.json"
+            response = s3_state_store.client.get_object(Bucket=bucket, Key=state_key)
+            assert (
+                job_state.JobState.from_file(
+                    state_id=state_id,
+                    file_obj=response["Body"],
+                )
+                == state
+            )
+            assert response["ContentType"] == "application/json"
