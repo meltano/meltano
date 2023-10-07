@@ -86,7 +86,7 @@ virtualenv = "^20.24.5"
 yaspin = "^2.3.0"
 
 [tool.poetry.extras]
-azure = ["azure-storage-blob", "azure-common", "azure-core"]
+azure = ["azure-storage-blob", "azure-common", "azure-core", "azure-identity"]
 gcs = ["google-cloud-storage"]
 mssql = ["pymssql"]
 postgres = ["psycopg"]

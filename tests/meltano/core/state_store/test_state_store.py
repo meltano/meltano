@@ -49,6 +49,10 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
         ["state_backend", "azure", "connection_string"],
         "SOME_CONNECTION_STRING",
     )
+    project.settings.set(
+        ["state_backend", "azure", "storage_account_url"],
+        "SOME_STORAGE_ACCOUNT_URL",
+    )
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )
@@ -56,13 +60,10 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     assert az_state_store.container_name == "some_container"
     assert az_state_store.prefix == "/some/path"
     assert az_state_store.connection_string == "SOME_CONNECTION_STRING"
+    assert az_state_store.storage_account_url == "SOME_ACCOUNT_URL"
 
     # Azure, missing container name
     project.settings.set(["state_backend", "uri"], "azure://")
-    project.settings.set(
-        ["state_backend", "azure", "connection_string"],
-        "SOME_CONNECTION_STRING",
-    )
     with pytest.raises(MeltanoError):
         state_store_manager_from_project_settings(project.settings)
 
@@ -72,6 +73,25 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )
+    # Should return client using default creds
+    _ = az_state_store.client
+
+    # Azure, missing storage account url
+    project.settings.unset(["state_backend", "uri", "storage_account_url"])
+    project.settings.set(["state_backend", "azure", "connection_string"], "SOME_CONNECTION_STRING")
+    az_state_store: AZStorageStateStoreManager = (
+        state_store_manager_from_project_settings(project.settings)
+    )
+    # Should return client using connection string
+    _ = az_state_store.client
+
+    # Azure, missing connection string and storage account url
+    project.settings.unset(["state_backend", "azure", "connection_string"])
+    project.settings.unset(["state_backend", "azure", "storage_account_url"])
+    az_state_store: AZStorageStateStoreManager = (
+        state_store_manager_from_project_settings(project.settings)
+    )
+    # Should raise error
     with pytest.raises(MeltanoError):
         _ = az_state_store.client  # noqa: WPS122
 
