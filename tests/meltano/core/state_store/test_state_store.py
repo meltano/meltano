@@ -78,7 +78,9 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
 
     # Azure, missing storage account url
     project.settings.unset(["state_backend", "uri", "storage_account_url"])
-    project.settings.set(["state_backend", "azure", "connection_string"], "SOME_CONNECTION_STRING")
+    project.settings.set(
+        ["state_backend", "azure", "connection_string"], "SOME_CONNECTION_STRING"
+    )
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )

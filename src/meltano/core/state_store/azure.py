@@ -107,13 +107,13 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             MeltanoError: If connection string is not provided.
         """
         with requires_azure():
-
             if self.account_url:
                 from azure.identity import DefaultAzureCredential
 
                 default_credential = DefaultAzureCredential()
                 return BlobServiceClient(
-                    self.storage_account_url, credential=default_credential)
+                    self.storage_account_url, credential=default_credential
+                )
 
             if self.connection_string:
                 return BlobServiceClient.from_connection_string(self.connection_string)
