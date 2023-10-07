@@ -119,7 +119,8 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 return BlobServiceClient.from_connection_string(self.connection_string)
 
             raise MeltanoError(
-                "Azure state backend requires a connection string or an account url to use host credentials",
+                "Azure state backend requires a connection string"
+                "or an account url to use host credentials",
                 "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
             )
 

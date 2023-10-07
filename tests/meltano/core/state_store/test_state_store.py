@@ -73,8 +73,8 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )
-    # Should return client using default creds
-    _ = az_state_store.client
+    # Should create client using default creds
+    az_state_store.client
 
     # Azure, missing storage account url
     project.settings.unset(["state_backend", "uri", "storage_account_url"])
@@ -82,8 +82,8 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )
-    # Should return client using connection string
-    _ = az_state_store.client
+    # Should create client using connection string
+    az_state_store.client
 
     # Azure, missing connection string and storage account url
     project.settings.unset(["state_backend", "azure", "connection_string"])
