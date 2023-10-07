@@ -112,7 +112,8 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
 
                 default_credential = DefaultAzureCredential()
                 return BlobServiceClient(
-                    self.storage_account_url, credential=default_credential
+                    self.storage_account_url,
+                    credential=default_credential,
                 )
 
             if self.connection_string:
