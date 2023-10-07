@@ -3,9 +3,10 @@ updates:
   - package-ecosystem: pip
     directory: "/.github/workflows"
     schedule:
-      interval: daily
+      interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
@@ -18,9 +19,10 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
@@ -34,9 +36,10 @@ updates:
     versioning-strategy: increase
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: "12:00"
       timezone: "UTC"
+      day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
