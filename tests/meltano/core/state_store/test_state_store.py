@@ -4,6 +4,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from azure.storage.blob import BlobServiceClient
 
 from meltano.core.error import MeltanoError
 from meltano.core.project import Project
@@ -60,7 +61,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     assert az_state_store.container_name == "some_container"
     assert az_state_store.prefix == "/some/path"
     assert az_state_store.connection_string == "SOME_CONNECTION_STRING"
-    assert az_state_store.storage_account_url == "SOME_ACCOUNT_URL"
+    assert az_state_store.storage_account_url == "SOME_STORAGE_ACCOUNT_URL"
 
     # Azure, missing container name
     project.settings.set(["state_backend", "uri"], "azure://")
@@ -74,7 +75,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
         state_store_manager_from_project_settings(project.settings)
     )
     # Should create client using default creds
-    az_state_store.client
+    assert isinstance(az_state_store.client, BlobServiceClient)
 
     # Azure, missing storage account url
     project.settings.unset(["state_backend", "uri", "storage_account_url"])
@@ -85,7 +86,7 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
         state_store_manager_from_project_settings(project.settings)
     )
     # Should create client using connection string
-    az_state_store.client
+    assert isinstance(az_state_store.client, BlobServiceClient)
 
     # Azure, missing connection string and storage account url
     project.settings.unset(["state_backend", "azure", "connection_string"])

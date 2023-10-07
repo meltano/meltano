@@ -107,7 +107,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             MeltanoError: If connection string is not provided.
         """
         with requires_azure():
-            if self.account_url:
+            if self.storage_account_url:
                 from azure.identity import DefaultAzureCredential
 
                 default_credential = DefaultAzureCredential()
