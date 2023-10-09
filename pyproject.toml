@@ -45,6 +45,7 @@ alembic = "^1.12.0"
 atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.4", optional = true}
+azure-identity = {version = "^1.14.1", optional = true}
 azure-storage-blob = {version = "^12.18.2", optional = true}
 boto3 = {version = "^1.28.62", optional = true}
 check-jsonschema = "^0.22.0"
@@ -82,6 +83,8 @@ structlog = "^23.2.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.8.0"
 tzlocal = "^5.1"
+# Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
+urllib3 = "<2"
 virtualenv = "^20.24.5"
 yaspin = "^2.3.0"
 
