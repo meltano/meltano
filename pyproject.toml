@@ -96,12 +96,12 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.9.1"
-boto3-stubs = {extras = ["essential"], version = "1.28.57"}
+boto3-stubs = {extras = ["essential"], version = "1.28.62"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
-coverage = {extras = ["toml"], version = "^7.3.1"}
+coverage = {extras = ["toml"], version = "^7.3.2"}
 freezegun = "^1.2.2"
-hypothesis = "^6.87.1"
+hypothesis = "^6.87.3"
 mock = "^5.0.2"
 moto = "^4.2.5"
 mypy = "^1.4.1"
