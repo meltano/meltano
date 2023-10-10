@@ -716,9 +716,7 @@ One can [Sign-in to Azure](https://learn.microsoft.com/en-us/azure/storage/blobs
 The `storage_account_url` which looks like `https://<myStorageAccountName>.blob.core.windows.net` and it will be used to fetch the default Azure credentials in the host system.
 
 :::info
-At least one of `state_backend.azure.storage_account_url` and `state_backend.azure.connection_string` has to be set in order to use Azure Blob Storage as a state backend.
-
-If `state_backend.azure.storage_account_url` is not set, Meltano will to try to use `state_backend.azure.connection_string`.
+At least one of `state_backend.azure.storage_account_url` and `state_backend.azure.connection_string` has to be set in order to use Azure Blob Storage as a state backend. If `state_backend.azure.storage_account_url` is not set, Meltano will to try to use `state_backend.azure.connection_string`.
 :::
 
 #### How to use
