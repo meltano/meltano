@@ -721,11 +721,22 @@ At least one of `state_backend.azure.storage_account_url` and `state_backend.azu
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.azure.storage_account_url "https://<myStorageAccountName>.blob.core.windows.net"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL="https://<myStorageAccountName>.blob.core.windows.net"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
 
