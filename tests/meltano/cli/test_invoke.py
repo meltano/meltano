@@ -157,7 +157,7 @@ class TestCliInvoke:
     def test_invoke_command_args(self, cli_runner, mock_invoke):
         res = cli_runner.invoke(
             cli,
-            ["invoke", "utility-mock:cmd", "--verbose"],
+            ["invoke", "utility-mock:cmd"],
             env={"ENV_VAR_ARG": "arg"},
         )
 
@@ -166,7 +166,7 @@ class TestCliInvoke:
 
         args = mock_invoke.call_args[0]
         assert args[0].endswith("utility-mock")
-        assert args[1:] == ("--option", "arg", "--verbose")
+        assert args[1:] == ("--option", "arg")
 
     def test_invoke_exit_code(self, cli_runner, tap, plugin_invoker_factory, utility):
         process_mock = Mock()

@@ -5,6 +5,9 @@ layout: doc
 sidebar_position: 2
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
 
@@ -84,13 +87,29 @@ With all that said, if you'd still prefer to use Meltano _without_ sending the m
 
 #### How to use
 
+<Tabs className="meltano-tabs" groupId="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set send_anonymous_usage_stats false
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=false
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="meltano init" label="meltano init" default>
+
+```bash
 meltano init --no-usage-stats demo-project
 ```
+
+</TabItem>
+</Tabs>
 
 #### Anonymization Standards
 
@@ -152,11 +171,22 @@ Used by Meltano to uniquely identify your project if the [`send_anonymous_usage_
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set project_id '<unique identifier>'
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_PROJECT_ID='<unique identifier>'
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="database-uri"></a>`database_uri`
 
@@ -178,21 +208,56 @@ Some systems may come with an older version by default. You can run <code>sqlite
 
 #### How to use
 
+###### PostgreSQL
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
-# PostgreSQL
 meltano config meltano set database_uri postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_DATABASE_URI=postgresql+psycopg://<username>:<password>@<host>:<port>/<database>
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="meltano run" label="meltano run" default>
+
+```bash
 meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<port>/<database> ...
+```
 
-# SQL Server (MSSQL)
+  </TabItem>
+</Tabs>
+
+
+###### SQL Server (MSSQL)
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
 meltano config meltano set database_uri mssql+pymssql://<username>:<password>@<host>:<port>/<database>
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_DATABASE_URI=mssql+pymssql://<username>:<password>@<host>:<port>/<database>
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="meltano run" label="meltano run" default>
+
+```bash
 meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<database> ...
 ```
+
+  </TabItem>
+</Tabs>
 
 :::info
 Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
@@ -223,11 +288,22 @@ Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set database_max_retries 3
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_DATABASE_MAX_RETRIES=3
 ```
+
+  </TabItem>
+</Tabs>
 
 ### `database_retry_timeout`
 
@@ -241,11 +317,22 @@ Subsequent disconnections are handled by SQLALchemy
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set database_retry_timeout 5
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_DATABASE_RETRY_TIMEOUT=5
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="project-readonly"></a>`project_readonly`
 
@@ -260,11 +347,23 @@ Note that [`meltano config <plugin> set`](/reference/command-line-interface#conf
 
 #### How to use
 
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set project_readonly true
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_PROJECT_READONLY=true
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="hub-api-root"></a>`hub_api_root`
 
@@ -277,13 +376,24 @@ If provided, this setting overrides the [`hub_url`](#hub-url).
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set hub_api_root "https://mysite.com/my-plugins"
 meltano config meltano set hub_api_root false
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_HUB_API_ROOT="https://mysite.com/my-plugins"
 export MELTANO_HUB_API_ROOT=false
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="hub-url"></a>`hub_url`
 
@@ -296,11 +406,22 @@ The Hub is primarily used by [`meltano add`](/reference/command-line-interface#a
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set hub_url http://localhost:4000
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_HUB_URL=http://localhost:4000
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="hub-url-auth"></a>`hub_url_auth`
 
@@ -316,13 +437,24 @@ No `Authorization` header is applied under the following conditions:
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set hub_url_auth "Bearer $ACCESS_TOKEN"
 meltano config meltano set hub_url_auth false
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_HUB_URL_AUTH="Bearer $ACCESS_TOKEN"
 export MELTANO_HUB_URL_AUTH=false
 ```
+
+  </TabItem>
+</Tabs>
 
 ## `meltano` CLI
 
@@ -339,13 +471,29 @@ The granularity of CLI logging. Ignored if a local logging config is found.
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set cli log_level debug
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_CLI_LOG_LEVEL=debug
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
+
+```bash
 meltano --log-level=debug ...
 ```
+
+  </TabItem>
+</Tabs>
 
 ### `cli.log_config`
 
@@ -357,13 +505,29 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set cli log_config /path/to/logging.yaml
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
+
+```bash
 meltano --log-config=/path/to/logging.yaml ...
 ```
+
+  </TabItem>
+</Tabs>
 
 A sample logging config:
 
@@ -441,11 +605,22 @@ With a default buffer size of 10MiB, the maximum message size would therefore be
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set elt.buffer_size 52428800 # 50MiB in bytes
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_ELT_BUFFER_SIZE=52428800
 ```
+
+  </TabItem>
+</Tabs>
 
 ## State Backends
 
@@ -458,11 +633,22 @@ URI for the [state backend](/concepts/state_backends) where you'd like Meltano t
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.uri "s3://your_bucket/meltano/state"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_URI="s3://your_bucket/meltano/state"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.lock_timeout_seconds`
 
@@ -473,11 +659,22 @@ Number of seconds that a [lock for a state ID](/concepts/state_backends#locking)
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.lock_timeout_seconds 720
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS=720
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
 
@@ -488,15 +685,58 @@ Number of seconds that a Meltano should wait if trying to access or modify state
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.lock_retry_seconds 720
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS=720
 ```
+
+  </TabItem>
+</Tabs>
 
 ### Azure-Specific Settings
 
 ---
+
+### <a name="state-backend-uri"></a>`state_backend.azure.storage_account_url`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL`
+- Default: None
+
+One can [Sign-in to Azure](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-python?tabs=managed-identity%2Croles-azure-portal%2Csign-in-azure-cli#sign-in-and-connect-your-app-code-to-azure-using-defaultazurecredential) using the Azure CLI.
+
+The `storage_account_url` will be used to fetch the default Azure credentials in the host system.
+
+:::info
+At least one of `state_backend.azure.storage_account_url` and `state_backend.azure.connection_string` has to be set in order to use Azure Blob Storage as a state backend. If `state_backend.azure.storage_account_url` is not set, Meltano will to try to use `state_backend.azure.connection_string`.
+:::
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.azure.storage_account_url "https://<myStorageAccountName>.blob.core.windows.net"
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL="https://<myStorageAccountName>.blob.core.windows.net"
+```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
 
@@ -507,11 +747,22 @@ The [Azure connection string](https://learn.microsoft.com/en-us/azure/storage/co
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.azure.connection_string "DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=https;AccountName=myAccountName;AccountKey=myAccountKey"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### S3-Specific Settings
 
@@ -526,11 +777,22 @@ The AWS access key ID to use when authenticating to S3.
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.s3.aws_access_key_id "someaccesskeyid"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
 
@@ -541,11 +803,22 @@ The AWS secret access key to use when authenticating to S3.
 
 #### How to use
 
-```bash
-meltano config meltano set state_backend.s3.aws_secret_access_key "somesecretaccesskey""
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
+```bash
+meltano config meltano set state_backend.s3.aws_secret_access_key "somesecretaccesskey"
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
 
@@ -556,11 +829,22 @@ The endpoint URL to use when connecting to S3. Only necessary if using S3-compat
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.s3.endpoint_url "https://play.min.io:9000"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 ```
+
+  </TabItem>
+</Tabs>
 
 ### GCS-Specific Settings
 
@@ -575,11 +859,22 @@ Path to the [credential file](https://cloud.google.com/docs/authentication/appli
 
 #### How to use
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
 ```bash
 meltano config meltano set state_backend.gcs.application_credentials "path/to/creds.json"
+```
 
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
 export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 ```
+
+  </TabItem>
+</Tabs>
 
 ## Snowplow Tracking
 
