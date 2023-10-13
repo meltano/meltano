@@ -444,8 +444,10 @@ class SettingDefinition(NameEq, Canonical):
                     self._parse_value(value, "array", Sequence),  # type: ignore
                 )
 
-        if self.kind == SettingKind.OPTIONS and all(
-            opt["value"] != value for opt in self.options
+        if (
+            value is not None
+            and self.kind == SettingKind.OPTIONS
+            and all(opt["value"] != value for opt in self.options)
         ):
             error_message = f"'{value}' is not a valid option for '{self.name}'"
             raise ValueError(error_message)

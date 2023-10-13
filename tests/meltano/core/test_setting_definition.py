@@ -68,5 +68,6 @@ class TestSettingDefinition:
 
         assert setting_definition.cast_value("abc") == "abc"
         assert setting_definition.cast_value("xyz") == "xyz"
+        assert setting_definition.cast_value(None) is None
         with pytest.raises(ValueError, match="is not a valid option"):
             setting_definition.cast_value("def")
