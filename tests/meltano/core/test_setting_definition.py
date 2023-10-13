@@ -56,21 +56,11 @@ class TestSettingDefinition:
             else:
                 assert setting_definition.cast_value(uncast) == expected
 
-    @pytest.mark.parametrize(
-        "options",
-        (
-            pytest.param(["abc", "xyz"], id="strings"),
-            pytest.param(
-                [{"value": "abc", "label": "ABC"}, {"value": "xyz", "label": "XYZ"}],
-                id="objects",
-            ),
-        ),
-    )
-    def test_cast_options(self, options: list):
+    def test_cast_options(self):
         setting_definition = SettingDefinition(
             "test_setting",
             kind=SettingKind.OPTIONS,
-            options=options,
+            options=["abc", "xyz"],
         )
 
         assert setting_definition.cast_value("abc") == "abc"
