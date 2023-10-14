@@ -13,6 +13,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
@@ -66,7 +67,7 @@ psycopg = {version = "^3.1.12", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
 pyjwt = "^2.6.0"
 pymssql = {version = "^2.2.10", optional = true}
-python = ">=3.8,<3.12"
+python = ">=3.8,<3.13"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
 python-slugify = "^8.0.1"
