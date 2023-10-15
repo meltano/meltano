@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import sys
 import tempfile
 import typing as t
 from functools import wraps
@@ -356,7 +357,7 @@ def reset(ctx, store):
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.option("--interactive", is_flag=True)
+@click.option("--stdin", is_flag=True)
 @click.argument("setting_name", nargs=-1)
 @click.argument("value", required=False)
 @click.option(
@@ -371,15 +372,25 @@ def set_(
     setting_name: tuple[str, ...],
     value: t.Any,
     store: str,
-    interactive: bool,
+    stdin: bool,
 ):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
-    if interactive:
-        interaction.configure_all()
+
+    if stdin:
+        if sys.stdin.isatty():
+            # Non-interactibe stdin flow
+            # If input is not provided from a file run the interactive flow
+            interaction.configure_all()
+        else:
+            # Interactive stdin flow
+            setting_name += (value,)
+            value = click.get_text_stream("stdin").read()
+
+            interaction.set_value(setting_name=setting_name, value=value, store=store)
     else:
         interaction.set_value(setting_name=setting_name, value=value, store=store)
 
