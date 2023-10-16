@@ -66,6 +66,26 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    def test_config_non_interactive_stdin(self, cli_runner):
+        with cli_runner.isolated_filesystem():
+            with open("setting.txt", "w") as test_file:
+                test_file.write("test")
+
+            with open("setting.txt") as test_file:
+                input_data = test_file.read()
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", "meltano", "set", "--stdin", "default_environment"],
+            input=input_data,
+        )
+        assert_cli_runner(result)
+
+        assert (
+            "Meltano setting 'default_environment' was set in `meltano.yml`: 'test'"
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
     def test_config_test(self, cli_runner, tap):
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True
