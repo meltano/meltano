@@ -679,3 +679,28 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
+
+
+def traverse_nested_settings(
+    dict_value,
+    nested_settings: list,
+    current_nested_setting=(),
+):
+    """
+    Creates an array of tuples of nested settings.
+    return [
+        [("nested1", "setting1"), value1]
+        [("nested2", "setting2"), value2]
+    ]
+    """
+    for sub_setting, sub_value in dict_value.items():
+        if isinstance(sub_value, dict):
+            # If the value is a dictionary, continue traversing
+            traverse_nested_settings(
+                sub_value,
+                nested_settings,
+                current_nested_setting + (sub_setting,),
+            )
+        else:
+            # When you reach a leaf node (non-dictionary value), append the accumulated path to final_sub_settings
+            nested_settings.append([current_nested_setting + (sub_setting,), sub_value])

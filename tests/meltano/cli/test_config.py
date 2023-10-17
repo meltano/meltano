@@ -8,6 +8,7 @@ from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.cli.utils import traverse_nested_settings
 from meltano.core.project import Project
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -69,20 +70,52 @@ class TestCliConfig:
     def test_config_non_interactive_stdin(self, cli_runner):
         with cli_runner.isolated_filesystem():
             with open("setting.txt", "w") as test_file:
-                test_file.write("test")
+                test_file.write("info")
 
             with open("setting.txt") as test_file:
                 input_data = test_file.read()
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--stdin", "default_environment"],
+            ["config", "meltano", "set", "--stdin", "cli", "log_level"],
             input=input_data,
         )
         assert_cli_runner(result)
 
         assert (
-            "Meltano setting 'default_environment' was set in `meltano.yml`: 'test'"
+            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
+        ) in result.stdout
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", "meltano", "set", "--stdin", "cli.log_level"],
+            input=input_data,
+        )
+        assert_cli_runner(result)
+
+        assert (
+            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
+        ) in result.stdout
+
+        data = {"log_level": "info"}
+        json_data = json.dumps(data)
+
+        with cli_runner.isolated_filesystem():
+            with open("setting.json", "w") as test_file:
+                test_file.write(json_data)
+
+            with open("setting.json") as test_file:
+                input_data = test_file.read()
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", "meltano", "set", "--stdin", "cli"],
+            input=input_data,
+        )
+        assert_cli_runner(result)
+
+        assert (
+            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
@@ -247,3 +280,24 @@ class TestCliConfigSet:
             {},
         )
         assert tap_config["config"]["test"] == "dev-mock"
+
+
+class TestConfigUtils:
+    def test_traverse_nested_settings(self):
+        test_setting = {
+            "nested1": {
+                "sub_nested": "value1",
+            },
+            "nested2": "value2",
+        }
+
+        nested_settings: list[tuple] = []
+        traverse_nested_settings(
+            dict_value=test_setting,
+            nested_settings=nested_settings,
+        )
+
+        assert nested_settings == [
+            [("nested1", "sub_nested"), "value1"],
+            [("nested2",), "value2"],
+        ]
