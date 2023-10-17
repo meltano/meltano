@@ -7,6 +7,7 @@ import sys
 import typing as t
 
 import click
+from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -16,7 +17,12 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.schedule import CRON_INTERVALS
+from meltano.core.schedule_service import (
+    BadCronError,
+    ScheduleAlreadyExistsError,
+    ScheduleService,
+)
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
 
@@ -281,6 +287,13 @@ def remove(ctx, name):
     ctx.obj["schedule_service"].remove(name)
 
 
+def validate_interval(interval: str):
+    """Validate the interval for a schedule."""
+    if interval not in CRON_INTERVALS and not croniter.is_valid(interval):
+        raise BadCronError(interval)
+    return interval
+
+
 def _update_job_schedule(
     candidate: Schedule,
     job: str | None,
@@ -307,7 +320,7 @@ def _update_job_schedule(
     if job:
         candidate.job = job
     if interval:
-        candidate.interval = interval
+        candidate.interval = validate_interval(interval)
     return candidate
 
 
@@ -346,7 +359,7 @@ def _update_elt_schedule(
     if transform:
         candidate.transform = transform
     if interval:
-        candidate.interval = interval
+        candidate.interval = validate_interval(interval)
     return candidate
 
 
