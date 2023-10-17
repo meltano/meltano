@@ -706,6 +706,38 @@ export MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS=720
 
 ---
 
+### <a name="state-backend-uri"></a>`state_backend.azure.storage_account_url`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL`
+- Default: None
+
+One can [Sign-in to Azure](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-python?tabs=managed-identity%2Croles-azure-portal%2Csign-in-azure-cli#sign-in-and-connect-your-app-code-to-azure-using-defaultazurecredential) using the Azure CLI.
+
+The `storage_account_url` will be used to fetch the default Azure credentials in the host system.
+
+:::info
+At least one of `state_backend.azure.storage_account_url` and `state_backend.azure.connection_string` has to be set in order to use Azure Blob Storage as a state backend. If `state_backend.azure.storage_account_url` is not set, Meltano will to try to use `state_backend.azure.connection_string`.
+:::
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.azure.storage_account_url "https://<myStorageAccountName>.blob.core.windows.net"
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL="https://<myStorageAccountName>.blob.core.windows.net"
+```
+
+  </TabItem>
+</Tabs>
+
 ### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING`
