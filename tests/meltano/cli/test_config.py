@@ -77,7 +77,7 @@ class TestCliConfig:
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--stdin", "cli", "log_level"],
+            ["config", "meltano", "set", "--interactive", "cli", "log_level"],
             input=input_data,
         )
         assert_cli_runner(result)
@@ -88,7 +88,7 @@ class TestCliConfig:
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--stdin", "cli.log_level"],
+            ["config", "meltano", "set", "--interactive", "cli.log_level"],
             input=input_data,
         )
         assert_cli_runner(result)
@@ -109,7 +109,7 @@ class TestCliConfig:
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--stdin", "cli"],
+            ["config", "meltano", "set", "--interactive", "cli"],
             input=input_data,
         )
         assert_cli_runner(result)

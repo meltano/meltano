@@ -358,7 +358,7 @@ def reset(ctx, store):
 
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
-@click.option("--stdin", is_flag=True)
+@click.option("--interactive", is_flag=True)
 @click.argument("setting_name", nargs=-1)
 @click.argument("value", required=False)
 @click.option(
@@ -373,7 +373,7 @@ def set_(
     setting_name: tuple[str, ...],
     value: t.Any,
     store: str,
-    stdin: bool,
+    interactive: bool,
 ):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
@@ -381,7 +381,7 @@ def set_(
 
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
 
-    if stdin:
+    if interactive:
         if sys.stdin.isatty():
             # Interactive stdin flow
             interaction.configure_all()
