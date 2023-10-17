@@ -702,5 +702,6 @@ def traverse_nested_settings(
                 current_nested_setting + (sub_setting,),
             )
         else:
-            # When you reach a leaf node (non-dictionary value), append the accumulated path to final_sub_settings
+            # When you reach a leaf node (non-dictionary value), 
+            # append the accumulated path to final_sub_settings
             nested_settings.append([current_nested_setting + (sub_setting,), sub_value])
