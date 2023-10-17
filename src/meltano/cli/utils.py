@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import signal
@@ -683,16 +684,10 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
 
 def traverse_nested_settings(
     dict_value,
-    nested_settings: list,
+    nested_settings: list[list[tuple | (set | int)]],
     current_nested_setting=(),
 ):
-    """
-    Creates an array of tuples of nested settings.
-    return [
-        [("nested1", "setting1"), value1]
-        [("nested2", "setting2"), value2]
-    ]
-    """
+    """Create an array of tuples for nested settings."""
     for sub_setting, sub_value in dict_value.items():
         if isinstance(sub_value, dict):
             # If the value is a dictionary, continue traversing
@@ -705,3 +700,19 @@ def traverse_nested_settings(
             # When you reach a leaf node (non-dictionary value),
             # append the accumulated path to final_sub_settings
             nested_settings.append([current_nested_setting + (sub_setting,), sub_value])
+
+
+def get_non_interactive_flow_setting_and_value(
+    current_setting,
+    current_value,
+):
+    """Update setting and value for non interactive stdin flow."""
+    current_setting += (current_value,)
+    input_data = click.get_text_stream("stdin").read()
+    try:
+        # Check if input requires parsing
+        value = json.loads(input_data)
+    except json.JSONDecodeError:
+        value = input_data
+
+    return current_setting, value

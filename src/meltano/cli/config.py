@@ -21,6 +21,7 @@ from meltano.cli.utils import (
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
+    get_non_interactive_flow_setting_and_value,
     traverse_nested_settings,
 )
 from meltano.core.db import project_engine
@@ -387,14 +388,10 @@ def set_(
             interaction.configure_all()
         else:
             # Non-Interactive stdin flow
-            setting_name += (value,)
-            input_data = click.get_text_stream("stdin").read()
-
-            try:
-                # Check if input requires parsing
-                value = json.loads(input_data)
-            except json.JSONDecodeError:
-                value = input_data
+            setting_name, value = get_non_interactive_flow_setting_and_value(
+                setting_name,
+                value,
+            )
 
             if isinstance(value, dict):
                 nested_settings: list[tuple] = []
