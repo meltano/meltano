@@ -287,13 +287,6 @@ def remove(ctx, name):
     ctx.obj["schedule_service"].remove(name)
 
 
-def validate_interval(interval: str):
-    """Validate the interval for a schedule."""
-    if interval not in CRON_INTERVALS and not croniter.is_valid(interval):
-        raise BadCronError(interval)
-    return interval
-
-
 def _update_job_schedule(
     candidate: Schedule,
     job: str | None,
@@ -320,7 +313,7 @@ def _update_job_schedule(
     if job:
         candidate.job = job
     if interval:
-        candidate.interval = validate_interval(interval)
+        candidate.interval = interval
     return candidate
 
 
@@ -359,8 +352,24 @@ def _update_elt_schedule(
     if transform:
         candidate.transform = transform
     if interval:
-        candidate.interval = validate_interval(interval)
+        candidate.interval = interval
     return candidate
+
+
+class CronParam(click.ParamType):
+    """Custom type definition for cron prameter."""
+
+    name = "cron"
+
+    def convert(self, value, *_):
+        """Validate and con interval."""
+        if value is None:
+            return None
+
+        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+            raise BadCronError(value)
+
+        return value
 
 
 @schedule.command(
@@ -369,7 +378,11 @@ def _update_elt_schedule(
     short_help="Update a schedule.",
 )
 @click.argument("name", required=True)
-@click.option("--interval", help="Update the interval of the schedule.")
+@click.option(
+    "--interval",
+    help="Update the interval of the schedule.",
+    type=CronParam(),
+)
 @click.option("--job", help="Update the name of the job to run a scheduled job.")
 @click.option("--extractor", help="Update the extractor for an elt schedule.")
 @click.option("--loader", help="Updated the loader for an elt schedule.")
