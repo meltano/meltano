@@ -5,6 +5,7 @@ import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.schedule_service import BadCronError
 from meltano.core.utils import iso8601_datetime
 
 
@@ -212,6 +213,14 @@ class TestCliSchedule:
                 schedule_service.find_schedule(job_schedule.name).cron_interval
                 == "0 * * * *"
             )
+
+            # Should raise exception for invalid cron interval
+            res = cli_runner.invoke(
+                cli,
+                ["schedule", "set", elt_schedule.name, "--interval", "@hourl"],
+            )
+            assert res.exit_code != 0
+            assert isinstance(res.exception, BadCronError)
 
             res = cli_runner.invoke(
                 cli,
