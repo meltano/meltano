@@ -363,9 +363,6 @@ class CronParam(click.ParamType):
 
     def convert(self, value, *_):
         """Validate and con interval."""
-        if value is None:
-            return None
-
         if value not in CRON_INTERVALS and not croniter.is_valid(value):
             raise BadCronError(value)
 
