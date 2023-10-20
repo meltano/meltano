@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 import click
 import requests
+from yaspin import yaspin
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -192,16 +193,17 @@ def add(  # noqa: WPS238
     tracker.track_command_event(CliEvent.inflight)
 
     if not flags.get("no_install"):
-        success = install_plugins(
-            project,
-            plugins,
-            reason=PluginInstallReason.ADD,
-            force=flags.get("force_install", False),
-        )
+        with yaspin(color="blue"):
+            success = install_plugins(
+                project,
+                plugins,
+                reason=PluginInstallReason.ADD,
+                force=flags.get("force_install", False),
+            )
 
-        if not success:
-            tracker.track_command_event(CliEvent.failed)
-            raise CliError("Failed to install plugin(s)")
+            if not success:
+                tracker.track_command_event(CliEvent.failed)
+                raise CliError("Failed to install plugin(s)")
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)
