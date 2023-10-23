@@ -98,16 +98,16 @@ s3 = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-black = "^23.9.1"
-boto3-stubs = {extras = ["essential"], version = "1.28.63"}
+black = "^23.10.0"
+boto3-stubs = {extras = ["essential"], version = "1.28.68"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.3.2"}
 freezegun = "^1.2.2"
-hypothesis = "^6.88.0"
+hypothesis = "^6.88.1"
 mock = "^5.0.2"
 moto = "^4.2.6"
-mypy = "^1.6.0"
+mypy = "^1.6.1"
 pre-commit = "^3.5.0"
 pytest = "^7.4.2"
 pytest-aiohttp = "^1.0.5"
