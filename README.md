@@ -1,3 +1,4 @@
+<div id="top"></div>
 <div align="center">
   <picture align="center" with="600">
     <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/5394188/228290090-d8a1bfe4-988e-49ef-9f2f-a86f2b014536.svg">
@@ -96,3 +97,4 @@ License
 -------
 
 This code is distributed under the MIT license, see the [LICENSE](https://github.com/meltano/meltano/blob/main/LICENSE) file.
+<p align="right">(<a href="#top">🔼 Back to top</a>)</p>
