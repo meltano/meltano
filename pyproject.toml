@@ -44,15 +44,15 @@ aiohttp = "^3.8.6"
 alembic = "^1.12.0"
 atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
-azure-core = {version = "^1.29.4", optional = true}
+azure-core = {version = "^1.29.5", optional = true}
 azure-identity = {version = "^1.14.1", optional = true}
-azure-storage-blob = {version = "^12.18.2", optional = true}
-boto3 = {version = "^1.28.62", optional = true}
+azure-storage-blob = {version = "^12.18.3", optional = true}
+boto3 = {version = "^1.28.68", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
 click-didyoumean = "^0.3.0"
-croniter = "^1.4.1"
+croniter = "^2.0.1"
 fasteners = "^0.19"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
@@ -65,7 +65,7 @@ psutil = "^5.9.5"
 psycopg = {version = "^3.1.12", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
 pyjwt = "^2.6.0"
-pymssql = {version = "^2.2.8", optional = true}
+pymssql = {version = "^2.2.9", optional = true}
 python = ">=3.8,<3.12"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
@@ -78,11 +78,11 @@ rich = "^13.6.0"
 "ruamel.yaml" = "^0.17.21"
 smart-open = "^6.4.0"
 snowplow-tracker = "^1.0.1"
-sqlalchemy = "^2.0.21"
+sqlalchemy = "^2.0.22"
 structlog = "^23.2.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.8.0"
-tzlocal = "^5.1"
+tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
 virtualenv = "^20.24.5"
@@ -98,16 +98,16 @@ s3 = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-black = "^23.9.1"
-boto3-stubs = {extras = ["essential"], version = "1.28.63"}
+black = "^23.10.0"
+boto3-stubs = {extras = ["essential"], version = "1.28.68"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.3.2"}
 freezegun = "^1.2.2"
-hypothesis = "^6.88.0"
+hypothesis = "^6.88.1"
 mock = "^5.0.2"
 moto = "^4.2.6"
-mypy = "^1.6.0"
+mypy = "^1.6.1"
 pre-commit = "^3.5.0"
 pytest = "^7.4.2"
 pytest-aiohttp = "^1.0.5"
