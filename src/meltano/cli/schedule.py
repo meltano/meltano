@@ -7,6 +7,7 @@ import sys
 import typing as t
 
 import click
+from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -16,7 +17,12 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleService
+from meltano.core.schedule import CRON_INTERVALS
+from meltano.core.schedule_service import (
+    BadCronError,
+    ScheduleAlreadyExistsError,
+    ScheduleService,
+)
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
 
@@ -350,13 +356,30 @@ def _update_elt_schedule(
     return candidate
 
 
+class CronParam(click.ParamType):
+    """Custom type definition for cron prameter."""
+
+    name = "cron"
+
+    def convert(self, value, *_):
+        """Validate and con interval."""
+        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+            raise BadCronError(value)
+
+        return value
+
+
 @schedule.command(
     cls=PartialInstrumentedCmd,
     name="set",
     short_help="Update a schedule.",
 )
 @click.argument("name", required=True)
-@click.option("--interval", help="Update the interval of the schedule.")
+@click.option(
+    "--interval",
+    help="Update the interval of the schedule.",
+    type=CronParam(),
+)
 @click.option("--job", help="Update the name of the job to run a scheduled job.")
 @click.option("--extractor", help="Update the extractor for an elt schedule.")
 @click.option("--loader", help="Updated the loader for an elt schedule.")
