@@ -5,6 +5,9 @@ layout: doc
 sidebar_position: 9
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Once you've [set up a Meltano project](/concepts/project) and
 [run some pipelines](/guide/integration) on your local machine,
 it'll be time to repeat this trick in production!
@@ -198,21 +201,43 @@ Specifically, you will want to configure Airflow to:
   instead of the `SequentialExecutor` default by setting the `core.executor` setting
   (or `AIRFLOW__CORE__EXECUTOR` environment variable) to `LocalExecutor`:
 
+  <Tabs className="meltano-tabs" queryString="meltano-tabs">
+    <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
   ```bash
   meltano config airflow set core.executor LocalExecutor
+  ```
 
+    </TabItem>
+    <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+  ```bash
   export AIRFLOW__CORE__EXECUTOR=LocalExecutor
   ```
+
+    </TabItem>
+  </Tabs>
 
 - [use a PostgreSQL metadata database](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#database-backend)
   instead of the SQLite default ([sounds familiar?](#storing-metadata)) by setting the `core.sql_alchemy_conn` setting
   (or `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable) to a [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql):
 
+  <Tabs className="meltano-tabs" queryString="meltano-tabs">
+    <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
   ```bash
   meltano config airflow set core.sql_alchemy_conn postgresql://<username>:<password>@<host>:<port>/<database>
+  ```
 
+    </TabItem>
+    <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+  ```bash
   export AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://<username>:<password>@<host>:<port>/<database>
   ```
+
+    </TabItem>
+  </Tabs>
 
   For this to work, the [`psycopg2` package](https://pypi.org/project/psycopg2/) will
   also need to be installed alongside [`apache-airflow`](https://pypi.org/project/apache-airflow/),
