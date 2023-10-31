@@ -4,7 +4,11 @@ import shutil
 from pathlib import Path
 
 import pytest
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+from azure.storage.blob._shared.authentication import (  # noqa: WPS436
+    SharedKeyCredentialPolicy,
+)
 
 from meltano.core.error import MeltanoError
 from meltano.core.project import Project
@@ -76,18 +80,20 @@ def test_state_store_manager_from_project_settings(project: Project, state_path:
     )
     # Should create client using default creds
     assert isinstance(az_state_store.client, BlobServiceClient)
+    assert isinstance(az_state_store.client.credential, DefaultAzureCredential)
 
     # Azure, missing storage account url
-    project.settings.unset(["state_backend", "uri", "storage_account_url"])
+    project.settings.unset(["state_backend", "azure", "storage_account_url"])
     project.settings.set(
         ["state_backend", "azure", "connection_string"],
-        "SOME_CONNECTION_STRING",
+        "DefaultEndpointsProtocol=https;AccountName=myAccount;AccountKey=myAccountKey",
     )
     az_state_store: AZStorageStateStoreManager = (
         state_store_manager_from_project_settings(project.settings)
     )
     # Should create client using connection string
     assert isinstance(az_state_store.client, BlobServiceClient)
+    assert isinstance(az_state_store.client.credential, SharedKeyCredentialPolicy)
 
     # Azure, missing connection string and storage account url
     project.settings.unset(["state_backend", "azure", "connection_string"])
