@@ -181,14 +181,20 @@ class Manifest:  # noqa: WPS214
     def _project_files(self) -> dict[str, t.Any]:
         project_files = flatten_dict.unflatten(
             deep_merge(
-                yaml.load(  # noqa: S506
+                yaml.load(
                     self._meltano_file,
-                    t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                    t.cast(  # noqa: S506
+                        t.Type[yaml.SafeLoader],
+                        YamlNoTimestampSafeLoader,
+                    ),
                 ),
                 *(
-                    yaml.load(  # noqa: S506
+                    yaml.load(
                         x.read_text(),
-                        t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                        t.cast(  # noqa: S506
+                            t.Type[yaml.SafeLoader],
+                            YamlNoTimestampSafeLoader,
+                        ),
                     )
                     for x in self.project.project_files.include_paths
                 ),
