@@ -22,6 +22,7 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
     get_non_interactive_flow_setting_and_value,
+    set_nested_setting,
     traverse_nested_settings,
 )
 from meltano.core.db import project_engine
@@ -360,6 +361,7 @@ def reset(ctx, store):
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
 @click.option("--interactive", is_flag=True)
+@click.option("--from-file", type=click.File("r"))
 @click.argument("setting_name", nargs=-1)
 @click.argument("value", required=False)
 @click.option(
@@ -375,6 +377,7 @@ def set_(
     value: t.Any,
     store: str,
     interactive: bool,
+    from_file,
 ):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
@@ -386,33 +389,32 @@ def set_(
         if sys.stdin.isatty():
             # Interactive stdin flow
             interaction.configure_all()
-        else:
-            # Non-Interactive stdin flow
-            setting_name, value = get_non_interactive_flow_setting_and_value(
-                setting_name,
-                value,
+    elif from_file:
+        setting_name, value = get_non_interactive_flow_setting_and_value(
+            setting_name,
+            value,
+            from_file,
+        )
+
+        if isinstance(value, dict):
+            nested_settings: list[tuple] = []
+            traverse_nested_settings(
+                dict_value=value,
+                nested_settings=nested_settings,
             )
 
-            if isinstance(value, dict):
-                nested_settings: list[tuple] = []
-                traverse_nested_settings(
-                    dict_value=value,
-                    nested_settings=nested_settings,
-                )
-
-                for sub_setting in nested_settings:
-                    child_setting, nested_setting_value = sub_setting
-                    interaction.set_value(
-                        setting_name=setting_name + child_setting,
-                        value=nested_setting_value,
-                        store=store,
-                    )
-            else:
-                interaction.set_value(
-                    setting_name=setting_name,
-                    value=value,
-                    store=store,
-                )
+            set_nested_setting(
+                nested_settings,
+                store,
+                setting_name,
+                interaction.set_value,
+            )
+        else:
+            interaction.set_value(
+                setting_name=setting_name,
+                value=value,
+                store=store,
+            )
     else:
         interaction.set_value(setting_name=setting_name, value=value, store=store)
 

@@ -68,17 +68,10 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     def test_config_non_interactive_stdin(self, cli_runner):
-        with cli_runner.isolated_filesystem():
-            with open("setting.txt", "w") as test_file:
-                test_file.write("info")
-
-            with open("setting.txt") as test_file:
-                input_data = test_file.read()
-
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--interactive", "cli", "log_level"],
-            input=input_data,
+            ["config", "meltano", "set", "cli", "log_level", "--from-file", "-"],
+            input="info",
         )
         assert_cli_runner(result)
 
@@ -88,8 +81,8 @@ class TestCliConfig:
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--interactive", "cli.log_level"],
-            input=input_data,
+            ["config", "meltano", "set", "cli.log_level", "--from-file", "-"],
+            input="info",
         )
         assert_cli_runner(result)
 
@@ -100,17 +93,10 @@ class TestCliConfig:
         data = {"log_level": "info"}
         json_data = json.dumps(data)
 
-        with cli_runner.isolated_filesystem():
-            with open("setting.json", "w") as test_file:
-                test_file.write(json_data)
-
-            with open("setting.json") as test_file:
-                input_data = test_file.read()
-
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "--interactive", "cli"],
-            input=input_data,
+            ["config", "meltano", "set", "cli", "--from-file", "-"],
+            input=json_data,
         )
         assert_cli_runner(result)
 

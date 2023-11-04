@@ -702,13 +702,30 @@ def traverse_nested_settings(
             nested_settings.append([current_nested_setting + (sub_setting,), sub_value])
 
 
+def set_nested_setting(
+    nested_settings: list[tuple],
+    store: str,
+    setting_name: tuple,
+    set_value: callable,
+):
+    """Set value of nested settings."""
+    for sub_setting in nested_settings:
+        child_setting, nested_setting_value = sub_setting
+        set_value(
+            setting_name=setting_name + child_setting,
+            value=nested_setting_value,
+            store=store,
+        )
+
+
 def get_non_interactive_flow_setting_and_value(
     current_setting,
     current_value,
+    from_file,
 ):
     """Update setting and value for non interactive stdin flow."""
     current_setting += (current_value,)
-    input_data = click.get_text_stream("stdin").read()
+    input_data = from_file.read()
     try:
         # Check if input requires parsing
         value = json.loads(input_data)
