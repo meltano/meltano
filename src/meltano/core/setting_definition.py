@@ -449,7 +449,7 @@ class SettingDefinition(NameEq, Canonical):
             and self.kind == SettingKind.OPTIONS
             and all(opt["value"] != value for opt in self.options)
         ):
-            error_message = f"'{value}' is not a valid option for '{self.name}'"
+            error_message = f"'{value}' is not a valid choice for '{self.name}'"
             raise ValueError(error_message)
 
         processor = self.value_processor
