@@ -424,6 +424,9 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             Value cast according to specified setting definition kind.
+
+        Raises:
+            ValueError: If value is not of the expected type.
         """
         value = value.isoformat() if isinstance(value, (date, datetime)) else value
 
@@ -440,6 +443,14 @@ class SettingDefinition(NameEq, Canonical):
                 value = list(
                     self._parse_value(value, "array", Sequence),  # type: ignore
                 )
+
+        if (
+            value is not None
+            and self.kind == SettingKind.OPTIONS
+            and all(opt["value"] != value for opt in self.options)
+        ):
+            error_message = f"'{value}' is not a valid choice for '{self.name}'"
+            raise ValueError(error_message)
 
         processor = self.value_processor
         if value is not None and processor:
