@@ -13,9 +13,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-env:
-  FOSSA_CLI_VERSION: '3.8.3'
-
 permissions:
   contents: read
 
@@ -28,19 +25,4 @@ jobs:
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/dependency-review-action@v3.1.0
-
-      - name: FOSSA dependency license check
-        run: |
-          curl --no-progress-meter -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash -s -- "v$FOSSA_CLI_VERSION"
-
-          echo '## FOSSA dependency license check' >> $GITHUB_STEP_SUMMARY
-          echo '' >> $GITHUB_STEP_SUMMARY
-
-          fossa analyze --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }} |& tee fossa_analyze.log
-          fossa test --fossa-api-key ${{ secrets.MELTYBOT_FOSSA_API_KEY }} --revision ${{ github.sha }}
-
-          TEST_FAILED=$?
-          FOSSA_REPORT_LINK="$(grep -A 1 '[ INFO] View FOSSA Report:' fossa_analyze.log | tail -n 1 | sed -e 's/^\[ INFO\]\s*//')"
-          echo "[FOSSA detected $([ $TEST_FAILED -ne 0 ] && echo -n '' || echo 'no ')issues](${FOSSA_REPORT_LINK})" >> $GITHUB_STEP_SUMMARY
-          exit $TEST_FAILED
+        uses: actions/dependency-review-action@v3.1.1
