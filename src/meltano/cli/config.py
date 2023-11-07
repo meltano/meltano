@@ -387,14 +387,7 @@ def set_(
 
     if from_file:
         setting_name += (value,)
-        value = from_file.read()
-
-        interaction.set_value(
-            setting_name=setting_name,
-            value=value,
-            store=store,
-        )
-        ctx.exit()
+        value = from_file.read().strip()
 
     interaction.set_value(setting_name=setting_name, value=value, store=store)
 
