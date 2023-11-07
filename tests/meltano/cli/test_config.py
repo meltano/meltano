@@ -78,15 +78,17 @@ class TestCliConfig:
             "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
         ) in result.stdout
 
+        filepath = tmp_path.joinpath("file.txt")
+        filepath.write_text("warning")
+
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "cli.log_level", "--from-file", "-"],
-            input="info",
+            ["config", "meltano", "set", "cli.log_level", "--from-file", filepath],
         )
         assert_cli_runner(result)
 
         assert (
-            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
+            "Meltano setting 'cli.log_level' was set in `.env`: 'warning'"
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
