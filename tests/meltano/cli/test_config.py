@@ -66,29 +66,31 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_non_interactive_stdin(self, cli_runner, tmp_path):
+    def test_config_non_interactive_stdin(self, cli_runner, tap, tmp_path):
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "cli", "log_level", "--from-file", "-"],
-            input="info",
+            ["config", tap.name, "set", "private_key", "--from-file", "-"],
+            input="content-from-stdin",
         )
         assert_cli_runner(result)
 
         assert (
-            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-stdin'"
         ) in result.stdout
 
         filepath = tmp_path.joinpath("file.txt")
-        filepath.write_text("warning")
+        filepath.write_text("content-from-file")
 
         result = cli_runner.invoke(
             cli,
-            ["config", "meltano", "set", "cli.log_level", "--from-file", filepath],
+            ["config", tap.name, "set", "private_key", "--from-file", filepath],
         )
         assert_cli_runner(result)
 
         assert (
-            "Meltano setting 'cli.log_level' was set in `.env`: 'warning'"
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-file'"
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
