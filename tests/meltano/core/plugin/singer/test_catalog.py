@@ -455,6 +455,11 @@ def select_all_executor():
         ("stream[0].properties.master.properties.details", "master.details"),
         ("stream[2].properties.name", "name"),
         ("stream[10].properties.list[2].properties.name", "list[2].name"),
+        ("stream[0].properties.properties.properties.prop_1", "properties.prop_1"),
+        (
+            "stream[0].properties.I HAVE SPACES.properties.SPECIAL CHAR %",
+            "I HAVE SPACES.SPECIAL CHAR %",
+        ),
     ),
 )
 def test_path_property(path, prop):

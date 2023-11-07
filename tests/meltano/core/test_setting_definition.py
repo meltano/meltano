@@ -55,3 +55,19 @@ class TestSettingDefinition:
                     setting_definition.cast_value(uncast)
             else:
                 assert setting_definition.cast_value(uncast) == expected
+
+    def test_cast_options(self):
+        setting_definition = SettingDefinition(
+            "test_setting",
+            kind=SettingKind.OPTIONS,
+            options=[
+                {"value": "abc", "label": "ABC"},
+                {"value": "xyz", "label": "XYZ"},
+            ],
+        )
+
+        assert setting_definition.cast_value("abc") == "abc"
+        assert setting_definition.cast_value("xyz") == "xyz"
+        assert setting_definition.cast_value(None) is None
+        with pytest.raises(ValueError, match="is not a valid choice"):
+            setting_definition.cast_value("def")
