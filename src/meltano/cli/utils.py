@@ -679,15 +679,3 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
-
-
-def get_non_interactive_flow_setting_and_value(
-    current_setting,
-    current_value,
-    from_file,
-):
-    """Update setting and value for non interactive stdin flow."""
-    current_setting += (current_value,)
-    input_data = from_file.read()
-
-    return current_setting, input_data

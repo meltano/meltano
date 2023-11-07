@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import sys
 import tempfile
 import typing as t
 from functools import wraps
@@ -21,7 +20,6 @@ from meltano.cli.utils import (
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
-    get_non_interactive_flow_setting_and_value,
 )
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -384,15 +382,11 @@ def set_(
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
 
     if interactive:
-        if sys.stdin.isatty():
-            # Interactive stdin flow
-            interaction.configure_all()
+        interaction.configure_all()
     elif from_file:
-        setting_name, value = get_non_interactive_flow_setting_and_value(
-            setting_name,
-            value,
-            from_file,
-        )
+        setting_name += (value,)
+        value = from_file.read()
+
         interaction.set_value(
             setting_name=setting_name,
             value=value,
