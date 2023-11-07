@@ -66,6 +66,34 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    def test_config_non_interactive_stdin(self, cli_runner, tap, tmp_path):
+        result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "private_key", "--from-file", "-"],
+            input="content-from-stdin",
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-stdin'"
+        ) in result.stdout
+
+        filepath = tmp_path.joinpath("file.txt")
+        filepath.write_text("content-from-file")
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "private_key", "--from-file", filepath],
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-file'"
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
     def test_config_test(self, cli_runner, tap):
         mock_invoke = mock.Mock()
         mock_invoke.sterr.at_eof.side_effect = True

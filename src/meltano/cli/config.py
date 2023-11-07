@@ -357,6 +357,7 @@ def reset(ctx, store):
 
 @config.command(cls=PartialInstrumentedCmd, name="set")
 @click.option("--interactive", is_flag=True)
+@click.option("--from-file", type=click.File("r"))
 @click.argument("setting_name", nargs=-1)
 @click.argument("value", required=False)
 @click.option(
@@ -372,16 +373,23 @@ def set_(
     value: t.Any,
     store: str,
     interactive: bool,
+    from_file: t.TextIO,
 ):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
     interaction = InteractiveConfig(ctx=ctx, store=store, extras=False)
+
     if interactive:
         interaction.configure_all()
-    else:
-        interaction.set_value(setting_name=setting_name, value=value, store=store)
+        ctx.exit()
+
+    if from_file:
+        setting_name += (value,)
+        value = from_file.read().strip()
+
+    interaction.set_value(setting_name=setting_name, value=value, store=store)
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
