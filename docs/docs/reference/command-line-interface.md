@@ -439,6 +439,25 @@ meltano config <plugin> set --interactive --extras
 meltano config <plugin> set --interactive --store=dotenv
 ```
 
+### How to use: File's content as config value
+
+To enable users to define a configuration value from an external file proves especially valuable for storing complex data like multiline strings or other values located within a separate file. Apart for strings, setting can be an object or array and it would be deserialized accordingly
+
+Setting config from file supports the same options as the direct `set` command (i.e. `--extras` and `--store=`).
+
+```bash
+# File content "info"
+# Configure plugin by passing file as argument
+meltano config <plugin> set nested.setting --from_file - ./file.txt
+
+# Configure plufin by passing the content of file as stdin
+cat file.txt | meltano config <plugin> set nested.setting --from_file -
+
+# File content {"setting": "info"}
+# Configure plugin by passing file as argument
+meltano config <plugin> set nested --from_file - ./file.txt
+```
+
 ## `docs`
 
 Open the Meltano documentation site in the default browser.

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import signal
@@ -682,42 +681,6 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         super().invoke(ctx)
 
 
-def traverse_nested_settings(
-    dict_value,
-    nested_settings: list[list[tuple | (set | int)]],
-    current_nested_setting=(),
-):
-    """Create an array of tuples for nested settings."""
-    for sub_setting, sub_value in dict_value.items():
-        if isinstance(sub_value, dict):
-            # If the value is a dictionary, continue traversing
-            traverse_nested_settings(
-                sub_value,
-                nested_settings,
-                current_nested_setting + (sub_setting,),
-            )
-        else:
-            # When you reach a leaf node (non-dictionary value),
-            # append the accumulated path to final_sub_settings
-            nested_settings.append([current_nested_setting + (sub_setting,), sub_value])
-
-
-def set_nested_setting(
-    nested_settings: list[tuple],
-    store: str,
-    setting_name: tuple,
-    set_value: callable,
-):
-    """Set value of nested settings."""
-    for sub_setting in nested_settings:
-        child_setting, nested_setting_value = sub_setting
-        set_value(
-            setting_name=setting_name + child_setting,
-            value=nested_setting_value,
-            store=store,
-        )
-
-
 def get_non_interactive_flow_setting_and_value(
     current_setting,
     current_value,
@@ -726,10 +689,5 @@ def get_non_interactive_flow_setting_and_value(
     """Update setting and value for non interactive stdin flow."""
     current_setting += (current_value,)
     input_data = from_file.read()
-    try:
-        # Check if input requires parsing
-        value = json.loads(input_data)
-    except json.JSONDecodeError:
-        value = input_data
 
-    return current_setting, value
+    return current_setting, input_data

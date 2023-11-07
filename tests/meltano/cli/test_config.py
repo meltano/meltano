@@ -8,7 +8,6 @@ from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.cli.utils import traverse_nested_settings
 from meltano.core.project import Project
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
@@ -83,20 +82,6 @@ class TestCliConfig:
             cli,
             ["config", "meltano", "set", "cli.log_level", "--from-file", "-"],
             input="info",
-        )
-        assert_cli_runner(result)
-
-        assert (
-            "Meltano setting 'cli.log_level' was set in `.env`: 'info'"
-        ) in result.stdout
-
-        data = {"log_level": "info"}
-        json_data = json.dumps(data)
-
-        result = cli_runner.invoke(
-            cli,
-            ["config", "meltano", "set", "cli", "--from-file", "-"],
-            input=json_data,
         )
         assert_cli_runner(result)
 
@@ -266,24 +251,3 @@ class TestCliConfigSet:
             {},
         )
         assert tap_config["config"]["test"] == "dev-mock"
-
-
-class TestConfigUtils:
-    def test_traverse_nested_settings(self):
-        test_setting = {
-            "nested1": {
-                "sub_nested": "value1",
-            },
-            "nested2": "value2",
-        }
-
-        nested_settings: list[tuple] = []
-        traverse_nested_settings(
-            dict_value=test_setting,
-            nested_settings=nested_settings,
-        )
-
-        assert nested_settings == [
-            [("nested1", "sub_nested"), "value1"],
-            [("nested2",), "value2"],
-        ]

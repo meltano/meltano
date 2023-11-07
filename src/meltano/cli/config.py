@@ -22,8 +22,6 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
     get_non_interactive_flow_setting_and_value,
-    set_nested_setting,
-    traverse_nested_settings,
 )
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -395,26 +393,11 @@ def set_(
             value,
             from_file,
         )
-
-        if isinstance(value, dict):
-            nested_settings: list[tuple] = []
-            traverse_nested_settings(
-                dict_value=value,
-                nested_settings=nested_settings,
-            )
-
-            set_nested_setting(
-                nested_settings,
-                store,
-                setting_name,
-                interaction.set_value,
-            )
-        else:
-            interaction.set_value(
-                setting_name=setting_name,
-                value=value,
-                store=store,
-            )
+        interaction.set_value(
+            setting_name=setting_name,
+            value=value,
+            store=store,
+        )
     else:
         interaction.set_value(setting_name=setting_name, value=value, store=store)
 
