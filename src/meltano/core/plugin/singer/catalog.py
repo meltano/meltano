@@ -249,7 +249,7 @@ def path_property(path: str) -> str:
       stream[0].properties.list_items.properties.account → list_items.account
       stream[0].properties.name                          → name
     """
-    prop_regex = r"properties\.([\w\[\]\d]+)+"
+    prop_regex = r"properties\.([^.]+)+"
     components = re.findall(prop_regex, path)
     return ".".join(components)
 
