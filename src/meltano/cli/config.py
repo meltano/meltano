@@ -155,7 +155,7 @@ def config(  # noqa: WPS231
     """
     tracker = ctx.obj["tracker"]
     try:
-        plugin_type = PluginType.from_cli_argument(plugin_type) if plugin_type else None
+        ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
     except ValueError:
         tracker.track_command_event(CliEvent.aborted)
         raise
@@ -163,7 +163,7 @@ def config(  # noqa: WPS231
     try:
         plugin = project.plugins.find_plugin(
             plugin_name,
-            plugin_type=plugin_type,
+            plugin_type=ptype,
             configurable=True,
         )
     except PluginNotFoundError:
