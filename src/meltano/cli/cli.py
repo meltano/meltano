@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import platform
 import sys
 import typing as t
 from pathlib import Path
@@ -111,7 +112,7 @@ def cli(  # noqa: C901,WPS231
     try:
         project = Project.find()
         setup_logging(project)
-        logger.debug("meltano %s, %s", __version__, os.name)  # noqa: WPS323
+        logger.debug("meltano %s, %s", __version__, platform.system())  # noqa: WPS323
         if project.readonly:
             logger.debug("Project is read-only.")
 
