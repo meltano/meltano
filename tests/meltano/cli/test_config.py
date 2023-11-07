@@ -66,7 +66,7 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_non_interactive_stdin(self, cli_runner):
+    def test_config_non_interactive_stdin(self, cli_runner, tmp_path):
         result = cli_runner.invoke(
             cli,
             ["config", "meltano", "set", "cli", "log_level", "--from-file", "-"],
