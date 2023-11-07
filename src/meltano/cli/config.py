@@ -373,7 +373,7 @@ def set_(
     value: t.Any,
     store: str,
     interactive: bool,
-    from_file,
+    from_file: t.TextIO,
 ):
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
@@ -383,7 +383,9 @@ def set_(
 
     if interactive:
         interaction.configure_all()
-    elif from_file:
+        ctx.exit()
+
+    if from_file:
         setting_name += (value,)
         value = from_file.read()
 
@@ -392,8 +394,9 @@ def set_(
             value=value,
             store=store,
         )
-    else:
-        interaction.set_value(setting_name=setting_name, value=value, store=store)
+        ctx.exit()
+
+    interaction.set_value(setting_name=setting_name, value=value, store=store)
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
