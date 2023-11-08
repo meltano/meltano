@@ -161,7 +161,7 @@ class TestSingerRunner:
         (
             (False, False, [], Payload.STATE),
             (True, False, [], Payload.STATE),
-            (False, False, ["entity"],Payload.STATE),
+            (False, False, ["entity"], Payload.STATE),
             (True, False, ["entity"], Payload.INCOMPLETE_STATE),
             (False, True, [], Payload.INCOMPLETE_STATE),
             (True, True, [], Payload.INCOMPLETE_STATE),
