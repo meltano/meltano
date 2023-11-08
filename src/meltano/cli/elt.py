@@ -95,7 +95,7 @@ class ELOptions:
     merge_state = click.option(
         "--merge-state",
         is_flag=True,
-        help="Merges State at the end of the run",
+        help="Merges state with that of previous runs.",
     )
 
 
