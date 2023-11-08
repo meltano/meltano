@@ -159,10 +159,14 @@ class TestSingerRunner:
     @pytest.mark.parametrize(
         ("full_refresh", "merge_state", "select_filter", "payload_flag"),
         (
+            (False, False, [], Payload.STATE),
+            (True, False, [], Payload.STATE),
+            (False, False, ["entity"],Payload.STATE),
+            (True, False, ["entity"], Payload.INCOMPLETE_STATE),
             (False, True, [], Payload.INCOMPLETE_STATE),
             (True, True, [], Payload.INCOMPLETE_STATE),
-            (False, False, ["entity"], Payload.STATE),
-            (True, False, ["entity"], Payload.INCOMPLETE_STATE),
+            (False, True, ["entity"], Payload.INCOMPLETE_STATE),
+            (True, True, ["entity"], Payload.INCOMPLETE_STATE),
         ),
     )
     async def test_bookmark(
