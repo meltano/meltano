@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
+import typing as t
 from datetime import datetime
 
 from meltano.core.behavior.hookable import hook
@@ -12,6 +13,9 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
 from . import PluginType, SingerPlugin
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +29,7 @@ class BookmarkWriter:
     def __init__(
         self,
         job: Job,
-        session: object,
+        session: Session,
         payload_flag: int = Payload.STATE,
         state_service: StateService | None = None,
     ):
