@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import platform
+from pathlib import Path
 
 import pytest
 from mock import AsyncMock, mock
@@ -172,6 +173,34 @@ class TestCliConfigSet:
 
         assert (
             f"Extractor '{tap.name}' setting 'secure' was set in `.env`: '{value}'"
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path):
+        result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "private_key", "--from-file", "-"],
+            input="content-from-stdin",
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-stdin'"
+        ) in result.stdout
+
+        filepath = tmp_path.joinpath("file.txt")
+        filepath.write_text("content-from-file")
+
+        result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "private_key", "--from-file", filepath],
+        )
+        assert_cli_runner(result)
+
+        assert (
+            f"Extractor '{tap.name}' setting 'private_key' was set in `meltano.yml`: "
+            "'content-from-file'"
         ) in result.stdout
 
     @pytest.mark.usefixtures("tap")

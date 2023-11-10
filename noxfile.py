@@ -48,7 +48,6 @@ pytest_deps = (
     "mock",
     "moto",
     "pytest",
-    "pytest-aiohttp",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-docker",
@@ -98,11 +97,6 @@ def pytest_meltano(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    install_env = {}
-    if session.python == "3.12":
-        # TODO: Remove this once aiohttp has 3.12 wheels
-        install_env["AIOHTTP_NO_EXTENSIONS"] = "1"
-
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
     extras = ["azure", "gcs", "s3"]
 
@@ -116,7 +110,6 @@ def pytest_meltano(session: Session) -> None:
     session.install(
         f".[{','.join(extras)}]",
         *pytest_deps,
-        env=install_env,
     )
     _run_pytest(session)
 
@@ -164,11 +157,6 @@ def mypy(session: Session) -> None:
     Args:
         session: Nox session.
     """
-    install_env = {}
-    if session.python == "3.12":
-        # TODO: Remove this once aiohttp has 3.12 wheels
-        install_env["AIOHTTP_NO_EXTENSIONS"] = "1"
-
     session.install(
         ".[mssql,azure,gcs,s3]",
         "boto3-stubs",
@@ -181,6 +169,5 @@ def mypy(session: Session) -> None:
         "types-PyYAML",
         "types-requests",
         "types-tabulate",
-        env=install_env,
     )
     session.run("mypy", *session.posargs)
