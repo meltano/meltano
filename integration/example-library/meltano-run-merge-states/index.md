@@ -1,6 +1,6 @@
 # Get setup
 
-This example shows how state from sequential invocations of `meltano run` can be merged together to create a single state file.
+This example shows how state from sequential invocations of `meltano run` can be merged together to create a state object that combines bookmarks from streams synced in different runs.
 
 This is useful for when you want to backfill/refresh a single stream, without losing the state of other streams.
 
@@ -8,7 +8,7 @@ This is useful for when you want to backfill/refresh a single stream, without lo
 meltano install
 ```
 
-## Without state file merging (default)
+## Without state merging (default)
 
 ### Extract all streams
 
@@ -45,7 +45,7 @@ meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:no-merge
 }
 ```
 
-## With state file merging
+## With state merging
 
 ### Extract all streams
 
