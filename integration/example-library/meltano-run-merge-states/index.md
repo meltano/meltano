@@ -30,7 +30,7 @@ meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=no-merg
 Note that the state will only contain the bookmark for `stream_1`.
 
 ```shell
-meltano state get dev:tap-with-state-to-target-jsonl:no-merge
+meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:no-merge
 ```
 
 ## With state file merging
@@ -55,5 +55,5 @@ meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=merge -
 Note that the state will now contain both the new bookmark for `stream_1` and the old bookmarks for the other streams.
 
 ```shell
-meltano state get dev:tap-with-state-to-target-jsonl:merge
+meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:merge
 ```
