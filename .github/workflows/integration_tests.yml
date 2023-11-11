@@ -39,6 +39,7 @@ jobs:
         - { integration_test: "meltano-config", needs_postgres: false}
         - { integration_test: "meltano-annotations", needs_postgres: false}
         - { integration_test: "meltano-manifest", needs_postgres: false}
+        - { integration_test: "meltano-run-merge-states", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest
