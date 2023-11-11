@@ -951,7 +951,7 @@ meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--merge-state` will merge state with that of previous runs.
+- `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 
 Examples:
 
