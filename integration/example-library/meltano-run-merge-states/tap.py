@@ -1,6 +1,6 @@
-"""Simple Singer tap."""
-
 #!/usr/bin/env python
+
+"""Simple Singer tap."""
 
 # flake8: noqa
 
