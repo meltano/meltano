@@ -33,6 +33,18 @@ Note that the state will only contain the bookmark for `stream_1`.
 meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:no-merge
 ```
 
+```json
+{
+  "singer_state": {
+    "bookmarks": {
+      "stream_1": {
+        "created_at": "2023-01-01T01:00:00Z"
+      }
+    }
+  }
+}
+```
+
 ## With state file merging
 
 ### Extract all streams
@@ -56,4 +68,22 @@ Note that the state will now contain both the new bookmark for `stream_1` and th
 
 ```shell
 meltano --environment=dev state get dev:tap-with-state-to-target-jsonl:merge
+```
+
+```json
+{
+  "singer_state": {
+    "bookmarks": {
+      "stream_1": {
+        "created_at": "2023-01-01T01:00:00Z"
+      },
+      "stream_2": {
+        "created_at": "2023-01-01T00:00:00Z"
+      },
+      "stream_3": {
+        "created_at": "2023-01-01T00:00:00Z"
+      }
+    }
+  }
+}
 ```
