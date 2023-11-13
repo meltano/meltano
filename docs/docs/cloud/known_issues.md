@@ -4,6 +4,7 @@ description: Details Beta limitations for  Meltano Cloud
 layout: doc
 hidden: false
 sidebar_position: 10
+sidebar_class_name: hidden
 ---
 
 :::info

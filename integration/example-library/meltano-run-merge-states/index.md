@@ -56,7 +56,7 @@ meltano run tap-with-state target-jsonl --state-id-suffix=merge
 
 ### Filter a single stream, merging states
 
-Run a 'full refresh' pipeline of a single stream, but merge the state with the existing state.
+Run a 'full refresh' pipeline of a single stream, but merge the current pipelines state with the latest stored state.
 
 ```shell
 TAP_WITH_STATE_TS='2023-01-01T01:00:00Z' \
