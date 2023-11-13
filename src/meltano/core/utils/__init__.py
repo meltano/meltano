@@ -16,7 +16,7 @@ import typing as t
 import unicodedata
 from contextlib import suppress
 from copy import copy, deepcopy
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timezone
 from enum import IntEnum
 from functools import reduce
 from operator import setitem
@@ -341,12 +341,13 @@ def iso8601_datetime(d: None) -> None: ...  # noqa: WPS428
 def iso8601_datetime(d: str) -> datetime: ...  # noqa: WPS428
 
 
-def iso8601_datetime(d):
+def iso8601_datetime(d: str | None):
     if d is None:
         return None
 
     isoformats = [
         "%Y-%m-%dT%H:%M:%SZ",  # noqa: WPS323
+        "%Y-%m-%dT%H:%M:%S+00:00",  # noqa: WPS323
         "%Y-%m-%dT%H:%M:%S",  # noqa: WPS323
         "%Y-%m-%d %H:%M:%S",  # noqa: WPS323
         "%Y-%m-%d",  # noqa: WPS323
@@ -354,7 +355,9 @@ def iso8601_datetime(d):
 
     for format_string in isoformats:
         with suppress(ValueError):
-            return coerce_datetime(datetime.strptime(d, format_string))
+            return coerce_datetime(
+                datetime.strptime(d, format_string).replace(tzinfo=timezone.utc),
+            )
     raise ValueError(f"{d} is not a valid UTC date.")  # noqa: EM102
 
 

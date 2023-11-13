@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import structlog
 from croniter import croniter
@@ -204,7 +204,7 @@ class ScheduleService:  # noqa: WPS214
         if isinstance(start_date, datetime):
             return start_date
 
-        return iso8601_datetime(start_date) or datetime.utcnow()
+        return iso8601_datetime(start_date) or datetime.now(tz=timezone.utc)
 
     def add_schedule(self, schedule: Schedule) -> Schedule:
         """Add a schedule to the project.

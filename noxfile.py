@@ -45,7 +45,6 @@ main_python_version = "3.12"
 pytest_deps = (
     "backoff",
     "colorama",  # colored output in Windows
-    "freezegun",
     "hypothesis",
     "mock",
     "moto",
@@ -57,9 +56,10 @@ pytest_deps = (
     "pytest-order",
     "pytest-randomly",
     "pytest-rerunfailures",
+    "pytest-structlog",
     "pytest-xdist",
     "requests-mock",
-    "pytest-structlog",
+    "time-machine",
 )
 
 

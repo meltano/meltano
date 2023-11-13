@@ -4,7 +4,7 @@ import asyncio
 import platform
 import signal
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -43,11 +43,11 @@ class TestJob:
 
         transition = subject.transit(State.RUNNING)
         assert transition == (State.IDLE, State.RUNNING)
-        subject.started_at = datetime.utcnow()
+        subject.started_at = datetime.now(timezone.utc)
 
         transition = subject.transit(State.SUCCESS)
         assert transition == (State.RUNNING, State.SUCCESS)
-        subject.ended_at = datetime.utcnow()
+        subject.ended_at = datetime.now(timezone.utc)
 
     @pytest.mark.asyncio()
     async def test_run(self, session):
@@ -146,7 +146,7 @@ class TestJob:
 
         # Jobs started more than 25 hours ago without a heartbeat are stale
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
-        job.started_at = datetime.utcnow() - offset
+        job.started_at = datetime.now(timezone.utc) - offset
         assert job.is_stale()
 
         # Jobs with a recent heartbeat are not stale
@@ -155,7 +155,7 @@ class TestJob:
 
         # Jobs without a heartbeat for 5 minutes are stale
         offset = timedelta(minutes=HEARTBEAT_VALID_MINUTES + 1)
-        job.last_heartbeat_at = datetime.utcnow() - offset
+        job.last_heartbeat_at = datetime.now(timezone.utc) - offset
         assert job.is_stale()
 
         # Completed jobs are not stale
@@ -172,7 +172,7 @@ class TestJob:
         # Fails a stale job without a heartbeat
         job.start()
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
-        job.started_at = datetime.utcnow() - offset
+        job.started_at = datetime.now(timezone.utc) - offset
 
         assert job.fail_stale()
         assert job.has_error()
@@ -185,7 +185,7 @@ class TestJob:
         job = Job()
         job.start()
         offset = timedelta(minutes=HEARTBEAT_VALID_MINUTES + 1)
-        job.last_heartbeat_at = datetime.utcnow() - offset
+        job.last_heartbeat_at = datetime.now(timezone.utc) - offset
 
         assert job.fail_stale()
         assert job.has_error()

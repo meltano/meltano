@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from .job import HEARTBEAT_VALID_MINUTES, HEARTBEATLESS_JOB_VALID_HOURS, Job, State
 
@@ -141,7 +141,7 @@ class JobFinder:
         Returns:
             All stale states with any state ID
         """
-        now = datetime.utcnow()
+        now = datetime.now(tz=timezone.utc)
         last_valid_heartbeat_at = now - timedelta(minutes=HEARTBEAT_VALID_MINUTES)
         last_valid_started_at = now - timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
 

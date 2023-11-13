@@ -83,7 +83,7 @@ class TestProjectFiles:
                     "loader": "target-meltano-yml",
                     "transform": "skip",
                     "interval": "@daily",
-                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: DTZ001
                 },
             ],
             "environments": [
@@ -182,7 +182,7 @@ class TestProjectFiles:
                     "extractor": "tap-meltano-yml",
                     "loader": "target-meltano-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: DTZ001
                     "interval": "@daily",
                 },
                 {
@@ -190,7 +190,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-2-yml",
                     "loader": "target-subconfig-2-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: DTZ001
                     "interval": "@daily",
                 },
                 {
@@ -198,7 +198,7 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-1-yml",
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: DTZ001
                     "interval": "@daily",
                 },
             ],
@@ -279,7 +279,7 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-meltano-yml",
                     "name": "modified-test-meltano-yml",
-                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432, DTZ001
                     "transform": "skip",
                 },
                 {
@@ -287,7 +287,7 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-subconfig-2-yml",
                     "name": "test-subconfig-2-yml",
-                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432, DTZ001
                     "transform": "skip",
                 },
                 {
@@ -295,7 +295,7 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
-                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432
+                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432, DTZ001
                     "transform": "skip",
                 },
             ],

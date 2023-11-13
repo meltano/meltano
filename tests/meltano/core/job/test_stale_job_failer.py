@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -21,7 +21,7 @@ class TestStaleJobFailer:
     def stale_job(self, session):
         job = Job(job_name="test")
         job.start()
-        job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
+        job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
         job.save(session)
 
         return job
@@ -30,7 +30,7 @@ class TestStaleJobFailer:
     def other_stale_job(self, session):
         job = Job(job_name="other")
         job.start()
-        job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
+        job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
         job.save(session)
 
         return job

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import platform
 import typing as t
-from datetime import date, datetime
+from datetime import datetime, timezone
 
 import dotenv
 import pytest
@@ -708,11 +708,11 @@ class TestPluginSettingsService:
         )
 
     def test_date_values(self, subject, monkeypatch):
-        today = date.today()
+        today = datetime.now(timezone.utc).date()
         monkeypatch.setitem(subject.plugin.config, "start_date", today)
         assert subject.get("start_date") == today.isoformat()
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         monkeypatch.setitem(subject.plugin.config, "start_date", now)
         assert subject.get("start_date") == now.isoformat()
 

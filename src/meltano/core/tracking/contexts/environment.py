@@ -8,7 +8,7 @@ import typing as t
 import uuid
 from collections import defaultdict
 from contextlib import suppress
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import cached_property
 from pathlib import Path
 from warnings import warn
@@ -135,7 +135,7 @@ class EnvironmentContext(SelfDescribingJson):
         Returns:
             A ISO 8601 timestamp formatted string.
         """
-        return f"{datetime.utcfromtimestamp(process.create_time()).isoformat()}Z"
+        return f"{datetime.fromtimestamp(process.create_time(), tz=timezone.utc).isoformat()}"  # noqa: E501
 
     @cached_property
     def process_info(self) -> dict[str, t.Any]:
