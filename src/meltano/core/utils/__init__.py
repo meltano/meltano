@@ -570,8 +570,8 @@ def _expand_env_vars(
             for k, v in raw_value.items()
         }
     if isinstance(raw_value, list):
-        if flat:
-            return [ENV_VAR_PATTERN.sub(replacer, v) for v in raw_value]
+        # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
+        # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat)
             if isinstance(v, (str, t.Mapping, list))

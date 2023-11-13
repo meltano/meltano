@@ -170,18 +170,48 @@ def test_expand_env_vars_array():
     assert expand_env_vars(input_array, env) == expected_output
 
 
-def test_expand_env_vars_array_nested():
-    input_array = [
-        {"some_key": "${ENV_VAR_1}"},
-        {"some_key": "${ENV_VAR_2}"},
-    ]
-    env = {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"}
-
-    expected_output = [
-        {"some_key": "substituted_1"},
-        {"some_key": "substituted_2"},
-    ]
-
+@pytest.mark.parametrize(
+    ("input_array", "env", "expected_output"),
+    (
+        pytest.param(
+            [
+                {"some_key": "${ENV_VAR_1}"},
+                {"some_key": "${ENV_VAR_2}"},
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                {"some_key": "substituted_1"},
+                {"some_key": "substituted_2"},
+            ],
+            id="array-of-flat-dicts",
+        ),
+        pytest.param(
+            [
+                {
+                    "some_key": [
+                        {
+                            "some_key": "${ENV_VAR_1}",
+                            "another_key": "${ENV_VAR_2}",
+                        },
+                    ],
+                },
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                {
+                    "some_key": [
+                        {
+                            "some_key": "substituted_1",
+                            "another_key": "substituted_2",
+                        },
+                    ],
+                },
+            ],
+            id="array-of-nested-dicts",
+        ),
+    ),
+)
+def test_expand_env_vars_array_nested(input_array, env, expected_output):
     assert expand_env_vars(input_array, env) == expected_output
 
 
