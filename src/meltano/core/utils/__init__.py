@@ -477,7 +477,12 @@ ENV_VAR_PATTERN = re.compile(
     re.VERBOSE,
 )
 
-Expandable = t.TypeVar("Expandable", str, t.Mapping[str, "Expandable"])
+Expandable = t.TypeVar(
+    "Expandable",
+    str,
+    t.Mapping[str, "Expandable"],
+    t.List["Expandable"],
+)
 
 
 class EnvVarMissingBehavior(IntEnum):
@@ -523,7 +528,7 @@ def expand_env_vars(
     """  # noqa: DAR402
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, t.Mapping)):
+    if not isinstance(raw_value, (str, t.Mapping, list)):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -560,10 +565,19 @@ def _expand_env_vars(
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat)
-            if isinstance(v, (str, t.Mapping))
+            if isinstance(v, (str, t.Mapping, list))
             else v
             for k, v in raw_value.items()
         }
+    if isinstance(raw_value, list):
+        if flat:
+            return [ENV_VAR_PATTERN.sub(replacer, v) for v in raw_value]
+        return [
+            _expand_env_vars(v, replacer, flat)
+            if isinstance(v, (str, t.Mapping, list))
+            else v
+            for v in raw_value
+        ]
     return ENV_VAR_PATTERN.sub(replacer, raw_value)
 
 

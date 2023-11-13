@@ -161,6 +161,30 @@ def test_expand_env_vars_nested():
     assert expand_env_vars(input_dict, env) == expected_output
 
 
+def test_expand_env_vars_array():
+    input_array = ["${ENV_VAR_1}", "${ENV_VAR_2}"]
+    env = {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"}
+
+    expected_output = ["substituted_1", "substituted_2"]
+
+    assert expand_env_vars(input_array, env) == expected_output
+
+
+def test_expand_env_vars_array_nested():
+    input_array = [
+        {"some_key": "${ENV_VAR_1}"},
+        {"some_key": "${ENV_VAR_2}"},
+    ]
+    env = {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"}
+
+    expected_output = [
+        {"some_key": "substituted_1"},
+        {"some_key": "substituted_2"},
+    ]
+
+    assert expand_env_vars(input_array, env) == expected_output
+
+
 def test_remove_suffix():
     assert remove_suffix("a_string", "ing") == "a_str"
     assert remove_suffix("a_string", "in") == "a_string"
