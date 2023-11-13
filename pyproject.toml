@@ -99,16 +99,16 @@ s3 = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-black = "^23.10.1"
-boto3-stubs = {extras = ["essential"], version = "1.28.78"}
+black = "^23.11.0"
+boto3-stubs = {extras = ["essential"], version = "1.28.84"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.3.2"}
 freezegun = "^1.2.2"
-hypothesis = "^6.88.3"
+hypothesis = "^6.88.4"
 mock = "^5.0.2"
-moto = "^4.2.7"
-mypy = "^1.6.1"
+moto = "^4.2.8"
+mypy = "^1.7.0"
 pre-commit = "^3.5.0"
 pytest = "^7.4.3"
 pytest-asyncio = "^0.21.1"
@@ -119,7 +119,7 @@ pytest-order = "^1.0"
 pytest-randomly = "^3.12"
 pytest-rerunfailures = "^12.0"
 pytest-structlog = "^0.6"
-pytest-xdist = "^3.3"
+pytest-xdist = "^3.4"
 requests-mock = "^1.11.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
 types-croniter = "^2.0.0"
