@@ -3,7 +3,7 @@ title: Meltano Cloud
 description: Information about Meltano Cloud Concepts.
 layout: doc
 toc: false
-hidden: false
+hidden: true
 ---
 
 :::info
