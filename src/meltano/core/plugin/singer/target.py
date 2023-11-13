@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import typing as t
-from datetime import datetime
+from datetime import datetime, timezone
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
@@ -86,7 +86,9 @@ class BookmarkWriter:
                 "incremental state has not been updated",
             )
         else:
-            logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")  # noqa: G004
+            logger.info(
+                f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004
+            )
             logger.debug(f"Incremental state: {new_state}")  # noqa: G004
 
 

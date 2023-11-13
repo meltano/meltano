@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import datetime
 import json
 import os
@@ -17,7 +18,7 @@ from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.blob._models import BlobProperties  # noqa: WPS436
 from boto3 import client
 from botocore.stub import Stubber
-from dateutil.tz import tzutc
+from freezegun import freeze_time
 from google.api_core.exceptions import NotFound as GCSNotFound
 from google.cloud.storage import Blob, Bucket
 
@@ -125,6 +126,19 @@ class TestLocalFilesystemStateStoreManager:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
         with subject.acquire_lock("acquire_lock"):
             assert os.path.exists(os.path.join(dir_path, "lock"))
+
+    def test_lock_timeout(self, subject: LocalFilesystemStateStoreManager):
+        state_id = "is_locked"
+        timeout = subject.lock_timeout_seconds
+
+        initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
+        with freeze_time(initial_dt) as frozen_datetime, subject.acquire_lock(state_id):
+            frozen_datetime.tick(datetime.timedelta(seconds=timeout / 2))
+            assert subject.is_locked(state_id)
+
+            frozen_datetime.tick(datetime.timedelta(seconds=timeout))
+            with contextlib.suppress(PermissionError):
+                assert not subject.is_locked(state_id)
 
     @pytest.mark.usefixtures("state_path")
     def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager):
@@ -445,7 +459,7 @@ class TestS3StateStoreManager:
                         15,
                         26,
                         173000,
-                        tzinfo=tzutc(),
+                        tzinfo=datetime.timezone.utc,
                     ),
                     "ETag": '"test_get_state_ids"',
                     "Size": 60,
@@ -465,7 +479,7 @@ class TestS3StateStoreManager:
                         15,
                         12,
                         450000,
-                        tzinfo=tzutc(),
+                        tzinfo=datetime.timezone.utc,
                     ),
                     "ETag": '"test_get_state_ids"',
                     "Size": 60,
