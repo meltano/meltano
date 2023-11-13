@@ -4,6 +4,7 @@ description: Information about Meltano Cloud Concepts.
 layout: doc
 toc: false
 hidden: true
+sidebar_class_name: hidden
 ---
 
 :::info

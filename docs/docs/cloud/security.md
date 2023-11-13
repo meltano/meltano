@@ -3,6 +3,7 @@ title: "Security"
 description: Details the security stature of Meltano Cloud
 layout: doc
 sidebar_position: 6
+sidebar_class_name: hidden
 ---
 
 :::info
