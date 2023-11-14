@@ -209,6 +209,18 @@ def test_expand_env_vars_array():
             ],
             id="array-of-nested-dicts",
         ),
+        pytest.param(
+            [
+                "${ENV_VAR_1}",
+                "${ENV_VAR_2}",
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                "substituted_1",
+                "substituted_2",
+            ],
+            id="flat-array",
+        ),
     ),
 )
 def test_expand_env_vars_array_nested(input_array, env, expected_output):
