@@ -469,6 +469,42 @@ export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
   </TabItem>
 </Tabs>
 
+
+If the extractor uses a dot character within stream names, you can escape it with a backslash (`\`). For example, if the extractor has a stream named `animals.data`, you can select fields using the following configuration:
+
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
+
+```yaml
+extractors:
+- name: tap-smoke-test
+  select:
+  - "animals\\.data.id"     # Use double backslash to escape the dot in quoted strings
+  - animals\.data.verified  # Use single backslash to escape the dot in unquoted strings
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="terminal" label="terminal">
+
+```bash
+meltano config tap-smoke-test set _select '["animals\\.data.id","animals\\.data.verified"]'
+
+meltano select tap-smoke-test 'animals\.data' id
+meltano select tap-smoke-test 'animals\.data' verified
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env">
+
+```bash
+export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
+```
+
+  </TabItem>
+</Tabs>
+
+
 #### <a name="select-filter-extra"></a>`select_filter` extra
 
 - Setting: `_select_filter`

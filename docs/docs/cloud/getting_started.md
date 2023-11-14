@@ -3,6 +3,7 @@ title: "Getting Started (Cloud)"
 description: Cloud Getting Started Guide
 layout: doc
 sidebar_position: 1
+sidebar_class_name: hidden
 ---
 
 :::info

@@ -3,6 +3,7 @@ title: "Concepts"
 description: Details the concepts of Meltano Cloud
 layout: doc
 sidebar_position: 3
+sidebar_class_name: hidden
 ---
 
 :::info

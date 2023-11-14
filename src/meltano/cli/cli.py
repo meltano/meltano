@@ -4,12 +4,16 @@ from __future__ import annotations
 
 import logging
 import os
+import platform
 import sys
 import typing as t
 from pathlib import Path
 
 import click
 
+from meltano import (
+    __version__,
+)
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
@@ -108,6 +112,7 @@ def cli(  # noqa: C901,WPS231
     try:
         project = Project.find()
         setup_logging(project)
+        logger.debug("meltano %s, %s", __version__, platform.system())  # noqa: WPS323
         if project.readonly:
             logger.debug("Project is read-only.")
 

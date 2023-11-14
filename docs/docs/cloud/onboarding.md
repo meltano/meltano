@@ -3,6 +3,7 @@ title: "Onboarding"
 description: Details the onboarding process of Meltano Cloud
 layout: doc
 sidebar_position: 2
+sidebar_class_name: hidden
 ---
 
 :::info
