@@ -161,15 +161,6 @@ def test_expand_env_vars_nested():
     assert expand_env_vars(input_dict, env) == expected_output
 
 
-def test_expand_env_vars_array():
-    input_array = ["${ENV_VAR_1}", "${ENV_VAR_2}"]
-    env = {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"}
-
-    expected_output = ["substituted_1", "substituted_2"]
-
-    assert expand_env_vars(input_array, env) == expected_output
-
-
 @pytest.mark.parametrize(
     ("input_array", "env", "expected_output"),
     (
