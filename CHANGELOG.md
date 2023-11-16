@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.2.0b0 (2023-11-16)
+
+### ✨ New
+
+- [#8184](https://github.com/meltano/meltano/issues/8184) Log Meltano version and Operating System at invocation of CLI -- _**Thanks @ashu565!**_
+- [#8228](https://github.com/meltano/meltano/issues/8228) Support setting configuration from files and STDIN -- _**Thanks @XshubhamX!**_
+- [#8194](https://github.com/meltano/meltano/issues/8194) Allow escaping stream names with periods in `select` rules
+- [#8241](https://github.com/meltano/meltano/issues/8241) Support Python 3.12
+- [#8215](https://github.com/meltano/meltano/issues/8215) Support authenticating to Azure state backend without a connection string -- _**Thanks @XshubhamX!**_
+
+### 🐛 Fixes
+
+- [#8249](https://github.com/meltano/meltano/issues/8249) Display special characters in column names in the output of `meltano select --list`
+- [#8227](https://github.com/meltano/meltano/issues/8227) Validate input to settings with `kind: options`
+- [#8232](https://github.com/meltano/meltano/issues/8232) Interval validation for `meltano schedule set` -- _**Thanks @XshubhamX!**_
+- [#8225](https://github.com/meltano/meltano/issues/8225) Redirect tap's stderr to /dev/null during a configuration test -- _**Thanks @raiatul14!**_
+
+### 📚 Documentation Improvements
+
+- [#8267](https://github.com/meltano/meltano/issues/8267) Add Q4 Changelog
+- [#8260](https://github.com/meltano/meltano/issues/8260) Add information about database schema destination -- _**Thanks @EChaffraix!**_
+- [#8259](https://github.com/meltano/meltano/issues/8259) Fix links in v3 migration guide
+- [#8251](https://github.com/meltano/meltano/issues/8251) Fix dbt model in part3.mdx -- _**Thanks @diegoquintanav!**_
+- [#8214](https://github.com/meltano/meltano/issues/8214) Document other supported ways of configuring an S3 endpoint URL
+- [#8211](https://github.com/meltano/meltano/issues/8211) Sync sidebar order with index page link-lists, remove broken /index links -- _**Thanks @mjsqu!**_
+- [#8209](https://github.com/meltano/meltano/issues/8209) Remove broken link (reference/index) and order links to match sidebar -- _**Thanks @mjsqu!**_
+- [#8210](https://github.com/meltano/meltano/issues/8210) Add tabs for all remaining env/cli/config settings -- _**Thanks @mjsqu!**_
+- [#8201](https://github.com/meltano/meltano/issues/8201) Use tabs for examples on settings page -- _**Thanks @mjsqu!**_
+- [#8200](https://github.com/meltano/meltano/issues/8200) Update contribution guidelines -- _**Thanks @mjsqu!**_
+- [#8155](https://github.com/meltano/meltano/issues/8155) Add september changelog
+
 ## v3.1.0 (2023-09-26)
 
 ### ✨ New
