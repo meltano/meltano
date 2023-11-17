@@ -11,6 +11,7 @@ import structlog
 import yaml
 
 from meltano.core import bundle
+from meltano.core.behavior.pluggable import Pluggable
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
@@ -20,8 +21,10 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class ConfigService:
+class ConfigService(Pluggable[SettingDefinition]):  # noqa: WPS214
     """Service to manage meltano.yml."""
+
+    settings_plugins: Pluggable[SettingDefinition] = Pluggable("meltano.settings")
 
     def __init__(self, project: Project):
         """Create a new project configuration service.
@@ -40,7 +43,12 @@ class ConfigService:
         """
         with open(str(bundle.root / "settings.yml")) as settings_yaml:
             settings_yaml_content = yaml.safe_load(settings_yaml)
-        return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
+
+        builtin = [
+            SettingDefinition.parse(x) for x in settings_yaml_content["settings"]
+        ]
+        plugged = list(self.settings_plugins.get_all_meltano_plugins().values())
+        return builtin + plugged
 
     @cached_property
     def current_meltano_yml(self) -> MeltanoFile:
