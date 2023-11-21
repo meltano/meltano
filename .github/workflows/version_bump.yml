@@ -73,6 +73,7 @@ jobs:
       id: create-pull-request
       with:
         # https://github.com/peter-evans/create-pull-request
+        token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
         commit-message: "chore: Bump package version"
         title: "chore: Release v${{ steps.cz-bump.outputs.version }}"
         body: |
@@ -80,11 +81,3 @@ jobs:
         branch: release/v${{ steps.cz-bump.outputs.version }}
         base: main
         labels: release
-
-    - name: Approve Pull Request
-      if: ${{ steps.create-pull-request.outputs.pull-request-number != 0 }}
-      uses: juliangruber/approve-pull-request-action@v2.0.4
-      with:
-        # https://github.com/juliangruber/approve-pull-request-action
-        github-token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
-        number: ${{ steps.create-pull-request.outputs.pull-request-number }}
