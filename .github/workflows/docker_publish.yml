@@ -28,6 +28,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: write
       security-events: write
     env:
       DEFAULT_PYTHON: "3.9"  # will be used in 'latest' images
