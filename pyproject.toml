@@ -47,7 +47,7 @@ azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.5", optional = true}
 azure-identity = {version = "^1.15.0", optional = true}
 azure-storage-blob = {version = "^12.19.0", optional = true}
-boto3 = {version = "^1.29.3", optional = true}
+boto3 = {version = "^1.29.7", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -86,7 +86,7 @@ typing-extensions = "^4.8.0"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-virtualenv = "^20.24.6"
+virtualenv = "^20.24.7"
 yaspin = "^2.3.0"
 
 [tool.poetry.extras]
