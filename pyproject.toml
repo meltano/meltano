@@ -76,7 +76,7 @@ questionary = "^2.0.1"
 requests = "^2.31.0"
 rich = "^13.7.0"
 "ruamel.yaml" = "^0.17.21"
-setuptools = {version = "^68.2.2", python = ">=3.12"}
+setuptools = {version = "^69.0.2", python = ">=3.12"}
 smart-open = "^6.4.0"
 snowplow-tracker = "^1.0.1"
 sqlalchemy = "^2.0.23"
