@@ -1,10 +1,13 @@
 """Service for managing task sets (aka jobs)."""
 from __future__ import annotations
 
+import typing as t
+
 import structlog
 
-from meltano.core.project import Project
-from meltano.core.task_sets import TaskSets
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+    from meltano.core.task_sets import TaskSets
 
 logger = structlog.getLogger(__name__)
 

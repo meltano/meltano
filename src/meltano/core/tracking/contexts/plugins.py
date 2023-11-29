@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as t
 import uuid
 
 from snowplow_tracker import SelfDescribingJson
@@ -9,10 +10,12 @@ from structlog.stdlib import get_logger
 
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
-from meltano.core.elt_context import ELTContext
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.tracking.schemas import PluginsContextSchema
 from meltano.core.utils import hash_sha256, safe_hasattr
+
+if t.TYPE_CHECKING:
+    from meltano.core.elt_context import ELTContext
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 logger = get_logger(__name__)
 

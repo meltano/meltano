@@ -7,12 +7,15 @@ import platform
 import subprocess
 import sys
 import typing as t
-from collections.abc import Mapping
 from pathlib import Path
 
-from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
 from meltano.core.tracking import Tracker
+
+if t.TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from meltano.core.project import Project
 
 MELTANO_COMMAND = "meltano"
 

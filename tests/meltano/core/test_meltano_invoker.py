@@ -4,6 +4,7 @@ import os
 import platform
 import subprocess
 import sys
+import typing as t
 from pathlib import Path
 
 import mock
@@ -11,8 +12,10 @@ import pytest
 
 import meltano
 from meltano.core.meltano_invoker import MELTANO_COMMAND, MeltanoInvoker
-from meltano.core.project import Project
 from meltano.core.tracking.contexts import environment_context
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class TestMeltanoInvoker:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as t
 import uuid
 from enum import Enum, auto
 from functools import cached_property
@@ -9,9 +10,11 @@ from functools import cached_property
 from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
-from meltano.core.project import Project
 from meltano.core.tracking.schemas import ProjectContextSchema
 from meltano.core.utils import hash_sha256
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 

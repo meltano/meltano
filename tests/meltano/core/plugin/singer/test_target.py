@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
-from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+
+if t.TYPE_CHECKING:
+    from meltano.core.project_add_service import ProjectAddService
 
 
 class TestSingerTarget:

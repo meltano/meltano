@@ -1,11 +1,14 @@
 """StateStoreManager for Google Cloud storage backend."""
 from __future__ import annotations
 
-from collections.abc import Iterator
+import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
 from meltano.core.state_store.filesystem import CloudStateStoreManager
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterator
 
 GOOGLE_INSTALLED = True
 

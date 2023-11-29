@@ -6,11 +6,14 @@ import copy
 import json
 import typing as t
 from functools import lru_cache
-from os import PathLike
 
 import yaml
-from ruamel.yaml import Representer
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
+
+if t.TYPE_CHECKING:
+    from os import PathLike
+
+    from ruamel.yaml import Representer
 
 T = t.TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
 

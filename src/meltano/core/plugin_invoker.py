@@ -9,22 +9,25 @@ import os
 import typing as t
 import uuid
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from structlog.stdlib import get_logger
 
 from meltano.core.container.container_service import ContainerService
 from meltano.core.error import Error
-from meltano.core.logging.utils import SubprocessOutputWriter
-from meltano.core.plugin import PluginRef
 from meltano.core.plugin.config_service import PluginConfigService
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.logging.utils import SubprocessOutputWriter
+    from meltano.core.plugin import PluginRef
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 logger = get_logger(__name__)
 

@@ -3,18 +3,22 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+import typing as t
 
 import mock
 import pytest
-from click.testing import CliRunner
 from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import ProjectPluginsService
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 @pytest.fixture(scope="class")

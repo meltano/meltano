@@ -3,16 +3,19 @@ from __future__ import annotations
 import json
 import platform
 import shutil
+import typing as t
 
 import boto3
 import mock
 import pytest
-from click.testing import CliRunner
 from moto import mock_s3
 
 import meltano
 from asserts import assert_cli_runner
 from meltano.cli import cli
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
 
 
 class TestCliUpgrade:

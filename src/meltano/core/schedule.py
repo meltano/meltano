@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import datetime
 import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
+
+if t.TYPE_CHECKING:
+    import datetime
 
 CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,

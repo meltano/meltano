@@ -5,15 +5,17 @@ from __future__ import annotations
 import typing as t
 from collections import namedtuple
 
-from sqlalchemy.orm import Session
-
-from meltano.core.job import Job
-from meltano.core.logging.output_logger import OutputLogger
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from meltano.core.job import Job
+    from meltano.core.logging.output_logger import OutputLogger
+    from meltano.core.project import Project
 
 
 class PluginContext(

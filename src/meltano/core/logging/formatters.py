@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import typing as t
-from types import TracebackType
 
 import click
 import structlog
 from rich.console import Console
 from rich.traceback import Traceback, install
-from structlog.types import Processor
 
 from meltano.core.utils import get_no_color_flag
+
+if t.TYPE_CHECKING:
+    from types import TracebackType
+
+    from structlog.types import Processor
 
 install(suppress=[click])
 

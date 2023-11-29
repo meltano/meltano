@@ -589,6 +589,7 @@ select = [
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
   "TID", # flake8-tidy-imports
+  "TCH", # flake8-type-checking
 ]
 
 [tool.ruff.per-file-ignores]
