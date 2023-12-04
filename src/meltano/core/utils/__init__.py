@@ -481,7 +481,7 @@ Expandable = t.TypeVar(
     "Expandable",
     str,
     t.Mapping[str, "Expandable"],
-    t.List["Expandable"],
+    t.Sequence["Expandable"],
 )
 
 
