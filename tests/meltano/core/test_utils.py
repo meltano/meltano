@@ -161,6 +161,63 @@ def test_expand_env_vars_nested():
     assert expand_env_vars(input_dict, env) == expected_output
 
 
+@pytest.mark.parametrize(
+    ("input_array", "env", "expected_output"),
+    (
+        pytest.param(
+            [
+                {"some_key": "${ENV_VAR_1}"},
+                {"some_key": "${ENV_VAR_2}"},
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                {"some_key": "substituted_1"},
+                {"some_key": "substituted_2"},
+            ],
+            id="array-of-flat-dicts",
+        ),
+        pytest.param(
+            [
+                {
+                    "some_key": [
+                        {
+                            "some_key": "${ENV_VAR_1}",
+                            "another_key": "${ENV_VAR_2}",
+                        },
+                    ],
+                },
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                {
+                    "some_key": [
+                        {
+                            "some_key": "substituted_1",
+                            "another_key": "substituted_2",
+                        },
+                    ],
+                },
+            ],
+            id="array-of-nested-dicts",
+        ),
+        pytest.param(
+            [
+                "${ENV_VAR_1}",
+                "${ENV_VAR_2}",
+            ],
+            {"ENV_VAR_1": "substituted_1", "ENV_VAR_2": "substituted_2"},
+            [
+                "substituted_1",
+                "substituted_2",
+            ],
+            id="flat-array",
+        ),
+    ),
+)
+def test_expand_env_vars_array_nested(input_array, env, expected_output):
+    assert expand_env_vars(input_array, env) == expected_output
+
+
 def test_remove_suffix():
     assert remove_suffix("a_string", "ing") == "a_str"
     assert remove_suffix("a_string", "in") == "a_string"
