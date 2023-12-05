@@ -63,7 +63,7 @@ psutil = "^6.0.0"
 psycopg = {version = "^3.2.3", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
 pymssql = {version = "^2.3.1", optional = true}
-python = ">=3.8,<3.13"
+python = ">=3.8,<3.14"
 python-dotenv = "^1.0.1"
 pyyaml = "^6.0.2"
 requests = "^2.32.3"
