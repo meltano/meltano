@@ -98,7 +98,6 @@ def cli(  # noqa: C901,WPS231
         ProjectSettingsService.config_override["cli.log_config"] = log_config
 
     ctx.obj["explicit_no_environment"] = no_environment
-
     no_color = get_no_color_flag()
     if no_color:
         ctx.color = False

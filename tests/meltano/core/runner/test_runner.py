@@ -157,12 +157,16 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio()
     @pytest.mark.parametrize(
-        ("full_refresh", "select_filter", "payload_flag"),
+        ("full_refresh", "merge_state", "select_filter", "payload_flag"),
         (
-            (False, [], Payload.STATE),
-            (True, [], Payload.STATE),
-            (False, ["entity"], Payload.STATE),
-            (True, ["entity"], Payload.INCOMPLETE_STATE),
+            (False, False, [], Payload.STATE),
+            (True, False, [], Payload.STATE),
+            (False, False, ["entity"], Payload.STATE),
+            (True, False, ["entity"], Payload.INCOMPLETE_STATE),
+            (False, True, [], Payload.INCOMPLETE_STATE),
+            (True, True, [], Payload.INCOMPLETE_STATE),
+            (False, True, ["entity"], Payload.INCOMPLETE_STATE),
+            (True, True, ["entity"], Payload.INCOMPLETE_STATE),
         ),
     )
     async def test_bookmark(
@@ -177,6 +181,7 @@ class TestSingerRunner:
         select_filter,
         payload_flag,
         elt_context,
+        merge_state,
     ):
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -188,6 +193,7 @@ class TestSingerRunner:
 
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter
+        subject.context.merge_state = merge_state
 
         target_invoker = plugin_invoker_factory(
             target,

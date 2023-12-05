@@ -65,6 +65,11 @@ logger = structlog.getLogger(__name__)
     "--state-id-suffix",
     help="Define a custom suffix to autogenerate state IDs with.",
 )
+@click.option(
+    "--merge-state",
+    is_flag=True,
+    help="Merges state with that of previous runs.",
+)
 @click.argument(
     "blocks",
     nargs=-1,
@@ -80,6 +85,7 @@ async def run(
     no_state_update: bool,
     force: bool,
     state_id_suffix: str,
+    merge_state: bool,
     blocks: list[str],
 ):
     """
@@ -116,10 +122,11 @@ async def run(
             logger,
             project,
             blocks,
-            full_refresh,
-            no_state_update,
-            force,
-            state_id_suffix,
+            full_refresh=full_refresh,
+            no_state_update=no_state_update,
+            force=force,
+            state_id_suffix=state_id_suffix,
+            merge_state=merge_state,
         )
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
