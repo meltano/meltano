@@ -109,9 +109,17 @@ def pytest_meltano(session: Session) -> None:
     elif backend_db == "postgresql_psycopg3":
         extras.append("postgres")
 
+    install_env = {}
+
+    # TODO: Remove this once PyO3 supports Python 3.13
+    # https://github.com/PyO3/pyo3/issues/4038
+    if session.python == "3.13":
+        install_env["PYO3_USE_ABI3_FORWARD_COMPATIBILITY"] = "1"
+
     session.install(
         f".[{','.join(extras)}]",
         *pytest_deps,
+        env=install_env,
     )
     _run_pytest(session)
 
