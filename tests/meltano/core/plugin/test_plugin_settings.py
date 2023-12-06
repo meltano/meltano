@@ -273,7 +273,7 @@ class TestPluginSettingsService:
 
         config = subject.as_dict(process=True)
         assert config["auth"]["username"] == "nested_username"
-        assert config["auth"]["password"] == "nested_password"
+        assert config["auth"]["password"] == "nested_password"  # noqa: S105
         assert "auth.username" not in config
         assert "auth.password" not in config
 

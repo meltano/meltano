@@ -426,7 +426,7 @@ class TestCliEltScratchpadOne:
             # lines not found in the log.
             # we already test the redirect handler in test_output_logger,
             # so we'll just verify that the # of lines matches.
-            log_diff = 1 if command == "el" else 2
+            log_diff = 2 if command == "el" else 3
             assert len(log.splitlines()) == len(full_result.splitlines()) - log_diff
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log

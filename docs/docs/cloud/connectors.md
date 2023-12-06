@@ -3,6 +3,7 @@ title: "Connectors"
 description: Details the Meltano Connector Quality Standards
 layout: doc
 sidebar_position: 5
+sidebar_class_name: hidden
 ---
 
 ## Connector Maintainers

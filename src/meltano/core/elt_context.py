@@ -95,6 +95,7 @@ class ELTContext:  # noqa: WPS230
         catalog: str | None = None,
         state: str | None = None,
         base_output_logger: OutputLogger | None = None,
+        merge_state: bool | None = False,
     ):
         """Initialise ELT Context instance.
 
@@ -113,6 +114,7 @@ class ELTContext:  # noqa: WPS230
             catalog: Catalog to pass to extractor.
             state: State to pass to extractor.
             base_output_logger: OutputLogger to use.
+            merge_state: Flag. Merges State at the end of run
         """
         self.project = project
         self.job = job
@@ -131,6 +133,7 @@ class ELTContext:  # noqa: WPS230
         self.state = state
 
         self.base_output_logger = base_output_logger
+        self.merge_state = merge_state
 
     @property
     def elt_run_dir(self):
@@ -217,6 +220,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._catalog = None
         self._state = None
         self._base_output_logger = None
+        self._merge_state = False
 
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.
@@ -330,6 +334,18 @@ class ELTContextBuilder:  # noqa: WPS214
             Updated ELTContextBuilder instance.
         """
         self._full_refresh = full_refresh
+        return self
+
+    def with_merge_state(self, merge_state: bool):
+        """Set whether the state is to be merged or overwritten.
+
+        Args:
+            merge_state: Merges the state at the end of run.
+
+        Returns:
+            Updated ELTContextBuilder instance.
+        """
+        self._merge_state = merge_state
         return self
 
     def with_select_filter(self, select_filter: list[str]) -> ELTContextBuilder:
@@ -486,4 +502,5 @@ class ELTContextBuilder:  # noqa: WPS214
             catalog=self._catalog,
             state=self._state,
             base_output_logger=self._base_output_logger,
+            merge_state=self._merge_state,
         )

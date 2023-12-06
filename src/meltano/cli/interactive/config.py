@@ -240,7 +240,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
-                    "New value",
+                    "New value (redacted)",
                     default="",
                     show_default=False,
                     hide_input=True,

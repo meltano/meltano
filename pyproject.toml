@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "3.1.0"
+version = "3.2.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -13,6 +13,7 @@ classifiers = [
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
@@ -40,14 +41,13 @@ homepage = "https://meltano.com"
 
 [tool.poetry.dependencies]
 aiodocker = "^0.21.0"
-aiohttp = "^3.8.6"
-alembic = "^1.12.1"
+alembic = "^1.13.0"
 atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.29.5", optional = true}
 azure-identity = {version = "^1.15.0", optional = true}
-azure-storage-blob = {version = "^12.18.3", optional = true}
-boto3 = {version = "^1.28.73", optional = true}
+azure-storage-blob = {version = "^12.19.0", optional = true}
+boto3 = {version = "^1.33.6", optional = true}
 check-jsonschema = "^0.22.0"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -56,17 +56,17 @@ croniter = "^2.0.1"
 fasteners = "^0.19"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
-importlib-resources = "^6.1.0"
+importlib-resources = "^6.1.1"
 jinja2 = "^3.1.2"
-jsonschema = "^4.19"
+jsonschema = "^4.20"
 packaging = "^23.2"
 platformdirs = "^3.11.0"
 psutil = "^5.9.6"
-psycopg = {version = "^3.1.12", extras = ["binary"], optional = true}
+psycopg = {version = "^3.1.14", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
 pyjwt = "^2.6.0"
-pymssql = {version = "^2.2.10", optional = true}
-python = ">=3.8,<3.12"
+pymssql = {version = "^2.2.11", optional = true}
+python = ">=3.8,<3.13"
 python-dateutil = "^2.8.2"
 python-dotenv = "^1.0.0"
 python-slugify = "^8.0.1"
@@ -74,18 +74,19 @@ python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
 questionary = "^2.0.1"
 requests = "^2.31.0"
-rich = "^13.6.0"
+rich = "^13.7.0"
 "ruamel.yaml" = "^0.17.21"
+setuptools = {version = "^69.0.2", python = ">=3.12"}
 smart-open = "^6.4.0"
 snowplow-tracker = "^1.0.1"
-sqlalchemy = "^2.0.22"
+sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
 tabulate = "^0.9.0"
 typing-extensions = "^4.8.0"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-virtualenv = "^20.24.6"
+virtualenv = "^20.25.0"
 yaspin = "^2.3.0"
 
 [tool.poetry.extras]
@@ -98,32 +99,31 @@ s3 = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-black = "^23.10.1"
-boto3-stubs = {extras = ["essential"], version = "1.28.73"}
+black = "^23.11.0"
+boto3-stubs = {extras = ["essential"], version = "1.33.6"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = "^7.3.2"}
-freezegun = "^1.2.2"
-hypothesis = "^6.88.1"
+freezegun = "^1.3.0"
+hypothesis = "^6.91.0"
 mock = "^5.0.2"
-moto = "^4.2.7"
-mypy = "^1.6.1"
+moto = "^4.2.11"
+mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 pytest = "^7.4.3"
-pytest-aiohttp = "^1.0.5"
-pytest-asyncio = "^0.21.1"
+pytest-asyncio = "^0.23.2"
 pytest-cov = "^4.1.0"
 pytest-docker = "^2.0"
 pytest-httpserver = "^1.0.6"
-pytest-order = "^1.0"
+pytest-order = "^1.2"
 pytest-randomly = "^3.12"
-pytest-rerunfailures = "^12.0"
+pytest-rerunfailures = "^13.0"
 pytest-structlog = "^0.6"
-pytest-xdist = "^3.3"
+pytest-xdist = "^3.5"
 requests-mock = "^1.11.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
 types-croniter = "^2.0.0"
-types-jsonschema = "^4.19.0.3"
+types-jsonschema = "^4.20.0.0"
 types-psutil = "^5.9.5.17"
 types-python-dateutil = "^2.8.19.14"
 types-python-slugify = "^8.0.0.2"
@@ -169,10 +169,7 @@ statistics = true
   "-*",
 ]
 "flake8-bandit" = [
-  "+*",
-  "-S404", # Allow subprocess module to be used
-  "-S310", # Allow `urllib.open`
-  "-S603", # Allow `subprocess.run(..., shell=False)`
+  "-*",
 ]
 "flake8-string-format" = [
   "-P101", # Allow format strings with unindex parameters (because the pyupgrade pre-commit hook enforces their usage)
@@ -254,9 +251,6 @@ pyflakes = [
 ]
 
 [tool.flakeheaven.exceptions."*tests/*"]
-"flake8-bandit" = [
-  "-S101", # Don't warn on use of asserts in tests
-]
 # Don't require docstrings in tests
 "flake8-darglint" = [
   "-DAR101",
@@ -476,8 +470,9 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
+prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "3.1.0"
+version = "3.2.0"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
@@ -502,7 +497,30 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = [
-  "meltano.cli.*",
+  "meltano.cli.add",
+  "meltano.cli.cli",
+  "meltano.cli.compile",
+  "meltano.cli.docs",
+  "meltano.cli.dragon",
+  "meltano.cli.elt",
+  "meltano.cli.environment",
+  "meltano.cli.hub",
+  "meltano.cli.initialize",
+  "meltano.cli.install",
+  "meltano.cli.interactive.*",
+  "meltano.cli.invoke",
+  "meltano.cli.job",
+  "meltano.cli.lock",
+  "meltano.cli.params",
+  "meltano.cli.remove",
+  "meltano.cli.run",
+  "meltano.cli.schedule",
+  "meltano.cli.schema",
+  "meltano.cli.select",
+  "meltano.cli.state",
+  "meltano.cli.upgrade",
+  "meltano.cli.utils",
+  "meltano.cli.validate",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
   "meltano.core.elt_context",
@@ -541,7 +559,7 @@ requires = ["poetry-core==1.7.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-target-version = "py37"
+target-version = "py38"
 line-length = 88
 exclude = [
   "src/meltano/migrations/*",
@@ -551,9 +569,12 @@ ignore = [
   "ANN102", # Missing type annotation for `cls` in class method
   "PT004",  # Add leading underscore to fixtures that do not return anything
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
+  "S310",   # Allow `urllib.open`
+  "S603",   # Allow `subprocess.run(..., shell=False)`
 ]
 select = [
   "ARG", # flake8-unused-arguments
+  "S",   # flake8-bandit
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
   "COM", # flake8-commas
@@ -573,6 +594,9 @@ select = [
 [tool.ruff.per-file-ignores]
 "src/meltano/**/__init__.py" = [
   "F401", # Permit unused imports in `__init__.py` files
+]
+"tests/**" = [
+  "S101", # Allow 'assert' in tests
 ]
 
 [tool.ruff.flake8-annotations]
