@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.2.0 (2023-12-05)
+
+## v3.2.0rc1 (2023-12-05)
+
+### ✨ New
+
+- [#8258](https://github.com/meltano/meltano/issues/8258) Add a `--merge-state` flag to `meltano run` to merge the current pipeline state with that of the latest run
+- [#8268](https://github.com/meltano/meltano/issues/8268) Expand environment variables in array setting values
+
+### 🐛 Fixes
+
+- [#8301](https://github.com/meltano/meltano/issues/8301) Interactive config now indicates that you're typing a redacted value -- _**Thanks @abastola0!**_
+
 ## v3.2.0b1 (2023-11-21)
 
 ### ✨ New
