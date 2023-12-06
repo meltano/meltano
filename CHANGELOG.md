@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.2.0 (2023-12-05)
+
 ## v3.2.0rc1 (2023-12-05)
 
 ### ✨ New
