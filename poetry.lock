@@ -335,17 +335,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.33.6"
+version = "1.33.11"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.33.6-py3-none-any.whl", hash = "sha256:b88f0f305186c5fd41f168e006baa45b7002a33029aec8e5bef373237a172fca"},
-    {file = "boto3-1.33.6.tar.gz", hash = "sha256:4f62fc1c7f3ea2d22917aa0aa07b86f119abd90bed3d815e4b52fb3d84773e15"},
+    {file = "boto3-1.33.11-py3-none-any.whl", hash = "sha256:8d54fa3a9290020f9a7f488f9cbe821029de0af05a677751b12973a5f726a5e2"},
+    {file = "boto3-1.33.11.tar.gz", hash = "sha256:620f1eb3e18e780be58383b4a4e10db003d2314131190514153996032c8d932d"},
 ]
 
 [package.dependencies]
-botocore = ">=1.33.6,<1.34.0"
+botocore = ">=1.33.11,<1.34.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.8.2,<0.9.0"
 
@@ -756,13 +756,13 @@ xray = ["mypy-boto3-xray (>=1.33.0,<1.34.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.33.6"
+version = "1.33.11"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.33.6-py3-none-any.whl", hash = "sha256:14282cd432c0683770eee932c43c12bb9ad5730e23755204ad102897c996693a"},
-    {file = "botocore-1.33.6.tar.gz", hash = "sha256:938056bab831829f90e09ecd70dd6b295afd52b1482f5582ee7a11d8243d9661"},
+    {file = "botocore-1.33.11-py3-none-any.whl", hash = "sha256:b46227eb3fa9cfdc8f5a83920ef347e67adea8095830ed265a3373b13b54421f"},
+    {file = "botocore-1.33.11.tar.gz", hash = "sha256:b14b328f902d120de0a09eaa657a9a701c0ceeb711197c2f01ef0523f855086c"},
 ]
 
 [package.dependencies]
@@ -3909,13 +3909,13 @@ files = [
 
 [[package]]
 name = "typing-extensions"
-version = "4.8.0"
+version = "4.9.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "typing_extensions-4.8.0-py3-none-any.whl", hash = "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0"},
-    {file = "typing_extensions-4.8.0.tar.gz", hash = "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"},
+    {file = "typing_extensions-4.9.0-py3-none-any.whl", hash = "sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd"},
+    {file = "typing_extensions-4.9.0.tar.gz", hash = "sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783"},
 ]
 
 [[package]]
@@ -4165,4 +4165,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "365c2f0a84f095c9deccd44a1e5a8023f5f17a1c5cda240b2b3b86b5f51f702b"
+content-hash = "d3a89554cf10d53b55b09db08ba507ad0a69bd2e7276a8ac0cfc567cbddb7977"
