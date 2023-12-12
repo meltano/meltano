@@ -11,7 +11,6 @@ from platform import system
 import mock
 import pytest
 
-from meltano import __file__ as meltano_init_file
 from meltano.cli import cli
 from meltano.core.manifest import manifest
 
@@ -21,7 +20,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
-schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
+schema_path = manifest.MANIFEST_SCHEMA_PATH
 
 
 def check_indent(json_path: Path, indent: int) -> None:

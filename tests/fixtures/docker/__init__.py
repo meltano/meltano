@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from meltano.core.utils.compat import importlib_resources
 
 from .snowplow import SnowplowMicro, snowplow, snowplow_optional, snowplow_session
 
@@ -24,4 +24,4 @@ def docker_compose_file() -> str:
     Returns:
         The absolute path to the `docker-compose.yml` file used by `pytest-docker`.
     """
-    return str(Path(__file__).parent.resolve() / "docker-compose.yml")
+    return str(importlib_resources.files(__package__) / "docker-compose.yml")
