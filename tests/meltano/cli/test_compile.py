@@ -11,7 +11,6 @@ from platform import system
 import mock
 import pytest
 
-from meltano import __file__ as meltano_init_file
 from meltano.cli import cli
 from meltano.core.manifest import manifest
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
@@ -22,7 +21,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
-schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
+schema_path = manifest.MANIFEST_SCHEMA_PATH
 
 SECURE_VALUE = "a-very-secure-value"
 
