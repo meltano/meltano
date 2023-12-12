@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from meltano.core.utils.compat import importlib_resources
 
-root = Path(__file__).resolve().parent
+root = importlib_resources.files(__package__)

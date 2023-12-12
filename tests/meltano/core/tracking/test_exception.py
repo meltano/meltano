@@ -12,21 +12,22 @@ from platform import python_version_tuple
 import pytest
 from jsonschema import ValidationError, validate
 
-from meltano.core.tracking import __file__ as tracking_module_path
+from meltano.core import tracking
 from meltano.core.tracking.contexts import ExceptionContext
 from meltano.core.utils import hash_sha256
+from meltano.core.utils.compat import importlib_resources
 
 THIS_FILE_BASENAME = Path(__file__).name
 
-with open(
-    Path(tracking_module_path).parent
+with (
+    importlib_resources.files(tracking)
     / "iglu-client-embedded"
     / "schemas"
     / "com.meltano"
     / "exception_context"
     / "jsonschema"
-    / "1-0-0",
-) as exception_context_schema_file:
+    / "1-0-0"
+).open() as exception_context_schema_file:
     EXCEPTION_CONTEXT_SCHEMA = json.load(exception_context_schema_file)
 
 

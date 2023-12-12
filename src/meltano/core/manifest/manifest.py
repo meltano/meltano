@@ -10,14 +10,13 @@ from collections import defaultdict
 from contextlib import suppress
 from functools import cached_property, reduce
 from operator import getitem
-from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 import flatten_dict  # type: ignore
 import structlog
 import yaml
 
-from meltano import __file__ as package_root_path
+from meltano import schemas
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
@@ -29,10 +28,12 @@ from meltano.core.utils import (
     expand_env_vars,
     get_no_color_flag,
 )
+from meltano.core.utils.compat import importlib_resources
 
 if t.TYPE_CHECKING:
     import sys
     from collections.abc import Iterable
+    from pathlib import Path
 
     from meltano.core.plugin.base import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -56,9 +57,7 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 JSON_LOCATION_PATTERN = re.compile(r"\.|(\[\])")
-MANIFEST_SCHEMA_PATH = (
-    Path(package_root_path).parent / "schemas" / "meltano.schema.json"
-)
+MANIFEST_SCHEMA_PATH = importlib_resources.files(schemas) / "meltano.schema.json"
 
 Trie: TypeAlias = t.Dict[str, "Trie"]
 PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
@@ -141,7 +140,7 @@ class Manifest:  # noqa: WPS214
         self._meltano_file = self.project.meltanofile.read_text()
         self.path = path
         self.check_schema = check_schema
-        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
+        with MANIFEST_SCHEMA_PATH.open() as manifest_schema_file:
             manifest_schema = json.load(manifest_schema_file)
         self._env_locations = meltano_config_env_locations(manifest_schema)
 
