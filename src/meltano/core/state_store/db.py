@@ -1,12 +1,16 @@
 """StateStoreManager for systemdb state backend."""
 from __future__ import annotations
 
+import typing as t
+
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import merge
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 class DBStateStoreManager(StateStoreManager):

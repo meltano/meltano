@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import typing as t
-from collections import Counter
 
 import mock
-from click.testing import CliRunner
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.project import Project
 
 if t.TYPE_CHECKING:
+    from collections import Counter
+
+    from click.testing import CliRunner
     from requests_mock import Mocker as RequestsMocker
+
+    from meltano.core.project import Project
 
 
 class TestCliHub:

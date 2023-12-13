@@ -14,7 +14,6 @@ import mock
 import pytest
 from snowplow_tracker import Emitter, SelfDescribing
 
-from meltano.core.project import Project
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
@@ -24,6 +23,7 @@ from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
     from fixtures.docker import SnowplowMicro
+    from meltano.core.project import Project
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:

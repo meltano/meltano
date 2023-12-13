@@ -9,11 +9,9 @@ import os
 import re
 import typing as t
 import uuid
-from collections.abc import Mapping
 from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
-from pathlib import Path
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -23,7 +21,6 @@ from psutil import Process
 from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
 
-from meltano.core.project import Project
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -33,6 +30,10 @@ from meltano.core.tracking.schemas import (
 from meltano.core.utils import format_exception
 
 if t.TYPE_CHECKING:
+    from collections.abc import Mapping
+    from pathlib import Path
+
+    from meltano.core.project import Project
     from meltano.core.tracking.contexts import (  # noqa: F401
         CliEvent,
         EnvironmentContext,

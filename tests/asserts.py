@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import traceback
+import typing as t
 
-from click.testing import Result
+if t.TYPE_CHECKING:
+    from click.testing import Result
 
 
 def assert_cli_runner(results: Result, message=None):

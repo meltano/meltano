@@ -5,6 +5,7 @@ import platform
 import re
 import shutil
 import subprocess
+import typing as t
 from pathlib import Path
 from time import perf_counter_ns
 
@@ -16,13 +17,15 @@ from structlog.stdlib import get_logger
 
 import meltano
 from asserts import assert_cli_runner
-from fixtures.cli import MeltanoCliRunner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
+
+if t.TYPE_CHECKING:
+    from fixtures.cli import MeltanoCliRunner
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 

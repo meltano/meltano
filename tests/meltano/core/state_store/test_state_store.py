@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import shutil
-from pathlib import Path
+import typing as t
 
 import pytest
 from azure.identity import DefaultAzureCredential
@@ -11,7 +11,6 @@ from azure.storage.blob._shared.authentication import (  # noqa: WPS436
 )
 
 from meltano.core.error import MeltanoError
-from meltano.core.project import Project
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
     DBStateStoreManager,
@@ -21,6 +20,11 @@ from meltano.core.state_store import (
     StateBackend,
     state_store_manager_from_project_settings,
 )
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project import Project
 
 
 class TestSystemDBStateBackend:

@@ -5,6 +5,7 @@ import platform
 import re
 import subprocess
 import sys
+import typing as t
 
 import mock
 import pytest
@@ -13,8 +14,10 @@ from meltano.core.error import MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import install_pip_plugin
-from meltano.core.project import Project
 from meltano.core.venv_service import VenvService, VirtualEnv
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 def _check_venv_created_with_python(project: Project, python: str | None):

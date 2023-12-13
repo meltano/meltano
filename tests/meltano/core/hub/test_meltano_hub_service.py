@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Counter
+import typing as t
 
 import click
 import mock
@@ -13,7 +13,11 @@ from meltano.cli.hub import hub
 from meltano.core.hub.client import HubConnectionError, HubPluginVariantNotFoundError
 from meltano.core.plugin.base import PluginType, Variant
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from collections import Counter
+
+    from meltano.core.project import Project
 
 
 class TestMeltanoHubService:

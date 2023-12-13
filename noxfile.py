@@ -11,10 +11,12 @@ from __future__ import annotations
 
 import os
 import sys
+import typing as t
 from pathlib import Path
 from random import randint
 
-from nox import Session
+if t.TYPE_CHECKING:
+    from nox import Session
 
 try:
     from nox_poetry import session as nox_session

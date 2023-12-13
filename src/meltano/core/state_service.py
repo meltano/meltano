@@ -11,12 +11,14 @@ import json
 import typing as t
 
 import structlog
-from sqlalchemy.orm import Session
 
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import SINGER_STATE_KEY, JobState
 from meltano.core.project import Project
 from meltano.core.state_store import state_store_manager_from_project_settings
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 logger = structlog.getLogger(__name__)
 

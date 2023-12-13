@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import pytest
 
@@ -11,7 +12,9 @@ from meltano.core.plugin_lock_service import (
     PluginLock,
     PluginLockService,
 )
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @pytest.fixture()

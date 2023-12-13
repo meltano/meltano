@@ -9,12 +9,13 @@ from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
 
-from ruamel.yaml import Representer
-
 from meltano.core import utils
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
+
+if t.TYPE_CHECKING:
+    from ruamel.yaml import Representer
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,

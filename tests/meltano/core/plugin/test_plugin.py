@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.plugin.requirements import PluginRequirement
-from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @pytest.mark.order(0)

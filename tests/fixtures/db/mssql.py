@@ -3,12 +3,15 @@ from __future__ import annotations
 import contextlib
 import logging
 import os
+import typing as t
 
 import pytest
 import sqlalchemy as sa
 from sqlalchemy import create_engine
-from sqlalchemy.engine import URL
 from sqlalchemy.pool import NullPool
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine import URL
 
 
 def recreate_database(engine, db_name):

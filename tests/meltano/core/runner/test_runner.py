@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from pathlib import Path
 
 import mock
@@ -9,9 +10,11 @@ from mock import AsyncMock
 
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 TEST_STATE_ID = "test_job"
 

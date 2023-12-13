@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import typing as t
 from abc import ABCMeta, abstractmethod
 
-from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
 from meltano.core.plugin.factory import base_plugin_factory
-from meltano.core.plugin.project_plugin import ProjectPlugin
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class PluginRepository(metaclass=ABCMeta):

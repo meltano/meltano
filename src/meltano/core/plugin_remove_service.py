@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import typing as t
 
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
     DbRemoveManager,
     InstallationRemoveManager,
@@ -12,8 +11,11 @@ from meltano.core.plugin_location_remove import (
     MeltanoYmlRemoveManager,
     PluginLocationRemoveManager,
 )
-from meltano.core.project import Project
 from meltano.core.utils import noop
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 class PluginRemoveService:

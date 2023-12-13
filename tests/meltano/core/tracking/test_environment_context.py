@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import random
-
-import pytest
+import typing as t
 
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.utils import hash_sha256
+
+if t.TYPE_CHECKING:
+    import pytest
 
 
 def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):

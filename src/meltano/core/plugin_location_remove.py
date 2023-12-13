@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import shutil
+import typing as t
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -10,11 +11,14 @@ import sqlalchemy
 
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 
-from .project import Project
 from .settings_store import SettingValueStore
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+
+    from .project import Project
 
 
 class PluginLocationRemoveStatus(Enum):
