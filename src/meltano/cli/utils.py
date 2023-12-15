@@ -494,8 +494,8 @@ def check_dependencies_met(
     """Check dependencies of added plugins are met.
 
     Args:
-        plugins: List of plugins to be added.
-        plugin_service: Plugin service to use when checking for dependencies.
+        plugin_refs: List of plugins to be added.
+        plugins_service: Plugin service to use when checking for dependencies.
 
     Returns:
         A tuple with dependency check outcome (True/False), and a string
@@ -535,6 +535,7 @@ def activate_environment(
     Args:
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
+        required: Whether an environment is required to be set.
     """
     if ctx.obj.get("selected_environment"):
         project.activate_environment(ctx.obj["selected_environment"])

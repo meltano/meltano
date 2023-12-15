@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 import typing as t
@@ -41,7 +41,7 @@ class JSONEncodedDict(TypeDecorator):
         return value
 
 
-class IntFlag(TypeDecorator):
+class IntFlag(TypeDecorator):  # noqa: D101
     impl = INTEGER
     cache_ok = True
 
@@ -67,13 +67,13 @@ class GUID(TypeDecorator):
     impl = CHAR
     cache_ok = True
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(self, dialect):  # noqa: D102
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         type_descriptor_length = 32
         return dialect.type_descriptor(CHAR(type_descriptor_length))
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value, dialect):  # noqa: D102
         if value is None:
             return value
         elif dialect.name == "postgresql":

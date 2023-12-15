@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import typing as t
 
@@ -10,7 +10,7 @@ from meltano.core.sqlalchemy import StrPK  # noqa: TCH001
 from .models import SystemModel
 
 
-class Setting(SystemModel):
+class Setting(SystemModel):  # noqa: D101
     __tablename__ = "plugin_settings"
 
     # represent the mapping to the ENV
@@ -24,6 +24,6 @@ class Setting(SystemModel):
     value: Mapped[t.Optional[str]] = mapped_column(types.PickleType)  # noqa: UP007
     enabled: Mapped[bool] = mapped_column(default=False)
 
-    def __repr__(self):
+    def __repr__(self):  # noqa: D105
         enabled_marker = "E" if self.enabled else ""
         return f"<({self.namespace}) {self.name}={self.value} {enabled_marker}>"

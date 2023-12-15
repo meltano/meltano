@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool

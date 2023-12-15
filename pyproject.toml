@@ -171,6 +171,9 @@ statistics = true
 "flake8-bandit" = [
   "-*",
 ]
+"flake8-docstrings" = [
+  "-*", # Covered by Ruff
+]
 "flake8-eradicate" = [
   "-*", # Covered by Ruff
 ]
@@ -181,7 +184,7 @@ statistics = true
   "-*",
 ]
 mccabe = [
-  "+*",
+  "-*", # Covered by Ruff
 ]
 pycodestyle = [
   "-*", # Covered by Ruff
@@ -255,15 +258,6 @@ pyflakes = [
   "-DAR201",
   "-DAR301",
 ]
-"flake8-docstrings" = [
-  "-D100",
-  "-D101",
-  "-D102",
-  "-D103",
-  "-D104",
-  "-D105",
-  "-D107",
-]
 "flake8-string-format" = [
   "-P103", # String does contain unindexed parameters
 ]
@@ -299,9 +293,6 @@ pyflakes = [
 ]
 
 [tool.flakeheaven.exceptions."*/cli/*"]
-"flake8-docstrings" = [
-  "-D301", # Allow backslashes in dosctrings
-]
 "flake8-darglint" = [
   "-*", # Don't require docstrings in click commands
 ]
@@ -315,11 +306,6 @@ pyflakes = [
 ]
 
 [tool.flakeheaven.exceptions."src/meltano/migrations/versions/*"]
-"flake8-docstrings" = [
-  "-D101", # Don't class docstrings in migrations
-  "-D103", # Don't require function docstrings in migrations
-  "-D400", # Don't require periods in the first lines of dosctrings
-]
 "wemake-python-styleguide" = [
   "-WPS102", # Allow module names starting with numbers
   "-WPS118", # Allow long filenames
@@ -359,13 +345,6 @@ pyflakes = [
   "-DAR201",
   "-DAR301",
 ]
-"flake8-docstrings" = [
-  "-D100",
-  "-D101",
-  "-D102",
-  "-D103",
-  "-D104",
-]
 
 [tool.flakeheaven.exceptions."src/meltano/__init__.py"]
 "wemake-python-styleguide" = [
@@ -397,11 +376,6 @@ pycodestyle = [
 [tool.flakeheaven.exceptions."src/meltano/core/settings_store.py"]
 "wemake-python-styleguide" = [
   "-WPS204", # Found overused expression: allow settings store implementations to all return vars with the same names
-]
-
-[tool.flakeheaven.exceptions."src/meltano/core/utils/__init__.py"]
-"flake8-docstrings" = [
-  "-D103", # Many of these utility functions are descriptively named and self-documenting
 ]
 
 [tool.flakeheaven.exceptions."src/meltano/core/state_store/*"]
@@ -586,12 +560,15 @@ ignore = [
   "S603",   # Allow `subprocess.run(..., shell=False)`
   "COM812", # Handled by the Ruff formatter
   "ISC001", # Handled by the Ruff formatter
+  "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
+  "D2",     # Allow docstrings to start with a single line of text
 ]
 select = [
   "ARG", # flake8-unused-arguments
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
   "COM", # flake8-commas
+  "D",   # pydocstyle/flake8-docstrings
   "E",   # pycodestyle (error)
   "ERA", # flake8-eradicate
   "F",   # pyflakes
@@ -617,8 +594,27 @@ unfixable = [
 "src/meltano/**/__init__.py" = [
   "F401", # Permit unused imports in `__init__.py` files
 ]
+"*/cli/*" = [
+  "D301", # Allow backslashes in dosctrings
+]
+"src/meltano/core/utils/__init__.py" = [
+  "D103", # Many of these utility functions are descriptively named and self-documenting
+]
+"src/meltano/migrations/versions/*" = [
+  "N806", # Allow uppercase variable names
+  "D101", # Don't class docstrings in migrations
+  "D103", # Don't require function docstrings in migrations
+  "D400", # Don't require periods in the first lines of dosctrings
+]
 "tests/**" = [
   "S101", # Allow 'assert' in tests
+  "D100",
+  "D101",
+  "D102",
+  "D103",
+  "D104",
+  "D105",
+  "D107",
 ]
 
 [tool.ruff.lint.flake8-annotations]

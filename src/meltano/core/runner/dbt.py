@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import asyncio
 import sys
@@ -14,16 +14,16 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin_invoker import PluginInvoker
 
 
-class DbtRunner(Runner):
-    def __init__(self, elt_context: ELTContext):
+class DbtRunner(Runner):  # noqa: D101
+    def __init__(self, elt_context: ELTContext):  # noqa: D107
         self.context = elt_context
 
     @property
-    def project(self):
+    def project(self):  # noqa: D102
         return self.context.project
 
     @property
-    def plugin_context(self):
+    def plugin_context(self):  # noqa: D102
         return self.context.transformer
 
     async def invoke(self, dbt: PluginInvoker, *args, log=None, **kwargs):
@@ -59,7 +59,7 @@ class DbtRunner(Runner):
                 {PluginType.TRANSFORMERS: exitcode},
             )
 
-    async def run(self, log=None):
+    async def run(self, log=None):  # noqa: D102
         dbt = self.context.transformer_invoker()
 
         async with dbt.prepared(self.context.session):

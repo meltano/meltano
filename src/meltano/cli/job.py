@@ -44,6 +44,7 @@ def _list_single_job(
         task_sets_service: The task sets service to use.
         list_format: The format to use.
         job_name: The job name to list.
+        ctx: The click context.
     """
     tracker: Tracker = ctx.obj["tracker"]
     try:
@@ -70,9 +71,9 @@ def _list_all_jobs(
     """List all jobs.
 
     Args:
-        project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
+        ctx: The click context.
     """
     if list_format == "json":
         click.echo(
@@ -289,6 +290,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
     Args:
         project: Project to use.
         task_set: TaskSets to validate.
+        ctx: Click context.
 
     Returns:
         True if the job's tasks are valid.

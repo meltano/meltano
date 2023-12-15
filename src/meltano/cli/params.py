@@ -15,7 +15,7 @@ from meltano.core.project_settings_service import ProjectSettingsService
 def database_uri_option(func):
     """Database URI Click option decorator.
 
-    args:
+    Args:
         func: The function to decorate.
     """
 
@@ -37,7 +37,7 @@ class pass_project:  # noqa: N801
     def __init__(self, migrate=False):
         """Instantiate decorator.
 
-        args:
+        Args:
             migrate: Flag to perform database migration before passing the project.
         """
         self.migrate = migrate
@@ -45,7 +45,7 @@ class pass_project:  # noqa: N801
     def __call__(self, func):
         """Return decorated function.
 
-        args:
+        Args:
             func: The function to decorate.
         """
 

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 import typing as t
@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-class SelectService:
+class SelectService:  # noqa: D101
     def __init__(self, project: Project, extractor: str):
         """Initialize a `SelectService` instance.
 
@@ -35,7 +35,7 @@ class SelectService:
         return self._extractor
 
     @property
-    def current_select(self):
+    def current_select(self):  # noqa: D102
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 

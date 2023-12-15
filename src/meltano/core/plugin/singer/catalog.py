@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import fnmatch
 import logging
@@ -22,7 +22,7 @@ class CatalogDict(t.TypedDict):
     streams: list[dict[str, t.Any]]
 
 
-class CatalogRule:
+class CatalogRule:  # noqa: D101
     def __init__(
         self,
         tap_stream_id: str | list[str],
@@ -76,7 +76,7 @@ class CatalogRule:
         return result
 
 
-class MetadataRule(CatalogRule):
+class MetadataRule(CatalogRule):  # noqa: D101
     def __init__(
         self,
         tap_stream_id: str | list[str],
@@ -91,7 +91,7 @@ class MetadataRule(CatalogRule):
         self.value = value
 
 
-class SchemaRule(CatalogRule):
+class SchemaRule(CatalogRule):  # noqa: D101
     def __init__(
         self,
         tap_stream_id: str | list[str],
@@ -123,7 +123,6 @@ class SelectPattern(t.NamedTuple):
             An appropriate `SelectPattern` instance.
 
         Example:
-
         >>> SelectPattern.parse("!a.b.c")
         SelectedPattern(
             stream_pattern='a',
@@ -283,7 +282,7 @@ def property_breadcrumb(props: list[str]) -> list[str]:
     return breadcrumb
 
 
-class CatalogNode(Enum):
+class CatalogNode(Enum):  # noqa: D101
     STREAM = auto()
     PROPERTY = auto()
     METADATA = auto()
@@ -296,10 +295,10 @@ class SelectionType(str, Enum):
     EXCLUDED = "excluded"
     AUTOMATIC = "automatic"
 
-    def __bool__(self):
+    def __bool__(self):  # noqa: D105
         return self is not self.__class__.EXCLUDED
 
-    def __add__(self, other):
+    def __add__(self, other):  # noqa: D105
         if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
             return SelectionType.EXCLUDED
 
@@ -350,7 +349,7 @@ def _(node: list, executor, path=""):
 
 
 @visit_with(visit)
-class CatalogExecutor:
+class CatalogExecutor:  # noqa: D101
     def execute(self, node_type: CatalogNode, node: Node, path: str):
         """Dispatch all node methods."""
         dispatch = {
@@ -388,8 +387,8 @@ class CatalogExecutor:
         return self.execute(node_type, node, path)
 
 
-class MetadataExecutor(CatalogExecutor):
-    def __init__(self, rules: list[MetadataRule]):
+class MetadataExecutor(CatalogExecutor):  # noqa: D101
+    def __init__(self, rules: list[MetadataRule]):  # noqa: D107
         self._stream = None
         self._rules = rules
 
@@ -480,13 +479,13 @@ class MetadataExecutor(CatalogExecutor):
         logging.debug("Setting '%s.%s' to '%s'", path, key, value)  # noqa: WPS323
 
 
-class SelectExecutor(MetadataExecutor):
-    def __init__(self, patterns: list[str]):
+class SelectExecutor(MetadataExecutor):  # noqa: D101
+    def __init__(self, patterns: list[str]):  # noqa: D107
         super().__init__(select_metadata_rules(patterns))
 
 
-class SchemaExecutor(CatalogExecutor):
-    def __init__(self, rules: list[SchemaRule]):
+class SchemaExecutor(CatalogExecutor):  # noqa: D101
+    def __init__(self, rules: list[SchemaRule]):  # noqa: D107
         self._stream = None
         self._rules = rules
 
@@ -545,8 +544,8 @@ class SchemaExecutor(CatalogExecutor):
         logging.debug("Setting '%s' to %r", path, payload)  # noqa: WPS323
 
 
-class ListExecutor(CatalogExecutor):
-    def __init__(self):
+class ListExecutor(CatalogExecutor):  # noqa: D101
+    def __init__(self):  # noqa: D107
         # properties per stream
         self.properties: dict[str, set[str]] = OrderedDict()
 
@@ -581,8 +580,8 @@ class SelectedNode(t.NamedTuple):
     selection: SelectionType
 
 
-class ListSelectedExecutor(CatalogExecutor):
-    def __init__(self):
+class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
+    def __init__(self):  # noqa: D107
         self.streams: set[SelectedNode] = set()
         self.properties: dict[str, set[SelectedNode]] = OrderedDict()
         super().__init__()

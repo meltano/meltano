@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import asyncio
 import logging
@@ -16,11 +16,11 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin_invoker import PluginInvoker
 
 
-class SingerRunner(Runner):
-    def __init__(self, elt_context: ELTContext):
+class SingerRunner(Runner):  # noqa: D101
+    def __init__(self, elt_context: ELTContext):  # noqa: D107
         self.context = elt_context
 
-    def stop(self, process, **wait_args):
+    def stop(self, process, **wait_args):  # noqa: D102
         while True:
             try:
                 code = process.wait(**wait_args)
@@ -200,12 +200,12 @@ class SingerRunner(Runner):
         elif target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})
 
-    def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
+    def dry_run(self, tap: PluginInvoker, target: PluginInvoker):  # noqa: D102
         logging.info("Dry run:")
         logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
         logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
-    async def run(
+    async def run(  # noqa: D102
         self,
         extractor_log=None,
         loader_log=None,
