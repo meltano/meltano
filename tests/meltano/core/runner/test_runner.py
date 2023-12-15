@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import os
 import typing as t
@@ -20,32 +20,32 @@ TEST_STATE_ID = "test_job"
 
 
 class AnyInstanceOf:
-    def __init__(self, target_cls):
+    def __init__(self, target_cls):  # noqa: ANN001, ANN204
         self.target_cls = target_cls
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # noqa: ANN001, ANN204
         return isinstance(other, self.target_cls)
 
-    def __repr__(self):
+    def __repr__(self):  # noqa: ANN204
         return f"<Any({self.target_cls}>"
 
 
-def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
+def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):  # noqa: ANN201
     for file in plugin.config_files.values():
-        Path(os.path.join(config_dir, file)).touch()
+        Path(os.path.join(config_dir, file)).touch()  # noqa: PTH118
 
     return config_dir
 
 
 class TestSingerRunner:
     @pytest.fixture()
-    def elt_context(
+    def elt_context(  # noqa: ANN201, PLR0913
         self,
-        project,  # noqa: ARG002
-        session,
-        tap,
-        target,
-        elt_context_builder,
+        project,  # noqa: ANN001, ARG002
+        session,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        elt_context_builder,  # noqa: ANN001
     ):
         job = Job(job_name="pytest_test_runner")
 
@@ -58,17 +58,17 @@ class TestSingerRunner:
         )
 
     @pytest.fixture()
-    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
+    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:  # noqa: ANN001
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
     @pytest.fixture()
-    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
+    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:  # noqa: ANN001
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
 
     @pytest.fixture()
-    def subject(self, session, elt_context):
+    def subject(self, session, elt_context):  # noqa: ANN001, ANN201
         Job(
             job_name=TEST_STATE_ID,
             state=State.SUCCESS,
@@ -79,8 +79,8 @@ class TestSingerRunner:
         return SingerRunner(elt_context)
 
     @pytest.fixture()
-    def process_mock_factory(self):
-        def _factory(name):
+    def process_mock_factory(self):  # noqa: ANN201
+        def _factory(name):  # noqa: ANN001, ANN202
             process_mock = mock.Mock()
             process_mock.name = name
             process_mock.wait = AsyncMock(return_value=0)
@@ -89,25 +89,25 @@ class TestSingerRunner:
         return _factory
 
     @pytest.fixture()
-    def tap_process(self, process_mock_factory, tap):
+    def tap_process(self, process_mock_factory, tap):  # noqa: ANN001, ANN201
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
     @pytest.fixture()
-    def target_process(self, process_mock_factory, target):
+    def target_process(self, process_mock_factory, target):  # noqa: ANN001, ANN201
         return process_mock_factory(target)
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("subject")
-    async def test_prepare_job(
+    async def test_prepare_job(  # noqa: ANN201, PLR0913
         self,
-        session,
-        tap_config_dir,
-        target_config_dir,
-        tap,
-        target,
-        plugin_invoker_factory,
+        session,  # noqa: ANN001
+        tap_config_dir,  # noqa: ANN001
+        target_config_dir,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
     ):
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
@@ -125,21 +125,21 @@ class TestSingerRunner:
         assert not target_invoker.files["config"].exists()
 
     @pytest.mark.asyncio()
-    async def test_invoke(
+    async def test_invoke(  # noqa: ANN201, PLR0913
         self,
-        session,
-        subject,
-        tap_config_dir,
-        target_config_dir,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        plugin_invoker_factory,
+        session,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        tap_config_dir,  # noqa: ANN001
+        target_config_dir,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
     ):
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        async with tap_invoker.prepared(  # noqa: WPS316
+        async with tap_invoker.prepared(
             session,
         ), target_invoker.prepared(session):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))
@@ -172,19 +172,19 @@ class TestSingerRunner:
             (True, True, ["entity"], Payload.INCOMPLETE_STATE),
         ),
     )
-    async def test_bookmark(
+    async def test_bookmark(  # noqa: ANN201, PLR0913
         self,
-        subject,
-        session,
-        target,
-        target_config_dir,
-        target_process,
-        plugin_invoker_factory,
-        full_refresh,
-        select_filter,
-        payload_flag,
-        elt_context,
-        merge_state,
+        subject,  # noqa: ANN001
+        session,  # noqa: ANN001
+        target,  # noqa: ANN001
+        target_config_dir,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        full_refresh,  # noqa: ANN001
+        select_filter,  # noqa: ANN001
+        payload_flag,  # noqa: ANN001
+        elt_context,  # noqa: ANN001
+        merge_state,  # noqa: ANN001
     ):
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -220,8 +220,8 @@ class TestSingerRunner:
                 )
                 await capture_subprocess_output(target_process.stdout, *bookmark_writer)
 
-            assert add_mock.call_count == 9
-            assert commit_mock.call_count == 9
+            assert add_mock.call_count == 9  # noqa: PLR2004
+            assert commit_mock.call_count == 9  # noqa: PLR2004
 
             # assert the STATE's `value` was saved
             job = subject.context.job
@@ -229,8 +229,8 @@ class TestSingerRunner:
             assert job.payload_flags == payload_flag
 
     @pytest.mark.asyncio()
-    async def test_run(self, subject):
-        async def invoke_mock(*args, **kwargs):  # noqa: ARG001
+    async def test_run(self, subject):  # noqa: ANN001, ANN201
+        async def invoke_mock(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, ARG001
             pass
 
         with mock.patch.object(

@@ -29,7 +29,7 @@ class PluginTestServiceFactory:
         """
         self.plugin_invoker = plugin_invoker
 
-    def get_test_service(self):
+    def get_test_service(self):  # noqa: ANN201
         """Resolve a test service instance for a plugin type.
 
         Returns:
@@ -65,7 +65,7 @@ class PluginTestService(ABC):
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> tuple[bool, str | None]:  # noqa: C901
+    async def validate(self) -> tuple[bool, str | None]:
         """Validate extractor configuration.
 
         Returns:

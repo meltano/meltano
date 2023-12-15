@@ -19,11 +19,11 @@ if t.TYPE_CHECKING:
     short_help="Interact with Meltano Hub.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
-def hub():
+def hub():  # noqa: ANN201
     """
     Interact with Meltano Hub.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
-    """  # noqa: D205
+    """  # noqa: D415
 
 
 @hub.command(
@@ -31,11 +31,11 @@ def hub():
     short_help="Ping Meltano Hub.",
 )
 @pass_project()
-def ping(project: Project):
+def ping(project: Project):  # noqa: ANN201
     """
     Ping Meltano Hub. This can be useful for checking if a custom Hub URL is reachable.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
-    """  # noqa: D205
+    """  # noqa: D415
     try:
         # We want to ensure that we can actually communicate with the Hub.
         # Requesting a list of plugins is a good way to do that, but we don't

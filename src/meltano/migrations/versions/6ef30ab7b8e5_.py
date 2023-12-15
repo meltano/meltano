@@ -4,7 +4,7 @@ Revision ID: 6ef30ab7b8e5
 Revises: b4c05e463b53
 Create Date: 2019-07-23 16:09:20.192447
 
-"""
+"""  # noqa: INP001, I002, D415
 import sqlalchemy as sa
 from alembic import op
 
@@ -21,7 +21,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -82,7 +82,7 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_table("roles_users")
     op.drop_table("role_permissions")
     op.drop_table("role")

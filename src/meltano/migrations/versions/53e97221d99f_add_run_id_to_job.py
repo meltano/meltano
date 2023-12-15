@@ -4,12 +4,12 @@ Revision ID: 53e97221d99f
 Revises: 6ef30ab7b8e5
 Create Date: 2019-10-10 13:12:55.147164
 
-"""
+"""  # noqa: INP001, I002, D415
 import uuid
 
 import sqlalchemy as sa
 import sqlalchemy.orm
-import sqlalchemy.types as types
+import sqlalchemy.types as types  # noqa: F401, PLR0402
 from alembic import op
 
 from meltano.migrations import GUID
@@ -23,7 +23,7 @@ depends_on = None
 Session = sa.orm.sessionmaker(future=True)
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     op.add_column("job", sa.Column("run_id", GUID))
 
     metadata = sa.MetaData()
@@ -36,5 +36,5 @@ def upgrade():
     session.commit()
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_column("job", "run_id")

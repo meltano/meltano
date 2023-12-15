@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import pytest
 from mock import AsyncMock
@@ -9,7 +9,7 @@ from meltano.core.block.plugin_command import plugin_command_invoker
 class TestInvokerCommand:
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session")
-    async def test_run_passes_command_args_when_required(self, project, dbt):
+    async def test_run_passes_command_args_when_required(self, project, dbt):  # noqa: ANN001, ANN201
         cmd = plugin_command_invoker(
             dbt,
             project,

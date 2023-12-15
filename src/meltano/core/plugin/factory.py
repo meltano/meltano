@@ -7,7 +7,7 @@ import importlib
 from . import BasePlugin, PluginDefinition, PluginType, Variant
 
 
-def lazy_import(module: str, classname: str):
+def lazy_import(module: str, classname: str):  # noqa: ANN201
     """Lazily import a class.
 
     Args:
@@ -18,7 +18,7 @@ def lazy_import(module: str, classname: str):
         Function for lazily importing the given class.
     """
 
-    def lazy():
+    def lazy():  # noqa: ANN202
         return getattr(
             importlib.import_module(module, "meltano.core.plugin"),
             classname,

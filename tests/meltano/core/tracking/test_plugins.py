@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -13,7 +13,7 @@ if t.TYPE_CHECKING:
 
 
 class TestPluginsTrackingContext:
-    def test_plugins_tracking_context_from_block(
+    def test_plugins_tracking_context_from_block(  # noqa: ANN201
         self,
         project: Project,
         dbt: ProjectPlugin,
@@ -31,10 +31,10 @@ class TestPluginsTrackingContext:
         self.assert_plugin_attributes(plugin_dict, dbt)
         assert plugin_dict.get("command") == "test"
 
-    def test_plugins_tracking_context(self, tap: ProjectPlugin, dbt: ProjectPlugin):
+    def test_plugins_tracking_context(self, tap: ProjectPlugin, dbt: ProjectPlugin):  # noqa: ANN201
         plugin_ctx = PluginsTrackingContext([(tap, None), (dbt, "test")])
         assert plugin_ctx.schema == PluginsContextSchema.url
-        assert len(plugin_ctx.data.get("plugins")) == 2
+        assert len(plugin_ctx.data.get("plugins")) == 2  # noqa: PLR2004
         for plugin_dict in plugin_ctx.data.get("plugins"):
             if plugin_dict.get("category") == "extractors":
                 self.assert_plugin_attributes(plugin_dict, tap)
@@ -58,7 +58,7 @@ class TestPluginsTrackingContext:
         assert not plugin_with_no_parent.get("parent_name_hash")
 
     @staticmethod
-    def assert_plugin_attributes(plugin_dict: dict[str, t.Any], plugin: ProjectPlugin):
+    def assert_plugin_attributes(plugin_dict: dict[str, t.Any], plugin: ProjectPlugin):  # noqa: ANN205
         for dict_key, plugin_key in (
             ("name_hash", "name"),
             ("namespace_hash", "namespace"),

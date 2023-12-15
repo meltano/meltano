@@ -51,13 +51,13 @@ class MeltanoInvoker:
         Returns:
             A `CompletedProcess` class object from `subprocess.run`.
         """
-        return subprocess.run(
+        return subprocess.run(  # noqa: PLW1510
             [self._executable_path(command), *args],
             **kwargs,
             env=self._executable_env(env),
         )
 
-    def _executable_path(self, command):
+    def _executable_path(self, command):  # noqa: ANN001, ANN202
         if command == MELTANO_COMMAND:
             # This symlink is created by Project.activate
             executable_symlink = self.project.run_dir().joinpath("bin")
@@ -65,7 +65,7 @@ class MeltanoInvoker:
                 return str(executable_symlink)
 
         executable = Path(
-            os.path.dirname(sys.executable),
+            os.path.dirname(sys.executable),  # noqa: PTH120
             f"{command}.exe" if platform.system() == "Windows" else command,
         )
 

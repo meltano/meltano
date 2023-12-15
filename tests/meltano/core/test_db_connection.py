@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
 
 
 class TestConnectionRetries:
-    def test_ping_failure(self):
+    def test_ping_failure(self):  # noqa: ANN201
         engine_mock = Mock()
 
         # check if OperationalError is raised if a connection can't be made
@@ -27,7 +27,7 @@ class TestConnectionRetries:
         with pytest.raises(OperationalError):
             connect(engine=engine_mock, max_retries=3, retry_timeout=0.1)
 
-        assert engine_mock.connect.call_count == 4
+        assert engine_mock.connect.call_count == 4  # noqa: PLR2004
 
         # check reconnect on second call to `engine.connect`
         engine_mock.reset_mock()
@@ -37,11 +37,11 @@ class TestConnectionRetries:
         ]
 
         connect(engine=engine_mock, max_retries=3, retry_timeout=0.1)
-        assert engine_mock.connect.call_count == 2
+        assert engine_mock.connect.call_count == 2  # noqa: PLR2004
 
 
 class TestProjectEngine:
-    def test_project_engine(
+    def test_project_engine(  # noqa: ANN201
         self,
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,

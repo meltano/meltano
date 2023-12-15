@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import warnings
 
@@ -19,7 +19,7 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 @pytest.fixture()
-def config_override():
+def config_override():  # noqa: ANN201
     try:
         ProjectSettingsService.config_override["project_id"] = "from_config_override"
 
@@ -29,23 +29,23 @@ def config_override():
 
 
 @pytest.fixture()
-def subject(project):
+def subject(project):  # noqa: ANN001, ANN201
     return ProjectSettingsService(project)
 
 
 class TestProjectSettingsService:
     @pytest.fixture()
-    def environment(self):
+    def environment(self):  # noqa: ANN201
         return Environment("testing", {})
 
-    def test_get_with_source(self, subject, monkeypatch):
+    def test_get_with_source(self, subject, monkeypatch):  # noqa: ANN001, ANN201
         # A warning is raised because the setting does not exist.
         with pytest.warns(RuntimeWarning):
             assert subject.get_with_source(
                 "and_now_for_something_completely_different",
             ) == (None, SettingValueStore.DEFAULT)
 
-        def assert_value_source(value, source):
+        def assert_value_source(value, source):  # noqa: ANN001, ANN202
             assert subject.get_with_source("project_id") == (value, source)
 
         subject.set(
@@ -67,50 +67,50 @@ class TestProjectSettingsService:
             assert_value_source("from_env", SettingValueStore.ENV)
 
     @pytest.mark.usefixtures("config_override")
-    def test_get_with_source_config_override(self, subject):
+    def test_get_with_source_config_override(self, subject):  # noqa: ANN001, ANN201
         assert subject.get_with_source("project_id") == (
             "from_config_override",
             SettingValueStore.CONFIG_OVERRIDE,
         )
 
-    def test_experimental_on(self, subject, monkeypatch):
+    def test_experimental_on(self, subject, monkeypatch):  # noqa: ANN001, ANN201
         changed = []
         monkeypatch.setenv("MELTANO_EXPERIMENTAL", "true")
         with subject.feature_flag(EXPERIMENTAL):
             changed.append(True)
         assert changed
 
-    def test_experimental_off_by_default(self, subject):
+    def test_experimental_off_by_default(self, subject):  # noqa: ANN001, ANN201
         changed = []
         with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
             EXPERIMENTAL,
         ):
             changed.append(True)
 
-    def test_feature_flag_allowed(self, subject):
+    def test_feature_flag_allowed(self, subject):  # noqa: ANN001, ANN201
         changed = []
-        subject.set([FEATURE_FLAG_PREFIX, "allowed"], True)
+        subject.set([FEATURE_FLAG_PREFIX, "allowed"], True)  # noqa: FBT003
 
         @subject.feature_flag("allowed")
-        def should_run():
+        def should_run():  # noqa: ANN202
             changed.append(True)
 
         should_run()
         assert changed
 
-    def test_feature_flag_disallowed(self, subject):
+    def test_feature_flag_disallowed(self, subject):  # noqa: ANN001, ANN201
         changed = []
-        subject.set([FEATURE_FLAG_PREFIX, "disallowed"], False)
+        subject.set([FEATURE_FLAG_PREFIX, "disallowed"], False)  # noqa: FBT003
 
         @subject.feature_flag("disallowed")
-        def should_not_run():
+        def should_not_run():  # noqa: ANN202
             changed.append(True)
 
         with pytest.raises(FeatureNotAllowedException):
             should_not_run()
 
-    def test_strict_env_var_mode_on_raises_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+    def test_strict_env_var_mode_on_raises_error(self, subject):  # noqa: ANN001, ANN201
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)  # noqa: FBT003
         subject.set(
             "stacked_env_var",
             "${NONEXISTENT_ENV_VAR}@nonexistent",
@@ -118,15 +118,15 @@ class TestProjectSettingsService:
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
-    def test_strict_env_var_mode_off_no_raise_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+    def test_strict_env_var_mode_off_no_raise_error(self, subject):  # noqa: ANN001, ANN201
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)  # noqa: FBT003
         subject.set(
             "stacked_env_var",
             "${NONEXISTENT_ENV_VAR}@nonexistent_1",
         )
         assert subject.get("stacked_env_var") == "@nonexistent_1"
 
-    def test_warn_if_default_setting_is_used(self, subject, monkeypatch):
+    def test_warn_if_default_setting_is_used(self, subject, monkeypatch):  # noqa: ANN001, ANN201
         # Assert that warnings are not raised in the following cases:
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -161,11 +161,11 @@ class TestProjectSettingsService:
             with pytest.warns(RuntimeWarning):
                 subject.get(setting)
 
-    def test_meltano_settings_with_active_environment(
+    def test_meltano_settings_with_active_environment(  # noqa: ANN201
         self,
-        subject,
-        monkeypatch,
-        environment,
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        environment,  # noqa: ANN001
     ):
         # make sure that meltano setting values are written to the root of `meltano.yml`
         # even if there is an active environment
@@ -174,19 +174,19 @@ class TestProjectSettingsService:
         subject.set("database_max_retries", 10000)
         value, source = subject.get_with_source("database_max_retries")
         assert source == SettingValueStore.MELTANO_YML
-        assert value == 10000
+        assert value == 10000  # noqa: PLR2004
 
-    def test_fully_missing_env_var_setting_is_none(
+    def test_fully_missing_env_var_setting_is_none(  # noqa: ANN201
         self,
         subject: ProjectSettingsService,
     ):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)  # noqa: FBT003
         # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
         with pytest.warns(RuntimeWarning, match="Unknown setting 'port'"):
             subject.set("port", "${UNSET_PORT_ENV_VAR}")
         assert subject.get("port") is None
 
-    def test_env_var_settings_expanded_before_cast(
+    def test_env_var_settings_expanded_before_cast(  # noqa: ANN201
         self,
         subject: ProjectSettingsService,
     ):
@@ -203,8 +203,8 @@ class TestProjectSettingsService:
             setting_def=setting_def,
         )
 
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)  # noqa: FBT003
         assert subject.get(name) is None
 
         subject.env_override["DB_MAX_RETRIES_TEST"] = "7"
-        assert subject.get(name) == 7
+        assert subject.get(name) == 7  # noqa: PLR2004

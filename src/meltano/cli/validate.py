@@ -31,7 +31,7 @@ logger = structlog.getLogger(__name__)
 TEST_LINE_LENGTH = 60
 
 
-def write_sep_line(title: str, sepchar: str, **kwargs):
+def write_sep_line(title: str, sepchar: str, **kwargs):  # noqa: ANN003, ANN201
     """Write a separator line in the terminal."""
     terminal_width, _ = shutil.get_terminal_size()
     char_count = (
@@ -84,9 +84,9 @@ class CommandLineRunner(ValidationsRunner):
     nargs=-1,
 )
 @pass_project(migrate=True)
-def test(
+def test(  # noqa: ANN201
     project: Project,
-    all_tests: bool,
+    all_tests: bool,  # noqa: FBT001
     plugin_tests: tuple[str, ...] = (),
 ):
     """
@@ -122,7 +122,7 @@ async def _run_plugin_tests(
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: dict[str, dict[str, int]]):
+def _report_and_exit(results: dict[str, dict[str, int]]):  # noqa: ANN202
     exit_code = 0
     failed_count = 0
     passed_count = 0

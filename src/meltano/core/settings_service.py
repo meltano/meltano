@@ -41,7 +41,7 @@ class FeatureFlags(Enum):
     STRICT_ENV_VAR_MODE = "strict_env_var_mode"
     PLUGIN_LOCKS_REQUIRED = "plugin_locks_required"
 
-    def __str__(self):
+    def __str__(self):  # noqa: ANN204
         """Return feature name.
 
         Returns:
@@ -62,7 +62,7 @@ class FeatureFlags(Enum):
 class FeatureNotAllowedException(Exception):
     """A disallowed code path is run."""
 
-    def __init__(self, feature):
+    def __init__(self, feature):  # noqa: ANN001, ANN204
         """Instantiate the error.
 
         Args:
@@ -80,7 +80,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
+class SettingsService(metaclass=ABCMeta):
     """Abstract base class for managing settings."""
 
     LOGGING = False
@@ -89,7 +89,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     def __init__(
         self,
         project: Project,
-        show_hidden: bool = True,
+        show_hidden: bool = True,  # noqa: FBT001, FBT002
         env_override: dict | None = None,
         config_override: dict | None = None,
     ):
@@ -109,7 +109,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     @property
     @abstractmethod
-    def label(self):
+    def label(self):  # noqa: ANN201
         """Return label.
 
         Returns:
@@ -118,7 +118,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     @property
     @abstractmethod
-    def docs_url(self):
+    def docs_url(self):  # noqa: ANN201
         """Return docs URL.
 
         Returns:
@@ -154,9 +154,9 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """Return definitions of supported settings."""
 
     @property
-    def inherited_settings_service(self):
+    def inherited_settings_service(self):  # noqa: ANN201
         """Return settings service to inherit configuration from."""
-        return None  # noqa: DAR201, RET501
+        return None  # noqa: RET501
 
     @property
     @abstractmethod
@@ -164,7 +164,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """Return current configuration in `meltano.yml`."""
 
     @abstractmethod
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):  # noqa: ANN001, ANN201
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -180,7 +180,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
 
     @property
-    def flat_meltano_yml_config(self):
+    def flat_meltano_yml_config(self):  # noqa: ANN201
         """Flatten meltano config.
 
         Returns:
@@ -190,7 +190,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         return flatten(self.meltano_yml_config, "dot")
 
     @property
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Return the environment as a dict.
 
         Returns:
@@ -210,13 +210,13 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
         return {key: val for key, val in values.items() if val != REDACTED_VALUE}
 
-    def config_with_metadata(
+    def config_with_metadata(  # noqa: ANN201
         self,
         prefix: str | None = None,
         extras: bool | None = None,
         source: SettingValueStore = SettingValueStore.AUTO,
         source_manager: SettingsStoreManager | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Return all config values with associated metadata.
 
@@ -257,7 +257,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return config
 
-    def as_dict(self, *args, process: bool = False, **kwargs) -> dict:
+    def as_dict(self, *args, process: bool = False, **kwargs) -> dict:  # noqa: ANN002, ANN003
         """Return settings without associated metadata.
 
         Args:
@@ -283,7 +283,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return config
 
-    def as_env(self, *args, **kwargs) -> dict[str, str]:
+    def as_env(self, *args, **kwargs) -> dict[str, str]:  # noqa: ANN002, ANN003
         """Return settings as an dictionary of environment variables.
 
         Args:
@@ -310,15 +310,15 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return env
 
-    def get_with_metadata(  # noqa: WPS210, WPS615
+    def get_with_metadata(  # noqa: ANN201, C901, PLR0912, PLR0913
         self,
         name: str,
-        redacted: bool = False,
+        redacted: bool = False,  # noqa: FBT001, FBT002
         source: SettingValueStore = SettingValueStore.AUTO,
         source_manager: SettingsStoreManager | None = None,
         setting_def: SettingDefinition | None = None,
-        expand_env_vars: bool = True,
-        **kwargs,
+        expand_env_vars: bool = True,  # noqa: FBT001, FBT002
+        **kwargs,  # noqa: ANN003
     ):
         """Get a setting with associated metadata.
 
@@ -441,7 +441,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return value, metadata
 
-    def get_with_source(self, *args, **kwargs):
+    def get_with_source(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
         """Get a setting value along with its source.
 
         Args:
@@ -454,7 +454,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         value, metadata = self.get_with_metadata(*args, **kwargs)
         return value, metadata["source"]
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
         """Get a setting value.
 
         Args:
@@ -467,12 +467,12 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(  # noqa: WPS615, WPS210
+    def set_with_metadata(  # noqa: ANN201
         self,
         path: str | list[str],
-        value,
-        store=SettingValueStore.AUTO,
-        **kwargs,
+        value,  # noqa: ANN001
+        store=SettingValueStore.AUTO,  # noqa: ANN001
+        **kwargs,  # noqa: ANN003
     ):
         """Set the value and metadata for a setting.
 
@@ -523,7 +523,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         self.log(f"Set setting {name!r} with metadata: {metadata}")
         return value, metadata
 
-    def set(self, *args, **kwargs):
+    def set(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
         """Set the value for a setting.
 
         Args:
@@ -536,7 +536,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         value, _ = self.set_with_metadata(*args, **kwargs)
         return value
 
-    def unset(self, path: list[str], store=SettingValueStore.AUTO, **kwargs):
+    def unset(self, path: list[str], store=SettingValueStore.AUTO, **kwargs):  # noqa: ANN001, ANN003, ANN201
         """Unset a setting.
 
         Args:
@@ -571,7 +571,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         self.log(f"Unset setting {name!r} with metadata: {metadata}")
         return metadata
 
-    def reset(self, store=SettingValueStore.AUTO, **kwargs):
+    def reset(self, store=SettingValueStore.AUTO, **kwargs):  # noqa: ANN001, ANN003, ANN201
         """Reset a setting.
 
         Args:
@@ -606,7 +606,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             return [
                 setting
                 for setting in self._setting_defs
-                if (extras is True and setting.is_extra)  # noqa: WPS408
+                if (extras is True and setting.is_extra)
                 or (extras is False and not setting.is_extra)
             ]
 
@@ -636,10 +636,10 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
-    def setting_env_vars(
+    def setting_env_vars(  # noqa: ANN201
         self,
-        setting_def,
-        for_writing=False,  # noqa: ARG002
+        setting_def,  # noqa: ANN001
+        for_writing=False,  # noqa: ANN001, FBT002, ARG002
     ):
         """Get environment variables for the given setting definition.
 
@@ -652,7 +652,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
         return setting_def.env_vars(self.env_prefixes)
 
-    def setting_env(self, setting_def):
+    def setting_env(self, setting_def):  # noqa: ANN001, ANN201
         """Get a single environment variable for the given setting definition.
 
         Args:
@@ -663,7 +663,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
         return self.setting_env_vars(setting_def)[0].key
 
-    def log(self, message):
+    def log(self, message):  # noqa: ANN001, ANN201
         """Log the given message.
 
         Args:
@@ -676,7 +676,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     def feature_flag(
         self,
         feature: str,
-        raise_error: bool = True,
+        raise_error: bool = True,  # noqa: FBT001, FBT002
     ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 

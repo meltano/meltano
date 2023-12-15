@@ -4,7 +4,7 @@ Revision ID: ceb00d7ff3bd
 Revises: 990c0665f3ce
 Create Date: 2020-01-27 09:59:36.427138
 
-"""
+"""  # noqa: INP001, I002, D415
 import sqlalchemy as sa
 from alembic import op
 
@@ -21,7 +21,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -35,5 +35,5 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_table("embed_tokens")

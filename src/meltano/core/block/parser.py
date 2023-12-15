@@ -66,17 +66,17 @@ def validate_block_sets(
 
 
 class BlockParser:  # noqa: D101
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         log: structlog.BoundLogger,
-        project,
+        project,  # noqa: ANN001
         blocks: list[str],
-        full_refresh: bool | None = False,
-        refresh_catalog: bool | None = False,
-        no_state_update: bool | None = False,
-        force: bool | None = False,
+        full_refresh: bool | None = False,  # noqa: FBT002
+        refresh_catalog: bool | None = False,  # noqa: FBT002
+        no_state_update: bool | None = False,  # noqa: FBT002
+        force: bool | None = False,  # noqa: FBT002
         state_id_suffix: str | None = None,
-        merge_state: bool | None = False,
+        merge_state: bool | None = False,  # noqa: FBT002
         run_id: uuid.UUID | None = None,
     ):
         """
@@ -225,13 +225,13 @@ class BlockParser:  # noqa: D101
             else:
                 raise BlockSetValidationError(
                     "Unknown command type or bad block sequence at index "  # noqa: EM102
-                    f"{cur + 1}, starting block '{plugin.name}'",  # noqa: WPS237
+                    f"{cur + 1}, starting block '{plugin.name}'",
                 )
 
-    def _find_next_elb_set(  # noqa: WPS231, WPS213
+    def _find_next_elb_set(
         self,
         offset: int = 0,
-    ) -> tuple[ExtractLoadBlocks | None, int]:  # noqa: WPS231, WPS213
+    ) -> tuple[ExtractLoadBlocks | None, int]:
         """Search plugins to find an extract EL block set.
 
         Args:
@@ -271,7 +271,7 @@ class BlockParser:  # noqa: D101
 
         blocks.append(builder.make_block(self._plugins[offset]))
 
-        for idx, plugin in enumerate(self._plugins[offset + 1 :]):  # noqa: E203
+        for idx, plugin in enumerate(self._plugins[offset + 1 :]):
             next_block = idx + 1
 
             if plugin.type not in CONSUMERS:

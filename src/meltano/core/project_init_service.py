@@ -36,7 +36,7 @@ class ProjectInitService:
         with contextlib.suppress(ValueError):
             self.project_directory = self.project_directory.relative_to(Path.cwd())
 
-    def init(  # noqa: C901
+    def init(
         self,
         *,
         activate: bool = True,
@@ -58,7 +58,7 @@ class ProjectInitService:
             self.project_directory.mkdir()
         except FileExistsError as ex:
             if (
-                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))
+                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))  # noqa: PTH110, PTH118
                 and not force
             ):
                 msg = (
@@ -93,7 +93,7 @@ class ProjectInitService:
 
         return project
 
-    def create_dot_meltano_dir(self, project: Project):
+    def create_dot_meltano_dir(self, project: Project):  # noqa: ANN201
         """Create .meltano directory.
 
         Args:
@@ -101,11 +101,11 @@ class ProjectInitService:
         """
         # explicitly create the .meltano directory if it doesn't exist
         click.secho("Creating .meltano folder", fg="blue")
-        os.makedirs(project.meltano_dir(), exist_ok=True)
+        os.makedirs(project.meltano_dir(), exist_ok=True)  # noqa: PTH103
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 
-    def create_files(self, project: Project):
+    def create_files(self, project: Project):  # noqa: ANN201
         """Create project files.
 
         Args:
@@ -128,7 +128,7 @@ class ProjectInitService:
                 click.secho("   |--", fg="yellow", nl=False)
                 click.echo(f" {path} (skipped)")
 
-    def set_send_anonymous_usage_stats(self, project: Project):
+    def set_send_anonymous_usage_stats(self, project: Project):  # noqa: ANN201
         """Set Anonymous Usage Stats flag.
 
         Args:
@@ -142,7 +142,7 @@ class ProjectInitService:
                 store=SettingValueStore.MELTANO_YML,
             )
 
-    def create_system_database(self, project: Project):
+    def create_system_database(self, project: Project):  # noqa: ANN201
         """Create Meltano System DB.
 
         Args:
@@ -165,7 +165,7 @@ class ProjectInitService:
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
-    def echo_instructions(self, project: Project):
+    def echo_instructions(self, project: Project):  # noqa: ANN201
         """Echo Next Steps to Click CLI.
 
         Args:

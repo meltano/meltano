@@ -4,7 +4,7 @@ Revision ID: 13e8639c6d2b
 Revises: d135f52a6f49
 Create Date: 2022-04-21 09:35:35.435614
 
-"""
+"""  # noqa: INP001, I002, D415
 from enum import Enum
 
 import sqlalchemy as sa
@@ -34,7 +34,7 @@ class State(Enum):
     STATE_EDIT = (5, ())
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
@@ -56,7 +56,7 @@ def upgrade():
         conn.execute(sa.text("DROP TYPE job_state;"))
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     conn = op.get_bind()
     # In sqlite, the field is already a varchar.
     # "ALTER COLUMN" statements are also not supported.

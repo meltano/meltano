@@ -7,10 +7,10 @@ Revision ID: f4c225a9492f
 Revises: 5b43800443d1
 Create Date: 2022-09-02 09:44:05.581824
 
-"""
+"""  # noqa: INP001
 from __future__ import annotations
 
-from alembic import op
+from alembic import op  # noqa: F401
 
 # revision identifiers, used by Alembic.
 revision = "f4c225a9492f"
@@ -19,9 +19,9 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     pass
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     pass

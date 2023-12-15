@@ -1,10 +1,10 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 
 import pytest
 
-from meltano.core.plugin.singer.catalog import (  # noqa: WPS235
+from meltano.core.plugin.singer.catalog import (
     CatalogRule,
     ListExecutor,
     ListSelectedExecutor,
@@ -685,7 +685,7 @@ CATALOG_PROPERTIES = {
 
 
 @pytest.fixture()
-def select_all_executor():
+def select_all_executor():  # noqa: ANN201
     return SelectExecutor(["*.*"])
 
 
@@ -702,12 +702,12 @@ def select_all_executor():
         ),
     ),
 )
-def test_path_property(path, prop):
+def test_path_property(path, prop):  # noqa: ANN001, ANN201
     assert path_property(path) == prop
 
 
 class TestCatalogRule:
-    def test_match(self):
+    def test_match(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream_id")
 
         # Stream ID matches
@@ -722,7 +722,7 @@ class TestCatalogRule:
         # Stream ID doesn't match
         assert not rule.match("tap_stream")
 
-    def test_match_wildcard(self):
+    def test_match_wildcard(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream*")
 
         # Stream ID pattern matches
@@ -733,7 +733,7 @@ class TestCatalogRule:
         # Stream ID pattern doesn't match
         assert not rule.match("tap_strea")
 
-    def test_match_multiple(self):
+    def test_match_multiple(self):  # noqa: ANN201
         rule = CatalogRule(["tap_stream_id", "other*"])
 
         # Stream ID patterns match
@@ -746,7 +746,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream")
         assert not rule.match("othe")
 
-    def test_match_negated(self):
+    def test_match_negated(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream_id", negated=True)
 
         # Stream ID doesn't match, so the rule does
@@ -763,7 +763,7 @@ class TestCatalogRule:
         # Stream ID doesn't match (good!), but breadcrumb doesn't match
         assert not rule.match("tap_stream", ["property"])
 
-    def test_match_negated_wildcard(self):
+    def test_match_negated_wildcard(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream*", negated=True)
 
         # Stream ID pattern doesn't match, so the rule does
@@ -774,7 +774,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_foo")
         assert not rule.match("tap_stream")
 
-    def test_match_negated_multiple(self):
+    def test_match_negated_multiple(self):  # noqa: ANN201
         rule = CatalogRule(["tap_stream_id", "other*"], negated=True)
 
         # Stream ID pattern doesn't match, so the rule does
@@ -787,7 +787,7 @@ class TestCatalogRule:
         assert not rule.match("other_foo")
         assert not rule.match("other")
 
-    def test_match_breadcrumb(self):
+    def test_match_breadcrumb(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream_id", ["property"])
 
         # Stream ID matches and breadcrumb is not considered
@@ -800,7 +800,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["property", "nested"])
 
-    def test_match_wildcard_breadcrumb(self):
+    def test_match_wildcard_breadcrumb(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream_id", ["proper*"])
 
         # Stream ID and breadcrumb pattern match
@@ -814,7 +814,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["other"])
 
-    def test_match_negated_breadcrumb(self):
+    def test_match_negated_breadcrumb(self):  # noqa: ANN201
         rule = CatalogRule("tap_stream_id", ["property"], negated=True)
 
         # Stream ID doesn't match (good!) and breadcrumb is not considered
@@ -830,15 +830,15 @@ class TestCatalogRule:
 
 class TestLegacyCatalogSelectVisitor:
     @pytest.fixture()
-    def catalog(self):
+    def catalog(self):  # noqa: ANN201
         return json.loads(LEGACY_CATALOG)
 
     @classmethod
-    def stream_is_selected(cls, stream):
+    def stream_is_selected(cls, stream):  # noqa: ANN001, ANN206
         return stream.get("selected", False)
 
     @classmethod
-    def metadata_is_selected(cls, metadata):
+    def metadata_is_selected(cls, metadata):  # noqa: ANN001, ANN206
         inclusion = metadata.get("inclusion")
         if inclusion == "automatic":
             return True
@@ -846,7 +846,7 @@ class TestLegacyCatalogSelectVisitor:
         return metadata.get("selected", False)
 
     @classmethod
-    def assert_catalog_is_selected(cls, catalog):
+    def assert_catalog_is_selected(cls, catalog):  # noqa: ANN001, ANN206
         streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
 
         # all streams are selected
@@ -871,7 +871,7 @@ class TestLegacyCatalogSelectVisitor:
                     field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
-    def test_visit(self, catalog, select_all_executor):
+    def test_visit(self, catalog, select_all_executor):  # noqa: ANN001, ANN201
         visit(catalog, select_all_executor)
 
         self.assert_catalog_is_selected(catalog)
@@ -879,11 +879,11 @@ class TestLegacyCatalogSelectVisitor:
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture()
-    def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+    def catalog(self, request):  # noqa: ANN001, ANN201
+        return json.loads(globals()[request.param])
 
     @classmethod
-    def stream_is_selected(cls, stream):
+    def stream_is_selected(cls, stream):  # noqa: ANN001, ANN206
         try:
             stream_metadata = next(
                 metadata
@@ -900,7 +900,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog, select_all_executor):
+    def test_visit(self, catalog, select_all_executor):  # noqa: ANN001, ANN201
         super().test_visit(catalog, select_all_executor)
 
     @pytest.mark.parametrize(
@@ -908,7 +908,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_select_all(self, catalog, select_all_executor):
+    def test_select_all(self, catalog, select_all_executor):  # noqa: ANN001, ANN201
         visit(catalog, select_all_executor)
         self.assert_catalog_is_selected(catalog)
 
@@ -942,7 +942,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select(self, catalog, attrs):
+    def test_select(self, catalog, attrs):  # noqa: ANN001, ANN201
         selector = SelectExecutor(
             [
                 "UniqueEntitiesName.code",
@@ -975,7 +975,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_escaped(self, catalog, attrs):
+    def test_select_escaped(self, catalog, attrs):  # noqa: ANN001, ANN201
         selector = SelectExecutor(
             [
                 "Unique\\.Entities\\.Name.code",
@@ -1001,7 +1001,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_negated(self, catalog, attrs):
+    def test_select_negated(self, catalog, attrs):  # noqa: ANN001, ANN201
         selector = SelectExecutor(
             [
                 "*.*",
@@ -1088,13 +1088,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             "no metadata",
         ],
     )
-    def test_node_selection(self, node: dict, selection_type: SelectionType):
+    def test_node_selection(self, node: dict, selection_type: SelectionType):  # noqa: ANN201
         """Test that selection metadata produces the expected selection type member."""
         assert ListSelectedExecutor.node_selection(node) == selection_type
 
 
 class TestSelectionType:
-    def test_selection_type_addition(self):
+    def test_selection_type_addition(self):  # noqa: ANN201
         st = SelectionType
         assert st.EXCLUDED + st.EXCLUDED == st.EXCLUDED
         assert st.SELECTED + st.EXCLUDED == st.EXCLUDED
@@ -1102,7 +1102,7 @@ class TestSelectionType:
         assert st.SELECTED + st.AUTOMATIC == st.AUTOMATIC
         assert st.SELECTED + st.SELECTED == st.SELECTED
 
-    def test_selection_type_repr(self):
+    def test_selection_type_repr(self):  # noqa: ANN201
         assert f"{SelectionType.EXCLUDED}" == "excluded"
         assert f"{SelectionType.AUTOMATIC}" == "automatic"
         assert f"{SelectionType.SELECTED}" == "selected"
@@ -1110,15 +1110,15 @@ class TestSelectionType:
 
 class TestMetadataExecutor:
     @pytest.fixture()
-    def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+    def catalog(self, request):  # noqa: ANN001, ANN201
+        return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
         "catalog",
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog):
+    def test_visit(self, catalog):  # noqa: ANN001, ANN201
         executor = MetadataExecutor(
             [
                 MetadataRule("UniqueEntitiesName", [], "replication-key", "created_at"),
@@ -1126,7 +1126,7 @@ class TestMetadataExecutor:
                     "UniqueEntitiesName",
                     ["properties", "created_at"],
                     "is-replication-key",
-                    True,
+                    True,  # noqa: FBT003
                 ),
                 MetadataRule(
                     "UniqueEntitiesName",
@@ -1167,15 +1167,15 @@ class TestMetadataExecutor:
 
 class TestSchemaExecutor:
     @pytest.fixture()
-    def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+    def catalog(self, request):  # noqa: ANN001, ANN201
+        return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
         "catalog",
         ("CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog):
+    def test_visit(self, catalog):  # noqa: ANN001, ANN201
         executor = SchemaExecutor(
             [
                 SchemaRule(
@@ -1218,7 +1218,7 @@ class TestSchemaExecutor:
         }
 
         if "created_at" in properties_node:
-            assert properties_node["created_at"] == {  # noqa: WPS52
+            assert properties_node["created_at"] == {
                 "type": "string",
                 "format": "date",
             }
@@ -1238,10 +1238,10 @@ class TestSchemaExecutor:
 
 class TestListExecutor:
     @pytest.fixture()
-    def catalog(self):
+    def catalog(self):  # noqa: ANN201
         return json.loads(CATALOG)
 
-    def test_visit(self, catalog):
+    def test_visit(self, catalog):  # noqa: ANN001, ANN201
         executor = ListExecutor()
         visit(catalog, executor)
 

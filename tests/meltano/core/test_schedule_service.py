@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 from datetime import datetime, timezone
@@ -20,8 +20,8 @@ from meltano.core.schedule_service import (
 
 
 @pytest.fixture(scope="session")
-def create_elt_schedule():
-    def make(name, **kwargs):
+def create_elt_schedule():  # noqa: ANN201
+    def make(name, **kwargs):  # noqa: ANN001, ANN003, ANN202
         attrs = {
             "extractor": "tap-mock",
             "loader": "target-mock",
@@ -38,8 +38,8 @@ def create_elt_schedule():
 
 
 @pytest.fixture(scope="session")
-def create_job_schedule():
-    def make(name, **kwargs):
+def create_job_schedule():  # noqa: ANN201
+    def make(name, **kwargs):  # noqa: ANN001, ANN003, ANN202
         attrs = {
             "job": "job-mock",
             "interval": "@daily",
@@ -54,7 +54,7 @@ def create_job_schedule():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project):  # noqa: ANN001, ANN201
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
@@ -68,11 +68,11 @@ def custom_tap(project):
 
 class TestScheduleService:
     @pytest.fixture()
-    def subject(self, schedule_service):
+    def subject(self, schedule_service):  # noqa: ANN001, ANN201
         return schedule_service
 
     @pytest.mark.order(0)
-    def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):
+    def test_add_schedules(self, subject, create_elt_schedule, create_job_schedule):  # noqa: ANN001, ANN201
         intervals = [
             "@once",
             "@manual",
@@ -111,7 +111,7 @@ class TestScheduleService:
         assert excinfo.value.reason == "Invalid Cron expression or alias: 'bad_cron'"
         assert excinfo.value.instruction == "Please use a valid cron expression"
 
-    def test_remove_schedule(self, subject):
+    def test_remove_schedule(self, subject):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -135,7 +135,7 @@ class TestScheduleService:
         with pytest.raises(ScheduleDoesNotExistError):
             subject.remove_schedule(target_name)
 
-    def test_schedule_update(self, subject):
+    def test_schedule_update(self, subject):  # noqa: ANN001, ANN201
         schedule = subject.schedules()[0]
 
         yearly_intervals = sum(sbj.interval == "@yearly" for sbj in subject.schedules())
@@ -160,17 +160,17 @@ class TestScheduleService:
         with pytest.raises(ScheduleDoesNotExistError):
             subject.update_schedule(schedule)
 
-    def test_schedule_start_date(
+    def test_schedule_start_date(  # noqa: ANN201, PLR0913
         self,
-        subject,
-        session,
-        tap,
-        target,
-        plugin_settings_service_factory,
+        subject,  # noqa: ANN001
+        session,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         # curry the `add_elt` method to remove some arguments
-        def add_elt(name, start_date):
-            return subject.add_elt(  # noqa: E731
+        def add_elt(name, start_date):  # noqa: ANN001, ANN202
+            return subject.add_elt(
                 session,
                 name,
                 tap.name,
@@ -180,7 +180,7 @@ class TestScheduleService:
                 start_date=start_date,
             )
 
-        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)  # noqa: WPS432
+        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)
 
         # when a start_date is set, the schedule should use it
         schedule = add_elt("with_start_date", mock_date)
@@ -200,7 +200,7 @@ class TestScheduleService:
             schedule = add_elt("with_no_start_date", None)
             assert schedule.start_date
 
-    def test_run_elt_schedule(self, subject, session, tap, target):
+    def test_run_elt_schedule(self, subject, session, tap, target):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -245,7 +245,7 @@ class TestScheduleService:
             )
 
     @pytest.mark.usefixtures("session", "tap", "target")
-    def test_run_job_schedule(self, subject):
+    def test_run_job_schedule(self, subject):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -285,17 +285,17 @@ class TestScheduleService:
                 },
             )
 
-    def test_find_namespace_schedule(self, subject, tap, create_elt_schedule):
+    def test_find_namespace_schedule(self, subject, tap, create_elt_schedule):  # noqa: ANN001, ANN201
         schedule = create_elt_schedule(tap.name)
         subject.add_schedule(schedule)
         found_schedule = subject.find_namespace_schedule(tap.namespace)
         assert found_schedule.extractor == tap.name
 
     @pytest.mark.usefixtures("create_elt_schedule")
-    def test_find_namespace_schedule_custom_extractor(
+    def test_find_namespace_schedule_custom_extractor(  # noqa: ANN201
         self,
-        subject,
-        custom_tap,
+        subject,  # noqa: ANN001
+        custom_tap,  # noqa: ANN001
     ):
         schedule = Schedule(
             name="tap-custom",
@@ -306,6 +306,6 @@ class TestScheduleService:
         found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
         assert found_schedule.extractor == custom_tap.name
 
-    def test_find_namespace_schedule_not_found(self, subject):
+    def test_find_namespace_schedule_not_found(self, subject):  # noqa: ANN001, ANN201
         with pytest.raises(ScheduleNotFoundError):
             subject.find_namespace_schedule("no-such-namespace")

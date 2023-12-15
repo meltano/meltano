@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 from configparser import ConfigParser
@@ -20,17 +20,17 @@ AIRFLOW_CONFIG = """
 
 class TestAirflow:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    @pytest.mark.asyncio()  # noqa:  WPS210
-    async def test_before_configure(  # noqa:  WPS210
+    @pytest.mark.asyncio()
+    async def test_before_configure(  # noqa: ANN201
         self,
-        subject,
-        project,
-        session,
-        plugin_invoker_factory,
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
     ):
         run_dir = project.run_dir("airflow")
 
@@ -43,7 +43,7 @@ class TestAirflow:
 
         original_exec = asyncio.create_subprocess_exec
 
-        def popen_mock(cmd, *popen_args, **kwargs):
+        def popen_mock(cmd, *popen_args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
             # first time, it creates the `airflow.cfg`
             if "--help" in popen_args:
                 assert "env" in kwargs
@@ -85,7 +85,7 @@ class TestAirflow:
                 assert commands[1][1] == "version"
                 assert commands[2][1] == "db"
                 assert commands[2][2] == "init"
-                assert configure.call_count == 2
+                assert configure.call_count == 2  # noqa: PLR2004
 
                 assert run_dir.joinpath("airflow.cfg").exists()
                 assert project.plugin_dir(subject, "airflow.db").exists()
@@ -99,7 +99,7 @@ class TestAirflow:
             assert not run_dir.joinpath("airflow.cfg").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory):  # noqa: ANN001, ANN201
         invoker: AirflowInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import io
 from textwrap import dedent
@@ -18,12 +18,12 @@ definition = {
 
 class TestCanonical:
     @pytest.fixture()
-    def subject(self):
+    def subject(self):  # noqa: ANN201
         return Canonical(**definition)
 
-    def test_canonical(self, subject):
+    def test_canonical(self, subject):  # noqa: ANN001, ANN201
         # make sure the Nones are removed
-        assert len(list(subject)) == 5
+        assert len(list(subject)) == 5  # noqa: PLR2004
 
         subject.test = "hello"
         yaml_definition = "\n".join(f"{k}: {v}" for k, v in iter(subject))
@@ -34,12 +34,12 @@ class TestCanonical:
 
         assert buf.read().strip() == yaml_definition
 
-    def test_false(self, subject):
+    def test_false(self, subject):  # noqa: ANN001, ANN201
         subject.false_value = False
 
         assert subject.canonical()["false_value"] is False
 
-    def test_nested(self, subject):
+    def test_nested(self, subject):  # noqa: ANN001, ANN201
         nested = Canonical(test="value")
         subject.nested = nested
 
@@ -47,25 +47,25 @@ class TestCanonical:
             nested,
         )
 
-    def test_nested_empty(self, subject):
+    def test_nested_empty(self, subject):  # noqa: ANN001, ANN201
         nested = Canonical(test="")
         subject.nested = nested
 
         assert "nested" not in Canonical.as_canonical(subject)
 
-    def test_update_canonical(self, subject):
+    def test_update_canonical(self, subject):  # noqa: ANN001, ANN201
         subject.update(Canonical(test="value"))
         assert subject.test == "value"
 
-    def test_update_dict(self, subject):
+    def test_update_dict(self, subject):  # noqa: ANN001, ANN201
         subject.update({"test": "value"})
         assert subject.test == "value"
 
-    def test_update_kwargs(self, subject):
+    def test_update_kwargs(self, subject):  # noqa: ANN001, ANN201
         subject.update(test="value")
         assert subject.test == "value"
 
-    def test_with_attrs(self, subject):
+    def test_with_attrs(self, subject):  # noqa: ANN001, ANN201
         subject.test = "value"
 
         assert subject.with_attrs().canonical() == subject.canonical()
@@ -78,9 +78,9 @@ class TestCanonical:
         assert new.new_test == "new_value"
         assert new.canonical() == {**subject.canonical(), "new_test": "new_value"}
 
-    def test_defaults(self, subject):
+    def test_defaults(self, subject):  # noqa: ANN001, ANN201
         with pytest.raises(AttributeError):
-            subject.test  # noqa: B018, WPS428
+            subject.test  # noqa: B018
 
         subject.test = None
 
@@ -99,10 +99,10 @@ class TestCanonical:
         assert subject.test == "changed"
         assert subject.canonical()["test"] == "changed"
 
-    def test_fallbacks(self, subject):
+    def test_fallbacks(self, subject):  # noqa: ANN001, ANN201
         # Calling an unknown attribute is not supported
         with pytest.raises(AttributeError):
-            subject.unknown  # noqa: B018, WPS428
+            subject.unknown  # noqa: B018
 
         fallback = Canonical(unknown="value", known="value")
         # This would typically be set from a Canonical subclass
@@ -135,7 +135,7 @@ class TestCanonical:
         assert subject.known == "value"
         assert subject.canonical()["known"] == "value"
 
-    def test_preserve_comments(self):
+    def test_preserve_comments(self):  # noqa: ANN201
         contents = """\
             # This is a top-level comment
             test: value
@@ -164,7 +164,7 @@ class TestCanonical:
         new_contents = out_stream.read()
         assert new_contents == contents
 
-    def test_annotations(self):
+    def test_annotations(self):  # noqa: ANN201
         original = CommentedMap(
             {"a": 1, "annotations": {"cloud": {"data": 123}}, "z": -1},
         )

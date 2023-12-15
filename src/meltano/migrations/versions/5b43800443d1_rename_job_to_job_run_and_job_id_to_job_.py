@@ -4,8 +4,8 @@ Revision ID: 5b43800443d1
 Revises: 13e8639c6d2b
 Create Date: 2022-06-29 14:28:51.673195
 
-"""
-import sqlalchemy as sa
+"""  # noqa: INP001, I002, D415
+import sqlalchemy as sa  # noqa: F401
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -15,11 +15,11 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     op.alter_column("job", "job_id", new_column_name="job_name")
     op.rename_table("job", "runs")
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.rename_table("runs", "job")
     op.alter_column("job", "job_name", new_column_name="job_id")

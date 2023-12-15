@@ -56,7 +56,7 @@ class PluginRepository(metaclass=ABCMeta):
     def get_base_plugin(
         self,
         project_plugin: ProjectPlugin,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> BasePlugin:
         """Get the base plugin for a project plugin.
 

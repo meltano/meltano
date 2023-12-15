@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 import sys
@@ -40,18 +40,18 @@ def load_module_from_path(name: str, path: Path) -> ModuleType:
 
 class TestSuperset:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.asyncio()  # noqa:  WPS210
-    async def test_hooks(  # noqa:  WPS210
+    @pytest.mark.asyncio()
+    async def test_hooks(  # noqa: ANN201, PLR0913
         self,
-        subject,
-        project,
-        session,
-        plugin_invoker_factory,
-        monkeypatch,
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -67,7 +67,7 @@ class TestSuperset:
 
         original_exec = asyncio.create_subprocess_exec
 
-        def popen_mock(cmd, *popen_args, **kwargs):
+        def popen_mock(cmd, *popen_args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
             assert kwargs["env"]["SUPERSET_HOME"] == str(run_dir)
             assert kwargs["env"]["SUPERSET_CONFIG_PATH"] == str(config_path)
 
@@ -111,7 +111,7 @@ class TestSuperset:
 
                 config_module = load_module_from_path("superset_config", config_path)
 
-                config_keys = dir(config_module)  # noqa: WPS421
+                config_keys = dir(config_module)
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
                     f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
@@ -137,13 +137,13 @@ class TestSuperset:
 
                 config_module = load_module_from_path("superset_config", config_path)
 
-                config_keys = dir(config_module)  # noqa: WPS421
+                config_keys = dir(config_module)
                 # Verify default Meltano-managed settings are here
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert "SECRET_KEY" in config_keys
                 # Verify custom Meltano-managed settings are here
                 assert "SUPERSET_WEBSERVER_PORT" in config_keys
-                assert config_module.SUPERSET_WEBSERVER_PORT == 5000
+                assert config_module.SUPERSET_WEBSERVER_PORT == 5000  # noqa: PLR2004
                 # Verify settings from the custom config path are here
                 assert "FOO_FAKE_SETTING" in config_keys
                 assert config_module.FOO_FAKE_SETTING == "fake_value"
@@ -151,7 +151,7 @@ class TestSuperset:
             assert not run_dir.joinpath("superset_config.py").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory):  # noqa: ANN001, ANN201
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

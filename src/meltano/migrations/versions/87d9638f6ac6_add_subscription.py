@@ -4,7 +4,7 @@ Revision ID: 87d9638f6ac6
 Revises: 23ea52e6d784
 Create Date: 2020-02-17 16:03:27.765240
 
-"""
+"""  # noqa: INP001, I002, D415
 import sqlalchemy as sa
 from alembic import op
 
@@ -21,7 +21,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
 
@@ -37,5 +37,5 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_table("subscriptions")

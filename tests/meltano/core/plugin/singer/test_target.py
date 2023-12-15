@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -14,25 +14,25 @@ if t.TYPE_CHECKING:
 
 class TestSingerTarget:
     @pytest.fixture()
-    def subject(self, project_add_service: ProjectAddService):
+    def subject(self, project_add_service: ProjectAddService):  # noqa: ANN201
         try:
             return project_add_service.add(PluginType.LOADERS, "target-mock")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
     @pytest.mark.asyncio()
-    async def test_exec_args(self, subject, session, plugin_invoker_factory):
+    async def test_exec_args(self, subject, session, plugin_invoker_factory):  # noqa: ANN001, ANN201
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
     @pytest.mark.asyncio()
-    async def test_setup_bookmark_writer(
+    async def test_setup_bookmark_writer(  # noqa: ANN201
         self,
-        subject,
-        session,
-        plugin_invoker_factory,
-        elt_context_builder,
+        subject,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        elt_context_builder,  # noqa: ANN001
     ):
         job = Job(job_name="pytest_test_runner")
 
@@ -91,7 +91,7 @@ class TestSingerTarget:
             .with_loader(subject.name)
             .with_job(job)
             .with_select_filter(["entity", "!other_entity"])
-            .with_full_refresh(True)
+            .with_full_refresh(True)  # noqa: FBT003
             .context()
         )
 

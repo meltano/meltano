@@ -50,7 +50,7 @@ class BookmarkWriter:
         self.state_service = state_service or StateService(session=self.session)
         self.payload_flag = payload_flag
 
-    def writeline(self, line: str):
+    def writeline(self, line: str):  # noqa: ANN201
         """Persist a state entry.
 
         Args:
@@ -89,7 +89,7 @@ class BookmarkWriter:
             )
         else:
             logger.info(
-                f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004
+                f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: G004, E501
             )
             logger.debug(f"Incremental state: {new_state}")  # noqa: G004
 
@@ -99,11 +99,11 @@ class SingerTarget(SingerPlugin):
 
     __plugin_type__ = PluginType.LOADERS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS = [  # noqa: RUF012
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 
-    def exec_args(self, plugin_invoker):
+    def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get command-line args to pass to the plugin.
 
         Args:
@@ -115,7 +115,7 @@ class SingerTarget(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Get config files for this target.
 
         Returns:
@@ -124,7 +124,7 @@ class SingerTarget(SingerPlugin):
         return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
-    def output_files(self):
+    def output_files(self):  # noqa: ANN201
         """Get output files for this target.
 
         Returns:
@@ -133,7 +133,7 @@ class SingerTarget(SingerPlugin):
         return {"state": "new_state.json"}
 
     @hook("before_invoke")
-    async def setup_bookmark_writer_hook(
+    async def setup_bookmark_writer_hook(  # noqa: ANN201
         self,
         plugin_invoker: PluginInvoker,
         exec_args: list[str],
@@ -152,7 +152,7 @@ class SingerTarget(SingerPlugin):
 
         self.setup_bookmark_writer(plugin_invoker)
 
-    def setup_bookmark_writer(self, plugin_invoker: PluginInvoker):
+    def setup_bookmark_writer(self, plugin_invoker: PluginInvoker):  # noqa: ANN201
         """Configure the bookmark writer.
 
         If running in a pipeline context, we configure the bookmark writer as

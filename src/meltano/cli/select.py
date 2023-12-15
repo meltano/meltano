@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def selection_color(selection):
+def selection_color(selection):  # noqa: ANN001, ANN201
     """Return the appropriate colour for given SelectionType."""
     if selection is SelectionType.SELECTED:
         return "bright_green"
@@ -30,7 +30,7 @@ def selection_color(selection):
     return None
 
 
-def selection_mark(selection):
+def selection_mark(selection):  # noqa: ANN001, ANN201
     """
     Return the mark to indicate the selection type of an attribute.
 
@@ -76,7 +76,7 @@ def selection_mark(selection):
 )
 @pass_project(migrate=True)
 @run_async
-async def select(
+async def select(  # noqa: ANN201
     project: Project,
     extractor: str,
     entities_filter: str,
@@ -109,13 +109,13 @@ async def select(
         raise CliError(f"Cannot list the selected attributes: {err}") from err  # noqa: EM102
 
 
-def update(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
-    exclude=False,
-    remove=False,
+def update(  # noqa: ANN201, PLR0913
+    project,  # noqa: ANN001
+    extractor,  # noqa: ANN001
+    entities_filter,  # noqa: ANN001
+    attributes_filter,  # noqa: ANN001
+    exclude=False,  # noqa: ANN001, FBT002
+    remove=False,  # noqa: ANN001, FBT002
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
@@ -125,8 +125,8 @@ def update(
 async def show(
     project: Project,
     extractor: str,
-    show_all: bool = False,
-    refresh: bool = False,
+    show_all: bool = False,  # noqa: FBT001, FBT002
+    refresh: bool = False,  # noqa: FBT001, FBT002
 ) -> None:
     """Show selected."""
     _, Session = project_engine(project)  # noqa: N806

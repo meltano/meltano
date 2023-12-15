@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 import threading
@@ -14,13 +14,13 @@ from meltano.core.project import PROJECT_ROOT_ENV, Project
 
 
 @pytest.fixture()
-def deactivate_project(project):
+def deactivate_project(project):  # noqa: ANN001, ANN201
     Project.deactivate()
     yield
     Project.activate(project)
 
 
-def update(payload):
+def update(payload):  # noqa: ANN001, ANN201
     project = Project.find()
 
     with project.meltano_update() as meltano:
@@ -31,15 +31,15 @@ def update(payload):
 class IndefiniteThread(threading.Thread):
     """Never ending thread."""
 
-    def __init__(self):
+    def __init__(self):  # noqa: ANN204
         """Set stop event."""
         super().__init__()
         self._stop_event = threading.Event()
 
-    def stop(self):
+    def stop(self):  # noqa: ANN201
         self._stop_event.set()
 
-    def run(self, *args, **kwargs):
+    def run(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
         while not self._stop_event.is_set():
             self.do(*args, **kwargs)
 
@@ -47,19 +47,19 @@ class IndefiniteThread(threading.Thread):
 class ProjectReader(IndefiniteThread):
     """Project using a never ending thread."""
 
-    def __init__(self, project):
+    def __init__(self, project):  # noqa: ANN001, ANN204
         """Set the project."""
         self.project = project
         super().__init__()
 
-    def do(self):
+    def do(self):  # noqa: ANN201
         assert self.project.meltano
         time.sleep(50 / 1000)  # 50ms
 
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, tmp_path, monkeypatch):
+    def test_find(self, project, tmp_path, monkeypatch):  # noqa: ANN001, ANN201
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -86,7 +86,7 @@ class TestProject:
         with pytest.raises(ProjectNotFound):
             Project.find(tmp_path)
 
-    def test_activate(self, project):
+    def test_activate(self, project):  # noqa: ANN001, ANN201
         Project.deactivate()
         assert Project._default is None
 
@@ -95,13 +95,13 @@ class TestProject:
         assert Project._default is project
         assert Project.find() is project
 
-    def test_find_threadsafe(self, project, concurrency):
+    def test_find_threadsafe(self, project, concurrency):  # noqa: ANN001, ANN201
         workers = ThreadPool(concurrency["threads"])
         projects = workers.map(Project.find, range(concurrency["cases"]))
         assert all(x is project for x in projects)
 
     @pytest.mark.concurrent()
-    def test_meltano_concurrency(self, project, concurrency):
+    def test_meltano_concurrency(self, project, concurrency):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -123,7 +123,7 @@ class TestProject:
         for key, val in unpacked_items:
             assert meltano.extras[key] == val
 
-    def test_preserve_comments(self, project: Project):
+    def test_preserve_comments(self, project: Project):  # noqa: ANN201
         original_contents = project.meltanofile.read_text()
 
         new_contents = f"# Please don't delete me :)\n{original_contents}"
@@ -138,7 +138,7 @@ class TestProject:
 
 
 class TestIncompatibleProject:
-    def test_incompatible(self, project):
+    def test_incompatible(self, project):  # noqa: ANN001, ANN201
         with project.meltano_update() as meltano:
             meltano["version"] += 1
 

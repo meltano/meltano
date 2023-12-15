@@ -64,7 +64,7 @@ class PluginLock:
 
     def load(
         self,
-        create: bool = False,
+        create: bool = False,  # noqa: FBT001, FBT002
         loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
     ) -> StandalonePlugin:
         """Load the plugin lockfile.
@@ -81,8 +81,8 @@ class PluginLock:
             The loaded plugin.
         """
 
-        def _load():
-            with open(self.path) as lockfile:
+        def _load():  # noqa: ANN202
+            with open(self.path) as lockfile:  # noqa: PTH123
                 return loader(lockfile)
 
         try:
@@ -114,7 +114,7 @@ class PluginLockService:
         """
         self.project = project
 
-    def save(
+    def save(  # noqa: ANN201
         self,
         plugin: ProjectPlugin,
         *,

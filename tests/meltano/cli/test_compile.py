@@ -1,4 +1,4 @@
-"""Test the compile CLI command."""
+"""Test the compile CLI command."""  # noqa: INP001
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
 
 
-def check_indent(json_path: Path, indent: int):
+def check_indent(json_path: Path, indent: int):  # noqa: ANN201
     text = json_path.read_text()
     # If the indent is as-expected, then a trip through `json.loads` and
     # `json.dumps` should produce the same text, usually. This isn't true in
@@ -41,14 +41,14 @@ class TestCompile:
     def clear_default_manifest_dir(self, manifest_dir: Path) -> None:
         shutil.rmtree(manifest_dir, ignore_errors=True)
 
-    def test_compile(self, manifest_dir: Path, cli_runner: CliRunner):
+    def test_compile(self, manifest_dir: Path, cli_runner: CliRunner):  # noqa: ANN201
         assert cli_runner.invoke(cli, ("compile",)).exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {
             f"meltano-manifest{x}.json" for x in (".dev", ".staging", ".prod", "")
         }
 
     @pytest.mark.parametrize("environment_name", ("dev", "staging", "prod"))
-    def test_compile_specific_environment(
+    def test_compile_specific_environment(  # noqa: ANN201
         self,
         manifest_dir: Path,
         cli_runner: CliRunner,
@@ -60,13 +60,13 @@ class TestCompile:
             f"meltano-manifest.{environment_name}.json",
         }
 
-    def test_compile_no_environment(self, manifest_dir: Path, cli_runner: CliRunner):
+    def test_compile_no_environment(self, manifest_dir: Path, cli_runner: CliRunner):  # noqa: ANN201
         result = cli_runner.invoke(cli, ("--no-environment", "compile"))
         assert result.exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {"meltano-manifest.json"}
 
     @pytest.mark.parametrize("indent", (-3, -1, 0, 1, 4, 9))
-    def test_compile_with_indent(
+    def test_compile_with_indent(  # noqa: ANN201
         self,
         manifest_dir: Path,
         cli_runner: CliRunner,
@@ -81,7 +81,7 @@ class TestCompile:
         )
         check_indent(manifest_dir / "meltano-manifest.dev.json", indent)
 
-    def test_specify_output_dir(
+    def test_specify_output_dir(  # noqa: ANN201
         self,
         manifest_dir: Path,
         cli_runner: CliRunner,
@@ -94,7 +94,7 @@ class TestCompile:
             f"meltano-manifest{x}.json" for x in (".dev", ".staging", ".prod", "")
         }
 
-    def test_warn_schema_violation(
+    def test_warn_schema_violation(  # noqa: ANN201, PLR0913
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -104,7 +104,7 @@ class TestCompile:
     ):
         original_yaml_load = manifest.yaml.load
 
-        def patch(*args, **kwargs):
+        def patch(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
             project_files = original_yaml_load(*args, **kwargs)
             project_files["invalid_key"] = None
             return project_files
@@ -120,7 +120,7 @@ class TestCompile:
         if system() == "Windows":
             # The log message is slightly different on Windows; this length
             # check is good enough:
-            assert len(log.events) == 2
+            assert len(log.events) == 2  # noqa: PLR2004
             return
         assert log.events == [
             {

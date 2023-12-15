@@ -1,4 +1,4 @@
-"""Test container commands."""
+"""Test container commands."""  # noqa: INP001
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ class TestContainerService:
                                 "8000": [
                                     {
                                         "HostPort": "8080",
-                                        "HostIP": "0.0.0.0",  # noqa: S104v
+                                        "HostIP": "0.0.0.0",  # v  # noqa: S104
                                     },
                                 ],
                             },
@@ -62,7 +62,7 @@ class TestContainerService:
         ids=["port-mapping", "custom-entrypoint"],
     )
     @pytest.mark.asyncio()
-    async def test_docker_config(self, spec: ContainerSpec, payload: dict):
+    async def test_docker_config(self, spec: ContainerSpec, payload: dict):  # noqa: ANN201
         """Check Docker container config from container spec."""
         if platform.system() == "Windows":
             pytest.xfail(

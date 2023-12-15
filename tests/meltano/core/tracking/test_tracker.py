@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 import logging
@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
-    with open(project.meltano_dir() / "analytics.json") as analytics_json_file:
+    with open(project.meltano_dir() / "analytics.json") as analytics_json_file:  # noqa: PTH123
         return json.load(analytics_json_file)
 
 
@@ -53,7 +53,7 @@ def delete_analytics_json(project: Project) -> None:
 
 class TestTracker:
     @pytest.fixture(autouse=True)
-    def clear_telemetry_settings(self, project, monkeypatch: pytest.MonkeyPatch):
+    def clear_telemetry_settings(self, project, monkeypatch: pytest.MonkeyPatch):  # noqa: ANN001, ANN201
         monkeypatch.delenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", raising=False)
         config = project.settings.meltano_yml_config
         config.pop("send_anonymous_usage_stats", None)
@@ -68,12 +68,12 @@ class TestTracker:
             project.refresh()
             yield
         finally:
-            (  # noqa: WPS414
+            (
                 type(project.settings).config_override,
                 project.settings.config_override,
             ) = original_config_override
 
-    def test_telemetry_state_change_check(self, project: Project):
+    def test_telemetry_state_change_check(self, project: Project):  # noqa: ANN201
         with mock.patch.object(
             Tracker,
             "save_telemetry_settings",
@@ -81,7 +81,7 @@ class TestTracker:
             Tracker(project)
             assert mocked.call_count == 1
 
-    def test_update_analytics_json(self, project: Project):
+    def test_update_analytics_json(self, project: Project):  # noqa: ANN201
         tracker = Tracker(project)
         inital_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
 
@@ -109,7 +109,7 @@ class TestTracker:
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
-    def test_restore_project_id_from_analytics_json(self, project: Project):
+    def test_restore_project_id_from_analytics_json(self, project: Project):  # noqa: ANN201
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
         original_project_id = project.settings.get("project_id")
@@ -132,14 +132,14 @@ class TestTracker:
             str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
         )
 
-    def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
+    def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):  # noqa: ANN201
         method_name = "track_telemetry_state_change_event"
 
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", True)  # noqa: FBT003
         project.settings.set("project_id", str(uuid.uuid4()))
         Tracker(project).save_telemetry_settings()
 
-        project.settings.set("send_anonymous_usage_stats", False)
+        project.settings.set("send_anonymous_usage_stats", False)  # noqa: FBT003
         with mock.patch.object(Tracker, method_name) as mocked:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 1
@@ -149,10 +149,10 @@ class TestTracker:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 0
 
-    def test_no_state_change_event_without_analytics_json(self, project: Project):
+    def test_no_state_change_event_without_analytics_json(self, project: Project):  # noqa: ANN201
         method_name = "track_telemetry_state_change_event"
 
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", True)  # noqa: FBT003
         project.settings.set("project_id", str(uuid.uuid4()))
         Tracker(project).save_telemetry_settings()
 
@@ -162,7 +162,7 @@ class TestTracker:
                 Tracker(project)
                 assert mocked.call_count == 0
 
-    def test_analytics_json_is_created(self, project: Project):
+    def test_analytics_json_is_created(self, project: Project):  # noqa: ANN201
         Tracker(project)
         check_analytics_json(project)
         with delete_analytics_json(project):
@@ -172,15 +172,15 @@ class TestTracker:
     @pytest.mark.parametrize(
         "analytics_json_content",
         (
-            f'{{"clientId":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-            f'{{"client_id":"{str(uuid.uuid4())}","projectId":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-            f'{{"client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anon_usage_stats":true}}',  # noqa: E501
-            f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
-            f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
+            f'{{"clientId":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: RUF010
+            f'{{"client_id":"{str(uuid.uuid4())}","projectId":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: RUF010
+            f'{{"client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anon_usage_stats":true}}',  # noqa: RUF010
+            f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',  # noqa: RUF010
+            f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: RUF010
         ),
         ids=(0, 1, 2, 3, 4),
     )
-    def test_invalid_analytics_json_is_overwritten(
+    def test_invalid_analytics_json_is_overwritten(  # noqa: ANN201
         self,
         project: Project,
         analytics_json_content: str,
@@ -188,7 +188,7 @@ class TestTracker:
         with delete_analytics_json(project):
             # Use `delete_analytics_json` to ensure `analytics.json` is restored after
             analytics_json_path = project.meltano_dir() / "analytics.json"
-            with open(analytics_json_path, "w") as analytics_json_file:
+            with open(analytics_json_path, "w") as analytics_json_file:  # noqa: PTH123
                 analytics_json_file.write(analytics_json_content)
 
             with pytest.raises((TypeError, KeyError, json.JSONDecodeError)):
@@ -198,11 +198,11 @@ class TestTracker:
 
             check_analytics_json(project)
 
-    def test_restore_project_id_and_telemetry_state_change(self, project: Project):
+    def test_restore_project_id_and_telemetry_state_change(self, project: Project):  # noqa: ANN201
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
         change event is fired because `send_anonymous_usage_stats` is negated.
-        """  # noqa: D205, D400
+        """
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
         original_project_id = project.settings.get("project_id")
@@ -245,47 +245,47 @@ class TestTracker:
             ([], False, False),
         ),
     )
-    def test_can_track(
+    def test_can_track(  # noqa: ANN201
         self,
         project: Project,
         snowplow_endpoints: list[str],
-        send_stats: bool,
-        expected: bool,
+        send_stats: bool,  # noqa: FBT001
+        expected: bool,  # noqa: FBT001
     ):
         project.settings.set("snowplow.collector_endpoints", snowplow_endpoints)
         project.settings.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
-    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):
+    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):  # noqa: ANN001, ANN201
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
         # Ensure the env var takes priority
-        project.settings.set("send_anonymous_usage_stats", False)
+        project.settings.set("send_anonymous_usage_stats", False)  # noqa: FBT003
         assert Tracker(project).send_anonymous_usage_stats is True
 
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
         assert Tracker(project).send_anonymous_usage_stats is False
 
         # Ensure the env var takes priority
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", True)  # noqa: FBT003
         assert Tracker(project).send_anonymous_usage_stats is False
 
     @pytest.mark.parametrize("setting_value", (False, True))
-    def test_send_anonymous_usage_stats_no_env(
+    def test_send_anonymous_usage_stats_no_env(  # noqa: ANN201
         self,
         project: Project,
-        setting_value: bool,
+        setting_value: bool,  # noqa: FBT001
     ):
         project.settings.set("send_anonymous_usage_stats", setting_value)
         assert Tracker(project).send_anonymous_usage_stats is setting_value
 
-    def test_default_send_anonymous_usage_stats(self, project: Project):
+    def test_default_send_anonymous_usage_stats(self, project: Project):  # noqa: ANN201
         assert Tracker(project).send_anonymous_usage_stats
 
     @pytest.mark.usefixtures("project")
-    def test_exit_event_is_fired(self, snowplow: SnowplowMicro):
-        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
+    def test_exit_event_is_fired(self, snowplow: SnowplowMicro):  # noqa: ANN201
+        subprocess.run(("meltano", "invoke", "alpha-beta-fox"))  # noqa: PLW1510
 
         event_summary = snowplow.all()
         assert event_summary["good"] > 0
@@ -299,10 +299,10 @@ class TestTracker:
         assert exit_event["unstruct_event"]["data"]["data"]["exit_code"] == 1
 
     @pytest.mark.parametrize("send_anonymous_usage_stats", (True, False))
-    def test_context_with_telemetry_state_change_event(
+    def test_context_with_telemetry_state_change_event(  # noqa: ANN201
         self,
         project: Project,
-        send_anonymous_usage_stats: bool,
+        send_anonymous_usage_stats: bool,  # noqa: FBT001
     ):
         tracker = Tracker(project)
         tracker.send_anonymous_usage_stats = send_anonymous_usage_stats
@@ -310,7 +310,7 @@ class TestTracker:
         passed = False
 
         class MockSnowplowTracker:
-            def track(self, event: SelfDescribing):
+            def track(self, event: SelfDescribing):  # noqa: ANN202
                 # Can't put asserts in here because this method is executed
                 # withing a try-except block that catches all exceptions.
                 nonlocal passed
@@ -332,15 +332,15 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "send_anonymous_usage_stats",
-            True,
-            False,
+            True,  # noqa: FBT003
+            False,  # noqa: FBT003
         )
         assert passed
 
         tracker.track_telemetry_state_change_event(
             "send_anonymous_usage_stats",
-            False,
-            True,
+            False,  # noqa: FBT003
+            True,  # noqa: FBT003
         )
         assert passed
 
@@ -350,11 +350,11 @@ class TestTracker:
         ((1.0, False), (5.0, True)),
         ids=("no_timeout", "timeout"),
     )
-    def test_timeout_if_endpoint_unavailable(
+    def test_timeout_if_endpoint_unavailable(  # noqa: ANN201
         self,
         project: Project,
-        sleep_duration,
-        timeout_should_occur,
+        sleep_duration,  # noqa: ANN001
+        timeout_should_occur,  # noqa: ANN001
     ):
         """Test to ensure that the default tracker timeout is respected.
 
@@ -393,17 +393,16 @@ class TestTracker:
         server_thread.join()
 
         timeout_occurred = (
-            tracker.snowplow_tracker.emitters[0].on_failure.call_count  # noqa: WPS219
-            == 1
+            tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
         )
         assert timeout_occurred is timeout_should_occur
 
-    def test_project_context_send_anonymous_usage_stats_source(
+    def test_project_context_send_anonymous_usage_stats_source(  # noqa: ANN201
         self,
         project: Project,
-        monkeypatch,
+        monkeypatch,  # noqa: ANN001
     ):
-        def get_source():
+        def get_source():  # noqa: ANN202
             return ProjectContext(project, uuid.uuid4()).to_json()["data"][
                 "send_anonymous_usage_stats_source"
             ]
@@ -421,11 +420,11 @@ class TestTracker:
 
     @pytest.mark.order(1)
     @pytest.mark.flaky(reruns=5, reruns_delay=2)
-    def test_get_snowplow_tracker_invalid_endpoint(
+    def test_get_snowplow_tracker_invalid_endpoint(  # noqa: ANN201
         self,
         project: Project,
-        caplog,
-        monkeypatch,
+        caplog,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         endpoints = """
             [
@@ -450,7 +449,7 @@ class TestTracker:
             assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
             assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
 
-            assert len(tracker.snowplow_tracker.emitters) == 2
+            assert len(tracker.snowplow_tracker.emitters) == 2  # noqa: PLR2004
 
             emitter = tracker.snowplow_tracker.emitters[0]
             assert isinstance(emitter, Emitter)
@@ -467,7 +466,7 @@ class TestTracker:
             # Remove the seemingly valid emitters to prevent a logging error on exit.
             tracker.snowplow_tracker.emitters = []
 
-    def test_client_id_from_env_var(
+    def test_client_id_from_env_var(  # noqa: ANN201
         self,
         project: Project,
         monkeypatch: pytest.MonkeyPatch,

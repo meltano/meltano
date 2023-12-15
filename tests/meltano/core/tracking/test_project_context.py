@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -31,7 +31,7 @@ if t.TYPE_CHECKING:
     ),
 )
 @pytest.mark.usefixtures("project")
-def test_environment_name_hash(
+def test_environment_name_hash(  # noqa: ANN201
     cmd: str,
     expected: str,
     snowplow: SnowplowMicro,

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -21,10 +21,10 @@ if t.TYPE_CHECKING:
 
 class TestProjectAddService:
     @pytest.fixture()
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         return project_add_service
 
-    def test_missing_plugin_exception(self, subject, hub_request_counter):
+    def test_missing_plugin_exception(self, subject, hub_request_counter):  # noqa: ANN001, ANN201
         with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
@@ -42,7 +42,7 @@ class TestProjectAddService:
             (PluginType.UTILITIES, "utility-mock", None, "original"),
         ),
     )
-    def test_add(
+    def test_add(  # noqa: ANN201, PLR0913
         self,
         plugin_type: PluginType,
         plugin_name: str,
@@ -79,14 +79,14 @@ class TestProjectAddService:
 
         assert hub_request_counter[f"/{plugin_type}/index"] == 1
         assert hub_request_counter[f"/{plugin_type}/{plugin_name}--{used_variant}"] == 1
-        assert len(hub_request_counter) == 2
+        assert len(hub_request_counter) == 2  # noqa: PLR2004
 
-    def test_add_inherited(
+    def test_add_inherited(  # noqa: ANN201
         self,
-        tap,
-        subject,
+        tap,  # noqa: ANN001
+        subject,  # noqa: ANN001
         project: Project,
-        hub_request_counter,
+        hub_request_counter,  # noqa: ANN001
     ):
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
@@ -117,10 +117,10 @@ class TestProjectAddService:
 
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
-        assert len(hub_request_counter) == 2
+        assert len(hub_request_counter) == 2  # noqa: PLR2004
 
     @pytest.mark.order(after="test_add_inherited")
-    def test_lockfile_inherited(
+    def test_lockfile_inherited(  # noqa: ANN201
         self,
         subject: ProjectAddService,
         hub_request_counter: Counter,
@@ -171,9 +171,9 @@ class TestProjectAddService:
 
         assert hub_request_counter["/extractors/index"] == 1
         assert hub_request_counter["/extractors/tap-mock--meltano"] == 1
-        assert len(hub_request_counter) == 2
+        assert len(hub_request_counter) == 2  # noqa: PLR2004
 
-    def test_add_name_contains_state_id_component_delimiter(
+    def test_add_name_contains_state_id_component_delimiter(  # noqa: ANN201
         self,
         subject: ProjectAddService,
     ):
@@ -184,10 +184,10 @@ class TestProjectAddService:
             )
 
     @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
-    def test_add_update(
+    def test_add_update(  # noqa: ANN201, PLR0913
         self,
         lock_save: mock.MagicMock,
-        target,
+        target,  # noqa: ANN001
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
@@ -209,7 +209,7 @@ class TestProjectAddService:
             ],
         }
 
-        assert not target.canonical().items() >= updated_attrs.items()  # noqa: WPS508
+        assert not target.canonical().items() >= updated_attrs.items()
 
         updated = subject.add(
             target.type,
@@ -220,7 +220,7 @@ class TestProjectAddService:
 
         assert hub_request_counter["/loaders/index"] == 1
         assert hub_request_counter["/loaders/target-mock--original"] == 1
-        assert len(hub_request_counter) == 2
+        assert len(hub_request_counter) == 2  # noqa: PLR2004
 
         assert lock_save.call_count == 1
 
@@ -229,7 +229,7 @@ class TestProjectAddService:
         assert updated.config_with_extras
 
     @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
-    def test_add_update_custom(
+    def test_add_update_custom(  # noqa: ANN201
         self,
         lock_save: mock.MagicMock,
         subject: ProjectAddService,

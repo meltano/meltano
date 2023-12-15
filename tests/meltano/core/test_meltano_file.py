@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import pytest
 
@@ -7,12 +7,12 @@ from meltano.core.meltano_file import MeltanoFile
 
 class TestMeltanoFile:
     @pytest.mark.usefixtures("tap", "target")
-    def test_load(self, project):
+    def test_load(self, project):  # noqa: ANN001, ANN201
         meltano_file = MeltanoFile.parse(project.meltano)
         assert meltano_file
 
     @pytest.mark.usefixtures("mapper")
-    def test_get_plugins_for_mappings(self, project):
+    def test_get_plugins_for_mappings(self, project):  # noqa: ANN001, ANN201
         meltano_file = MeltanoFile.parse(project.meltano)
 
         test_config = {
@@ -47,7 +47,7 @@ class TestMeltanoFile:
         }
 
         plugins = meltano_file.get_plugins_for_mappings(test_config)
-        assert len(plugins) == 2
+        assert len(plugins) == 2  # noqa: PLR2004
 
         assert plugins[0].extra_config.get("_mapping")
         assert (

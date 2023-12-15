@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 from datetime import datetime, timedelta, timezone
 
@@ -46,7 +46,7 @@ class TestSQLAlchemyModels:
             ),
         ),
     )
-    def test_datetime_utc_model(
+    def test_datetime_utc_model(  # noqa: ANN201
         self,
         engine: sa.Engine,
         table: sa.Table,

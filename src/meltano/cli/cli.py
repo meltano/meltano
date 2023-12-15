@@ -36,7 +36,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> t.Any:
+    def main(self, *args, **kwargs) -> t.Any:  # noqa: ANN002, ANN003, ANN401
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:
@@ -76,19 +76,19 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
-def cli(  # noqa: C901,WPS231
+def cli(  # noqa: ANN201, C901, PLR0913
     ctx: click.Context,
     log_level: str,
     log_config: str,
     environment: str,
-    no_environment: bool,
+    no_environment: bool,  # noqa: FBT001
     cwd: Path | None,
-):  # noqa: WPS231
+):
     """
     Your CLI for ELT+
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface
-    """  # noqa: D400
+    """  # noqa: D415
     ctx.ensure_object(dict)
 
     if log_level:
@@ -111,7 +111,7 @@ def cli(  # noqa: C901,WPS231
     try:
         project = Project.find()
         setup_logging(project)
-        logger.debug("meltano %s, %s", __version__, platform.system())  # noqa: WPS323
+        logger.debug("meltano %s, %s", __version__, platform.system())
         if project.readonly:
             logger.debug("Project is read-only.")
 
@@ -161,9 +161,8 @@ def detect_selected_environment(
 
     Args:
         cli_environment: The `--environment` option value from the CLI.
-        no_environment: The `--no-environment` option value from the CLI.
+        cli_no_environment: The `--no-environment` option value from the CLI.
         project: The Meltano project.
-        project_setting_service: A project settings service for the project.
 
     Returns:
         The selected environment, and whether it is the default environment.

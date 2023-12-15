@@ -125,22 +125,22 @@ class ELOptions:
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def el(  # WPS408
+async def el(  # WPS408  # noqa: ANN201, PLR0913
     project: Project,
     ctx: click.Context,
     extractor: str,
     loader: str,
-    dry: bool,
-    full_refresh: bool,
-    refresh_catalog: bool,
+    dry: bool,  # noqa: FBT001
+    full_refresh: bool,  # noqa: FBT001
+    refresh_catalog: bool,  # noqa: FBT001
     select: list[str],
     exclude: list[str],
     catalog: str,
     state: str,
     dump: str,
     state_id: str,
-    force: bool,
-    merge_state: bool,
+    force: bool,  # noqa: FBT001
+    merge_state: bool,  # noqa: FBT001
 ):
     """
     Run an EL pipeline to Extract and Load data.
@@ -194,23 +194,23 @@ async def el(  # WPS408
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def elt(  # WPS408
+async def elt(  # WPS408  # noqa: ANN201, PLR0913
     project: Project,
     ctx: click.Context,
     extractor: str,
     loader: str,
     transform: str,
-    dry: bool,
-    full_refresh: bool,
-    refresh_catalog: bool,
+    dry: bool,  # noqa: FBT001
+    full_refresh: bool,  # noqa: FBT001
+    refresh_catalog: bool,  # noqa: FBT001
     select: list[str],
     exclude: list[str],
     catalog: str,
     state: str,
     dump: str,
     state_id: str,
-    force: bool,
-    merge_state: bool,
+    force: bool,  # noqa: FBT001
+    merge_state: bool,  # noqa: FBT001
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -243,23 +243,23 @@ async def elt(  # WPS408
     )
 
 
-async def _run_el_command(
+async def _run_el_command(  # noqa: ANN202, PLR0913
     project: Project,
     ctx: click.Context,
     extractor: str,
     loader: str,
     transform: str | None,
-    dry: bool,
-    full_refresh: bool,
-    refresh_catalog: bool,
+    dry: bool,  # noqa: FBT001
+    full_refresh: bool,  # noqa: FBT001
+    refresh_catalog: bool,  # noqa: FBT001
     select: list[str],
     exclude: list[str],
     catalog: str,
     state: str,
     dump: str,
     state_id: str,
-    force: bool,
-    merge_state: bool,
+    force: bool,  # noqa: FBT001
+    merge_state: bool,  # noqa: FBT001
 ):
     if platform.system() == "Windows":
         raise CliError(
@@ -317,20 +317,20 @@ async def _run_el_command(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _elt_context_builder(
+def _elt_context_builder(  # noqa: ANN202, PLR0913
     project: Project,
-    job,
-    session,
-    extractor,
-    loader,
-    transform,
-    dry_run=False,
-    full_refresh=False,
-    refresh_catalog=False,
-    select_filter=None,
-    catalog=None,
-    state=None,
-    merge_state=False,
+    job,  # noqa: ANN001
+    session,  # noqa: ANN001
+    extractor,  # noqa: ANN001
+    loader,  # noqa: ANN001
+    transform,  # noqa: ANN001
+    dry_run=False,  # noqa: ANN001, FBT002
+    full_refresh=False,  # noqa: ANN001, FBT002
+    refresh_catalog=False,  # noqa: ANN001, FBT002
+    select_filter=None,  # noqa: ANN001
+    catalog=None,  # noqa: ANN001
+    state=None,  # noqa: ANN001
+    merge_state=False,  # noqa: ANN001, FBT002
 ):
     select_filter = select_filter or []
     transform_name = None
@@ -355,7 +355,7 @@ def _elt_context_builder(
     )
 
 
-async def dump_file(context_builder, dumpable):
+async def dump_file(context_builder, dumpable):  # noqa: ANN001, ANN201
     """Dump the given dumpable for this pipeline."""
     elt_context = context_builder.context()
 
@@ -373,7 +373,7 @@ async def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err  # noqa: EM102
 
 
-async def _run_job(tracker, project, job, session, context_builder, force=False):
+async def _run_job(tracker, project, job, session, context_builder, force=False):  # noqa: ANN001, ANN202, FBT002, PLR0913
     fail_stale_jobs(session, job.job_name)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
@@ -396,7 +396,7 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 
 
 @asynccontextmanager
-async def _redirect_output(log, output_logger):
+async def _redirect_output(log, output_logger):  # noqa: ANN001, ANN202
     meltano_stdout = output_logger.out(
         "meltano",
         log.bind(stdio="stdout", cmd_type="elt"),
@@ -407,7 +407,7 @@ async def _redirect_output(log, output_logger):
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
-        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316, E501
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
             try:
                 yield
             except CliError as err:
@@ -415,7 +415,7 @@ async def _redirect_output(log, output_logger):
                 raise
 
 
-async def _run_elt(
+async def _run_elt(  # noqa: ANN202
     tracker: Tracker,
     log: structlog.BoundLogger,
     context_builder: ELTContextBuilder,
@@ -451,11 +451,11 @@ async def _run_elt(
             ) from err
 
 
-async def _run_extract_load(  # noqa: WPS210, WPS231
-    log,
-    elt_context,
-    output_logger,
-    **kwargs,
+async def _run_extract_load(  # noqa: ANN202
+    log,  # noqa: ANN001
+    elt_context,  # noqa: ANN001
+    output_logger,  # noqa: ANN001
+    **kwargs,  # noqa: ANN003
 ):
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
@@ -524,7 +524,7 @@ async def _run_extract_load(  # noqa: WPS210, WPS231
     log.info("Extract & load complete!")
 
 
-async def _run_transform(log, elt_context, output_logger, **kwargs):
+async def _run_transform(log, elt_context, output_logger, **kwargs):  # noqa: ANN001, ANN003, ANN202
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
         state_id=elt_context.job.job_name,
@@ -550,7 +550,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     log.info("Transformation complete!")
 
 
-def _find_extractor(project: Project, extractor_name: str):
+def _find_extractor(project: Project, extractor_name: str):  # noqa: ANN202
     try:
         return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
@@ -563,7 +563,7 @@ def _find_extractor(project: Project, extractor_name: str):
         )
 
 
-def _find_transform_for_extractor(
+def _find_transform_for_extractor(  # noqa: ANN202
     project: Project,
     extractor_name: str,
 ):

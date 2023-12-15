@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -20,8 +20,8 @@ class TestPluginInstallService:
         params=({}, {"parallelism": -1}, {"parallelism": 2}),
         ids=("default", "-p=-1", "-p=2"),
     )
-    def subject(self, project: Project, request):
-        with open(project.meltanofile, "w") as file:
+    def subject(self, project: Project, request):  # noqa: ANN001, ANN201
+        with open(project.meltanofile, "w") as file:  # noqa: PTH123
             file.write(
                 yaml.dump(
                     {
@@ -30,7 +30,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -41,7 +41,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "namespace": "target_csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 },
                             ],
                         },
@@ -51,10 +51,10 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    def test_default_init_should_not_fail(self, subject):
+    def test_default_init_should_not_fail(self, subject):  # noqa: ANN001, ANN201
         assert subject
 
-    def test_remove_duplicates(self, subject):
+    def test_remove_duplicates(self, subject):  # noqa: ANN001, ANN201
         states, deduped_plugins = subject.remove_duplicates(
             plugins=subject.project.plugins.plugins(),
             reason=PluginInstallReason.INSTALL,
@@ -64,16 +64,16 @@ class TestPluginInstallService:
         assert states[0].plugin.name == "tap-gitlab--child-1"
         assert states[0].skipped
 
-        assert len(deduped_plugins) == 2
+        assert len(deduped_plugins) == 2  # noqa: PLR2004
         assert [plugin.name for plugin in deduped_plugins] == [
             "tap-gitlab",
             "target-csv",
         ]
 
     @pytest.mark.slow()
-    def test_install_all(self, subject):
+    def test_install_all(self, subject):  # noqa: ANN001, ANN201
         all_plugins = subject.install_all_plugins()
-        assert len(all_plugins) == 3
+        assert len(all_plugins) == 3  # noqa: PLR2004
 
         assert all_plugins[2].plugin.name == "target-csv"
         assert all_plugins[2].successful
@@ -90,8 +90,8 @@ class TestPluginInstallService:
         assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
-    def test_get_quoted_pip_install_args(self, project):
-        with open(project.meltanofile, "w") as file:
+    def test_get_quoted_pip_install_args(self, project):  # noqa: ANN001, ANN201
+        with open(project.meltanofile, "w") as file:  # noqa: PTH123
             file.write(
                 yaml.dump(
                     {

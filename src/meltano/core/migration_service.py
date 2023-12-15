@@ -62,9 +62,9 @@ class MigrationService:
             if rev.revision == target_revision:
                 raise MigrationUneededException
 
-    def upgrade(  # noqa: WPS213, WPS231 too many expression and too complex
+    def upgrade(  # too many expression and too complex
         self,
-        silent: bool = False,
+        silent: bool = False,  # noqa: FBT001, FBT002
     ) -> None:
         """Upgrade to the latest revision.
 

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 import subprocess
@@ -14,19 +14,19 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 
 class EnvVarResolutionExpectation(t.NamedTuple):
     expected_env_values: dict
-    meltanofile_updates: dict = {}
-    terminal_env: dict = {}
+    meltanofile_updates: dict = {}  # noqa: RUF012
+    terminal_env: dict = {}  # noqa: RUF012
 
 
-def _meltanofile_update_dict(
-    top_level_plugin_setting=True,
-    top_level_plugin_config=False,
-    top_level_env=False,
-    top_level_plugin_env=False,
-    environment_level_env=False,
-    environment_level_plugin_env=False,
-    environment_level_plugin_config=False,
-    environment_level_plugin_config_indirected=False,
+def _meltanofile_update_dict(  # noqa: ANN202, PLR0913
+    top_level_plugin_setting=True,  # noqa: ANN001, FBT002
+    top_level_plugin_config=False,  # noqa: ANN001, FBT002
+    top_level_env=False,  # noqa: ANN001, FBT002
+    top_level_plugin_env=False,  # noqa: ANN001, FBT002
+    environment_level_env=False,  # noqa: ANN001, FBT002
+    environment_level_plugin_env=False,  # noqa: ANN001, FBT002
+    environment_level_plugin_config=False,  # noqa: ANN001, FBT002
+    environment_level_plugin_config_indirected=False,  # noqa: ANN001, FBT002
 ):
     plugin_name = "test-env-var-resolution"
     plugin_namespace = plugin_name.replace("-", "_")
@@ -224,13 +224,13 @@ class TestEnvVarResolution:
         ids=_env_var_resolution_expectations.keys(),
     )
     @pytest.mark.usefixtures("cli_runner")
-    def test_env_var_resolution(
+    def test_env_var_resolution(  # noqa: ANN201, PLR0913
         self,
-        expected_env_values,
-        meltanofile_updates,
-        terminal_env,
-        project,
-        monkeypatch,
+        expected_env_values,  # noqa: ANN001
+        meltanofile_updates,  # noqa: ANN001
+        terminal_env,  # noqa: ANN001
+        project,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -259,7 +259,7 @@ class TestEnvVarResolution:
         ]
 
 
-def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
+def test_environment_variable_inheritance(cli_runner, project, monkeypatch):  # noqa: ANN001, ANN201
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -306,10 +306,10 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch):
     assert result.stdout.strip() == "STACKED=12345"
 
 
-def test_environment_variable_inheritance_meltano_env_only(
-    cli_runner,
-    project,
-    monkeypatch,
+def test_environment_variable_inheritance_meltano_env_only(  # noqa: ANN201
+    cli_runner,  # noqa: ANN001
+    project,  # noqa: ANN001
+    monkeypatch,  # noqa: ANN001
 ):
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
@@ -345,10 +345,10 @@ def test_environment_variable_inheritance_meltano_env_only(
     assert result.stdout.strip() == "STACKED=12"
 
 
-def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
+def test_strict_env_var_mode_raises_full_replace(cli_runner, project):  # noqa: ANN001, ANN201
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-        True,
+        True,  # noqa: FBT003
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())
@@ -370,10 +370,10 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
     assert result.exception.instruction == "Make sure the environment variable is set"
 
 
-def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
+def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):  # noqa: ANN001, ANN201
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-        True,
+        True,  # noqa: FBT003
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())

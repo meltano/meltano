@@ -44,6 +44,7 @@ def _list_single_job(
         task_sets_service: The task sets service to use.
         list_format: The format to use.
         job_name: The job name to list.
+        ctx: The click context.
     """
     tracker: Tracker = ctx.obj["tracker"]
     try:
@@ -70,9 +71,9 @@ def _list_all_jobs(
     """List all jobs.
 
     Args:
-        project: The project to use.
         task_sets_service: The task sets service to use.
         list_format: The format to use.
+        ctx: The click context.
     """
     if list_format == "json":
         click.echo(
@@ -100,7 +101,7 @@ def _list_all_jobs(
 )
 @click.pass_context
 @pass_project(migrate=True)
-def job(project, ctx):
+def job(project, ctx):  # noqa: ANN001, ANN201
     """
     Manage jobs.
 
@@ -140,7 +141,7 @@ def job(project, ctx):
 )
 @click.argument("job_name", required=False, default=None)
 @click.pass_context
-def list_jobs(ctx, list_format: str, job_name: str):
+def list_jobs(ctx, list_format: str, job_name: str):  # noqa: ANN001, ANN201
     """List available jobs."""
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
@@ -168,7 +169,7 @@ def list_jobs(ctx, list_format: str, job_name: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def add(ctx, job_name: str, raw_tasks: str):
+def add(ctx, job_name: str, raw_tasks: str):  # noqa: ANN001, ANN201
     """Add tasks to a new job.
 
     Example usage:
@@ -227,7 +228,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def set_cmd(ctx, job_name: str, raw_tasks: str):
+def set_cmd(ctx, job_name: str, raw_tasks: str):  # noqa: ANN001, ANN201
     """Update the tasks associated with an existing job.
 
     Example usage:
@@ -267,7 +268,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 @job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
-def remove(ctx, job_name: str):  # noqa: WPS442
+def remove(ctx, job_name: str):  # noqa: ANN001, ANN201
     """Remove a job.
 
     Usage:
@@ -289,6 +290,7 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
     Args:
         project: Project to use.
         task_set: TaskSets to validate.
+        ctx: Click context.
 
     Returns:
         True if the job's tasks are valid.

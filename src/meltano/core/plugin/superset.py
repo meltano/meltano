@@ -21,7 +21,7 @@ logger = structlog.getLogger(__name__)
 class SupersetInvoker(PluginInvoker):
     """Invoker that prepares env for Superset."""
 
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Environment variables for Superset.
 
         Returns:
@@ -43,10 +43,10 @@ class Superset(BasePlugin):
 
     invoker_class = SupersetInvoker
 
-    EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]
+    EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]  # noqa: RUF012
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return the configuration files required by the plugin.
 
         Returns:
@@ -55,11 +55,11 @@ class Superset(BasePlugin):
         return {"config": "superset_config.py"}
 
     @hook("before_configure")
-    async def before_configure(
+    async def before_configure(  # noqa: ANN201
         self,
         invoker: SupersetInvoker,
-        session,  # noqa: ARG002
-    ):  # noqa: WPS217
+        session,  # noqa: ANN001, ARG002
+    ):
         """Write plugin configuration to superset_config.py.
 
         Args:
@@ -103,12 +103,12 @@ class Superset(BasePlugin):
 
             logger.info(f"Merged in config from {custom_config_path}")  # noqa: G004
         config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
+        with open(config_path, "w") as config_file:  # noqa: PTH123
             config_file.write("\n".join(config_script_lines))
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_invoke")
-    async def db_upgrade_hook(
+    async def db_upgrade_hook(  # noqa: ANN201
         self,
         invoker: PluginInvoker,
         exec_args: list[str],  # noqa: ARG002
@@ -142,7 +142,7 @@ class Superset(BasePlugin):
         logger.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
-    async def init_hook(
+    async def init_hook(  # noqa: ANN201
         self,
         invoker: PluginInvoker,
         exec_args: list[str],  # noqa: ARG002
@@ -175,7 +175,7 @@ class Superset(BasePlugin):
         logger.debug("Completed `superset init`")
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker: PluginInvoker):
+    async def before_cleanup(self, invoker: PluginInvoker):  # noqa: ANN201
         """Delete the config file.
 
         Args:

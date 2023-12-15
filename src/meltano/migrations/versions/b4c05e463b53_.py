@@ -4,12 +4,12 @@ Revision ID: b4c05e463b53
 Revises: 6f28844bcd3c
 Create Date: 2019-07-23 16:05:29.073296
 
-"""
+"""  # noqa: INP001, I002, D415
 from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects.mssql import DATETIME2
+from sqlalchemy.dialects.mssql import DATETIME2  # noqa: F401
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.migrations import IntFlag, JSONEncodedDict
@@ -35,7 +35,7 @@ class State(Enum):
     DEAD = (4, ())
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -65,6 +65,6 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_table("job")
     op.drop_table("plugin_settings")

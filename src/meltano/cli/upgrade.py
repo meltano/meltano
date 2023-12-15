@@ -21,7 +21,7 @@ from meltano.core.upgrade_service import UpgradeService
 )
 @pass_project()
 @click.pass_context
-def upgrade(ctx, project):
+def upgrade(ctx, project):  # noqa: ANN001, ANN201
     """
     Upgrade Meltano and your entire project to the latest version.
 
@@ -33,12 +33,12 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
-    upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
-    ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
+    engine, _ = project_engine(project)
+    upgrade_service = UpgradeService(engine, project)
+    ctx.obj["upgrade_service"] = upgrade_service
 
 
-@upgrade.command(  # noqa: WPS125
+@upgrade.command(
     cls=InstrumentedCmd,
     short_help="Upgrade Meltano and your entire project to the latest version.",
 )
@@ -62,7 +62,7 @@ def upgrade(ctx, project):
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all(ctx, pip_url, force, skip_package):
+def all(ctx, pip_url, force, skip_package):  # noqa: ANN001, ANN201, A001
     """
     Upgrade Meltano and your entire project to the latest version.
 
@@ -85,7 +85,7 @@ def all(ctx, pip_url, force, skip_package):
         click.echo()
 
         upgrade_service.migrate_state()
-        if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):
+        if not os.getenv("MELTANO_PACKAGE_UPGRADED", default=False):  # noqa: PLW1508
             click.echo()
             click.secho("Your Meltano project has been upgraded!", fg="green")
     else:
@@ -127,7 +127,7 @@ def all(ctx, pip_url, force, skip_package):
     help="Force upgrade.",
 )
 @click.pass_context
-def package(ctx, **kwargs):
+def package(ctx, **kwargs):  # noqa: ANN001, ANN003, ANN201
     """Upgrade the Meltano package only."""
     ctx.obj["upgrade_service"].upgrade_package(**kwargs)
 
@@ -137,7 +137,7 @@ def package(ctx, **kwargs):
     short_help="Update files managed by file bundles only.",
 )
 @click.pass_context
-def files(ctx):
+def files(ctx):  # noqa: ANN001, ANN201
     """Update files managed by file bundles only."""
     ctx.obj["upgrade_service"].update_files()
 
@@ -147,6 +147,6 @@ def files(ctx):
     short_help="Apply migrations to system database only.",
 )
 @click.pass_context
-def database(ctx):
+def database(ctx):  # noqa: ANN001, ANN201
     """Apply migrations to system database only."""
     ctx.obj["upgrade_service"].migrate_database()

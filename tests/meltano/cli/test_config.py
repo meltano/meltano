@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 import platform
@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
 
 class TestCliConfig:
     @pytest.mark.usefixtures("project")
-    def test_config(self, cli_runner, tap):
+    def test_config(self, cli_runner, tap):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -32,7 +32,7 @@ class TestCliConfig:
         assert json_config["test"] == "mock"
 
     @pytest.mark.usefixtures("project")
-    def test_config_extras(self, cli_runner, tap):
+    def test_config_extras(self, cli_runner, tap):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
         assert_cli_runner(result)
 
@@ -40,7 +40,7 @@ class TestCliConfig:
         assert "_select" in json_config
 
     @pytest.mark.usefixtures("project")
-    def test_config_env(self, cli_runner, tap):
+    def test_config_env(self, cli_runner, tap):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -51,7 +51,7 @@ class TestCliConfig:
         assert "TAP_MOCK_TEST='mock'" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano(self, cli_runner, engine_uri):
+    def test_config_meltano(self, cli_runner, engine_uri):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(cli, ["config", "meltano"])
         assert_cli_runner(result)
 
@@ -60,7 +60,7 @@ class TestCliConfig:
         assert json_config["cli"]["log_level"] == "info"
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano_set(self, cli_runner):
+    def test_config_meltano_set(self, cli_runner):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(
             cli,
             ["config", "meltano", "set", "cli.log_config", "log_config.yml"],
@@ -73,7 +73,7 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("message_type", ("RECORD", "BATCH"))
-    def test_config_test(self, cli_runner, tap, message_type: str):
+    def test_config_test(self, cli_runner, tap, message_type: str):  # noqa: ANN001, ANN201
         mock_invoke = mock.Mock()
         mock_invoke.stderr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
@@ -93,7 +93,7 @@ class TestCliConfig:
             assert "Plugin configuration is valid" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano_test(self, cli_runner):
+    def test_config_meltano_test(self, cli_runner):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(cli, ["config", "meltano", "test"])
 
         assert result.exit_code == 1
@@ -103,12 +103,12 @@ class TestCliConfig:
         )
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_redacted(
+    def test_config_list_redacted(  # noqa: ANN201
         self,
-        cli_runner,
-        tap,
-        session,
-        plugin_settings_service_factory,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
@@ -127,12 +127,12 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_list_unsafe(
+    def test_config_list_unsafe(  # noqa: ANN201
         self,
-        cli_runner,
-        tap,
-        session,
-        plugin_settings_service_factory,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         value = "thisisatest"
 
@@ -155,7 +155,7 @@ class TestCliConfig:
 
 class TestCliConfigSet:
     @pytest.mark.usefixtures("project")
-    def test_config_set_redacted(self, cli_runner, tap):
+    def test_config_set_redacted(self, cli_runner, tap):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(
             cli,
             ["config", tap.name, "set", "secure", "thisisatest"],
@@ -168,7 +168,7 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_set_unsafe(self, cli_runner, tap):
+    def test_config_set_unsafe(self, cli_runner, tap):  # noqa: ANN001, ANN201
         value = "thisisatest"
 
         result = cli_runner.invoke(
@@ -182,7 +182,7 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path):
+    def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path):  # noqa: ANN001, ANN201
         result = cli_runner.invoke(
             cli,
             ["config", tap.name, "set", "private_key", "--from-file", "-"],
@@ -210,7 +210,7 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("tap")
-    def test_environments_order_of_precedence(self, project: Project, cli_runner):
+    def test_environments_order_of_precedence(self, project: Project, cli_runner):  # noqa: ANN001, ANN201
         # set base config in `meltano.yml`
         result = cli_runner.invoke(
             cli,

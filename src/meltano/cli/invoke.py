@@ -74,15 +74,15 @@ logger = structlog.stdlib.get_logger(__name__)
 )
 @click.pass_context
 @pass_project(migrate=True)
-def invoke(
+def invoke(  # noqa: ANN201, PLR0913
     project: Project,
     ctx: click.Context,
     plugin_type: str,
     dump: str,
-    list_commands: bool,
+    list_commands: bool,  # noqa: FBT001
     plugin_name: str,
     plugin_args: tuple[str, ...],
-    containers: bool = False,
+    containers: bool = False,  # noqa: FBT001, FBT002
     print_var: str | None = None,
 ):
     """
@@ -142,13 +142,13 @@ def invoke(
     sys.exit(exit_code)
 
 
-async def _invoke(
+async def _invoke(  # noqa: ANN202, PLR0913
     invoker: PluginInvoker,
     plugin_args: str,
     session: sessionmaker,
     dump: str,
     command_name: str,
-    containers: bool,
+    containers: bool,  # noqa: FBT001
     print_var: list | None = None,
 ):
     if command_name is not None:
@@ -164,7 +164,7 @@ async def _invoke(
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
-            elif (  # noqa: WPS337
+            elif (
                 containers
                 and command_name is not None
                 and command.container_spec is not None
@@ -189,7 +189,7 @@ async def _invoke(
     return exit_code
 
 
-def do_list_commands(plugin):
+def do_list_commands(plugin):  # noqa: ANN001, ANN201
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
@@ -208,7 +208,7 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-async def dump_file(invoker: PluginInvoker, file_id: str):
+async def dump_file(invoker: PluginInvoker, file_id: str):  # noqa: ANN201
     """Dump file."""
     try:
         content = await invoker.dump(file_id)
@@ -216,4 +216,4 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
         raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
     except Exception as err:
         raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
-    print(content)  # noqa: T201, WPS421
+    print(content)  # noqa: T201

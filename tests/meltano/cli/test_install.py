@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import os
 import shutil
@@ -14,14 +14,14 @@ from meltano.core.project_add_service import PluginAlreadyAddedException
 
 class TestCliInstall:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service):
+    def tap_gitlab(self, project_add_service):  # noqa: ANN001, ANN201
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
     @pytest.mark.order(0)
-    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner):
+    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner):  # noqa: ANN001, ANN201, PLR0913
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -51,14 +51,14 @@ class TestCliInstall:
             )
 
     @pytest.mark.usefixtures("dbt")
-    def test_install_type(
+    def test_install_type(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap,
-        tap_gitlab,
-        target,
-        mapper,
-        cli_runner,
+        project,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        tap_gitlab,  # noqa: ANN001
+        target,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
     ):
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
@@ -96,23 +96,23 @@ class TestCliInstall:
 
             assert install_plugin_mock_m.call_count == 1
             seen_plugins = install_plugin_mock_m.call_args[0][1]
-            assert len(seen_plugins) == 3
+            assert len(seen_plugins) == 3  # noqa: PLR2004
             assert mapper in seen_plugins
             mappings_seen = 0
             for found in seen_plugins:
                 assert found == mapper
                 if found.extra_config.get("_mapping"):
                     mappings_seen += 1
-            assert mappings_seen == 2
+            assert mappings_seen == 2  # noqa: PLR2004
 
     @pytest.mark.usefixtures("tap_gitlab", "dbt")
-    def test_install_type_name(
+    def test_install_type_name(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap,
-        target,
-        mapper,
-        cli_runner,
+        project,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
     ):
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
@@ -150,17 +150,17 @@ class TestCliInstall:
 
             assert install_plugin_mock_m.call_count == 1
             seen_plugins = install_plugin_mock_m.call_args[0][1]
-            assert len(seen_plugins) == 3
+            assert len(seen_plugins) == 3  # noqa: PLR2004
             assert mapper in seen_plugins
             mappings_seen = 0
             for found in seen_plugins:
                 assert found == mapper
                 if found.extra_config.get("_mapping"):
                     mappings_seen += 1
-            assert mappings_seen == 2
+            assert mappings_seen == 2  # noqa: PLR2004
 
     @pytest.mark.usefixtures("target", "dbt")
-    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner):
+    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner):  # noqa: ANN001, ANN201
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -179,7 +179,7 @@ class TestCliInstall:
             )
 
     @pytest.mark.usefixtures("dbt")
-    def test_install_multiple_any_type(self, project, tap, target, dbt, cli_runner):
+    def test_install_multiple_any_type(self, project, tap, target, dbt, cli_runner):  # noqa: ANN001, ANN201, PLR0913
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -197,15 +197,15 @@ class TestCliInstall:
                 force=False,
             )
 
-    def test_install_parallel(
+    def test_install_parallel(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap,
-        tap_gitlab,
-        target,
-        dbt,
-        mapper,
-        cli_runner,
+        project,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        tap_gitlab,  # noqa: ANN001
+        target,  # noqa: ANN001
+        dbt,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
     ):
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -227,21 +227,21 @@ class TestCliInstall:
             for cli_arg in (dbt, tap_gitlab, target, tap, mapper):
                 assert cli_arg in commands[0][1]
 
-            assert kwargs["parallelism"] == 10
+            assert kwargs["parallelism"] == 10  # noqa: PLR2004
             assert not kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 3  # noqa: PLR2004
 
-    def test_clean_install(
+    def test_clean_install(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap,
-        tap_gitlab,
-        target,
-        dbt,
-        mapper,
-        cli_runner,
+        project,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        tap_gitlab,  # noqa: ANN001
+        target,  # noqa: ANN001
+        dbt,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
     ):
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -267,20 +267,20 @@ class TestCliInstall:
             assert kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 3  # noqa: PLR2004
 
     @pytest.mark.usefixtures("tap_gitlab", "target")
-    def test_install_schedule(
+    def test_install_schedule(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap_gitlab,
-        target,
-        dbt,
-        mapper,
-        cli_runner,
-        schedule_service,
-        job_schedule,
-        task_sets_service,
+        project,  # noqa: ANN001
+        tap_gitlab,  # noqa: ANN001
+        target,  # noqa: ANN001
+        dbt,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        schedule_service,  # noqa: ANN001
+        job_schedule,  # noqa: ANN001
+        task_sets_service,  # noqa: ANN001
     ):
         with mock.patch(
             "meltano.cli.install.ScheduleService",
@@ -315,15 +315,15 @@ class TestCliInstall:
             assert install_plugin_mock.mock_calls[0].kwargs["clean"] is False
             assert install_plugin_mock.mock_calls[0].kwargs["force"] is False
 
-    def test_install_schedule_elt(
+    def test_install_schedule_elt(  # noqa: ANN201, PLR0913
         self,
-        project,
-        tap,
-        target,
-        cli_runner,
-        schedule_service,
-        elt_schedule,
-        task_sets_service,
+        project,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        schedule_service,  # noqa: ANN001
+        elt_schedule,  # noqa: ANN001
+        task_sets_service,  # noqa: ANN001
     ):
         with mock.patch(
             "meltano.cli.install.ScheduleService",
@@ -360,7 +360,7 @@ class TestCliInstall:
 # For more details
 @pytest.mark.order(-1)
 @pytest.mark.usefixtures("un_engine_uri", "project_function")
-def test_new_folder_should_autocreate_on_install(cli_runner):
+def test_new_folder_should_autocreate_on_install(cli_runner):  # noqa: ANN001, ANN201
     """Be sure .meltano auto creates a db on install by default.
 
     We had a case https://github.com/meltano/meltano/issues/6383
@@ -369,4 +369,4 @@ def test_new_folder_should_autocreate_on_install(cli_runner):
     shutil.rmtree(".meltano")
     result = cli_runner.invoke(cli, ["install"])
     assert result
-    assert os.path.exists(".meltano/meltano.db")
+    assert os.path.exists(".meltano/meltano.db")  # noqa: PTH110

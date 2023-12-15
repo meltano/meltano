@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import mock
 import pytest
@@ -16,7 +16,7 @@ class TestCliSchedule:
         "meltano.core.schedule_service.PluginSettingsService.get",
         autospec=True,
     )
-    def test_schedule_add(self, get, cli_runner, schedule_service):
+    def test_schedule_add(self, get, cli_runner, schedule_service):  # noqa: ANN001, ANN201
         test_date = "2010-01-01"
         get.return_value = test_date
 
@@ -131,7 +131,7 @@ class TestCliSchedule:
         assert res.exit_code == 1
 
     @pytest.mark.parametrize("exit_code", (0, 1, 143))
-    def test_schedule_run(self, exit_code, cli_runner, elt_schedule, job_schedule):
+    def test_schedule_run(self, exit_code, cli_runner, elt_schedule, job_schedule):  # noqa: ANN001, ANN201
         process_mock = mock.Mock(returncode=exit_code)
         with mock.patch(
             "meltano.cli.schedule.ScheduleService.run",
@@ -155,7 +155,7 @@ class TestCliSchedule:
             assert res.exit_code == exit_code
             run_mock.assert_called_once_with(job_schedule, "--dry-run")
 
-    def test_schedule_remove(self, cli_runner, job_schedule):
+    def test_schedule_remove(self, cli_runner, job_schedule):  # noqa: ANN001, ANN201
         process_mock = mock.Mock(returncode=0)
 
         with mock.patch(
@@ -166,12 +166,12 @@ class TestCliSchedule:
             assert res.exit_code == 0
             remove_mock.assert_called_once_with(job_schedule.name)
 
-    def test_schedule_set(
+    def test_schedule_set(  # noqa: ANN201
         self,
-        cli_runner,
-        elt_schedule,
-        job_schedule,
-        schedule_service,
+        cli_runner,  # noqa: ANN001
+        elt_schedule,  # noqa: ANN001
+        job_schedule,  # noqa: ANN001
+        schedule_service,  # noqa: ANN001
     ):
         with mock.patch(
             "meltano.cli.schedule.ScheduleService",

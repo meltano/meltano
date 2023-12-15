@@ -35,7 +35,7 @@ class EnvironmentService:
         """
         self.project = project
 
-    def add(self, name) -> Environment:
+    def add(self, name) -> Environment:  # noqa: ANN001
         """Create a new Environment in `meltano.yml`.
 
         Args:

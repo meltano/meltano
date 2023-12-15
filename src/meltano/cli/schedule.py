@@ -44,7 +44,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def schedule(project, ctx):
+def schedule(project, ctx):  # noqa: ANN001, ANN201
     """
     Manage pipeline schedules.
 
@@ -55,7 +55,7 @@ def schedule(project, ctx):
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
 
-def _add_elt(
+def _add_elt(  # noqa: ANN202, PLR0913
     ctx: click.Context,
     name: str,
     extractor: str,
@@ -89,7 +89,7 @@ def _add_elt(
         session.close()
 
 
-def _add_job(ctx, name: str, job: str, interval: str):
+def _add_job(ctx, name: str, job: str, interval: str):  # noqa: ANN001, ANN202
     """Add a new scheduled job."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -124,7 +124,7 @@ def _add_job(ctx, name: str, job: str, interval: str):
 )
 @click.option("--start-date", type=click.DateTime(), default=None, help="ELT Only")
 @click.pass_context
-def add(
+def add(  # noqa: ANN201, PLR0913
     ctx: click.Context,
     name: str,
     job: str | None,
@@ -203,7 +203,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(  # noqa: WPS125
+@schedule.command(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help="List available schedules.",
@@ -215,7 +215,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     default="text",
 )
 @click.pass_context
-def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
+def list_schedules(ctx: click.Context, list_format: str) -> None:
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -229,7 +229,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
         if list_format == "text":
             transform_elt_markers = {
                 "run": ("→", "→"),
-                "only": ("×", "→"),
+                "only": ("×", "→"),  # noqa: RUF001
                 "skip": ("→", "x"),
             }
 
@@ -281,7 +281,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
 @click.argument("name")
 @click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def run(ctx: click.Context, name: str, elt_options: tuple[str]):
+def run(ctx: click.Context, name: str, elt_options: tuple[str]):  # noqa: ANN201
     """Run a schedule."""
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
@@ -296,7 +296,7 @@ def run(ctx: click.Context, name: str, elt_options: tuple[str]):
 )
 @click.argument("name", required=True)
 @click.pass_context
-def remove(ctx, name):
+def remove(ctx, name):  # noqa: ANN001, ANN201
     """Remove a schedule.
 
     Usage:
@@ -379,7 +379,7 @@ class CronParam(click.ParamType):
 
     name = "cron"
 
-    def convert(self, value, *_):
+    def convert(self, value, *_):  # noqa: ANN001, ANN201
         """Validate and con interval."""
         if value not in CRON_INTERVALS and not croniter.is_valid(value):
             raise BadCronError(value)
@@ -408,7 +408,7 @@ class CronParam(click.ParamType):
     help="Update the transform flag for an elt schedule.",
 )
 @click.pass_context
-def set_cmd(
+def set_cmd(  # noqa: ANN201, PLR0913
     ctx: click.Context,
     name: str,
     interval: str | None,

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 import logging
@@ -43,7 +43,7 @@ else:
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
-def pytest_runtest_setup(item):
+def pytest_runtest_setup(item):  # noqa: ANN001, ANN201
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database
@@ -55,16 +55,16 @@ def pytest_runtest_setup(item):
 
 
 @pytest.fixture(scope="session")
-def concurrency():
+def concurrency():  # noqa: ANN201
     return {
-        "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),
-        "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
-        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: WPS432
+        "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),  # noqa: PLW1508
+        "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),  # noqa: PLW1508
+        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: PLW1508
     }
 
 
 class MockAdapter(BaseAdapter):
-    RETURN_500 = {
+    RETURN_500 = {  # noqa: RUF012
         "/extractors/this-returns-500--original": {"error": "Server error"},
     }
 
@@ -160,16 +160,16 @@ class MockAdapter(BaseAdapter):
             },
         }
 
-    def send(
+    def send(  # noqa: ANN201, PLR0913
         self,
         request: requests.PreparedRequest,
-        stream: bool = False,  # noqa: ARG002
-        timeout: float  # noqa: ARG002, WPS320
+        stream: bool = False,  # noqa: FBT001, FBT002, ARG002
+        timeout: float  # noqa: ARG002
         | tuple[float, float]
         | tuple[float, None]
         | None = None,
-        verify: bool | str = True,  # noqa: ARG002
-        cert: t.Any | None = None,  # noqa: ARG002
+        verify: bool | str = True,  # noqa: FBT002, ARG002
+        cert: t.Any | None = None,  # noqa: ANN401, ARG002
         proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
@@ -199,7 +199,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class", autouse=True)
-def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
+def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:  # noqa: ANN001
     project.hub_service.session.mount(
         project.hub_service.hub_api_url,
         MockAdapter(project.hub_service.hub_api_url, discovery),
@@ -207,13 +207,13 @@ def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
 
 
 @pytest.fixture(scope="class")
-def hub_endpoints(project: Project):
+def hub_endpoints(project: Project):  # noqa: ANN201
     adapter = project.hub_service.session.adapters[project.hub_service.hub_api_url]
     return adapter._mapping
 
 
 @pytest.fixture()
-def hub_request_counter(project: Project):
+def hub_request_counter(project: Project):  # noqa: ANN201
     counter: Counter = project.hub_service.session.get_adapter(
         project.hub_service.hub_api_url,
     ).count

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 import typing as t
@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
 
 
 @pytest.mark.order(0)
-def test_create(session):
+def test_create(session):  # noqa: ANN001, ANN201
     setting = Setting(
         name="api_key.test.test",
         namespace="gitlab",
@@ -46,8 +46,8 @@ def test_create(session):
 
 
 @pytest.fixture(scope="class")
-def env_var():
-    def _wrapper(plugin_settings_service, setting_name):
+def env_var():  # noqa: ANN201
+    def _wrapper(plugin_settings_service, setting_name):  # noqa: ANN001, ANN202
         setting_def = plugin_settings_service.find_setting(setting_name)
         return plugin_settings_service.setting_env(setting_def)
 
@@ -55,7 +55,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project):  # noqa: ANN001, ANN201
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -70,7 +70,7 @@ def custom_tap(project):
 
 
 @pytest.fixture()
-def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
+def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:  # noqa: ANN001
     return plugin_settings_service_factory(tap)
 
 
@@ -84,14 +84,14 @@ def environment(project: Project) -> Environment:
 
 
 class TestPluginSettingsService:
-    def test_get_with_source(
+    def test_get_with_source(  # noqa: ANN201, PLR0913
         self,
-        session,
-        tap,
-        inherited_tap,
-        env_var,
-        monkeypatch,
-        plugin_settings_service_factory,
+        session,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        inherited_tap,  # noqa: ANN001
+        env_var,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(inherited_tap)
 
@@ -156,7 +156,7 @@ class TestPluginSettingsService:
             SettingValueStore.CONFIG_OVERRIDE,
         )
 
-    def test_get_with_source_casting(self, session, subject, env_var, monkeypatch):
+    def test_get_with_source_casting(self, session, subject, env_var, monkeypatch):  # noqa: ANN001, ANN201
         # Verify that integer settings set in env are cast correctly
         monkeypatch.setenv(env_var(subject, "port"), "3333")
 
@@ -196,7 +196,7 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_definitions(self, subject):
+    def test_definitions(self, subject):  # noqa: ANN001, ANN201
         subject.show_hidden = False
         subject._setting_defs = None
 
@@ -211,7 +211,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(1)
     @pytest.mark.usefixtures("tap")
-    def test_as_dict(self, subject, session):
+    def test_as_dict(self, subject, session):  # noqa: ANN001, ANN201
         expected = {"test": "mock", "start_date": None, "secure": None}
         full_config = subject.as_dict(session=session)
         redacted_config = subject.as_dict(redacted=True, session=session)
@@ -220,7 +220,7 @@ class TestPluginSettingsService:
             assert full_config.get(key) == value
             assert redacted_config.get(key) == value
 
-    def test_environment_only_config(
+    def test_environment_only_config(  # noqa: ANN201
         self,
         environment: Environment,
         subject: PluginSettingsService,
@@ -243,7 +243,7 @@ class TestPluginSettingsService:
             assert env_plugin.config["test_environment"] == "THIS_IS_FROM_ENVIRONMENT"
 
     @pytest.mark.usefixtures("tap")
-    def test_as_dict_process(self, subject: PluginSettingsService):
+    def test_as_dict_process(self, subject: PluginSettingsService):  # noqa: ANN201
         config = subject.as_dict()
         assert config["auth.username"] is None
         assert config["auth.password"] is None
@@ -281,17 +281,17 @@ class TestPluginSettingsService:
         assert "auth.password" not in config
 
     @pytest.mark.usefixtures("project")
-    def test_as_dict_custom(
+    def test_as_dict_custom(  # noqa: ANN201
         self,
-        session,
-        custom_tap,
-        plugin_settings_service_factory,
+        session,  # noqa: ANN001
+        custom_tap,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(custom_tap)
         assert subject.as_dict(extras=False, session=session) == custom_tap.config
 
     @pytest.mark.usefixtures("tap")
-    def test_as_dict_redacted(self, subject, session):
+    def test_as_dict_redacted(self, subject, session):  # noqa: ANN001, ANN201
         store = SettingValueStore.DB
 
         # ensure values are redacted when they are set
@@ -306,8 +306,8 @@ class TestPluginSettingsService:
         assert config["secure"] == "thisisatest"
 
     @pytest.mark.usefixtures("tap")
-    def test_as_env(self, subject, session, env_var):
-        subject.set("boolean", True, store=SettingValueStore.DOTENV)
+    def test_as_env(self, subject, session, env_var):  # noqa: ANN001, ANN201
+        subject.set("boolean", True, store=SettingValueStore.DOTENV)  # noqa: FBT003
         subject.set("list", [1, 2, 3, "4"], store=SettingValueStore.DOTENV)
         subject.set("object", {"1": {"2": 3}}, store=SettingValueStore.DOTENV)
 
@@ -331,12 +331,12 @@ class TestPluginSettingsService:
         assert config["MELTANO_EXTRACT_BOOLEAN"] == "true"
 
     @pytest.mark.usefixtures("project")
-    def test_as_env_custom(
+    def test_as_env_custom(  # noqa: ANN201
         self,
-        session,
-        custom_tap,
-        env_var,
-        plugin_settings_service_factory,
+        session,  # noqa: ANN001
+        custom_tap,  # noqa: ANN001
+        env_var,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(custom_tap)
         config = subject.as_env(session=session)
@@ -345,16 +345,16 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(4)
     @pytest.mark.usefixtures("env_var")
-    def test_namespace_as_env_prefix(
+    def test_namespace_as_env_prefix(  # noqa: ANN201
         self,
         project: Project,
-        session,
+        session,  # noqa: ANN001
         target: ProjectPlugin,
-        plugin_settings_service_factory,
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(target)
 
-        def assert_env_value(value, env_var):
+        def assert_env_value(value, env_var):  # noqa: ANN001, ANN202
             read_value, metadata = subject.get_with_metadata("schema")
             assert value == read_value
             assert metadata["env_var"] == env_var
@@ -386,14 +386,14 @@ class TestPluginSettingsService:
             config["MELTANO_LOAD_SCHEMA"] == "name_prefix"
         )  # Generic prefix, read-only
 
-    def test_setting_env_vars(
+    def test_setting_env_vars(  # noqa: ANN201
         self,
-        tap,
-        inherited_tap,
-        alternative_target,
-        plugin_settings_service_factory,
+        tap,  # noqa: ANN001
+        inherited_tap,  # noqa: ANN001
+        alternative_target,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
-        def env_vars(service, setting_name, **kwargs):
+        def env_vars(service, setting_name, **kwargs):  # noqa: ANN001, ANN003, ANN202
             return [
                 setting.definition
                 for setting in service.setting_env_vars(
@@ -443,13 +443,13 @@ class TestPluginSettingsService:
         ]
 
     @pytest.mark.usefixtures("tap")
-    def test_store_db(self, session, subject):
+    def test_store_db(self, session, subject):  # noqa: ANN001, ANN201
         store = SettingValueStore.DB
 
         subject.set("test_a", "THIS_IS_FROM_DB", store=store, session=session)
         subject.set("test_b", "THIS_IS_FROM_DB", store=store, session=session)
 
-        assert session.query(Setting).count() == 2
+        assert session.query(Setting).count() == 2  # noqa: PLR2004
 
         subject.unset("test_a", store=store, session=session)
 
@@ -460,7 +460,7 @@ class TestPluginSettingsService:
         assert session.query(Setting).count() == 0
 
     @pytest.mark.usefixtures("tap")
-    def test_store_meltano_yml(self, subject, project):
+    def test_store_meltano_yml(self, subject, project):  # noqa: ANN001, ANN201
         store = SettingValueStore.MELTANO_YML
 
         subject.set("test_a", "THIS_IS_FROM_YML", store=store)
@@ -487,7 +487,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(2)
     @pytest.mark.usefixtures("tap")
-    def test_store_dotenv(self, subject: PluginSettingsService, project: Project):
+    def test_store_dotenv(self, subject: PluginSettingsService, project: Project):  # noqa: ANN201
         store = SettingValueStore.DOTENV
 
         assert not project.dotenv.exists()
@@ -512,7 +512,7 @@ class TestPluginSettingsService:
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
         dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
-        subject.set("boolean", True, store=store)
+        subject.set("boolean", True, store=store)  # noqa: FBT003
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
         assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
@@ -547,13 +547,13 @@ class TestPluginSettingsService:
         assert not project.dotenv.exists()
 
     @pytest.mark.usefixtures("tap")
-    def test_env_var_expansion(
+    def test_env_var_expansion(  # noqa: ANN201, PLR0913
         self,
-        session,
+        session,  # noqa: ANN001
         subject: PluginSettingsService,
         project: Project,
-        monkeypatch,
-        env_var,
+        monkeypatch,  # noqa: ANN001
+        env_var,  # noqa: ANN001
     ):
         if platform.system() == "Windows":
             pytest.xfail(
@@ -609,19 +609,19 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap")
-    def test_nested_keys(self, session, subject, project):
-        def set_config(path, value):
+    def test_nested_keys(self, session, subject, project):  # noqa: ANN001, ANN201
+        def set_config(path, value):  # noqa: ANN001, ANN202
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
 
-        def unset_config(path):
+        def unset_config(path):  # noqa: ANN001, ANN202
             subject.unset(path, store=SettingValueStore.MELTANO_YML)
 
-        def yml_config():
+        def yml_config():  # noqa: ANN202
             with project.meltano_update() as meltano:
                 extractor = meltano.plugins.extractors[0]
                 return extractor.config
 
-        def final_config():
+        def final_config():  # noqa: ANN202
             return subject.as_dict(session=session)
 
         set_config("metadata.stream.replication-key", "created_at")
@@ -670,9 +670,9 @@ class TestPluginSettingsService:
         assert "metadata.stream.replication-key" not in final_config()
 
     @pytest.mark.usefixtures("tap")
-    def test_custom_setting(self, session, subject, env_var):
+    def test_custom_setting(self, session, subject, env_var):  # noqa: ANN001, ANN201
         subject.set("custom_string", "from_yml", store=SettingValueStore.MELTANO_YML)
-        subject.set("custom_bool", True, store=SettingValueStore.MELTANO_YML)
+        subject.set("custom_bool", True, store=SettingValueStore.MELTANO_YML)  # noqa: FBT003
         subject.set("custom_array", [1, 2, 3, "4"], store=SettingValueStore.MELTANO_YML)
 
         assert subject.get_with_source("custom_string", session=session) == (
@@ -707,7 +707,7 @@ class TestPluginSettingsService:
             SettingValueStore.ENV,
         )
 
-    def test_date_values(self, subject, monkeypatch):
+    def test_date_values(self, subject, monkeypatch):  # noqa: ANN001, ANN201
         today = datetime.now(timezone.utc).date()
         monkeypatch.setitem(subject.plugin.config, "start_date", today)
         assert subject.get("start_date") == today.isoformat()
@@ -717,11 +717,11 @@ class TestPluginSettingsService:
         assert subject.get("start_date") == now.isoformat()
 
     @pytest.mark.usefixtures("tap")
-    def test_kind_object(
+    def test_kind_object(  # noqa: ANN201
         self,
         subject: PluginSettingsService,
-        monkeypatch,
-        env_var,
+        monkeypatch,  # noqa: ANN001
+        env_var,  # noqa: ANN001
     ):
         assert subject.get_with_source("object") == (
             {"nested": "from_default"},
@@ -799,7 +799,7 @@ class TestPluginSettingsService:
         )
 
     @pytest.mark.usefixtures("tap")
-    def test_extra(self, subject, monkeypatch, env_var):
+    def test_extra(self, subject, monkeypatch, env_var):  # noqa: ANN001, ANN201
         subject._setting_defs = None
 
         assert "_select" in subject.as_dict()
@@ -863,13 +863,13 @@ class TestPluginSettingsService:
         )
 
     @pytest.mark.usefixtures("environment")
-    def test_extra_object(
+    def test_extra_object(  # noqa: ANN201, PLR0913
         self,
-        subject,
-        monkeypatch,
-        env_var,
-        project_add_service,
-        plugin_settings_service_factory,
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        env_var,  # noqa: ANN001
+        project_add_service,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
     ):
         try:
             transform = project_add_service.add(
@@ -962,11 +962,11 @@ class TestPluginSettingsService:
             SettingValueStore.MELTANO_YML,
         )
 
-    def test_find_setting_raises_with_conflicting(
+    def test_find_setting_raises_with_conflicting(  # noqa: ANN201
         self,
-        tap,
-        plugin_settings_service_factory,
-        monkeypatch,
+        tap,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -974,11 +974,11 @@ class TestPluginSettingsService:
         with pytest.raises(ConflictingSettingValueException):
             subject.get("aliased")
 
-    def test_find_setting_raises_with_multiple(
+    def test_find_setting_raises_with_multiple(  # noqa: ANN201
         self,
-        tap,
-        plugin_settings_service_factory,
-        monkeypatch,
+        tap,  # noqa: ANN001
+        plugin_settings_service_factory,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         subject = plugin_settings_service_factory(tap)
         monkeypatch.setenv("TAP_MOCK_ALIASED", "value_0")
@@ -986,26 +986,26 @@ class TestPluginSettingsService:
         with pytest.raises(MultipleEnvVarsSetException):
             subject.get("aliased")
 
-    def test_find_setting_aliases(self, tap, plugin_settings_service_factory):
+    def test_find_setting_aliases(self, tap, plugin_settings_service_factory):  # noqa: ANN001, ANN201
         subject = plugin_settings_service_factory(tap)
         subject.set("aliased_3", "value_3")
         assert subject.get("aliased") == "value_3"
 
     @pytest.mark.order(-1)
-    def test_strict_env_var_mode_on_raises_error(self, subject):
+    def test_strict_env_var_mode_on_raises_error(self, subject):  # noqa: ANN001, ANN201
         subject.project_settings_service.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-            True,
+            True,  # noqa: FBT003
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
     @pytest.mark.order(-1)
-    def test_strict_env_var_mode_off_no_raise_error(self, subject):
+    def test_strict_env_var_mode_off_no_raise_error(self, subject):  # noqa: ANN001, ANN201
         subject.project_settings_service.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-            False,
+            False,  # noqa: FBT003
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None

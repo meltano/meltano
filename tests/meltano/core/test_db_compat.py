@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 from contextlib import nullcontext
 
@@ -39,7 +39,7 @@ class TestDatabaseCompatibility:
             ),
         ),
     )
-    def test_db_compatibility(self, dialect, version, expected):
+    def test_db_compatibility(self, dialect, version, expected):  # noqa: ANN001, ANN201
         engine_mock = Mock()
         engine_mock.dialect.name = dialect
         engine_mock.dialect.server_version_info = version

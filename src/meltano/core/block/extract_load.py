@@ -43,21 +43,21 @@ class BlockSetHasNoStateError(Exception):
     """Block has no state."""
 
 
-class ELBContext:  # noqa: WPS230
+class ELBContext:
     """ELBContext holds the context for ELB BlockSets."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         project: Project,
         session: Session | None = None,
         job: Job | None = None,
-        full_refresh: bool | None = False,
-        refresh_catalog: bool | None = False,
-        force: bool | None = False,
-        update_state: bool | None = True,
+        full_refresh: bool | None = False,  # noqa: FBT002
+        refresh_catalog: bool | None = False,  # noqa: FBT002
+        force: bool | None = False,  # noqa: FBT002
+        update_state: bool | None = True,  # noqa: FBT002
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        merge_state: bool | None = False,
+        merge_state: bool | None = False,  # noqa: FBT002
         run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
@@ -105,7 +105,7 @@ class ELBContext:  # noqa: WPS230
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
-class ELBContextBuilder:  # noqa: WPS214
+class ELBContextBuilder:
     """Build up ELBContexts for ExtractLoadBlocks."""
 
     def __init__(self, project: Project):
@@ -134,7 +134,7 @@ class ELBContextBuilder:  # noqa: WPS214
 
         self._base_output_logger = None
 
-    def with_job(self, job: Job):
+    def with_job(self, job: Job):  # noqa: ANN201
         """Set the associated job for the context.
 
         Args:
@@ -146,7 +146,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._job = job
         return self
 
-    def with_merge_state(self, merge_state: bool):
+    def with_merge_state(self, merge_state: bool):  # noqa: ANN201, FBT001
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -159,7 +159,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._merge_state = merge_state
         return self
 
-    def with_full_refresh(self, full_refresh: bool):
+    def with_full_refresh(self, full_refresh: bool):  # noqa: ANN201, FBT001
         """Set whether this is a full refresh.
 
         Args:
@@ -171,7 +171,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._full_refresh = full_refresh
         return self
 
-    def with_refresh_catalog(self, refresh_catalog: bool):
+    def with_refresh_catalog(self, refresh_catalog: bool):  # noqa: ANN201, FBT001
         """Set whether cached catalog should be ignored.
 
         Args:
@@ -183,7 +183,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_no_state_update(self, no_state_update: bool):
+    def with_no_state_update(self, no_state_update: bool):  # noqa: ANN201, FBT001
         """Set whether this run should not update state.
 
         By default we typically attempt to track state. This allows avoiding
@@ -198,7 +198,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._state_update = not no_state_update
         return self
 
-    def with_force(self, force: bool):
+    def with_force(self, force: bool):  # noqa: ANN201, FBT001
         """Set whether the execution of the job should be forced if it is stale.
 
         Args:
@@ -210,7 +210,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._force = force
         return self
 
-    def with_state_id_suffix(self, state_id_suffix: str):
+    def with_state_id_suffix(self, state_id_suffix: str):  # noqa: ANN201
         """Set a state ID suffix for this run.
 
         Args:
@@ -222,7 +222,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._state_id_suffix = state_id_suffix
         return self
 
-    def with_run_id(self, run_id: uuid.UUID | None):
+    def with_run_id(self, run_id: uuid.UUID | None):  # noqa: ANN201
         """Set a run ID for this run.
 
         Args:
@@ -335,7 +335,7 @@ class ELBContextBuilder:  # noqa: WPS214
         )
 
 
-class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
+class ExtractLoadBlocks(BlockSet):
     """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
@@ -435,7 +435,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 continue
             return False
 
-    async def upstream_stop(self, index) -> None:
+    async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.
 
         Args:
@@ -468,7 +468,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         )
         return done
 
-    def validate_set(self) -> None:  # noqa: WPS231, WPS238
+    def validate_set(self) -> None:
         """Validate a ExtractLoad block set to ensure its valid and runnable.
 
         Raises:
@@ -536,7 +536,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             async with job.run(session):
                 await self.execute()
 
-    async def terminate(self, graceful: bool = False) -> None:
+    async def terminate(self, graceful: bool = False) -> None:  # noqa: FBT001, FBT002
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
         Not actually implemented yet.
@@ -632,7 +632,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         for block in self.blocks:
             await block.post()
 
-    async def _link_io(self) -> None:  # noqa: WPS231
+    async def _link_io(self) -> None:
         """Link the blocks in the set together.
 
         This method does one last validation check to ensure that a consumer
@@ -684,7 +684,7 @@ class ELBExecutionManager:
             elb: The `ExtractLoadBlocks` to manage.
         """
         self.elb = elb
-        self.stream_buffer_size = self.elb.context.project.settings.get(  # noqa: WPS219
+        self.stream_buffer_size = self.elb.context.project.settings.get(
             "elt.buffer_size",
         )
         self.line_length_limit = self.stream_buffer_size // 2
@@ -727,7 +727,7 @@ class ELBExecutionManager:
         # Wait for all buffered consumer (target) output to be processed
         await asyncio.wait([consumer.proxy_stdout(), consumer.proxy_stderr()])
 
-    async def _wait_for_process_completion(  # noqa: WPS213 WPS217 WPS210
+    async def _wait_for_process_completion(
         self,
         current_head: IOBlock,
     ) -> tuple[int, int] | None:
@@ -774,7 +774,7 @@ class ELBExecutionManager:
                     line_length_limit=self.line_length_limit,
                     stream_buffer_size=self.stream_buffer_size,
                 )
-            raise output_futures_failed.exception()  # noqa: RSE102
+            raise output_futures_failed.exception()
 
         # If all the output handlers completed without raising an
         # exception, we still need to wait for all the underlying block
@@ -847,7 +847,7 @@ class ELBExecutionManager:
             await block.stop()
 
 
-def _check_exit_codes(  # noqa: WPS238
+def _check_exit_codes(
     producer_code: int,
     consumer_code: int,
     intermediate_codes: dict[str, int],

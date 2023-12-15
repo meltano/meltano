@@ -32,7 +32,7 @@ class UUIDParamType(click.ParamType):
 
     name = "uuid"
 
-    def convert(self, value, param, ctx):
+    def convert(self, value, param, ctx):  # noqa: ANN001, ANN201
         """Convert an input value to a UUID."""
         try:
             return uuid.UUID(value)
@@ -101,16 +101,16 @@ class UUIDParamType(click.ParamType):
 @pass_project(migrate=True)
 @click.pass_context
 @run_async
-async def run(
+async def run(  # noqa: ANN201, PLR0913
     ctx: click.Context,
     project: Project,
-    dry_run: bool,
-    full_refresh: bool,
-    refresh_catalog: bool,
-    no_state_update: bool,
-    force: bool,
+    dry_run: bool,  # noqa: FBT001
+    full_refresh: bool,  # noqa: FBT001
+    refresh_catalog: bool,  # noqa: FBT001
+    no_state_update: bool,  # noqa: FBT001
+    force: bool,  # noqa: FBT001
     state_id_suffix: str,
-    merge_state: bool,
+    merge_state: bool,  # noqa: FBT001
     run_id: uuid.UUID | None,
     blocks: list[str],
 ):
@@ -181,7 +181,7 @@ async def run(
 async def _run_blocks(
     tracker: Tracker,
     parsed_blocks: list[BlockSet | PluginCommandBlock],
-    dry_run: bool,
+    dry_run: bool,  # noqa: FBT001
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__

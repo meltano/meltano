@@ -1,8 +1,8 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 from collections import OrderedDict
 
-import pytest  # noqa: F401
+import pytest
 
 from meltano.core.utils import (
     EnvVarMissingBehavior,
@@ -16,7 +16,7 @@ from meltano.core.utils import (
 )
 
 
-def test_nest():
+def test_nest():  # noqa: ANN201
     subject = {}
 
     one_deep = nest(subject, "a.b")
@@ -44,7 +44,7 @@ def test_nest():
     assert subject == {"a": {"b": "not_a_dict", "list": [], "value": {"value": 1}}}
 
     # make sure existing values aren't cleared when `value=None` and `force=True`
-    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)  # noqa: WPS122
+    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)
     assert subject == {
         "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
     }
@@ -55,7 +55,7 @@ def test_nest():
     }
 
 
-def test_pop_at_path():
+def test_pop_at_path():  # noqa: ANN201
     subject = {}
     pop_at_path(subject, "a.b.c")
     assert not subject
@@ -79,7 +79,7 @@ def test_pop_at_path():
     assert not subject
 
 
-def test_set_at_path():
+def test_set_at_path():  # noqa: ANN201
     subject = {}
 
     set_at_path(subject, "a.b.c", "value")
@@ -101,14 +101,14 @@ def test_set_at_path():
     assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}
 
 
-def test_flatten():
+def test_flatten():  # noqa: ANN201
     example_config = {"_update": {"orchestrate/dags/meltano.py": False}}
     expected_flat = {"_update.orchestrate/dags/meltano.py": False}
     result = flatten(example_config, "dot")
     assert result == expected_flat
 
 
-def test_expand_env_vars():
+def test_expand_env_vars():  # noqa: ANN201
     env = {"ENV_VAR": "substituted"}
     assert expand_env_vars("${ENV_VAR}_suffix", env) == "substituted_suffix"
     assert expand_env_vars("prefix_${ENV_VAR}", env) == "prefix_substituted"
@@ -137,7 +137,7 @@ def test_expand_env_vars():
     )
 
 
-def test_expand_env_vars_nested():
+def test_expand_env_vars_nested():  # noqa: ANN201
     input_dict = {
         "some_key": 12,
         "some_var": "${ENV_VAR_1}",
@@ -215,26 +215,26 @@ def test_expand_env_vars_nested():
         ),
     ),
 )
-def test_expand_env_vars_array_nested(input_array, env, expected_output):
+def test_expand_env_vars_array_nested(input_array, env, expected_output):  # noqa: ANN001, ANN201
     assert expand_env_vars(input_array, env) == expected_output
 
 
-def test_remove_suffix():
+def test_remove_suffix():  # noqa: ANN201
     assert remove_suffix("a_string", "ing") == "a_str"
     assert remove_suffix("a_string", "in") == "a_string"
     assert remove_suffix("a_string", "gni") == "a_string"
 
 
-def test_makedirs_decorator(tmp_path):
-    def root(*paths):
+def test_makedirs_decorator(tmp_path):  # noqa: ANN001, ANN201
+    def root(*paths):  # noqa: ANN002, ANN202
         return tmp_path.joinpath(*paths)
 
     @makedirs
-    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ARG001
+    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ANN002, ANN202, ARG001
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, make_dirs: bool = True):  # noqa: ARG001
+    def species(genus_name, species_name, make_dirs: bool = True):  # noqa: ANN001, ANN202, FBT001, FBT002
         return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")

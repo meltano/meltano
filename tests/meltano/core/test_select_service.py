@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 import typing as t
@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
 
 @pytest.mark.asyncio()
 @pytest.mark.usefixtures("tap")
-async def test_select_service_list_all(
+async def test_select_service_list_all(  # noqa: ANN201
     project: Project,
     session: Session,
     monkeypatch: pytest.MonkeyPatch,
@@ -42,7 +42,7 @@ async def test_select_service_list_all(
     extractor = "tap-mock"
     service = SelectService(project, extractor)
 
-    async def mock_run_discovery(tap, plugin_invoker, catalog_path):  # noqa: ARG001
+    async def mock_run_discovery(tap, plugin_invoker, catalog_path):  # noqa: ANN001, ANN202, ARG001
         with catalog_path.open("w") as catalog_file:
             json.dump(catalog, catalog_file)
 
@@ -72,7 +72,7 @@ async def test_select_service_list_all(
     )
 
     # Update the catalog to include a new property
-    catalog["streams"][0]["schema"]["properties"]["name"] = {"type": "string"}  # noqa: WPS219
+    catalog["streams"][0]["schema"]["properties"]["name"] = {"type": "string"}
 
     # Without refreshing the catalog, the new property should not be included
     list_all = await service.list_all(session, refresh=False)

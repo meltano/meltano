@@ -28,7 +28,7 @@ def env_mapping_to_docker(mapping: dict[str, t.Any]) -> list[str]:
 class ContainerSpec(Canonical):
     """Container model for commands."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         image: str,
         *,
@@ -84,7 +84,7 @@ class ContainerSpec(Canonical):
             port_bindings[container_port].append(
                 {
                     "HostPort": host_port,
-                    "HostIP": "0.0.0.0",  # noqa: S104. Binding to all interfaces is OK.
+                    "HostIP": "0.0.0.0",  # . Binding to all interfaces is OK.  # noqa: E501, S104
                 },
             )
 

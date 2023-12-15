@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import asyncio
 
@@ -19,12 +19,12 @@ class AsyncReader(asyncio.StreamReader):
 
 
 @pytest.mark.asyncio()
-async def test_capture_subprocess_output():
+async def test_capture_subprocess_output():  # noqa: ANN201
     input_lines = [b"LINE\n", b"LINE 2\n", b"\xed\n"]
     output_lines = []
 
     class LineWriter:
-        def writeline(self, line: str):
+        def writeline(self, line: str):  # noqa: ANN202
             output_lines.append(line)
 
     reader = AsyncReader(input_lines)

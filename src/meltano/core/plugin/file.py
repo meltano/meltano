@@ -27,12 +27,12 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class FilePlugin(BasePlugin):  # noqa: WPS214
+class FilePlugin(BasePlugin):
     """Meltano file plugin type."""
 
     __plugin_type__ = PluginType.FILES
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS = [  # noqa: RUF012
         SettingDefinition(
             name="_update",
             kind=SettingKind.OBJECT,
@@ -120,7 +120,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
             A dictionary of file names and their contents.
         """
 
-        def with_update_header(content: str, relative_path: PathLike):
+        def with_update_header(content: str, relative_path: PathLike):  # noqa: ANN202
             return (
                 "\n\n".join([self.update_file_header(relative_path), content])
                 if any(relative_path.match(path) for path in paths_to_update)
@@ -192,7 +192,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
             A dictionary of file names and their contents.
         """
 
-        def rename_if_exists(relative_path: Path):
+        def rename_if_exists(relative_path: Path):  # noqa: ANN202
             if not project.root_dir(relative_path).exists():
                 return relative_path
 
@@ -277,7 +277,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         )
 
     @hook("after_install")
-    async def after_install(
+    async def after_install(  # noqa: ANN201
         self,
         install_service: PluginInstallService,
         plugin: ProjectPlugin,

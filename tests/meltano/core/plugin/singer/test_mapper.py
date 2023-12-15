@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import json
 import typing as t
@@ -61,7 +61,7 @@ class TestSingerMapper:
         )
 
     @pytest.mark.asyncio()
-    async def test_exec_args(
+    async def test_exec_args(  # noqa: ANN201
         self,
         subject: ProjectPlugin,
         session: Session,
@@ -72,7 +72,7 @@ class TestSingerMapper:
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
     @pytest.mark.asyncio()
-    async def test_merged_config(
+    async def test_merged_config(  # noqa: ANN201
         self,
         subject: ProjectPlugin,
         session: Session,
@@ -83,7 +83,7 @@ class TestSingerMapper:
         async with invoker.prepared(session):
             config_path = invoker.files["config"]
 
-            with open(config_path) as config_file:
+            with open(config_path) as config_file:  # noqa: PTH123
                 config = json.load(config_file)
 
             assert config == {

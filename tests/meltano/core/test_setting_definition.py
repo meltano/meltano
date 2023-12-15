@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import pytest
 
@@ -44,10 +44,10 @@ class TestSettingDefinition:
         ),
         ids=("array", "object"),
     )
-    def test_cast_value_array(
+    def test_cast_value_array(  # noqa: ANN201
         self,
         setting_definition: SettingDefinition,
-        uncast_expected_pairs,
+        uncast_expected_pairs,  # noqa: ANN001
     ):
         for uncast, expected in uncast_expected_pairs:
             if isinstance(expected, type) and issubclass(expected, Exception):
@@ -56,7 +56,7 @@ class TestSettingDefinition:
             else:
                 assert setting_definition.cast_value(uncast) == expected
 
-    def test_cast_options(self):
+    def test_cast_options(self):  # noqa: ANN201
         setting_definition = SettingDefinition(
             "test_setting",
             kind=SettingKind.OPTIONS,
@@ -167,10 +167,10 @@ class TestSettingDefinition:
             ),
         ),
     )
-    def test_parse(
+    def test_parse(  # noqa: ANN201
         self,
         setting_definition: SettingDefinition,
-        sensitive: bool,
+        sensitive: bool,  # noqa: FBT001
         kind: SettingKind,
     ):
         assert setting_definition.sensitive is sensitive

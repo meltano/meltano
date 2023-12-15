@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 from uuid import uuid4
@@ -12,8 +12,8 @@ from meltano.core.utils import nest_object
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class SingerPlugin(BasePlugin):
-    def __init__(self, *args, **kwargs) -> None:
+class SingerPlugin(BasePlugin):  # noqa: D101
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize a `SingerPlugin`.
 
         Args:
@@ -26,46 +26,46 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config):
+    def process_config(self, flat_config):  # noqa: ANN001, ANN201, D102
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
         # options. We need to pop those redundant entries recursively.
 
-        def _pop_non_leaf_keys(nested_config: dict) -> None:  # noqa: WPS430
+        def _pop_non_leaf_keys(nested_config: dict) -> None:
             """Recursively pop dictionary entries with '.' in their keys."""
             for key, val in list(nested_config.items()):
                 if "." in key:
                     nested_config.pop(key)
-                elif isinstance(val, dict):  # noqa: WPS220
+                elif isinstance(val, dict):
                     _pop_non_leaf_keys(val)
 
         _pop_non_leaf_keys(processed_config)
         return processed_config
 
     @hook("before_configure")
-    async def before_configure(
+    async def before_configure(  # noqa: ANN201
         self,
-        invoker,
-        session,  # noqa: ARG002
+        invoker,  # noqa: ANN001
+        session,  # noqa: ANN001, ARG002
     ):
-        """Create configuration file."""  # noqa: DAR101
+        """Create configuration file."""
         config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
+        with open(config_path, "w") as config_file:  # noqa: PTH123
             config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker):  # noqa: ANN001, ANN201
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
         logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
-    def instance_uuid(self):
+    def instance_uuid(self):  # noqa: ANN201
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
             self._instance_uuid = str(uuid4())

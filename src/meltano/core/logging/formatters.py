@@ -31,7 +31,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = (
 def rich_exception_formatter_factory(
     color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
     no_color: bool | None = None,
-    show_locals: bool = False,
+    show_locals: bool = False,  # noqa: FBT001, FBT002
 ) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:
     """Create an exception formatter for logging using the rich package.
 
@@ -49,7 +49,7 @@ def rich_exception_formatter_factory(
     """
 
     def _traceback(
-        sio,
+        sio,  # noqa: ANN001
         exc_info: tuple[type[t.Any], BaseException, TracebackType | None],
     ) -> None:
         sio.write("\n")
@@ -83,8 +83,8 @@ def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormat
 
 
 def console_log_formatter(
-    colors: bool = False,
-    show_locals: bool = False,
+    colors: bool = False,  # noqa: FBT001, FBT002
+    show_locals: bool = False,  # noqa: FBT001, FBT002
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
@@ -117,9 +117,9 @@ def console_log_formatter(
 
 
 def key_value_formatter(
-    sort_keys: bool = False,
+    sort_keys: bool = False,  # noqa: FBT001, FBT002
     key_order: t.Sequence[str] | None = None,
-    drop_missing: bool = False,
+    drop_missing: bool = False,  # noqa: FBT001, FBT002
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.
 

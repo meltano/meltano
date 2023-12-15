@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import os
 import platform
@@ -32,7 +32,7 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 class TestCli:
     @pytest.fixture()
-    def test_cli_project(self, tmp_path: Path, project_init_service):
+    def test_cli_project(self, tmp_path: Path, project_init_service):  # noqa: ANN001, ANN201
         """Return the non-activated project."""
         os.chdir(tmp_path)
         project = project_init_service.init(activate=False)
@@ -44,14 +44,14 @@ class TestCli:
             shutil.rmtree(project.root)
 
     @pytest.fixture()
-    def deactivate_project(self):
+    def deactivate_project(self):  # noqa: ANN201
         Project.deactivate()
 
     @pytest.fixture()
-    def empty_project(
+    def empty_project(  # noqa: ANN201
         self,
-        empty_meltano_yml_dir,
-        pushd,  # noqa: ARG002
+        empty_meltano_yml_dir,  # noqa: ANN001
+        pushd,  # noqa: ANN001, ARG002
     ):
         project = Project(empty_meltano_yml_dir)
         try:
@@ -60,7 +60,7 @@ class TestCli:
             Project.deactivate()
 
     @pytest.mark.order(0)
-    def test_activate_project(self, test_cli_project, cli_runner, pushd):
+    def test_activate_project(self, test_cli_project, cli_runner, pushd):  # noqa: ANN001, ANN201
         project = test_cli_project
 
         pushd(project.root)
@@ -71,18 +71,18 @@ class TestCli:
         assert Project._default.readonly is False
 
     @pytest.mark.order(1)
-    def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd):
+    def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd):  # noqa: ANN001, ANN201
         pushd(empty_project.root)
         with pytest.raises(EmptyMeltanoFileException):
             cli_runner.invoke(cli, ["config"], catch_exceptions=False)
 
     @pytest.mark.order(2)
-    def test_activate_project_readonly_env(
+    def test_activate_project_readonly_env(  # noqa: ANN201
         self,
-        test_cli_project,
-        cli_runner,
-        pushd,
-        monkeypatch,
+        test_cli_project,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
         assert Project._default is None
@@ -91,22 +91,22 @@ class TestCli:
         assert Project._default.readonly
 
     @pytest.mark.order(2)
-    def test_activate_project_readonly_dotenv(
+    def test_activate_project_readonly_dotenv(  # noqa: ANN201
         self,
-        test_cli_project,
-        cli_runner,
-        pushd,
+        test_cli_project,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
-        test_cli_project.settings.set("project_readonly", True)
+        test_cli_project.settings.set("project_readonly", True)  # noqa: FBT003
         assert Project._default is None
         pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
         assert Project._default.readonly
 
-    def test_environment_precedence(
+    def test_environment_precedence(  # noqa: ANN201
         self,
         project: Project,
-        pushd,
+        pushd,  # noqa: ANN001
         cli_runner: MeltanoCliRunner,
         monkeypatch: pytest.MonkeyPatch,
     ):
@@ -140,17 +140,17 @@ class TestCli:
                 == f"Environment {name!r} was not found."
             )
 
-    def test_version(self, cli_runner):
+    def test_version(self, cli_runner):  # noqa: ANN001, ANN201
         cli_version = cli_runner.invoke(cli, ["--version"])
 
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_default_environment_is_activated(
+    def test_default_environment_is_activated(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -160,11 +160,11 @@ class TestCli:
         assert Project._default.environment.name == "test-meltano-environment"
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_environment_flag_overrides_default(
+    def test_environment_flag_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -175,12 +175,12 @@ class TestCli:
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_environment_variable_overrides_default(
+    def test_environment_variable_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
-        monkeypatch,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
         pushd(project_files_cli.root)
@@ -191,11 +191,11 @@ class TestCli:
         assert Project._default.environment.name == "test-subconfig-2-yml"
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_lower_null_environment_overrides_default(
+    def test_lower_null_environment_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -205,11 +205,11 @@ class TestCli:
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_upper_null_environment_overrides_default(
+    def test_upper_null_environment_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -219,11 +219,11 @@ class TestCli:
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_no_environment_overrides_default(
+    def test_no_environment_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -233,11 +233,11 @@ class TestCli:
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
+    def test_no_environment_and_null_environment_overrides_default(  # noqa: ANN201
         self,
-        project_files_cli,
-        cli_runner,
-        pushd,
+        project_files_cli,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        pushd,  # noqa: ANN001
     ):
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -246,13 +246,13 @@ class TestCli:
         )
         assert Project._default.environment is None
 
-    def test_handle_meltano_error(self):
+    def test_handle_meltano_error(self):  # noqa: ANN201
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
 
     @pytest.mark.usefixtures("pushd")
-    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path):
+    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path):  # noqa: ANN001, ANN201
         project = test_cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
@@ -296,7 +296,7 @@ class TestCli:
             ("add", "utility", "example"),
         ),
     )
-    def test_error_msg_outside_project(
+    def test_error_msg_outside_project(  # noqa: ANN201
         self,
         tmp_path: Path,
         command_args: tuple[str, ...],
@@ -315,7 +315,7 @@ class TestCli:
         # Python environment. This is not the only test that requires this.
         assert (
             "must be run inside a Meltano project"
-            in subprocess.run(
+            in subprocess.run(  # noqa: PLW1510
                 ("meltano", *command_args),
                 text=True,
                 stderr=subprocess.PIPE,
@@ -324,7 +324,7 @@ class TestCli:
         )
 
 
-def _get_dummy_logging_config(colors=True):
+def _get_dummy_logging_config(colors=True):  # noqa: ANN001, ANN202, FBT002
     return {
         "version": 1,
         "disable_existing_loggers": False,
@@ -438,14 +438,14 @@ class TestCliColors:
             ),
         ),
     )
-    def test_no_color(
+    def test_no_color(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        env,
-        log_config,
-        cli_colors_expected,
-        log_colors_expected,
-        tmp_path,
+        cli_runner,  # noqa: ANN001
+        env,  # noqa: ANN001
+        log_config,  # noqa: ANN001
+        cli_colors_expected,  # noqa: ANN001
+        log_colors_expected,  # noqa: ANN001
+        tmp_path,  # noqa: ANN001
     ):
         styled_text = click.style(self.TEST_TEXT, fg="red")
 
@@ -456,7 +456,7 @@ class TestCliColors:
             log_config_path = None
 
         @click.command("dummy")
-        def dummy_command():
+        def dummy_command():  # noqa: ANN202
             setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
             logger.info(self.TEST_TEXT)
@@ -476,7 +476,7 @@ class TestCliColors:
 
 class TestLargeConfigProject:
     @pytest.mark.usefixtures("large_config_project")
-    def test_list_config_performance(self, cli_runner):
+    def test_list_config_performance(self, cli_runner):  # noqa: ANN001, ANN201
         start = perf_counter_ns()
         assert (
             cli_runner.invoke(
@@ -487,4 +487,4 @@ class TestLargeConfigProject:
         )
         duration_ns = perf_counter_ns() - start
         # Ensure the large config can be processed in less than 25 seconds
-        assert duration_ns < 25000000000
+        assert duration_ns < 25000000000  # noqa: PLR2004

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import platform
 
@@ -18,7 +18,7 @@ from meltano.core.utils import NotFound
 
 class TestEnvironmentService:
     @pytest.fixture()
-    def subject(self, environment_service):
+    def subject(self, environment_service):  # noqa: ANN001, ANN201
         return environment_service
 
     @pytest.fixture()
@@ -26,7 +26,7 @@ class TestEnvironmentService:
         return environment_service.add("test-environment")
 
     @pytest.mark.order(0)
-    def test_add_environment(self, subject: EnvironmentService):
+    def test_add_environment(self, subject: EnvironmentService):  # noqa: ANN201
         count = 10
         environments = [Environment(f"environment_{idx}") for idx in range(count)]
         for environment in environments:
@@ -47,7 +47,7 @@ class TestEnvironmentService:
             subject.add_environment(environments[3])
 
     @pytest.mark.order(1)
-    def test_remove_environment(
+    def test_remove_environment(  # noqa: ANN201
         self,
         subject: EnvironmentService,
         environment: Environment,
@@ -63,7 +63,7 @@ class TestEnvironmentService:
             subject.remove("i-do-not-exist")
 
     @pytest.mark.order(2)
-    def test_list_environments(
+    def test_list_environments(  # noqa: ANN201
         self,
         subject: EnvironmentService,
     ):
@@ -74,7 +74,7 @@ class TestEnvironmentService:
         new_environment = subject.add("new-environment")
         assert subject.list_environments() == [new_environment]
 
-    def test_add_name_contains_state_id_component_delimiter(
+    def test_add_name_contains_state_id_component_delimiter(  # noqa: ANN201
         self,
         subject: EnvironmentService,
     ):

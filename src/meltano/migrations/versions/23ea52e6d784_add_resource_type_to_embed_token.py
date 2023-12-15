@@ -4,7 +4,7 @@ Revision ID: 23ea52e6d784
 Revises: ceb00d7ff3bd
 Create Date: 2020-02-12 09:29:31.592426
 
-"""
+"""  # noqa: INP001, I002, D415
 import sqlalchemy as sa
 import sqlalchemy.orm
 from alembic import op
@@ -23,7 +23,7 @@ depends_on = None
 Session = sa.orm.sessionmaker()
 
 
-def upgrade():
+def upgrade():  # noqa: ANN201
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
@@ -36,5 +36,5 @@ def upgrade():
     op.execute(Embed_Tokens.update().values({"resource_type": "report"}))
 
 
-def downgrade():
+def downgrade():  # noqa: ANN201
     op.drop_column("embed_tokens", "resource_type")

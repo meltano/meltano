@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import asyncio
 import json
@@ -32,7 +32,7 @@ class MockIOBlock(IOBlock):
 
 
 @pytest.fixture(scope="class")
-def tap_mock_transform(project_add_service):
+def tap_mock_transform(project_add_service):  # noqa: ANN001, ANN201
     try:
         return project_add_service.add(PluginType.TRANSFORMS, "tap-mock-transform")
     except PluginAlreadyAddedException as err:
@@ -40,8 +40,8 @@ def tap_mock_transform(project_add_service):
 
 
 @pytest.fixture()
-def process_mock_factory():
-    def _factory(name):
+def process_mock_factory():  # noqa: ANN201
+    def _factory(name):  # noqa: ANN001, ANN202
         process_mock = mock.Mock()
         process_mock.name = name
         process_mock.wait = AsyncMock(return_value=0)
@@ -53,7 +53,7 @@ def process_mock_factory():
 
 
 @pytest.fixture()
-def tap_process(process_mock_factory, tap):
+def tap_process(process_mock_factory, tap):  # noqa: ANN001, ANN201
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
     tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
@@ -65,11 +65,11 @@ def tap_process(process_mock_factory, tap):
 
 
 @pytest.fixture()
-def target_process(process_mock_factory, target):
+def target_process(process_mock_factory, target):  # noqa: ANN001, ANN201
     target = process_mock_factory(target)
 
     # Have `target.wait` take 2s to make sure the tap always finishes before the target
-    async def wait_mock():
+    async def wait_mock():  # noqa: ANN202
         await asyncio.sleep(2)
         return target.wait.return_value
 
@@ -87,12 +87,12 @@ def target_process(process_mock_factory, target):
 
 
 @pytest.fixture()
-def mapper_process(process_mock_factory, mapper):
+def mapper_process(process_mock_factory, mapper):  # noqa: ANN001, ANN201
     mapper = process_mock_factory(mapper)
 
     # Have `mapper.wait` take 1s to make sure the mapper always finishes after
     # the tap but before the target
-    async def wait_mock():
+    async def wait_mock():  # noqa: ANN202
         await asyncio.sleep(1)
         return mapper.wait.return_value
 
@@ -110,10 +110,10 @@ def mapper_process(process_mock_factory, mapper):
 
 
 @pytest.fixture()
-def dbt_process(process_mock_factory, dbt):
+def dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
     dbt = process_mock_factory(dbt)
 
-    async def wait_mock():
+    async def wait_mock():  # noqa: ANN202
         await asyncio.sleep(1)
         return dbt.wait.return_value
 
@@ -176,13 +176,13 @@ class EventMatcher:
 class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project", "job_logging_service")
-    def test_run_parsing_failures(
+    def test_run_parsing_failures(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
     ):
         result = cli_runner.invoke(cli, ["run"])
         assert result.exit_code == 0
@@ -258,15 +258,15 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_basic_invocations(
+    def test_run_basic_invocations(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        mapper_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        mapper_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -318,13 +318,13 @@ class TestCliRunScratchpadOne:
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
-    def test_run_custom_suffix_command_option(
+    def test_run_custom_suffix_command_option(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
         job_logging_service: JobLoggingService,
     ):
         # exit cleanly when everything is fine
@@ -381,15 +381,15 @@ class TestCliRunScratchpadOne:
             "dynamic (multiple env)",
         ],
     )
-    def test_run_custom_suffix_active_environment(
+    def test_run_custom_suffix_active_environment(  # noqa: ANN201, PLR0913
         self,
-        suffix_args,
-        cli_runner,
+        suffix_args,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
         project: Project,
-        tap,
-        target,
-        tap_process,
-        target_process,
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
         job_logging_service: JobLoggingService,
     ):
         state_id_suffix, expected_suffix, suffix_env = suffix_args
@@ -432,7 +432,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_multiple_commands(self, cli_runner, dbt_process):
+    def test_run_multiple_commands(self, cli_runner, dbt_process):  # noqa: ANN001, ANN201
         # Verify that requesting the same command plugin multiple time with
         # different args works
         invoke_async = AsyncMock(
@@ -458,8 +458,8 @@ class TestCliRunScratchpadOne:
                 "plugin command added for execution",
             )
 
-            assert len(command_add_events) == 2
-            assert invoke_async.call_count == 2
+            assert len(command_add_events) == 2  # noqa: PLR2004
+            assert invoke_async.call_count == 2  # noqa: PLR2004
 
             assert command_add_events[0]["command_name"] == "test"
             assert invoke_async.mock_calls[0][2]["command"] == "test"
@@ -478,15 +478,15 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_complex_invocations(
+    def test_run_complex_invocations(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        mapper_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        mapper_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process),
@@ -512,7 +512,7 @@ class TestCliRunScratchpadOne:
             )  # dbt
 
             completed_events = matcher.find_by_event("Block run completed.")
-            assert len(completed_events) == 2
+            assert len(completed_events) == 2  # noqa: PLR2004
             for event in completed_events:
                 assert event["success"]
 
@@ -541,14 +541,14 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_plugin_command_failure(
+    def test_run_plugin_command_failure(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -577,7 +577,7 @@ class TestCliRunScratchpadOne:
             )  # dbt
 
             completed_events = matcher.find_by_event("Block run completed.")
-            assert len(completed_events) == 2
+            assert len(completed_events) == 2  # noqa: PLR2004
             for event in completed_events:
                 if event["block_type"] == "ExtractLoadBlocks":
                     assert event["success"]
@@ -608,14 +608,14 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_tap_failure(
+    def test_run_elb_tap_failure(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         # In this scenario, the tap fails on the third read. Target should still
         # complete, but dbt should not.
@@ -678,20 +678,20 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_before_tap_finished(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail
         # before tap finishes
-        async def tap_wait_mock():
+        async def tap_wait_mock():  # noqa: ANN202
             await asyncio.sleep(2)
             return tap_process.wait.return_value
 
@@ -708,7 +708,7 @@ class TestCliRunScratchpadOne:
 
         # Have `target_process.wait` take 1s to make sure the
         # `stdin.write`/`drain` exceptions can be raised
-        async def target_wait_mock():
+        async def target_wait_mock():  # noqa: ANN202
             await asyncio.sleep(1)
             return 1
 
@@ -774,14 +774,14 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_after_tap_finished(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -844,14 +844,14 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_tap_and_target_failed(
+    def test_run_elb_tap_and_target_failed(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -924,26 +924,26 @@ class TestCliRunScratchpadOne:
         "dbt_process",
         "job_logging_service",
     )
-    def test_run_elb_tap_line_length_limit_error(
+    def test_run_elb_tap_line_length_limit_error(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
     ):
         args = ["run", tap.name, target.name]
 
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
-        try:  # noqa: WPS328
+        try:
             raise asyncio.LimitOverrunError(
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:
-            try:  # noqa: WPS328, WPS505
+            try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
                 raise ValueError(str(err))
@@ -952,7 +952,7 @@ class TestCliRunScratchpadOne:
 
         # Have `tap_process.wait` take 1s to make sure the `LimitOverrunError`
         # exception can be raised before tap finishes
-        async def wait_mock():
+        async def wait_mock():  # noqa: ANN202
             await asyncio.sleep(1)
             return tap_process.wait.return_value
 
@@ -992,16 +992,16 @@ class TestCliRunScratchpadOne:
         "dbt_process",
         "job_logging_service",
     )
-    def test_run_mapper_config(
+    def test_run_mapper_config(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        mapper,
-        tap_process,
-        target_process,
-        mapper_process,
-        project_add_service,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        mapper_process,  # noqa: ANN001
+        project_add_service,  # noqa: ANN001
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -1138,16 +1138,16 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_mapper_failure(
+    def test_run_elb_mapper_failure(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        mapper,
-        tap_process,
-        target_process,
-        mapper_process,
-        dbt_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        mapper,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        mapper_process,  # noqa: ANN001
+        dbt_process,  # noqa: ANN001
     ):
         # In this scenario, the map fails on the second read. Target should
         # still complete, but dbt should not.
@@ -1217,14 +1217,14 @@ class TestCliRunScratchpadOne:
         "dbt_process",
         "job_logging_service",
     )
-    def test_run_dry_run(
+    def test_run_dry_run(  # noqa: ANN201, PLR0913
         self,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
-        mapper_process,
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
+        mapper_process,  # noqa: ANN001
     ):
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -1260,14 +1260,14 @@ class TestCliRunScratchpadOne:
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("colors", (True, False))
-    def test_color_console_exception_handler(
+    def test_color_console_exception_handler(  # noqa: ANN201, PLR0913
         self,
-        colors,
-        cli_runner,
-        tap,
-        target,
-        tap_process,
-        target_process,
+        colors,  # noqa: ANN001
+        cli_runner,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        tap_process,  # noqa: ANN001
+        target_process,  # noqa: ANN001
         monkeypatch: pytest.MonkeyPatch,
     ):
         monkeypatch.delenv("FORCE_COLOR", raising=False)
@@ -1314,11 +1314,11 @@ class TestUUIDParamType:
             pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
         ),
     )
-    def test_valid_uuid(self, value: str):
+    def test_valid_uuid(self, value: str):  # noqa: ANN201
         param = UUIDParamType()
         assert param.convert(value, None, None) == uuid.UUID(value)
 
-    def test_invalid_uuid(self):
+    def test_invalid_uuid(self):  # noqa: ANN201
         param = UUIDParamType()
         value = "zzz"
         with pytest.raises(click.BadParameter, match="is not a valid UUID"):

@@ -45,10 +45,10 @@ class MutuallyExclusiveOptionsError(Exception):
         return f"Must provide exactly one of: {','.join(self.options)}"
 
 
-def _prompt_for_confirmation(prompt):
+def _prompt_for_confirmation(prompt):  # noqa: ANN001, ANN202
     """Wrap destructive CLI commands which should prompt the user for confirmation."""
 
-    def _prompt_callback(ctx: click.Context, param, value: bool):  # noqa: ARG001
+    def _prompt_callback(ctx: click.Context, param, value: bool):  # noqa: ANN001, ANN202, FBT001, ARG001
         if not value and not click.confirm(prompt):
             ctx.exit(1)
 
@@ -109,7 +109,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
 )
 @click.pass_context
 @pass_project(migrate=True)
-def meltano_state(project: Project, ctx: click.Context):
+def meltano_state(project: Project, ctx: click.Context):  # noqa: ANN201
     """
     Manage state.
 
@@ -117,13 +117,13 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
-    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
+def list_state(ctx: click.Context, pattern: str | None):  # noqa: ANN201
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.
@@ -152,7 +152,7 @@ def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
 @click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
 @click.pass_context
-def copy_state(
+def copy_state(  # noqa: ANN201
     ctx: click.Context,
     project: Project,
     src_state_id: str,
@@ -168,7 +168,7 @@ def copy_state(
 
     logger.info(
         f"State for {dst_state_id} was successfully copied from "  # noqa: G004
-        f"{src_state_id} at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"{src_state_id} at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -182,7 +182,7 @@ def copy_state(
 @click.argument("dst-state-id", type=str)
 @pass_project(migrate=True)
 @click.pass_context
-def move_state(
+def move_state(  # noqa: ANN201
     ctx: click.Context,
     project: Project,
     src_state_id: str,
@@ -198,7 +198,7 @@ def move_state(
 
     logger.info(
         f"State for {src_state_id} was successfully moved to {dst_state_id} "  # noqa: G004
-        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -217,7 +217,7 @@ def move_state(
 @click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
 @click.pass_context
-def merge_state(
+def merge_state(  # noqa: ANN201, PLR0913
     ctx: click.Context,
     project: Project,
     state_id: str,
@@ -237,7 +237,7 @@ def merge_state(
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     if input_file:
-        with open(input_file) as state_f:
+        with open(input_file) as state_f:  # noqa: PTH123
             state_service.add_state(
                 state_id,
                 state_f.read(),
@@ -249,7 +249,7 @@ def merge_state(
         state_service.merge_state(from_state_id, state_id)
     logger.info(
         f"State for {state_id} was successfully "  # noqa: G004
-        f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -266,7 +266,7 @@ def merge_state(
 @click.argument("state", type=str, required=False)
 @pass_project(migrate=True)
 @click.pass_context
-def set_state(
+def set_state(  # noqa: ANN201
     ctx: click.Context,
     project: Project,
     state_id: str,
@@ -284,21 +284,21 @@ def set_state(
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     if input_file:
-        with open(input_file) as state_f:
+        with open(input_file) as state_f:  # noqa: PTH123
             state_service.set_state(state_id, state_f.read())
     elif state:
         state_service.set_state(state_id, state)
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
-        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
-@meltano_state.command(cls=InstrumentedCmd, name="get")  # noqa: WPS46
+@meltano_state.command(cls=InstrumentedCmd, name="get")
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS463
+def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: ANN201
     """Get state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -312,7 +312,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str):
+def clear_state(ctx: click.Context, project: Project, state_id: str):  # noqa: ANN201
     """Clear state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]

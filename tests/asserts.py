@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import traceback
 import typing as t
@@ -7,7 +7,7 @@ if t.TYPE_CHECKING:
     from click.testing import Result
 
 
-def assert_cli_runner(results: Result, message=None):
+def assert_cli_runner(results: Result, message=None):  # noqa: ANN001, ANN201
     assertion_message = str(message or results.output)
 
     if results.exception:

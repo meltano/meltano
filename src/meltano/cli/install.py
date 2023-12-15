@@ -59,14 +59,14 @@ logger = structlog.getLogger(__name__)
 )
 @click.pass_context
 @pass_project(migrate=True)
-def install(  # noqa: C901
+def install(  # noqa: ANN201, PLR0913
     project: Project,
     ctx: click.Context,
     plugin_type: str,
     plugin_name: str,
-    clean: bool,
+    clean: bool,  # noqa: FBT001
     parallelism: int,
-    force: bool,
+    force: bool,  # noqa: FBT001
     schedule_name: str,
 ):
     """
@@ -114,7 +114,7 @@ def install(  # noqa: C901
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):
+def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()

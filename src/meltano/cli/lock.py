@@ -42,7 +42,7 @@ logger = structlog.get_logger(__name__)
 @click.option("--update", "-u", is_flag=True, help="Update the lock file.")
 @click.pass_context
 @pass_project()
-def lock(
+def lock(  # noqa: PLR0913
     project: Project,
     ctx: click.Context,
     *,
@@ -97,7 +97,7 @@ def lock(
         else:
             plugin.parent = None
             with project.plugins.use_preferred_source(DefinitionSource.HUB):
-                plugin = project.plugins.ensure_parent(plugin)
+                plugin = project.plugins.ensure_parent(plugin)  # noqa: PLW2901
             try:
                 lock_service.save(plugin, exists_ok=update)
             except LockfileAlreadyExistsError as err:

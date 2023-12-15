@@ -56,9 +56,9 @@ def compile_command(
     project: Project,
     ctx: click.Context,
     directory: Path,
-    lint: bool,
+    lint: bool,  # noqa: FBT001
     indent: int,
-):
+) -> None:
     """
     Compile a Meltano project into environment-specific manifest files.
 
@@ -90,7 +90,7 @@ def compile_command(
         project.refresh(environment=environment)
         manifest = Manifest(project=project, path=path, check_schema=lint)
         try:
-            with open(path, "w") as manifest_file:
+            with open(path, "w") as manifest_file:  # noqa: PTH123
                 json.dump(
                     manifest.data,
                     manifest_file,

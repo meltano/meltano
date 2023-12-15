@@ -47,13 +47,13 @@ logger = structlog.stdlib.get_logger(__name__)
 class CliError(Exception):
     """CLI Error."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
         """Instantiate custom CLI Error exception."""
         super().__init__(*args, **kwargs)
 
         self.printed = False
 
-    def print(self):  # noqa: T202
+    def print(self):  # noqa: ANN201
         """Print CLI error."""
         if self.printed:
             return
@@ -67,7 +67,7 @@ class CliError(Exception):
 def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
-    update: bool = False,
+    update: bool = False,  # noqa: FBT001, FBT002
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
@@ -111,7 +111,7 @@ def print_added_plugin(
         click.echo(f"Documentation:\t{docs_url}")
 
 
-def _prompt_plugin_namespace(plugin_type, plugin_name):
+def _prompt_plugin_namespace(plugin_type, plugin_name):  # noqa: ANN001, ANN202
     click.secho(
         f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
         fg="green",
@@ -174,12 +174,12 @@ def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
         f"\nSpecify the plugin's {click.style(prompt_request, fg='blue')}\n"
         f"\nDefault: name derived from {derived_from}\n",
     )
-    plugin_basename = os.path.basename(pip_url or plugin_name)
-    package_name, _ = os.path.splitext(plugin_basename)
+    plugin_basename = os.path.basename(pip_url or plugin_name)  # noqa: PTH119
+    package_name, _ = os.path.splitext(plugin_basename)  # noqa: PTH122
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 
-def _prompt_plugin_capabilities(plugin_type):
+def _prompt_plugin_capabilities(plugin_type):  # noqa: ANN001, ANN202
     if plugin_type != PluginType.EXTRACTORS:
         return []
 
@@ -240,7 +240,7 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
     )
 
     settings = None
-    while settings is None:  # noqa:  WPS426  # allows lambda in loop
+    while settings is None:
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
             type=list,
@@ -262,18 +262,18 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
     return settings
 
 
-def add_plugin(  # noqa: C901
+def add_plugin(  # noqa: ANN201, PLR0913
     plugin_type: PluginType,
     plugin_name: str,
     *,
     python: str | None = None,
     add_service: ProjectAddService,
-    variant=None,
-    inherit_from=None,
-    custom=False,
-    update=False,
-    lock=True,
-    plugin_yaml=None,
+    variant=None,  # noqa: ANN001
+    inherit_from=None,  # noqa: ANN001
+    custom=False,  # noqa: ANN001
+    update=False,  # noqa: ANN001
+    lock=True,  # noqa: ANN001
+    plugin_yaml=None,  # noqa: ANN001
 ):
     """Add Plugin to given Project."""
     if custom:
@@ -349,7 +349,7 @@ def add_plugin(  # noqa: C901
                 "changes until it is):\n"
                 f"\tmeltano config {plugin.name} list\n\n"
                 "To learn more, visit "
-                "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"  # noqa: E501
+                "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"
                 f"Alternatively, to keep the existing '{plugin.name}' with "
                 f"variant '{new_plugin.variant}', add variant '{new_plugin.variant}' "
                 "as a separate plugin with its own unique name:\n"
@@ -388,8 +388,8 @@ def add_plugin(  # noqa: C901
 def add_required_plugins(
     plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
-    lock: bool = True,
-):
+    lock: bool = True,  # noqa: FBT001, FBT002
+) -> list[ProjectPlugin]:
     """Add any Plugins required by the given Plugin."""
     added_plugins = []
     for plugin_install in plugins:
@@ -406,7 +406,7 @@ def add_required_plugins(
     return added_plugins
 
 
-def install_status_update(install_state: PluginInstallState):
+def install_status_update(install_state: PluginInstallState):  # noqa: ANN201
     """
     Print the status of plugin installation.
 
@@ -428,13 +428,13 @@ def install_status_update(install_state: PluginInstallState):
         logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
 
 
-def install_plugins(
-    project,
-    plugins,
-    reason=PluginInstallReason.INSTALL,
-    parallelism=None,
-    clean=False,
-    force=False,
+def install_plugins(  # noqa: PLR0913
+    project,  # noqa: ANN001
+    plugins,  # noqa: ANN001
+    reason=PluginInstallReason.INSTALL,  # noqa: ANN001
+    parallelism=None,  # noqa: ANN001
+    clean=False,  # noqa: ANN001, FBT002
+    force=False,  # noqa: ANN001, FBT002
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
@@ -475,10 +475,10 @@ def install_plugins(
 
 
 @contextmanager
-def propagate_stop_signals(proc):
+def propagate_stop_signals(proc):  # noqa: ANN001, ANN201
     """Propagate stop signals to `proc`, then wait for it to terminate."""
 
-    def _handler(sig, _):  # noqa: WPS430
+    def _handler(sig, _):  # noqa: ANN001, ANN202
         proc.send_signal(sig)
         logger.debug("stopping child process...")
         # unset signal handler, so that even if the child never stops,
@@ -499,8 +499,8 @@ def check_dependencies_met(
     """Check dependencies of added plugins are met.
 
     Args:
-        plugins: List of plugins to be added.
-        plugin_service: Plugin service to use when checking for dependencies.
+        plugin_refs: List of plugins to be added.
+        plugins_service: Plugin service to use when checking for dependencies.
 
     Returns:
         A tuple with dependency check outcome (True/False), and a string
@@ -530,7 +530,7 @@ def check_dependencies_met(
 def activate_environment(
     ctx: click.Context,
     project: Project,
-    required: bool = False,
+    required: bool = False,  # noqa: FBT001, FBT002
 ) -> None:
     """Activate the selected environment.
 
@@ -540,6 +540,7 @@ def activate_environment(
     Args:
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
+        required: Whether an environment is required to be set.
     """
     if ctx.obj.get("selected_environment"):
         project.activate_environment(ctx.obj["selected_environment"])
@@ -617,9 +618,9 @@ class InstrumentedCmdMixin:
 
     def __init__(
         self,
-        *args,
+        *args,  # noqa: ANN002
         environment_behavior: CliEnvironmentBehavior | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize the `InstrumentedCmdMixin`.
 
@@ -636,7 +637,7 @@ class InstrumentedCmdMixin:
 class InstrumentedGroupMixin(InstrumentedCmdMixin):
     """Shared functionality for all instrumented groups."""
 
-    def invoke(self, ctx: click.Context):
+    def invoke(self, ctx: click.Context):  # noqa: ANN201
         """Update the telemetry context and invoke the group."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
@@ -644,7 +645,7 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
         # Typing these mixin hierarchies is a bit messy, so we'll just ignore it here
         # https://mypy.readthedocs.io/en/latest/more_types.html#mixin-classes
-        super().invoke(ctx)  # type: ignore
+        super().invoke(ctx)  # type: ignore  # noqa: PGH003
 
 
 class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup, DYMGroup):
@@ -662,7 +663,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
     dependent on whether invocation of the command resulted in an Exception.
     """
 
-    def invoke(self, ctx: click.Context):
+    def invoke(self, ctx: click.Context):  # noqa: ANN201
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
@@ -686,7 +687,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
     Only automatically fires a 'start' event.
     """
 
-    def invoke(self, ctx):
+    def invoke(self, ctx):  # noqa: ANN001, ANN201
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)

@@ -23,7 +23,7 @@ class SingerMapper(SingerPlugin):
 
     __plugin_type__ = PluginType.MAPPERS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS = [  # noqa: RUF012
         SettingDefinition(
             name="_mappings",
             kind=SettingKind.ARRAY,
@@ -38,26 +38,26 @@ class SingerMapper(SingerPlugin):
         ),
     ]
 
-    def exec_args(self, plugin_invoker: PluginInvoker):
+    def exec_args(self, plugin_invoker: PluginInvoker):  # noqa: ANN201
         """Return the arguments to be passed to the plugin's executable."""
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return the configuration files required by the plugin."""
         return {"config": f"mapper.{self.instance_uuid}.config.json"}
 
     @hook("before_configure")
-    async def before_configure(
+    async def before_configure(  # noqa: ANN201
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ARG002
+        session,  # noqa: ANN001, ARG002
     ):
-        """Create configuration file."""  # noqa: DAR101
+        """Create configuration file."""
         config_path = invoker.files["config"]
 
         config_payload: dict = {}
-        with open(config_path, "w") as config_file:
+        with open(config_path, "w") as config_file:  # noqa: PTH123
             config_payload = {
                 **invoker.plugin_config_processed,
                 **self._get_mapping_config(invoker.plugin.extra_config),

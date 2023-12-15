@@ -54,7 +54,7 @@ class PluginCommandBlock(metaclass=ABCMeta):
 class InvokerCommand(InvokerBase, PluginCommandBlock):
     """`PluginCommandBlock` that supports invoking plugin commands."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         name: str,
         log: SubprocessOutputWriter,
@@ -113,7 +113,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         return self._command_args
 
-    async def _start(self):
+    async def _start(self):  # noqa: ANN202
         invoke_args = (self.command_args,) if self.command_args else ()
         await self.start(*invoke_args)
 
@@ -123,7 +123,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         Raises:
             RunnerError: if the command fails.
         """
-        try:  # noqa: WPS501
+        try:
             async with self.invoker.prepared(self.context.session):
                 await self._start()
 

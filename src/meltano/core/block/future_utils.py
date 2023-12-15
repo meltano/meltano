@@ -38,7 +38,7 @@ def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
     return None
 
 
-def handle_producer_line_length_limit_error(
+def handle_producer_line_length_limit_error(  # noqa: ANN201
     exception: Exception,
     line_length_limit: int,
     stream_buffer_size: int,
@@ -60,7 +60,7 @@ def handle_producer_line_length_limit_error(
     if not isinstance(exception, ValueError):
         return
 
-    exception = exception.__context__  # noqa: WPS609
+    exception = exception.__context__
     if not isinstance(exception, asyncio.LimitOverrunError):
         return
 

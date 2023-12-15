@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import asyncio
 import platform
@@ -17,28 +17,28 @@ from meltano.core.job.job import (
 
 
 class TestJob:
-    def sample_job(self, payload=None):
+    def sample_job(self, payload=None):  # noqa: ANN001, ANN201
         return Job(
             job_name="meltano:sample-elt",
             state=State.IDLE,
             payload=payload or {},
         )
 
-    def test_save(self, session):
+    def test_save(self, session):  # noqa: ANN001, ANN201
         subject = self.sample_job().save(session)
 
         assert subject.id > 0
 
-    def test_load(self, session):
+    def test_load(self, session):  # noqa: ANN001, ANN201
         for key in range(10):
             session.add(self.sample_job({"key": key}))
 
         subjects = session.query(Job).filter_by(job_name="meltano:sample-elt")
 
-        assert len(subjects.all()) == 10
+        assert len(subjects.all()) == 10  # noqa: PLR2004
         session.rollback()
 
-    def test_transit(self, session):
+    def test_transit(self, session):  # noqa: ANN001, ANN201
         subject = self.sample_job().save(session)
 
         transition = subject.transit(State.RUNNING)
@@ -50,7 +50,7 @@ class TestJob:
         subject.ended_at = datetime.now(timezone.utc)
 
     @pytest.mark.asyncio()
-    async def test_run(self, session):
+    async def test_run(self, session):  # noqa: ANN001, ANN201
         subject = self.sample_job().save(session)
 
         # A successful run will mark the subject as SUCCESS and set the `ended_at`
@@ -76,12 +76,12 @@ class TestJob:
         assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
 
     @pytest.mark.asyncio()
-    async def test_run_failed(self, session):
+    async def test_run_failed(self, session):  # noqa: ANN001, ANN201
         # A failed run will mark the subject as FAILED an set the payload['error']
         subject = self.sample_job({"original_state": 1}).save(session)
         exception = Exception("This is a test.")
 
-        with pytest.raises(Exception) as err:  # noqa: PT012, PT011
+        with pytest.raises(Exception) as err:  # noqa: PT011, PT012
             async with subject.run(session):
                 raise exception
 
@@ -94,13 +94,13 @@ class TestJob:
         assert subject.payload["error"] == "This is a test."
 
     @pytest.mark.asyncio()
-    async def test_run_interrupted(self, session):
+    async def test_run_interrupted(self, session):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
-        with pytest.raises(KeyboardInterrupt):  # noqa: PT012
+        with pytest.raises(KeyboardInterrupt):
             async with subject.run(session):
                 signal.raise_signal(signal.SIGINT)
 
@@ -110,14 +110,14 @@ class TestJob:
         assert subject.payload["error"] == "The process was interrupted"
 
     @pytest.mark.asyncio()
-    async def test_run_terminated(self, session):
+    async def test_run_terminated(self, session):  # noqa: ANN001, ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 
-        with pytest.raises(SystemExit):  # noqa: PT012
+        with pytest.raises(SystemExit):
             async with subject.run(session):
                 signal.raise_signal(signal.SIGTERM)
 
@@ -126,7 +126,7 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was terminated"
 
-    def test_run_id(self, session):
+    def test_run_id(self, session):  # noqa: ANN001, ANN201
         job = Job()
         run_id = job.run_id
         assert isinstance(run_id, uuid.UUID)
@@ -134,7 +134,7 @@ class TestJob:
         job.save(session)
         assert job.run_id == run_id
 
-    def test_is_stale(self):
+    def test_is_stale(self):  # noqa: ANN201
         job = Job()
 
         # Idle jobs are not stale
@@ -162,7 +162,7 @@ class TestJob:
         job.success()
         assert not job.is_stale()
 
-    def test_fail_stale(self):
+    def test_fail_stale(self):  # noqa: ANN201
         job = Job()
 
         # Leaves a job that isn't stale alone

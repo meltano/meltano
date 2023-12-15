@@ -29,10 +29,10 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class ConflictingSettingValueException(Exception):  # noqa: N818
+class ConflictingSettingValueException(Exception):
     """A setting has multiple conflicting values via aliases."""
 
-    def __init__(self, setting_names):
+    def __init__(self, setting_names):  # noqa: ANN001, ANN204
         """Instantiate the error.
 
         Args:
@@ -51,10 +51,10 @@ class ConflictingSettingValueException(Exception):  # noqa: N818
         return f"Conflicting values for setting found in: {self.setting_names}"
 
 
-class MultipleEnvVarsSetException(Exception):  # noqa: N818
+class MultipleEnvVarsSetException(Exception):
     """A setting value is set via multiple environment variable names."""
 
-    def __init__(self, names):
+    def __init__(self, names):  # noqa: ANN001, ANN204
         """Instantiate the error.
 
         Args:
@@ -79,7 +79,7 @@ class StoreNotSupportedError(Error):
 
 
 def cast_setting_value(
-    value: t.Any,
+    value: t.Any,  # noqa: ANN401
     metadata: dict[str, t.Any],
     setting_def: SettingDefinition | None,
 ) -> tuple[t.Any, dict[str, t.Any]]:
@@ -215,7 +215,7 @@ class SettingsStoreManager(ABC):
     def __init__(
         self,
         settings_service: SettingsService,
-        **kwargs,  # noqa: ARG002
+        **kwargs,  # noqa: ANN003, ARG002
     ):
         """Initialise settings store manager.
 
@@ -231,7 +231,7 @@ class SettingsStoreManager(ABC):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: FBT001, FBT002
     ) -> tuple[str, dict]:
         """Abstract get method.
 
@@ -245,7 +245,7 @@ class SettingsStoreManager(ABC):
         self,
         name: str,
         path: list[str],
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Unimplemented set method.
@@ -317,7 +317,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
-        cast_value: bool = False,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: FBT001, FBT002, ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
@@ -342,14 +342,14 @@ class BaseEnvStoreManager(SettingsStoreManager):
 
     @property
     @abstractmethod
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Abstract environment values property."""
 
     def get(
         self,
         name: str,  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: FBT001, FBT002
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
 
@@ -392,7 +392,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
             else (value, metadata)
         )
 
-    def setting_env_vars(self, *args, **kwargs) -> dict:
+    def setting_env_vars(self, *args, **kwargs) -> dict:  # noqa: ANN002, ANN003
         """Return setting environment variables.
 
         Args:
@@ -411,7 +411,7 @@ class EnvStoreManager(BaseEnvStoreManager):
     label = "the environment"
 
     @property
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Return values from the calling terminals environment.
 
         Returns:
@@ -419,7 +419,7 @@ class EnvStoreManager(BaseEnvStoreManager):
         """
         return self.settings_service.env
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
         """Get value by name from the .env file.
 
         Args:
@@ -444,7 +444,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
     label = "`.env`"
     writable = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
         """Initialise a .env file store manager instance.
 
         Args:
@@ -480,7 +480,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             self._env = self.project.dotenv_env
         return self._env
 
-    def get(self, *args, **kwargs) -> tuple[str, dict]:
+    def get(self, *args, **kwargs) -> tuple[str, dict]:  # noqa: ANN002, ANN003
         """Get value by name from the .env file.
 
         Args:
@@ -498,7 +498,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
         return value, metadata
 
-    def set(self, name: str, path: list[str], value, setting_def=None):  # noqa: ARG002
+    def set(self, name: str, path: list[str], value, setting_def=None):  # noqa: ANN001, ANN201, ARG002
         """Set value by name in the .env file.
 
         Args:
@@ -581,7 +581,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         return {}
 
     @contextmanager
-    def update_dotenv(self):
+    def update_dotenv(self):  # noqa: ANN201
         """Update .env configuration.
 
         Yields:
@@ -605,7 +605,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
     label = "`meltano.yml`"
     writable = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
         """Initialise MeltanoYmlStoreManager instance.
 
         Args:
@@ -634,7 +634,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
+        cast_value: bool = False,  # noqa: FBT001, FBT002
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
@@ -681,7 +681,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         self,
         name: str,
         path: list[str],
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         setting_def: SettingDefinition | None = None,
     ) -> dict:
         """Set value by name in the Meltano YAML File.
@@ -779,7 +779,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         return self._flat_config
 
     @contextmanager
-    def update_config(self):
+    def update_config(self):  # noqa: ANN201
         """Update Meltano YAML configuration.
 
         Yields:
@@ -800,7 +800,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
         # This is not quite the right place for this, but we need to create
         # setting defs for missing keys again when `meltano.yml` changes
-        self.settings_service._setting_defs = None  # noqa: WPS437
+        self.settings_service._setting_defs = None
 
 
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
@@ -808,7 +808,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
 
     label = "the active environment in `meltano.yml`"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN204
         """Initialise MeltanoEnvStoreManager instance.
 
         Args:
@@ -829,7 +829,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
             self._flat_config = flatten(self.settings_service.environment_config, "dot")
         return self._flat_config
 
-    def ensure_supported(self, method: str = "get"):
+    def ensure_supported(self, method: str = "get"):  # noqa: ANN201
         """Ensure project is not read-only and an environment is active.
 
         Args:
@@ -869,7 +869,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
 
         # This is not quite the right place for this, but we need to create
         # setting defs for missing keys again when `meltano.yml` changes
-        self.settings_service._setting_defs = None  # noqa: WPS437
+        self.settings_service._setting_defs = None
 
 
 class DbStoreManager(SettingsStoreManager):
@@ -880,10 +880,10 @@ class DbStoreManager(SettingsStoreManager):
 
     def __init__(
         self,
-        *args,
+        *args,  # noqa: ANN002
         bulk: bool = False,
         session: Session | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialise DbStoreManager.
 
@@ -918,7 +918,7 @@ class DbStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
-        cast_value: bool = False,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: FBT001, FBT002, ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
 
@@ -950,7 +950,7 @@ class DbStoreManager(SettingsStoreManager):
         self,
         name: str,
         path: list[str],  # noqa: ARG002
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
     ) -> dict:
         """Set value by name in the system database.
@@ -1053,9 +1053,9 @@ class InheritedStoreManager(SettingsStoreManager):
     def __init__(
         self,
         settings_service: SettingsService,
-        *args,
+        *args,  # noqa: ANN002
         bulk: bool = False,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize inherited store manager.
 
@@ -1074,7 +1074,7 @@ class InheritedStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: FBT001, FBT002, ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
@@ -1152,7 +1152,7 @@ class DefaultStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,  # noqa: ARG002
+        cast_value: bool = False,  # noqa: FBT001, FBT002, ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
@@ -1182,7 +1182,7 @@ class AutoStoreManager(SettingsStoreManager):
     label = "the system database, `meltano.yml`, and `.env`"
     writable = True
 
-    def __init__(self, *args, cache: bool = True, **kwargs):
+    def __init__(self, *args, cache: bool = True, **kwargs):  # noqa: ANN002, ANN003
         """Initialise AutoStoreManager.
 
         Args:
@@ -1230,7 +1230,7 @@ class AutoStoreManager(SettingsStoreManager):
         stores.remove(SettingValueStore.AUTO)
         return stores
 
-    def ensure_supported(self, store, method="set"):
+    def ensure_supported(self, store, method="set"):  # noqa: ANN001, ANN201
         """Return if a given store is supported for the given method.
 
         Args:
@@ -1247,7 +1247,7 @@ class AutoStoreManager(SettingsStoreManager):
         except StoreNotSupportedError:
             return False
 
-    def auto_store(  # noqa: WPS231 # Too complex
+    def auto_store(  # noqa: C901, PLR0911, PLR0912
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
@@ -1319,8 +1319,8 @@ class AutoStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
-        cast_value: bool = False,
-        **kwargs,
+        cast_value: bool = False,  # noqa: FBT001, FBT002
+        **kwargs,  # noqa: ANN003
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
 
@@ -1373,7 +1373,7 @@ class AutoStoreManager(SettingsStoreManager):
             else (value, metadata)
         )
 
-    def set(self, name: str, path: list[str], value, setting_def=None) -> dict:
+    def set(self, name: str, path: list[str], value, setting_def=None) -> dict:  # noqa: ANN001
         """Set a Setting by name, path and (optionally) SettingDefinition.
 
         Args:

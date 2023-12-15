@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import os
 import platform
@@ -21,7 +21,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def _check_venv_created_with_python(project: Project, python: str | None):
+def _check_venv_created_with_python(project: Project, python: str | None):  # noqa: ANN202
     with mock.patch(
         "meltano.core.venv_service.VirtualEnv._resolve_python_path",
     ) as venv_mock:
@@ -29,7 +29,7 @@ def _check_venv_created_with_python(project: Project, python: str | None):
         venv_mock.assert_called_once_with(python)
 
 
-async def _check_venv_created_with_python_for_plugin(
+async def _check_venv_created_with_python_for_plugin(  # noqa: ANN202
     project: Project,
     plugin: ProjectPlugin,
     python: str | None,
@@ -43,10 +43,10 @@ async def _check_venv_created_with_python_for_plugin(
 
 class TestVenvService:
     @pytest.fixture()
-    def subject(self, project):
+    def subject(self, project):  # noqa: ANN001, ANN201
         return VenvService(project=project, namespace="namespace", name="name")
 
-    def test_clean_run_files(self, project: Project, subject: VenvService):
+    def test_clean_run_files(self, project: Project, subject: VenvService):  # noqa: ANN201
         file = project.run_dir("name", "test.file.txt")
         file.touch()
         assert file.exists()
@@ -57,7 +57,7 @@ class TestVenvService:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
-    async def test_clean_install(self, subject: VenvService):
+    async def test_clean_install(self, subject: VenvService):  # noqa: ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -70,7 +70,7 @@ class TestVenvService:
         assert venv_dir.exists()
 
         # ensure that the binary is python3
-        assert os.path.samefile(
+        assert os.path.samefile(  # noqa: PTH121
             venv_dir.joinpath("bin/python"),
             venv_dir.joinpath("bin/python3"),
         )
@@ -102,7 +102,7 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:
+        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:  # noqa: PTH123
             assert (
                 fingerprint_file.read()
                 # sha256 of "example"
@@ -116,7 +116,7 @@ class TestVenvService:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
-    async def test_install(self, subject: VenvService):
+    async def test_install(self, subject: VenvService):  # noqa: ANN201
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -140,7 +140,7 @@ class TestVenvService:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
-    async def test_requires_clean_install(self, subject: VenvService):
+    async def test_requires_clean_install(self, subject: VenvService):  # noqa: ANN201
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
 
@@ -162,13 +162,13 @@ class TestVenvService:
         assert subject.requires_clean_install(["example==0.1.0"])
         assert subject.requires_clean_install(["example", "another-package"])
 
-    def test_top_level_python_setting(self, project: Project):
+    def test_top_level_python_setting(self, project: Project):  # noqa: ANN201
         project.settings.set("python", "test-python-executable-project-level")
         _check_venv_created_with_python(project, "test-python-executable-project-level")
         project.settings.unset("python")
         _check_venv_created_with_python(project, None)
 
-    async def test_plugin_python_setting(self, project: Project):
+    async def test_plugin_python_setting(self, project: Project):  # noqa: ANN201
         plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-mock",
@@ -216,19 +216,19 @@ class TestVirtualEnv:
             ("Windows", "Lib"),
         ),
     )
-    def test_cross_platform(self, system: str, lib_dir: str, project: Project):
+    def test_cross_platform(self, system: str, lib_dir: str, project: Project):  # noqa: ANN201
         with mock.patch("platform.system", return_value=system):
             subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
             assert subject.lib_dir == subject.root / lib_dir
 
-    def test_unknown_platform(self, project: Project):
+    def test_unknown_platform(self, project: Project):  # noqa: ANN201
         with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
             MeltanoError,
             match="(?i)Platform 'commodore64'.*?not supported.",
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
 
-    def test_different_python_versions(self, project: Project):
+    def test_different_python_versions(self, project: Project):  # noqa: ANN201
         root = project.venvs_dir("pytest", "pytest")
 
         assert (
@@ -280,19 +280,19 @@ class TestVirtualEnv:
 
 class TestUvVenvService:
     @pytest.fixture()
-    def subject(self, project):
+    def subject(self, project):  # noqa: ANN001, ANN201
         find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
 
-    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch):  # noqa: ANN201
         find_uv.cache_clear()
         monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
         assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_global(self, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_global(self, monkeypatch: pytest.MonkeyPatch):  # noqa: ANN201
         find_uv.cache_clear()
 
-        def raise_import_error():
+        def raise_import_error():  # noqa: ANN202
             raise ImportError
 
         monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
@@ -300,10 +300,10 @@ class TestUvVenvService:
 
         assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_not_found(self, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_not_found(self, monkeypatch: pytest.MonkeyPatch):  # noqa: ANN201
         find_uv.cache_clear()
 
-        def raise_import_error():
+        def raise_import_error():  # noqa: ANN202
             raise ImportError
 
         monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
@@ -314,7 +314,7 @@ class TestUvVenvService:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
-    async def test_install(self, subject: UvVenvService):
+    async def test_install(self, subject: UvVenvService):  # noqa: ANN201
         # Make sure the venv exists already
         await subject.install(["cowsay"], clean=True)
 
@@ -335,7 +335,7 @@ class TestUvVenvService:
         )
         assert "cowsay" in str(run.stdout)
 
-    async def test_handle_installation_error(self, subject: UvVenvService):
+    async def test_handle_installation_error(self, subject: UvVenvService):  # noqa: ANN201
         process = mock.Mock(spec=Process)
         process.stderr = "Some error"
 

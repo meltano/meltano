@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import inspect
 import json
@@ -18,7 +18,7 @@ from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
 
-with open(
+with open(  # noqa: PTH123
     Path(tracking_module_path).parent
     / "iglu-client-embedded"
     / "schemas"
@@ -49,7 +49,7 @@ def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     return True
 
 
-def test_null_exception_context():
+def test_null_exception_context():  # noqa: ANN201
     ctx = ExceptionContext()
     assert isinstance(ctx.data, dict)
     assert isinstance(ctx.data["context_uuid"], str)
@@ -57,11 +57,11 @@ def test_null_exception_context():
     assert ctx.data["exception"] is None
 
 
-def test_simple_exception_context():
+def test_simple_exception_context():  # noqa: ANN201
     msg = "The error message"
 
     ex = ValueError(msg)
-    try:  # noqa: WPS328
+    try:
         raise ex
     except Exception:
         ctx = ExceptionContext()
@@ -93,7 +93,7 @@ def test_simple_exception_context():
         assert key in tb_data[0]
 
 
-def test_complex_exception_context():
+def test_complex_exception_context():  # noqa: ANN201
     if platform.system() == "Windows":
         pytest.xfail("Fails on Windows: https://github.com/meltano/meltano/issues/3444")
 
@@ -111,7 +111,7 @@ def test_complex_exception_context():
             raise ValueError("that path was a bad value") from ex  # noqa: EM101
 
     try:
-        try:  # noqa: WPS505
+        try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             _function_to_deepen_traceback()
         except Exception:

@@ -14,7 +14,7 @@ class SystemModel(DeclarativeBase):
     """Base class for all database models."""
 
     metadata = SystemMetadata
-    type_annotation_map = {
+    type_annotation_map = {  # noqa: RUF012
         str: types.String(),
         bool: types.Boolean(),
         datetime: types.DateTime(),

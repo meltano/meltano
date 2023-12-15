@@ -1,4 +1,4 @@
-"""Test the lock CLI command."""
+"""Test the lock CLI command."""  # noqa: INP001
 
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ class TestLock:
         ),
         ids=("noop", "all-and-plugin-name"),
     )
-    def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
+    def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):  # noqa: ANN201
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
 
@@ -37,13 +37,13 @@ class TestLock:
 
     @pytest.mark.order(1)
     @pytest.mark.usefixtures("tap", "target")
-    def test_lockfile_exists(
+    def test_lockfile_exists(  # noqa: ANN201
         self,
         cli_runner: CliRunner,
         project: Project,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
-        assert len(lockfiles) == 2
+        assert len(lockfiles) == 2  # noqa: PLR2004
 
         result = cli_runner.invoke(cli, ["lock", "--all"])
         assert result.exit_code == 0
@@ -52,7 +52,7 @@ class TestLock:
         assert "Locked definition" not in result.stdout
 
     @pytest.mark.order(2)
-    def test_lockfile_update(
+    def test_lockfile_update(  # noqa: ANN201
         self,
         cli_runner: CliRunner,
         project: Project,
@@ -76,7 +76,7 @@ class TestLock:
         result = cli_runner.invoke(cli, ["lock", "--all", "--update"])
         assert result.exit_code == 0
         assert result.stdout.count("Lockfile exists") == 0
-        assert result.stdout.count("Locked definition") == 2
+        assert result.stdout.count("Locked definition") == 2  # noqa: PLR2004
 
         new_checksum = tap_lock.sha256_checksum
         new_definition = tap_lock.load()
@@ -89,14 +89,14 @@ class TestLock:
 
     @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap", "inherited_tap", "hub_endpoints")
-    def test_lockfile_update_extractors(
+    def test_lockfile_update_extractors(  # noqa: ANN201
         self,
         cli_runner: CliRunner,
         project: Project,
     ):
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         # 1 tap, 1 target
-        assert len(lockfiles) == 2
+        assert len(lockfiles) == 2  # noqa: PLR2004
 
         result = cli_runner.invoke(
             cli,
@@ -107,7 +107,7 @@ class TestLock:
         assert "Locked definition for extractor tap-mock" in result.stdout
         assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
 
-    def test_lock_plugin_not_found(self, cli_runner: CliRunner):
+    def test_lock_plugin_not_found(self, cli_runner: CliRunner):  # noqa: ANN201
         result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])
         assert result.exit_code == 1
         assert isinstance(result.exception, CliError)

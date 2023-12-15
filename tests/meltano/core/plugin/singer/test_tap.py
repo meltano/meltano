@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import asyncio
 import json
@@ -23,9 +23,9 @@ from meltano.core.state_service import InvalidJobStateError, StateService
 
 
 class CatalogFixture:
-    empty_stream: CatalogDict = {"streams": []}
-    empty_properties: CatalogDict = {"streams": [{"tap_stream_id": "foo"}]}
-    regular_stream: CatalogDict = {
+    empty_stream: CatalogDict = {"streams": []}  # noqa: RUF012
+    empty_properties: CatalogDict = {"streams": [{"tap_stream_id": "foo"}]}  # noqa: RUF012
+    regular_stream: CatalogDict = {  # noqa: RUF012
         "streams": [
             {
                 "tap_stream_id": "foo",
@@ -47,12 +47,12 @@ class CatalogFixture:
 
 class TestSingerTap:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.order(0)
     @pytest.mark.asyncio()
-    async def test_exec_args(self, subject, session, plugin_invoker_factory):
+    async def test_exec_args(self, subject, session, plugin_invoker_factory):  # noqa: ANN001, ANN201
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
@@ -78,7 +78,7 @@ class TestSingerTap:
             ]
 
     @pytest.mark.asyncio()
-    async def test_cleanup(self, subject, session, plugin_invoker_factory):
+    async def test_cleanup(self, subject, session, plugin_invoker_factory):  # noqa: ANN001, ANN201
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert invoker.files["config"].exists()
@@ -86,14 +86,14 @@ class TestSingerTap:
         assert not invoker.files["config"].exists()
 
     @pytest.mark.asyncio()
-    async def test_look_up_state(  # noqa: WPS213, WPS217
+    async def test_look_up_state(  # noqa: ANN201, PLR0913, PLR0915
         self,
-        subject,
-        project,
-        session,
-        plugin_invoker_factory,
-        elt_context_builder,
-        monkeypatch,
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        elt_context_builder,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         job = Job(job_name="pytest_test_runner")
         elt_context = (
@@ -107,7 +107,7 @@ class TestSingerTap:
         state_service = StateService(session=session)
 
         @contextmanager
-        def create_job():
+        def create_job():  # noqa: ANN202
             new_job = Job(job_name=job.job_name)
             new_job.start()
             yield new_job
@@ -120,7 +120,7 @@ class TestSingerTap:
                         new_job.payload_flags,
                     )
 
-        async def assert_state(state):
+        async def assert_state(state):  # noqa: ANN001, ANN202
             async with invoker.prepared(session):
                 await subject.look_up_state(invoker)
 
@@ -211,19 +211,19 @@ class TestSingerTap:
 
     @pytest.mark.order(1)
     @pytest.mark.asyncio()
-    async def test_discover_catalog(  # noqa: WPS213
+    async def test_discover_catalog(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
-        def mock_discovery(*args, **kwargs):  # noqa: ARG001
+        def mock_discovery(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, ARG001
             future = asyncio.Future()
             future.set_result(catalog_path.open("w").write('{"discovered": true}'))
             return future
@@ -275,7 +275,7 @@ class TestSingerTap:
         monkeypatch.setitem(
             invoker.settings_service.config_override,
             "_use_cached_catalog",
-            False,
+            False,  # noqa: FBT003
         )
 
         async with invoker.prepared(session):
@@ -296,13 +296,13 @@ class TestSingerTap:
                 assert not catalog_cache_key_path.exists()
 
     @pytest.mark.asyncio()
-    async def test_discover_catalog_custom(
+    async def test_discover_catalog_custom(  # noqa: ANN201, PLR0913
         self,
-        project,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -322,28 +322,28 @@ class TestSingerTap:
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
     @pytest.mark.asyncio()
-    async def test_apply_select(  # noqa: WPS213
+    async def test_apply_select(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
 
-        def reset_catalog():
+        def reset_catalog():  # noqa: ANN202
             catalog_path.open("w").write('{"rules": []}')
 
-        def assert_rules(*rules):
+        def assert_rules(*rules):  # noqa: ANN002, ANN202
             with catalog_path.open() as catalog_file:
                 catalog = json.load(catalog_file)
 
             assert catalog["rules"] == list(rules)
 
-        def mock_metadata_executor(rules):
-            def visit(catalog):
+        def mock_metadata_executor(rules):  # noqa: ANN001, ANN202
+            def visit(catalog):  # noqa: ANN001, ANN202
                 for rule in rules:
                     catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value],
@@ -409,29 +409,29 @@ class TestSingerTap:
             )
 
     @pytest.mark.asyncio()
-    async def test_apply_catalog_rules(  # noqa: WPS213
+    async def test_apply_catalog_rules(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
-        def reset_catalog():
+        def reset_catalog():  # noqa: ANN202
             catalog_path.open("w").write('{"rules": []}')
 
-        def assert_rules(*rules):
+        def assert_rules(*rules):  # noqa: ANN002, ANN202
             with catalog_path.open() as catalog_file:
                 catalog = json.load(catalog_file)
 
             assert catalog["rules"] == list(rules)
 
-        def mock_metadata_executor(rules):
-            def visit(catalog):
+        def mock_metadata_executor(rules):  # noqa: ANN001, ANN202
+            def visit(catalog):  # noqa: ANN001, ANN202
                 for rule in rules:
                     rule_list = [
                         rule.tap_stream_id,
@@ -445,8 +445,8 @@ class TestSingerTap:
 
             return mock.Mock(visit=visit)
 
-        def mock_schema_executor(rules):
-            def visit(catalog):
+        def mock_schema_executor(rules):  # noqa: ANN001, ANN202
+            def visit(catalog):  # noqa: ANN001, ANN202
                 for rule in rules:
                     catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.payload],
@@ -576,12 +576,12 @@ class TestSingerTap:
             assert cache_key is None
 
     @pytest.mark.asyncio()
-    async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
+    async def test_apply_catalog_rules_select_filter(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -621,7 +621,7 @@ class TestSingerTap:
             ],
         }
 
-        async def selected_properties():
+        async def selected_properties():  # noqa: ANN202
             catalog_path = invoker.files["catalog"]
 
             with catalog_path.open("w") as catalog_file:
@@ -705,31 +705,31 @@ class TestSingerTap:
         }
 
     @pytest.mark.asyncio()
-    async def test_apply_catalog_rules_invalid(
+    async def test_apply_catalog_rules_invalid(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             invoker.files["catalog"].open("w").write("this is invalid json")
 
-            with pytest.raises(PluginExecutionError, match=r"invalid"):  # noqa: WPS360
+            with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
 
     @pytest.mark.asyncio()
-    async def test_catalog_cache_key(  # noqa: WPS217
+    async def test_catalog_cache_key(  # noqa: ANN201
         self,
-        session,
-        plugin_invoker_factory,
-        subject,
-        monkeypatch,
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
     ):
         invoker = plugin_invoker_factory(subject)
         config_override = invoker.settings_service.config_override
 
-        async def cache_key():
+        async def cache_key():  # noqa: ANN202
             async with invoker.prepared(session):
                 return subject.catalog_cache_key(invoker)
 
@@ -788,10 +788,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "elt_context_builder")
-    async def test_run_discovery(
+    async def test_run_discovery(  # noqa: ANN201
         self,
-        plugin_invoker_factory,
-        subject,
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -820,10 +820,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "elt_context_builder")
-    async def test_run_discovery_failure(
+    async def test_run_discovery_failure(  # noqa: ANN201
         self,
-        plugin_invoker_factory,
-        subject,
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -845,10 +845,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "elt_context_builder")
-    async def test_run_discovery_stderr_output(
+    async def test_run_discovery_stderr_output(  # noqa: ANN201
         self,
-        plugin_invoker_factory,
-        subject,
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -869,7 +869,7 @@ class TestSingerTap:
             return_value=False,
         ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
             await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock.call_count == 2
+            assert stream_mock.call_count == 2  # noqa: PLR2004
 
         with mock.patch(
             "meltano.core.plugin.singer.tap.logger.isEnabledFor",
@@ -878,7 +878,7 @@ class TestSingerTap:
             "meltano.core.plugin.singer.tap._stream_redirect",
         ) as stream_mock2:
             await subject.run_discovery(invoker, catalog_path)
-            assert stream_mock2.call_count == 2
+            assert stream_mock2.call_count == 2  # noqa: PLR2004
 
         # ensure stderr is redirected to devnull if we don't need it
         discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")  # noqa: TID251
@@ -892,7 +892,7 @@ class TestSingerTap:
         ) as stream_mock3:
             await subject.run_discovery(invoker, catalog_path)
 
-            assert stream_mock3.call_count == 2
+            assert stream_mock3.call_count == 2  # noqa: PLR2004
             call_kwargs = invoker.invoke_async.call_args_list[0][1]
             assert call_kwargs.get("stderr") is subprocess.PIPE
 
@@ -900,10 +900,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "elt_context_builder")
-    async def test_run_discovery_handle_io_exceptions(
+    async def test_run_discovery_handle_io_exceptions(  # noqa: ANN201
         self,
-        plugin_invoker_factory,
-        subject,
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -925,10 +925,10 @@ class TestSingerTap:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "elt_context_builder")
-    async def test_run_discovery_utf8_output(
+    async def test_run_discovery_utf8_output(  # noqa: ANN201
         self,
-        plugin_invoker_factory,
-        subject,
+        plugin_invoker_factory,  # noqa: ANN001
+        subject,  # noqa: ANN001
     ):
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -1040,7 +1040,7 @@ class TestSingerTap:
             ),
         ),
     )
-    async def test_warn_property_not_found(
+    async def test_warn_property_not_found(  # noqa: ANN201, PLR0913
         self,
         subject: SingerTap,
         caplog: pytest.LogCaptureFixture,

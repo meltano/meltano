@@ -96,7 +96,7 @@ class LockedDefinitionService(PluginRepository):
             PluginDefinition.from_standalone(
                 StandalonePlugin.parse_json_file(lockfile),  # type: ignore[arg-type]
             )
-            for lockfile in iglob(
+            for lockfile in iglob(  # noqa: PTH207
                 "*.lock",
                 root_dir=self.project.root_plugins_dir(plugin_type.value),
             )

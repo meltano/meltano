@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 import typing as t
 
@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
 
 
 class TestCliHub:
-    def test_ping(
+    def test_ping(  # noqa: ANN201
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -39,7 +39,7 @@ class TestCliHub:
             in result.stdout
         )
 
-    def test_ping_unreachable(
+    def test_ping_unreachable(  # noqa: ANN201
         self,
         project: Project,
         cli_runner: CliRunner,
@@ -47,7 +47,7 @@ class TestCliHub:
         requests_mock: RequestsMocker,
     ):
         hub_api = project.hub_service.hub_api_url
-        requests_mock.get(  # noqa: S113
+        requests_mock.get(
             hub_api,
             exc=ConnectionError("Connection refused"),
         )

@@ -18,16 +18,16 @@ if t.TYPE_CHECKING:
 logger = structlog.get_logger(__name__)
 
 
-class ProjectSettingsService(SettingsService):  # noqa: WPS214
+class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
-    config_override = {}
+    config_override = {}  # noqa: RUF012
     supports_environments = False
 
     def __init__(
         self,
         project: Project,
-        show_hidden: bool = True,
+        show_hidden: bool = True,  # noqa: FBT001, FBT002
         env_override: dict | None = None,
         config_override: dict | None = None,
     ):
@@ -56,7 +56,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             **self.env_override,
         }
 
-        self.config_override = {  # noqa: WPS601
+        self.config_override = {
             **self.__class__.config_override,
             **self.config_override,
         }
@@ -69,7 +69,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             )
 
     @property
-    def project_settings_service(self):
+    def project_settings_service(self):  # noqa: ANN201
         """Get the settings service for this project.
 
         For ProjectSettingsService, just returns self.
@@ -95,7 +95,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
 
         if project_id is None:
             try:
-                with open(
+                with open(  # noqa: PTH123
                     self.project.meltano_dir() / "analytics.json",
                 ) as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]
@@ -145,7 +145,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         return self.project.config_service.settings
 
     @property
-    def meltano_yml_config(self):
+    def meltano_yml_config(self):  # noqa: ANN201
         """Return current configuration in `meltano.yml`.
 
         Returns:
@@ -153,7 +153,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         """
         return self.project.config_service.current_config
 
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config):  # noqa: ANN001, ANN201
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -161,7 +161,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
         """
         self.project.config_service.update_config(config)
 
-    def process_config(self, config) -> dict:
+    def process_config(self, config) -> dict:  # noqa: ANN001
         """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:

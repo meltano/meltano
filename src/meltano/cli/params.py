@@ -12,15 +12,15 @@ from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
 
 
-def database_uri_option(func):
+def database_uri_option(func):  # noqa: ANN001, ANN201
     """Database URI Click option decorator.
 
-    args:
+    Args:
         func: The function to decorate.
     """
 
     @click.option("--database-uri", help="System database URI.")
-    def decorate(*args, database_uri=None, **kwargs):
+    def decorate(*args, database_uri=None, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
         if database_uri:
             ProjectSettingsService.config_override["database_uri"] = database_uri
 
@@ -34,23 +34,23 @@ class pass_project:  # noqa: N801
 
     __name__ = "project"
 
-    def __init__(self, migrate=False):
+    def __init__(self, migrate=False):  # noqa: ANN001, ANN204, FBT002
         """Instantiate decorator.
 
-        args:
+        Args:
             migrate: Flag to perform database migration before passing the project.
         """
         self.migrate = migrate
 
-    def __call__(self, func):
+    def __call__(self, func):  # noqa: ANN001, ANN204
         """Return decorated function.
 
-        args:
+        Args:
             func: The function to decorate.
         """
 
         @database_uri_option
-        def decorate(*args, **kwargs):
+        def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
             ctx = click.get_current_context()
 
             project = ctx.obj["project"]

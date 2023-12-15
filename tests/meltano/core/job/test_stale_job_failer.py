@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: INP001
 
 from datetime import datetime, timedelta, timezone
 
@@ -10,7 +10,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 
 class TestStaleJobFailer:
     @pytest.fixture()
-    def live_job(self, session):
+    def live_job(self, session):  # noqa: ANN001, ANN201
         job = Job(job_name="test")
         job.start()
         job.save(session)
@@ -18,7 +18,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def stale_job(self, session):
+    def stale_job(self, session):  # noqa: ANN001, ANN201
         job = Job(job_name="test")
         job.start()
         job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
@@ -27,7 +27,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def other_stale_job(self, session):
+    def other_stale_job(self, session):  # noqa: ANN001, ANN201
         job = Job(job_name="other")
         job.start()
         job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
@@ -36,7 +36,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def complete_job(self, session):
+    def complete_job(self, session):  # noqa: ANN001, ANN201
         job = Job(job_name="other")
         job.start()
         job.success()
@@ -44,13 +44,13 @@ class TestStaleJobFailer:
 
         return job
 
-    def test_fail_stale_jobs(
+    def test_fail_stale_jobs(  # noqa: ANN201, PLR0913
         self,
-        live_job,
-        stale_job,
-        other_stale_job,
-        complete_job,
-        session,
+        live_job,  # noqa: ANN001
+        stale_job,  # noqa: ANN001
+        other_stale_job,  # noqa: ANN001
+        complete_job,  # noqa: ANN001
+        session,  # noqa: ANN001
     ):
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
@@ -73,13 +73,13 @@ class TestStaleJobFailer:
         assert other_stale_job.has_error()
         assert not other_stale_job.is_stale()
 
-    def test_fail_stale_jobs_with_state_id(
+    def test_fail_stale_jobs_with_state_id(  # noqa: ANN201, PLR0913
         self,
-        live_job,
-        stale_job,
-        other_stale_job,
-        complete_job,
-        session,
+        live_job,  # noqa: ANN001
+        stale_job,  # noqa: ANN001
+        other_stale_job,  # noqa: ANN001
+        complete_job,  # noqa: ANN001
+        session,  # noqa: ANN001
     ):
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
