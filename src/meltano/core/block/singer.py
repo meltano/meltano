@@ -3,16 +3,20 @@
 from __future__ import annotations
 
 import asyncio
-from asyncio.subprocess import Process
+import typing as t
 from contextlib import suppress
 
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging import capture_subprocess_output
-from meltano.core.logging.utils import SubprocessOutputWriter
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.project import Project
 from meltano.core.runner import RunnerError
+
+if t.TYPE_CHECKING:
+    from asyncio.subprocess import Process
+
+    from meltano.core.logging.utils import SubprocessOutputWriter
+    from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project import Project
 
 PRODUCERS = (PluginType.EXTRACTORS, PluginType.MAPPERS)
 CONSUMERS = (PluginType.LOADERS, PluginType.MAPPERS)

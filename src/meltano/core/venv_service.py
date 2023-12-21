@@ -12,14 +12,17 @@ import shutil
 import subprocess
 import sys
 import typing as t
-from asyncio.subprocess import Process
-from collections.abc import Iterable
 from functools import cached_property
 from numbers import Number
 from pathlib import Path
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from asyncio.subprocess import Process
+    from collections.abc import Iterable
+
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 

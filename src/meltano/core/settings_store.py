@@ -14,7 +14,6 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
-from sqlalchemy.orm import Session
 
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import Error, ProjectReadonly
@@ -23,6 +22,8 @@ from meltano.core.setting_definition import SettingDefinition, SettingMissingErr
 from meltano.core.utils import flatten, pop_at_path, set_at_path
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from meltano.core.settings_service import SettingsService
 
 

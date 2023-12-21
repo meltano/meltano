@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import typing as t
-from collections.abc import Generator
 from contextlib import suppress
+
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 def meltano_config_env_locations(

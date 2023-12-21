@@ -10,15 +10,15 @@ from functools import cached_property
 
 import structlog
 
-from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
+    from meltano.core.environment import EnvironmentPluginConfig
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)

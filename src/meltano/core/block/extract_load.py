@@ -6,10 +6,8 @@ import asyncio
 import logging
 import typing as t
 from contextlib import asynccontextmanager, closing
-from pathlib import Path
 
 import structlog
-from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
@@ -18,17 +16,24 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
-from meltano.core.project import Project
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
-from .ioblock import IOBlock
 from .singer import SingerBlock
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from sqlalchemy.orm import Session
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+
+    from .ioblock import IOBlock
 
 logger = structlog.getLogger(__name__)
 

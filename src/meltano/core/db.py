@@ -8,14 +8,17 @@ import typing as t
 from urllib.parse import urlparse
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
 from meltano.core.error import MeltanoError
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine import Connection, Engine
+
+    from meltano.core.project import Project
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project

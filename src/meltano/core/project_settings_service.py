@@ -8,12 +8,12 @@ import typing as t
 import structlog
 
 from meltano.core.error import ProjectReadonly
-from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService, SettingValueStore
 from meltano.core.utils import nest_object
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.setting_definition import SettingDefinition
 
 logger = structlog.get_logger(__name__)
 

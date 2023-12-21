@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections import Counter
+import typing as t
 
 import mock
 import pytest
@@ -10,9 +10,13 @@ from meltano.core.plugin import PluginType, Variant
 from meltano.core.plugin.base import PluginRefNameContainsStateIdDelimiterError
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
 from meltano.core.project_plugins_service import PluginDefinitionNotFoundError
+
+if t.TYPE_CHECKING:
+    from collections import Counter
+
+    from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
 
 
 class TestProjectAddService:

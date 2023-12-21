@@ -4,18 +4,22 @@ from __future__ import annotations
 
 import json
 import shutil
+import typing as t
 from pathlib import Path
 from platform import system
 
 import mock
 import pytest
-from click.testing import CliRunner
-from pytest_structlog import StructuredLogCapture
 
 from meltano import __file__ as meltano_init_file
 from meltano.cli import cli
 from meltano.core.manifest import manifest
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
+    from pytest_structlog import StructuredLogCapture
+
+    from meltano.core.project import Project
 
 schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
 

@@ -11,10 +11,10 @@ from functools import cached_property
 import yaml
 
 from meltano.core import bundle
-from meltano.core.meltano_file import MeltanoFile
 from meltano.core.setting_definition import SettingDefinition
 
 if t.TYPE_CHECKING:
+    from meltano.core.meltano_file import MeltanoFile
     from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)

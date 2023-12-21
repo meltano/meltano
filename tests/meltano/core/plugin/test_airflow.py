@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import typing as t
 from configparser import ConfigParser
 
 import pytest
 from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.airflow import AirflowInvoker
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import asyncio
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.airflow import AirflowInvoker
 
 AIRFLOW_CONFIG = """
 

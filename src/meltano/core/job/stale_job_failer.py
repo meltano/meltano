@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import logging
-
-from sqlalchemy.orm import Session
+import typing as t
 
 from .finder import JobFinder
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

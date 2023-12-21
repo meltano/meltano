@@ -2,19 +2,22 @@ from __future__ import annotations
 
 import json
 import shutil
+import typing as t
 from copy import deepcopy
 
 import pytest
 
-from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginDefinitionNotFoundError,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.locked_definition_service import LockedDefinitionService
+    from meltano.core.project import Project
 
 
 @pytest.fixture()

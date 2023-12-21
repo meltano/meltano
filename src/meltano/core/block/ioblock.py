@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import typing as t
 from abc import ABCMeta, abstractmethod
-from asyncio import StreamWriter, Task
 
-from meltano.core.logging.utils import SubprocessOutputWriter
+if t.TYPE_CHECKING:
+    from asyncio import StreamWriter, Task
+
+    from meltano.core.logging.utils import SubprocessOutputWriter
 
 
 class IOBlock(metaclass=ABCMeta):

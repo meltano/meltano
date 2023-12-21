@@ -26,7 +26,6 @@ from meltano.core.error import (
     ProjectReadonly,
 )
 from meltano.core.hub import MeltanoHubService
-from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -34,6 +33,7 @@ from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
+    from meltano.core.plugin.base import PluginRef
 
 
 logger = logging.getLogger(__name__)

@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import logging
 import os
+import typing as t
 from contextlib import contextmanager
-from pathlib import Path
 
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 @contextmanager
