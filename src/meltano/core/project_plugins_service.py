@@ -387,7 +387,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, keep_config=False):
+    def update_plugin(self, plugin: ProjectPlugin, keep_config: bool = False):
         """Update a plugin.
 
         Args:

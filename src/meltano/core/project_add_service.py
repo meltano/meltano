@@ -50,7 +50,7 @@ class ProjectAddService:
         plugin_name: str,
         *,
         lock: bool = True,
-        update=False,
+        update: bool = False,
         **attrs: t.Any,
     ) -> ProjectPlugin:
         """Add a new plugin to the project.

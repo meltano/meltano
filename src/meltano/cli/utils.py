@@ -65,7 +65,7 @@ class CliError(Exception):
 def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
-    update=False,
+    update: bool = False,
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
