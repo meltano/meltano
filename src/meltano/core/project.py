@@ -372,7 +372,7 @@ class Project(Versioned):  # noqa: WPS214
         """
         return self.root.joinpath(".env")
 
-    @property
+    @cached_property
     def dotenv_env(self):
         """Get values from this project's .env file.
 
