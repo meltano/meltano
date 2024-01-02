@@ -60,7 +60,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.56.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v9.0.0-alpha.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
