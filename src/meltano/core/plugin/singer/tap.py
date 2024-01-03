@@ -9,8 +9,10 @@ import shutil
 import sys
 import typing as t
 from contextlib import suppress
+from functools import reduce
 from hashlib import sha1
 from io import StringIO
+from itertools import takewhile
 
 import structlog
 from jsonschema import Draft4Validator
@@ -557,6 +559,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 SchemaExecutor(schema_rules).visit(catalog)
 
             if metadata_rules:
+                self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)
 
             with catalog_path.open("w") as catalog_f:
@@ -615,3 +618,54 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         key_json = json.dumps(key_dict)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324
+
+    def warn_property_not_found(  # noqa: C901
+        self,
+        rules: list[MetadataRule],
+        catalog: list[dict[str, t.Any]],
+    ):
+        """Validate MetadataRules conforms to discovered Catalog.
+
+        Validate MetadataRules against the tap's discovered Catalog & emit
+        warnings for each rule that does not match any property in catalog.
+
+        The method is intentionally written in a defensive manner so as not to
+        raise exceptions. e.g.
+            * use dict.get rather than []-accessor
+            * filter list comprehensions to remove some elements that should
+              not be used for validatation
+
+        Args:
+            rules: List of `MetadataRule`
+            catalog: Discovered Source Catalog
+        """
+        property_rules = [
+            r
+            for r in rules
+            if r.tap_stream_id != "*"
+            and len(r.breadcrumb) >= 2
+            and r.breadcrumb != ["properties", "*"]
+        ]
+        stream_dict = {
+            stream.get("tap_stream_id"): stream
+            for stream in catalog.get("streams", [])
+            if isinstance(stream, dict)
+        }
+
+        def is_not_star(x):
+            return x != "*"
+
+        def dict_get(dictionary, key):
+            return dictionary.get(key, {})
+
+        for rule in property_rules:
+            if not (path := takewhile(is_not_star, rule.breadcrumb)):
+                continue
+            if not (s := stream_dict.get(rule.tap_stream_id)):
+                logger.warning(f"Stream `{rule.tap_stream_id}` was not found.")
+                continue
+            if not reduce(dict_get, path, s.get("schema", {})):
+                logger.warning(
+                    f'Property `{rule.tap_stream_id}.{".".join(rule.breadcrumb[1:])}`'
+                    " was not found in the tap's Catalog",
+                )
