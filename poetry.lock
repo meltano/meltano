@@ -381,13 +381,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.11"
-description = "Type annotations for boto3 1.34.11 generated with mypy-boto3-builder 7.23.0"
+version = "1.34.12"
+description = "Type annotations for boto3 1.34.12 generated with mypy-boto3-builder 7.23.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-stubs-1.34.11.tar.gz", hash = "sha256:184f0dbc901baff1f5b252218d57fbca5b75521c0641ad9a4d7fa34aa20cfb7a"},
-    {file = "boto3_stubs-1.34.11-py3-none-any.whl", hash = "sha256:7fe6acc350bc103d6a500828180b1696fb897ab45cf36c16ac4ed33a9c36a9e0"},
+    {file = "boto3-stubs-1.34.12.tar.gz", hash = "sha256:f0f9ea058624e22359f4060a5aece334eaabb4173581b7b1e2fc41056d44f938"},
+    {file = "boto3_stubs-1.34.12-py3-none-any.whl", hash = "sha256:f0ed25e31eab1ee9b0e8e8e1226160243b15be5b65129f0947cbe10915971a8a"},
 ]
 
 [package.dependencies]
@@ -444,7 +444,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.11)", "botocore (==1.34.11)"]
+boto3 = ["boto3 (==1.34.12)", "botocore (==1.34.12)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -2860,13 +2860,13 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.23.2"
+version = "0.23.3"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-asyncio-0.23.2.tar.gz", hash = "sha256:c16052382554c7b22d48782ab3438d5b10f8cf7a4bdcae7f0f67f097d95beecc"},
-    {file = "pytest_asyncio-0.23.2-py3-none-any.whl", hash = "sha256:ea9021364e32d58f0be43b91c6233fb8d2224ccef2398d6837559e587682808f"},
+    {file = "pytest-asyncio-0.23.3.tar.gz", hash = "sha256:af313ce900a62fbe2b1aed18e37ad757f1ef9940c6b6a88e2954de38d6b1fb9f"},
+    {file = "pytest_asyncio-0.23.3-py3-none-any.whl", hash = "sha256:37a9d912e8338ee7b4a3e917381d1c95bfc8682048cb0fbc35baba316ec1faba"},
 ]
 
 [package.dependencies]
@@ -4205,4 +4205,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "ad041322acfe8e32199f3b24bb703d6720be93c5ef19e482e52135e6f8a68a4d"
+content-hash = "d4a706a1fa2b96e4fc951e4742ae517f492051ebcbeeef44bbd53900cddfff6f"
