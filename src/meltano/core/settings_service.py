@@ -21,6 +21,7 @@ from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.settings_store import SettingsStoreManager
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         self.show_hidden = show_hidden
         self.env_override = env_override or {}
         self.config_override = config_override or {}
-        self._setting_defs = None
+        self._setting_defs: list[SettingDefinition] | None = None
 
     @property
     @abstractmethod
@@ -125,7 +126,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     @property
     @abstractmethod
-    def project_settings_service(self):
+    def project_settings_service(self) -> SettingsService:
         """Get a project settings service.
 
         Returns:
@@ -170,8 +171,12 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
 
     @abstractmethod
-    def process_config(self):
-        """Process configuration dictionary to be used downstream."""
+    def process_config(self, config: dict) -> dict:
+        """Process configuration dictionary to be used downstream.
+
+        Args:
+            config: configuration dictionary to process
+        """
 
     @property
     def flat_meltano_yml_config(self):
@@ -206,10 +211,10 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
     def config_with_metadata(
         self,
-        prefix=None,
-        extras=None,
-        source=SettingValueStore.AUTO,
-        source_manager=None,
+        prefix: str | None = None,
+        extras: bool | None = None,
+        source: SettingValueStore = SettingValueStore.AUTO,
+        source_manager: SettingsStoreManager | None = None,
         **kwargs,
     ):
         """Return all config values with associated metadata.
@@ -226,7 +231,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             dict of config with metadata
         """
         if source_manager:
-            source_manager.bulk = True
+            # TODO: Ensure only a bulk-enabled manager can be used here
+            source_manager.bulk = True  # type: ignore[attr-defined]
         else:
             source_manager = source.manager(self, bulk=True, **kwargs)
 
@@ -250,7 +256,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return config
 
-    def as_dict(self, *args, process=False, **kwargs) -> dict:
+    def as_dict(self, *args, process: bool = False, **kwargs) -> dict:
         """Return settings without associated metadata.
 
         Args:
@@ -306,11 +312,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     def get_with_metadata(  # noqa: WPS210, WPS615
         self,
         name: str,
-        redacted=False,
-        source=SettingValueStore.AUTO,
-        source_manager=None,
-        setting_def=None,
-        expand_env_vars=True,
+        redacted: bool = False,
+        source: SettingValueStore = SettingValueStore.AUTO,
+        source_manager: SettingsStoreManager | None = None,
+        setting_def: SettingDefinition | None = None,
+        expand_env_vars: bool = True,
         **kwargs,
     ):
         """Get a setting with associated metadata.
@@ -335,7 +341,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         self.log(f"Getting setting '{name}'")
 
-        metadata = {"name": name, "source": source, "setting": setting_def}
+        metadata: dict[str, t.Any] = {
+            "name": name,
+            "source": source,
+            "setting": setting_def,
+        }
 
         expandable_env = {**self.project.dotenv_env, **self.env}
         if setting_def and setting_def.is_extra:
@@ -363,11 +373,11 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             expanded_value = do_expand_env_vars(
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars
-                expanded_value = None
+                expanded_value = None  # type: ignore[assignment]
 
             if expanded_value != value:
                 metadata["expanded"] = True
@@ -402,7 +412,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
                             object_source = nested_source
 
                 if object_value:
-                    value = object_value
+                    value = object_value  # type: ignore[assignment]
                     metadata["source"] = object_source
 
             cast_value = setting_def.cast_value(value)
@@ -575,7 +585,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras=None) -> t.Iterable[dict]:
+    def definitions(self, extras: bool | None = None) -> t.Iterable[SettingDefinition]:
         """Return setting definitions along with extras.
 
         Args:
@@ -623,7 +633,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    # TODO: The `for_writing` parameter is unsued, but referenced elsewhere.
+    # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
     def setting_env_vars(
         self,
@@ -691,7 +701,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
                 allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
 
         try:
-            yield allowed
+            yield t.cast(bool, allowed)
         finally:
             if raise_error and not allowed:
                 raise FeatureNotAllowedException(feature)

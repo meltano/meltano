@@ -143,7 +143,7 @@ class SettingValueStore(str, Enum):
         return [store for store in cls if store.writable]
 
     @property
-    def manager(self) -> SettingsStoreManager:
+    def manager(self) -> type[SettingsStoreManager]:
         """Return store manager for this store.
 
         Returns:
@@ -232,7 +232,7 @@ class SettingsStoreManager(ABC):
         name: str,
         setting_def: SettingDefinition | None = None,
         cast_value: bool = False,
-    ) -> None:
+    ) -> tuple[str, dict]:
         """Abstract get method.
 
         Args:
@@ -247,7 +247,7 @@ class SettingsStoreManager(ABC):
         path: list[str],
         value: t.Any,
         setting_def: SettingDefinition | None = None,
-    ) -> None:
+    ) -> dict:
         """Unimplemented set method.
 
         Args:
@@ -266,7 +266,7 @@ class SettingsStoreManager(ABC):
         name: str,
         path: list[str],
         setting_def: SettingDefinition | None = None,
-    ) -> None:
+    ) -> dict:
         """Unimplemented unset method.
 
         Args:
@@ -279,7 +279,7 @@ class SettingsStoreManager(ABC):
         """
         raise NotImplementedError
 
-    def reset(self) -> None:
+    def reset(self) -> dict:
         """Unimplemented reset method.
 
         Raises:

@@ -169,6 +169,8 @@ ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 class SettingDefinition(NameEq, Canonical):
     """Meltano SettingDefinition class."""
 
+    name: str
+
     def __init__(
         self,
         name: str | None = None,
