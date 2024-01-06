@@ -22,6 +22,10 @@ The following CLI options are available for the top-level `meltano` command:
 - [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
 - [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
+### DotEnv Configuration
+
+- `--env-file` - Path to a [`.env` file](/concepts/project#env) to load environment variables from. Can be an absolute path, or relative to the current working directory.
+
 ### No Color
 
 The no color configuration is available for all meltano subcommands via an environment variable:
