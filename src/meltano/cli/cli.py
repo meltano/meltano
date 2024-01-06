@@ -74,6 +74,10 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
+@click.option(
+    "--env-file",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+)
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(  # noqa: C901,WPS231
@@ -83,6 +87,7 @@ def cli(  # noqa: C901,WPS231
     environment: str,
     no_environment: bool,
     cwd: Path | None,
+    env_file: Path | None,
 ):  # noqa: WPS231
     """
     Your CLI for ELT+
@@ -109,7 +114,7 @@ def cli(  # noqa: C901,WPS231
             raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102
 
     try:
-        project = Project.find()
+        project = Project.find(dotenv_file=env_file)
         setup_logging(project)
         logger.debug("meltano %s, %s", __version__, platform.system())  # noqa: WPS323
         if project.readonly:

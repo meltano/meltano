@@ -81,6 +81,7 @@ class Project(Versioned):  # noqa: WPS214
         root: StrPath,
         environment: Environment | None = None,
         readonly: bool = False,
+        dotenv_file: Path | None = None,
     ):
         """Initialize a `Project` instance.
 
@@ -88,6 +89,7 @@ class Project(Versioned):  # noqa: WPS214
             root: The root directory of the project.
             environment: The active Meltano environment.
             readonly: Whether the project is in read-only mode.
+            dotenv_file: The path to the .env file to use.
         """
         self.root = Path(root).resolve()
         self.environment: Environment | None = environment
@@ -95,6 +97,7 @@ class Project(Versioned):  # noqa: WPS214
         self.sys_dir_root = Path(
             os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
+        self.dotenv_file = dotenv_file
 
     def refresh(self, **kwargs) -> None:
         """Refresh the project instance to reflect external changes.
@@ -257,7 +260,12 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Path | str | None = None, activate=True):
+    def find(  # noqa: C901
+        cls,
+        project_root: Path | str | None = None,
+        activate=True,
+        dotenv_file: Path | None = None,
+    ):
         """Find a Project.
 
         Args:
@@ -266,6 +274,7 @@ class Project(Versioned):  # noqa: WPS214
                 directory and it's parents.
             activate: Save the found project so that future calls to `find`
                 will continue to use this project.
+            dotenv_file: The path to the .env file to use.
 
         Returns:
             the found project
@@ -281,12 +290,12 @@ class Project(Versioned):  # noqa: WPS214
         readonly = truthy(os.getenv(PROJECT_READONLY_ENV, "false"))
 
         if project_root := project_root or os.getenv(PROJECT_ROOT_ENV):
-            project = Project(project_root, readonly=readonly)
+            project = Project(project_root, readonly=readonly, dotenv_file=dotenv_file)
             if not project.meltanofile.exists():
                 raise ProjectNotFound(project)
         else:
             for directory in walk_parent_directories():
-                project = Project(directory, readonly=readonly)
+                project = Project(directory, readonly=readonly, dotenv_file=dotenv_file)
                 if project.meltanofile.exists():
                     break
             if not project.meltanofile.exists():
@@ -376,7 +385,13 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             the path to this project's .env file
         """
-        return self.root.joinpath(".env")
+        if self.dotenv_file and self.dotenv_file.is_file():
+            return (
+                self.dotenv_file
+                if self.dotenv_file.is_absolute()
+                else self.root.joinpath(self.dotenv_file)
+            )
+        return self.dotenv_file or self.root.joinpath(".env")
 
     @cached_property
     def dotenv_env(self) -> dict[str, str | None]:
