@@ -381,13 +381,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.12"
-description = "Type annotations for boto3 1.34.12 generated with mypy-boto3-builder 7.23.0"
+version = "1.34.14"
+description = "Type annotations for boto3 1.34.14 generated with mypy-boto3-builder 7.23.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-stubs-1.34.12.tar.gz", hash = "sha256:f0f9ea058624e22359f4060a5aece334eaabb4173581b7b1e2fc41056d44f938"},
-    {file = "boto3_stubs-1.34.12-py3-none-any.whl", hash = "sha256:f0ed25e31eab1ee9b0e8e8e1226160243b15be5b65129f0947cbe10915971a8a"},
+    {file = "boto3-stubs-1.34.14.tar.gz", hash = "sha256:2926f993f6fa8936b7c4dd1552c1eb1618a664657b5db595b23eb7a389666d5e"},
+    {file = "boto3_stubs-1.34.14-py3-none-any.whl", hash = "sha256:7c65a73a896ca8482ca6447e2222a2d2bc3b0bc63dbcdce8b809ab3a5eef7ffe"},
 ]
 
 [package.dependencies]
@@ -444,7 +444,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.12)", "botocore (==1.34.12)"]
+boto3 = ["boto3 (==1.34.14)", "botocore (==1.34.14)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -1685,13 +1685,13 @@ test = ["objgraph", "psutil"]
 
 [[package]]
 name = "hypothesis"
-version = "6.92.2"
+version = "6.92.5"
 description = "A library for property-based testing"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.92.2-py3-none-any.whl", hash = "sha256:d335044492acb03fa1fdb4edacb81cca2e578049fc7306345bc0e8947fef15a9"},
-    {file = "hypothesis-6.92.2.tar.gz", hash = "sha256:841f89a486c43bdab55698de8929bd2635639ec20bf6ce98ccd75622d7ee6d41"},
+    {file = "hypothesis-6.92.5-py3-none-any.whl", hash = "sha256:7f45942ae77f7d474ab68b16c0e1e9280c73af9806da33292c3f316c14d6d479"},
+    {file = "hypothesis-6.92.5.tar.gz", hash = "sha256:847bd741bbd7a6a54f7c7402e4f6aa395f7a53113f515fe42adebfbe5e1e5efd"},
 ]
 
 [package.dependencies]
@@ -1700,7 +1700,7 @@ exceptiongroup = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 sortedcontainers = ">=2.1.0,<3.0.0"
 
 [package.extras]
-all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.17.3)", "pandas (>=1.1)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.3)"]
+all = ["backports.zoneinfo (>=0.2.1)", "black (>=19.10b0)", "click (>=7.0)", "django (>=3.2)", "dpcontracts (>=0.4)", "lark (>=0.10.1)", "libcst (>=0.3.16)", "numpy (>=1.17.3)", "pandas (>=1.1)", "pytest (>=4.6)", "python-dateutil (>=1.4)", "pytz (>=2014.1)", "redis (>=3.0.0)", "rich (>=9.0.0)", "tzdata (>=2023.4)"]
 cli = ["black (>=19.10b0)", "click (>=7.0)", "rich (>=9.0.0)"]
 codemods = ["libcst (>=0.3.16)"]
 dateutil = ["python-dateutil (>=1.4)"]
@@ -1713,7 +1713,7 @@ pandas = ["pandas (>=1.1)"]
 pytest = ["pytest (>=4.6)"]
 pytz = ["pytz (>=2014.1)"]
 redis = ["redis (>=3.0.0)"]
-zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.3)"]
+zoneinfo = ["backports.zoneinfo (>=0.2.1)", "tzdata (>=2023.4)"]
 
 [[package]]
 name = "identify"
@@ -2009,13 +2009,13 @@ test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "moto"
-version = "4.2.12"
+version = "4.2.13"
 description = ""
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "moto-4.2.12-py2.py3-none-any.whl", hash = "sha256:bdcad46e066a55b7d308a786e5dca863b3cba04c6239c6974135a48d1198b3ab"},
-    {file = "moto-4.2.12.tar.gz", hash = "sha256:7c4d37f47becb4a0526b64df54484e988c10fde26861fc3b5c065bc78800cb59"},
+    {file = "moto-4.2.13-py2.py3-none-any.whl", hash = "sha256:93e0fd13b624bd79115494f833308c3641b2be0fc9f4f18aa9264aa01f6168e0"},
+    {file = "moto-4.2.13.tar.gz", hash = "sha256:01aef6a489a725c8d725bd3dc6f70ff1bedaee3e2641752e4b471ff0ede4b4d7"},
 ]
 
 [package.dependencies]
@@ -3833,24 +3833,24 @@ files = [
 
 [[package]]
 name = "types-croniter"
-version = "2.0.0.0"
+version = "2.0.0.20240106"
 description = "Typing stubs for croniter"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.0.0.tar.gz", hash = "sha256:f6b47bce88054127551091e9e447824cbb610e8ff9b84565903f7a53fa4933aa"},
-    {file = "types_croniter-2.0.0.0-py3-none-any.whl", hash = "sha256:a49162276f97a2924609768bcc494039fd5182e8f94eba900ce2bee989e8baa6"},
+    {file = "types-croniter-2.0.0.20240106.tar.gz", hash = "sha256:a5c92566d750e025ab31279029ab44b479e2e3509cd8db3784574bdab1012571"},
+    {file = "types_croniter-2.0.0.20240106-py3-none-any.whl", hash = "sha256:266d9ecabbc06afab7cc0cfa7f2149eb36f613ed66ddd6c9bac4edcf727e9a58"},
 ]
 
 [[package]]
 name = "types-jsonschema"
-version = "4.20.0.0"
+version = "4.20.0.20240105"
 description = "Typing stubs for jsonschema"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-jsonschema-4.20.0.0.tar.gz", hash = "sha256:0de1032d243f1d3dba8b745ad84efe8c1af71665a9deb1827636ac535dcb79c1"},
-    {file = "types_jsonschema-4.20.0.0-py3-none-any.whl", hash = "sha256:e6d5df18aaca4412f0aae246a294761a92040e93d7bc840f002b7329a8b72d26"},
+    {file = "types-jsonschema-4.20.0.20240105.tar.gz", hash = "sha256:4a71af7e904498e7ad055149f6dc1eee04153b59a99ad7dd17aa3769c9bc5982"},
+    {file = "types_jsonschema-4.20.0.20240105-py3-none-any.whl", hash = "sha256:26706cd70a273e59e718074c4e756608a25ba61327a7f9a4493ebd11941e5ad4"},
 ]
 
 [package.dependencies]
@@ -3858,24 +3858,24 @@ referencing = "*"
 
 [[package]]
 name = "types-psutil"
-version = "5.9.5.17"
+version = "5.9.5.20240106"
 description = "Typing stubs for psutil"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "types-psutil-5.9.5.17.tar.gz", hash = "sha256:f7d8769812d72a4b513d7ec9eb5580fe2f6013fc270394a603cb6534811f3e4d"},
-    {file = "types_psutil-5.9.5.17-py3-none-any.whl", hash = "sha256:2161d166256084acf629d30aaf6bda8bee726ae1fea530559650281056b491fc"},
+    {file = "types-psutil-5.9.5.20240106.tar.gz", hash = "sha256:60b233fb613b41fe859526103dbda0b4812d7a16c5f791119ec7016fbe1c8128"},
+    {file = "types_psutil-5.9.5.20240106-py3-none-any.whl", hash = "sha256:fea169a85b1bb9d9edd0b063a93ad950e37d574290b1bf11ef5e46c9c5d82326"},
 ]
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.8.19.14"
+version = "2.8.19.20240106"
 description = "Typing stubs for python-dateutil"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "types-python-dateutil-2.8.19.14.tar.gz", hash = "sha256:1f4f10ac98bb8b16ade9dbee3518d9ace017821d94b057a425b069f834737f4b"},
-    {file = "types_python_dateutil-2.8.19.14-py3-none-any.whl", hash = "sha256:f977b8de27787639986b4e28963263fd0e5158942b3ecef91b9335c130cb1ce9"},
+    {file = "types-python-dateutil-2.8.19.20240106.tar.gz", hash = "sha256:1f8db221c3b98e6ca02ea83a58371b22c374f42ae5bbdf186db9c9a76581459f"},
+    {file = "types_python_dateutil-2.8.19.20240106-py3-none-any.whl", hash = "sha256:efbbdc54590d0f16152fa103c9879c7d4a00e82078f6e2cf01769042165acaa2"},
 ]
 
 [[package]]
@@ -3927,13 +3927,13 @@ files = [
 
 [[package]]
 name = "types-tabulate"
-version = "0.9.0.3"
+version = "0.9.0.20240106"
 description = "Typing stubs for tabulate"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "types-tabulate-0.9.0.3.tar.gz", hash = "sha256:197651f9d6467193cd166d8500116a6d3a26f2a4eb2db093bc9535ee1c0be55e"},
-    {file = "types_tabulate-0.9.0.3-py3-none-any.whl", hash = "sha256:462d1b62e01728416e8277614d6a3eb172d53a8efaf04a04a973ff2dd45238f6"},
+    {file = "types-tabulate-0.9.0.20240106.tar.gz", hash = "sha256:c9b6db10dd7fcf55bd1712dd3537f86ddce72a08fd62bb1af4338c7096ce947e"},
+    {file = "types_tabulate-0.9.0.20240106-py3-none-any.whl", hash = "sha256:0378b7b6fe0ccb4986299496d027a6d4c218298ecad67199bbd0e2d7e9d335a1"},
 ]
 
 [[package]]
@@ -4205,4 +4205,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "1f2cea0db0572c7d18259d73e2216aee7dae0fbf332775532d9bc416d2f62289"
+content-hash = "bd246c508cb86231d9a2888b28d492fc7043cc9c778ed9caae5d7f017b8029a7"
