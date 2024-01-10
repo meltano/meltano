@@ -63,6 +63,12 @@ def concurrency():
     }
 
 
+@pytest.fixture(autouse=True)
+def clean_env(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("FORCE_COLOR", raising=False)
+    monkeypatch.delenv("NO_COLOR", raising=False)
+
+
 class MockAdapter(BaseAdapter):
     RETURN_500 = {
         "/extractors/this-returns-500--original": {"error": "Server error"},
