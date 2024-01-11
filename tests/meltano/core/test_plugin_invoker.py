@@ -29,6 +29,7 @@ class TestPluginInvoker:
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
         dotenv.set_key(project.dotenv, "TAP_MOCK_TEST", "from_dotenv")
+        project.refresh()
 
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
