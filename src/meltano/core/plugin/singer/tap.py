@@ -633,7 +633,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         raise exceptions. e.g.
             * use dict.get rather than []-accessor
             * filter list comprehensions to remove some elements that should
-              not be used for validatation
+              not be used for validation
 
         Args:
             rules: List of `MetadataRule`
