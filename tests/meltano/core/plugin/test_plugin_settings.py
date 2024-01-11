@@ -347,9 +347,9 @@ class TestPluginSettingsService:
     @pytest.mark.usefixtures("env_var")
     def test_namespace_as_env_prefix(
         self,
-        project,
+        project: Project,
         session,
-        target,
+        target: ProjectPlugin,
         plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(target)
@@ -376,6 +376,7 @@ class TestPluginSettingsService:
         # Name prefix
         dotenv.unset_key(project.dotenv, "MOCK_SCHEMA")
         dotenv.set_key(project.dotenv, "TARGET_MOCK_SCHEMA", "name_prefix")
+        project.refresh()
         assert_env_value("name_prefix", "TARGET_MOCK_SCHEMA")
 
         config = subject.as_env(session=session)
@@ -486,7 +487,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(2)
     @pytest.mark.usefixtures("tap")
-    def test_store_dotenv(self, subject, project):
+    def test_store_dotenv(self, subject: PluginSettingsService, project: Project):
         store = SettingValueStore.DOTENV
 
         assert not project.dotenv.exists()
@@ -507,6 +508,7 @@ class TestPluginSettingsService:
         )
 
         dotenv.set_key(project.dotenv, "TAP_MOCK_BOOLEAN", "false")
+        project.refresh()
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
         dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
@@ -548,8 +550,8 @@ class TestPluginSettingsService:
     def test_env_var_expansion(
         self,
         session,
-        subject,
-        project,
+        subject: PluginSettingsService,
+        project: Project,
         monkeypatch,
         env_var,
     ):
@@ -564,6 +566,7 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "A", "rock")
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
+        project.refresh()
 
         yml_config = {
             "var": "$VAR",
