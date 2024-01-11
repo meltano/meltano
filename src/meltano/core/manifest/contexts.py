@@ -10,10 +10,12 @@ from __future__ import annotations
 
 import os
 import typing as t
-from collections.abc import Mapping
 from contextlib import contextmanager, suppress
 
-from meltano.core.manifest.manifest import Manifest
+if t.TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from meltano.core.manifest.manifest import Manifest
 
 _active_manifest: list[Manifest] = []
 

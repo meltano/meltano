@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import typing as t
 from abc import ABCMeta, abstractmethod
 
 import structlog
@@ -11,12 +12,14 @@ from meltano.core.block.singer import InvokerBase
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
-from meltano.core.logging.utils import SubprocessOutputWriter
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
-from meltano.core.project import Project
 from meltano.core.runner import RunnerError
+
+if t.TYPE_CHECKING:
+    from meltano.core.logging.utils import SubprocessOutputWriter
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
 

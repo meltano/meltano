@@ -15,13 +15,14 @@ from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project import Project
-from meltano.core.project_init_service import ProjectInitService
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+    from meltano.core.project_init_service import ProjectInitService
 
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
 fails_on_windows = pytest.mark.xfail(

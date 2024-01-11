@@ -1,0 +1,27 @@
+version: 1
+default_environment: dev
+project_id: 95ed0825-997f-4baf-9c13-bae04ac44fe1
+environments:
+- name: dev
+- name: staging
+- name: prod
+send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  - name: tap-smoke-test
+    namespace: tap_smoke_test
+    pip_url: git+https://github.com/meltano/tap-smoke-test.git
+    executable: tap-smoke-test
+    capabilities:
+    - discover
+    - catalog
+    settings:
+    - name: schema_inference_record_count
+      kind: integer
+    - name: streams
+      kind: array
+    config:
+      schema_inference_record_count: 5
+      streams:
+      - stream_name: $ANIMAL_GROUP
+        input_filename: $MELTANO_PROJECT_ROOT/data/$ANIMAL_GROUP.jsonl

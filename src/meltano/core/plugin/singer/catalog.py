@@ -13,6 +13,8 @@ from meltano.core.behavior.visitor import visit_with
 Node = t.Dict[str, t.Any]
 T = t.TypeVar("T", bound="CatalogRule")
 
+UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
+
 
 class CatalogRule:
     def __init__(
@@ -131,14 +133,14 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if "." in pattern:
-            stream, prop = pattern.split(".", maxsplit=1)
+        if re.search(UNESCAPED_DOT, pattern):
+            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
 
         return cls(
-            stream_pattern=stream,
+            stream_pattern=stream.replace(r"\.", "."),
             property_pattern=prop,
             negated=negated,
             raw=raw,
@@ -247,7 +249,7 @@ def path_property(path: str) -> str:
       stream[0].properties.list_items.properties.account → list_items.account
       stream[0].properties.name                          → name
     """
-    prop_regex = r"properties\.([\w\[\]\d]+)+"
+    prop_regex = r"properties\.([^.]+)+"
     components = re.findall(prop_regex, path)
     return ".".join(components)
 

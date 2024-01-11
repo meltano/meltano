@@ -11,7 +11,8 @@ from sqlalchemy.exc import SAWarning
 from sqlalchemy.orm import close_all_sessions, sessionmaker
 from sqlalchemy.pool import NullPool
 
-from meltano.core.project import Project
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)

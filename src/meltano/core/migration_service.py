@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import logging
+import typing as t
 
 import click
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy.engine import Engine
 
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine import Engine
 
 SPLAT = "*"
 

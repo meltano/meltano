@@ -38,7 +38,7 @@ PLUGIN_COLOR = "magenta"
 ENVIRONMENT_COLOR = "orange1"
 SETTING_COLOR = "blue1"
 
-HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() | safe }}[/{{ plugin_color }}] {% if environment_name %}in Environment[{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}] {% endif %}Interactively[/bold underline]
+HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plugin_name.capitalize() | safe }}[/{{ plugin_color }}] {% if environment_name %}in Environment [{{ environment_color }}]{{ environment_name }}[/{{ environment_color }}] {% endif %}Interactively[/bold underline]
 
 Following the prompts below, you will be guided through configuration of this plugin.
 
@@ -111,7 +111,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
     def _print_home_screen(self):
         """Print screen for this interactive."""
-        markdown_template = Environment(loader=BaseLoader, autoescape=True).from_string(
+        markdown_template = Environment(
+            loader=BaseLoader(),
+            autoescape=True,
+        ).from_string(
             HOME_SCREEN_TEMPLATE,
         )
         markdown_text = markdown_template.render(
@@ -240,7 +243,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
-                    "New value",
+                    "New value (redacted)",
                     default="",
                     show_default=False,
                     hide_input=True,

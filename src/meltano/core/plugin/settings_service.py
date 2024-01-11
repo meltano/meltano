@@ -6,10 +6,12 @@ import typing as t
 from functools import cached_property
 
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
-from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import FeatureFlags, SettingsService
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+    from meltano.core.setting_definition import SettingDefinition
 
 
 class PluginSettingsService(SettingsService):  # noqa: WPS214

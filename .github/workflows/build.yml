@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.0
+      uses: actions/checkout@v4.1.1
 
     - name: Install Poetry
       env:
@@ -28,7 +28,7 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v4.7.0
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: 3.9
         architecture: x64
@@ -61,7 +61,7 @@ jobs:
         poetry run pip wheel --no-deps . --wheel-dir dist/
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
         name: python-artifacts
         path: 'dist/*'
@@ -73,10 +73,10 @@ jobs:
     environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.0
+      uses: actions/checkout@v4.1.1
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3.0.2
+      uses: actions/download-artifact@v4
       with:
         name: python-artifacts
         path: dist/
@@ -97,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.8.10
+      uses: pypa/gh-action-pypi-publish@v1.8.11

@@ -54,6 +54,8 @@ settings:
 - name: state_backend.azure.connection_string
   sensitive: true
   env_specific: true
+- name: state_backend.azure.storage_account_url
+  env_specific: true
 
 ## AWS S3 state backend
 - name: state_backend.s3.aws_access_key_id

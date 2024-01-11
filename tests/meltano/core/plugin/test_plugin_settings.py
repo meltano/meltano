@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import platform
+import typing as t
 from datetime import date, datetime
 
 import dotenv
 import pytest
 
-from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 from meltano.core.settings_service import (
@@ -24,6 +22,11 @@ from meltano.core.settings_store import (
     MultipleEnvVarsSetException,
 )
 from meltano.core.utils import EnvironmentVariableNotSetError
+
+if t.TYPE_CHECKING:
+    from meltano.core.environment import Environment
+    from meltano.core.plugin.settings_service import PluginSettingsService
+    from meltano.core.project import Project
 
 
 @pytest.mark.order(0)
@@ -273,7 +276,7 @@ class TestPluginSettingsService:
 
         config = subject.as_dict(process=True)
         assert config["auth"]["username"] == "nested_username"
-        assert config["auth"]["password"] == "nested_password"
+        assert config["auth"]["password"] == "nested_password"  # noqa: S105
         assert "auth.username" not in config
         assert "auth.password" not in config
 

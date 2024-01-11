@@ -176,7 +176,6 @@ Now we're able to reference the table using the keyword "source" as you can see 
 Add a file called `authors.sql` to the folder `transform/models/tap_github` with the following contents:
 
 ```sql
-{% raw %}
 {{
   config(
     materialized='table'
@@ -185,7 +184,7 @@ Add a file called `authors.sql` to the folder `transform/models/tap_github` with
 
 with base as (
     select *
-    from {{ source('tap_github', 'commits') }} {% endraw %}
+    from {{ source('tap_github', 'commits') }}
 )
 select distinct (commit -> 'author' -> 'name') as authors
 from base

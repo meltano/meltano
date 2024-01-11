@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.base import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.base import PluginRef
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 class SelectService:

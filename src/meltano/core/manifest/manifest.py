@@ -6,12 +6,10 @@ from __future__ import annotations
 import json
 import re
 import subprocess
-import sys
 import typing as t
 from collections import defaultdict
-from collections.abc import Iterable
 from contextlib import suppress
-from functools import reduce
+from functools import cached_property, reduce
 from operator import getitem
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -20,20 +18,10 @@ import flatten_dict  # type: ignore
 import structlog
 import yaml
 
-if sys.version_info >= (3, 10):
-    from typing import TypeAlias
-else:
-    from typing_extensions import TypeAlias
-
-from functools import cached_property
-
 from meltano import __file__ as package_root_path
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
-from meltano.core.plugin.base import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
-from meltano.core.project import Project
 from meltano.core.utils import (
     EnvVarMissingBehavior,
     MergeStrategy,
@@ -42,6 +30,19 @@ from meltano.core.utils import (
     expand_env_vars,
     get_no_color_flag,
 )
+
+if t.TYPE_CHECKING:
+    import sys
+    from collections.abc import Iterable
+
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+
+    if sys.version_info >= (3, 10):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
 
 # NOTE: We do not use `Project(...).meltano.canonical` for 3 reasons:
 # - It will make it difficult to refactor the rest of the Meltano core to be
@@ -181,14 +182,20 @@ class Manifest:  # noqa: WPS214
     def _project_files(self) -> dict[str, t.Any]:
         project_files = flatten_dict.unflatten(
             deep_merge(
-                yaml.load(  # noqa: S506
+                yaml.load(
                     self._meltano_file,
-                    t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                    t.cast(  # noqa: S506
+                        t.Type[yaml.SafeLoader],
+                        YamlNoTimestampSafeLoader,
+                    ),
                 ),
                 *(
-                    yaml.load(  # noqa: S506
+                    yaml.load(
                         x.read_text(),
-                        t.cast(t.Type[yaml.SafeLoader], YamlNoTimestampSafeLoader),
+                        t.cast(  # noqa: S506
+                            t.Type[yaml.SafeLoader],
+                            YamlNoTimestampSafeLoader,
+                        ),
                     )
                     for x in self.project.project_files.include_paths
                 ),

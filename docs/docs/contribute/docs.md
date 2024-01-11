@@ -17,15 +17,12 @@ We recognize that not everything will fall into the four categories and welcome 
 
 Follow the steps below to work locally with this project.
 
-1. Make sure you have a Ruby environment set up locally.
+1. Make sure you have a nodejs environment (>v16) set up locally.
 1. Fork, clone or download this project.
-1. Install ruby dependencies: `bundle install`
 1. Install node dependencies: `npm install`
-1. Build and preview: `bundle exec jekyll serve`
-1. Preview the site at [http://127.0.0.1:4000](http://127.0.0.1:4000).
+1. Run `npm start` to run a local development server
+1. View the docs at [http://localhost:3000](http://localhost:3000).
 1. Make changes to the content of the site and preview them at the link above.
-
-**Note:** Changes to `_config.yml` require you to stop the Jekyll server (`^C`) and restart it with `bundle exec jekyll serve`.
 
 ### <a name="add_a_new_page"></a>Add a New Page
 

@@ -1,0 +1,10 @@
+{"id": 1, "description": "Komodo Dragon", "verified": true, "views": 74, "created_at": "2022-03-15T09:45:30Z"}
+{"id": 2, "description": "Green Sea Turtle", "verified": true, "views": 63, "created_at": "2022-05-18T14:20:12Z"}
+{"id": 3, "description": "King Cobra", "verified": true, "views": 58, "created_at": "2022-07-10T17:55:42Z"}
+{"id": 4, "description": "Gila Monster", "verified": true, "views": 42, "created_at": "2022-09-04T21:12:58Z"}
+{"id": 5, "description": "Galapagos Tortoise", "verified": true, "views": 53, "created_at": "2022-11-09T11:30:25Z"}
+{"id": 6, "description": "American Alligator", "verified": true, "views": 67, "created_at": "2023-01-22T08:15:37Z"}
+{"id": 7, "description": "Western Diamondback Rattlesnake", "verified": true, "views": 49, "created_at": "2023-03-05T14:48:19Z"}
+{"id": 8, "description": "Chameleon", "verified": true, "views": 38, "created_at": "2023-05-14T20:05:52Z"}
+{"id": 9, "description": "Iguana", "verified": true, "views": 45, "created_at": "2023-07-19T09:10:36Z"}
+{"id": 10, "description": "Leopard Gecko", "verified": true, "views": 55, "created_at": "2023-09-30T16:27:04Z"}

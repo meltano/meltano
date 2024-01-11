@@ -39,12 +39,14 @@ jobs:
         - { integration_test: "meltano-config", needs_postgres: false}
         - { integration_test: "meltano-annotations", needs_postgres: false}
         - { integration_test: "meltano-manifest", needs_postgres: false}
+        - { integration_test: "meltano-run-merge-states", needs_postgres: false}
+        - { integration_test: "meltano-expand-envvars-in-array", needs_postgres: false}
       fail-fast: false
 
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.0
+      uses: actions/checkout@v4.1.1
 
     - name: Install Poetry
       env:
@@ -54,7 +56,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.10
-      uses: actions/setup-python@v4.7.0
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.10'
         architecture: x64

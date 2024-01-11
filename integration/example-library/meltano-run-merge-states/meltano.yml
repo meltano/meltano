@@ -1,0 +1,27 @@
+version: 1
+default_environment: dev
+project_id: a3e6d53c-8ccc-4cac-a89c-08b70120f243
+environments:
+- name: dev
+- name: staging
+- name: prod
+send_anonymous_usage_stats: false
+plugins:
+  extractors:
+  - name: tap-with-state
+    namespace: tap_with_state
+    variant: custom
+    executable: ./tap.py
+    capabilities:
+    - discover
+    - catalog
+    - state
+    settings:
+    - name: ts
+      kind: date_iso8601
+      description: Dummy timestamp
+    select: ["*.*"]
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl

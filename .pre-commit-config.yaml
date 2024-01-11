@@ -22,7 +22,7 @@ repos:
           - "poetry==1.6.1"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
@@ -38,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.26.3
+    rev: 0.27.3
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -53,20 +53,20 @@ repos:
         args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.5
+    rev: v0.9.0.6
     hooks:
       - id: shellcheck
         name: shellcheck
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.50.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v9.0.0-alpha.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
         args: ['--fix', '--config=docs/.eslintrc.json']
         additional_dependencies:
-          - "eslint@8.45.0" # Keep this in sync with the rev above!
+          - "eslint@8.55.0" # Keep this in sync with the rev above!
           - "eslint-config-prettier@8.8.0"
           - "eslint-plugin-prettier@5.0.0"
           - "eslint-plugin-react@7.33.0"
@@ -74,13 +74,13 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.291
+    rev: v0.1.11
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
 
   - repo: https://github.com/psf/black
-    rev: 23.9.1
+    rev: 23.12.1
     hooks:
       - id: black
         exclude: ^(src/meltano/migrations/)

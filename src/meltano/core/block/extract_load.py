@@ -6,10 +6,8 @@ import asyncio
 import logging
 import typing as t
 from contextlib import asynccontextmanager, closing
-from pathlib import Path
 
 import structlog
-from sqlalchemy.orm import Session
 
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
@@ -18,17 +16,24 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
-from meltano.core.project import Project
 from meltano.core.runner import RunnerError
 from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
-from .ioblock import IOBlock
 from .singer import SingerBlock
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from sqlalchemy.orm import Session
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+
+    from .ioblock import IOBlock
 
 logger = structlog.getLogger(__name__)
 
@@ -50,6 +55,7 @@ class ELBContext:  # noqa: WPS230
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
+        merge_state: bool | None = False,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
 
@@ -62,6 +68,7 @@ class ELBContext:  # noqa: WPS230
             update_state: Whether to update the state of the job.
             state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
+            merge_state: Whether to merge state at the end of run.
         """
         self.project = project
         self.session = session
@@ -70,6 +77,7 @@ class ELBContext:  # noqa: WPS230
         self.force = force
         self.update_state = update_state
         self.state_id_suffix = state_id_suffix
+        self.merge_state = merge_state
 
         # not yet used but required to satisfy the interface
         self.dry_run = False
@@ -113,6 +121,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._state_id_suffix = None
         self._env = {}
         self._blocks = []
+        self._merge_state = False
 
         self._base_output_logger = None
 
@@ -126,6 +135,19 @@ class ELBContextBuilder:  # noqa: WPS214
             self
         """
         self._job = job
+        return self
+
+    def with_merge_state(self, merge_state: bool):
+        """Set whether the state is to be merged or overwritten.
+
+        Args:
+            merge_state : merge the state for the context
+
+        Returns:
+            self
+
+        """
+        self._merge_state = merge_state
         return self
 
     def with_full_refresh(self, full_refresh: bool):
@@ -274,6 +296,7 @@ class ELBContextBuilder:  # noqa: WPS214
             update_state=self._state_update,
             state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
+            merge_state=self._merge_state,
         )
 
 

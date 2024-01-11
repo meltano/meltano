@@ -3,9 +3,11 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import typing as t
 from pathlib import Path
 
-from meltano.core.plugin.project_plugin import ProjectPlugin
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class PluginConfigService:
