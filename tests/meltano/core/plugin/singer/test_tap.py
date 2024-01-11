@@ -201,7 +201,7 @@ class TestSingerTap:
             return future
 
         async with invoker.prepared(session):
-            with mock.patch.object(SingerTap, 'warn_property_not_found'):
+            with mock.patch.object(SingerTap, "warn_property_not_found"):
                 with mock.patch.object(
                     SingerTap,
                     "run_discovery",
