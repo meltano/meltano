@@ -234,7 +234,7 @@ class TestBasePlugin:
 
     def test_extra_settings(self, subject):
         subject.EXTRA_SETTINGS = [
-            SettingDefinition(name="_foo", kind=SettingKind.PASSWORD, value="default"),
+            SettingDefinition(name="_foo", sensitive=True, value="default"),
             SettingDefinition(name="_bar", kind=SettingKind.INTEGER, value=0),
         ]
         settings = subject.extra_settings
@@ -242,7 +242,7 @@ class TestBasePlugin:
         # Known, overwritten in plugin/variant definition
         foo_setting = find_named(settings, "_foo")
         assert foo_setting
-        assert foo_setting.kind == SettingKind.PASSWORD
+        assert foo_setting.sensitive
         assert foo_setting.value == "bar"
         assert not foo_setting.is_custom
 

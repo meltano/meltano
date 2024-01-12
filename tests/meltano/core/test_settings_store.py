@@ -8,7 +8,7 @@ import pytest
 from meltano.core.environment import Environment
 from meltano.core.project import Project
 from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
@@ -39,7 +39,7 @@ class DummySettingsService(SettingsService):
         self._meltano_environment_config = {}
         self.__definitions = [
             SettingDefinition("regular", aliases=["basic"], value="from_default"),
-            SettingDefinition("password", kind=SettingKind.PASSWORD),
+            SettingDefinition("password", sensitive=True),
             SettingDefinition("env_specific", env_specific=True),
         ]
         self._inherited_settings = None

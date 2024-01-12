@@ -40,9 +40,9 @@
     },
     {
       "name": "password",
-      "kind": "password",
       "label": "Password",
-      "description": "PostgreSQL password"
+      "description": "PostgreSQL password",
+      "sensitive": true
     },
     {
       "name": "dbname",

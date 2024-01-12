@@ -24,7 +24,7 @@
     },
     {
       "name": "password",
-      "kind": "password",
+      "sensitive": true,
       "label": "Password",
       "description": "The user password to authenticate with."
     },
