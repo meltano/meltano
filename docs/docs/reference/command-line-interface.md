@@ -136,6 +136,21 @@ Using `--from-ref` allows you to add a plugin before it is available on [Meltano
   Meltano will throw an error if the referenced plugin definition is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
 
+A plugin can be updated using the `--update` option
+
+```bash
+meltano add --update <type> <name>
+
+# For example:
+# Update from Meltano Hub
+meltano add --update extractor tap-spotify
+
+# Update from ref
+meltano add --update --from-ref tap-spotify--matatika.yml extractor tap-spotify
+```
+
+This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
+
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
 ```bash
@@ -172,7 +187,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--no-install`: Do not install the plugin after adding it to the project.
-
+- `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
