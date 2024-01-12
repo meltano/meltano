@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
 import typing as t
+from importlib.metadata import distribution
 
 import click
 
-import meltano
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.error import MeltanoError
 from meltano.core.project_plugins_service import PluginType
@@ -20,6 +21,47 @@ if t.TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
     from meltano.core.project import Project
+
+
+def _get_pep610_data() -> dict[str, t.Any] | None:
+    dist = distribution("meltano")
+    if contents := dist.read_text("direct_url.json"):
+        return json.loads(contents)
+
+    return None
+
+
+def _check_editable_installation(*, force: bool) -> None:
+    if pep610_data := _get_pep610_data():
+        url: str | None = pep610_data.get("url")
+        dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
+        if url and dir_info and dir_info.get("editable", False) and not force:
+            # TODO: Use `str.removeprefix` when we drop support for Python 3.8
+            meltano_dir = url.replace("file://", "", 1)
+            raise AutomaticPackageUpgradeError(
+                reason="it is installed from source",
+                instructions=f"navigate to `{meltano_dir}` and run `git pull`",
+            )
+
+
+def _check_docker_installation() -> None:
+    if os.path.exists("/.dockerenv"):
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed inside Docker",
+            instructions=(
+                "pull the latest Docker image using "
+                "`docker pull meltano/meltano` and recreate any containers "
+                "you may have created"
+            ),
+        )
+
+
+def _check_in_nox_session() -> None:
+    if os.getenv("NOX_CURRENT_SESSION") == "tests":
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed inside a Nox test session",
+            instructions="",
+        )
 
 
 class UpgradeError(Exception):
@@ -33,7 +75,7 @@ class AutomaticPackageUpgradeError(Exception):
         """Initialize the `AutomaticPackageUpgradeError`.
 
         Args:
-            reason: The reason the exception occured.
+            reason: The reason the exception occurred.
             instructions: Instructions for how to manually resolve the exception.
         """
         self.reason = reason
@@ -54,33 +96,9 @@ class UpgradeService:  # noqa: WPS214
         self.engine = engine
 
     def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
-        fail_reason = None
-        instructions = ""
-
-        meltano_file_path = "/src/meltano/__init__.py"
-        editable = meltano.__file__.endswith(meltano_file_path)
-        if editable and not force:
-            meltano_dir = meltano.__file__[: -len(meltano_file_path)]
-            fail_reason = "it is installed from source"
-            instructions = f"navigate to `{meltano_dir}` and run `git pull`"
-
-        elif os.path.exists("/.dockerenv"):
-            fail_reason = "it is installed inside Docker"
-            instructions = (
-                "pull the latest Docker image using "
-                "`docker pull meltano/meltano` and recreate any containers "
-                "you may have created"
-            )
-
-        elif os.getenv("NOX_CURRENT_SESSION") == "tests":
-            fail_reason = "it is installed inside a Nox test session"
-            instructions = ""
-
-        if fail_reason:
-            raise AutomaticPackageUpgradeError(
-                reason=fail_reason,
-                instructions=instructions,
-            )
+        _check_editable_installation(force=force)
+        _check_docker_installation()
+        _check_in_nox_session()
 
         pip_url = pip_url or "meltano"
         run = subprocess.run(
@@ -168,7 +186,7 @@ class UpgradeService:  # noqa: WPS214
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
             click.secho("Applying migrations to project state...", fg="blue")
-            for filepath in state_service.state_store_manager.list_all_files():
+            for filepath in manager.list_all_files():
                 parts = filepath.split(manager.delimiter)
                 if (
                     parts[-1] == "state.json"
