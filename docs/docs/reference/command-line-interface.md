@@ -124,10 +124,8 @@ meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
 # The above also applies to the plugin variant, if provided
 meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
 
-# Once added, the custom plugin definition can be updated by removing the plugin
-# and re-adding it with the same `meltano add --from-ref` command
-meltano remove extractor tap-spotify
-meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+# Once added, the custom plugin definition can be updated with the `--update` option
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
 ```
 
 Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
@@ -146,7 +144,7 @@ meltano add --update <type> <name>
 meltano add --update extractor tap-spotify
 
 # Update from ref
-meltano add --update --from-ref tap-spotify--matatika.yml extractor tap-spotify
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
 ```
 
 This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
