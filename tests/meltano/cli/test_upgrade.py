@@ -4,34 +4,59 @@ import json
 import platform
 import shutil
 import typing as t
+from importlib.metadata import PathDistribution
 
 import boto3
 import mock
 import pytest
 from moto import mock_aws
 
-import meltano
 from asserts import assert_cli_runner
 from meltano.cli import cli
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from click.testing import CliRunner
 
 
 class TestCliUpgrade:
     @pytest.mark.usefixtures("project")
-    def test_upgrade(self, cli_runner: CliRunner) -> None:
+    def test_upgrade(
+        self,
+        cli_runner: CliRunner,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         # If an editable install was used, test that it cannot be upgraded automatically
-        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+        dist_path = tmp_path / "meltano"
+        dist_path.mkdir()
+        dist_path.joinpath("direct_url.json").write_text(
+            json.dumps(
+                {
+                    "dir_info": {"editable": True},
+                    "url": f"{dist_path.as_uri()}",
+                },
+            ),
+        )
+        with monkeypatch.context() as m:
+            m.setattr(
+                "meltano.core.upgrade_service.distribution",
+                lambda _: PathDistribution(dist_path),
+            )
             result = cli_runner.invoke(cli, ["upgrade"])
             assert_cli_runner(result)
 
             assert (
                 "The `meltano` package could not be upgraded automatically"
+                in result.stdout
+            )
+            assert (
+                f"To upgrade manually, navigate to `{dist_path}` and run `git pull`"
                 in result.stdout
             )
             assert "run `meltano upgrade --skip-package`" in result.stdout
@@ -62,7 +87,13 @@ class TestCliUpgrade:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         # If an editable install was used, test that it cannot be upgraded automatically
-        if meltano.__file__.endswith("/src/meltano/__init__.py"):
+        with mock.patch("importlib.metadata.distribution") as mock_dist:
+            mock_dist.return_value.read_text.return_value = json.dumps(
+                {
+                    "dir_info": {"editable": True},
+                    "url": "file:///Users/user/Code/meltano/meltano",
+                },
+            )
             result = cli_runner.invoke(cli, ["upgrade", "package"])
             assert_cli_runner(result)
 
