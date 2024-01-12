@@ -8,6 +8,7 @@ import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
+from functools import cached_property
 
 from meltano.core import utils
 from meltano.core.behavior import NameEq
@@ -149,16 +150,16 @@ class SettingKind(YAMLEnum):
     OBJECT = "object"
     HIDDEN = "hidden"
 
-    @classmethod
-    def get_sensitive(cls):
-        """Get the sensitive setting kinds.
+    @cached_property
+    def is_sensitive(self):
+        """Return whether the setting kind is sensitive.
 
         Returns:
-            A set of setting kinds.
+            True if the setting kind is sensitive.
         """
-        return {
-            cls.PASSWORD,
-            cls.OAUTH,
+        return self in {
+            SettingKind.PASSWORD,
+            SettingKind.OAUTH,
         }
 
 
@@ -225,7 +226,7 @@ class SettingDefinition(NameEq, Canonical):
 
         kind = SettingKind(kind) if kind else None
         hidden = hidden or kind is SettingKind.HIDDEN or None
-        sensitive = sensitive or kind in SettingKind.get_sensitive() or None
+        sensitive = sensitive or kind and kind.is_sensitive or None
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
