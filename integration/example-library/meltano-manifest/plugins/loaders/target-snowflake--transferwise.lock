@@ -45,9 +45,9 @@
     },
     {
       "name": "password",
-      "kind": "password",
       "label": "Password",
-      "description": "Snowflake Password"
+      "description": "Snowflake Password",
+      "sensitive": true
     },
     {
       "name": "warehouse",
@@ -66,21 +66,21 @@
     },
     {
       "name": "aws_access_key_id",
-      "kind": "password",
       "label": "AWS Access Key ID",
-      "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used"
+      "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used",
+      "sensitive": true
     },
     {
       "name": "aws_secret_access_key",
-      "kind": "password",
       "label": "AWS Secret Access Key",
-      "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used"
+      "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used",
+      "sensitive": true
     },
     {
       "name": "aws_session_token",
-      "kind": "password",
       "label": "AWS Session Token",
-      "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used"
+      "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used",
+      "sensitive": true
     },
     {
       "name": "aws_profile",
@@ -181,9 +181,9 @@
     },
     {
       "name": "client_side_encryption_master_key",
-      "kind": "password",
       "label": "Client Side Encryption Master Key",
-      "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string."
+      "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string.",
+      "sensitive": true
     },
     {
       "name": "client_side_encryption_stage_object",

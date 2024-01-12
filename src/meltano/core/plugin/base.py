@@ -831,6 +831,7 @@ class StandalonePlugin(Canonical):
 
         deprecated_kind_replacements = {
             SettingKind.HIDDEN: "hidden: true",
+            SettingKind.PASSWORD: "sensitive: true",
         }
 
         settings_by_deprecated_kind = defaultdict(list)
