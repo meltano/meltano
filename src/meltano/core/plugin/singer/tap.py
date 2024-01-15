@@ -668,6 +668,6 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):
                 logger.warning(
-                    f"Property `{rule.tap_stream_id}` was not found in "
-                    f"the schema of stream `{'.'.join(rule.breadcrumb[1:])}`",
+                    f"Property `{'.'.join(rule.breadcrumb[1:])}` was not found in "
+                    f"the schema of stream `{rule.tap_stream_id}`",
                 )
