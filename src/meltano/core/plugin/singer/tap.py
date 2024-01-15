@@ -662,11 +662,12 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             if not (path := takewhile(is_not_star, rule.breadcrumb)):
                 continue
             if not (s := stream_dict.get(rule.tap_stream_id)):
-                logger.warning("Stream `%s` was not found", rule.tap_stream_id)
+                logger.warning(
+                    f"Stream `{rule.tap_stream_id}` was not found",
+                )
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):
                 logger.warning(
-                    "Property `%s` was not found in the schema of stream `%s`",
-                    ".".join(rule.breadcrumb[1:]),
-                    rule.tap_stream_id,
+                    f"Property `{rule.tap_stream_id}` was not found in "
+                    f"the schema of stream `{'.'.join(rule.breadcrumb[1:])}`",
                 )
