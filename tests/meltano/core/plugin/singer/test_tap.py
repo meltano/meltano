@@ -14,7 +14,7 @@ from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin.singer.catalog import ListSelectedExecutor
+from meltano.core.plugin.singer.catalog import ListSelectedExecutor, MetadataRule
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 
@@ -898,3 +898,72 @@ class TestSingerTap:
             return_value=True,
         ):
             await subject.run_discovery(invoker, catalog_path)
+
+    @pytest.mark.parametrize(
+        ("rule", "catalog", "message", "emit_warning"),
+        (
+            pytest.param(
+                MetadataRule("foo", ["properties", "bar"], "baz", False),
+                {"streams": []},
+                "Stream `foo` was not found",
+                True,
+                id="stream_not_found",
+            ),
+            pytest.param(
+                MetadataRule("foo", ["properties", "bar"], "baz", False),
+                {"streams": [{"tap_stream_id": "foo"}]},
+                "Property `bar` was not found in the schema of stream `foo`",
+                True,
+                id="property_not_found",
+            ),
+            pytest.param(
+                MetadataRule("foo", ["properties", "bar"], "baz", False),
+                {"streams": [{"tap_stream_id": "foo"}]},
+                "Stream `foo` was not found",
+                False,
+                id="stream_is_found",
+            ),
+            pytest.param(
+                MetadataRule("foo", ["properties", "bar"], "baz", False),
+                {
+                    "streams": [
+                        {
+                            "tap_stream_id": "foo",
+                            "schema": {"properties": {"bar": {"type": "string"}}},
+                        },
+                    ],
+                },
+                "Property `foo.bar` was not found",
+                False,
+                id="property_is_found",
+            ),
+            pytest.param(
+                MetadataRule("*", ["properties", "bar"], "baz", False),
+                {
+                    "streams": [],
+                },
+                "Stream `foo` was not found",
+                False,
+                id="stream_is_wildcard",
+            ),
+            pytest.param(
+                MetadataRule("foo", ["properties", "*"], "baz", False),
+                {"streams": [{"tap_stream_id": "foo"}]},
+                "Property `foo.bar` was not found",
+                False,
+                id="property_is_wildcard",
+            ),
+        ),
+    )
+    def test_warn_property_not_found(
+        self,
+        subject: SingerTap,
+        capsys: pytest.CaptureFixture,
+        rule: MetadataRule,
+        catalog: dict,
+        message: str,
+        emit_warning: bool,
+    ):
+        subject.warn_property_not_found([rule], catalog)
+        # If the warning is emitted, it should be in the output
+        assert emit_warning is (message in capsys.readouterr().out)
