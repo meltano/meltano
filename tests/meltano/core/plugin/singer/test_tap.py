@@ -201,45 +201,44 @@ class TestSingerTap:
             return future
 
         async with invoker.prepared(session):
-            with mock.patch.object(SingerTap, "warn_property_not_found"):
-                with mock.patch.object(
-                    SingerTap,
-                    "run_discovery",
-                    side_effect=mock_discovery,
-                ) as mocked_run_discovery:
-                    await subject.discover_catalog(invoker)
+            with mock.patch.object(
+                SingerTap,
+                "run_discovery",
+                side_effect=mock_discovery,
+            ) as mocked_run_discovery:
+                await subject.discover_catalog(invoker)
 
-                    assert mocked_run_discovery.called
-                    assert json.loads(catalog_path.read_text()) == {"discovered": True}
-                    assert not catalog_cache_key_path.exists()
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-                    # If there is no cache key, discovery is invoked again
-                    mocked_run_discovery.reset_mock()
-                    await subject.discover_catalog(invoker)
+                # If there is no cache key, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker)
 
-                    assert json.loads(catalog_path.read_text()) == {"discovered": True}
-                    assert not catalog_cache_key_path.exists()
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
-                    # Apply catalog rules to store the cache key
-                    subject.apply_catalog_rules(invoker)
-                    assert catalog_cache_key_path.exists()
+                # Apply catalog rules to store the cache key
+                subject.apply_catalog_rules(invoker)
+                assert catalog_cache_key_path.exists()
 
-                    # If the cache key hasn't changed, discovery isn't invoked again
-                    mocked_run_discovery.reset_mock()
-                    await subject.discover_catalog(invoker)
+                # If the cache key hasn't changed, discovery isn't invoked again
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker)
 
-                    mocked_run_discovery.assert_not_called()
-                    assert json.loads(catalog_path.read_text()) == {"discovered": True}
-                    assert catalog_cache_key_path.exists()
+                mocked_run_discovery.assert_not_called()
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert catalog_cache_key_path.exists()
 
-                    # If the cache key no longer matches, discovery is invoked again
-                    mocked_run_discovery.reset_mock()
-                    catalog_cache_key_path.write_text("bogus")
-                    await subject.discover_catalog(invoker)
+                # If the cache key no longer matches, discovery is invoked again
+                mocked_run_discovery.reset_mock()
+                catalog_cache_key_path.write_text("bogus")
+                await subject.discover_catalog(invoker)
 
-                    assert mocked_run_discovery.called
-                    assert json.loads(catalog_path.read_text()) == {"discovered": True}
-                    assert not catalog_cache_key_path.exists()
+                assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
 
     @pytest.mark.asyncio()
     async def test_discover_catalog_custom(
@@ -899,6 +898,8 @@ class TestSingerTap:
         ):
             await subject.run_discovery(invoker, catalog_path)
 
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("use_test_log_config")
     @pytest.mark.parametrize(
         ("rule", "catalog", "message", "emit_warning"),
         (
@@ -919,9 +920,9 @@ class TestSingerTap:
             pytest.param(
                 MetadataRule("foo", ["properties", "bar"], "baz", False),
                 {"streams": [{"tap_stream_id": "foo"}]},
-                "Stream `foo` was not found",
-                False,
-                id="stream_is_found",
+                "Property `bar` was not found in the schema of stream `foo`",
+                True,
+                id="stream_is_found_property_not_present_in_catalog",
             ),
             pytest.param(
                 MetadataRule("foo", ["properties", "bar"], "baz", False),
@@ -933,7 +934,7 @@ class TestSingerTap:
                         },
                     ],
                 },
-                "Property `foo.bar` was not found",
+                "no warning expected",
                 False,
                 id="property_is_found",
             ),
@@ -942,28 +943,53 @@ class TestSingerTap:
                 {
                     "streams": [],
                 },
-                "Stream `foo` was not found",
+                "no warning expected",
                 False,
                 id="stream_is_wildcard",
             ),
             pytest.param(
                 MetadataRule("foo", ["properties", "*"], "baz", False),
                 {"streams": [{"tap_stream_id": "foo"}]},
-                "Property `foo.bar` was not found",
+                "no warning expected",
                 False,
                 id="property_is_wildcard",
             ),
         ),
     )
-    def test_warn_property_not_found(
+    async def test_warn_property_not_found(
         self,
         subject: SingerTap,
+        caplog: pytest.CaptureFixture,
         capsys: pytest.CaptureFixture,
         rule: MetadataRule,
         catalog: dict,
         message: str,
         emit_warning: bool,
     ):
+        """
+        Warning messages should be emitted when a MetadataRule doesn't match.
+
+        _A quirk seems to be that if this test is invoked on its own, the
+        output is captured in the fixture `pytest.capsys`, however if pytest
+        runs globally then the output is captured in `pytest.caplog`. Not sure
+        why, hoping this message finds a developer more knowledgable than I._
+
+        For now, I'm adding up the output of both capsys & caplog and testing
+        expected messages are captured somewhere. As in, both of these would
+        work.
+
+        ```
+        poetry run pytest
+        poetry run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
+        ```
+        """  # noqa: E501
         subject.warn_property_not_found([rule], catalog)
+
         # If the warning is emitted, it should be in the output
-        assert emit_warning is (message in capsys.readouterr().out)
+        if emit_warning:
+            logtext = caplog.text
+            sysout, syserr = capsys.readouterr()
+            assert message in (logtext + sysout + syserr)
+        else:
+            assert len(caplog.records) == 0
+            assert syserr + sysout == ""
