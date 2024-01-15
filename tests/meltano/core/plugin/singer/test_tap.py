@@ -984,12 +984,10 @@ class TestSingerTap:
         ```
         """  # noqa: E501
         subject.warn_property_not_found([rule], catalog)
-
+        sysout, syserr = capsys.readouterr()
         # If the warning is emitted, it should be in the output
         if emit_warning:
-            logtext = caplog.text
-            sysout, syserr = capsys.readouterr()
-            assert message in (logtext + sysout + syserr)
+            assert message in (caplog.text + sysout + syserr)
         else:
             assert len(caplog.records) == 0
             assert syserr + sysout == ""
