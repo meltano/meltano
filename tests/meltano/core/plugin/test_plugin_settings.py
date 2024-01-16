@@ -55,7 +55,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project_add_service):
+def custom_tap(project):
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -64,7 +64,7 @@ def custom_tap(project_add_service):
         config=expected,
     )
     try:
-        return project_add_service.add_plugin(tap)
+        return project.plugins.add_to_file(tap)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
