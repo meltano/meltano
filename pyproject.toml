@@ -472,6 +472,7 @@ skip_covered = true
 name = "cz_version_bump"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
+changelog_merge_prerelease = true
 version = "3.3.0a1"
 version_files = [
   "pyproject.toml:^version =",

@@ -52,17 +52,17 @@ jobs:
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
         commit: "false"
         push: "false"
-        changelog: "true"
+        changelog: ${{ github.event.inputs.prerelease == 'none' && 'true' || 'false' }}
         github_token: ${{ secrets.MELTYBOT_GITHUB_AUTH_TOKEN }}
         extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
-        changelog_increment_filename: _changelog_fragment.md
+        changelog_increment_filename: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
 
     - name: Draft Release
       id: draft-release
       uses: softprops/action-gh-release@v1
       with:
         draft: true
-        body_path: _changelog_fragment.md
+        body_path: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
         tag_name: v${{ steps.cz-bump.outputs.version }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' }}
       env:
