@@ -65,6 +65,7 @@ class CliError(Exception):
 def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
+    update: bool = False,
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
@@ -73,16 +74,22 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    if plugin.should_add_to_file():
-        click.secho(
-            f"Added {descriptor} '{plugin.name}' to your Meltano project",
-            fg="green",
+    action, preposition = (
+        (
+            "Updated" if plugin.should_add_to_file() else "Updating",
+            "in",
         )
-    else:
-        click.secho(
-            f"Adding {descriptor} '{plugin.name}' to your Meltano project...",
-            fg="green",
+        if update
+        else (
+            "Added" if plugin.should_add_to_file() else "Adding",
+            "to",
         )
+    )
+
+    click.secho(
+        f"{action} {descriptor} '{plugin.name}' {preposition} your project",
+        fg="green",
+    )
 
     inherit_from = plugin.inherit_from
     has_variant = plugin.is_variant_set
@@ -262,6 +269,7 @@ def add_plugin(  # noqa: C901
     variant=None,
     inherit_from=None,
     custom=False,
+    update=False,
     lock=True,
     plugin_yaml=None,
 ):
@@ -306,10 +314,11 @@ def add_plugin(  # noqa: C901
             variant=variant,
             inherit_from=inherit_from,
             lock=lock,
+            update=update,
             python=python,
             **plugin_attrs,
         )
-        print_added_plugin(plugin)
+        print_added_plugin(plugin, update=update)
     except PluginAlreadyAddedException as err:
         plugin = err.plugin
         click.secho(

@@ -159,7 +159,7 @@ class VirtualEnv:
 
 
 async def _extract_stderr(_):
-    return None
+    return None  # pragma: no cover
 
 
 async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
@@ -437,6 +437,12 @@ class VenvService:  # noqa: WPS214
             f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",
         )
 
+        async def extract_stderr(proc: Process) -> str | None:  # pragma: no cover
+            if not proc.stdout:
+                return None
+
+            return (await proc.stdout.read()).decode("unicode_escape")
+
         try:
             return await exec_async(
                 str(self.exec_path("python")),
@@ -446,6 +452,7 @@ class VenvService:  # noqa: WPS214
                 "--log",
                 str(self.pip_log_path),
                 *pip_install_args,
+                extract_stderr=extract_stderr,
             )
         except AsyncSubprocessError as err:
             logger.info(
@@ -455,4 +462,5 @@ class VenvService:  # noqa: WPS214
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.",
                 err.process,
+                stderr=await err.stderr,
             ) from err
