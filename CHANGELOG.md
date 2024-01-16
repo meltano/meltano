@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.3.0a1 (2024-01-16)
+
+### ✨ New
+
+- [#7874](https://github.com/meltano/meltano/issues/7874) Add setting `sensitive` flag -- _**Thanks @ReubenFrankel!**_
+
+### ⚡ Performance Improvements
+
+- [#8343](https://github.com/meltano/meltano/issues/8343) Cache `Project.dotenv_env`
+
+### 📚 Documentation Improvements
+
+- [#8306](https://github.com/meltano/meltano/issues/8306) Add changelog updates
+
 ## v3.2.0 (2023-12-05)
 
 ## v3.2.0rc1 (2023-12-05)
