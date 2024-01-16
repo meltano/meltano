@@ -954,6 +954,94 @@ class TestSingerTap:
                 False,
                 id="property_is_wildcard",
             ),
+            pytest.param(
+                MetadataRule(
+                    "foo",
+                    ["properties", "attribute", "properties", "name"],
+                    "baz",
+                    False,
+                ),
+                {
+                    "streams": [
+                        {
+                            "tap_stream_id": "foo",
+                            "schema": {
+                                "properties": {
+                                    "bar": {"type": "string"},
+                                    "attribute": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+                "no warning expected",
+                False,
+                id="nsted_property_is_found",
+            ),
+            pytest.param(
+                MetadataRule(
+                    "foo",
+                    ["properties", "attribute", "*"],
+                    "baz",
+                    False,
+                ),
+                {
+                    "streams": [
+                        {
+                            "tap_stream_id": "foo",
+                            "schema": {
+                                "properties": {
+                                    "bar": {"type": "string"},
+                                    "attribute": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+                "no warning expected",
+                False,
+                id="nsted_property_is_wildcard",
+            ),
+            pytest.param(
+                MetadataRule(
+                    "foo",
+                    ["properties", "attribute", "properties", "email"],
+                    "baz",
+                    False,
+                ),
+                {
+                    "streams": [
+                        {
+                            "tap_stream_id": "foo",
+                            "schema": {
+                                "properties": {
+                                    "bar": {"type": "string"},
+                                    "attribute": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+                "Property `attribute.properties.email` was not "
+                "found in the schema of stream `foo`",
+                True,
+                id="nsted_property_not_found",
+            ),
         ),
     )
     async def test_warn_property_not_found(
