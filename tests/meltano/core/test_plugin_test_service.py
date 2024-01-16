@@ -1,17 +1,20 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from signal import SIGTERM
 
 import pytest
 from mock import AsyncMock, Mock, patch
 
 from meltano.core.plugin.error import PluginNotSupportedError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_test_service import (
     ExtractorTestService,
     PluginTestServiceFactory,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
 MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
@@ -19,7 +22,7 @@ MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 
 class TestPluginTestServiceFactory:
     @pytest.fixture(autouse=True)
-    @patch("meltano.core.plugin_test_service.PluginInvoker")
+    @patch("meltano.core.plugin_invoker.PluginInvoker")
     def setup(self, mock_invoker):
         self.mock_invoker = mock_invoker
 
@@ -43,7 +46,7 @@ class TestPluginTestServiceFactory:
 
 class TestExtractorTestService:
     @pytest.fixture(autouse=True)
-    @patch("meltano.core.plugin_test_service.PluginInvoker")
+    @patch("meltano.core.plugin_invoker.PluginInvoker")
     def setup(self, mock_invoker):
         self.mock_invoke = Mock()
         self.mock_invoke.name = "utility-mock"

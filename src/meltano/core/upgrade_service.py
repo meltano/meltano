@@ -5,17 +5,21 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import typing as t
 
 import click
-from sqlalchemy.engine import Engine
 
 import meltano
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.error import MeltanoError
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginType
 from meltano.core.state_service import StateService
 from meltano.core.state_store.filesystem import CloudStateStoreManager
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine import Engine
+
+    from meltano.core.project import Project
 
 
 class UpgradeError(Exception):

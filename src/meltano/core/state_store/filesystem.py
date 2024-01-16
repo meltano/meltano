@@ -6,13 +6,12 @@ import logging
 import os
 import re
 import shutil
+import typing as t
 from abc import abstractmethod, abstractproperty
 from base64 import b64decode, b64encode
-from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from functools import reduce
-from io import TextIOWrapper
 from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
@@ -22,6 +21,10 @@ from smart_open import open  # type: ignore
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import remove_suffix
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterator
+    from io import TextIOWrapper
 
 logger = logging.getLogger(__name__)
 

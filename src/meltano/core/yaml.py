@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import os
+import typing as t
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +12,9 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.setting_definition import SettingKind
 from meltano.core.utils import hash_sha256
+
+if t.TYPE_CHECKING:
+    import os
 
 yaml = YAML()
 yaml.default_flow_style = False

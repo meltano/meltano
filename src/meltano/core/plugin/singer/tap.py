@@ -7,18 +7,16 @@ import json
 import logging
 import shutil
 import sys
-from asyncio.streams import StreamReader
+import typing as t
 from contextlib import suppress
 from hashlib import sha1
 from io import StringIO
-from pathlib import Path
 
 import structlog
 from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
@@ -33,6 +31,12 @@ from .catalog import (
     select_filter_metadata_rules,
     select_metadata_rules,
 )
+
+if t.TYPE_CHECKING:
+    from asyncio.streams import StreamReader
+    from pathlib import Path
+
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.getLogger(__name__)
 

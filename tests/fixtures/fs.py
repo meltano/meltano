@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import os
 import shutil
+import typing as t
 from functools import partial
-from pathlib import Path
 
 import pytest
 
 from fixtures.utils import cd
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 @pytest.fixture(scope="class")

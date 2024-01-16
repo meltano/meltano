@@ -2,19 +2,22 @@ from __future__ import annotations
 
 import json
 import shutil
+import typing as t
 from copy import deepcopy
 
 import pytest
 
-from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     DefinitionSource,
     PluginDefinitionNotFoundError,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.locked_definition_service import LockedDefinitionService
+    from meltano.core.project import Project
 
 
 @pytest.fixture()
@@ -185,7 +188,7 @@ class TestProjectPluginsService:
     def test_update_plugin(self, project: Project, tap):
         # update a tap with a random value
         tap.config["test"] = 42
-        outdated = project.plugins.update_plugin(tap)
+        tap, outdated = project.plugins.update_plugin(tap)
         assert (
             project.plugins.get_plugin(tap).config["test"]
             == 42  # noqa: WPS432 (OK magic number)
@@ -197,6 +200,15 @@ class TestProjectPluginsService:
             project.plugins.get_plugin(tap).config
             == {}  # noqa: WPS520 (OK compare with falsy)
         )
+
+    def test_update_plugin_not_found(self, project: Project):
+        nonexistent_plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-foo",
+        )
+
+        with pytest.raises(PluginNotFoundError):
+            project.plugins.update_plugin(nonexistent_plugin)
 
     def test_find_plugins_by_mapping_name(self, project: Project, mapper):
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [

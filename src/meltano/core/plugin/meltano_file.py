@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-import os
+import typing as t
 from pathlib import Path
 
 import yaml
 
 from meltano.core import bundle
 from meltano.core.plugin.file import FilePlugin
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    import os
+
+    from meltano.core.project import Project
 
 
 class MeltanoFilePlugin(FilePlugin):

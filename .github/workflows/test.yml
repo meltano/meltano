@@ -102,7 +102,7 @@ jobs:
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4.7.1
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -197,14 +197,14 @@ jobs:
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
-        name: coverage-data
+        name: coverage-data-${{ matrix.id }}
         path: ".coverage.*"
 
     - name: Upload test logs
       if: always()
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
         name: test-logs-${{ matrix.id }}
         path: pytest.log
@@ -257,7 +257,7 @@ jobs:
         poetry --version
 
     - name: Set up Python 3.10
-      uses: actions/setup-python@v4.7.1
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.10'
         architecture: x64
@@ -266,9 +266,10 @@ jobs:
         cache-dependency-path: 'poetry.lock'
 
     - name: Download coverage data
-      uses: actions/download-artifact@v3.0.2
+      uses: actions/download-artifact@v4
       with:
-        name: coverage-data
+        pattern: coverage-data-*
+        merge-multiple: true
 
     - name: Install Nox
       env:
@@ -307,7 +308,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.10
-      uses: actions/setup-python@v4.7.1
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: '3.10'
         architecture: x64

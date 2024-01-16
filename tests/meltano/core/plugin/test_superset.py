@@ -2,17 +2,21 @@ from __future__ import annotations
 
 import platform
 import sys
+import typing as t
 from importlib.util import module_from_spec, spec_from_file_location
-from pathlib import Path
-from types import ModuleType
 
 import pytest
 from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.superset import SupersetInvoker
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import asyncio
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+    from types import ModuleType
+
+    from meltano.core.plugin.superset import SupersetInvoker
 
 
 def load_module_from_path(name: str, path: Path) -> ModuleType:

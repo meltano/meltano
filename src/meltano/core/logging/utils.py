@@ -16,8 +16,10 @@ from meltano.core.logging.formatters import (
     TIMESTAMPER,
     rich_exception_formatter_factory,
 )
-from meltano.core.project import Project
 from meltano.core.utils import get_no_color_flag
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 LEVELS = {  # noqa: WPS407
     "debug": logging.DEBUG,

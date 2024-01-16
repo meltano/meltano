@@ -124,10 +124,8 @@ meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
 # The above also applies to the plugin variant, if provided
 meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
 
-# Once added, the custom plugin definition can be updated by removing the plugin
-# and re-adding it with the same `meltano add --from-ref` command
-meltano remove extractor tap-spotify
-meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+# Once added, the custom plugin definition can be updated with the `--update` option
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
 ```
 
 Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
@@ -135,6 +133,21 @@ Using `--from-ref` allows you to add a plugin before it is available on [Meltano
 :::note
   Meltano will throw an error if the referenced plugin definition is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
+
+A plugin can be updated using the `--update` option
+
+```bash
+meltano add --update <type> <name>
+
+# For example:
+# Update from Meltano Hub
+meltano add --update extractor tap-spotify
+
+# Update from ref
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
+```
+
+This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
@@ -172,7 +185,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--no-install`: Do not install the plugin after adding it to the project.
-
+- `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
@@ -253,7 +266,7 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
-- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
@@ -457,6 +470,15 @@ uuidgen | meltano config <plugin> set <name> --from-file -
 :::info
   <p>When setting a config value for an <code>object</code> or <code>array</code> setting, the file contents must be valid JSON.</p>
 :::
+
+### Sensitive configuration
+Values for sensitive settings (defined as `sensitive: true`) are redacted in the output of the following commands:
+
+```bash
+meltano config <plugin> list
+meltano config set <name> <value>
+meltano config <plugin> set --interactive
+```
 
 ## `docs`
 

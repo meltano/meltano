@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import os
+import typing as t
 from pathlib import Path
 
 from meltano.core import yaml
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 class TransformAddService:

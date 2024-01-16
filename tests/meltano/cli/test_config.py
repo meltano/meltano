@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import platform
-from pathlib import Path
+import typing as t
 from signal import SIGTERM
 
 import pytest
@@ -10,8 +10,12 @@ from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
-from meltano.core.project import Project
 from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project import Project
 
 
 class TestCliConfig:
@@ -78,7 +82,7 @@ class TestCliConfig:
         mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         with mock.patch(
-            "meltano.core.plugin_test_service.PluginInvoker.invoke_async",
+            "meltano.core.plugin_invoker.PluginInvoker.invoke_async",
             return_value=mock_invoke,
         ) as mocked_invoke:
             result = cli_runner.invoke(cli, ["config", tap.name, "test"])

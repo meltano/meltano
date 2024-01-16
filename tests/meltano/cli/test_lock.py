@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import pytest
-from click.testing import CliRunner
 
 from meltano.cli import cli
 from meltano.cli.utils import CliError
-from meltano.core.hub import MeltanoHubService
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLock
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
+
+    from meltano.core.hub import MeltanoHubService
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 class TestLock:

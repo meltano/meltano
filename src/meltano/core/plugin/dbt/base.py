@@ -2,17 +2,20 @@
 from __future__ import annotations
 
 import logging
+import typing as t
 from pathlib import Path
 
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstaller, PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.transform_add_service import TransformAddService
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 

@@ -62,7 +62,7 @@
     },
     {
       "name": "record_key_property_name",
-      "kind": "password",
+      "sensitive": true,
       "label": "Record Key Property Name",
       "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list."
     },

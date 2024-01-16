@@ -3,12 +3,14 @@ from __future__ import annotations
 import logging
 import re
 import typing as t
-from pathlib import Path
 from types import TracebackType
 
 import pytest
 
 from meltano.core.logging.formatters import console_log_formatter
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 

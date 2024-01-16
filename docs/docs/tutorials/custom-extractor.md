@@ -384,7 +384,7 @@ plugins:
       settings:
         - name: username
         - name: password
-          kind: password
+          sensitive: true
         - name: start_date
           # Default value for the plugin:
           value: '2010-01-01T00:00:00Z'
@@ -426,7 +426,8 @@ To properly expose and configure your settings, you'll need to define them:
   - `foo` represents the `{ foo: VALUE }` in the output configuration.
   - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.
 
-- **kind**: Represent the type of value this should be, (e.g. `password` for sensitive values or `date_iso8601` for dates).
+- **kind**: (optional): Represent the type of value this should be, (e.g. `date_iso8601` for dates). Defaults to `string`.
+- **sensitive**: (optional - defaults to `false`): Indicate whether the setting is sensitive (e.g. a password, token or code).
 - **value** (optional): Define a default value for the plugin's setting.
 
 ### Passing sensitive setting values
@@ -434,7 +435,7 @@ To properly expose and configure your settings, you'll need to define them:
 _**It is best practice not to store sensitive values directly in `meltano.yml`.**_
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
-for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting `kind` is set to `password` and then
+for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting is set to `sensitive: true` and then
 run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
