@@ -659,7 +659,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             return dictionary.get(key, {})
 
         for rule in property_rules:
-            if not (path := takewhile(is_not_star, rule.breadcrumb)):
+            if not (path := list(takewhile(is_not_star, rule.breadcrumb))):
                 continue
             if not (s := stream_dict.get(rule.tap_stream_id)):
                 logger.warning(
