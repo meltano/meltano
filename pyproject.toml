@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "3.2.0"
+version = "3.3.0a1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -100,12 +100,12 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.12.1"
-boto3-stubs = {extras = ["essential"], version = "1.34.14"}
+boto3-stubs = {extras = ["essential"], version = "1.34.19"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 freezegun = "^1.4.0"
-hypothesis = "^6.92.5"
+hypothesis = "^6.93.1"
 mock = "^5.0.2"
 moto = "^4.2.13"
 mypy = "^1.8.0"
@@ -472,7 +472,8 @@ skip_covered = true
 name = "cz_version_bump"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
-version = "3.2.0"
+changelog_merge_prerelease = true
+version = "3.3.0a1"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
