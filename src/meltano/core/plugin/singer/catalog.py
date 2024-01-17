@@ -16,6 +16,12 @@ T = t.TypeVar("T", bound="CatalogRule")
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
 
 
+class CatalogDict(t.TypedDict):
+    """A catalog dictionary."""
+
+    streams: list[dict[str, t.Any]]
+
+
 class CatalogRule:
     def __init__(
         self,

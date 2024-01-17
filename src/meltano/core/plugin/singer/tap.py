@@ -25,6 +25,7 @@ from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
 from .catalog import (
+    CatalogDict,
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
@@ -622,7 +623,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
     def warn_property_not_found(  # noqa: C901
         self,
         rules: list[MetadataRule],
-        catalog: list[dict[str, t.Any]],
+        catalog: CatalogDict,
     ):
         """Validate MetadataRules conforms to discovered Catalog.
 

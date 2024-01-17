@@ -14,7 +14,11 @@ from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin.singer.catalog import ListSelectedExecutor, MetadataRule
+from meltano.core.plugin.singer.catalog import (
+    CatalogDict,
+    ListSelectedExecutor,
+    MetadataRule,
+)
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 
@@ -981,7 +985,7 @@ class TestSingerTap:
                 },
                 "no warning expected",
                 False,
-                id="nsted_property_is_found",
+                id="nested_property_is_found",
             ),
             pytest.param(
                 MetadataRule(
@@ -1010,7 +1014,7 @@ class TestSingerTap:
                 },
                 "no warning expected",
                 False,
-                id="nsted_property_is_wildcard",
+                id="nested_property_is_wildcard",
             ),
             pytest.param(
                 MetadataRule(
@@ -1040,17 +1044,17 @@ class TestSingerTap:
                 "Property `attribute.properties.email` was not "
                 "found in the schema of stream `foo`",
                 True,
-                id="nsted_property_not_found",
+                id="nested_property_not_found",
             ),
         ),
     )
     async def test_warn_property_not_found(
         self,
         subject: SingerTap,
-        caplog: pytest.CaptureFixture,
+        caplog: pytest.LogCaptureFixture,
         capsys: pytest.CaptureFixture,
         rule: MetadataRule,
-        catalog: dict,
+        catalog: CatalogDict,
         message: str,
         emit_warning: bool,
     ):
