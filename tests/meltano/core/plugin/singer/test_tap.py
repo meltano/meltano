@@ -908,11 +908,18 @@ class TestSingerTap:
         ("rule", "catalog", "message", "emit_warning"),
         (
             pytest.param(
-                MetadataRule("foo", ["properties", "bar"], "baz", False),
-                {"streams": []},
+                MetadataRule("foo", ["properties", "*"], "baz", False),
+                {"streams": [{"tap_stream_id": "bar"}]},
                 "Stream `foo` was not found",
                 True,
                 id="stream_not_found",
+            ),
+            pytest.param(
+                MetadataRule("foo", ["properties", "*"], "baz", False),
+                {"streams": []},
+                "Stream `foo` was not found",
+                True,
+                id="no_streams_found",
             ),
             pytest.param(
                 MetadataRule("foo", ["properties", "bar"], "baz", False),

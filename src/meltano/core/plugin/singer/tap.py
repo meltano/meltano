@@ -640,13 +640,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             rules: List of `MetadataRule`
             catalog: Discovered Source Catalog
         """
-        property_rules = [
-            r
-            for r in rules
-            if r.tap_stream_id != "*"
-            and len(r.breadcrumb) >= 2
-            and r.breadcrumb != ["properties", "*"]
-        ]
+        property_rules = [r for r in rules if "*" not in r.tap_stream_id]
         stream_dict = {
             stream.get("tap_stream_id"): stream
             for stream in catalog.get("streams", [])
@@ -654,19 +648,21 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         }
 
         def is_not_star(x):
-            return x != "*"
+            return "*" not in x
 
         def dict_get(dictionary, key):
             return dictionary.get(key, {})
 
         for rule in property_rules:
-            if not (path := list(takewhile(is_not_star, rule.breadcrumb))):
-                continue
+            path = list(takewhile(is_not_star, rule.breadcrumb))
+
             if not (s := stream_dict.get(rule.tap_stream_id)):
                 logger.warning(
                     "Stream `%s` was not found",  # noqa: WPS323
                     rule.tap_stream_id,
                 )
+                continue
+            if len(path) <= 1:
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):
                 logger.warning(
