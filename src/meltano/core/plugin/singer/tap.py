@@ -654,14 +654,13 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             return dictionary.get(key, {})
 
         for rule in property_rules:
-            path = list(takewhile(is_not_star, rule.breadcrumb))
-
             if not (s := stream_dict.get(rule.tap_stream_id)):
                 logger.warning(
                     "Stream `%s` was not found",  # noqa: WPS323
                     rule.tap_stream_id,
                 )
                 continue
+            path = list(takewhile(is_not_star, rule.breadcrumb))
             if len(path) <= 1:
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):

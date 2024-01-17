@@ -17,9 +17,32 @@ from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import (
     CatalogDict,
     ListSelectedExecutor,
-    MetadataRule,
+    select_metadata_rules,
 )
 from meltano.core.state_service import InvalidJobStateError, StateService
+
+
+class CatalogFixture:
+    empty_stream: CatalogDict = {"streams": []}
+    empty_properties: CatalogDict = {"streams": [{"tap_stream_id": "foo"}]}
+    regular_stream: CatalogDict = {
+        "streams": [
+            {
+                "tap_stream_id": "foo",
+                "schema": {
+                    "properties": {
+                        "bar": {"type": "string"},
+                        "attribute": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+        ],
+    }
 
 
 class TestSingerTap:
@@ -905,153 +928,87 @@ class TestSingerTap:
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("use_test_log_config")
     @pytest.mark.parametrize(
-        ("rule", "catalog", "message", "emit_warning"),
+        ("rule_pattern", "catalog", "message"),
         (
             pytest.param(
-                MetadataRule("foo", ["properties", "*"], "baz", False),
-                {"streams": [{"tap_stream_id": "bar"}]},
-                "Stream `foo` was not found",
-                True,
+                "bar.*",
+                CatalogFixture.empty_properties,
+                "Stream `bar` was not found",
                 id="stream_not_found",
             ),
             pytest.param(
-                MetadataRule("foo", ["properties", "*"], "baz", False),
-                {"streams": []},
+                "foo.*",
+                CatalogFixture.empty_stream,
                 "Stream `foo` was not found",
-                True,
-                id="no_streams_found",
+                id="no_streams_exist",
             ),
             pytest.param(
-                MetadataRule("foo", ["properties", "bar"], "baz", False),
-                {"streams": [{"tap_stream_id": "foo"}]},
+                "foo.bar",
+                CatalogFixture.empty_properties,
                 "Property `bar` was not found in the schema of stream `foo`",
-                True,
+                id="no_properties_exist",
+            ),
+            pytest.param(
+                "foo.spam",
+                CatalogFixture.regular_stream,
+                "Property `spam` was not found in the schema of stream `foo`",
                 id="property_not_found",
             ),
             pytest.param(
-                MetadataRule("foo", ["properties", "bar"], "baz", False),
-                {"streams": [{"tap_stream_id": "foo"}]},
-                "Property `bar` was not found in the schema of stream `foo`",
-                True,
-                id="stream_is_found_property_not_present_in_catalog",
-            ),
-            pytest.param(
-                MetadataRule("foo", ["properties", "bar"], "baz", False),
-                {
-                    "streams": [
-                        {
-                            "tap_stream_id": "foo",
-                            "schema": {"properties": {"bar": {"type": "string"}}},
-                        },
-                    ],
-                },
-                "no warning expected",
-                False,
+                "foo.bar",
+                CatalogFixture.regular_stream,
+                None,
                 id="property_is_found",
             ),
             pytest.param(
-                MetadataRule("*", ["properties", "bar"], "baz", False),
-                {
-                    "streams": [],
-                },
-                "no warning expected",
-                False,
+                "*.bar",
+                CatalogFixture.empty_stream,
+                None,
                 id="stream_is_wildcard",
             ),
             pytest.param(
-                MetadataRule("foo", ["properties", "*"], "baz", False),
-                {"streams": [{"tap_stream_id": "foo"}]},
-                "no warning expected",
-                False,
+                "zoo.*",
+                CatalogFixture.empty_stream,
+                "Stream `zoo` was not found",
+                id="stream_not_found_property_is_wildcard",
+            ),
+            pytest.param(
+                "foo.*",
+                CatalogFixture.regular_stream,
+                None,
                 id="property_is_wildcard",
             ),
             pytest.param(
-                MetadataRule(
-                    "foo",
-                    ["properties", "attribute", "properties", "name"],
-                    "baz",
-                    False,
-                ),
-                {
-                    "streams": [
-                        {
-                            "tap_stream_id": "foo",
-                            "schema": {
-                                "properties": {
-                                    "bar": {"type": "string"},
-                                    "attribute": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    ],
-                },
-                "no warning expected",
-                False,
+                "foo.attribute.name",
+                CatalogFixture.regular_stream,
+                None,
                 id="nested_property_is_found",
             ),
             pytest.param(
-                MetadataRule(
-                    "foo",
-                    ["properties", "attribute", "*"],
-                    "baz",
-                    False,
-                ),
-                {
-                    "streams": [
-                        {
-                            "tap_stream_id": "foo",
-                            "schema": {
-                                "properties": {
-                                    "bar": {"type": "string"},
-                                    "attribute": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    ],
-                },
-                "no warning expected",
-                False,
+                "foo.attribute.*",
+                CatalogFixture.regular_stream,
+                None,
                 id="nested_property_is_wildcard",
             ),
             pytest.param(
-                MetadataRule(
-                    "foo",
-                    ["properties", "attribute", "properties", "email"],
-                    "baz",
-                    False,
-                ),
-                {
-                    "streams": [
-                        {
-                            "tap_stream_id": "foo",
-                            "schema": {
-                                "properties": {
-                                    "bar": {"type": "string"},
-                                    "attribute": {
-                                        "type": "object",
-                                        "properties": {
-                                            "name": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            },
-                        },
-                    ],
-                },
+                "foo.attribute.email",
+                CatalogFixture.regular_stream,
                 "Property `attribute.properties.email` was not "
                 "found in the schema of stream `foo`",
-                True,
                 id="nested_property_not_found",
+            ),
+            pytest.param(
+                "foo*.*",
+                CatalogFixture.regular_stream,
+                None,
+                id="stream_has_wildcard",
+            ),
+            pytest.param(
+                "foo.ATTRIBUTES.em*",
+                CatalogFixture.regular_stream,
+                "Property `ATTRIBUTES.properties.em*` was not "
+                "found in the schema of stream `foo`",
+                id="property_not_found-sub_property_has_wildcard",
             ),
         ),
     )
@@ -1060,10 +1017,9 @@ class TestSingerTap:
         subject: SingerTap,
         caplog: pytest.LogCaptureFixture,
         capsys: pytest.CaptureFixture,
-        rule: MetadataRule,
+        rule_pattern: str,
         catalog: CatalogDict,
-        message: str,
-        emit_warning: bool,
+        message: str | None,
     ):
         """
         Warning messages should be emitted when a MetadataRule doesn't match.
@@ -1082,10 +1038,11 @@ class TestSingerTap:
         poetry run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
         ```
         """  # noqa: E501
-        subject.warn_property_not_found([rule], catalog)
+        rules = select_metadata_rules([rule_pattern])
+        subject.warn_property_not_found(rules, catalog)
         sysout, syserr = capsys.readouterr()
         # If the warning is emitted, it should be in the output
-        if emit_warning:
+        if message is not None:
             assert message in (caplog.text + sysout + syserr)
         else:
             assert len(caplog.records) == 0
