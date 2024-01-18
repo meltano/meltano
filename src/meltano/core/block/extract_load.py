@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import os
 import asyncio
 import logging
+import os
 import typing as t
 from contextlib import asynccontextmanager, closing
 
@@ -41,23 +41,25 @@ logger = structlog.getLogger(__name__)
 
 TAP_ROW_LIMITED = False
 try:
-    TAP_ROW_LIMIT = int(os.environ.get('TAP_ROW_LIMIT'))
+    TAP_ROW_LIMIT = int(os.environ.get("TAP_ROW_LIMIT"))
     TAP_ROW_LIMITED = True
-except (ValueError, TypeError) as error:
+except (ValueError, TypeError):
     TAP_ROW_LIMITED = False
 
 
-class GotEnoughRowsException ( Exception):
+class GotEnoughRowsException(Exception):
     pass
+
 
 class RowLimitHandler:
     def __init__(self, row_limit):
         self.linecount = 0
         self.row_limit = row_limit
+
     def writeline(self, line):
         self.linecount += 1
         if self.linecount > self.row_limit:
-            raise GotEnoughRowsException()
+            raise GotEnoughRowsException
 
 
 class BlockSetHasNoStateError(Exception):
@@ -784,7 +786,9 @@ class ELBExecutionManager:
             logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
 
-            if not isinstance(output_futures_failed.exception(), GotEnoughRowsException):
+            if not isinstance(
+                output_futures_failed.exception(), GotEnoughRowsException
+            ):
                 raise RunnerError(
                     (
                         "Unexpected completion sequence in ExtractLoadBlock set. "
