@@ -9,7 +9,7 @@ import shutil
 import sys
 import typing as t
 from contextlib import suppress
-from functools import reduce
+from functools import lru_cache, reduce
 from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
@@ -620,6 +620,23 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324
 
+    @staticmethod
+    @lru_cache
+    def _warn_missing_stream(stream_id: str):
+        logger.warning(
+            "Stream `%s` was not found in the catalog",  # noqa: WPS323
+            stream_id,
+        )
+
+    @staticmethod
+    @lru_cache
+    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]):
+        logger.warning(
+            "Property `%s` was not found in the schema of stream `%s`",  # noqa: E501, WPS323
+            ".".join(breadcrumb[1:]),
+            stream_id,
+        )
+
     def warn_property_not_found(  # noqa: C901
         self,
         rules: list[MetadataRule],
@@ -659,17 +676,10 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
         for rule in property_rules:
             if not (s := stream_dict.get(rule.tap_stream_id)):
-                logger.warning(
-                    "Stream `%s` was not found",  # noqa: WPS323
-                    rule.tap_stream_id,
-                )
+                self._warn_missing_stream(rule.tap_stream_id)
                 continue
-            path = list(takewhile(is_not_star, rule.breadcrumb))
+            path = tuple(takewhile(is_not_star, rule.breadcrumb))
             if len(path) <= 1:
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):
-                logger.warning(
-                    "Property `%s` was not found in the schema of stream `%s`",  # noqa: E501, WPS323
-                    ".".join(rule.breadcrumb[1:]),
-                    rule.tap_stream_id,
-                )
+                self._warn_missing_property(rule.tap_stream_id, tuple(rule.breadcrumb))
