@@ -640,7 +640,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             rules: List of `MetadataRule`
             catalog: Discovered Source Catalog
         """
-        property_rules = [r for r in rules if "*" not in r.tap_stream_id]
+        property_rules = [
+            r
+            for r in rules
+            if "*" not in r.tap_stream_id and isinstance(r.tap_stream_id, str)
+        ]
         stream_dict = {
             stream.get("tap_stream_id"): stream
             for stream in catalog.get("streams", [])
