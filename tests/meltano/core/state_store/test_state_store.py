@@ -141,8 +141,7 @@ class TestS3StateBackend:
         assert s3_state_store.prefix == "/some/path"
         assert s3_state_store.aws_access_key_id == "aws_access_key_id"  # noqa: S105
         assert (
-            s3_state_store.aws_secret_access_key
-            == "aws_secret_access_key"  # noqa: S105
+            s3_state_store.aws_secret_access_key == "aws_secret_access_key"  # noqa: S105
         )
 
         # AWS S3 (credentials provided directly)
@@ -164,6 +163,5 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store_direct_creds, S3StateStoreManager)
         assert s3_state_store_direct_creds.aws_access_key_id == "a_different_id"
         assert (
-            s3_state_store_direct_creds.aws_secret_access_key
-            == "a_different_key"  # noqa: S105
+            s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )

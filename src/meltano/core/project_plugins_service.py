@@ -225,7 +225,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
-                "Plugin configuration profiles are no longer supported, "
+                "Plugin configuration profiles are no longer supported, "  # noqa: G004
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 

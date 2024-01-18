@@ -197,7 +197,7 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
                 return relative_path
 
             logger.info(
-                f"File {str(relative_path)!r} already exists, keeping both versions",
+                f"File {str(relative_path)!r} already exists, keeping both versions",  # noqa: G004
             )
             return relative_path.with_name(
                 f"{relative_path.stem} ({self.name}){relative_path.suffix}",
@@ -298,19 +298,19 @@ class FilePlugin(BasePlugin):  # noqa: WPS214
         ]
 
         if reason is PluginInstallReason.ADD:
-            logger.info(f"Adding '{plugin.name}' files to project...")
+            logger.info(f"Adding '{plugin.name}' files to project...")  # noqa: G004
             for path in self.create_files(install_service.project, paths_to_update):
-                logger.info(f"Created {path}")
+                logger.info(f"Created {path}")  # noqa: G004
         elif reason is PluginInstallReason.UPGRADE:
-            logger.info(f"Updating '{plugin.name}' files in project...")
+            logger.info(f"Updating '{plugin.name}' files in project...")  # noqa: G004
             updated_paths = self.update_files(install_service.project, paths_to_update)
             if not updated_paths:
                 logger.info("Nothing to update")
                 return
             for path in updated_paths:
-                logger.info(f"Updated {path}")
+                logger.info(f"Updated {path}")  # noqa: G004
         else:
             logger.info(
-                "Run `meltano upgrade files` to update your project's "
+                "Run `meltano upgrade files` to update your project's "  # noqa: G004
                 f"{plugin.name!r} files.",
             )

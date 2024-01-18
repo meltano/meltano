@@ -843,7 +843,7 @@ class StandalonePlugin(Canonical):
         if settings_by_deprecated_kind:
             for kind, settings in settings_by_deprecated_kind.items():
                 logger.warning(
-                    f"`kind: {kind}` is deprecated for setting definitions"
+                    f"`kind: {kind}` is deprecated for setting definitions"  # noqa: G003
                     + (
                         f" in favour of `{deprecated_kind_replacements[kind]}`"
                         if deprecated_kind_replacements[kind]
