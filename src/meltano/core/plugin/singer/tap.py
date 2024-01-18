@@ -45,7 +45,7 @@ logger = structlog.getLogger(__name__)
 
 
 async def _stream_redirect(
-    stream: asyncio.StreamReader,
+    stream: asyncio.StreamReader | None,
     *file_like_objs,
     write_str=False,
 ):
@@ -57,7 +57,7 @@ async def _stream_redirect(
         write_str: if True, stream is written as str
     """
     encoding = sys.getdefaultencoding()
-    while not stream.at_eof():
+    while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
             file_like_obj.write(data.decode(encoding) if write_str else data)
@@ -466,7 +466,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # noqa: RSE102
+                        raise failed_future.exception()  # type: ignore[misc] # noqa: RSE102
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
@@ -557,11 +557,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 catalog = json.load(catalog_file)
 
             if schema_rules:
-                SchemaExecutor(schema_rules).visit(catalog)
+                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
 
             if metadata_rules:
                 self.warn_property_not_found(metadata_rules, catalog)
-                MetadataExecutor(metadata_rules).visit(catalog)
+                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
             with catalog_path.open("w") as catalog_f:
                 json.dump(catalog, catalog_f, indent=2)
@@ -657,11 +657,6 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             rules: List of `MetadataRule`
             catalog: Discovered Source Catalog
         """
-        property_rules = [
-            r
-            for r in rules
-            if "*" not in r.tap_stream_id and isinstance(r.tap_stream_id, str)
-        ]
         stream_dict = {
             stream.get("tap_stream_id"): stream
             for stream in catalog.get("streams", [])
@@ -674,7 +669,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         def dict_get(dictionary, key):
             return dictionary.get(key, {})
 
-        for rule in property_rules:
+        for rule in rules:
+            if isinstance(rule.tap_stream_id, list) or "*" in rule.tap_stream_id:
+                continue
             if not (s := stream_dict.get(rule.tap_stream_id)):
                 self._warn_missing_stream(rule.tap_stream_id)
                 continue
