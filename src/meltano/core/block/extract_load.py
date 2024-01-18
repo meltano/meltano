@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import asyncio
 import logging
 import typing as t
@@ -36,6 +37,27 @@ if t.TYPE_CHECKING:
     from .ioblock import IOBlock
 
 logger = structlog.getLogger(__name__)
+
+
+TAP_ROW_LIMITED = False
+try:
+    TAP_ROW_LIMIT = int(os.environ.get('TAP_ROW_LIMIT'))
+    TAP_ROW_LIMITED = True
+except (ValueError, TypeError) as error:
+    TAP_ROW_LIMITED = False
+
+
+class GotEnoughRowsException ( Exception):
+    pass
+
+class RowLimitHandler:
+    def __init__(self, row_limit):
+        self.linecount = 0
+        self.row_limit = row_limit
+    def writeline(self, line):
+        self.linecount += 1
+        if self.linecount > self.row_limit:
+            raise GotEnoughRowsException()
 
 
 class BlockSetHasNoStateError(Exception):
@@ -223,6 +245,10 @@ class ELBContextBuilder:  # noqa: WPS214
             plugin_invoker=self.invoker_for(ctx),
             plugin_args=plugin_args,
         )
+
+        if TAP_ROW_LIMITED:
+            pi.add_output_handler("stdout", RowLimitHandler(TAP_ROW_LIMIT))
+
         self._blocks.append(block)
         self._env.update(ctx.env)
         return block
@@ -734,7 +760,10 @@ class ELBExecutionManager:
                     line_length_limit=self.line_length_limit,
                     stream_buffer_size=self.stream_buffer_size,
                 )
-            raise output_futures_failed.exception()  # noqa: RSE102
+            if not isinstance(ex, GotEnoughRowsException):
+                raise output_futures_failed.exception()  # noqa: RSE102
+            else:
+                logger.debug("Target Rows Reached")
         else:
             # If all the output handlers completed without raising an
             # exception, we still need to wait for all the underlying block
@@ -754,16 +783,18 @@ class ELBExecutionManager:
         else:
             logger.warning("Intermediate block in sequence failed.")
             await self._stop_all_blocks(start_idx)
-            raise RunnerError(
-                (
-                    "Unexpected completion sequence in ExtractLoadBlock set. "
-                    "Intermediate block (likely a mapper) failed."
-                ),
-                {
-                    PluginType.EXTRACTORS: 1,
-                    PluginType.LOADERS: 1,
-                },
-            )
+
+            if not isinstance(output_futures_failed.exception(), GotEnoughRowsException):
+                raise RunnerError(
+                    (
+                        "Unexpected completion sequence in ExtractLoadBlock set. "
+                        "Intermediate block (likely a mapper) failed."
+                    ),
+                    {
+                        PluginType.EXTRACTORS: 1,
+                        PluginType.LOADERS: 1,
+                    },
+                )
 
     async def _handle_head_completed(
         self,
