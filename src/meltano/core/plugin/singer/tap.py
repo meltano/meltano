@@ -205,7 +205,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             elif "properties" in plugin_invoker.capabilities:
                 args += ["--properties", catalog_path]
             else:
-                logger.warn(  # noqa: G010
+                logger.warning(
                     "A catalog file was found, but it will be ignored as the "
                     "extractor does not advertise the `catalog` or "
                     "`properties` capability",
@@ -216,7 +216,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             if "state" in plugin_invoker.capabilities:
                 args += ["--state", state_path]
             else:
-                logger.warn(  # noqa: G010
+                logger.warning(
                     "A state file was found, but it will be ignored as the "
                     "extractor does not advertise the `state` capability",
                 )

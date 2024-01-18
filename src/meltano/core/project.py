@@ -230,7 +230,7 @@ class Project(Versioned):  # noqa: WPS214
             else:
                 raise
 
-        logger.debug(f"Activated project at {project.root}")  # noqa: G004
+        logger.debug("Activated project at %s", project.root)
 
         # set the default project
         cls._default = project

@@ -78,13 +78,13 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
         # plugin in the BlockSet has "state" capability
         try:
             if not project.environment:
-                logger.warn(  # noqa: G010
+                logger.warning(
                     "Running state operation for environment "  # noqa: G004
                     f"'{match['env']}' outside of an environment",
                 )
 
             elif project.environment.name != match["env"]:
-                logger.warn(  # noqa: G010
+                logger.warning(
                     f"Environment '{match['env']}' used in state operation does "  # noqa: G004
                     f"not match current environment '{project.environment.name}'.",
                 )
@@ -94,7 +94,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service
         except Exception:
-            logger.warn("No plugins found for provided state_id.")  # noqa: G010
+            logger.warning("No plugins found for provided state_id.")
     # If provided state_id does not match convention (i.e., run via "meltano elt"),
     # use the standalone StateService in the CLI context.
     return None

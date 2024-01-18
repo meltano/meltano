@@ -217,6 +217,7 @@ pyflakes = [
   "-WPS309", # Allow reversed compare order
   "-WPS316",
   "-WPS317", # Allow "incorrect multi-line parameters", since Black forces them to be "incorrect"
+  "-WPS323", # Allow % formatting on strings, for logging
   "-WPS324", # Allow inconsistent returns - permitted because of too many false positives
   "-WPS326", # Allow syntax-level (process when first parsed, rather than at every run) string concatenation
   "-WPS332", # Allow assignment expressions (walrus operator :=)

@@ -212,7 +212,7 @@ async def elt(  # WPS408
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
     """
-    logger.warn("The `elt` command is deprecated in favor of `el`")  # noqa: G010
+    logger.warning("The `elt` command is deprecated in favor of `el`")
     await _run_el_command(
         project,
         ctx,
@@ -418,7 +418,7 @@ async def _run_elt(
                 await _run_extract_load(log, elt_context, output_logger)
 
             if elt_context.transformer:
-                log.warn(  # noqa: G010
+                log.warning(
                     "The option to run a transformation is deprecated and will be "
                     "removed in a future version.",
                 )
