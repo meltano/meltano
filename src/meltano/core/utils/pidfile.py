@@ -26,7 +26,7 @@ class PIDFile:
         except FileNotFoundError:
             pass
 
-        logger.debug(f"Loaded PID {self._pid} from {self.path}")  # noqa: G004
+        logger.debug("Loaded PID %s from %s", self._pid, self.path)
         return self._pid
 
     def write_pid(self, pid: int):

@@ -391,7 +391,7 @@ class Project(Versioned):  # noqa: WPS214
         """
         if getattr(self.environment, "name", object()) != name:
             self.refresh(environment=Environment.find(self.meltano.environments, name))
-        logger.info(f"Environment {name!r} is active")  # noqa: G004
+        logger.info("Environment '%s' is active", name)
 
     def deactivate_environment(self) -> None:
         """Deactivate the currently active environment."""

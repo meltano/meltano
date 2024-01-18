@@ -284,14 +284,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Reading state from {self.label}")  # noqa: G004
+        logger.info("Reading state from %s", self.label)
         with self.acquire_lock(state_id):
             try:
                 with self.get_reader(self.get_state_path(state_id)) as reader:
                     return JobState.from_file(state_id, reader)
             except Exception as e:
                 if self.is_file_not_found_error(e):
-                    logger.info(f"No state found for {state_id}.")  # noqa: G004
+                    logger.info("No state found for %s.", state_id)
                     return None
                 raise e
 
@@ -304,7 +304,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Writing state to {self.label}")  # noqa: G004
+        logger.info("Writing state to %s", self.label)
         filepath = self.get_state_path(state.state_id)
         with self.acquire_lock(state.state_id):
             if state.is_complete():

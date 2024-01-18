@@ -538,7 +538,8 @@ def expand_env_vars(
             val = str(env[var])
         except KeyError as ex:
             logger.debug(
-                f"Variable '${var}' is not set in the provided env dictionary.",  # noqa: G004
+                "Variable '%s' is not set in the provided env dictionary.",
+                var,
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
@@ -546,7 +547,7 @@ def expand_env_vars(
                 return f"${{{var}}}"
             return ""
         if not val:
-            logger.debug(f"Variable '${var}' is empty.")  # noqa: G004
+            logger.debug("Variable '$%s' is empty.", var)
         return val
 
     return _expand_env_vars(raw_value, replacer, flat)

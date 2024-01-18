@@ -52,7 +52,7 @@ def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
-        logging.warning(f"Found meltano project at: {root}")  # noqa: G004
+        logging.warning("Found meltano project at: %s", root)
 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False

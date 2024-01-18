@@ -90,8 +90,9 @@ def project_engine(
         + (parsed_db_uri.hostname or ""),
     ).geturl()
     logging.debug(
-        f"Creating DB engine for project at {str(project.root)!r} "  # noqa: G004
-        f"with DB URI {sanitized_db_uri!r}",
+        "Creating DB engine for project at '%s' with DB URI '%s'",
+        project.root,
+        sanitized_db_uri,
     )
 
     if database_uri is None:

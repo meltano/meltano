@@ -192,7 +192,7 @@ class ScheduleService:  # noqa: WPS214
             settings_service = PluginSettingsService(self.project, extractor_plugin)
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
-            logging.debug(f"`start_date` not found in {extractor_plugin}.")  # noqa: G004
+            logging.debug("`start_date` not found in %s.", extractor_plugin)
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

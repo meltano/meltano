@@ -135,7 +135,9 @@ class StateService:  # noqa: WPS214
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",  # noqa: G004
+            "Added to state %s state payload %s",
+            state_to_add_to.job_name,
+            new_state_dict,
         )
         partial_state = (
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}

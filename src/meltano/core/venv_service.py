@@ -260,8 +260,9 @@ class VenvService:  # noqa: WPS214
         """
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
-                f"Packages for '{self.namespace}/{self.name}' have changed so "  # noqa: G004
-                "performing a clean install.",
+                "Packages for '%s/%s' have changed so performing a clean install.",
+                self.namespace,
+                self.name,
             )
             clean = True
 
@@ -320,7 +321,11 @@ class VenvService:  # noqa: WPS214
         Returns:
             The Python process creating the virtual environment.
         """
-        logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
+        logger.debug(
+            "Creating virtual environment for '%s/%s'",
+            self.namespace,
+            self.name,
+        )
 
         async def extract_stderr(proc: Process):
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
@@ -353,7 +358,11 @@ class VenvService:  # noqa: WPS214
         Returns:
             The process running `pip install --upgrade ...`.
         """
-        logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")  # noqa: G004
+        logger.debug(
+            "Upgrading pip for '%s/%s'",
+            self.namespace,
+            self.name,
+        )
         try:
             return await self._pip_install(("--upgrade", "pip"))
         except AsyncSubprocessError as err:
@@ -434,7 +443,10 @@ class VenvService:  # noqa: WPS214
             else f"Installing with args {pip_install_args_str!r} into"
         )
         logger.debug(
-            f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",  # noqa: G004
+            "%s virtual environment for '%s/%s'",
+            log_msg_prefix,
+            self.namespace,
+            self.name,
         )
 
         async def extract_stderr(proc: Process) -> str | None:  # pragma: no cover

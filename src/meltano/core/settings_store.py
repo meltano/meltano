@@ -1393,7 +1393,7 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
         store = self.auto_store(name, setting_def=setting_def)
-        logger.debug(f"AutoStoreManager returned store '{store}'")  # noqa: G004
+        logger.debug("AutoStoreManager returned store '%s'", store)
         if store is None:
             raise StoreNotSupportedError("No storage method available")
 

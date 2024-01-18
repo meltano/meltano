@@ -24,11 +24,11 @@ class SingerRunner(Runner):
         while True:
             try:
                 code = process.wait(**wait_args)
-                logging.debug(f"{process} exited with {code}")  # noqa: G004
+                logging.debug("%s exited with %s", process, code)
                 return code
             except subprocess.TimeoutExpired:
                 process.kill()
-                logging.error(f"{process} was killed.")  # noqa: G004
+                logging.error("%s was killed.", process)
 
     async def invoke(  # noqa: WPS210, WPS213, WPS217, WPS231, WPS238
         self,
@@ -202,8 +202,8 @@ class SingerRunner(Runner):
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
-        logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
-        logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
+        logging.info("\textractor: %s at '%s'", tap.plugin.name, tap.exec_path())
+        logging.info("\tloader: %s at '%s'", target.plugin.name, target.exec_path())
 
     async def run(
         self,
@@ -246,9 +246,10 @@ class SingerRunner(Runner):
             return
 
         logging.error(
-            f"The extractor generated a message exceeding the message size "  # noqa: G004
-            f"limit of {human_size(line_length_limit)} (half the buffer size "
-            f"of {human_size(stream_buffer_size)}).",
+            "The extractor generated a message exceeding the message size limit of %s "
+            "(half the buffer size of %s).",
+            human_size(line_length_limit),
+            human_size(stream_buffer_size),
         )
         logging.error(
             "To let this message be processed, increase the 'elt.buffer_size' "
