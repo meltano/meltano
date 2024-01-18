@@ -81,7 +81,7 @@ class ExtractorTestService(PluginTestService):
             return False, str(exc)
 
         last_line = None
-        while not process.stdout.at_eof():
+        while process.stdout and not process.stdout.at_eof():
             data = await process.stdout.readline()
             line = data.decode("utf-8").strip()
             if line:

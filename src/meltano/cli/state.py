@@ -78,14 +78,14 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
         # plugin in the BlockSet has "state" capability
         try:
             if not project.environment:
-                logger.warn(
-                    "Running state operation for environment "
+                logger.warning(
+                    "Running state operation for environment "  # noqa: G004
                     f"'{match['env']}' outside of an environment",
                 )
 
             elif project.environment.name != match["env"]:
-                logger.warn(
-                    f"Environment '{match['env']}' used in state operation does "
+                logger.warning(
+                    f"Environment '{match['env']}' used in state operation does "  # noqa: G004
                     f"not match current environment '{project.environment.name}'.",
                 )
 
@@ -94,7 +94,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             parser = BlockParser(logger, project, blocks)
             return next(parser.find_blocks()).state_service
         except Exception:
-            logger.warn("No plugins found for provided state_id.")
+            logger.warning("No plugins found for provided state_id.")
     # If provided state_id does not match convention (i.e., run via "meltano elt"),
     # use the standalone StateService in the CLI context.
     return None
@@ -166,7 +166,7 @@ def copy_state(
     state_service.copy_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {dst_state_id} was successfully copied from "
+        f"State for {dst_state_id} was successfully copied from "  # noqa: G004
         f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
@@ -196,7 +196,7 @@ def move_state(
     state_service.move_state(src_state_id, dst_state_id)
 
     logger.info(
-        f"State for {src_state_id} was successfully moved to {dst_state_id} "
+        f"State for {src_state_id} was successfully moved to {dst_state_id} "  # noqa: G004
         f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
@@ -247,7 +247,7 @@ def merge_state(
     elif from_state_id:
         state_service.merge_state(from_state_id, state_id)
     logger.info(
-        f"State for {state_id} was successfully "
+        f"State for {state_id} was successfully "  # noqa: G004
         f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 
@@ -288,7 +288,7 @@ def set_state(
     elif state:
         state_service.set_state(state_id, state)
     logger.info(
-        f"State for {state_id} was successfully set "
+        f"State for {state_id} was successfully set "  # noqa: G004
         f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
     )
 

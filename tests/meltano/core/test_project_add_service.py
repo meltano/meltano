@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typing as t
 
+import mock
 import pytest
 
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
@@ -181,3 +182,93 @@ class TestProjectAddService:
                 PluginType.EXTRACTORS,
                 f"tap-mock{STATE_ID_COMPONENT_DELIMITER}",
             )
+
+    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    def test_add_update(
+        self,
+        lock_save: mock.MagicMock,
+        target,
+        subject: ProjectAddService,
+        project: Project,
+        hub_request_counter: Counter,
+    ):
+        target.config = {
+            "username": "meltano",
+            "password": "meltano",
+        }
+
+        project.plugins.update_plugin(target)
+
+        updated_attrs = {
+            "label": "Mock",
+            "description": "Mock target",
+            "executable": "./target-mock.sh",
+            "settings": [
+                {"name": "username"},
+                {"name": "password"},
+            ],
+        }
+
+        assert not target.canonical().items() >= updated_attrs.items()  # noqa: WPS508
+
+        updated = subject.add(
+            target.type,
+            target.name,
+            update=True,
+            **updated_attrs,
+        )
+
+        assert hub_request_counter["/loaders/index"] == 1
+        assert hub_request_counter["/loaders/target-mock--original"] == 1
+        assert len(hub_request_counter) == 2
+
+        assert lock_save.call_count == 1
+
+        assert updated in project.meltano["plugins"][target.type]
+        assert updated.canonical().items() >= updated_attrs.items()
+        assert updated.config_with_extras
+
+    @mock.patch("meltano.core.plugin_lock_service.PluginLock.save")
+    def test_add_update_custom(
+        self,
+        lock_save: mock.MagicMock,
+        subject: ProjectAddService,
+        project: Project,
+        hub_request_counter: Counter,
+    ):
+        custom_plugin = subject.add(
+            PluginType.EXTRACTORS,
+            "tap-custom",
+            namespace="tap_custom",
+            config={
+                "username": "meltano",
+                "password": "meltano",
+                "start_date": "2023-01-01",
+            },
+        )
+
+        updated_attrs = {
+            "label": "Custom",
+            "description": "Custom tap",
+            "executable": "./tap-custom.sh",
+            "settings": [
+                {"name": "username"},
+                {"name": "password"},
+            ],
+        }
+
+        updated = subject.add(
+            custom_plugin.type,
+            custom_plugin.name,
+            update=True,
+            namespace=custom_plugin.namespace,
+            **updated_attrs,
+        )
+
+        assert len(hub_request_counter) == 0
+
+        assert lock_save.call_count == 0
+
+        assert updated in project.meltano["plugins"][custom_plugin.type]
+        assert updated.canonical().items() >= updated_attrs.items()
+        assert updated.config_with_extras

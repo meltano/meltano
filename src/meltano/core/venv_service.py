@@ -159,7 +159,7 @@ class VirtualEnv:
 
 
 async def _extract_stderr(_):
-    return None
+    return None  # pragma: no cover
 
 
 async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
@@ -260,7 +260,7 @@ class VenvService:  # noqa: WPS214
         """
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
-                f"Packages for '{self.namespace}/{self.name}' have changed so "
+                f"Packages for '{self.namespace}/{self.name}' have changed so "  # noqa: G004
                 "performing a clean install.",
             )
             clean = True
@@ -320,7 +320,7 @@ class VenvService:  # noqa: WPS214
         Returns:
             The Python process creating the virtual environment.
         """
-        logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")
+        logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
         async def extract_stderr(proc: Process):
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
@@ -353,7 +353,7 @@ class VenvService:  # noqa: WPS214
         Returns:
             The process running `pip install --upgrade ...`.
         """
-        logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")
+        logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")  # noqa: G004
         try:
             return await self._pip_install(("--upgrade", "pip"))
         except AsyncSubprocessError as err:
@@ -434,8 +434,14 @@ class VenvService:  # noqa: WPS214
             else f"Installing with args {pip_install_args_str!r} into"
         )
         logger.debug(
-            f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",
+            f"{log_msg_prefix} virtual environment for '{self.namespace}/{self.name}'",  # noqa: G004
         )
+
+        async def extract_stderr(proc: Process) -> str | None:  # pragma: no cover
+            if not proc.stdout:
+                return None
+
+            return (await proc.stdout.read()).decode("unicode_escape")
 
         try:
             return await exec_async(
@@ -446,6 +452,7 @@ class VenvService:  # noqa: WPS214
                 "--log",
                 str(self.pip_log_path),
                 *pip_install_args,
+                extract_stderr=extract_stderr,
             )
         except AsyncSubprocessError as err:
             logger.info(
@@ -455,4 +462,5 @@ class VenvService:  # noqa: WPS214
             raise AsyncSubprocessError(
                 f"Failed to install plugin '{self.name}'.",
                 err.process,
+                stderr=await err.stderr,
             ) from err

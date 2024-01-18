@@ -167,9 +167,7 @@ class TestSingerBlocks:
             plugin_args={"foo": "bar"},
         )
 
-        mock_tap_plugin_invoker.output_handlers = (
-            []
-        )  # we're capturing logs below directly
+        mock_tap_plugin_invoker.output_handlers = []  # we're capturing logs below directly  # noqa: E501
 
         output_log = OutputLogger(log)
         log = structlog.getLogger("test")
