@@ -706,4 +706,4 @@ class SingerTap(SingerPlugin):
             if len(path) <= 1:
                 continue
             if not reduce(dict_get, path, s.get("schema", {})):
-                self._warn_missing_property(rule.tap_stream_id, tuple(rule.breadcrumb))
+                self._warn_missing_property(rule.tap_stream_id, rule.breadcrumb)
