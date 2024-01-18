@@ -207,7 +207,7 @@ class Project(Versioned):  # noqa: WPS214
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
                         logger.warning(
-                            "Could not create symlink: meltano.exe not "
+                            "Could not create symlink: meltano.exe not "  # noqa: G004
                             f"present in {str(Path(sys.executable).parent)}",
                         )
                 else:
@@ -224,13 +224,13 @@ class Project(Versioned):  # noqa: WPS214
         except OSError as error:
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
-                    f"Could not create symlink: {error}\nPlease make sure "
+                    f"Could not create symlink: {error}\nPlease make sure "  # noqa: G004
                     "that the underlying filesystem supports symlinks.",
                 )
             else:
                 raise
 
-        logger.debug(f"Activated project at {project.root}")
+        logger.debug(f"Activated project at {project.root}")  # noqa: G004
 
         # set the default project
         cls._default = project
@@ -391,7 +391,7 @@ class Project(Versioned):  # noqa: WPS214
         """
         if getattr(self.environment, "name", object()) != name:
             self.refresh(environment=Environment.find(self.meltano.environments, name))
-        logger.info(f"Environment {name!r} is active")
+        logger.info(f"Environment {name!r} is active")  # noqa: G004
 
     def deactivate_environment(self) -> None:
         """Deactivate the currently active environment."""

@@ -205,7 +205,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             elif "properties" in plugin_invoker.capabilities:
                 args += ["--properties", catalog_path]
             else:
-                logger.warn(
+                logger.warn(  # noqa: G010
                     "A catalog file was found, but it will be ignored as the "
                     "extractor does not advertise the `catalog` or "
                     "`properties` capability",
@@ -216,7 +216,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             if "state" in plugin_invoker.capabilities:
                 args += ["--state", state_path]
             else:
-                logger.warn(
+                logger.warn(  # noqa: G010
                     "A state file was found, but it will be ignored as the "
                     "extractor does not advertise the `state` capability",
                 )
@@ -306,7 +306,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
             try:
                 shutil.copy(custom_state_path, state_path)
-                logger.info(f"Found state in {custom_state_filename}")
+                logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find state file {custom_state_path}",
@@ -384,7 +384,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
             try:
                 shutil.copy(custom_catalog_path, catalog_path)
-                logger.info(f"Found catalog in {custom_catalog_path}")
+                logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find catalog file {custom_catalog_path}",

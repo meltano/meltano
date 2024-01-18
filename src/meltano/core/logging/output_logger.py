@@ -211,7 +211,7 @@ class Out:  # noqa: WPS230
             logger.error(str(err))
             raise
         except Exception as err:
-            logger.error(str(err), exc_info=True)
+            logger.error(str(err), exc_info=True)  # noqa: G201
             raise
         finally:
             logger.removeHandler(self.redirect_log_handler)

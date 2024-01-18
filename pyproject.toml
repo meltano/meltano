@@ -593,17 +593,18 @@ ignore = [
 ]
 select = [
   "ARG", # flake8-unused-arguments
-  "S",   # flake8-bandit
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
   "COM", # flake8-commas
   "E",   # pycodestyle (error)
   "ERA", # flake8-eradicate
   "F",   # pyflakes
+  "G",   # flake8-logging-format
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "PT",  # flake8-pytest-style
   "RSE", # flake8-raise
+  "S",   # flake8-bandit
   "SIM", # flake8-simplify
   "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
