@@ -174,7 +174,7 @@ class Manifest:  # noqa: WPS214
                     str(instance_path),
                 )
                 logger.warning(
-                    f"Failed to validate {instance_name} against Meltano manifest "
+                    f"Failed to validate {instance_name} against Meltano manifest "  # noqa: G004
                     f"schema ({MANIFEST_SCHEMA_PATH}):\n{jsonschema_checker_message}",
                 )
 

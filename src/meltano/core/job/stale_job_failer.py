@@ -32,6 +32,6 @@ def fail_stale_jobs(session: Session, state_id: str | None = None) -> None:
 
         error = job.payload["error"]
         logger.info(
-            f"Marked stale run{with_state_id} that started at "
+            f"Marked stale run{with_state_id} that started at "  # noqa: G004
             f"{job.started_at} as failed: {error}",
         )
