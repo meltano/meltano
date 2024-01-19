@@ -280,7 +280,7 @@ jobs:
 
     - name: Combine coverage data and display human readable report
       run: |
-        nox -rs coverage -- combine
+        nox -rs coverage -- combine --debug=pathmap
         nox -rs coverage -- report --show-missing --ignore-errors
 
     - name: Create coverage report
