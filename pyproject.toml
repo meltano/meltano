@@ -448,6 +448,7 @@ concurrency = [
   "thread",
 ]
 parallel = true
+relative_files = true  # This allows coverage to be measured in Windows
 source = [
   "meltano",
   "tests",
