@@ -49,7 +49,7 @@ Note that for users who are using pyenv with the [virtualenv plugin](https://git
 likely not need to prefix the commands with `poetry` as poetry will default to using the pyenv activated virtual
 environment.
 
-This means that you're ready to start Meltano CLI development. For API development, read on.
+This means that you're ready to start Meltano CLI development.
 
 :::caution
 
@@ -63,7 +63,7 @@ export MELTANO_SEND_ANONYMOUS_USAGE_STATS=False
 
 ## System Database
 
-Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
+Certain features of Meltano are supported by a database that is managed using Alembic migrations.
 
 :::caution
 
