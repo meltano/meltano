@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "3.3.0a2"
+version = "3.3.0rc1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -100,12 +100,12 @@ s3 = ["boto3"]
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
 black = "^23.12.1"
-boto3-stubs = {extras = ["essential"], version = "1.34.19"}
+boto3-stubs = {extras = ["essential"], version = "1.34.23"}
 bumpversion = "^0.6.0"
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 freezegun = "^1.4.0"
-hypothesis = "^6.93.1"
+hypothesis = "^6.96.2"
 mock = "^5.0.2"
 moto = "^4.2.13"
 mypy = "^1.8.0"
@@ -123,7 +123,7 @@ pytest-xdist = "^3.5"
 requests-mock = "^1.11.0"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
 types-croniter = "^2.0.0"
-types-jsonschema = "^4.20.0.20240105"
+types-jsonschema = "^4.21.0.20240118"
 types-psutil = "^5.9.5.20240106"
 types-python-dateutil = "^2.8.19.20240106"
 types-python-slugify = "^8.0.0.2"
@@ -476,7 +476,7 @@ name = "cz_version_bump"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
-version = "3.3.0a2"
+version = "3.3.0rc1"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
