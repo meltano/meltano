@@ -52,14 +52,14 @@ class SingerPlugin(BasePlugin):
             config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
-        logging.debug(f"Created configuration at {config_path}")
+        logging.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker):
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
-        logging.debug(f"Deleted configuration at {config_path}")
+        logging.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
     def instance_uuid(self):

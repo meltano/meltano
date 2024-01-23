@@ -60,7 +60,7 @@ async def install_dbt_plugin(
     """
     if reason not in {PluginInstallReason.ADD, PluginInstallReason.UPGRADE}:
         logger.info(
-            f"Run `meltano add transform {plugin.name}` "
+            f"Run `meltano add transform {plugin.name}` "  # noqa: G004
             "to re-add this transform to your dbt project.",
         )
         return
@@ -70,14 +70,14 @@ async def install_dbt_plugin(
 
         # Add repo to my-test-project/transform/packages.yml
         packages_path = transform_add_service.packages_file.relative_to(project.root)
-        logger.info(f"Adding dbt package '{plugin.pip_url}' to '{packages_path}'...")
+        logger.info(f"Adding dbt package '{plugin.pip_url}' to '{packages_path}'...")  # noqa: G004
         transform_add_service.add_to_packages(plugin)
 
         # Add model and vars to my-test-project/transform/dbt_project.yml
         dbt_project_path = transform_add_service.dbt_project_file.relative_to(
             project.root,
         )
-        logger.info(f"Adding dbt model to '{dbt_project_path}'...")
+        logger.info(f"Adding dbt model to '{dbt_project_path}'...")  # noqa: G004
         transform_add_service.update_dbt_project(plugin)
     except PluginNotFoundError as ex:
         raise PluginInstallError(

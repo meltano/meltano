@@ -54,7 +54,7 @@ class JobLoggingService:
             # Don't stop the Job running if you can not open the log file
             # for writting: just return /dev/null
             logging.error(
-                f"Could open log file {log_file_name!r} for writting. "
+                f"Could open log file {log_file_name!r} for writting. "  # noqa: G004
                 "Using `/dev/null`",
             )
             with open(os.devnull, "w") as log_file:

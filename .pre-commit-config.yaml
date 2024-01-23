@@ -74,16 +74,12 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.13
+    rev: v0.1.14
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
-
-  - repo: https://github.com/psf/black
-    rev: 23.12.1
-    hooks:
-      - id: black
-        exclude: ^(src/meltano/migrations/)
+    - id: ruff-format
+      exclude: ^(src/meltano/migrations/)
 
   - repo: https://github.com/flakeheaven/flakeheaven
     rev: 3.3.0
