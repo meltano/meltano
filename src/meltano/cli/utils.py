@@ -371,7 +371,6 @@ def add_plugin(  # noqa: C901
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
             fg="yellow",
-            err=True,
         )
         click.echo(
             "You can remove the file manually to avoid using a stale definition.",
