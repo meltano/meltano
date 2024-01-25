@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import os
 import subprocess
 import sys
@@ -10,6 +9,7 @@ import typing as t
 from importlib.metadata import distribution
 
 import click
+import pep610
 
 from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.error import MeltanoError
@@ -23,25 +23,21 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def _get_pep610_data() -> dict[str, t.Any] | None:
-    dist = distribution("meltano")
-    if contents := dist.read_text("direct_url.json"):
-        return json.loads(contents)
-
-    return None
-
-
 def _check_editable_installation(*, force: bool) -> None:
-    if pep610_data := _get_pep610_data():
-        url: str | None = pep610_data.get("url")
-        dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
-        if url and dir_info and dir_info.get("editable", False) and not force:
-            # TODO: Use `str.removeprefix` when we drop support for Python 3.8
-            meltano_dir = url.replace("file://", "", 1)
-            raise AutomaticPackageUpgradeError(
-                reason="it is installed from source",
-                instructions=f"navigate to `{meltano_dir}` and run `git pull`",
-            )
+    dist = distribution("meltano")
+    if (
+        (pep610_data := pep610.read_from_distribution(dist))  # noqa: WPS222
+        and isinstance(pep610_data, pep610.DirData)
+        and pep610_data.url
+        and pep610_data.dir_info.is_editable()
+        and not force
+    ):
+        # TODO: Use `str.removeprefix` when we drop support for Python 3.8
+        meltano_dir = pep610_data.url.replace("file://", "", 1)
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed from source",
+            instructions=f"navigate to `{meltano_dir}` and run `git pull`",
+        )
 
 
 def _check_docker_installation() -> None:
