@@ -446,6 +446,10 @@ source = [
   "meltano",
   "tests",
 ]
+omit = [
+  "src/meltano/migrations/env.py",
+  "src/meltano/cli/interactive/*",
+]
 
 [tool.coverage.paths]
 source = [
@@ -455,8 +459,7 @@ source = [
 ]
 
 [tool.coverage.report]
-exclude_lines = [
-  "pragma: no cover",
+exclude_also = [
   '''if (t\.)?TYPE_CHECKING:''',
   "\\.\\.\\.",
 ]
