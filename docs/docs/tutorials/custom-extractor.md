@@ -338,7 +338,6 @@ Alternatively, you can create a [plugin definition](/concepts/project#custom-plu
   name: tap-jsonplaceholder
   namespace: tap_jsonplaceholder
   pip_url: -e ../tap-jsonplaceholder
-  variant: test
   ```
 
 </details>
