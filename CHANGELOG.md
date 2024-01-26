@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.3.1 (2024-01-26)
+
+### 🐛 Fixes
+
+- [#8379](https://github.com/meltano/meltano/issues/8379) `--from-ref` for a plugin definition missing a `variant` -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#8378](https://github.com/meltano/meltano/issues/8378) Mention `--from-ref` in the custom extractor guide -- _**Thanks @ReubenFrankel!**_
+
 ## v3.3.0 (2024-01-23)
 
 ### ✨ New
