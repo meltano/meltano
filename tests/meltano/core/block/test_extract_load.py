@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import tempfile
+import typing as t
 from pathlib import Path
 
 import mock
@@ -24,11 +25,13 @@ from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.runner import RunnerError
 from meltano.core.runner.singer import SingerRunner
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})

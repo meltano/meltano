@@ -16,8 +16,10 @@ from meltano.core.logging.formatters import (
     TIMESTAMPER,
     rich_exception_formatter_factory,
 )
-from meltano.core.project import Project
 from meltano.core.utils import get_no_color_flag
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 LEVELS = {  # noqa: WPS407
     "debug": logging.DEBUG,
@@ -27,7 +29,9 @@ LEVELS = {  # noqa: WPS407
     "critical": logging.CRITICAL,
 }
 DEFAULT_LEVEL = "info"
-FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+FORMAT = (
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+)
 
 
 def parse_log_level(log_level: dict[str, int]) -> int:
@@ -183,15 +187,15 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
 class SubprocessOutputWriter(t.Protocol):
     """A basic interface suitable for use with `capture_subprocess_output`."""
 
-    def writelines(self, lines: str):
-        """Write the provided lines to an output.
+    def writeline(self, line: str):
+        """Write the provided line to an output.
 
         Args:
-            lines: String to write
+            line: String to write
         """
 
 
-async def _write_line_writer(writer, line):
+async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
         try:
@@ -224,7 +228,7 @@ async def capture_subprocess_output(
             subprocess.
         line_writers: A `StreamWriter`, or object has a compatible writelines method.
     """
-    while not reader.at_eof():
+    while reader and not reader.at_eof():
         line = await reader.readline()
         if not line:
             continue

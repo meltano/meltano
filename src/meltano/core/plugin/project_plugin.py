@@ -49,6 +49,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
     VARIANT_ATTR = "variant"
 
+    variant: str | None
+
     def __init__(
         self,
         plugin_type: PluginType,
@@ -184,7 +186,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
         if "profiles" in extras:
             logger.warning(
-                "Plugin configuration profiles are no longer supported, ignoring "
+                "Plugin configuration profiles are no longer supported, ignoring "  # noqa: G004
                 f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
             )
 

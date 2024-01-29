@@ -6,8 +6,8 @@ import os
 import platform
 import shutil
 import string
+import typing as t
 from base64 import b64encode
-from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
@@ -28,6 +28,9 @@ from meltano.core.state_store import (
     S3StateStoreManager,
     WindowsFilesystemStateStoreManager,
 )
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 def on_windows() -> bool:

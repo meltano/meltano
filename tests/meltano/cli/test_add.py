@@ -15,13 +15,14 @@ from meltano.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.plugin import PluginRef, PluginType, Variant
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project import Project
-from meltano.core.project_init_service import ProjectInitService
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
+    from meltano.core.project_init_service import ProjectInitService
 
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
 fails_on_windows = pytest.mark.xfail(
@@ -817,3 +818,26 @@ class TestCliAdd:
             reason=PluginInstallReason.ADD,
             force=True,
         )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_update(self, cli_runner):
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock" in res.stdout
+
+            res = cli_runner.invoke(
+                cli,
+                ["add", "extractor", "tap-mock", "--update"],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert "Updated extractor 'tap-mock" in res.stdout
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_update_not_in_project(self, cli_runner):
+        res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock", "--update"])
+
+        assert res.exit_code == 1
+        assert res.exception
+        assert str(res.exception) == "Extractor 'tap-mock' is not known to Meltano"

@@ -329,6 +329,38 @@ Installing extractor 'tap-jsonplaceholder'...
 Installed extractor 'tap-jsonplaceholder'
 ```
 
+Alternatively, you can create a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file locally and add to your project using the `--from-ref` option:
+
+<details>
+  <summary><code>tap-jsonplaceholder.yml</code></summary>
+
+  ```yml
+  name: tap-jsonplaceholder
+  namespace: tap_jsonplaceholder
+  pip_url: -e ../tap-jsonplaceholder
+  ```
+
+</details>
+
+```bash
+meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+:::info
+  <p>The plugin name must be present in the YAML file to constitute a valid plugin definition - supplying it as a command argument is a no-op in this case</p>
+:::
+
+As you develop your custom extractor, it is possible that its settings will change:
+- New functionality is added, requiring new setting(s)
+- Existing functionality is modified, requiring setting(s) to be renamed
+- Existing functionality is removed, requiring setting(s) to be removed
+
+In this case, you will need to update the extractor in your project - by maintaining your plugin definiton YAML file in line with changes to the tap as you go, this is a simple process of running the previous command along with the `--update` flag:
+
+```bash
+meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
 ### Add a JSONL target
 
 Run the command below to add the JSONL loader that will contain the extracted data stream:
@@ -384,7 +416,7 @@ plugins:
       settings:
         - name: username
         - name: password
-          kind: password
+          sensitive: true
         - name: start_date
           # Default value for the plugin:
           value: '2010-01-01T00:00:00Z'
@@ -426,7 +458,8 @@ To properly expose and configure your settings, you'll need to define them:
   - `foo` represents the `{ foo: VALUE }` in the output configuration.
   - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.
 
-- **kind**: Represent the type of value this should be, (e.g. `password` for sensitive values or `date_iso8601` for dates).
+- **kind**: (optional): Represent the type of value this should be, (e.g. `date_iso8601` for dates). Defaults to `string`.
+- **sensitive**: (optional - defaults to `false`): Indicate whether the setting is sensitive (e.g. a password, token or code).
 - **value** (optional): Define a default value for the plugin's setting.
 
 ### Passing sensitive setting values
@@ -434,7 +467,7 @@ To properly expose and configure your settings, you'll need to define them:
 _**It is best practice not to store sensitive values directly in `meltano.yml`.**_
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
-for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting `kind` is set to `password` and then
+for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting is set to `sensitive: true` and then
 run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 

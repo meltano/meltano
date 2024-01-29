@@ -6,13 +6,12 @@ import logging
 import os
 import re
 import shutil
+import typing as t
 from abc import abstractmethod, abstractproperty
 from base64 import b64decode, b64encode
-from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from functools import reduce
-from io import TextIOWrapper
 from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
@@ -22,6 +21,10 @@ from smart_open import open  # type: ignore
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import remove_suffix
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterator
+    from io import TextIOWrapper
 
 logger = logging.getLogger(__name__)
 
@@ -281,14 +284,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Reading state from {self.label}")
+        logger.info(f"Reading state from {self.label}")  # noqa: G004
         with self.acquire_lock(state_id):
             try:
                 with self.get_reader(self.get_state_path(state_id)) as reader:
                     return JobState.from_file(state_id, reader)
             except Exception as e:
                 if self.is_file_not_found_error(e):
-                    logger.info(f"No state found for {state_id}.")
+                    logger.info(f"No state found for {state_id}.")  # noqa: G004
                     return None
                 raise e
 
@@ -301,7 +304,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Writing state to {self.label}")
+        logger.info(f"Writing state to {self.label}")  # noqa: G004
         filepath = self.get_state_path(state.state_id)
         with self.acquire_lock(state.state_id):
             if state.is_complete():

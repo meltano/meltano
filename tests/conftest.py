@@ -13,7 +13,9 @@ import requests
 from requests.adapters import BaseAdapter
 
 from meltano.core.plugin.base import PluginType
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 logging.basicConfig(level=logging.INFO)
 

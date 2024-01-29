@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginType, Variant
 from meltano.core.plugin.project_plugin import CyclicInheritanceError, ProjectPlugin
 from meltano.core.plugin.requirements import PluginRequirement
-from meltano.core.project import Project
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.utils import find_named
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 @pytest.mark.order(0)
@@ -230,7 +234,7 @@ class TestBasePlugin:
 
     def test_extra_settings(self, subject):
         subject.EXTRA_SETTINGS = [
-            SettingDefinition(name="_foo", kind=SettingKind.PASSWORD, value="default"),
+            SettingDefinition(name="_foo", sensitive=True, value="default"),
             SettingDefinition(name="_bar", kind=SettingKind.INTEGER, value=0),
         ]
         settings = subject.extra_settings
@@ -238,7 +242,7 @@ class TestBasePlugin:
         # Known, overwritten in plugin/variant definition
         foo_setting = find_named(settings, "_foo")
         assert foo_setting
-        assert foo_setting.kind == SettingKind.PASSWORD
+        assert foo_setting.sensitive
         assert foo_setting.value == "bar"
         assert not foo_setting.is_custom
 

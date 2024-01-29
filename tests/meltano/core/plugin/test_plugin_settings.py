@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import platform
+import typing as t
 from datetime import date, datetime
 
 import dotenv
 import pytest
 
-from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.setting import Setting
 from meltano.core.settings_service import (
@@ -24,6 +22,11 @@ from meltano.core.settings_store import (
     MultipleEnvVarsSetException,
 )
 from meltano.core.utils import EnvironmentVariableNotSetError
+
+if t.TYPE_CHECKING:
+    from meltano.core.environment import Environment
+    from meltano.core.plugin.settings_service import PluginSettingsService
+    from meltano.core.project import Project
 
 
 @pytest.mark.order(0)
@@ -52,7 +55,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project_add_service):
+def custom_tap(project):
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
@@ -61,7 +64,7 @@ def custom_tap(project_add_service):
         config=expected,
     )
     try:
-        return project_add_service.add_plugin(tap)
+        return project.plugins.add_to_file(tap)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
@@ -273,7 +276,7 @@ class TestPluginSettingsService:
 
         config = subject.as_dict(process=True)
         assert config["auth"]["username"] == "nested_username"
-        assert config["auth"]["password"] == "nested_password"
+        assert config["auth"]["password"] == "nested_password"  # noqa: S105
         assert "auth.username" not in config
         assert "auth.password" not in config
 
@@ -344,9 +347,9 @@ class TestPluginSettingsService:
     @pytest.mark.usefixtures("env_var")
     def test_namespace_as_env_prefix(
         self,
-        project,
+        project: Project,
         session,
-        target,
+        target: ProjectPlugin,
         plugin_settings_service_factory,
     ):
         subject = plugin_settings_service_factory(target)
@@ -373,6 +376,7 @@ class TestPluginSettingsService:
         # Name prefix
         dotenv.unset_key(project.dotenv, "MOCK_SCHEMA")
         dotenv.set_key(project.dotenv, "TARGET_MOCK_SCHEMA", "name_prefix")
+        project.refresh()
         assert_env_value("name_prefix", "TARGET_MOCK_SCHEMA")
 
         config = subject.as_env(session=session)
@@ -483,7 +487,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(2)
     @pytest.mark.usefixtures("tap")
-    def test_store_dotenv(self, subject, project):
+    def test_store_dotenv(self, subject: PluginSettingsService, project: Project):
         store = SettingValueStore.DOTENV
 
         assert not project.dotenv.exists()
@@ -504,6 +508,7 @@ class TestPluginSettingsService:
         )
 
         dotenv.set_key(project.dotenv, "TAP_MOCK_BOOLEAN", "false")
+        project.refresh()
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
         dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
@@ -545,8 +550,8 @@ class TestPluginSettingsService:
     def test_env_var_expansion(
         self,
         session,
-        subject,
-        project,
+        subject: PluginSettingsService,
+        project: Project,
         monkeypatch,
         env_var,
     ):
@@ -561,6 +566,7 @@ class TestPluginSettingsService:
         dotenv.set_key(project.dotenv, "A", "rock")
         dotenv.set_key(project.dotenv, "B", "paper")
         dotenv.set_key(project.dotenv, "C", "scissors")
+        project.refresh()
 
         yml_config = {
             "var": "$VAR",

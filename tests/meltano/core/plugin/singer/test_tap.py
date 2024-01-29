@@ -14,8 +14,35 @@ from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer import SingerTap
-from meltano.core.plugin.singer.catalog import ListSelectedExecutor
+from meltano.core.plugin.singer.catalog import (
+    CatalogDict,
+    ListSelectedExecutor,
+    select_metadata_rules,
+)
 from meltano.core.state_service import InvalidJobStateError, StateService
+
+
+class CatalogFixture:
+    empty_stream: CatalogDict = {"streams": []}
+    empty_properties: CatalogDict = {"streams": [{"tap_stream_id": "foo"}]}
+    regular_stream: CatalogDict = {
+        "streams": [
+            {
+                "tap_stream_id": "foo",
+                "schema": {
+                    "properties": {
+                        "bar": {"type": "string"},
+                        "attribute": {
+                            "type": "object",
+                            "properties": {
+                                "name": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+        ],
+    }
 
 
 class TestSingerTap:
@@ -897,3 +924,126 @@ class TestSingerTap:
             return_value=True,
         ):
             await subject.run_discovery(invoker, catalog_path)
+
+    @pytest.mark.asyncio()
+    @pytest.mark.usefixtures("use_test_log_config")
+    @pytest.mark.parametrize(
+        ("rule_pattern", "catalog", "message"),
+        (
+            pytest.param(
+                "bar.*",
+                CatalogFixture.empty_properties,
+                "Stream `bar` was not found",
+                id="stream_not_found",
+            ),
+            pytest.param(
+                "foo.*",
+                CatalogFixture.empty_stream,
+                "Stream `foo` was not found",
+                id="no_streams_exist",
+            ),
+            pytest.param(
+                "foo.bar",
+                CatalogFixture.empty_properties,
+                "Property `bar` was not found in the schema of stream `foo`",
+                id="no_properties_exist",
+            ),
+            pytest.param(
+                "foo.spam",
+                CatalogFixture.regular_stream,
+                "Property `spam` was not found in the schema of stream `foo`",
+                id="property_not_found",
+            ),
+            pytest.param(
+                "foo.bar",
+                CatalogFixture.regular_stream,
+                None,
+                id="property_is_found",
+            ),
+            pytest.param(
+                "*.bar",
+                CatalogFixture.empty_stream,
+                None,
+                id="stream_is_wildcard",
+            ),
+            pytest.param(
+                "zoo.*",
+                CatalogFixture.empty_stream,
+                "Stream `zoo` was not found",
+                id="stream_not_found_property_is_wildcard",
+            ),
+            pytest.param(
+                "foo.*",
+                CatalogFixture.regular_stream,
+                None,
+                id="property_is_wildcard",
+            ),
+            pytest.param(
+                "foo.attribute.name",
+                CatalogFixture.regular_stream,
+                None,
+                id="nested_property_is_found",
+            ),
+            pytest.param(
+                "foo.attribute.*",
+                CatalogFixture.regular_stream,
+                None,
+                id="nested_property_is_wildcard",
+            ),
+            pytest.param(
+                "foo.attribute.email",
+                CatalogFixture.regular_stream,
+                "Property `attribute.properties.email` was not "
+                "found in the schema of stream `foo`",
+                id="nested_property_not_found",
+            ),
+            pytest.param(
+                "foo*.*",
+                CatalogFixture.regular_stream,
+                None,
+                id="stream_has_wildcard",
+            ),
+            pytest.param(
+                "foo.ATTRIBUTES.em*",
+                CatalogFixture.regular_stream,
+                "Property `ATTRIBUTES.properties.em*` was not "
+                "found in the schema of stream `foo`",
+                id="property_not_found-sub_property_has_wildcard",
+            ),
+        ),
+    )
+    async def test_warn_property_not_found(
+        self,
+        subject: SingerTap,
+        caplog: pytest.LogCaptureFixture,
+        capsys: pytest.CaptureFixture,
+        rule_pattern: str,
+        catalog: CatalogDict,
+        message: str | None,
+    ):
+        """
+        Warning messages should be emitted when a MetadataRule doesn't match.
+
+        _A quirk seems to be that if this test is invoked on its own, the
+        output is captured in the fixture `pytest.capsys`, however if pytest
+        runs globally then the output is captured in `pytest.caplog`. Not sure
+        why, hoping this message finds a developer more knowledgable than I._
+
+        For now, I'm adding up the output of both capsys & caplog and testing
+        expected messages are captured somewhere. As in, both of these would
+        work.
+
+        ```
+        poetry run pytest
+        poetry run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
+        ```
+        """  # noqa: E501
+        rules = select_metadata_rules([rule_pattern])
+        subject.warn_property_not_found(rules, catalog)
+        sysout, syserr = capsys.readouterr()
+        # If the warning is emitted, it should be in the output
+        if message is not None:
+            assert message in (caplog.text + sysout + syserr)
+        else:
+            assert len(caplog.records) == 0
+            assert syserr + sysout == ""

@@ -8,13 +8,15 @@ import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from enum import Enum
-
-from ruamel.yaml import Representer
+from functools import cached_property
 
 from meltano.core import utils
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
+
+if t.TYPE_CHECKING:
+    from ruamel.yaml import Representer
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
@@ -148,6 +150,18 @@ class SettingKind(YAMLEnum):
     OBJECT = "object"
     HIDDEN = "hidden"
 
+    @cached_property
+    def is_sensitive(self):
+        """Return whether the setting kind is sensitive.
+
+        Returns:
+            True if the setting kind is sensitive.
+        """
+        return self in {
+            SettingKind.PASSWORD,
+            SettingKind.OAUTH,
+        }
+
 
 ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
@@ -172,6 +186,7 @@ class SettingDefinition(NameEq, Canonical):
         placeholder: str | None = None,
         env_specific: bool | None = None,
         hidden: bool | None = None,
+        sensitive: bool | None = None,
         custom: bool = False,
         value_processor=None,
         value_post_processor=None,
@@ -196,6 +211,7 @@ class SettingDefinition(NameEq, Canonical):
             placeholder: A placeholder value for this setting.
             env_specific: Flag for environment-specific setting.
             hidden: Hidden setting.
+            sensitive: Sensitive setting.
             custom: Custom setting flag.
             value_processor: Used with `kind: object` to pre-process the keys
                 in a particular way.
@@ -210,6 +226,7 @@ class SettingDefinition(NameEq, Canonical):
 
         kind = SettingKind(kind) if kind else None
         hidden = hidden or kind is SettingKind.HIDDEN or None
+        sensitive = sensitive or kind and kind.is_sensitive or None
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
@@ -228,6 +245,7 @@ class SettingDefinition(NameEq, Canonical):
             placeholder=placeholder,
             env_specific=env_specific,
             hidden=hidden,
+            sensitive=sensitive,
             value_processor=value_processor,
             value_post_processor=value_post_processor,
             _custom=custom,
@@ -332,7 +350,7 @@ class SettingDefinition(NameEq, Canonical):
         Returns:
             True if setting value is redacted.
         """
-        return self.kind in {SettingKind.PASSWORD, SettingKind.OAUTH}
+        return self.sensitive
 
     def env_vars(
         self,
@@ -424,6 +442,9 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             Value cast according to specified setting definition kind.
+
+        Raises:
+            ValueError: If value is not of the expected type.
         """
         value = value.isoformat() if isinstance(value, (date, datetime)) else value
 
@@ -440,6 +461,14 @@ class SettingDefinition(NameEq, Canonical):
                 value = list(
                     self._parse_value(value, "array", Sequence),  # type: ignore
                 )
+
+        if (
+            value is not None
+            and self.kind == SettingKind.OPTIONS
+            and all(opt["value"] != value for opt in self.options)
+        ):
+            error_message = f"'{value}' is not a valid choice for '{self.name}'"
+            raise ValueError(error_message)
 
         processor = self.value_processor
         if value is not None and processor:

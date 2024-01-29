@@ -35,11 +35,11 @@ The no color configuration is available for all meltano subcommands via an envir
 Specifically, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
-2. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
-3. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
-4. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
-   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
-   2. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
+1. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
+1. Store the plugin definition in the `./plugins` directory (see [Lock Artifacts](/concepts/plugins#lock-artifacts))
+1. Assuming a valid `pip_url` is specified, install the new plugin using [`meltano install <type> <name>`](#install), which will:
+  1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
+  1. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
@@ -124,17 +124,30 @@ meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
 # The above also applies to the plugin variant, if provided
 meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
 
-# Once added, the custom plugin defintion can be updated by removing the plugin
-# and re-adding it with the same `meltano add --from-ref` command
-meltano remove extractor tap-spotify
-meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+# Once added, the custom plugin definition can be updated with the `--update` option
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
 ```
 
-Using `--from-ref` allows you to add a plugin before it is avilable on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
+Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
 
 :::note
-  Meltano will throw an error if the referenced plugin definiton is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
+  Meltano will throw an error if the referenced plugin definition is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
+
+A plugin can be updated using the `--update` option
+
+```bash
+meltano add --update <type> <name>
+
+# For example:
+# Update from Meltano Hub
+meltano add --update extractor tap-spotify
+
+# Update from ref
+meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
+```
+
+This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
@@ -172,7 +185,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--no-install`: Do not install the plugin after adding it to the project.
-
+- `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
@@ -253,7 +266,7 @@ When no explicit `--store` is specified, `meltano config <plugin> set` will auto
 
 - the [system database](/concepts/project#system-database), if the project is [deployed as read-only](/reference/settings#project-readonly);
 - the current location, if a setting's default value has already been overwritten;
-- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `kind: password` or `env_specific: true`);
+- [`.env`](/concepts/project#env), if a setting is sensitive or environment-specific (defined as `sensitive: true` or `env_specific: true`);
 - [`meltano.yml`](/concepts/project#meltano-yml-project-file) otherwise.
 
 If supported by the plugin type, its configuration can be tested using [`meltano config <plugin> test`](/reference/command-line-interface#config).
@@ -439,6 +452,34 @@ meltano config <plugin> set --interactive --extras
 meltano config <plugin> set --interactive --store=dotenv
 ```
 
+### How to use: Read setting value from a file
+
+The `--from-file` option can be used to read a configuration value from a file or a piped external process. This is specially useful for storing complex data like multiline strings, or passing a value generated by a different command line application.
+
+* Settings of [kind](/reference/plugin-definition-syntax/#settingskind) `object` or `array` will be deserialized accordingly.
+* The special filename `-` can be used to read from `STDIN`.
+
+```bash
+# Set setting `<name>` to the contents of `./file.txt`.
+meltano config <plugin> set <name> --from-file ./file.txt
+
+# Set setting `<name>` to the value returned by `uuidgen`.
+uuidgen | meltano config <plugin> set <name> --from-file -
+```
+
+:::info
+  <p>When setting a config value for an <code>object</code> or <code>array</code> setting, the file contents must be valid JSON.</p>
+:::
+
+### Sensitive configuration
+Values for sensitive settings (defined as `sensitive: true`) are redacted in the output of the following commands:
+
+```bash
+meltano config <plugin> list
+meltano config set <name> <value>
+meltano config <plugin> set --interactive
+```
+
 ## `docs`
 
 Open the Meltano documentation site in the default browser.
@@ -479,6 +520,8 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
+
+- A `--merge-state` flag can be passed to merge state with that of previous runs.
 
   Notes:
 
@@ -900,7 +943,7 @@ Run a set of command blocks in series.
 Command blocks are specified as a list of plugin names, e.g. `meltano run some_tap some_mapping some_target some_plugin:some_cmd` and
 are run in the order they are specified from left to right. A failure in any block will cause the entire run to abort.
 
-Multiple commmand blocks can be chained together or repeated, and extractor/loader pairs will automatically be linked to perform EL work.
+Multiple command blocks can be chained together or repeated, and extractor/loader pairs will automatically be linked to perform EL work.
 If you have an active environment defined, a State ID is autogenerated for each extractor/loader pair and used to store and look up the [incremental replication state](/guide/integration#incremental-replication-state) in the [system database](/guide/production#storing-metadata).
 This allows subsequent runs with the same extractor and loader combinations to start where the previous run ended.
 The format of the generated id's is `<environment_name>:<tap_name>-to-<target_name>(:<state_id_suffix)`.
@@ -934,6 +977,7 @@ meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
+- `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 
 Examples:
 
@@ -952,6 +996,9 @@ meltano --environment=dev run --force tap-gitlab target-postgres tap-salesforce 
 # run a pipeline with a custom state ID suffix
 # the autogenerated ID for the EL pair will be 'dev:tap-gitlab-to-target-postgres:pipeline-alias'
 meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-secrets target-postgres
+
+# run a pipeline, merging state with that of previous runs.
+meltano --environment=dev run --merge-state tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
@@ -1422,7 +1469,7 @@ meltano state copy <src_state_id> <dst_state_id>
 #### Examples
 
 ```bash
-# Use prod state to update dev environemnt
+# Use prod state to update dev environment
 meltano state copy prod:tap-gitlab-to-target-jsonl dev:tap-gitlab-to-target-jsonl
 ```
 

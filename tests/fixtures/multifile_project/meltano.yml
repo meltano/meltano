@@ -39,10 +39,10 @@ plugins:
   - name: tap-meltano-yml # Comment on array element
     settings:
     - name: token
-      kind: password
       description: >-
         Token for the API.
         This is a secret.
+      sensitive: true
 
   mappers:
   # My mappers

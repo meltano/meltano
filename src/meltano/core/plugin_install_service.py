@@ -20,12 +20,14 @@ from meltano.core.error import (
     PluginInstallWarning,
 )
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
 from meltano.core.venv_service import VenvService
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 logger = logging.getLogger(__name__)
 

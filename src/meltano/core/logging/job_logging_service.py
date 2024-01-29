@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import logging
 import os
+import typing as t
 from contextlib import contextmanager
 
-from meltano.core.project import Project
 from meltano.core.utils import makedirs, slugify
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 MAX_FILE_SIZE = 2097152  # 2MB max
 
@@ -51,7 +54,7 @@ class JobLoggingService:
             # Don't stop the Job running if you can not open the log file
             # for writting: just return /dev/null
             logging.error(
-                f"Could open log file {log_file_name!r} for writting. "
+                f"Could open log file {log_file_name!r} for writting. "  # noqa: G004
                 "Using `/dev/null`",
             )
             with open(os.devnull, "w") as log_file:

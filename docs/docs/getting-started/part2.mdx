@@ -133,7 +133,7 @@ Fill in the details for these four attributes, and set add_record_metadata to Tr
 $ meltano config target-postgres set user meltano
 &ensp;&ensp;Loader 'target-postgres' setting 'user' was set in `meltano.yml`: 'meltano'
 $ meltano config target-postgres set password password
-&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: '(redacted)'
+&ensp;&ensp;Loader 'target-postgres' setting 'password' was set in `.env`: (redacted)
 $ meltano config target-postgres set database postgres
 &ensp;&ensp;Loader 'target-postgres' setting 'database' was set in `meltano.yml`: 'postgres'
 $ meltano config target-postgres set add_record_metadata True
@@ -182,6 +182,8 @@ $ meltano config target-postgres
 
 </Termy>
 
+By default, the database `schema` is named using the tap : `tap_github`. You change the target schema by setting default_target_schema in the target_postgres configuration.
+
 ## Run your data integration (EL) pipeline
 
 Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [loader](#add-a-loader-to-send-data-to-a-destination) are all set up, it's time to run your first data integration (EL) pipeline!
@@ -211,6 +213,7 @@ $ meltano run tap-github target-postgres
 <br />
 
 If everything was configured correctly, you should now see your data flow from your source into your destination!
+
 The postgres database should now have a schema `tap_github` with the table `commits` containing your data.
 
 ## Next Steps

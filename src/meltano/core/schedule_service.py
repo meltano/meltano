@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-import subprocess
+import typing as t
 from datetime import date, datetime
 
 from croniter import croniter
@@ -13,11 +13,15 @@ from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.project import Project
 from meltano.core.schedule import CRON_INTERVALS, Schedule
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
+
+if t.TYPE_CHECKING:
+    import subprocess
+
+    from meltano.core.project import Project
 
 
 class ScheduleAlreadyExistsError(MeltanoError):
@@ -188,7 +192,7 @@ class ScheduleService:  # noqa: WPS214
             settings_service = PluginSettingsService(self.project, extractor_plugin)
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
-            logging.debug(f"`start_date` not found in {extractor_plugin}.")
+            logging.debug(f"`start_date` not found in {extractor_plugin}.")  # noqa: G004
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

@@ -6,12 +6,8 @@ import typing as t
 from enum import Enum
 from urllib.parse import urlparse
 
-from sqlalchemy.orm import Session
-
 from meltano.core.db import project_engine
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.state_store.azure import AZStorageStateStoreManager
-from meltano.core.state_store.base import StateStoreManager
 from meltano.core.state_store.db import DBStateStoreManager
 from meltano.core.state_store.filesystem import (
     LocalFilesystemStateStoreManager,
@@ -19,6 +15,12 @@ from meltano.core.state_store.filesystem import (
 )
 from meltano.core.state_store.google import GCSStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.state_store.base import StateStoreManager
 
 
 class StateBackend(str, Enum):

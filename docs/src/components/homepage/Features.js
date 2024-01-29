@@ -46,19 +46,6 @@ const FeatureList = [
     },
   },
   {
-    title: 'Meltano Cloud',
-    Svg: require('@site/static/img/homepage/cloud.svg').default,
-    description: (
-      <>
-        Dive into the documentation for Meltano Cloud, the hosted version of Meltano Core.
-      </>
-    ),
-    link: {
-      title: 'Cloud Docs',
-      url: '/cloud',
-    },
-  },
-  {
     title: 'SDK',
     Svg: require('@site/static/img/homepage/sdk.svg').default,
     description: (

@@ -7,12 +7,14 @@ import typing as t
 import uuid
 from contextlib import suppress
 from pathlib import Path
-from types import TracebackType
 
 from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.tracking.schemas import ExceptionContextSchema
 from meltano.core.utils import hash_sha256
+
+if t.TYPE_CHECKING:
+    from types import TracebackType
 
 BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix)
 

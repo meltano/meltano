@@ -6,13 +6,13 @@ import typing as t
 from pathlib import Path
 
 import pytest
-from click import Command
 from click.testing import CliRunner
 
 from fixtures.utils import cd, tmp_project
 from meltano.core.project_files import ProjectFiles
 
 if t.TYPE_CHECKING:
+    from click import Command
     from click.testing import Result
 
     from fixtures.docker import SnowplowMicro

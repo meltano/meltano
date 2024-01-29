@@ -6,14 +6,16 @@ import logging
 import typing as t
 from collections import OrderedDict
 from copy import copy
-from os import PathLike
-from pathlib import Path
 
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
 from meltano.core.utils import deep_merge
+
+if t.TYPE_CHECKING:
+    from os import PathLike
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -154,7 +156,7 @@ class ProjectFiles:  # noqa: WPS214
                 try:
                     self._is_valid_include_path(path)
                 except InvalidIncludePathError as err:
-                    logger.critical(f"Include path '{path}' is invalid: \n {err}")
+                    logger.critical(f"Include path '{path}' is invalid: \n {err}")  # noqa: G004
                     raise err
                 include_paths.append(path)
             if self._meltano_file_path in include_paths:
@@ -177,7 +179,7 @@ class ProjectFiles:  # noqa: WPS214
             key_path_string = ":".join(key)
             existing_key_file_path = self._plugin_file_map.get(key)
             logger.critical(
-                f'Plugin with path "{key_path_string}" already added in '
+                f'Plugin with path "{key_path_string}" already added in '  # noqa: G004
                 f"file {existing_key_file_path}.",
             )
             raise Exception("Duplicate plugin name found.")
@@ -235,7 +237,7 @@ class ProjectFiles:  # noqa: WPS214
             try:
                 contents: CommentedMap = yaml.load(path)
             except YAMLError as exc:
-                logger.critical(f"Error while parsing YAML file: {path} \n {exc}")
+                logger.critical(f"Error while parsing YAML file: {path} \n {exc}")  # noqa: G004
                 raise exc
             else:
                 self._raw_contents_map[str(path)] = contents

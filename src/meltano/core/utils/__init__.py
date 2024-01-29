@@ -477,7 +477,12 @@ ENV_VAR_PATTERN = re.compile(
     re.VERBOSE,
 )
 
-Expandable = t.TypeVar("Expandable", str, t.Mapping[str, "Expandable"])
+Expandable = t.TypeVar(
+    "Expandable",
+    str,
+    t.Mapping[str, "Expandable"],
+    t.Sequence["Expandable"],
+)
 
 
 class EnvVarMissingBehavior(IntEnum):
@@ -523,7 +528,7 @@ def expand_env_vars(
     """  # noqa: DAR402
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, t.Mapping)):
+    if not isinstance(raw_value, (str, t.Mapping, list)):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -533,7 +538,7 @@ def expand_env_vars(
             val = str(env[var])
         except KeyError as ex:
             logger.debug(
-                f"Variable '${var}' is not set in the provided env dictionary.",
+                f"Variable '${var}' is not set in the provided env dictionary.",  # noqa: G004
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
@@ -541,7 +546,7 @@ def expand_env_vars(
                 return f"${{{var}}}"
             return ""
         if not val:
-            logger.debug(f"Variable '${var}' is empty.")
+            logger.debug(f"Variable '${var}' is empty.")  # noqa: G004
         return val
 
     return _expand_env_vars(raw_value, replacer, flat)
@@ -560,10 +565,19 @@ def _expand_env_vars(
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat)
-            if isinstance(v, (str, t.Mapping))
+            if isinstance(v, (str, t.Mapping, list))
             else v
             for k, v in raw_value.items()
         }
+    if isinstance(raw_value, list):
+        # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
+        # for lists anyway, so we don't support it here.
+        return [
+            _expand_env_vars(v, replacer, flat)
+            if isinstance(v, (str, t.Mapping, list))
+            else v
+            for v in raw_value
+        ]
     return ENV_VAR_PATTERN.sub(replacer, raw_value)
 
 

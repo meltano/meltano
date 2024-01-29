@@ -61,7 +61,7 @@ def handle_producer_line_length_limit_error(
         return
 
     logging.error(
-        "The extractor generated a message exceeding the message size limit "
+        "The extractor generated a message exceeding the message size limit "  # noqa: G004
         f"of {human_size(line_length_limit)} (half the buffer size "
         f"of {human_size(stream_buffer_size)}).",
     )

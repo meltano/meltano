@@ -3,22 +3,25 @@ from __future__ import annotations
 import asyncio
 import json
 import re
+import typing as t
 
 import pytest
 from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock
-from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.project import Project
 from meltano.core.project_plugins_service import (
     AmbiguousMappingName,
     PluginAlreadyAddedException,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.logging.job_logging_service import JobLoggingService
+    from meltano.core.project import Project
 
 
 class MockIOBlock(IOBlock):

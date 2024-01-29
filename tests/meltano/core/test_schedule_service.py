@@ -54,14 +54,14 @@ def create_job_schedule():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project_add_service):
+def custom_tap(project):
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
         namespace="tap_custom",
     )
     try:
-        return project_add_service.add_plugin(tap)
+        return project.plugins.add_to_file(tap)
     except PluginAlreadyAddedException as err:
         return err.plugin
 
