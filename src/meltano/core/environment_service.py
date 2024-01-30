@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from meltano.core.environment import Environment
-from meltano.core.project import Project
 from meltano.core.utils import find_named
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class EnvironmentAlreadyExistsError(Exception):

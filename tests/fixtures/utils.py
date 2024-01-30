@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import logging
 import os
+import typing as t
 from contextlib import contextmanager
-from pathlib import Path
 
 from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 @contextmanager
@@ -25,7 +28,7 @@ def cd(path: Path) -> Path:
 def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:
     project_init_service = ProjectInitService(name)
     blank_project = project_init_service.init()
-    logging.debug(f"Created new project at {blank_project.root}")
+    logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004
     os.remove(blank_project.meltanofile)
     compatible_copy_tree(source, blank_project.root)
     Project._default = None
@@ -36,4 +39,4 @@ def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:
             yield project
         finally:
             Project.deactivate()
-            logging.debug(f"Cleaned project at {project.root}")
+            logging.debug(f"Cleaned project at {project.root}")  # noqa: G004

@@ -460,7 +460,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `password`, `options`, `file`, `array`, `object`, and `hidden` (deprecated).
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 
 ```yaml
 settings:
@@ -477,8 +477,8 @@ settings:
 <br/>
 
 :::caution
-
   <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden</code></a>.</p>
+  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive</code></a>.</p>
 :::
 
 ### `settings[*].label`
@@ -494,6 +494,16 @@ settings:
 ### `settings[*].placeholder`
 
 Optional. Use to set the input's placeholder default.
+
+### `settings[*].sensitive`
+Optional. Use to mark a setting as sensitive (e.g. a password, token or code).
+
+```yaml
+settings:
+- name: setting_name
+  kind: string
+  sensitive: true
+```
 
 ### `settings[*].tooltip`
 

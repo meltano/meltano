@@ -5,11 +5,14 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import typing as t
 from abc import ABC, abstractmethod
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
-from meltano.core.plugin_invoker import PluginInvoker
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = logging.getLogger(__name__)
 
@@ -72,15 +75,15 @@ class ExtractorTestService(PluginTestService):
         try:
             process = await self.plugin_invoker.invoke_async(
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.STDOUT,
             )
         except Exception as exc:
             return False, str(exc)
 
         last_line = None
-        while not process.stdout.at_eof():
+        while process.stdout and not process.stdout.at_eof():
             data = await process.stdout.readline()
-            line = data.decode("ascii").strip()
+            line = data.decode("utf-8").strip()
             if line:
                 logger.debug(line)
                 last_line = line

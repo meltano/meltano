@@ -16,8 +16,10 @@ from meltano.core.logging.formatters import (
     TIMESTAMPER,
     rich_exception_formatter_factory,
 )
-from meltano.core.project import Project
 from meltano.core.utils import get_no_color_flag
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 LEVELS = {  # noqa: WPS407
     "debug": logging.DEBUG,
@@ -27,7 +29,9 @@ LEVELS = {  # noqa: WPS407
     "critical": logging.CRITICAL,
 }
 DEFAULT_LEVEL = "info"
-FORMAT = "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+FORMAT = (
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+)
 
 
 def parse_log_level(log_level: dict[str, int]) -> int:

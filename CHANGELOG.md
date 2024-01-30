@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.3.1 (2024-01-26)
+
+### 🐛 Fixes
+
+- [#8379](https://github.com/meltano/meltano/issues/8379) `--from-ref` for a plugin definition missing a `variant` -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#8378](https://github.com/meltano/meltano/issues/8378) Mention `--from-ref` in the custom extractor guide -- _**Thanks @ReubenFrankel!**_
+
+## v3.3.0 (2024-01-23)
+
+### ✨ New
+
+- [#8351](https://github.com/meltano/meltano/issues/8351) Warn if select rules are not used on catalog -- _**Thanks @haleemur!**_
+- [#8176](https://github.com/meltano/meltano/issues/8176) Add new `--update` flag to `meltano add` to re-add plugins to a project -- _**Thanks @ReubenFrankel!**_
+- [#7874](https://github.com/meltano/meltano/issues/7874) Add setting `sensitive` flag -- _**Thanks @ReubenFrankel!**_
+
+### 🐛 Fixes
+
+- [#8365](https://github.com/meltano/meltano/issues/8365) Retain stderr in `meltano config <plugin> test` -- _**Thanks @ReubenFrankel!**_
+- [#8354](https://github.com/meltano/meltano/issues/8354) Emit pip installation errors
+
+### ⚡ Performance Improvements
+
+- [#8343](https://github.com/meltano/meltano/issues/8343) Cache `Project.dotenv_env`
+
+### 📚 Documentation Improvements
+
+- [#8306](https://github.com/meltano/meltano/issues/8306) Add changelog updates
+
+## v3.2.0 (2023-12-05)
+
+## v3.2.0rc1 (2023-12-05)
+
+### ✨ New
+
+- [#8258](https://github.com/meltano/meltano/issues/8258) Add a `--merge-state` flag to `meltano run` to merge the current pipeline state with that of the latest run
+- [#8268](https://github.com/meltano/meltano/issues/8268) Expand environment variables in array setting values
+
+### 🐛 Fixes
+
+- [#8301](https://github.com/meltano/meltano/issues/8301) Interactive config now indicates that you're typing a redacted value -- _**Thanks @abastola0!**_
+
 ## v3.2.0b1 (2023-11-21)
 
 ### ✨ New

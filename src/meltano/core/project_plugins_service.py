@@ -10,15 +10,15 @@ from functools import cached_property
 
 import structlog
 
-from meltano.core.environment import EnvironmentPluginConfig
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import LockedDefinitionService
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundError
-from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
+    from meltano.core.environment import EnvironmentPluginConfig
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -225,7 +225,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         if "@" in plugin_name:
             plugin_name, profile_name = plugin_name.split("@", 2)
             logger.warning(
-                "Plugin configuration profiles are no longer supported, "
+                "Plugin configuration profiles are no longer supported, "  # noqa: G004
                 f"ignoring `@{profile_name}` in plugin name.",
             )
 
@@ -387,26 +387,37 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin):
+    def update_plugin(self, plugin: ProjectPlugin, keep_config: bool = False):
         """Update a plugin.
 
         Args:
             plugin: The plugin to update.
+            keep_config: Whether to keep the previous configuration for the updated
+                plugin.
 
         Returns:
-            The outdated plugin.
+            A tuple containing the updated and outdated plugins.
+
+        Raises:
+            PluginNotFoundError: If the plugin is not found.
         """
         with self.update_plugins() as plugins:
             # find the proper plugin to update
-            idx, outdated = next(
-                (idx, plg)
-                for idx, plg in enumerate(plugins[plugin.type])
-                if plg == plugin
-            )
+            try:
+                idx, outdated = next(
+                    (idx, plg)
+                    for idx, plg in enumerate(plugins[plugin.type])
+                    if plg == plugin
+                )
 
-            plugins[plugin.type][idx] = plugin
+                if keep_config:
+                    plugin.config_with_extras = outdated.config_with_extras
 
-            return outdated
+                plugins[plugin.type][idx] = plugin
+
+                return plugin, outdated
+            except StopIteration as stop:
+                raise PluginNotFoundError(plugin) from stop
 
     def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
         """Update a plugin configuration inside a Meltano environment.

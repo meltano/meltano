@@ -97,24 +97,24 @@ def discovery():  # noqa: WPS213
                             {
                                 "name": "oauth_credentials.client_id",
                                 "description": "The Google Analytics oauth client ID.",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client ID",
                             },
                             {
                                 "name": "oauth_credentials.client_secret",
                                 "description": "The Google Analytics oauth client secret.",  # noqa: E501
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client Secret",
                             },
                             {
                                 "name": "oauth_credentials.access_token",
                                 "description": "The Google Analytics oauth access token.",  # noqa: E501
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Access Token",
                             },
                             {
                                 "name": "oauth_credentials.refresh_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "description": "The Google Analytics oauth refresh token.",  # noqa: E501
                                 "label": "OAuth Refresh Token",
                             },
@@ -172,22 +172,22 @@ def discovery():  # noqa: WPS213
                             },
                             {
                                 "name": "oauth_credentials.client_id",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client ID",
                             },
                             {
                                 "name": "oauth_credentials.client_secret",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client Secret",
                             },
                             {
                                 "name": "oauth_credentials.access_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Access Token",
                             },
                             {
                                 "name": "oauth_credentials.refresh_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Refresh Token",
                             },
                             {
@@ -521,21 +521,21 @@ def discovery():  # noqa: WPS213
                         "settings": [
                             {
                                 "name": "developer_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "Developer Token",
                                 "description": "Your Developer Token for Google AdWord Application",  # noqa: E501
                                 "placeholder": "Ex. *****************",
                             },
                             {
                                 "name": "oauth_client_id",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client ID",
                                 "description": "Your Google OAuth Client ID",
                                 "placeholder": "Ex. 123456789012345.apps.googleusercontent.com",  # noqa: E501
                             },
                             {
                                 "name": "oauth_client_secret",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client Secret",
                                 "description": "Your Google OAuth Client Secret",
                                 "placeholder": "Ex. *****************",
@@ -807,21 +807,21 @@ def discovery():  # noqa: WPS213
                         "settings": [
                             {
                                 "name": "developer_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "Developer Token",
                                 "description": "Your Developer Token for Google AdWord Application",  # noqa: E501
                                 "placeholder": "Ex. *****************",
                             },
                             {
                                 "name": "oauth_client_id",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client ID",
                                 "description": "Your Google OAuth Client ID",
                                 "placeholder": "Ex. 123456789012345.apps.googleusercontent.com",  # noqa: E501
                             },
                             {
                                 "name": "oauth_client_secret",
-                                "kind": "password",
+                                "sensitive": True,
                                 "label": "OAuth Client Secret",
                                 "description": "Your Google OAuth Client Secret",
                                 "placeholder": "Ex. *****************",
@@ -934,7 +934,7 @@ def discovery():  # noqa: WPS213
                             },
                             {
                                 "name": "private_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "value": "",
                                 "label": "Access Token",
                                 "description": "GitLab personal access token or other API token.",  # noqa: E501
@@ -998,7 +998,7 @@ def discovery():  # noqa: WPS213
                             },
                             {
                                 "name": "private_token",
-                                "kind": "password",
+                                "sensitive": True,
                                 "value": "",
                                 "label": "Access Token",
                                 "description": "GitLab personal access token or other API token.",  # noqa: E501
@@ -1058,7 +1058,7 @@ def discovery():  # noqa: WPS213
                         "settings": [
                             {"name": "test", "value": "mock"},
                             {"name": "start_date"},
-                            {"name": "secure", "kind": "password"},
+                            {"name": "secure", "sensitive": True},
                             {"name": "port", "kind": "integer", "value": 5000},
                             {"name": "list", "kind": "array", "value": []},
                             {
@@ -1070,7 +1070,7 @@ def discovery():  # noqa: WPS213
                             {"name": "hidden", "kind": "hidden", "value": 42},
                             {"name": "boolean", "kind": "boolean"},
                             {"name": "auth.username"},
-                            {"name": "auth.password", "kind": "password"},
+                            {"name": "auth.password", "sensitive": True},
                             {
                                 "name": "aliased",
                                 "kind": "string",
@@ -1306,7 +1306,7 @@ def discovery():  # noqa: WPS213
                             },
                             {
                                 "name": "password",
-                                "kind": "password",
+                                "sensitive": True,
                                 "description": "PostgreSQL password",
                                 "label": "Password",
                             },
@@ -1431,7 +1431,7 @@ def discovery():  # noqa: WPS213
                             {"name": "postgres_port", "kind": "integer", "value": 5432},
                             {"name": "postgres_database"},
                             {"name": "postgres_username"},
-                            {"name": "postgres_password", "kind": "password"},
+                            {"name": "postgres_password", "sensitive": True},
                             {
                                 "name": "postgres_schema",
                                 "aliases": ["schema"],
@@ -1556,7 +1556,7 @@ def discovery():  # noqa: WPS213
                             },
                             {
                                 "name": "password",
-                                "kind": "password",
+                                "sensitive": True,
                                 "value": "warehouse",
                             },
                             {
@@ -1765,7 +1765,7 @@ def discovery():  # noqa: WPS213
                     },
                     {
                         "name": "SECRET_KEY",
-                        "kind": "password",
+                        "sensitive": True,
                         "value": "thisisnotapropersecretkey",
                     },
                 ],
@@ -2072,7 +2072,7 @@ def job_logging_service(project):
 @contextmanager
 def project_directory(project_init_service):
     project = project_init_service.init()
-    logging.debug(f"Created new project at {project.root}")
+    logging.debug(f"Created new project at {project.root}")  # noqa: G004
 
     # empty out the `plugins`
     with project.meltano_update() as meltano:
@@ -2087,7 +2087,7 @@ def project_directory(project_init_service):
         yield project
     finally:
         Project.deactivate()
-        logging.debug(f"Cleaned project at {project.root}")
+        logging.debug(f"Cleaned project at {project.root}")  # noqa: G004
 
 
 @pytest.fixture(scope="class")

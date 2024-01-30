@@ -9,11 +9,9 @@ import os
 import re
 import typing as t
 import uuid
-from collections.abc import Mapping
 from contextlib import contextmanager, suppress
 from datetime import datetime
 from enum import Enum, auto
-from pathlib import Path
 from urllib.parse import urlparse
 from warnings import warn
 
@@ -21,7 +19,6 @@ import structlog
 import tzlocal
 from psutil import Process
 
-from meltano.core.project import Project
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,
@@ -31,6 +28,10 @@ from meltano.core.tracking.schemas import (
 from meltano.core.utils import format_exception
 
 if t.TYPE_CHECKING:
+    from collections.abc import Mapping
+    from pathlib import Path
+
+    from meltano.core.project import Project
     from meltano.core.tracking.contexts import (  # noqa: F401
         CliEvent,
         EnvironmentContext,
@@ -41,20 +42,21 @@ from functools import cached_property
 
 logger = structlog.get_logger(__name__)
 
-# Supress these imports from snowplow_tracker if tracking is disabled
+# Suppress these imports from snowplow_tracker if tracking is disabled
 # It helps to resolve issues related to import conflicts -
 # snowplow-tracker vs. minimal-snowplow tracker
 SNOWPLOW_TRACKER_AVAILABLE = False
 try:
-    from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
+    from snowplow_tracker import (
+        Emitter,
+        SelfDescribing,
+        SelfDescribingJson,  # type: ignore
+    )
     from snowplow_tracker import Tracker as SnowplowTracker
 
     SNOWPLOW_TRACKER_AVAILABLE = True
-except Exception as e:
-    logger.warning(
-        "Import of snowplow_tracker failed. "
-        f"Disable tracking to fix it. Reason: {str(e)}",
-    )
+except Exception:
+    logger.exception("Import of `snowplow_tracker` failed. Disable tracking to fix it.")
 
     class SelfDescribingJson:
         """A self-describing JSON object.

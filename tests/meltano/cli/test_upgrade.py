@@ -3,16 +3,19 @@ from __future__ import annotations
 import json
 import platform
 import shutil
+import typing as t
 
 import boto3
 import mock
 import pytest
-from click.testing import CliRunner
-from moto import mock_s3
+from moto import mock_aws
 
 import meltano
 from asserts import assert_cli_runner
 from meltano.cli import cli
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
 
 
 class TestCliUpgrade:
@@ -209,7 +212,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
 
-    @mock_s3
+    @mock_aws
     @pytest.mark.usefixtures("project")
     def test_upgrade_state(self, cli_runner, monkeypatch):
         state_ids = [f"dev:tap-{i}-to-target-{i}" for i in range(10)]

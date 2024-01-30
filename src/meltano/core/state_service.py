@@ -11,12 +11,14 @@ import json
 import typing as t
 
 import structlog
-from sqlalchemy.orm import Session
 
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import SINGER_STATE_KEY, JobState
 from meltano.core.project import Project
 from meltano.core.state_store import state_store_manager_from_project_settings
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 logger = structlog.getLogger(__name__)
 
@@ -133,7 +135,7 @@ class StateService:  # noqa: WPS214
         state_to_add_to.payload_flags = payload_flags
         state_to_add_to.save(self.session)
         logger.debug(
-            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",
+            f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",  # noqa: G004
         )
         partial_state = (
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}

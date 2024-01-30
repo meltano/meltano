@@ -7,24 +7,25 @@ import json
 import logging
 import shutil
 import sys
-from asyncio.streams import StreamReader
+import typing as t
 from contextlib import suppress
+from functools import lru_cache, reduce
 from hashlib import sha1
 from io import StringIO
-from pathlib import Path
+from itertools import takewhile
 
 import structlog
 from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from meltano.core.utils import file_has_data, flatten
 
 from . import PluginType, SingerPlugin
 from .catalog import (
+    CatalogDict,
     MetadataExecutor,
     MetadataRule,
     SchemaExecutor,
@@ -34,11 +35,17 @@ from .catalog import (
     select_metadata_rules,
 )
 
+if t.TYPE_CHECKING:
+    from asyncio.streams import StreamReader
+    from pathlib import Path
+
+    from meltano.core.plugin_invoker import PluginInvoker
+
 logger = structlog.getLogger(__name__)
 
 
 async def _stream_redirect(
-    stream: asyncio.StreamReader,
+    stream: asyncio.StreamReader | None,
     *file_like_objs,
     write_str=False,
 ):
@@ -50,7 +57,7 @@ async def _stream_redirect(
         write_str: if True, stream is written as str
     """
     encoding = sys.getdefaultencoding()
-    while not stream.at_eof():
+    while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
             file_like_obj.write(data.decode(encoding) if write_str else data)
@@ -198,7 +205,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             elif "properties" in plugin_invoker.capabilities:
                 args += ["--properties", catalog_path]
             else:
-                logger.warn(
+                logger.warning(
                     "A catalog file was found, but it will be ignored as the "
                     "extractor does not advertise the `catalog` or "
                     "`properties` capability",
@@ -209,7 +216,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             if "state" in plugin_invoker.capabilities:
                 args += ["--state", state_path]
             else:
-                logger.warn(
+                logger.warning(
                     "A state file was found, but it will be ignored as the "
                     "extractor does not advertise the `state` capability",
                 )
@@ -299,7 +306,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
             try:
                 shutil.copy(custom_state_path, state_path)
-                logger.info(f"Found state in {custom_state_filename}")
+                logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find state file {custom_state_path}",
@@ -377,7 +384,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
             try:
                 shutil.copy(custom_catalog_path, catalog_path)
-                logger.info(f"Found catalog in {custom_catalog_path}")
+                logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find catalog file {custom_catalog_path}",
@@ -459,7 +466,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # noqa: RSE102
+                        raise failed_future.exception()  # type: ignore[misc] # noqa: RSE102
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
@@ -550,10 +557,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 catalog = json.load(catalog_file)
 
             if schema_rules:
-                SchemaExecutor(schema_rules).visit(catalog)
+                SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
 
             if metadata_rules:
-                MetadataExecutor(metadata_rules).visit(catalog)
+                self.warn_property_not_found(metadata_rules, catalog)
+                MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
             with catalog_path.open("w") as catalog_f:
                 json.dump(catalog, catalog_f, indent=2)
@@ -611,3 +619,64 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         key_json = json.dumps(key_dict)
 
         return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324
+
+    @staticmethod
+    @lru_cache
+    def _warn_missing_stream(stream_id: str):
+        logger.warning(
+            "Stream `%s` was not found in the catalog",  # noqa: WPS323
+            stream_id,
+        )
+
+    @staticmethod
+    @lru_cache
+    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]):
+        logger.warning(
+            "Property `%s` was not found in the schema of stream `%s`",  # noqa: E501, WPS323
+            ".".join(breadcrumb[1:]),
+            stream_id,
+        )
+
+    def warn_property_not_found(  # noqa: C901
+        self,
+        rules: list[MetadataRule],
+        catalog: CatalogDict,
+    ):
+        """Validate MetadataRules conforms to discovered Catalog.
+
+        Validate MetadataRules against the tap's discovered Catalog & emit
+        warnings for each rule that does not match any property in catalog.
+
+        The method is intentionally written in a defensive manner so as not to
+        raise exceptions. e.g.
+            * use dict.get rather than []-accessor
+            * filter list comprehensions to remove some elements that should
+              not be used for validation
+
+        Args:
+            rules: List of `MetadataRule`
+            catalog: Discovered Source Catalog
+        """
+        stream_dict = {
+            stream.get("tap_stream_id"): stream
+            for stream in catalog.get("streams", [])
+            if isinstance(stream, dict)
+        }
+
+        def is_not_star(x):
+            return "*" not in x
+
+        def dict_get(dictionary, key):
+            return dictionary.get(key, {})
+
+        for rule in rules:
+            if isinstance(rule.tap_stream_id, list) or "*" in rule.tap_stream_id:
+                continue
+            if not (s := stream_dict.get(rule.tap_stream_id)):
+                self._warn_missing_stream(rule.tap_stream_id)
+                continue
+            path = tuple(takewhile(is_not_star, rule.breadcrumb))
+            if len(path) <= 1:
+                continue
+            if not reduce(dict_get, path, s.get("schema", {})):
+                self._warn_missing_property(rule.tap_stream_id, tuple(rule.breadcrumb))

@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import structlog
 
 from meltano.core.behavior.hookable import hook
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 
 from . import PluginType, SingerPlugin
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
 

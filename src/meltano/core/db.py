@@ -8,14 +8,17 @@ import typing as t
 from urllib.parse import urlparse
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 from sqlalchemy.sql import text
 
 from meltano.core.error import MeltanoError
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine import Connection, Engine
+
+    from meltano.core.project import Project
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
@@ -87,7 +90,7 @@ def project_engine(
         + (parsed_db_uri.hostname or ""),
     ).geturl()
     logging.debug(
-        f"Creating DB engine for project at {str(project.root)!r} "
+        f"Creating DB engine for project at {str(project.root)!r} "  # noqa: G004
         f"with DB URI {sanitized_db_uri!r}",
     )
 
@@ -140,13 +143,13 @@ def connect(
         except OperationalError:
             if attempt >= max_retries:
                 logging.error(
-                    f"Could not connect to the database after {attempt} "
+                    f"Could not connect to the database after {attempt} "  # noqa: G004
                     "attempts. Max retries exceeded.",
                 )
                 raise
             attempt += 1
             logging.info(
-                f"DB connection failed. Will retry after {retry_timeout}s. "
+                f"DB connection failed. Will retry after {retry_timeout}s. "  # noqa: G004
                 f"Attempt {attempt}/{max_retries}",
             )
             time.sleep(retry_timeout)
@@ -207,9 +210,9 @@ def ensure_schema_exists(
             conn.execute(grant_select_schema)
             conn.execute(grant_usage_schema)
 
-    logging.info(f"Schema {schema_name} has been created successfully.")
+    logging.info(f"Schema {schema_name} has been created successfully.")  # noqa: G004
     for role in grant_roles:
-        logging.info(f"Usage has been granted for role: {role}.")
+        logging.info(f"Usage has been granted for role: {role}.")  # noqa: G004
 
 
 def check_database_compatibility(engine: Engine) -> None:

@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import sys
+import typing as t
 
-from meltano.core.elt_context import ELTContext
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker
 
 from . import Runner, RunnerError
+
+if t.TYPE_CHECKING:
+    from meltano.core.elt_context import ELTContext
+    from meltano.core.plugin_invoker import PluginInvoker
 
 
 class DbtRunner(Runner):

@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import typing as t
-from asyncio.streams import StreamReader
-from asyncio.subprocess import Process
 from enum import Enum
 
 if t.TYPE_CHECKING:
+    from asyncio.streams import StreamReader
+    from asyncio.subprocess import Process
+
     from meltano.core.project import Project
 
 

@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: weekly
       time: "12:00"
-      timezone: "UTC"
+      timezone: "Etc/UTC"
       day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
@@ -21,15 +21,14 @@ updates:
     schedule:
       interval: weekly
       time: "12:00"
-      timezone: "UTC"
+      timezone: "Etc/UTC"
       day: monday
     reviewers: [meltano/engineering]
     labels: [deps]
     groups:
-      default:
-        update-types:
-        - "minor"
-        - "patch"
+      actions:
+        patterns:
+          - "*"
     commit-message:
       prefix: "ci: "
   - package-ecosystem: pip
@@ -38,7 +37,7 @@ updates:
     schedule:
       interval: weekly
       time: "12:00"
-      timezone: "UTC"
+      timezone: "Etc/UTC"
       day: monday
     reviewers: [meltano/engineering]
     labels: [deps]

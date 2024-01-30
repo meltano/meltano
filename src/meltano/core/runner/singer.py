@@ -4,13 +4,16 @@ import asyncio
 import logging
 import subprocess
 import sys
+import typing as t
 
-from meltano.core.elt_context import ELTContext
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner import Runner, RunnerError
 from meltano.core.utils import human_size
+
+if t.TYPE_CHECKING:
+    from meltano.core.elt_context import ELTContext
+    from meltano.core.plugin_invoker import PluginInvoker
 
 
 class SingerRunner(Runner):
@@ -21,11 +24,11 @@ class SingerRunner(Runner):
         while True:
             try:
                 code = process.wait(**wait_args)
-                logging.debug(f"{process} exited with {code}")
+                logging.debug(f"{process} exited with {code}")  # noqa: G004
                 return code
             except subprocess.TimeoutExpired:
                 process.kill()
-                logging.error(f"{process} was killed.")
+                logging.error(f"{process} was killed.")  # noqa: G004
 
     async def invoke(  # noqa: WPS210, WPS213, WPS217, WPS231, WPS238
         self,
@@ -199,8 +202,8 @@ class SingerRunner(Runner):
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
-        logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")
-        logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")
+        logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
+        logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
     async def run(
         self,
@@ -243,7 +246,7 @@ class SingerRunner(Runner):
             return
 
         logging.error(
-            f"The extractor generated a message exceeding the message size "
+            f"The extractor generated a message exceeding the message size "  # noqa: G004
             f"limit of {human_size(line_length_limit)} (half the buffer size "
             f"of {human_size(stream_buffer_size)}).",
         )

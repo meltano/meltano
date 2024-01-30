@@ -1,9 +1,11 @@
 """Storage managers for job state."""
 from __future__ import annotations
 
+import typing as t
 from abc import ABC, abstractmethod, abstractproperty
 
-from meltano.core.job_state import JobState
+if t.TYPE_CHECKING:
+    from meltano.core.job_state import JobState
 
 
 class UnsupportedStateBackendURIError(Exception):

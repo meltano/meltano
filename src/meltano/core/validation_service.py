@@ -6,11 +6,13 @@ import typing as t
 from abc import ABCMeta, abstractmethod
 from enum import Enum
 
-from sqlalchemy.orm.session import sessionmaker
-
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
-from meltano.core.project import Project
+
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm.session import sessionmaker
+
+    from meltano.core.project import Project
 
 EXIT_CODE_OK = 0
 

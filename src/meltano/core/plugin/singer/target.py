@@ -1,4 +1,5 @@
 """SingerTarget and supporting classes."""
+
 from __future__ import annotations
 
 import json
@@ -8,7 +9,6 @@ from datetime import datetime
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
@@ -16,6 +16,8 @@ from . import PluginType, SingerPlugin
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
+
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = logging.getLogger(__name__)
 
@@ -84,8 +86,8 @@ class BookmarkWriter:
                 "incremental state has not been updated",
             )
         else:
-            logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")
-            logger.debug(f"Incremental state: {new_state}")
+            logger.info(f"Incremental state has been updated at {datetime.utcnow()}.")  # noqa: G004
+            logger.debug(f"Incremental state: {new_state}")  # noqa: G004
 
 
 class SingerTarget(SingerPlugin):

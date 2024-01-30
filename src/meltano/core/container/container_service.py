@@ -8,10 +8,10 @@ import typing as t
 
 from structlog.stdlib import get_logger
 
-from meltano.core.container.container_spec import ContainerSpec
-
 if t.TYPE_CHECKING:
     from aiodocker.containers import DockerContainer
+
+    from meltano.core.container.container_spec import ContainerSpec
 
 
 logger = get_logger(__name__)

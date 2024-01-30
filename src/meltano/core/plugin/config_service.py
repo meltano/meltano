@@ -3,9 +3,11 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import typing as t
 from pathlib import Path
 
-from meltano.core.plugin.project_plugin import ProjectPlugin
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class PluginConfigService:
@@ -46,7 +48,7 @@ class PluginConfigService:
                 stubbed.append(dst)
             except FileNotFoundError:
                 logging.debug(
-                    f"Could not find {src.name} in {src.resolve()}, skipping.",
+                    f"Could not find {src.name} in {src.resolve()}, skipping.",  # noqa: G004
                 )
 
         return stubbed

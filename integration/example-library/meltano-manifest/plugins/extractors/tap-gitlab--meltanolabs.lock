@@ -35,7 +35,7 @@
     },
     {
       "name": "private_token",
-      "kind": "password",
+      "sensitive": true,
       "value": "",
       "label": "Access Token",
       "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",

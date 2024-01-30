@@ -342,6 +342,21 @@ plugins:
 Note that the `--inherit-from` option and `inherit_from` property can also be used to
 [explicitly inherit from a discoverable plugin](#explicit-inheritance).
 
+### Updating plugins
+
+You can update a plugin in your project using the `--update` option. Updating a plugin will re-add it to your project - that is:
+
+- Update the plugin lock file (the same as [`meltano lock --update`](/reference/command-line-interface#lock) would)
+- Update the plugin entry in the `meltano.yml`, without overwriting any user-defined [config](/concepts/project#plugin-configuration) or [extras](/guide/configuration#plugin-extras)
+
+
+```bash
+meltano add --update <type> <name>
+
+# For example:
+meltano add --update extractor tap-gitlab
+```
+
 ## Installing your project's plugins
 
 Whenever you add a new plugin to a Meltano project using [`meltano add`](/reference/command-line-interface#add),

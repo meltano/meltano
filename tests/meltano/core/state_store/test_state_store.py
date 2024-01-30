@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import shutil
-from pathlib import Path
+import typing as t
 
 import pytest
 from azure.identity import DefaultAzureCredential
@@ -11,7 +11,6 @@ from azure.storage.blob._shared.authentication import (  # noqa: WPS436
 )
 
 from meltano.core.error import MeltanoError
-from meltano.core.project import Project
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
     DBStateStoreManager,
@@ -21,6 +20,11 @@ from meltano.core.state_store import (
     StateBackend,
     state_store_manager_from_project_settings,
 )
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.project import Project
 
 
 class TestSystemDBStateBackend:
@@ -137,8 +141,7 @@ class TestS3StateBackend:
         assert s3_state_store.prefix == "/some/path"
         assert s3_state_store.aws_access_key_id == "aws_access_key_id"  # noqa: S105
         assert (
-            s3_state_store.aws_secret_access_key
-            == "aws_secret_access_key"  # noqa: S105
+            s3_state_store.aws_secret_access_key == "aws_secret_access_key"  # noqa: S105
         )
 
         # AWS S3 (credentials provided directly)
@@ -160,6 +163,5 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store_direct_creds, S3StateStoreManager)
         assert s3_state_store_direct_creds.aws_access_key_id == "a_different_id"
         assert (
-            s3_state_store_direct_creds.aws_secret_access_key
-            == "a_different_key"  # noqa: S105
+            s3_state_store_direct_creds.aws_secret_access_key == "a_different_key"  # noqa: S105
         )

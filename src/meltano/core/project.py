@@ -26,7 +26,6 @@ from meltano.core.error import (
     ProjectReadonly,
 )
 from meltano.core.hub import MeltanoHubService
-from meltano.core.plugin.base import PluginRef
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -34,6 +33,7 @@ from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
+    from meltano.core.plugin.base import PluginRef
 
 
 logger = logging.getLogger(__name__)
@@ -207,7 +207,7 @@ class Project(Versioned):  # noqa: WPS214
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
                         logger.warning(
-                            "Could not create symlink: meltano.exe not "
+                            "Could not create symlink: meltano.exe not "  # noqa: G004
                             f"present in {str(Path(sys.executable).parent)}",
                         )
                 else:
@@ -224,13 +224,13 @@ class Project(Versioned):  # noqa: WPS214
         except OSError as error:
             if error.errno == errno.EOPNOTSUPP:
                 logger.warning(
-                    f"Could not create symlink: {error}\nPlease make sure "
+                    f"Could not create symlink: {error}\nPlease make sure "  # noqa: G004
                     "that the underlying filesystem supports symlinks.",
                 )
             else:
                 raise
 
-        logger.debug(f"Activated project at {project.root}")
+        logger.debug("Activated project at %s", project.root)
 
         # set the default project
         cls._default = project
@@ -372,7 +372,7 @@ class Project(Versioned):  # noqa: WPS214
         """
         return self.root.joinpath(".env")
 
-    @property
+    @cached_property
     def dotenv_env(self):
         """Get values from this project's .env file.
 
@@ -391,7 +391,7 @@ class Project(Versioned):  # noqa: WPS214
         """
         if getattr(self.environment, "name", object()) != name:
             self.refresh(environment=Environment.find(self.meltano.environments, name))
-        logger.info(f"Environment {name!r} is active")
+        logger.info(f"Environment {name!r} is active")  # noqa: G004
 
     def deactivate_environment(self) -> None:
         """Deactivate the currently active environment."""

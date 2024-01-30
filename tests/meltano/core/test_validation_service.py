@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import typing as t
+
 import pytest
 from mock import Mock
 
 from meltano.core.plugin import PluginType
-from meltano.core.project import Project
 from meltano.core.validation_service import ValidationsRunner
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
 
 
 class MockValidationsRunner(ValidationsRunner):
