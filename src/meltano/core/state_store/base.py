@@ -21,7 +21,7 @@ class StateIDLockedError(Exception):
     """A job attempted to acquire a lock on an already-locked state ID."""
 
 
-class StateStoreManager(ABC):
+class StateStoreManager(ABC):  # noqa: WPS214
     """Base state store manager."""
 
     def __init__(self, **kwargs):  # noqa: B027
@@ -86,3 +86,11 @@ class StateStoreManager(ABC):
             state_id: the state_id to lock
         """
         ...
+
+    def get_all(self) -> list[JobState]:
+        """Get all state for all state_ids.
+
+        Raises:
+            NotImplementedError: always, this is an abstract method
+        """
+        raise NotImplementedError

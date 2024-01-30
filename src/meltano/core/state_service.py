@@ -59,6 +59,14 @@ class StateService:  # noqa: WPS214
             for state_id in self.state_store_manager.get_state_ids(state_id_pattern)
         }
 
+    def get_all_states(self) -> list[JobState]:
+        """Get all job states.
+
+        Returns:
+            List of all job states
+        """
+        return self.state_store_manager.get_all()
+
     def _get_or_create_job(self, job: Job | str) -> Job:
         """If Job is passed, return it. If state_id is passed, create new and return.
 
