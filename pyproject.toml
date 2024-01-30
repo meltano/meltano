@@ -166,6 +166,7 @@ include = ["src/meltano"]
 
 [tool.pytest.ini_options]
 addopts = [
+  "--color=yes",
   "--doctest-modules",
   "-ra",
   "--strict-config",

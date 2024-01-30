@@ -151,3 +151,18 @@ class DBStateStoreManager(StateStoreManager):
         Args:
             state_id: the state_id to unlock
         """
+
+    def get_all(self) -> list[MeltanoState]:
+        """Get all job states.
+
+        Returns:
+            List of all job states
+        """
+        return [
+            MeltanoState(
+                state_id=job_state.state_id,
+                partial_state=job_state.partial_state,
+                completed_state=job_state.completed_state,
+            )
+            for job_state in self.session.query(JobState).all()
+        ]

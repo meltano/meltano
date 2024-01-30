@@ -23,6 +23,8 @@ from meltano.core.job import Payload
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 if t.TYPE_CHECKING:
+    import pathlib
+
     from meltano.core.project import Project
 
 STATE_SERVICE_KEY = "state_service"
@@ -392,3 +394,57 @@ def clear_state(
         count = state_service.clear_all_states()
         msg = f"{count} state(s) were successfully cleared"
         logger.info(msg)
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="export")
+@click.option(
+    "--output-file",
+    type=click.Path(),
+    help="Export state to a JSON file.",
+)
+@pass_project(migrate=True)
+@click.pass_context
+def export_state(
+    ctx: click.Context,
+    project: Project,  # noqa: ARG001
+    output_file: pathlib.Path | None,
+) -> None:
+    """Export state."""
+    state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+    try:
+        states = state_service.get_all_states()
+    except NotImplementedError:
+        click.secho("State export is not supported for this state backend.", fg="red")
+        return
+
+    states_mapping = {
+        state.state_id: {
+            "completed": state.completed_state,
+            "partial": state.partial_state,
+        }
+        for state in states
+    }
+
+    if output_file:
+        with output_file.open("w") as state_f:
+            json.dump(states_mapping, state_f)
+    else:
+        click.echo(json.dumps(states_mapping))
+
+
+@meltano_state.command(cls=InstrumentedCmd, name="import")
+@click.option(
+    "--input-file",
+    type=click.File("r"),
+    help="Import state from a JSON file.",
+)
+@pass_project(migrate=True)
+@click.pass_context
+def import_state(
+    ctx: click.Context,
+    project: Project,
+    input_file: t.TextIO,
+) -> None:
+    """Import state."""
+    msg = "Importing state is not yet supported."
+    raise NotImplementedError(msg)
