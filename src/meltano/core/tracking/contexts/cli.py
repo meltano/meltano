@@ -4,9 +4,9 @@ from __future__ import annotations
 from enum import Enum, auto
 
 import click
-from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.tracking.schemas import CliContextSchema
+from meltano.core.tracking.tracker import SelfDescribingJson
 from meltano.core.utils import hash_sha256
 
 
