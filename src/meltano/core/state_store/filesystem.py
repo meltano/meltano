@@ -588,3 +588,18 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
             ):
                 state_ids.add(state_id)
         return list(state_ids)
+
+    def get_all(self) -> list[JobState]:
+        """Get all state stored in the backend.
+
+        Returns:
+            List of JobStates
+        """
+        states = []
+        for filepath in self.list_all_files():
+            (state_id, filename) = filepath.split("/")[-2:]
+            if filename == "state.json":
+                with self.get_reader(filepath) as reader:
+                    states.append(JobState.from_file(state_id, reader))
+
+        return states
