@@ -29,6 +29,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  FORCE_COLOR: 1
+
 jobs:
   tests:
     strategy:
@@ -97,9 +100,9 @@ jobs:
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }}) (${{ matrix.markers || 'not concurrent' }})"
     runs-on: ${{ matrix.os }}
     env:
-      PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
       FORCE_COLOR: 1
       NOXFORCEPYTHON: ${{ matrix.python-version }}
+      PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
 
     steps:
     - name: Check out the repository
@@ -311,8 +314,6 @@ jobs:
   mypy:
     name: "Static type checking"
     runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
 
     steps:
     - name: Check out the repository

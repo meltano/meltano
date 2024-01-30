@@ -191,3 +191,11 @@ class StateStoreManager(ABC):
             retry_seconds: the number of seconds to wait before retrying
         """
         ...
+
+    def get_all(self) -> list[MeltanoState]:
+        """Get all state for all state_ids.
+
+        Raises:
+            NotImplementedError: always, this is an abstract method
+        """
+        raise NotImplementedError

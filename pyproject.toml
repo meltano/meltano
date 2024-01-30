@@ -143,6 +143,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [tool.pytest.ini_options]
 addopts = [
+  "--color=yes",
   "--cov=meltano",
   "--cov=tests",
   "--doctest-modules",
