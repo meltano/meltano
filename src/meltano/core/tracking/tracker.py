@@ -55,7 +55,7 @@ try:
     from snowplow_tracker import Tracker as SnowplowTracker
 
     SNOWPLOW_TRACKER_AVAILABLE = True
-except Exception:
+except Exception:  # pragma: no cover
     logger.exception("Import of `snowplow_tracker` failed. Disable tracking to fix it.")
 
     class SelfDescribingJson:
