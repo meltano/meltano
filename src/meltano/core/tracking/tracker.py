@@ -165,11 +165,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
 
+        emitters: list[Emitter] = []
+
         # Supress errors when instantiating Emmiters
         # It helps to resolve issues related to import conflicts -
         # snowplow-tracker vs. minimal-snowplow tracker
         if SNOWPLOW_TRACKER_AVAILABLE:
-            emitters: list[Emitter] = []
             for endpoint in endpoints:
                 if not check_url(endpoint):
                     logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
@@ -187,7 +188,6 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             logger.warning(
                 "Snowplow tracker is not available, setting emitters to empty list",
             )
-            emitters = []
 
         if emitters:
             self.snowplow_tracker = SnowplowTracker(
