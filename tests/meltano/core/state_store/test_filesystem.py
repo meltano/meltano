@@ -136,6 +136,7 @@ class TestLocalFilesystemStateStoreManager:
                 "w+",
             ).close()
         assert set(dev_ids + prod_ids) == set(subject.get_state_ids())
+        assert set(dev_ids) == set(subject.get_state_ids(pattern="dev*"))
 
     def test_get(
         self,
