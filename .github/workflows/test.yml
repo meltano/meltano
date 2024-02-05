@@ -288,6 +288,8 @@ jobs:
         nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
       uses: codecov/codecov-action@v4.0.1
 
   mypy:
