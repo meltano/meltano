@@ -197,15 +197,17 @@ class SubprocessOutputWriter(t.Protocol):
 
 async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
     # StreamWriters like a subprocess's stdin need special consideration
-    def _decode_log(byte_string):  #8377
-        encodings = ['latin-1']  # list of encoding we need to consider; default is utf-8
+    def _decode_log(byte_string):  # 8377
+        encodings = [
+            "latin-1"
+        ]  # list of encoding we need to consider; default is utf-8
         for enc in encodings:
             try:
                 return byte_string.decode(enc)
-            except UnicodeDecodeError as e:
+            except UnicodeDecodeError:
                 pass
         else:
-            return byte_string.decode('utf-8', errors='ignore')
+            return byte_string.decode("utf-8", errors="ignore")
 
     if isinstance(writer, asyncio.StreamWriter):
         try:
