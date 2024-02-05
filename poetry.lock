@@ -358,13 +358,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.30"
-description = "Type annotations for boto3 1.34.30 generated with mypy-boto3-builder 7.23.1"
+version = "1.34.34"
+description = "Type annotations for boto3 1.34.34 generated with mypy-boto3-builder 7.23.1"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-stubs-1.34.30.tar.gz", hash = "sha256:338e588a5e658484b87b084a3703cb5b5b35eb10892e66be1e15e9e730da850d"},
-    {file = "boto3_stubs-1.34.30-py3-none-any.whl", hash = "sha256:229afc0cdbe426894fcc526bba76b8d6ebaa3e7f9be01b3ba23fe1a466fb07b7"},
+    {file = "boto3-stubs-1.34.34.tar.gz", hash = "sha256:96789d5bdbd9ee10dca6512c7707a07cf52ef7b1aeab792a942c7d6b1317d3dc"},
+    {file = "boto3_stubs-1.34.34-py3-none-any.whl", hash = "sha256:21da2f7f68205c1f5ec05e09709ec4b3f97ffcdb5e5f09e0ece7a1f36ad797cf"},
 ]
 
 [package.dependencies]
@@ -421,7 +421,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.30)", "botocore (==1.34.30)"]
+boto3 = ["boto3 (==1.34.34)", "botocore (==1.34.34)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -1664,13 +1664,13 @@ test = ["objgraph", "psutil"]
 
 [[package]]
 name = "hypothesis"
-version = "6.97.1"
+version = "6.98.1"
 description = "A library for property-based testing"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.97.1-py3-none-any.whl", hash = "sha256:02c06828bb73303a4b6c1735f62af055553a9395f2dadd711d8322aa569b8279"},
-    {file = "hypothesis-6.97.1.tar.gz", hash = "sha256:73bbe3c9f5ee647ed0bcf5fc5a4b752391142583a6bdb7825ac8ddc1339a6618"},
+    {file = "hypothesis-6.98.1-py3-none-any.whl", hash = "sha256:84c241a2df1fc3c08c24d179990e204e6b8ba03ddd3604a4341d3d02de4cb550"},
+    {file = "hypothesis-6.98.1.tar.gz", hash = "sha256:0a0f227b3dd095e2240a90569afc05965f6feffc0f036d3bc7adc4d460c80817"},
 ]
 
 [package.dependencies]
@@ -1988,13 +1988,13 @@ test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "moto"
-version = "5.0.0"
+version = "5.0.1"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "moto-5.0.0-py2.py3-none-any.whl", hash = "sha256:1d01de681da1453335ec09ba43db521e577cbd58d25ddfb61e5965534b8be539"},
-    {file = "moto-5.0.0.tar.gz", hash = "sha256:4a94a147ee70e85e0842da8d1093728c66085165775d1d302f0f77538bf92b95"},
+    {file = "moto-5.0.1-py2.py3-none-any.whl", hash = "sha256:94e3b07a403cc8078ffee94bf404ef677112d036a57ddb5e0f19c5fcf48987f5"},
+    {file = "moto-5.0.1.tar.gz", hash = "sha256:62b9798aef9028432194cebb7a671f4064257bb3be662d9c1b83b94411b694bb"},
 ]
 
 [package.dependencies]
@@ -2009,24 +2009,24 @@ werkzeug = ">=0.5,<2.2.0 || >2.2.0,<2.2.1 || >2.2.1"
 xmltodict = "*"
 
 [package.extras]
-all = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.0)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
+all = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
 apigateway = ["PyYAML (>=5.1)", "ecdsa (!=0.15)", "openapi-spec-validator (>=0.5.0)", "python-jose[cryptography] (>=3.1.0,<4.0.0)"]
-apigatewayv2 = ["PyYAML (>=5.1)"]
+apigatewayv2 = ["PyYAML (>=5.1)", "openapi-spec-validator (>=0.5.0)"]
 appsync = ["graphql-core"]
 awslambda = ["docker (>=3.0.0)"]
 batch = ["docker (>=3.0.0)"]
-cloudformation = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.0)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
+cloudformation = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
 cognitoidp = ["ecdsa (!=0.15)", "python-jose[cryptography] (>=3.1.0,<4.0.0)"]
-dynamodb = ["docker (>=3.0.0)", "py-partiql-parser (==0.5.0)"]
-dynamodbstreams = ["docker (>=3.0.0)", "py-partiql-parser (==0.5.0)"]
+dynamodb = ["docker (>=3.0.0)", "py-partiql-parser (==0.5.1)"]
+dynamodbstreams = ["docker (>=3.0.0)", "py-partiql-parser (==0.5.1)"]
 ec2 = ["sshpubkeys (>=3.1.0)"]
 glue = ["pyparsing (>=3.0.7)"]
 iotdata = ["jsondiff (>=1.1.2)"]
-proxy = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=2.5.1)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.0)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
-resourcegroupstaggingapi = ["PyYAML (>=5.1)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.0)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)"]
-s3 = ["PyYAML (>=5.1)", "py-partiql-parser (==0.5.0)"]
-s3crc32c = ["PyYAML (>=5.1)", "crc32c", "py-partiql-parser (==0.5.0)"]
-server = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "flask (!=2.2.0,!=2.2.1)", "flask-cors", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.0)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
+proxy = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=2.5.1)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "multipart", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
+resourcegroupstaggingapi = ["PyYAML (>=5.1)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)"]
+s3 = ["PyYAML (>=5.1)", "py-partiql-parser (==0.5.1)"]
+s3crc32c = ["PyYAML (>=5.1)", "crc32c", "py-partiql-parser (==0.5.1)"]
+server = ["PyYAML (>=5.1)", "aws-xray-sdk (>=0.93,!=0.96)", "cfn-lint (>=0.40.0)", "docker (>=3.0.0)", "ecdsa (!=0.15)", "flask (!=2.2.0,!=2.2.1)", "flask-cors", "graphql-core", "jsondiff (>=1.1.2)", "openapi-spec-validator (>=0.5.0)", "py-partiql-parser (==0.5.1)", "pyparsing (>=3.0.7)", "python-jose[cryptography] (>=3.1.0,<4.0.0)", "setuptools", "sshpubkeys (>=3.1.0)"]
 ssm = ["PyYAML (>=5.1)"]
 xray = ["aws-xray-sdk (>=0.93,!=0.96)", "setuptools"]
 
@@ -2870,13 +2870,13 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-docker"
-version = "3.0.0"
+version = "3.1.1"
 description = "Simple pytest fixtures for Docker and Docker Compose based tests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-docker-3.0.0.tar.gz", hash = "sha256:82c2621289d07d87ff6725462fcc1a9e408f544400ca1b6b9831b37b88954357"},
-    {file = "pytest_docker-3.0.0-py3-none-any.whl", hash = "sha256:3440b3f7ee1af43b5332569694d3c6324ecc0f3f94ccd528ecdbfd9ee90d1da6"},
+    {file = "pytest-docker-3.1.1.tar.gz", hash = "sha256:2371524804a752aaa766c79b9eee8e634534afddb82597f3b573da7c5d6ffb5f"},
+    {file = "pytest_docker-3.1.1-py3-none-any.whl", hash = "sha256:fd0d48d6feac41f62acbc758319215ec9bb805c2309622afb07c27fa5c5ae362"},
 ]
 
 [package.dependencies]
@@ -2885,7 +2885,7 @@ pytest = ">=4.0,<9.0"
 
 [package.extras]
 docker-compose-v1 = ["docker-compose (>=1.27.3,<2.0)"]
-tests = ["pytest-pycodestyle (>=2.0.0,<3.0)", "pytest-pylint (>=0.14.1,<1.0)", "requests (>=2.22.0,<3.0)"]
+tests = ["mypy (>=0.500,<2.000)", "pytest-mypy (>=0.10,<1.0)", "pytest-pycodestyle (>=2.0.0,<3.0)", "pytest-pylint (>=0.14.1,<1.0)", "requests (>=2.22.0,<3.0)", "types-requests (>=2.31,<3.0)", "types-setuptools (>=69.0,<70.0)"]
 
 [[package]]
 name = "pytest-httpserver"
@@ -2950,18 +2950,18 @@ pytest = ">=7"
 
 [[package]]
 name = "pytest-structlog"
-version = "0.6"
+version = "0.7"
 description = "Structured logging assertions"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "pytest-structlog-0.6.tar.gz", hash = "sha256:10a641728b31835fedfa121336f2f6f47c3a4f54c1747d913ac8c3af8cbf27c0"},
-    {file = "pytest_structlog-0.6-py2.py3-none-any.whl", hash = "sha256:03fa8335ee4ca2287f73344c718eb015218c0969a8dddf7447d05e87c9bb7c19"},
+    {file = "pytest-structlog-0.7.tar.gz", hash = "sha256:6a046fb3992ebbe401c45450b34dd18db50500146f80693a5f2bc755ab787ce7"},
+    {file = "pytest_structlog-0.7-py3-none-any.whl", hash = "sha256:c265c2009c9ace98a69291ac5ecc8a874e22a8fa945409f1eccb26c18f000e25"},
 ]
 
 [package.dependencies]
 pytest = "*"
-structlog = "*"
+structlog = ">=22.2.0"
 
 [[package]]
 name = "pytest-xdist"
@@ -3930,13 +3930,13 @@ referencing = "*"
 
 [[package]]
 name = "types-psutil"
-version = "5.9.5.20240106"
+version = "5.9.5.20240205"
 description = "Typing stubs for psutil"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-psutil-5.9.5.20240106.tar.gz", hash = "sha256:60b233fb613b41fe859526103dbda0b4812d7a16c5f791119ec7016fbe1c8128"},
-    {file = "types_psutil-5.9.5.20240106-py3-none-any.whl", hash = "sha256:fea169a85b1bb9d9edd0b063a93ad950e37d574290b1bf11ef5e46c9c5d82326"},
+    {file = "types-psutil-5.9.5.20240205.tar.gz", hash = "sha256:51df36a361aa597bf483dcc5b58f2ab7aa87452a36d2da97c90994d6a81ef743"},
+    {file = "types_psutil-5.9.5.20240205-py3-none-any.whl", hash = "sha256:3ec9bd8b95a64fe1269241d3ffb74b94a45df2d0391da1402423cd33f29745ca"},
 ]
 
 [[package]]
@@ -4277,4 +4277,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "712270c3e60d0c2235d6458b5f045778b2528d9616ba56ef23f4800eb23f1b60"
+content-hash = "e91a411c6f82f84d99593e18460e1ade1557390742336458ae64b84d90ad3225"
