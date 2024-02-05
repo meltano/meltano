@@ -8,7 +8,7 @@ import typing as t
 import boto3
 import mock
 import pytest
-from moto import mock_s3
+from moto import mock_aws
 
 import meltano
 from asserts import assert_cli_runner
@@ -212,7 +212,7 @@ class TestCliUpgrade:
         result = cli_runner.invoke(cli, ["upgrade", "database"])
         assert_cli_runner(result)
 
-    @mock_s3
+    @mock_aws
     @pytest.mark.usefixtures("project")
     def test_upgrade_state(self, cli_runner, monkeypatch):
         state_ids = [f"dev:tap-{i}-to-target-{i}" for i in range(10)]
