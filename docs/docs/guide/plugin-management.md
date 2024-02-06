@@ -556,7 +556,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    meltano install [<type>|-] <name>
 
    # For example:
-   meltano install target-postgres
+   meltano install loader target-postgres
    ```
 
 1. View the current configuration using [`meltano config <name> list`](/reference/command-line-interface#config) to see if it is still valid:
