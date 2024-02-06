@@ -288,6 +288,10 @@ jobs:
         nox -rs coverage -- xml --ignore-errors
 
     - name: Upload coverage report
+      with:
+        fail_ci_if_error: true
+        files: ./coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
       uses: codecov/codecov-action@v4.0.1
 
   mypy:
