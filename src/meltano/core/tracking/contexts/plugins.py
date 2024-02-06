@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import importlib
 import typing as t
 import uuid
 
-from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.block.blockset import BlockSet
@@ -18,6 +18,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
 logger = get_logger(__name__)
+snowplow = importlib.import_module("snowplow_tracker")
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
@@ -47,7 +48,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
 
 
 # Proactively named to avoid name collisions more widely used "PluginContext"
-class PluginsTrackingContext(SelfDescribingJson):
+class PluginsTrackingContext(snowplow.SelfDescribingJson):
     """Tracking context for the Meltano plugins."""
 
     def __init__(self, plugins: list(tuple[ProjectPlugin, str | None])):

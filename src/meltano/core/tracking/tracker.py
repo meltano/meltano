@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import atexit
+import importlib
 import json
 import locale
 import os
@@ -18,8 +19,6 @@ from warnings import warn
 import structlog
 import tzlocal
 from psutil import Process
-from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
-from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
@@ -32,6 +31,8 @@ from meltano.core.utils import format_exception
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
     from pathlib import Path
+
+    import snowplow_tracker  # noqa: TID251
 
     from meltano.core.project import Project
     from meltano.core.tracking.contexts import (  # noqa: F401
@@ -49,6 +50,7 @@ URL_REGEX = (
 MICROSECONDS_PER_SECOND = 1000000
 
 logger = structlog.get_logger(__name__)
+snowplow = importlib.import_module("snowplow_tracker")
 
 
 class BlockEvents(Enum):
@@ -113,14 +115,14 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
 
-        emitters: list[Emitter] = []
+        emitters: list[snowplow_tracker.Emitter] = []
         for endpoint in endpoints:
             if not check_url(endpoint):
                 logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
                 continue
             parsed_url = urlparse(endpoint)
             emitters.append(
-                Emitter(
+                snowplow.Emitter(
                     endpoint=parsed_url.hostname + parsed_url.path,
                     protocol=parsed_url.scheme or "http",
                     port=parsed_url.port,
@@ -129,7 +131,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             )
 
         if emitters:
-            self.snowplow_tracker = SnowplowTracker(
+            self.snowplow_tracker: snowplow_tracker.Tracker = snowplow.Tracker(
                 namespace="meltano-core",
                 app_id="meltano",
                 emitters=emitters,
@@ -146,7 +148,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         project_ctx = ProjectContext(project, self.client_id)
         self.project_id: uuid.UUID = project_ctx.project_uuid
-        self._contexts: tuple[SelfDescribingJson] = (
+        self._contexts: tuple[snowplow_tracker.SelfDescribingJson] = (
             environment_context,
             project_ctx,
         )
@@ -195,7 +197,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         return uuid.uuid4()
 
     @property
-    def contexts(self) -> tuple[SelfDescribingJson]:
+    def contexts(self) -> tuple[snowplow_tracker.SelfDescribingJson]:
         """Get the contexts that will accompany events fired by this tracker.
 
         Returns:
@@ -275,7 +277,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:
+    def with_contexts(self, *extra_contexts) -> t.Generator[Tracker, None, None]:
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
@@ -299,7 +301,10 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         """
         return self.snowplow_tracker is not None and self.send_anonymous_usage_stats
 
-    def track_unstruct_event(self, event_json: SelfDescribingJson) -> None:
+    def track_unstruct_event(
+        self,
+        event_json: snowplow_tracker.SelfDescribingJson,
+    ) -> None:
         """Fire an unstructured tracking event.
 
         Args:
@@ -310,7 +315,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             return
         try:
             self.snowplow_tracker.track(
-                SelfDescribing(
+                snowplow.SelfDescribing(
                     event_json=event_json,
                     context=self.contexts,
                 ),
@@ -328,7 +333,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             event: An member from `meltano.core.tracking.CliEvent`
         """
         self.track_unstruct_event(
-            SelfDescribingJson(CliEventSchema.url, {"event": event.name}),
+            snowplow.SelfDescribingJson(CliEventSchema.url, {"event": event.name}),
         )
 
     def track_telemetry_state_change_event(
@@ -368,7 +373,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             from_value = str(from_value)
         if isinstance(to_value, uuid.UUID):
             to_value = str(to_value)
-        event_json = SelfDescribingJson(
+        event_json = snowplow.SelfDescribingJson(
             TelemetryStateChangeEventSchema.url,
             {
                 "setting_name": setting_name,
@@ -378,7 +383,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         )
         try:
             self.snowplow_tracker.track(
-                SelfDescribing(
+                snowplow.SelfDescribing(
                     event_json=event_json,
                     # If tracking is disabled, then include only the minimal
                     # Snowplow contexts required
@@ -500,7 +505,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             event: The event string (e.g. "initialize", "started", etc)
         """
         self.track_unstruct_event(
-            SelfDescribingJson(
+            snowplow.SelfDescribingJson(
                 BlockEventSchema.url,
                 {"type": block_type, "event": event.name},
             ),
@@ -543,7 +548,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         now = datetime.utcnow()
 
         self.track_unstruct_event(
-            SelfDescribingJson(
+            snowplow.SelfDescribingJson(
                 ExitEventSchema.url,
                 {
                     "exit_code": cli.exit_code,

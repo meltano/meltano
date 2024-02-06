@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import importlib
 import typing as t
 import uuid
 from enum import Enum, auto
 from functools import cached_property
 
-from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.tracking.schemas import ProjectContextSchema
@@ -17,6 +17,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = get_logger(__name__)
+snowplow = importlib.import_module("snowplow_tracker")
 
 
 class ProjectUUIDSource(Enum):
@@ -32,7 +33,7 @@ class ProjectUUIDSource(Enum):
     random = auto()
 
 
-class ProjectContext(SelfDescribingJson):
+class ProjectContext(snowplow.SelfDescribingJson):
     """Tracking context for the Meltano project."""
 
     def __init__(self, project: Project, client_id: uuid.UUID):

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import os
 import platform
 import typing as t
@@ -14,7 +15,6 @@ from pathlib import Path
 from warnings import warn
 
 import psutil
-from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
@@ -22,6 +22,7 @@ from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
 
 logger = get_logger(__name__)
+snowplow = importlib.import_module("snowplow_tracker")
 
 # This file is only ever created in CI when building a release
 release_marker_path = Path(__file__).parent / ".release_marker"
@@ -45,7 +46,7 @@ def _get_parent_context_uuid_str() -> str | None:
     return None
 
 
-class EnvironmentContext(SelfDescribingJson):
+class EnvironmentContext(snowplow.SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
     ci_markers = {

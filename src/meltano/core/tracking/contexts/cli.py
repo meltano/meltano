@@ -1,16 +1,17 @@
 """Meltano telemetry contexts for the CLI events."""
 from __future__ import annotations
 
+import importlib
 import typing as t
 from enum import Enum, auto
-
-from snowplow_tracker import SelfDescribingJson
 
 from meltano.core.tracking.schemas import CliContextSchema
 from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
     import click
+
+snowplow = importlib.import_module("snowplow_tracker")
 
 
 class CliEvent(Enum):
@@ -34,7 +35,7 @@ class CliEvent(Enum):
     aborted = auto()
 
 
-class CliContext(SelfDescribingJson):
+class CliContext(snowplow.SelfDescribingJson):
     """CLI context for the Snowplow tracker."""
 
     def __init__(

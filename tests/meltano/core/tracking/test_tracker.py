@@ -12,7 +12,7 @@ from time import sleep
 
 import mock
 import pytest
-from snowplow_tracker import Emitter, SelfDescribing
+from snowplow_tracker import Emitter, SelfDescribing  # noqa: TID251
 
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
