@@ -205,7 +205,7 @@ async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
             await writer.wait_closed()
             return False
     else:
-        writer.writeline(line.decode())
+        writer.writeline(line.decode(errors="replace"))
 
     return True
 
