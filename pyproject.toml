@@ -579,6 +579,7 @@ exclude = [
 ignore = [
   "ANN101", # Missing type annotation for `self` in method
   "ANN102", # Missing type annotation for `cls` in class method
+  "N815",   # mixedCase variable in class scope (constants, method names)
   "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
   "PT004",  # Add leading underscore to fixtures that do not return anything
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
