@@ -103,5 +103,4 @@ repos:
           - flake8-rst-docstrings==0.2.7
           - flake8-string-format==0.3.0
           - flake8-typing-as-t==0.0.3
-          - pep8-naming==0.12.1
           - wemake-python-styleguide==0.16.1
