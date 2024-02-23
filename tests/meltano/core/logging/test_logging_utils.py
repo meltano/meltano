@@ -20,14 +20,14 @@ class AsyncReader(asyncio.StreamReader):
 
 @pytest.mark.asyncio()
 async def test_capture_subprocess_output():
-    INPUT_LINES = [b"LINE\n", b"LINE 2\n", b"\xed\n"]
-    OUTPUT_LINES = []
+    input_lines = [b"LINE\n", b"LINE 2\n", b"\xed\n"]
+    output_lines = []
 
     class LineWriter:
         def writeline(self, line: str):
-            OUTPUT_LINES.append(line)
+            output_lines.append(line)
 
-    reader = AsyncReader(INPUT_LINES)
+    reader = AsyncReader(input_lines)
 
     await capture_subprocess_output(reader, LineWriter())
-    assert ["LINE\n", "LINE 2\n", "�\n"] == OUTPUT_LINES
+    assert ["LINE\n", "LINE 2\n", "�\n"] == output_lines
