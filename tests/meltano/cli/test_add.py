@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 import os
 import platform
 import shutil
 import typing as t
+from pathlib import Path
 
 import mock
 import pytest
@@ -841,3 +843,25 @@ class TestCliAdd:
         assert res.exit_code == 1
         assert res.exception
         assert str(res.exception) == "Extractor 'tap-mock' is not known to Meltano"
+
+    def test_lockfile_exists(self, cli_runner):
+        plugins_dir = Path("plugins/utilities")
+        plugins_dir.mkdir(parents=True, exist_ok=True)
+        lockfile = plugins_dir / "utility-mock--original.lock"
+        lockfile.write_text(
+            json.dumps(
+                {
+                    "plugin_type": "utilities",
+                    "name": "utility-mock",
+                    "namespace": "utility_mock",
+                }
+            )
+        )
+        lockfile.touch()
+
+        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(cli, ["add", "utility", "utility-mock"])
+            assert res.exit_code == 0, res.stdout
+            assert "Plugin definition is already locked at" in res.stdout
+            assert "You can remove the file manually" in res.stdout
