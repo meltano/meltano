@@ -25,4 +25,4 @@ jobs:
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/dependency-review-action@v4.1.1
+        uses: actions/dependency-review-action@v4.1.3
