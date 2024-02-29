@@ -305,7 +305,7 @@ def add_plugin(  # noqa: C901
         plugin_attrs = plugin_definition.canonical()
 
         plugin_name = plugin_attrs.pop("name")
-        variant = plugin_attrs.pop("variant")
+        variant = plugin_attrs.pop("variant", variant)
 
     try:
         plugin = add_service.add(
@@ -371,7 +371,6 @@ def add_plugin(  # noqa: C901
         click.secho(
             f"Plugin definition is already locked at {exc.path}.",
             fg="yellow",
-            err=True,
         )
         click.echo(
             "You can remove the file manually to avoid using a stale definition.",

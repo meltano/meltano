@@ -329,6 +329,38 @@ Installing extractor 'tap-jsonplaceholder'...
 Installed extractor 'tap-jsonplaceholder'
 ```
 
+Alternatively, you can create a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file locally and add to your project using the `--from-ref` option:
+
+<details>
+  <summary><code>tap-jsonplaceholder.yml</code></summary>
+
+  ```yml
+  name: tap-jsonplaceholder
+  namespace: tap_jsonplaceholder
+  pip_url: -e ../tap-jsonplaceholder
+  ```
+
+</details>
+
+```bash
+meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+:::info
+  <p>The plugin name must be present in the YAML file to constitute a valid plugin definition - supplying it as a command argument is a no-op in this case</p>
+:::
+
+As you develop your custom extractor, it is possible that its settings will change:
+- New functionality is added, requiring new setting(s)
+- Existing functionality is modified, requiring setting(s) to be renamed
+- Existing functionality is removed, requiring setting(s) to be removed
+
+In this case, you will need to update the extractor in your project - by maintaining your plugin definiton YAML file in line with changes to the tap as you go, this is a simple process of running the previous command along with the `--update` flag:
+
+```bash
+meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
 ### Add a JSONL target
 
 Run the command below to add the JSONL loader that will contain the extracted data stream:

@@ -13,7 +13,9 @@ if t.TYPE_CHECKING:
 GOOGLE_INSTALLED = True
 
 try:
-    import google  # type: ignore
+    import google
+    import google.api_core.exceptions  # noqa: WPS301
+    import google.cloud.storage  # type: ignore[import-untyped]  # noqa: WPS301
 except ImportError:
     GOOGLE_INSTALLED = False
 

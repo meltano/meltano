@@ -205,7 +205,7 @@ async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
             await writer.wait_closed()
             return False
     else:
-        writer.writeline(line.decode())
+        writer.writeline(line.decode(errors="replace"))
 
     return True
 
@@ -214,7 +214,7 @@ async def capture_subprocess_output(
     reader: asyncio.StreamReader | None,
     *line_writers: SubprocessOutputWriter,
 ) -> None:
-    """Capture in real time the output stream of a suprocess that is run async.
+    """Capture in real time the output stream of a subprocess that is run async.
 
     The stream has been set to asyncio.subprocess.PIPE and is provided using
     reader to this function.

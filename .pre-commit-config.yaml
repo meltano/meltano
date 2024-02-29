@@ -38,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.27.3
+    rev: 0.28.0
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -60,7 +60,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.0.0-alpha.1 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v8.55.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -74,7 +74,7 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.13
+    rev: v0.2.2
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
@@ -103,5 +103,4 @@ repos:
           - flake8-rst-docstrings==0.2.7
           - flake8-string-format==0.3.0
           - flake8-typing-as-t==0.0.3
-          - pep8-naming==0.12.1
           - wemake-python-styleguide==0.16.1
