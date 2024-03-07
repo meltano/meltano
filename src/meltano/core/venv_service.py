@@ -325,6 +325,7 @@ class VenvService:  # noqa: WPS214
         async def extract_stderr(proc: Process):
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
                 "unicode_escape",
+                errors="replace",
             )
 
         try:
@@ -441,7 +442,7 @@ class VenvService:  # noqa: WPS214
             if not proc.stdout:
                 return None
 
-            return (await proc.stdout.read()).decode("unicode_escape")
+            return (await proc.stdout.read()).decode("unicode_escape", errors="replace")
 
         try:
             return await exec_async(
