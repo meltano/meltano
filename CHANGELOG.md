@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.3.2 (2024-03-06)
+
+### 🐛 Fixes
+
+- [#8436](https://github.com/meltano/meltano/issues/8436) Terminal output from plugin installation is now safely decoded
+- [#8381](https://github.com/meltano/meltano/issues/8381) Print `Plugin definition is already locked` to stdout instead of stderr
+- [#8399](https://github.com/meltano/meltano/issues/8399) Handle non-UTF-8 lines in plugin output for logging -- _**Thanks @nkclemson!**_
+
+### 📚 Documentation Improvements
+
+- [#8434](https://github.com/meltano/meltano/issues/8434) Added a note about using the `--require-virtualenv` flag for installing Meltano with pip
+- [#8433](https://github.com/meltano/meltano/issues/8433) Removed some stale references to the old API
+
 ## v3.3.1 (2024-01-26)
 
 ### 🐛 Fixes

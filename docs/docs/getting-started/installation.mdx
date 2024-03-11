@@ -79,6 +79,16 @@ Meltano provides a Python package that can be installed using `pip`.
 :::caution
 
   <p>To avoid dependency conflicts, please ensure Meltano is installed into a clean Python virtual environment.</p>
+  <br/>
+  <p>
+    You can use the <a href="https://pip.pypa.io/en/stable/cli/pip/#cmdoption-require-virtualenv"><code>--require-virtualenv</code></a> command
+    line flag or the <code>PIP_REQUIRE_VIRTUALENV=1</code> environment variable to ensure that Meltano is installed into a virtual environment.
+  </p>
+  <br/>
+  <p>
+    In ephemeral CI or container-based deployments where Meltano is the main application, installing it globally may actually
+    be preferred.
+  </p>
 :::
 
 <Termy>
