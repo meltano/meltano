@@ -3967,13 +3967,13 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.21.0.20240118"
+version = "4.21.0.20240311"
 description = "Typing stubs for jsonschema"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-jsonschema-4.21.0.20240118.tar.gz", hash = "sha256:31aae1b5adc0176c1155c2d4f58348b22d92ae64315e9cc83bd6902168839232"},
-    {file = "types_jsonschema-4.21.0.20240118-py3-none-any.whl", hash = "sha256:77a4ac36b0be4f24274d5b9bf0b66208ee771c05f80e34c4641de7d63e8a872d"},
+    {file = "types-jsonschema-4.21.0.20240311.tar.gz", hash = "sha256:f7165ce70abd91df490c73b089873afd2899c5e56430ee495b64f851ad01f287"},
+    {file = "types_jsonschema-4.21.0.20240311-py3-none-any.whl", hash = "sha256:e872f5661513824edf9698f73a66c9c114713d93eab58699bd0532e7e6db5750"},
 ]
 
 [package.dependencies]
@@ -3981,24 +3981,24 @@ referencing = "*"
 
 [[package]]
 name = "types-psutil"
-version = "5.9.5.20240205"
+version = "5.9.5.20240311"
 description = "Typing stubs for psutil"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-psutil-5.9.5.20240205.tar.gz", hash = "sha256:51df36a361aa597bf483dcc5b58f2ab7aa87452a36d2da97c90994d6a81ef743"},
-    {file = "types_psutil-5.9.5.20240205-py3-none-any.whl", hash = "sha256:3ec9bd8b95a64fe1269241d3ffb74b94a45df2d0391da1402423cd33f29745ca"},
+    {file = "types-psutil-5.9.5.20240311.tar.gz", hash = "sha256:7e5ab45170d9a53a83b461b1771f5eb8b00bb249e6ca7bb3e6391e8cab7742c7"},
+    {file = "types_psutil-5.9.5.20240311-py3-none-any.whl", hash = "sha256:890965f336122917091ae68b6bb2e63987ae143f917a229169b9dc83580529a9"},
 ]
 
 [[package]]
 name = "types-python-dateutil"
-version = "2.8.19.20240106"
+version = "2.8.19.20240311"
 description = "Typing stubs for python-dateutil"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-python-dateutil-2.8.19.20240106.tar.gz", hash = "sha256:1f8db221c3b98e6ca02ea83a58371b22c374f42ae5bbdf186db9c9a76581459f"},
-    {file = "types_python_dateutil-2.8.19.20240106-py3-none-any.whl", hash = "sha256:efbbdc54590d0f16152fa103c9879c7d4a00e82078f6e2cf01769042165acaa2"},
+    {file = "types-python-dateutil-2.8.19.20240311.tar.gz", hash = "sha256:51178227bbd4cbec35dc9adffbf59d832f20e09842d7dcb8c73b169b8780b7cb"},
+    {file = "types_python_dateutil-2.8.19.20240311-py3-none-any.whl", hash = "sha256:ef813da0809aca76472ca88807addbeea98b19339aebe56159ae2f4b4f70857a"},
 ]
 
 [[package]]
@@ -4014,13 +4014,13 @@ files = [
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.12"
+version = "6.0.12.20240311"
 description = "Typing stubs for PyYAML"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 files = [
-    {file = "types-PyYAML-6.0.12.12.tar.gz", hash = "sha256:334373d392fde0fdf95af5c3f1661885fa10c52167b14593eb856289e1855062"},
-    {file = "types_PyYAML-6.0.12.12-py3-none-any.whl", hash = "sha256:c05bc6c158facb0676674b7f11fe3960db4f389718e19e62bd2b84d6205cfd24"},
+    {file = "types-PyYAML-6.0.12.20240311.tar.gz", hash = "sha256:a9e0f0f88dc835739b0c1ca51ee90d04ca2a897a71af79de9aec5f38cb0a5342"},
+    {file = "types_PyYAML-6.0.12.20240311-py3-none-any.whl", hash = "sha256:b845b06a1c7e54b8e5b4c683043de0d9caf205e7434b3edc678ff2411979b8f6"},
 ]
 
 [[package]]
@@ -4407,4 +4407,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "3e5b6a98e480ba18dc41b7b7ac228dd67c5a58156ab9cf1b5f9901391a741fdd"
+content-hash = "c37e15c8e16ed73fe6b9c2c368b9080121b9b03f5657748a4cb37384881ef7ca"
