@@ -1,4 +1,5 @@
 """StateStoreManager for Azure Blob storage backend."""
+
 from __future__ import annotations
 
 import typing as t

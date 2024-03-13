@@ -1,6 +1,5 @@
 """Defines helpers for the core codebase."""
 
-
 from __future__ import annotations
 
 import asyncio
@@ -308,18 +307,15 @@ def truthy(val: str) -> bool:
 
 
 @t.overload
-def coerce_datetime(d: None) -> None:
-    ...  # noqa: WPS428
+def coerce_datetime(d: None) -> None: ...  # noqa: WPS428
 
 
 @t.overload
-def coerce_datetime(d: datetime) -> datetime:
-    ...  # noqa: WPS428
+def coerce_datetime(d: datetime) -> datetime: ...  # noqa: WPS428
 
 
 @t.overload
-def coerce_datetime(d: date) -> datetime:
-    ...  # noqa: WPS428
+def coerce_datetime(d: date) -> datetime: ...  # noqa: WPS428
 
 
 def coerce_datetime(d):
@@ -338,13 +334,11 @@ def coerce_datetime(d):
 
 
 @t.overload
-def iso8601_datetime(d: None) -> None:
-    ...  # noqa: WPS428
+def iso8601_datetime(d: None) -> None: ...  # noqa: WPS428
 
 
 @t.overload
-def iso8601_datetime(d: str) -> datetime:
-    ...  # noqa: WPS428
+def iso8601_datetime(d: str) -> datetime: ...  # noqa: WPS428
 
 
 def iso8601_datetime(d):
@@ -365,8 +359,7 @@ def iso8601_datetime(d):
 
 
 class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str:
-        ...  # noqa: WPS428
+    def __getitem__(self, key: str) -> str: ...  # noqa: WPS428
 
 
 _G = t.TypeVar("_G", bound=_GetItemProtocol)

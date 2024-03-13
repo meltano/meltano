@@ -1,6 +1,5 @@
 """Storage Managers for Meltano Configuration."""
 
-
 from __future__ import annotations
 
 import logging
