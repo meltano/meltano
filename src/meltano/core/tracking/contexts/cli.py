@@ -1,4 +1,5 @@
 """Meltano telemetry contexts for the CLI events."""
+
 from __future__ import annotations
 
 import typing as t

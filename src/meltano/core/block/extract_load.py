@@ -775,9 +775,9 @@ class ELBExecutionManager:
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
         else:
-            self._intermediate_codes[
-                current_head.string_id
-            ] = current_head.process_future.result()
+            self._intermediate_codes[current_head.string_id] = (
+                current_head.process_future.result()
+            )
 
         await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
         # Close next inline stdin so downstream can cascade and complete naturally
