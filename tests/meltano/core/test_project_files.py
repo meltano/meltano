@@ -229,12 +229,12 @@ class TestProjectFiles:
     def test_update(self, project_files):
         meltano_config = project_files.load()
         meltano_config["version"] = 2
-        meltano_config["plugins"]["extractors"][1][
-            "name"
-        ] = "modified-tap-subconfig-2-yml"
-        meltano_config["plugins"]["loaders"][2][
-            "name"
-        ] = "modified-target-subconfig-1-yml"
+        meltano_config["plugins"]["extractors"][1]["name"] = (
+            "modified-tap-subconfig-2-yml"
+        )
+        meltano_config["plugins"]["loaders"][2]["name"] = (
+            "modified-target-subconfig-1-yml"
+        )
         meltano_config["schedules"][0]["name"] = "modified-test-meltano-yml"
 
         project_files.update(meltano_config)

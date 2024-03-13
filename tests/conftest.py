@@ -130,9 +130,9 @@ class MockAdapter(BaseAdapter):
                     if "dialect" in plugin:
                         hub[plugin_key]["dialect"] = plugin["dialect"]
 
-                hub[index_key][plugin_name][
-                    "logo_url"
-                ] = f"https://mock.meltano.com/{plugin_name}.png"
+                hub[index_key][plugin_name]["logo_url"] = (
+                    f"https://mock.meltano.com/{plugin_name}.png"
+                )
                 hub[index_key][plugin_name]["default_variant"] = default_variant
 
         return hub

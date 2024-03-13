@@ -1,6 +1,5 @@
 """Meltano Projects."""
 
-
 from __future__ import annotations
 
 import errno

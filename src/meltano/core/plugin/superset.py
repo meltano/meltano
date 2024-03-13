@@ -1,4 +1,5 @@
 """Plugin glue code for Superset."""
+
 from __future__ import annotations
 
 import logging

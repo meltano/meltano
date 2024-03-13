@@ -4,6 +4,7 @@ This module contains the Hookable class which allows for implementation of a
 classic before/after hook pattern. Allowing you to register functions to be
 called before or after given trigger.
 """
+
 from __future__ import annotations
 
 import logging
