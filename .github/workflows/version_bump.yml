@@ -3,6 +3,10 @@ name: Version bump
 on:
   workflow_dispatch:
     inputs:
+      dry_run:
+        description: "Run the action without creating a PR or release draft"
+        required: true
+        type: boolean
       bump:
         description: "Version bump type"
         required: true
@@ -57,7 +61,12 @@ jobs:
         extra_requirements: 'git+https://github.com/meltano/commitizen-version-bump@main'
         changelog_increment_filename: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}
 
+    - name: Add job summary
+      run: |
+        cat _changelog_fragment.md >> $GITHUB_STEP_SUMMARY
+
     - name: Draft Release
+      if: ${{ github.event.inputs.dry_run == 'false' }}
       id: draft-release
       uses: softprops/action-gh-release@v2
       with:
@@ -69,6 +78,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Pull Request
+      if: ${{ github.event.inputs.dry_run == 'false' }}
       uses: peter-evans/create-pull-request@v6
       id: create-pull-request
       with:
