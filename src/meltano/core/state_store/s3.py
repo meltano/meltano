@@ -1,4 +1,5 @@
 """StateStoreManager for S3 cloud storage backend."""
+
 from __future__ import annotations
 
 import typing as t

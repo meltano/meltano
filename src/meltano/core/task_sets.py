@@ -1,4 +1,5 @@
 """meltano tasks/jobs (not state related jobs)."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
