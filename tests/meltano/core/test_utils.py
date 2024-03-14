@@ -8,6 +8,7 @@ from meltano.core.utils import (
     EnvVarMissingBehavior,
     expand_env_vars,
     flatten,
+    makedirs,
     nest,
     pop_at_path,
     remove_suffix,
@@ -222,3 +223,22 @@ def test_remove_suffix():
     assert remove_suffix("a_string", "ing") == "a_str"
     assert remove_suffix("a_string", "in") == "a_string"
     assert remove_suffix("a_string", "gni") == "a_string"
+
+
+def test_makedirs_decorator(tmp_path):
+    def root(*paths):
+        return tmp_path.joinpath(*paths)
+
+    @makedirs
+    def hierarchy(*ranks):
+        return root(*ranks)
+
+    @makedirs
+    def species(genus_name, species_name):
+        return hierarchy(genus_name, species_name)
+
+    cat = species("felis", "catus")
+    assert cat.exists()
+
+    wolf = species("canis", "lupus", make_dirs=False)
+    assert not wolf.exists()
