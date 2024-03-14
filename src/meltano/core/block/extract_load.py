@@ -609,6 +609,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
+                run_id=str(self.context.job.run_id)
+                if self.context.job
+                else "stateless",
             )
             if logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
