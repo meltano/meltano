@@ -40,7 +40,7 @@ if t.TYPE_CHECKING:
         from typing_extensions import TypeAlias
 
 
-StrPath: TypeAlias = str | os.PathLike[str]
+StrPath: TypeAlias = t.Union[str, os.PathLike]
 
 logger = logging.getLogger(__name__)
 
