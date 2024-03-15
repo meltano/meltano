@@ -1,4 +1,5 @@
 """Factory for creating plugins."""
+
 from __future__ import annotations
 
 import importlib

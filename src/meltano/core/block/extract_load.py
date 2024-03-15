@@ -609,6 +609,8 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
+                run_id=str(self.context.job.run_id) if self.context.job else None,
+                job_name=self.context.job.job_name if self.context.job else None,
             )
             if logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
@@ -775,9 +777,9 @@ class ELBExecutionManager:
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
         else:
-            self._intermediate_codes[
-                current_head.string_id
-            ] = current_head.process_future.result()
+            self._intermediate_codes[current_head.string_id] = (
+                current_head.process_future.result()
+            )
 
         await asyncio.wait([current_head.proxy_stdout(), current_head.proxy_stderr()])
         # Close next inline stdin so downstream can cascade and complete naturally

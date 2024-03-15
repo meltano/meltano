@@ -1,6 +1,5 @@
 """Project plugin service."""
 
-
 from __future__ import annotations
 
 import enum
