@@ -34,6 +34,13 @@ if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
 
+    if sys.version_info < (3, 10):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
+
+
+StrPath: TypeAlias = str | os.PathLike[str]
 
 logger = logging.getLogger(__name__)
 
@@ -342,11 +349,12 @@ class Project(Versioned):  # noqa: WPS214
 
         self.refresh()
 
-    def root_dir(self, *joinpaths):
+    def root_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:  # noqa: ARG002
         """Return the root directory of this project, optionally joined with path.
 
         Args:
             joinpaths: list of subdirs and/or file to join to project root.
+            kwargs: Additional keyword arguments.
 
         Returns:
             project root joined with provided subdirs and/or file
@@ -354,7 +362,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root.joinpath(*joinpaths)
 
     @property
-    def meltanofile(self):
+    def meltanofile(self) -> Path:
         """Get the path to this project's meltano.yml.
 
         Returns:
@@ -363,7 +371,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root.joinpath("meltano.yml")
 
     @property
-    def dotenv(self):
+    def dotenv(self) -> Path:
         """Get the path to this project's .env file.
 
         Returns:
@@ -372,7 +380,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.root.joinpath(".env")
 
     @cached_property
-    def dotenv_env(self):
+    def dotenv_env(self) -> dict[str, str | None]:
         """Get values from this project's .env file.
 
         Returns:
@@ -416,11 +424,12 @@ class Project(Versioned):  # noqa: WPS214
         self.refresh()
 
     @makedirs
-    def meltano_dir(self, *joinpaths):
+    def meltano_dir(self, *joinpaths: StrPath, **kwargs) -> Path:  # noqa: ARG002
         """Path to the project `.meltano` directory.
 
         Args:
             joinpaths: Paths to join to the `.meltano` directory.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `.meltano` dir optionally joined to given paths.
@@ -428,11 +437,12 @@ class Project(Versioned):  # noqa: WPS214
         return self.sys_dir_root.joinpath(*joinpaths)
 
     @makedirs
-    def analyze_dir(self, *joinpaths):
+    def analyze_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:  # noqa: ARG002
         """Path to the project `analyze` directory.
 
         Args:
             joinpaths: Paths to join to the `analyze` directory.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `analyze` dir optionally joined to given paths.
@@ -440,11 +450,12 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("analyze", *joinpaths)
 
     @makedirs
-    def extract_dir(self, *joinpaths):
+    def extract_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:  # noqa: ARG002
         """Path to the project `extract` directory.
 
         Args:
             joinpaths: Paths to join to the `extract` directory.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `extract` dir optionally joined to given paths.
@@ -452,86 +463,98 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("extract", *joinpaths)
 
     @makedirs
-    def venvs_dir(self, *prefixes):
+    def venvs_dir(self, *prefixes: StrPath, **kwargs: t.Any) -> Path:
         """Path to a `venv` directory in `.meltano`.
 
         Args:
             prefixes: Paths to prepend to the `venv` directory in `.meltano`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `venv` dir optionally prepended with given prefixes.
         """
-        return self.meltano_dir(*prefixes, "venv")
+        return self.meltano_dir(*prefixes, "venv", **kwargs)
 
     @makedirs
-    def run_dir(self, *joinpaths):
+    def run_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:
         """Path to the `run` directory in `.meltano`.
 
         Args:
             joinpaths: Paths to join to the `run` directory in `.meltano`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `run` dir optionally joined to given paths.
         """
-        return self.meltano_dir("run", *joinpaths)
+        return self.meltano_dir("run", *joinpaths, **kwargs)
 
     @makedirs
-    def logs_dir(self, *joinpaths):
+    def logs_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:
         """Path to the `logs` directory in `.meltano`.
 
         Args:
             joinpaths: Paths to join to the `logs` directory in `.meltano`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `logs` dir optionally joined to given paths.
         """
-        return self.meltano_dir("logs", *joinpaths)
+        return self.meltano_dir("logs", *joinpaths, **kwargs)
 
     @makedirs
-    def job_dir(self, state_id, *joinpaths):
+    def job_dir(self, state_id, *joinpaths: StrPath, **kwargs: t.Any) -> Path:
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
             state_id: State ID of `run` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.run_dir("elt", sanitize_filename(state_id), *joinpaths)
+        return self.run_dir("elt", sanitize_filename(state_id), *joinpaths, **kwargs)
 
     @makedirs
-    def job_logs_dir(self, state_id, *joinpaths):
+    def job_logs_dir(self, state_id, *joinpaths: StrPath, **kwargs: t.Any) -> Path:
         """Path to the `elt` directory in `.meltano/logs`.
 
         Args:
             state_id: State ID of `logs` dir.
             joinpaths: Paths to join to the `elt` directory in `.meltano/logs`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to `elt` dir optionally joined to given paths.
         """
-        return self.logs_dir("elt", sanitize_filename(state_id), *joinpaths)
+        return self.logs_dir("elt", sanitize_filename(state_id), *joinpaths, **kwargs)
 
     @makedirs
-    def plugin_dir(self, plugin: PluginRef, *joinpaths):
+    def plugin_dir(
+        self,
+        plugin: PluginRef,
+        *joinpaths: StrPath,
+        **kwargs: t.Any,
+    ) -> Path:
         """Path to the plugin installation directory in `.meltano`.
 
         Args:
             plugin: Plugin to retrieve or create directory for.
             joinpaths: Paths to join to the plugin installation directory in `.meltano`.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Resolved path to plugin installation dir optionally joined to given paths.
         """
-        return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
+        return self.meltano_dir(plugin.type, plugin.name, *joinpaths, **kwargs)
 
     @makedirs
-    def root_plugins_dir(self, *joinpaths: str):
+    def root_plugins_dir(self, *joinpaths: StrPath, **kwargs: t.Any) -> Path:  # noqa: ARG002
         """Path to the project `plugins` directory.
 
         Args:
             joinpaths: Paths to join with the project `plugins` directory.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Path to the project `plugins` directory.
@@ -544,6 +567,7 @@ class Project(Versioned):  # noqa: WPS214
         plugin_type: str,
         plugin_name: str,
         variant_name: str | None = None,
+        **kwargs: t.Any,
     ):
         """Path to the project lock file.
 
@@ -551,6 +575,7 @@ class Project(Versioned):  # noqa: WPS214
             plugin_type: The plugin type.
             plugin_name: The plugin name.
             variant_name: The plugin variant name.
+            kwargs: Additional keyword arguments.
 
         Returns:
             Path to the plugin lock file.
@@ -560,7 +585,7 @@ class Project(Versioned):  # noqa: WPS214
         if variant_name:
             filename = f"{filename}--{variant_name}"
 
-        return self.root_plugins_dir(plugin_type, f"{filename}.lock")
+        return self.root_plugins_dir(plugin_type, f"{filename}.lock", **kwargs)
 
     def __eq__(self, other):
         """Project equivalence check.

@@ -26,7 +26,17 @@ class JobLoggingService:
         self.project = project
 
     @makedirs
-    def logs_dir(self, state_id, *joinpaths):
+    def logs_dir(self, state_id, *joinpaths, **kwargs: t.Any):  # noqa: ARG002
+        """Return the logs directory for a given state_id.
+
+        Args:
+            state_id: The state ID for the logs.
+            joinpaths: Additional paths to join to the logs directory.
+            kwargs: Additional keyword arguments.
+
+        Returns:
+            The logs directory for the given state ID.
+        """
         return self.project.job_logs_dir(state_id, *joinpaths)
 
     def generate_log_name(
