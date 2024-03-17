@@ -129,6 +129,6 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
         """
         if self.job:
             raise NotImplementedError(
-                "Can't obtain last successful State(Job) for schedule job.",
+                "Can't obtain last successful State(Job) for schedule job.",  # noqa: EM101
             )
         return StateJobFinder(self.name).latest_success(session)

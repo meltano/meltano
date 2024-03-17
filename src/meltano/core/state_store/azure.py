@@ -76,7 +76,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
 
         if not self.parsed.hostname:
             raise MeltanoError(
-                f"Azure state backend URI must include a container name: {self.uri}",
+                f"Azure state backend URI must include a container name: {self.uri}",  # noqa: EM102
                 "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",  # noqa: E501
             )
 
@@ -124,7 +124,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 return BlobServiceClient.from_connection_string(self.connection_string)
 
             raise MeltanoError(
-                "Azure state backend requires a connection string "
+                "Azure state backend requires a connection string "  # noqa: EM101
                 "or an account URL to use host credentials",
                 "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
             )

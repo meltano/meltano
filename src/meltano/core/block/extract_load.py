@@ -437,18 +437,18 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             BlockSetValidationError: if the block set is not valid.
         """
         if not self.blocks:
-            raise BlockSetValidationError("No blocks in set.")
+            raise BlockSetValidationError("No blocks in set.")  # noqa: EM101
 
         if self.head.consumer:
-            raise BlockSetValidationError("first block in set should not be consumer")
+            raise BlockSetValidationError("first block in set should not be consumer")  # noqa: EM101
 
         if self.tail.producer:
-            raise BlockSetValidationError("last block in set should not be a producer")
+            raise BlockSetValidationError("last block in set should not be a producer")  # noqa: EM101
 
         for block in self.intermediate:
             if not block.consumer or not block.producer:
                 raise BlockSetValidationError(
-                    "intermediate blocks must be producers AND consumers",
+                    "intermediate blocks must be producers AND consumers",  # noqa: EM101
                 )
 
     async def execute(self) -> None:
@@ -489,7 +489,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             )
         ):
             raise RunnerError(
-                f"Another '{job.job_name}' pipeline is already running "
+                f"Another '{job.job_name}' pipeline is already running "  # noqa: EM102
                 f"which started at {existing.started_at}. To ignore this "
                 "check use the '--force' option.",
             )
@@ -630,7 +630,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     )  # link previous blocks stdout with current blocks stdin
                 else:
                     raise BlockSetValidationError(
-                        "run step requires input but has no upstream",
+                        "run step requires input but has no upstream",  # noqa: EM101
                     )
 
 
@@ -756,7 +756,7 @@ class ELBExecutionManager:
             await self._stop_all_blocks(start_idx)
             raise RunnerError(
                 (
-                    "Unexpected completion sequence in ExtractLoadBlock set. "
+                    "Unexpected completion sequence in ExtractLoadBlock set. "  # noqa: EM101
                     "Intermediate block (likely a mapper) failed."
                 ),
                 {
@@ -824,23 +824,23 @@ def _check_exit_codes(  # noqa: WPS238
     if producer_code:
         if consumer_code:
             raise RunnerError(
-                "Extractor and loader failed",
+                "Extractor and loader failed",  # noqa: EM101
                 {
                     PluginType.EXTRACTORS: producer_code,
                     PluginType.LOADERS: consumer_code,
                 },
             )
-        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})
+        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})  # noqa: EM101
 
     if consumer_code:
-        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
+        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})  # noqa: EM101
 
     if failed_mappers := [
         {mapper_id: exit_code}
         for mapper_id, exit_code in intermediate_codes.items()
         if exit_code
     ]:
-        raise RunnerError("Mappers failed", failed_mappers)
+        raise RunnerError("Mappers failed", failed_mappers)  # noqa: EM101
 
 
 def generate_state_id(
@@ -865,7 +865,7 @@ def generate_state_id(
     """
     if not project.environment:
         raise RunnerError(
-            "No active environment for invocation, but requested state ID",
+            "No active environment for invocation, but requested state ID",  # noqa: EM101
         )
 
     state_id_components = [
@@ -876,7 +876,7 @@ def generate_state_id(
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
         raise RunnerError(
-            "Cannot generate a state ID from components containing the "
+            "Cannot generate a state ID from components containing the "  # noqa: EM102
             f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 

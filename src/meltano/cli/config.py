@@ -52,7 +52,7 @@ def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     for arg in args:
         if isinstance(arg, click.core.Context):
             return arg
-    raise ValueError("No click.core.Context provided in *args")
+    raise ValueError("No click.core.Context provided in *args")  # noqa: EM101
 
 
 def _get_store_choices() -> list[SettingValueStore]:
@@ -343,7 +343,7 @@ def reset(ctx, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} settings in {store.label} could "
+            f"{settings.label.capitalize()} settings in {store.label} could "  # noqa: EM102
             f"not be reset: {err}",
         ) from err
 
@@ -400,7 +400,7 @@ def test(ctx):
     tracker = ctx.obj["tracker"]
     if not invoker:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Testing of the Meltano project configuration is not supported")
+        raise CliError("Testing of the Meltano project configuration is not supported")  # noqa: EM101
 
     session = ctx.obj["session"]
 
@@ -446,7 +446,7 @@ def unset(ctx, setting_name, store):
     except StoreNotSupportedError as err:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} "
+            f"{settings.label.capitalize()} setting '{path}' in {store.label} "  # noqa: EM102
             f"could not be unset: {err}",
         ) from err
 

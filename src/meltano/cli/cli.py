@@ -106,7 +106,7 @@ def cli(  # noqa: C901,WPS231
         try:
             os.chdir(cwd)
         except OSError as ex:
-            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex
+            raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102
 
     try:
         project = Project.find()

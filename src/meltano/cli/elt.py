@@ -251,7 +251,7 @@ async def _run_el_command(
 ):
     if platform.system() == "Windows":
         raise CliError(
-            "ELT command not supported on Windows. Please use the run command "
+            "ELT command not supported on Windows. Please use the run command "  # noqa: EM101
             "as documented here: "
             "https://docs.meltano.com/reference/command-line-interface#run",
         )
@@ -353,9 +353,9 @@ async def dump_file(context_builder, dumpable):
 
         click.echo(content)
     except FileNotFoundError as err:
-        raise CliError(f"Could not find {dumpable} file for this pipeline") from err
+        raise CliError(f"Could not find {dumpable} file for this pipeline") from err  # noqa: EM102
     except Exception as err:
-        raise CliError(f"Could not dump {dumpable}: {err}") from err
+        raise CliError(f"Could not dump {dumpable}: {err}") from err  # noqa: EM102
 
 
 async def _run_job(tracker, project, job, session, context_builder, force=False):
@@ -363,7 +363,7 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
         raise CliError(
-            f"Another '{job.job_name}' pipeline is already running which "
+            f"Another '{job.job_name}' pipeline is already running which "  # noqa: EM102
             f"started at {existing.started_at}. To ignore this check use "
             "the '--force' option.",
         )
@@ -427,7 +427,7 @@ async def _run_elt(
                 log.info("Transformation skipped.")
         except RunnerError as err:
             raise CliError(
-                f"ELT could not be completed: {err}.\nFor more detailed log "
+                f"ELT could not be completed: {err}.\nFor more detailed log "  # noqa: EM102
                 "messages re-run the command using 'meltano "
                 "--log-level=debug ...' CLI flag.\nNote that you can also "
                 f"check the generated log file at '{output_logger.file}'.\n"

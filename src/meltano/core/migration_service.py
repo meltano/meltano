@@ -101,7 +101,7 @@ class MigrationService:
                     migration_logger.setLevel(original_log_level)
             except FileNotFoundError as ex:
                 raise MigrationError(
-                    "Cannot upgrade the system database, revision lock not found.",
+                    "Cannot upgrade the system database, revision lock not found.",  # noqa: EM101
                 ) from ex
             except MigrationUneededException:
                 if not silent:
@@ -109,6 +109,6 @@ class MigrationService:
             except Exception as ex:
                 logging.exception(str(ex))
                 raise MigrationError(
-                    "Cannot upgrade the system database. It might be corrupted or "
+                    "Cannot upgrade the system database. It might be corrupted or "  # noqa: EM101
                     "was created before database migrations where introduced (v0.34.0)",
                 ) from ex

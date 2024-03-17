@@ -568,7 +568,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             None,
         ):
             return transformer
-        raise PluginNotFoundError("No Plugin of type Transformer found.")
+        raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
 
     @contextmanager
     def use_preferred_source(self, source: DefinitionSource) -> None:
