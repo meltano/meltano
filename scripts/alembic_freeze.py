@@ -14,4 +14,4 @@ with LOCK_PATH.open("w") as lock:
     HEAD = scripts.get_current_head()
     lock.write(HEAD)
 
-print(f"Meltano database frozen at {HEAD}.")
+print(f"Meltano database frozen at {HEAD}.")  # noqa: T201

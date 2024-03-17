@@ -61,7 +61,7 @@ def main():  # noqa: WPS213
         if is_default_python:
             tags.append("latest")
 
-    print("\n".join(tags))
+    print("\n".join(tags))  # noqa: T201
 
 
 if __name__ == "__main__":
