@@ -22,7 +22,7 @@ try:
     from nox_poetry import session as nox_session
 except ImportError:
     raise SystemExit(
-        "Nox failed to import the 'nox-poetry' package. Please install it "
+        "Nox failed to import the 'nox-poetry' package. Please install it "  # noqa: EM102
         f"using the following command: {sys.executable} -m pip install nox-poetry",
     ) from None
 
