@@ -105,4 +105,3 @@ repos:
           - flake8-string-format==0.3.0
           - flake8-typing-as-t==0.0.3
           - wemake-python-styleguide==0.16.1
-
