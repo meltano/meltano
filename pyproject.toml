@@ -603,6 +603,7 @@ select = [
   "RSE", # flake8-raise
   "S",   # flake8-bandit
   "SIM", # flake8-simplify
+  "T20", # flake8-print
   "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
