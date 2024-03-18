@@ -92,7 +92,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.2
 
     - name: Install Poetry
       env:
@@ -113,7 +113,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.1.0
+      uses: docker/setup-buildx-action@v3.2.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
@@ -247,7 +247,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.2
 
     - name: Install Poetry
       env:
@@ -302,7 +302,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.2
 
     - name: Install Poetry
       env:
