@@ -24,7 +24,7 @@ def _get_active_manifest() -> Manifest:
     try:
         return _active_manifest[-1]
     except IndexError:
-        raise Exception("No manifest has been activated") from None
+        raise Exception("No manifest has been activated") from None  # noqa: EM101
 
 
 @contextmanager
@@ -100,7 +100,7 @@ def plugin_context(plugin_name: str) -> t.Iterator[None]:
             if x["name"] == plugin_name
         )
     except StopIteration:
-        raise ValueError(f"Plugin {plugin_name!r} not found in manifest") from None
+        raise ValueError(f"Plugin {plugin_name!r} not found in manifest") from None  # noqa: EM102
 
     with _env_context(plugin["env"]):
         yield
@@ -128,7 +128,7 @@ def schedule_context(schedule_name: str) -> t.Iterator[None]:
     try:
         schedule = next(x for x in schedules if x["name"] == schedule_name)
     except StopIteration:
-        raise ValueError(f"Schedule {schedule!r} not found in manifest") from None
+        raise ValueError(f"Schedule {schedule!r} not found in manifest") from None  # noqa: EM102
 
     with _env_context(schedule["env"]):
         yield
@@ -156,7 +156,7 @@ def job_context(job_name: str) -> t.Iterator[None]:
     try:
         job = next(x for x in jobs if x["name"] == job_name)
     except StopIteration:
-        raise ValueError(f"Job {job!r} not found in manifest") from None
+        raise ValueError(f"Job {job!r} not found in manifest") from None  # noqa: EM102
 
     with _env_context(job["env"]):
         yield

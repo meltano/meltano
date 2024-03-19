@@ -455,7 +455,7 @@ def _apply_scaffold(
         if key == "[]":
             if not isinstance(manifest_component, list):
                 raise TypeError(
-                    "Expected list during manifest scaffolding, "
+                    "Expected list during manifest scaffolding, "  # noqa: EM102
                     f"got {type(manifest_component)}",
                 )
             for element in manifest_component:
@@ -467,7 +467,7 @@ def _apply_scaffold(
             )
         else:
             raise TypeError(
-                "Expected dict during manifest scaffolding, "
+                "Expected dict during manifest scaffolding, "  # noqa: EM102
                 f"got {type(manifest_component)}",
             )
 

@@ -355,7 +355,7 @@ def iso8601_datetime(d):
     for format_string in isoformats:
         with suppress(ValueError):
             return coerce_datetime(datetime.strptime(d, format_string))
-    raise ValueError(f"{d} is not a valid UTC date.")
+    raise ValueError(f"{d} is not a valid UTC date.")  # noqa: EM102
 
 
 class _GetItemProtocol(t.Protocol):
@@ -625,7 +625,7 @@ def hash_sha256(value: str | bytes) -> str:
         ValueError: If we are blindly passed a value that is None.
     """
     if value is None:
-        raise ValueError("Cannot hash None.")
+        raise ValueError("Cannot hash None.")  # noqa: EM101
     if isinstance(value, str):
         value = value.encode()
     return hashlib.sha256(value).hexdigest()
@@ -691,7 +691,7 @@ def strtobool(val: str) -> bool:
     elif val in {"n", "no", "f", "false", "off", "0"}:
         return False
 
-    raise ValueError(f"invalid truth value {val!r}")
+    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
 
 
 def get_boolean_env_var(env_var: str, default: bool = False) -> bool:

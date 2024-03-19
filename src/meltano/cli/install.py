@@ -107,7 +107,7 @@ def install(  # noqa: C901
     )
     if not success:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError("Failed to install plugin(s)")
+        raise CliError("Failed to install plugin(s)")  # noqa: EM101
     tracker.track_command_event(CliEvent.completed)
 
 

@@ -58,7 +58,7 @@ class SingerRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start extractor: {err}") from err
+            raise RunnerError(f"Cannot start extractor: {err}") from err  # noqa: EM102
 
         # Start target
         try:
@@ -69,7 +69,7 @@ class SingerRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start loader: {err}") from err
+            raise RunnerError(f"Cannot start loader: {err}") from err  # noqa: EM102
 
         # Process tap output
         tap_outputs = [p_target.stdin]
@@ -192,13 +192,13 @@ class SingerRunner(Runner):
 
         if tap_code and target_code:
             raise RunnerError(
-                "Extractor and loader failed",
+                "Extractor and loader failed",  # noqa: EM101
                 {PluginType.EXTRACTORS: tap_code, PluginType.LOADERS: target_code},
             )
         elif tap_code:
-            raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})
+            raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})  # noqa: EM101
         elif target_code:
-            raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})
+            raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
@@ -259,4 +259,4 @@ class SingerRunner(Runner):
             "To learn more, visit "
             "https://docs.meltano.com/reference/settings#eltbuffer_size",
         )
-        raise RunnerError("Output line length limit exceeded") from exception
+        raise RunnerError("Output line length limit exceeded") from exception  # noqa: EM101

@@ -37,7 +37,7 @@ class FakeTraceback:  # pragma: no cover
 
     def __init__(self, frames, line_nums):
         if len(frames) != len(line_nums):
-            raise ValueError("Ya messed up!")
+            raise ValueError("Ya messed up!")  # noqa: EM101
         self._frames = frames
         self._line_nums = line_nums
         self.tb_frame = frames[0]

@@ -44,7 +44,7 @@ def ping(project: Project):
         project.hub_service.get_plugins_of_type(PluginType.ORCHESTRATORS)
     except Exception as ex:
         raise click.ClickException(
-            f"Failed to connect to the Hub at {project.hub_service.hub_api_url!r}",
+            f"Failed to connect to the Hub at {project.hub_service.hub_api_url!r}",  # noqa: EM102
         ) from ex
     else:
         click.secho(

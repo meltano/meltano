@@ -74,4 +74,4 @@ def handle_producer_line_length_limit_error(
         "To learn more, visit "
         "https://docs.meltano.com/reference/settings#eltbuffer_size",
     )
-    raise RunnerError("Output line length limit exceeded") from exception
+    raise RunnerError("Output line length limit exceeded") from exception  # noqa: EM101

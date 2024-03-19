@@ -202,7 +202,7 @@ def add(ctx, job_name: str, raw_tasks: str):
         task_sets_service.add(task_sets)
     except JobAlreadyExistsError as serr:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError(f"Job '{task_sets.name}' already exists.") from serr
+        raise CliError(f"Job '{task_sets.name}' already exists.") from serr  # noqa: EM102
 
     click.echo(f"Added job {task_sets.name}: {task_sets.tasks}")
 
