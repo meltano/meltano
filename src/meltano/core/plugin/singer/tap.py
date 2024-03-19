@@ -279,7 +279,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         """
         if "state" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support incremental state",
+                f"Extractor '{self.name}' does not support incremental state",  # noqa: EM102
             )
 
         state_path = plugin_invoker.files["state"]
@@ -309,7 +309,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
-                    f"Could not find state file {custom_state_path}",
+                    f"Could not find state file {custom_state_path}",  # noqa: EM102
                 ) from err
 
             return
@@ -387,7 +387,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
-                    f"Could not find catalog file {custom_catalog_path}",
+                    f"Could not find catalog file {custom_catalog_path}",  # noqa: EM102
                 ) from err
         else:
             await self.run_discovery(plugin_invoker, catalog_path)
@@ -400,7 +400,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
-                f"Catalog discovery failed: invalid catalog: {err}",
+                f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
             ) from err
 
     async def run_discovery(  # noqa: WPS238, WPS210
@@ -422,7 +422,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         """
         if "discover" not in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support catalog discovery "
+                f"Extractor '{self.name}' does not support catalog discovery "  # noqa: EM102
                 "(the `discover` capability is not advertised)",
             )
         with StringIO("") as stderr_buff:
@@ -476,7 +476,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 catalog_path.unlink()
                 stderr_buff.seek(0)
                 raise PluginExecutionError(
-                    "Catalog discovery failed: command "
+                    "Catalog discovery failed: command "  # noqa: EM102
                     f"{plugin_invoker.exec_args('--discover')} returned "
                     f"{exit_code} with stderr:\n {stderr_buff.read()}",
                 )
@@ -526,7 +526,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             and "properties" not in plugin_invoker.capabilities
         ):
             raise PluginLacksCapabilityError(
-                f"Extractor '{self.name}' does not support entity selection "
+                f"Extractor '{self.name}' does not support entity selection "  # noqa: EM102
                 "or catalog metadata and schema rules",
             )
 
@@ -573,12 +573,12 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                     catalog_cache_key_path.unlink()
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                "Applying catalog rules failed: catalog file is missing.",
+                "Applying catalog rules failed: catalog file is missing.",  # noqa: EM101
             ) from err
         except Exception as err:
             catalog_path.unlink()
             raise PluginExecutionError(
-                f"Applying catalog rules failed: catalog file is invalid: {err}",
+                f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
             ) from err
 
     def catalog_cache_key(self, plugin_invoker):

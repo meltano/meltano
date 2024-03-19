@@ -133,7 +133,7 @@ class ProjectFiles:  # noqa: WPS214
             InvalidIncludePathError: If the included path is not a valid file.
         """
         if not (file_path.is_file() and file_path.exists()):
-            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")
+            raise InvalidIncludePathError(f"Included path '{file_path}' not found.")  # noqa: EM102
 
     def _resolve_include_paths(self, include_path_patterns: list[str]) -> list[Path]:
         """Return a list of paths from a list of glob pattern strings.
@@ -182,7 +182,7 @@ class ProjectFiles:  # noqa: WPS214
                 f'Plugin with path "{key_path_string}" already added in '  # noqa: G004
                 f"file {existing_key_file_path}.",
             )
-            raise Exception("Duplicate plugin name found.")
+            raise Exception("Duplicate plugin name found.")  # noqa: EM101
         else:
             self._plugin_file_map.update({key: str(include_path)})
 

@@ -418,7 +418,7 @@ class ELTContextBuilder:  # noqa: WPS214
         except PluginNotFoundError as err:
             if plugin_ref.name == "dbt":
                 raise PluginNotFoundError(
-                    "Transformer 'dbt' not found.\n"
+                    "Transformer 'dbt' not found.\n"  # noqa: EM101
                     "Use of the legacy 'dbt' Transformer is deprecated in favor of "
                     "new adapter specific implementations (e.g. 'dbt-snowflake') "
                     "compatible with the 'meltano run ...' command.\n"

@@ -99,7 +99,7 @@ class JsonschemaRefLocationParser:
         location_as_ref = self.path_to_ref(path)
         if location_as_ref.startswith(ref):
             raise RecursionError(
-                "Cannot resolve recursive jsonschema "
+                "Cannot resolve recursive jsonschema "  # noqa: EM102
                 f"ref {ref!r} at {location_as_ref!r}",
             )
 
@@ -107,14 +107,14 @@ class JsonschemaRefLocationParser:
         parts = ref.split("/")
 
         if parts[0] != "#":
-            raise ValueError("Cannot resolve non-local jsonschema ref")
+            raise ValueError("Cannot resolve non-local jsonschema ref")  # noqa: EM101
 
         for key in parts[1:]:
             try:
                 current_schema = current_schema[key]
             except KeyError as ex:
                 raise KeyError(
-                    f"Unable to resolve local jsonschema ref {ref!r} at level {key!r}",
+                    f"Unable to resolve local jsonschema ref {ref!r} at level {key!r}",  # noqa: EM102
                 ) from ex
         return current_schema
 

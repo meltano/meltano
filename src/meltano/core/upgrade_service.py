@@ -90,7 +90,7 @@ class UpgradeService:  # noqa: WPS214
         )
 
         if run.returncode != 0:
-            raise UpgradeError("Failed to upgrade `meltano`.", run)
+            raise UpgradeError("Failed to upgrade `meltano`.", run)  # noqa: EM101
 
         return True
 
@@ -141,7 +141,7 @@ class UpgradeService:  # noqa: WPS214
             reason=PluginInstallReason.UPGRADE,
         )
         if not success:
-            raise MeltanoError("Failed to upgrade plugin(s)")
+            raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
 
     def migrate_database(self):
         """Migrate the Meltano database.

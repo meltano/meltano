@@ -109,7 +109,7 @@ class PluginsTrackingContext(SelfDescribingJson):
         if isinstance(blk, PluginCommandBlock):
             return cls([(blk.context.plugin, blk.command)])
         raise TypeError(
-            "Parameter 'blk' must be an instance of 'BlockSet' or "
+            "Parameter 'blk' must be an instance of 'BlockSet' or "  # noqa: EM102
             f"'PluginCommandBlock', not {type(blk)!r}",
         )
 

@@ -34,7 +34,7 @@ class Versioned(ABC):
 
         if file_version != version:
             raise IncompatibleVersionError(
-                f"Version {version} required, currently at {self.file_version}",
+                f"Version {version} required, currently at {self.file_version}",  # noqa: EM102
                 file_version,
                 version,
             )

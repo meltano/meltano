@@ -102,14 +102,14 @@ def _run_cli():
             cli(obj={"project": None})
         except ProjectReadonly as err:
             raise CliError(
-                f"The requested action could not be completed: {err}",
+                f"The requested action could not be completed: {err}",  # noqa: EM102
             ) from err
         except KeyboardInterrupt:  # noqa: WPS329
             raise
         except MeltanoError as err:
             handle_meltano_error(err)
         except Exception as err:
-            raise CliError(f"{troubleshooting_message}\n{err}") from err
+            raise CliError(f"{troubleshooting_message}\n{err}") from err  # noqa: EM102
     except CliError as cli_error:
         cli_error.print()
         sys.exit(1)

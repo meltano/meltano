@@ -108,7 +108,7 @@ def test_complex_exception_context():
             nonlocal file_not_found_error
             file_not_found_error = ex
             line_nums.append(1 + inspect.currentframe().f_lineno)
-            raise ValueError("that path was a bad value") from ex
+            raise ValueError("that path was a bad value") from ex  # noqa: EM101
 
     try:
         try:  # noqa: WPS505

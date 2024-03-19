@@ -86,7 +86,7 @@ class Superset(BasePlugin):
 
             if not custom_config_path.exists():
                 raise PluginExecutionError(
-                    f"Could not find config file {custom_config_path}",
+                    f"Could not find config file {custom_config_path}",  # noqa: EM102
                 )
 
             config_script_lines.extend(
@@ -134,7 +134,7 @@ class Superset(BasePlugin):
         if exit_code:
             raise AsyncSubprocessError(
                 (
-                    "Superset metadata database could not be initialized: "
+                    "Superset metadata database could not be initialized: "  # noqa: EM101
                     "`superset db upgrade` failed"
                 ),
                 handle,
@@ -167,7 +167,7 @@ class Superset(BasePlugin):
         if exit_code:
             raise AsyncSubprocessError(
                 (
-                    "Superset default roles and permissions could not be "
+                    "Superset default roles and permissions could not be "  # noqa: EM101
                     "created: `superset init` failed"
                 ),
                 handle,

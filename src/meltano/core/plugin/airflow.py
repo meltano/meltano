@@ -123,7 +123,7 @@ class Airflow(BasePlugin):
 
         if exit_code:
             raise AsyncSubprocessError(
-                "Command `airflow --help` failed",
+                "Command `airflow --help` failed",  # noqa: EM101
                 process=handle,
             )
 
@@ -146,7 +146,7 @@ class Airflow(BasePlugin):
 
         if handle.returncode:
             raise AsyncSubprocessError(
-                "Command `airflow version` failed",
+                "Command `airflow version` failed",  # noqa: EM101
                 process=handle,
             )
 
@@ -165,7 +165,7 @@ class Airflow(BasePlugin):
         if exit_code:
             raise AsyncSubprocessError(
                 (
-                    "Airflow metadata database could not be initialized: "
+                    "Airflow metadata database could not be initialized: "  # noqa: EM101
                     "`airflow initdb` failed"
                 ),
                 handle,
