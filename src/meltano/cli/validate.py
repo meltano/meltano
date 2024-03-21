@@ -64,7 +64,7 @@ class CommandLineRunner(ValidationsRunner):
         handle = await self.invoker.invoke_async(command=name)
         with propagate_stop_signals(handle):
             exit_code = await handle.wait()
-        return exit_code
+        return exit_code  # noqa: RET504
 
 
 @click.command(

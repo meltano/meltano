@@ -86,7 +86,7 @@ class AsyncSubprocessError(Exception):
         """Return the output of the process to stderr."""
         if not self._stderr:  # noqa: DAR201
             return None
-        elif not isinstance(self._stderr, str):
+        elif not isinstance(self._stderr, str):  # noqa: RET505
             stream = await self._stderr.read()
             self._stderr = stream.decode("utf-8")
 

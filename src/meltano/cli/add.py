@@ -32,7 +32,7 @@ if t.TYPE_CHECKING:
 
 def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     if not value:
-        return
+        return None
 
     try:
         url = urlparse(value)

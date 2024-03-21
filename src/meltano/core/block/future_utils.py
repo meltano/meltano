@@ -26,9 +26,9 @@ def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
     Returns:
         The first future that failed.
     """
-    if exception_future in done:
+    if exception_future in done:  # noqa: RET503
         futures_done, _ = exception_future.result()
-        if futures_failed := [
+        if futures_failed := [  # noqa: RET503
             future for future in futures_done if future.exception() is not None
         ]:
             return futures_failed.pop()

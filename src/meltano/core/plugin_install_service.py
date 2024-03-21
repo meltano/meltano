@@ -161,7 +161,7 @@ class PluginInstallService:  # noqa: WPS214
         """
         if self._parallelism is None:
             return cpu_count()
-        elif self._parallelism < 1:
+        elif self._parallelism < 1:  # noqa: RET505
             return sys.maxsize
         return self._parallelism
 

@@ -604,6 +604,7 @@ select = [
   "ISC", # flake8-implicit-str-concat
   "N",   # pep8-naming
   "PT",  # flake8-pytest-style
+  "RET", # flake8-return
   "RSE", # flake8-raise
   "S",   # flake8-bandit
   "SIM", # flake8-simplify

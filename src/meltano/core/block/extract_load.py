@@ -94,7 +94,7 @@ class ELBContext:  # noqa: WPS230
         Returns:
             The run directory for the current job.
         """
-        if self.job:
+        if self.job:  # noqa: RET503
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
@@ -278,7 +278,7 @@ class ELBContextBuilder:  # noqa: WPS214
         Returns:
             The run directory for the current job.
         """
-        if self._job:
+        if self._job:  # noqa: RET503
             return self.project.job_dir(self._job.job_name, str(self._job.run_id))
 
     def context(self) -> ELBContext:
@@ -377,7 +377,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):
+        for idx, block in reversed(list(enumerate(self.blocks))):  # noqa: RET503
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
@@ -390,7 +390,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):
+        for idx, block in enumerate(self.blocks):  # noqa: RET503
             if idx >= index:
                 return True
             if block.process_future.done():
@@ -737,7 +737,7 @@ class ELBExecutionManager:
                     stream_buffer_size=self.stream_buffer_size,
                 )
             raise output_futures_failed.exception()  # noqa: RSE102
-        else:
+        else:  # noqa: RET506
             # If all the output handlers completed without raising an
             # exception, we still need to wait for all the underlying block
             # processes to complete. Note that since all output handlers

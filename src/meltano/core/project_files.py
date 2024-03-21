@@ -183,7 +183,7 @@ class ProjectFiles:  # noqa: WPS214
                 f"file {existing_key_file_path}.",
             )
             raise Exception("Duplicate plugin name found.")  # noqa: EM101
-        else:
+        else:  # noqa: RET506
             self._plugin_file_map.update({key: str(include_path)})
 
     def _index_file(  # noqa: WPS210

@@ -154,7 +154,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
-        return None  # noqa: DAR201
+        return None  # noqa: DAR201, RET501
 
     @property
     @abstractmethod

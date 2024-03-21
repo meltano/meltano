@@ -535,7 +535,7 @@ def expand_env_vars(
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
-            elif if_missing == EnvVarMissingBehavior.ignore:
+            elif if_missing == EnvVarMissingBehavior.ignore:  # noqa: RET506
                 return f"${{{var}}}"
             return ""
         if not val:
@@ -688,7 +688,7 @@ def strtobool(val: str) -> bool:
     val = val.lower()
     if val in {"y", "yes", "t", "true", "on", "1"}:
         return True
-    elif val in {"n", "no", "f", "false", "off", "0"}:
+    elif val in {"n", "no", "f", "false", "off", "0"}:  # noqa: RET505
         return False
 
     raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
@@ -827,7 +827,7 @@ def remove_suffix(string: str, suffix: str) -> str:
     """
     if sys.version_info >= (3, 9):
         return string.removesuffix(suffix)
-    elif string.endswith(suffix):
+    elif string.endswith(suffix):  # noqa: RET505
         return string[: -len(suffix)]
     return string
 

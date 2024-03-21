@@ -1274,7 +1274,7 @@ class AutoStoreManager(SettingsStoreManager):
         if setting_def and setting_def.is_redacted:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
-            elif self.ensure_supported(store=SettingValueStore.DB):
+            elif self.ensure_supported(store=SettingValueStore.DB):  # noqa: RET505
                 return SettingValueStore.DB
             # ensure secrets don't leak into other stores
             return None
@@ -1293,7 +1293,7 @@ class AutoStoreManager(SettingsStoreManager):
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML
             # fall back to dotenv
-            elif self.ensure_supported(store=SettingValueStore.DOTENV):
+            elif self.ensure_supported(store=SettingValueStore.DOTENV):  # noqa: RET505
                 return SettingValueStore.DOTENV
             # fall back to meltano system db
             elif self.ensure_supported(store=SettingValueStore.DB):
@@ -1308,7 +1308,7 @@ class AutoStoreManager(SettingsStoreManager):
         if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
             return SettingValueStore.MELTANO_YML
         # fall back to dotenv
-        elif self.ensure_supported(store=SettingValueStore.DOTENV):
+        elif self.ensure_supported(store=SettingValueStore.DOTENV):  # noqa: RET505
             return SettingValueStore.DOTENV
         # fall back to meltano system db
         elif self.ensure_supported(store=SettingValueStore.DB):

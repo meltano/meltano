@@ -148,7 +148,7 @@ class EventMatcher:
         Returns:
             True if the event was found, False otherwise.
         """
-        for line in self.seen_events:
+        for line in self.seen_events:  # noqa: RET503
             matches = line["event"] == event
             if matches:
                 return True

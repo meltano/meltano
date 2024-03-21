@@ -451,7 +451,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:
                 return utils.truthy(value)
-            elif self.kind == SettingKind.INTEGER:
+            elif self.kind == SettingKind.INTEGER:  # noqa: RET505
                 return int(value)
             elif self.kind == SettingKind.OBJECT:
                 value = dict(

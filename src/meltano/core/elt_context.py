@@ -144,7 +144,7 @@ class ELTContext:  # noqa: WPS230
         Returns:
             The job dir, if a Job is provided, else None.
         """
-        if self.job:
+        if self.job:  # noqa: RET503
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:

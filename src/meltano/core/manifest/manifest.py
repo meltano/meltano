@@ -270,7 +270,7 @@ class Manifest:  # noqa: WPS214
         """
         if key != "env":
             return NotImplemented  # type: ignore
-        data[key] = self.sanitize_env_vars(
+        data[key] = self.sanitize_env_vars(  # noqa: RET503
             {
                 **expand_env_vars(
                     data[key],
