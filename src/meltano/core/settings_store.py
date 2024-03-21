@@ -842,7 +842,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
             raise StoreNotSupportedError(
-                "Project config cannot be stored in an Environment.",
+                "Project config cannot be stored in an Environment.",  # noqa: EM101
             )
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
@@ -912,7 +912,7 @@ class DbStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if database session is not provided.
         """
         if not self.session:
-            raise StoreNotSupportedError("No database session provided")
+            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
 
     def get(
         self,
@@ -1090,10 +1090,10 @@ class InheritedStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if no setting_def is passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError("Setting is missing")
+            raise StoreNotSupportedError("Setting is missing")  # noqa: EM101
 
         if not self.inherited_settings_service:
-            raise StoreNotSupportedError("Inherited settings service is missing")
+            raise StoreNotSupportedError("Inherited settings service is missing")  # noqa: EM101
 
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:
@@ -1394,7 +1394,7 @@ class AutoStoreManager(SettingsStoreManager):
         store = self.auto_store(name, setting_def=setting_def)
         logger.debug(f"AutoStoreManager returned store '{store}'")  # noqa: G004
         if store is None:
-            raise StoreNotSupportedError("No storage method available")
+            raise StoreNotSupportedError("No storage method available")  # noqa: EM101
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)

@@ -95,7 +95,7 @@ async def select(
                 remove=flags["remove"],
             )
     except PluginExecutionError as err:
-        raise CliError(f"Cannot list the selected attributes: {err}") from err
+        raise CliError(f"Cannot list the selected attributes: {err}") from err  # noqa: EM102
 
 
 def update(

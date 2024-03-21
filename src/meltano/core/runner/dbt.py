@@ -38,7 +38,7 @@ class DbtRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start dbt: {err}") from err
+            raise RunnerError(f"Cannot start dbt: {err}") from err  # noqa: EM102
 
         await asyncio.wait(
             [
@@ -55,7 +55,7 @@ class DbtRunner(Runner):
         if exitcode := handle.returncode:
             command = kwargs["command"] or args[0]
             raise RunnerError(
-                f"`dbt {command}` failed",
+                f"`dbt {command}` failed",  # noqa: EM102
                 {PluginType.TRANSFORMERS: exitcode},
             )
 

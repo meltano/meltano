@@ -38,7 +38,7 @@ elif PYTEST_BACKEND == "postgresql_psycopg3":
 elif PYTEST_BACKEND == "mssql":
     pytest_plugins.append("fixtures.db.mssql")
 else:
-    raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")
+    raise Exception(f"Unsuported backend: {PYTEST_BACKEND}.")  # noqa: EM102
 
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 

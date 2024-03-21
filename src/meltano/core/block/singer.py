@@ -100,7 +100,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
                 stderr=asyncio.subprocess.PIPE,
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start plugin: {err}") from err
+            raise RunnerError(f"Cannot start plugin: {err}") from err  # noqa: EM102
 
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
@@ -133,7 +133,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
                 to proxy.
         """
         if self.process_handle is None:
-            raise IOLinkError("No IO to proxy, process not running")
+            raise IOLinkError("No IO to proxy, process not running")  # noqa: EM101
 
         if self._stdout_future is None:
             outputs = self._merge_outputs(self.invoker.StdioSource.STDOUT, self.outputs)
@@ -154,7 +154,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
                 to proxy.
         """
         if self.process_handle is None:
-            raise IOLinkError("No IO to proxy, process not running")
+            raise IOLinkError("No IO to proxy, process not running")  # noqa: EM101
 
         if self._stderr_future is None:
             err_outputs = self._merge_outputs(
@@ -187,7 +187,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self._process_future is None:
             if self.process_handle is None:
                 raise ProcessWaitError(
-                    "No process to wait, process not running running",
+                    "No process to wait, process not running running",  # noqa: EM101
                 )
             self._process_future = asyncio.ensure_future(self.process_handle.wait())
         return self._process_future
@@ -220,7 +220,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self._stdout_future is None:
             self.outputs.append(dst)
         else:
-            raise IOLinkError("IO capture already in flight")
+            raise IOLinkError("IO capture already in flight")  # noqa: EM101
 
     def stderr_link(self, dst: SubprocessOutputWriter):
         """Use stderr_link to instruct block to link/write stderr content to dst.
@@ -234,7 +234,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         if self._stderr_future is None:
             self.err_outputs.append(dst)
         else:
-            raise IOLinkError("IO capture already in flight")
+            raise IOLinkError("IO capture already in flight")  # noqa: EM101
 
     async def pre(self, context) -> None:
         """Pre triggers preparation of the underlying plugin.
@@ -336,7 +336,7 @@ class SingerBlock(InvokerBase, IOBlock):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err
+            raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102
 
     async def stop(self, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.

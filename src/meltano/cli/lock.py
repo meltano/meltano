@@ -60,7 +60,7 @@ def lock(
     lock_service = PluginLockService(project)
     if (all_plugins and plugin_name) or not (all_plugins or plugin_name):
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Exactly one of --all or plugin name must be specified.")
+        raise CliError("Exactly one of --all or plugin name must be specified.")  # noqa: EM101
 
     try:
         with project.plugins.use_preferred_source(DefinitionSource.ANY):
