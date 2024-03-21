@@ -5,6 +5,7 @@ import logging
 import os
 import tempfile
 import typing as t
+import uuid
 from pathlib import Path
 
 import mock
@@ -32,6 +33,7 @@ from meltano.core.runner.singer import SingerRunner
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 TEST_STATE_ID = "test_job"
 MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
@@ -576,6 +578,24 @@ class TestExtractLoadBlocks:
 
             await elb.run()
             assert elb.run_with_job.call_count == 1
+
+    def test_custom_run_id(
+        self,
+        tap,
+        target,
+        project_with_environment: Project,
+    ):
+        run_id = uuid.UUID("12345678-1234-5678-1234-567812345678")
+        builder = ELBContextBuilder(project_with_environment).with_run_id(run_id)
+        assert builder._run_id == run_id
+
+        elb_context = builder.context()
+        tap_block = builder.make_block(tap)
+        target_block = builder.make_block(target)
+        extract_load_blocks = ExtractLoadBlocks(elb_context, (tap_block, target_block))
+        assert extract_load_blocks.context.update_state
+        assert extract_load_blocks.context.job is not None
+        assert extract_load_blocks.context.job.run_id == run_id
 
 
 class TestExtractLoadUtils:

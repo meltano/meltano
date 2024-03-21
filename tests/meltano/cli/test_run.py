@@ -4,11 +4,14 @@ import asyncio
 import json
 import re
 import typing as t
+import uuid
 
+import click
 import pytest
 from mock import AsyncMock, mock
 
 from meltano.cli import cli
+from meltano.cli.run import UUIDParamType
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
@@ -1301,3 +1304,16 @@ class TestCliRunScratchpadOne:
                 assert match
             else:
                 assert not match
+
+
+class TestUUIDParamType:
+    def test_valid_uuid(self):
+        param = UUIDParamType()
+        value = "123e4567-e89b-12d3-a456-426614174000"
+        assert param.convert(value, None, None) == uuid.UUID(value)
+
+    def test_invalid_uuid(self):
+        param = UUIDParamType()
+        value = "zzz"
+        with pytest.raises(click.BadParameter, match="is not a valid UUID"):
+            param.convert(value, None, None)
