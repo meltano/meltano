@@ -51,7 +51,7 @@ class CliError(Exception):
 
         self.printed = False
 
-    def print(self):
+    def print(self):  # noqa: T202
         """Print CLI error."""
         if self.printed:
             return
