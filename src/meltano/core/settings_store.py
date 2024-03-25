@@ -83,16 +83,16 @@ def cast_setting_value(
     metadata: dict[str, t.Any],
     setting_def: SettingDefinition | None,
 ) -> tuple[t.Any, dict[str, t.Any]]:
-    """Cast a setting value according to its setting defition.
+    """Cast a setting value according to its setting definition.
 
     Args:
         value: The setting value to be cast.
         metadata: The metadata of the setting value.
-        setting_def: The setting defition.
+        setting_def: The setting definition.
 
     Returns:
         A tuple with the setting value, and its metadata. If the
-        setting defition was `None`, or the value was not changed by
+        setting definition was `None`, or the value was not changed by
         the cast, the pair returned is the same `value` and `metadata`
         objects provided. Otherwise, the cast value is returned along
         with a new dictionary which is a shallow copy of the provided
@@ -108,10 +108,10 @@ def cast_setting_value(
 class SettingValueStore(str, Enum):
     """Setting Value Store.
 
-    Note: The declaration order of stores determins store precedence when using
+    Note: The declaration order of stores determines store precedence when using
         the Auto store manager. This is because the `.readables()` and
         `.writables()` methods return ordered lists that the Auto store manager
-        iterates over when retrieveing setting values.
+        iterates over when retrieving setting values.
     """
 
     CONFIG_OVERRIDE = "config_override"
@@ -1274,7 +1274,7 @@ class AutoStoreManager(SettingsStoreManager):
         if setting_def and setting_def.is_redacted:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
-            elif self.ensure_supported(store=SettingValueStore.DB):  # noqa: RET505
+            if self.ensure_supported(store=SettingValueStore.DB):
                 return SettingValueStore.DB
             # ensure secrets don't leak into other stores
             return None
@@ -1293,10 +1293,10 @@ class AutoStoreManager(SettingsStoreManager):
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML
             # fall back to dotenv
-            elif self.ensure_supported(store=SettingValueStore.DOTENV):  # noqa: RET505
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
             # fall back to meltano system db
-            elif self.ensure_supported(store=SettingValueStore.DB):
+            if self.ensure_supported(store=SettingValueStore.DB):
                 return SettingValueStore.DB
             return None
 
@@ -1308,10 +1308,10 @@ class AutoStoreManager(SettingsStoreManager):
         if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
             return SettingValueStore.MELTANO_YML
         # fall back to dotenv
-        elif self.ensure_supported(store=SettingValueStore.DOTENV):  # noqa: RET505
+        if self.ensure_supported(store=SettingValueStore.DOTENV):
             return SettingValueStore.DOTENV
         # fall back to meltano system db
-        elif self.ensure_supported(store=SettingValueStore.DB):
+        if self.ensure_supported(store=SettingValueStore.DB):
             return SettingValueStore.DB
         return None
 
@@ -1329,7 +1329,7 @@ class AutoStoreManager(SettingsStoreManager):
             setting_def: SettingDefinition. If none is passed, one will be
                 discovered using `self.find_setting(name)`.
             cast_value: Whether to cast the value according to `setting_def`.
-            kwargs: Additional keword arguments to pass to `manager.get()`.
+            kwargs: Additional keyword arguments to pass to `manager.get()`.
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.

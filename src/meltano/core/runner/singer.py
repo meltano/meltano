@@ -142,14 +142,14 @@ class SingerRunner(Runner):
 
                 failed_future = output_futures_failed.pop()
                 raise failed_future.exception()  # noqa: RSE102
-            else:  # noqa: RET506
-                # If all of the output handlers completed without raising an
-                # exception, we still need to wait for the tap or target to
-                # complete.
-                done, _ = await asyncio.wait(
-                    [tap_process_future, target_process_future],
-                    return_when=asyncio.FIRST_COMPLETED,
-                )
+
+            # If all of the output handlers completed without raising an
+            # exception, we still need to wait for the tap or target to
+            # complete.
+            done, _ = await asyncio.wait(
+                [tap_process_future, target_process_future],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
 
         if target_process_future in done:
             target_code = target_process_future.result()
@@ -195,9 +195,9 @@ class SingerRunner(Runner):
                 "Extractor and loader failed",  # noqa: EM101
                 {PluginType.EXTRACTORS: tap_code, PluginType.LOADERS: target_code},
             )
-        elif tap_code:  # noqa: RET506
+        if tap_code:
             raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})  # noqa: EM101
-        elif target_code:
+        if target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):

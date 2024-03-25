@@ -86,7 +86,7 @@ class AsyncSubprocessError(Exception):
         """Return the output of the process to stderr."""
         if not self._stderr:  # noqa: DAR201
             return None
-        elif not isinstance(self._stderr, str):  # noqa: RET505
+        if not isinstance(self._stderr, str):
             stream = await self._stderr.read()
             self._stderr = stream.decode("utf-8")
 
@@ -112,7 +112,7 @@ class EmptyMeltanoFileException(MeltanoError):
 
 
 class MeltanoConfigurationError(MeltanoError):
-    """Exception for when Meltano is inproperly configured."""
+    """Exception for when Meltano is improperly configured."""
 
 
 class ProjectNotFound(Error):

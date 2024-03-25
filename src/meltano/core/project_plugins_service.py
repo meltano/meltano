@@ -242,7 +242,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 )
             ):
                 return self.ensure_parent(plugin)
-            elif plugin.type == PluginType.MAPPERS:  # noqa: RET505
+
+            if plugin.type == PluginType.MAPPERS:
                 mapping = self._find_mapping(plugin_name, plugin)
                 if mapping:
                     return mapping

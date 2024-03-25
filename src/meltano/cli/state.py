@@ -235,7 +235,7 @@ def merge_state(
     }
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
-    elif input_file:  # noqa: RET506
+    if input_file:
         with open(input_file) as state_f:
             state_service.add_state(
                 state_id,
@@ -282,7 +282,7 @@ def set_state(
     }
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
-    elif input_file:  # noqa: RET506
+    if input_file:
         with open(input_file) as state_f:
             state_service.set_state(state_id, state_f.read())
     elif state:

@@ -737,12 +737,13 @@ class ELBExecutionManager:
                     stream_buffer_size=self.stream_buffer_size,
                 )
             raise output_futures_failed.exception()  # noqa: RSE102
-        else:  # noqa: RET506
-            # If all the output handlers completed without raising an
-            # exception, we still need to wait for all the underlying block
-            # processes to complete. Note that since all output handlers
-            # completed we DO NOT need to wait for any output futures!
-            done = await self.elb.process_wait(None, start_idx)
+
+        # If all the output handlers completed without raising an
+        # exception, we still need to wait for all the underlying block
+        # processes to complete. Note that since all output handlers
+        # completed we DO NOT need to wait for any output futures!
+        done = await self.elb.process_wait(None, start_idx)
+
         if self.elb.tail.process_future.done():
             logger.debug("tail consumer completed first")
             self._consumer_code = self.elb.tail.process_future.result()

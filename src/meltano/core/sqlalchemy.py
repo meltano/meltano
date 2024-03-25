@@ -76,7 +76,7 @@ class GUID(TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value is None:
             return value
-        elif dialect.name == "postgresql":  # noqa: RET505
+        if dialect.name == "postgresql":
             return str(value)
         if not isinstance(value, uuid.UUID):
             value = uuid.UUID(value)

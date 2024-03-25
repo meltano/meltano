@@ -234,7 +234,7 @@ class Manifest:  # noqa: WPS214
     def sanitize_env_vars(self, env: t.Mapping[str, str]) -> dict[str, str]:
         """Sanitize environment variables.
 
-        Sanitization is perfomed by:
+        Sanitization is performed by:
         - Replacing the project root as an absolute path in values with
             '${MELTANO_PROJECT_ROOT}'
 

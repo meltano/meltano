@@ -93,7 +93,7 @@ class VirtualEnv:
         """
         if self._system in {"Linux", "Darwin"}:
             return self.root / "lib"
-        elif self._system == "Windows":  # noqa: RET505
+        if self._system == "Windows":
             return self.root / "Lib"
         raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 
@@ -109,7 +109,7 @@ class VirtualEnv:
         """
         if self._system in {"Linux", "Darwin"}:
             return self.root / "bin"
-        elif self._system == "Windows":  # noqa: RET505
+        if self._system == "Windows":
             return self.root / "Scripts"
         raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 
@@ -129,7 +129,7 @@ class VirtualEnv:
                 / f"python{'.'.join(str(x) for x in self.python_version_tuple[:2])}"
                 / "site-packages"
             )
-        elif self._system == "Windows":  # noqa: RET505
+        if self._system == "Windows":
             return self.lib_dir / "site-packages"
         raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 

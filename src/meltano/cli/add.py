@@ -30,7 +30,7 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
+def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     if not value:
         return None
 
@@ -79,7 +79,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     "--from-ref",
     "plugin_yaml",
     callback=_load_yaml_from_ref,
-    help="Reference a plugin defintion to add from.",
+    help="Reference a plugin definition to add from.",
 )
 @click.option(
     "--python",

@@ -21,14 +21,13 @@ if t.TYPE_CHECKING:
 
 def selection_color(selection):
     """Return the appropriate colour for given SelectionType."""
-    ret_val = None
     if selection is SelectionType.SELECTED:
-        ret_val = "bright_green"
-    elif selection is SelectionType.AUTOMATIC:
-        ret_val = "bright_white"
-    elif selection is SelectionType.EXCLUDED:
-        ret_val = "red"
-    return ret_val  # RET503, RET505
+        return "bright_green"
+    if selection is SelectionType.AUTOMATIC:
+        return "bright_white"
+    if selection is SelectionType.EXCLUDED:
+        return "red"
+    return None
 
 
 def selection_mark(selection):

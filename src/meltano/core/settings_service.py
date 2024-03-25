@@ -623,7 +623,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         except StopIteration as err:
             raise SettingMissingError(name) from err
 
-    # TODO: The `for_writing` parameter is unsued, but referenced elsewhere.
+    # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
     def setting_env_vars(
         self,

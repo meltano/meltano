@@ -63,8 +63,7 @@ class CommandLineRunner(ValidationsRunner):
         write_sep_line(f"{self.plugin_name}:{name}", "=", bold=True)
         handle = await self.invoker.invoke_async(command=name)
         with propagate_stop_signals(handle):
-            exit_code = await handle.wait()
-        return exit_code  # noqa: RET504
+            return await handle.wait()
 
 
 @click.command(
@@ -88,7 +87,7 @@ class CommandLineRunner(ValidationsRunner):
 def test(
     project: Project,
     all_tests: bool,
-    plugin_tests: tuple[str] = (),
+    plugin_tests: tuple[str, ...] = (),
 ):
     """
     Run validations using plugins' tests.
