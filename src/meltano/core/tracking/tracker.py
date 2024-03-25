@@ -18,8 +18,6 @@ from warnings import warn
 import structlog
 import tzlocal
 from psutil import Process
-from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
-from snowplow_tracker import Tracker as SnowplowTracker
 
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
@@ -42,13 +40,67 @@ if t.TYPE_CHECKING:
 
 from functools import cached_property
 
+logger = structlog.get_logger(__name__)
+
+# Suppress these imports from snowplow_tracker if tracking is disabled
+# It helps to resolve issues related to import conflicts -
+# snowplow-tracker vs. minimal-snowplow tracker
+SNOWPLOW_TRACKER_AVAILABLE = False
+try:
+    from snowplow_tracker import (
+        Emitter,
+        SelfDescribing,
+        SelfDescribingJson,  # type: ignore
+    )
+    from snowplow_tracker import Tracker as SnowplowTracker
+
+    SNOWPLOW_TRACKER_AVAILABLE = True
+except Exception:  # pragma: no cover
+    logger.exception("Import of `snowplow_tracker` failed. Disable tracking to fix it.")
+
+    class SelfDescribingJson:
+        """A self-describing JSON object.
+
+        It is a copy from snowplow_tracker library.
+        We must define it if above imports fail,
+        it is used on many places across the whole codebase
+        """
+
+        def __init__(self, schema, data) -> None:
+            """Init a self-describing JSON object.
+
+            Args:
+                schema: JSON schema.
+                data: JSON payload
+            """
+            self.schema = schema
+            self.data = data
+
+        def to_json(self) -> dict:
+            """Return a JSON representation of the object.
+
+            Returns:
+                Dictionary with schema and data
+            """
+            return {
+                "schema": self.schema,
+                "data": self.data,
+            }
+
+        def to_string(self) -> str:
+            """Return a string representation of the object.
+
+            Returns:
+                String representation of the JSON
+            """
+            return json.dumps(self.to_json())
+
+
 URL_REGEX = (
     r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
 )
 
 MICROSECONDS_PER_SECOND = 1000000
-
-logger = structlog.get_logger(__name__)
 
 
 class BlockEvents(Enum):
@@ -86,7 +138,7 @@ class TelemetrySettings(t.NamedTuple):
 class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
-    def __init__(  # noqa: WPS210 - too many local variables
+    def __init__(  # noqa: WPS210, C901, WPS213 - too many local variables
         self,
         project: Project,
         request_timeout: float | tuple[float, float] | None = 3.5,
@@ -114,18 +166,27 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         endpoints = project.settings.get("snowplow.collector_endpoints")
 
         emitters: list[Emitter] = []
-        for endpoint in endpoints:
-            if not check_url(endpoint):
-                logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
-                continue
-            parsed_url = urlparse(endpoint)
-            emitters.append(
-                Emitter(
-                    endpoint=parsed_url.hostname + parsed_url.path,
-                    protocol=parsed_url.scheme or "http",
-                    port=parsed_url.port,
-                    request_timeout=request_timeout,
-                ),
+
+        # Supress errors when instantiating Emmiters
+        # It helps to resolve issues related to import conflicts -
+        # snowplow-tracker vs. minimal-snowplow tracker
+        if SNOWPLOW_TRACKER_AVAILABLE:
+            for endpoint in endpoints:
+                if not check_url(endpoint):
+                    logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
+                    continue
+                parsed_url = urlparse(endpoint)
+                emitters.append(
+                    Emitter(
+                        endpoint=parsed_url.hostname + parsed_url.path,
+                        protocol=parsed_url.scheme or "http",
+                        port=parsed_url.port,
+                        request_timeout=request_timeout,
+                    ),
+                )
+        else:
+            logger.warning(
+                "Snowplow tracker is not available, setting emitters to empty list",
             )
 
         if emitters:
