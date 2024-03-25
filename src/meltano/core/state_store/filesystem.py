@@ -378,7 +378,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         Returns:
             None
         """
-        return None
+        return None  # noqa: RET501
 
     @property
     def state_dir(self) -> str:

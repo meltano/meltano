@@ -297,8 +297,8 @@ class BlockParser:  # noqa: D101
                         f"Expected unique mappings name not the mapper plugin "  # noqa: EM102
                         f"name: {plugin.name}.",
                     )
-                else:
-                    blocks.append(builder.make_block(plugin))
+                blocks.append(builder.make_block(plugin))
+
             elif plugin.type == PluginType.LOADERS:
                 self.log.debug("blocks", offset=offset, idx=next_block)
                 blocks.append(builder.make_block(plugin))
