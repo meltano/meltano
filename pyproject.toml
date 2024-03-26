@@ -603,11 +603,14 @@ select = [
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "N",   # pep8-naming
+  "PIE", # flake8-pie
   "PT",  # flake8-pytest-style
+  "Q", # flake8-quotes
   "RET", # flake8-return
   "RSE", # flake8-raise
   "S",   # flake8-bandit
   "SIM", # flake8-simplify
+  "T10", # flake8-debugger
   "T20", # flake8-print
   "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
