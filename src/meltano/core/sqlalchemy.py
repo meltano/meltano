@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import json
 import typing as t
 import uuid
@@ -7,7 +8,7 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.types import CHAR, INTEGER, VARCHAR, TypeDecorator
+from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
 from typing_extensions import Annotated
 
 
@@ -91,6 +92,42 @@ class GUID(TypeDecorator):
             return value
         if not isinstance(value, uuid.UUID):
             value = uuid.UUID(value)
+        return value
+
+
+class DateTimeUTC(TypeDecorator):
+    """Parses datetimes timezone-aware and stores them as UTC."""
+
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value: datetime.datetime | None, _dialect: str):
+        """Convert the datetime value to UTC and remove the timezone.
+
+        Args:
+            value: The datetime value to convert.
+
+        Returns:
+            The converted datetime value.
+        """
+        if value is None:
+            return None
+
+        if value.tzinfo:
+            value = value.astimezone(datetime.timezone.utc)
+        return value.replace(tzinfo=None)
+
+    def process_result_value(self, value: datetime.datetime | None, _dialect: str):
+        """Convert the naive datetime value to UTC.
+
+        Args:
+            value: The datetime value to convert.
+
+        Returns:
+            The converted datetime value.
+        """
+        if value is not None:
+            value = value.replace(tzinfo=datetime.timezone.utc)
         return value
 
 

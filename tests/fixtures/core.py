@@ -2025,7 +2025,7 @@ def elt_schedule(
             loader=target.name,
             transform="skip",
             interval="@daily",
-            start_date=datetime.datetime.now(),
+            start_date=datetime.datetime.now(datetime.timezone.utc),
         )
     except ScheduleAlreadyExistsError as err:
         return err.schedule
@@ -2203,7 +2203,12 @@ def state_ids(
 def mock_time():
     def _mock_time():
         for idx in itertools.count():  # noqa: WPS526
-            yield datetime.datetime(1, 1, 1) + datetime.timedelta(hours=idx)
+            yield datetime.datetime(
+                1,
+                1,
+                1,
+                tzinfo=datetime.timezone.utc,
+            ) + datetime.timedelta(hours=idx)
 
     return _mock_time()
 

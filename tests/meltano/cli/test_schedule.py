@@ -50,7 +50,18 @@ class TestCliSchedule:
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
         assert schedule.interval == "@yearly"  # not anytime soon ;)
-        assert schedule.start_date == iso8601_datetime(test_date)
+
+        parsed_date = iso8601_datetime(test_date)
+        assert schedule.start_date is not None
+        assert schedule.start_date.year == parsed_date.year
+        assert schedule.start_date.month == parsed_date.month
+        assert schedule.start_date.day == parsed_date.day
+        assert schedule.start_date.hour == parsed_date.hour
+        assert schedule.start_date.minute == parsed_date.minute
+        assert schedule.start_date.second == parsed_date.second
+
+        # https://sourceforge.net/p/ruamel-yaml/tickets/366/
+        assert schedule.start_date.tzinfo is None
 
         # test adding a scheduled job
         with mock.patch(

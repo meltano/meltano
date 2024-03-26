@@ -10,7 +10,7 @@ import re
 import typing as t
 import uuid
 from contextlib import contextmanager, suppress
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum, auto
 from urllib.parse import urlparse
 from warnings import warn
@@ -535,19 +535,19 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             return
         cli.exit_code_reported = True
 
-        start_time = datetime.utcfromtimestamp(Process().create_time())
+        start_time = datetime.fromtimestamp(Process().create_time(), tz=timezone.utc)
 
         # This is the reported "end time" for this process, though in reality
         # the process will end a short time after this time as it takes time
         # to emit the event.
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
 
         self.track_unstruct_event(
             SelfDescribingJson(
                 ExitEventSchema.url,
                 {
                     "exit_code": cli.exit_code,
-                    "exit_timestamp": f"{now.isoformat()}Z",
+                    "exit_timestamp": f"{now.isoformat()}",
                     "process_duration_microseconds": int(
                         (now - start_time).total_seconds() * MICROSECONDS_PER_SECOND,
                     ),
