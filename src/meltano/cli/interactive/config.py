@@ -331,6 +331,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         elif action.lower() == "e":
             return InteractionStatus.EXIT
+        return None
 
     def configure_all(self):
         """Configure all settings."""

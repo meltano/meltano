@@ -56,7 +56,7 @@ class LogEntry:
         Returns:
             True if a matching log line is found, else False
         """
-        for line in lines:
+        for line in lines:  # noqa: RET503
             matches = (
                 line.get("name") == self.name
                 and line.get("cmd_type") == self.cmd_type
@@ -204,7 +204,7 @@ class TestWindowsELT:
         args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
-        # Didn't use `exception_logged()` as `result.stderr` doensn't contain
+        # Didn't use `exception_logged()` as `result.stderr` doesn't contain
         # the error for some reason
         assert (
             "ELT command not supported on Windows. Please use the run command "

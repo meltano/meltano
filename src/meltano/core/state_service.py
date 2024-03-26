@@ -79,7 +79,7 @@ class StateService:  # noqa: WPS214
                 started_at=now,
                 ended_at=now,
             )
-        elif isinstance(job, Job):
+        if isinstance(job, Job):
             return job
         raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 

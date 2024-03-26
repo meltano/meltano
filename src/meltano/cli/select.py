@@ -23,10 +23,11 @@ def selection_color(selection):
     """Return the appropriate colour for given SelectionType."""
     if selection is SelectionType.SELECTED:
         return "bright_green"
-    elif selection is SelectionType.AUTOMATIC:
+    if selection is SelectionType.AUTOMATIC:
         return "bright_white"
-    elif selection is SelectionType.EXCLUDED:
+    if selection is SelectionType.EXCLUDED:
         return "red"
+    return None
 
 
 def selection_mark(selection):

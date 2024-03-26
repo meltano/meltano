@@ -74,7 +74,7 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.3
+    rev: v0.3.4
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
@@ -99,7 +99,6 @@ repos:
           - flake8-docstrings==1.6.0
           - flake8-eradicate==1.4.0
           - flake8-polyfill==1.0.2
-          - flake8-print==5.0.0
           - flake8-quotes==3.3.1
           - flake8-rst-docstrings==0.2.7
           - flake8-string-format==0.3.0
