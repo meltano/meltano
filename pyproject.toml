@@ -605,7 +605,7 @@ select = [
   "N",   # pep8-naming
   "PIE", # flake8-pie
   "PT",  # flake8-pytest-style
-  "Q", # flake8-quotes
+  "Q",   # flake8-quotes
   "RET", # flake8-return
   "RSE", # flake8-raise
   "S",   # flake8-bandit
