@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+import uuid
 
 import click
 import structlog
@@ -24,6 +25,19 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
+
+
+class UUIDParamType(click.ParamType):
+    """A custom click parameter type for UUIDs."""
+
+    name = "uuid"
+
+    def convert(self, value, param, ctx):
+        """Convert an input value to a UUID."""
+        try:
+            return uuid.UUID(value)
+        except ValueError:
+            self.fail(f"{value} is not a valid UUID.", param, ctx)
 
 
 @click.command(
@@ -70,6 +84,11 @@ logger = structlog.getLogger(__name__)
     is_flag=True,
     help="Merges state with that of previous runs.",
 )
+@click.option(
+    "--run-id",
+    type=UUIDParamType(),
+    help="Use a custom run ID.",
+)
 @click.argument(
     "blocks",
     nargs=-1,
@@ -86,6 +105,7 @@ async def run(
     force: bool,
     state_id_suffix: str,
     merge_state: bool,
+    run_id: uuid.UUID | None,
     blocks: list[str],
 ):
     """
@@ -127,6 +147,7 @@ async def run(
             force=force,
             state_id_suffix=state_id_suffix,
             merge_state=merge_state,
+            run_id=run_id,
         )
         parsed_blocks = list(parser.find_blocks(0))
         if not parsed_blocks:
