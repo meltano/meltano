@@ -236,7 +236,6 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         Args:
             state_id: the state_id to create the dir/prefix for
         """
-        ...
 
     @contextmanager
     def acquire_lock(self, state_id: str, retry_seconds: int = 1) -> Iterator[None]:

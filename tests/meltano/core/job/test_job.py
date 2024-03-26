@@ -30,7 +30,7 @@ class TestJob:
         assert subject.id > 0
 
     def test_load(self, session):
-        for key in range(0, 10):
+        for key in range(10):
             session.add(self.sample_job({"key": key}))
 
         subjects = session.query(Job).filter_by(job_name="meltano:sample-elt")
