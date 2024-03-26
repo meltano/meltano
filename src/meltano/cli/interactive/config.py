@@ -331,6 +331,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
 
         elif action.lower() == "e":
             return InteractionStatus.EXIT
+        return None
 
     def configure_all(self):
         """Configure all settings."""
@@ -412,7 +413,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             else:
                 self.tracker.track_command_event(CliEvent.aborted)
             raise CliError(
-                f"{settings.label.capitalize()} setting '{path}' could not be "
+                f"{settings.label.capitalize()} setting '{path}' could not be "  # noqa: EM102
                 f"set in {store.label}: {err}",
             ) from err
 

@@ -112,13 +112,13 @@ class S3StateStoreManager(CloudStateStoreManager):
                     aws_secret_access_key=self.aws_secret_access_key,
                 )
                 return session.client("s3", endpoint_url=self.endpoint_url)
-            elif self.aws_secret_access_key:
+            if self.aws_secret_access_key:
                 raise InvalidStateBackendConfigurationException(
-                    "AWS secret access key configured, but not AWS access key ID.",
+                    "AWS secret access key configured, but not AWS access key ID.",  # noqa: EM101
                 )
-            elif self.aws_access_key_id:
+            if self.aws_access_key_id:
                 raise InvalidStateBackendConfigurationException(
-                    "AWS access key ID configured, but no AWS secret access key.",
+                    "AWS access key ID configured, but no AWS secret access key.",  # noqa: EM101
                 )
             session = boto3.Session()
             return session.client("s3")

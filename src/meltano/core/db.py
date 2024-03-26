@@ -178,7 +178,7 @@ def init_hook(engine: Engine) -> None:
             try:
                 hook(conn)
             except Exception as ex:
-                raise Exception(f"Failed to initialize database: {ex!s}") from ex
+                raise Exception(f"Failed to initialize database: {ex!s}") from ex  # noqa: EM102
 
 
 def ensure_schema_exists(

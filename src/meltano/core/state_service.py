@@ -79,9 +79,9 @@ class StateService:  # noqa: WPS214
                 started_at=now,
                 ended_at=now,
             )
-        elif isinstance(job, Job):
+        if isinstance(job, Job):
             return job
-        raise TypeError("job must be of type Job or of type str")
+        raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 
     @property
     def state_store_manager(self):
@@ -109,7 +109,7 @@ class StateService:  # noqa: WPS214
         """
         if SINGER_STATE_KEY not in state:
             raise InvalidJobStateError(
-                f"{SINGER_STATE_KEY} not found in top level of provided state",
+                f"{SINGER_STATE_KEY} not found in top level of provided state",  # noqa: EM102
             )
 
     def add_state(

@@ -148,7 +148,7 @@ class EventMatcher:
         Returns:
             True if the event was found, False otherwise.
         """
-        for line in self.seen_events:
+        for line in self.seen_events:  # noqa: RET503
             matches = line["event"] == event
             if matches:
                 return True
@@ -936,7 +936,7 @@ class TestCliRunScratchpadOne:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         try:  # noqa: WPS328
             raise asyncio.LimitOverrunError(
-                "Separator is not found, and chunk exceed the limit",
+                "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:

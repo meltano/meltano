@@ -234,7 +234,7 @@ class Manifest:  # noqa: WPS214
     def sanitize_env_vars(self, env: t.Mapping[str, str]) -> dict[str, str]:
         """Sanitize environment variables.
 
-        Sanitization is perfomed by:
+        Sanitization is performed by:
         - Replacing the project root as an absolute path in values with
             '${MELTANO_PROJECT_ROOT}'
 
@@ -270,7 +270,7 @@ class Manifest:  # noqa: WPS214
         """
         if key != "env":
             return NotImplemented  # type: ignore
-        data[key] = self.sanitize_env_vars(
+        data[key] = self.sanitize_env_vars(  # noqa: RET503
             {
                 **expand_env_vars(
                     data[key],
@@ -455,7 +455,7 @@ def _apply_scaffold(
         if key == "[]":
             if not isinstance(manifest_component, list):
                 raise TypeError(
-                    "Expected list during manifest scaffolding, "
+                    "Expected list during manifest scaffolding, "  # noqa: EM102
                     f"got {type(manifest_component)}",
                 )
             for element in manifest_component:
@@ -467,7 +467,7 @@ def _apply_scaffold(
             )
         else:
             raise TypeError(
-                "Expected dict during manifest scaffolding, "
+                "Expected dict during manifest scaffolding, "  # noqa: EM102
                 f"got {type(manifest_component)}",
             )
 

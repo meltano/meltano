@@ -141,7 +141,7 @@ async def run(
         logger.debug("All ExtractLoadBlocks validated, starting execution.")
     else:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError("Some ExtractLoadBlocks set failed validation.")
+        raise CliError("Some ExtractLoadBlocks set failed validation.")  # noqa: EM101
     try:
         await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
     except Exception as err:
@@ -190,7 +190,7 @@ async def _run_blocks(
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise CliError(
-                f"Run invocation could not be completed as block failed: {err}",
+                f"Run invocation could not be completed as block failed: {err}",  # noqa: EM102
             ) from err
         except Exception as bare_err:
             # make sure we also fire block failed events for all other exceptions

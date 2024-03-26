@@ -94,7 +94,7 @@ class ELBContext:  # noqa: WPS230
         Returns:
             The run directory for the current job.
         """
-        if self.job:
+        if self.job:  # noqa: RET503
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
 
@@ -278,7 +278,7 @@ class ELBContextBuilder:  # noqa: WPS214
         Returns:
             The run directory for the current job.
         """
-        if self._job:
+        if self._job:  # noqa: RET503
             return self.project.job_dir(self._job.job_name, str(self._job.run_id))
 
     def context(self) -> ELBContext:
@@ -377,7 +377,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):
+        for idx, block in reversed(list(enumerate(self.blocks))):  # noqa: RET503
             if block.requires_input and block.proxy_stderr.done():
                 return idx
 
@@ -390,7 +390,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):
+        for idx, block in enumerate(self.blocks):  # noqa: RET503
             if idx >= index:
                 return True
             if block.process_future.done():
@@ -437,18 +437,18 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             BlockSetValidationError: if the block set is not valid.
         """
         if not self.blocks:
-            raise BlockSetValidationError("No blocks in set.")
+            raise BlockSetValidationError("No blocks in set.")  # noqa: EM101
 
         if self.head.consumer:
-            raise BlockSetValidationError("first block in set should not be consumer")
+            raise BlockSetValidationError("first block in set should not be consumer")  # noqa: EM101
 
         if self.tail.producer:
-            raise BlockSetValidationError("last block in set should not be a producer")
+            raise BlockSetValidationError("last block in set should not be a producer")  # noqa: EM101
 
         for block in self.intermediate:
             if not block.consumer or not block.producer:
                 raise BlockSetValidationError(
-                    "intermediate blocks must be producers AND consumers",
+                    "intermediate blocks must be producers AND consumers",  # noqa: EM101
                 )
 
     async def execute(self) -> None:
@@ -489,7 +489,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
             )
         ):
             raise RunnerError(
-                f"Another '{job.job_name}' pipeline is already running "
+                f"Another '{job.job_name}' pipeline is already running "  # noqa: EM102
                 f"which started at {existing.started_at}. To ignore this "
                 "check use the '--force' option.",
             )
@@ -632,7 +632,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                     )  # link previous blocks stdout with current blocks stdin
                 else:
                     raise BlockSetValidationError(
-                        "run step requires input but has no upstream",
+                        "run step requires input but has no upstream",  # noqa: EM101
                     )
 
 
@@ -737,12 +737,13 @@ class ELBExecutionManager:
                     stream_buffer_size=self.stream_buffer_size,
                 )
             raise output_futures_failed.exception()  # noqa: RSE102
-        else:
-            # If all the output handlers completed without raising an
-            # exception, we still need to wait for all the underlying block
-            # processes to complete. Note that since all output handlers
-            # completed we DO NOT need to wait for any output futures!
-            done = await self.elb.process_wait(None, start_idx)
+
+        # If all the output handlers completed without raising an
+        # exception, we still need to wait for all the underlying block
+        # processes to complete. Note that since all output handlers
+        # completed we DO NOT need to wait for any output futures!
+        done = await self.elb.process_wait(None, start_idx)
+
         if self.elb.tail.process_future.done():
             logger.debug("tail consumer completed first")
             self._consumer_code = self.elb.tail.process_future.result()
@@ -758,7 +759,7 @@ class ELBExecutionManager:
             await self._stop_all_blocks(start_idx)
             raise RunnerError(
                 (
-                    "Unexpected completion sequence in ExtractLoadBlock set. "
+                    "Unexpected completion sequence in ExtractLoadBlock set. "  # noqa: EM101
                     "Intermediate block (likely a mapper) failed."
                 ),
                 {
@@ -826,23 +827,23 @@ def _check_exit_codes(  # noqa: WPS238
     if producer_code:
         if consumer_code:
             raise RunnerError(
-                "Extractor and loader failed",
+                "Extractor and loader failed",  # noqa: EM101
                 {
                     PluginType.EXTRACTORS: producer_code,
                     PluginType.LOADERS: consumer_code,
                 },
             )
-        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})
+        raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: producer_code})  # noqa: EM101
 
     if consumer_code:
-        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})
+        raise RunnerError("Loader failed", {PluginType.LOADERS: consumer_code})  # noqa: EM101
 
     if failed_mappers := [
         {mapper_id: exit_code}
         for mapper_id, exit_code in intermediate_codes.items()
         if exit_code
     ]:
-        raise RunnerError("Mappers failed", failed_mappers)
+        raise RunnerError("Mappers failed", failed_mappers)  # noqa: EM101
 
 
 def generate_state_id(
@@ -867,7 +868,7 @@ def generate_state_id(
     """
     if not project.environment:
         raise RunnerError(
-            "No active environment for invocation, but requested state ID",
+            "No active environment for invocation, but requested state ID",  # noqa: EM101
         )
 
     state_id_components = [
@@ -878,7 +879,7 @@ def generate_state_id(
 
     if any(c for c in state_id_components if c and STATE_ID_COMPONENT_DELIMITER in c):
         raise RunnerError(
-            "Cannot generate a state ID from components containing the "
+            "Cannot generate a state ID from components containing the "  # noqa: EM102
             f"delimiter string '{STATE_ID_COMPONENT_DELIMITER}'",
         )
 

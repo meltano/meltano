@@ -477,7 +477,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         command_config = self.find_command(plugin_command)
 
         if not command_config.container_spec:
-            raise ValueError("Command is missing a container spec")
+            raise ValueError("Command is missing a container spec")  # noqa: EM101
 
         spec = command_config.container_spec
         service = ContainerService()

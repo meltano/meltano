@@ -53,7 +53,7 @@ class VirtualEnv:
         """
         self._system = platform.system()
         if self._system not in self._SUPPORTED_PLATFORMS:
-            raise MeltanoError(f"Platform {self._system!r} not supported.")
+            raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
         self.python_path = self._resolve_python_path(python)
 
@@ -67,17 +67,17 @@ class VirtualEnv:
             python_path = str(python.resolve())
         elif isinstance(python, Number):
             raise MeltanoError(
-                "Python must be specified as an executable name or path, "
+                "Python must be specified as an executable name or path, "  # noqa: EM102
                 f"not the number {python!r}",
             )
         else:
             python_path = python if os.path.exists(python) else shutil.which(python)
 
         if python_path is None:
-            raise MeltanoError(f"Python executable {python!r} was not found")
+            raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
 
         if not os.access(python_path, os.X_OK):
-            raise MeltanoError(f"{python_path!r} is not executable")
+            raise MeltanoError(f"{python_path!r} is not executable")  # noqa: EM102
 
         return python_path
 
@@ -93,9 +93,9 @@ class VirtualEnv:
         """
         if self._system in {"Linux", "Darwin"}:
             return self.root / "lib"
-        elif self._system == "Windows":
+        if self._system == "Windows":
             return self.root / "Lib"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 
     @cached_property
     def bin_dir(self) -> Path:
@@ -109,9 +109,9 @@ class VirtualEnv:
         """
         if self._system in {"Linux", "Darwin"}:
             return self.root / "bin"
-        elif self._system == "Windows":
+        if self._system == "Windows":
             return self.root / "Scripts"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 
     @cached_property
     def site_packages_dir(self) -> Path:
@@ -129,9 +129,9 @@ class VirtualEnv:
                 / f"python{'.'.join(str(x) for x in self.python_version_tuple[:2])}"
                 / "site-packages"
             )
-        elif self._system == "Windows":
+        if self._system == "Windows":
             return self.lib_dir / "site-packages"
-        raise MeltanoError(f"Platform {self._system!r} not supported.")
+        raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
 
     @cached_property
     def python_version_tuple(self) -> tuple[int, int, int]:
@@ -187,7 +187,7 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
 
     if run.returncode != 0:
         raise AsyncSubprocessError(
-            "Command failed",
+            "Command failed",  # noqa: EM101
             process=run,
             stderr=await extract_stderr(run),
         )
@@ -340,7 +340,7 @@ class VenvService:  # noqa: WPS214
             )
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
-                f"Could not create the virtualenv for '{self.namespace}/{self.name}'",
+                f"Could not create the virtualenv for '{self.namespace}/{self.name}'",  # noqa: EM102
                 process=err.process,
                 stderr=await err.stderr,
             ) from err
@@ -359,7 +359,7 @@ class VenvService:  # noqa: WPS214
             return await self._pip_install(("--upgrade", "pip"))
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
-                "Failed to upgrade pip to the latest version.",
+                "Failed to upgrade pip to the latest version.",  # noqa: EM101
                 err.process,
             ) from err
 
@@ -461,7 +461,7 @@ class VenvService:  # noqa: WPS214
                 self.pip_log_path,
             )
             raise AsyncSubprocessError(
-                f"Failed to install plugin '{self.name}'.",
+                f"Failed to install plugin '{self.name}'.",  # noqa: EM102
                 err.process,
                 stderr=await err.stderr,
             ) from err

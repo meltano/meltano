@@ -32,6 +32,7 @@ def first_failed_future(exception_future: Task, done: set[Task]) -> Task | None:
             future for future in futures_done if future.exception() is not None
         ]:
             return futures_failed.pop()
+    return None
 
 
 def handle_producer_line_length_limit_error(
@@ -74,4 +75,4 @@ def handle_producer_line_length_limit_error(
         "To learn more, visit "
         "https://docs.meltano.com/reference/settings#eltbuffer_size",
     )
-    raise RunnerError("Output line length limit exceeded") from exception
+    raise RunnerError("Output line length limit exceeded") from exception  # noqa: EM101

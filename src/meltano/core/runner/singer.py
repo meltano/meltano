@@ -58,7 +58,7 @@ class SingerRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start extractor: {err}") from err
+            raise RunnerError(f"Cannot start extractor: {err}") from err  # noqa: EM102
 
         # Start target
         try:
@@ -69,7 +69,7 @@ class SingerRunner(Runner):
                 stderr=asyncio.subprocess.PIPE,  # Log
             )
         except Exception as err:
-            raise RunnerError(f"Cannot start loader: {err}") from err
+            raise RunnerError(f"Cannot start loader: {err}") from err  # noqa: EM102
 
         # Process tap output
         tap_outputs = [p_target.stdin]
@@ -142,14 +142,14 @@ class SingerRunner(Runner):
 
                 failed_future = output_futures_failed.pop()
                 raise failed_future.exception()  # noqa: RSE102
-            else:
-                # If all of the output handlers completed without raising an
-                # exception, we still need to wait for the tap or target to
-                # complete.
-                done, _ = await asyncio.wait(
-                    [tap_process_future, target_process_future],
-                    return_when=asyncio.FIRST_COMPLETED,
-                )
+
+            # If all of the output handlers completed without raising an
+            # exception, we still need to wait for the tap or target to
+            # complete.
+            done, _ = await asyncio.wait(
+                [tap_process_future, target_process_future],
+                return_when=asyncio.FIRST_COMPLETED,
+            )
 
         if target_process_future in done:
             target_code = target_process_future.result()
@@ -192,13 +192,13 @@ class SingerRunner(Runner):
 
         if tap_code and target_code:
             raise RunnerError(
-                "Extractor and loader failed",
+                "Extractor and loader failed",  # noqa: EM101
                 {PluginType.EXTRACTORS: tap_code, PluginType.LOADERS: target_code},
             )
-        elif tap_code:
-            raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})
-        elif target_code:
-            raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})
+        if tap_code:
+            raise RunnerError("Extractor failed", {PluginType.EXTRACTORS: tap_code})  # noqa: EM101
+        if target_code:
+            raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
@@ -221,7 +221,7 @@ class SingerRunner(Runner):
         async with tap.prepared(self.context.session), target.prepared(
             self.context.session,
         ):
-            await self.invoke(
+            await self.invoke(  # noqa: RET503
                 tap,
                 target,
                 extractor_log=extractor_log,
@@ -259,4 +259,4 @@ class SingerRunner(Runner):
             "To learn more, visit "
             "https://docs.meltano.com/reference/settings#eltbuffer_size",
         )
-        raise RunnerError("Output line length limit exceeded") from exception
+        raise RunnerError("Output line length limit exceeded") from exception  # noqa: EM101

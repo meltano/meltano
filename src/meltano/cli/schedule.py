@@ -140,14 +140,14 @@ def add(ctx, name, job, extractor, loader, transform, interval, start_date):
     """  # noqa: E501
     if job and (extractor or loader):
         raise click.ClickException(
-            "Cannot mix --job with --extractor/--loader/--transform",
+            "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
         )
 
     if not job:
         if not extractor:
-            raise click.ClickException("Missing --extractor")
+            raise click.ClickException("Missing --extractor")  # noqa: EM101
         if not loader:
-            raise click.ClickException("Missing --loader")
+            raise click.ClickException("Missing --loader")  # noqa: EM101
 
         _add_elt(ctx, name, extractor, loader, transform, interval, start_date)
         return
@@ -307,7 +307,7 @@ def _update_job_schedule(
     """
     if not candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with job only flags as "
+            f"Cannot update schedule {candidate.name} with job only flags as "  # noqa: EM102
             "its a elt schedule",
         )
     if job:
@@ -341,7 +341,7 @@ def _update_elt_schedule(
     """
     if candidate.job:
         raise click.ClickException(
-            f"Cannot update schedule {candidate.name} with elt only flags as "
+            f"Cannot update schedule {candidate.name} with elt only flags as "  # noqa: EM102
             "its a scheduled job",
         )
 
@@ -402,13 +402,13 @@ def set_cmd(ctx, name, interval, job, extractor, loader, transform):
     if candidate.job:
         if extractor or loader or transform:
             raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform",
+                "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
             )
         updated = _update_job_schedule(candidate, job, interval)
     else:
         if job:
             raise click.ClickException(
-                "Cannot mix --job with --extractor/--loader/--transform",
+                "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
             )
         updated = _update_elt_schedule(
             candidate,

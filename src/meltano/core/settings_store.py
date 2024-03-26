@@ -83,16 +83,16 @@ def cast_setting_value(
     metadata: dict[str, t.Any],
     setting_def: SettingDefinition | None,
 ) -> tuple[t.Any, dict[str, t.Any]]:
-    """Cast a setting value according to its setting defition.
+    """Cast a setting value according to its setting definition.
 
     Args:
         value: The setting value to be cast.
         metadata: The metadata of the setting value.
-        setting_def: The setting defition.
+        setting_def: The setting definition.
 
     Returns:
         A tuple with the setting value, and its metadata. If the
-        setting defition was `None`, or the value was not changed by
+        setting definition was `None`, or the value was not changed by
         the cast, the pair returned is the same `value` and `metadata`
         objects provided. Otherwise, the cast value is returned along
         with a new dictionary which is a shallow copy of the provided
@@ -108,10 +108,10 @@ def cast_setting_value(
 class SettingValueStore(str, Enum):
     """Setting Value Store.
 
-    Note: The declaration order of stores determins store precedence when using
+    Note: The declaration order of stores determines store precedence when using
         the Auto store manager. This is because the `.readables()` and
         `.writables()` methods return ordered lists that the Auto store manager
-        iterates over when retrieveing setting values.
+        iterates over when retrieving setting values.
     """
 
     CONFIG_OVERRIDE = "config_override"
@@ -842,7 +842,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
             raise StoreNotSupportedError(
-                "Project config cannot be stored in an Environment.",
+                "Project config cannot be stored in an Environment.",  # noqa: EM101
             )
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
@@ -912,7 +912,7 @@ class DbStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if database session is not provided.
         """
         if not self.session:
-            raise StoreNotSupportedError("No database session provided")
+            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
 
     def get(
         self,
@@ -1090,10 +1090,10 @@ class InheritedStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if no setting_def is passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError("Setting is missing")
+            raise StoreNotSupportedError("Setting is missing")  # noqa: EM101
 
         if not self.inherited_settings_service:
-            raise StoreNotSupportedError("Inherited settings service is missing")
+            raise StoreNotSupportedError("Inherited settings service is missing")  # noqa: EM101
 
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:
@@ -1274,7 +1274,7 @@ class AutoStoreManager(SettingsStoreManager):
         if setting_def and setting_def.is_redacted:
             if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
-            elif self.ensure_supported(store=SettingValueStore.DB):
+            if self.ensure_supported(store=SettingValueStore.DB):
                 return SettingValueStore.DB
             # ensure secrets don't leak into other stores
             return None
@@ -1293,10 +1293,10 @@ class AutoStoreManager(SettingsStoreManager):
             if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
                 return SettingValueStore.MELTANO_YML
             # fall back to dotenv
-            elif self.ensure_supported(store=SettingValueStore.DOTENV):
+            if self.ensure_supported(store=SettingValueStore.DOTENV):
                 return SettingValueStore.DOTENV
             # fall back to meltano system db
-            elif self.ensure_supported(store=SettingValueStore.DB):
+            if self.ensure_supported(store=SettingValueStore.DB):
                 return SettingValueStore.DB
             return None
 
@@ -1308,10 +1308,10 @@ class AutoStoreManager(SettingsStoreManager):
         if self.ensure_supported(store=SettingValueStore.MELTANO_YML):
             return SettingValueStore.MELTANO_YML
         # fall back to dotenv
-        elif self.ensure_supported(store=SettingValueStore.DOTENV):
+        if self.ensure_supported(store=SettingValueStore.DOTENV):
             return SettingValueStore.DOTENV
         # fall back to meltano system db
-        elif self.ensure_supported(store=SettingValueStore.DB):
+        if self.ensure_supported(store=SettingValueStore.DB):
             return SettingValueStore.DB
         return None
 
@@ -1329,7 +1329,7 @@ class AutoStoreManager(SettingsStoreManager):
             setting_def: SettingDefinition. If none is passed, one will be
                 discovered using `self.find_setting(name)`.
             cast_value: Whether to cast the value according to `setting_def`.
-            kwargs: Additional keword arguments to pass to `manager.get()`.
+            kwargs: Additional keyword arguments to pass to `manager.get()`.
 
         Returns:
             A tuple containing the got value and accompanying metadata dictionary.
@@ -1394,7 +1394,7 @@ class AutoStoreManager(SettingsStoreManager):
         store = self.auto_store(name, setting_def=setting_def)
         logger.debug(f"AutoStoreManager returned store '{store}'")  # noqa: G004
         if store is None:
-            raise StoreNotSupportedError("No storage method available")
+            raise StoreNotSupportedError("No storage method available")  # noqa: EM101
 
         # May raise StoreNotSupportedError, but that's good.
         manager = self.manager_for(store)

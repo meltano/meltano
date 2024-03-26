@@ -30,9 +30,9 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 
-def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
+def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     if not value:
-        return
+        return None
 
     try:
         url = urlparse(value)
@@ -79,7 +79,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict:
     "--from-ref",
     "plugin_yaml",
     callback=_load_yaml_from_ref,
-    help="Reference a plugin defintion to add from.",
+    help="Reference a plugin definition to add from.",
 )
 @click.option(
     "--python",
@@ -148,7 +148,7 @@ def add(  # noqa: WPS238
         PluginType.ORCHESTRATORS,
     }:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"--custom is not supported for {plugin_type}")
+        raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102
 
     plugin_refs = [
         PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
@@ -159,7 +159,7 @@ def add(  # noqa: WPS238
     )
     if not dependencies_met:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(f"Failed to install plugin(s): {err}")
+        raise CliError(f"Failed to install plugin(s): {err}")  # noqa: EM102
 
     add_service = ProjectAddService(project)
 
@@ -207,7 +207,7 @@ def add(  # noqa: WPS238
 
         if not success:
             tracker.track_command_event(CliEvent.failed)
-            raise CliError("Failed to install plugin(s)")
+            raise CliError("Failed to install plugin(s)")  # noqa: EM101
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)

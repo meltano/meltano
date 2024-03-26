@@ -134,7 +134,7 @@ class PluginLockService:
 
         if plugin_lock.path.exists() and not exists_ok:
             raise LockfileAlreadyExistsError(
-                f"Lockfile already exists: {plugin_lock.path}",
+                f"Lockfile already exists: {plugin_lock.path}",  # noqa: EM102
                 plugin_lock.path,
                 plugin,
             )

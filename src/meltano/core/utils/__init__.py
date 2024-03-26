@@ -259,7 +259,7 @@ def to_env_var(*xs: str) -> str:
 def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
-    Wrapper arround `flatten_dict.flatten`.
+    Wrapper around `flatten_dict.flatten`.
 
     Args:
         d: the dict to flatten
@@ -355,7 +355,7 @@ def iso8601_datetime(d):
     for format_string in isoformats:
         with suppress(ValueError):
             return coerce_datetime(datetime.strptime(d, format_string))
-    raise ValueError(f"{d} is not a valid UTC date.")
+    raise ValueError(f"{d} is not a valid UTC date.")  # noqa: EM102
 
 
 class _GetItemProtocol(t.Protocol):
@@ -535,7 +535,7 @@ def expand_env_vars(
             )
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
-            elif if_missing == EnvVarMissingBehavior.ignore:
+            if if_missing == EnvVarMissingBehavior.ignore:
                 return f"${{{var}}}"
             return ""
         if not val:
@@ -625,7 +625,7 @@ def hash_sha256(value: str | bytes) -> str:
         ValueError: If we are blindly passed a value that is None.
     """
     if value is None:
-        raise ValueError("Cannot hash None.")
+        raise ValueError("Cannot hash None.")  # noqa: EM101
     if isinstance(value, str):
         value = value.encode()
     return hashlib.sha256(value).hexdigest()
@@ -688,10 +688,10 @@ def strtobool(val: str) -> bool:
     val = val.lower()
     if val in {"y", "yes", "t", "true", "on", "1"}:
         return True
-    elif val in {"n", "no", "f", "false", "off", "0"}:
+    if val in {"n", "no", "f", "false", "off", "0"}:
         return False
 
-    raise ValueError(f"invalid truth value {val!r}")
+    raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
 
 
 def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
@@ -827,7 +827,7 @@ def remove_suffix(string: str, suffix: str) -> str:
     """
     if sys.version_info >= (3, 9):
         return string.removesuffix(suffix)
-    elif string.endswith(suffix):
+    if string.endswith(suffix):
         return string[: -len(suffix)]
     return string
 
@@ -878,7 +878,7 @@ def sanitize_filename(filename: str) -> str:
         filename: The name of the file to sanitize - not the full path.
 
     Returns:
-        The provided filename after a series of santitization steps. It will
+        The provided filename after a series of sanitization steps. It will
         only contain ASCII characters. If necessary on Windows, the filename
         will be prefixed by an underscore to avoid conflict with reserved
         Windows file names.

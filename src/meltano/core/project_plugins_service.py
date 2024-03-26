@@ -242,7 +242,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
                 )
             ):
                 return self.ensure_parent(plugin)
-            elif plugin.type == PluginType.MAPPERS:
+
+            if plugin.type == PluginType.MAPPERS:
                 mapping = self._find_mapping(plugin_name, plugin)
                 if mapping:
                     return mapping
@@ -252,7 +253,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
     def _find_mapping(self, plugin_name: str, plugin: ProjectPlugin) -> ProjectPlugin:
         mapping_name = plugin.extra_config.get("_mapping_name")
-        if mapping_name == plugin_name:
+        if mapping_name == plugin_name:  # noqa: RET503
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
                 raise AmbiguousMappingName(mapping_name)
@@ -568,7 +569,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             None,
         ):
             return transformer
-        raise PluginNotFoundError("No Plugin of type Transformer found.")
+        raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
 
     @contextmanager
     def use_preferred_source(self, source: DefinitionSource) -> None:

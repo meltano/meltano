@@ -213,7 +213,7 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
     try:
         content = await invoker.dump(file_id)
     except FileNotFoundError as err:
-        raise CliError(f"Could not find {file_id}") from err
+        raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
     except Exception as err:
-        raise CliError(f"Could not dump {file_id}: {err}") from err
-    print(content)  # noqa: WPS421
+        raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
+    print(content)  # noqa: T201, WPS421

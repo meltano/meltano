@@ -71,6 +71,6 @@ class SingerMapper(SingerPlugin):
 
     @staticmethod
     def _get_mapping_config(extra_config: dict) -> dict | None:
-        for mapping in extra_config.get("_mappings", []):
+        for mapping in extra_config.get("_mappings", []):  # noqa: RET503
             if mapping.get("name") == extra_config.get("_mapping_name"):
                 return mapping["config"]
