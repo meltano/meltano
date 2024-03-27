@@ -256,7 +256,7 @@ class BlockParser:  # noqa: D101
 
         self.log.debug(
             "head of set is extractor as expected",
-            block=self._plugins[offset],
+            block=self._plugins[offset].name,
         )
 
         blocks.append(builder.make_block(self._plugins[offset]))
