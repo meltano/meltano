@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
 from collections import OrderedDict
 from copy import copy
 
+import structlog
 from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 BLANK_SUBFILE = CommentedMap(
     [

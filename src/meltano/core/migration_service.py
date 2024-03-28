@@ -6,6 +6,7 @@ import logging
 import typing as t
 
 import click
+import structlog
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
@@ -81,7 +82,7 @@ class MigrationService:
             script = ScriptDirectory.from_config(cfg)
             # let's make sure we actually need to migrate
 
-            migration_logger = logging.getLogger("alembic.runtime.migration")
+            migration_logger = structlog.stdlib.get_logger("alembic.runtime.migration")
             original_log_level = migration_logger.getEffectiveLevel()
             if silent:
                 migration_logger.setLevel(logging.ERROR)

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 import psutil
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PIDFile:

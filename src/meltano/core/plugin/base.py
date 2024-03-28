@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import re
 from collections import defaultdict
 
 import yaml
+from structlog.stdlib import get_logger
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -17,7 +17,7 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class VariantNotFoundError(Exception):
