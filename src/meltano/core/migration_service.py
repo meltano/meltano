@@ -81,7 +81,7 @@ class MigrationService:
             script = ScriptDirectory.from_config(cfg)
             # let's make sure we actually need to migrate
 
-            migration_logger = logging.getLogger("alembic.runtime.migration")
+            migration_logger = logging.getLogger("alembic.runtime.migration")  # noqa: TID251
             original_log_level = migration_logger.getEffectiveLevel()
             if silent:
                 migration_logger.setLevel(logging.ERROR)

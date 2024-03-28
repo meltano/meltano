@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 
 import click
+import structlog
 
 from meltano.cli.params import database_uri_option
 from meltano.cli.utils import InstrumentedCmd
@@ -18,7 +19,7 @@ EXTRACTORS = "extractors"
 LOADERS = "loaders"
 ALL = "all"
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 path_type = click.Path(file_okay=False, path_type=Path)
 
 

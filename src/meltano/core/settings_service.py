@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-import logging
 import os
 import typing as t
 import warnings
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager, suppress
 from enum import Enum
+
+import structlog
 
 from meltano.core.setting_definition import (
     SettingDefinition,
@@ -22,7 +23,7 @@ from meltano.core.utils import expand_env_vars as do_expand_env_vars
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 # sentinel value to use to prevent leaking sensitive data

@@ -6,7 +6,6 @@ import asyncio
 import collections
 import functools
 import hashlib
-import logging
 import math
 import os
 import platform
@@ -24,11 +23,12 @@ from operator import setitem
 from pathlib import Path
 
 import flatten_dict
+import structlog
 from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"

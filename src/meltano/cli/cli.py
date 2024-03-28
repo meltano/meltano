@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import os
 import platform
 import sys
@@ -10,6 +9,7 @@ import typing as t
 from pathlib import Path
 
 import click
+import structlog
 
 from meltano import (
     __version__,
@@ -24,7 +24,7 @@ from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import get_no_color_flag
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class NoWindowsGlobbingGroup(InstrumentedGroup):

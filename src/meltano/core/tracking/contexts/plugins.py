@@ -5,8 +5,8 @@ from __future__ import annotations
 import typing as t
 import uuid
 
+import structlog
 from snowplow_tracker import SelfDescribingJson
-from structlog.stdlib import get_logger
 
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from meltano.core.elt_context import ELTContext
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
-logger = get_logger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:

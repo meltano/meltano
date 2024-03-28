@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 import tempfile
 import typing as t
 from functools import wraps
@@ -12,6 +11,7 @@ from pathlib import Path
 
 import click
 import dotenv
+import structlog
 
 from meltano.cli.interactive import InteractiveConfig
 from meltano.cli.params import pass_project
@@ -34,7 +34,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def _get_ctx_arg(*args: t.Any) -> click.core.Context:
