@@ -7,6 +7,7 @@ import json
 import logging
 import typing as t
 from abc import ABC, abstractmethod
+from signal import SIGTERM
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
@@ -99,10 +100,11 @@ class ExtractorTestService(PluginTestService):
 
         returncode = await process.wait()
 
-        # Considered valid if subprocess is terminated (exit status < 0) on
-        # RECORD message received. See
-        # https://docs.python.org/3/library/subprocess.html#subprocess.CompletedProcess.returncode  # noqa: E501
+        # Considered valid if subprocess is terminated (|exit status| == 15) on
+        # RECORD message received
+        # https://docs.python.org/3/library/subprocess.html#subprocess.Popen.terminate
+        # https://docs.python.org/3/library/subprocess.html#subprocess.Popen.returncode
         return (
-            returncode < 0,
+            abs(returncode) == SIGTERM,
             last_line if returncode else "No RECORD message received",
         )

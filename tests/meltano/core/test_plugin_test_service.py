@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import typing as t
+from signal import SIGTERM
 
 import pytest
 from mock import AsyncMock, Mock, patch
@@ -49,8 +50,8 @@ class TestExtractorTestService:
     def setup(self, mock_invoker):
         self.mock_invoke = Mock()
         self.mock_invoke.name = "utility-mock"
-        self.mock_invoke.wait = AsyncMock(return_value=-1)
-        self.mock_invoke.returncode = -1
+        self.mock_invoke.wait = AsyncMock(return_value=-SIGTERM)
+        self.mock_invoke.returncode = -SIGTERM
         self.mock_invoker = mock_invoker
         self.mock_invoker.invoke_async = AsyncMock(return_value=self.mock_invoke)
 
