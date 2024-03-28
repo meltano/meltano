@@ -18,13 +18,15 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
+ANY = "-"
+
 logger = structlog.getLogger(__name__)
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
 @click.argument(
     "plugin_type",
-    type=click.Choice(PluginType.cli_arguments()),
+    type=click.Choice((*PluginType.cli_arguments(), ANY)),
     required=False,
 )
 @click.argument("plugin_name", nargs=-1, required=False)
@@ -74,13 +76,14 @@ def install(  # noqa: C901
     """
     tracker: Tracker = ctx.obj["tracker"]
     try:
-        if plugin_type:
+        if plugin_type and plugin_type != ANY:
             plugin_type = PluginType.from_cli_argument(plugin_type)
             plugins = project.plugins.get_plugins_of_type(plugin_type)
-            if plugin_name:
-                plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
         else:
             plugins = list(project.plugins.plugins())
+
+        if plugin_name:
+            plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
 
         if schedule_name:
             schedule_plugins = _get_schedule_plugins(

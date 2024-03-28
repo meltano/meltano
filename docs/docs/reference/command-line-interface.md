@@ -768,6 +768,8 @@ Installs dependencies of your project based on the **meltano.yml** file.
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
+To install a plugin without knowing its type, or to install multiple plugins of varying types, use the special `-` (any) character as the plugin type argument, followed by plugin name(s). `meltano install -` with no additional positional arguments has the same effect as `meltano install` (i.e. install all plugins).
+
 To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
 
@@ -787,10 +789,12 @@ Meltano stores package installation logs in `.meltano/logs/pip/{plugin_type}/{pl
 
 ```bash
 meltano install
+meltano install -
 
 meltano install extractors
 meltano install extractor tap-gitlab
 meltano install extractors tap-gitlab tap-adwords
+meltano install - tap-gitlab target-postgres
 meltano install --schedule=<schedule_name>
 
 meltano install --parallelism=16
