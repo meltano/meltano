@@ -853,7 +853,7 @@ class TestSingerTap:
             assert stream_mock2.call_count == 2
 
         # ensure stderr is redirected to devnull if we don't need it
-        discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")
+        discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")  # noqa: TID251
         original_level = discovery_logger.getEffectiveLevel()
         discovery_logger.setLevel(logging.INFO)
         with mock.patch(

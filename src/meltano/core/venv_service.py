@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import logging
 import os
 import platform
 import shlex
@@ -16,6 +15,8 @@ from functools import cached_property
 from numbers import Number
 from pathlib import Path
 
+import structlog
+
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
@@ -24,7 +25,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class VirtualEnv:

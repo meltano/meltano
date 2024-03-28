@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
-import logging
 from uuid import uuid4
+
+import structlog
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin
 from meltano.core.utils import nest_object
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class SingerPlugin(BasePlugin):
@@ -52,14 +55,14 @@ class SingerPlugin(BasePlugin):
             config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
-        logging.debug(f"Created configuration at {config_path}")  # noqa: G004
+        logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker):
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
-        logging.debug(f"Deleted configuration at {config_path}")  # noqa: G004
+        logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
     def instance_uuid(self):

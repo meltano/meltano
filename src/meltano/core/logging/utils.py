@@ -138,7 +138,7 @@ def setup_logging(  # noqa: WPS210
     # Mimick Python 3.8's `force=True` kwarg to override any
     # existing logger handlers
     # See https://github.com/python/cpython/commit/cf67d6a934b51b1f97e72945b596477b271f70b8
-    root = logging.getLogger()
+    root = logging.getLogger()  # noqa: TID251
     for handler in root.handlers[:]:
         root.removeHandler(handler)
         handler.close()
@@ -177,7 +177,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     Args:
         log_level: set log levels to provided level.
     """
-    root_logger = logging.getLogger()
+    root_logger = logging.getLogger()  # noqa: TID251
     root_logger.setLevel(log_level)
     for handler in root_logger.handlers:
         if handler.name == "console":

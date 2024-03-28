@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-import logging
 import typing as t
 from abc import ABC, abstractmethod
+
+import structlog
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
@@ -14,7 +15,7 @@ from meltano.core.plugin.error import PluginNotSupportedError
 if t.TYPE_CHECKING:
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginTestServiceFactory:

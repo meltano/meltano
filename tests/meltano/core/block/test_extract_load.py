@@ -169,7 +169,7 @@ class TestELBContextBuilder:
 class TestExtractLoadBlocks:
     @pytest.fixture()
     def log_level_debug(self):
-        root_logger = logging.getLogger()
+        root_logger = logging.getLogger()  # noqa: TID251
         log_level = root_logger.level
         try:
             root_logger.setLevel(logging.DEBUG)

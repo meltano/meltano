@@ -89,7 +89,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         seen_lines.append(parsed_line)
 
     for line in seen_lines:
-        if line.get("exc_info") and repr(exc) in line.get("exc_info"):
+        if line.get("event") and exc.args[0] in line.get("event"):
             return True
     return False
 

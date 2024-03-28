@@ -436,7 +436,7 @@ class TestTracker:
             ]
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
-        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)  # noqa: TID251
 
         with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
             tracker = Tracker(project)

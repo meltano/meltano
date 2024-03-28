@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 import os
 import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+import structlog
 import yaml
 
 from meltano.core import bundle
@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ConfigService:
