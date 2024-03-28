@@ -96,6 +96,21 @@
         }
       }
     },
+    "venv": {
+      "type": "object",
+      "description": "Configuration for plugin virtual environments.",
+      "properties": {
+        "backend": {
+          "type": "string",
+          "description": "The virtual environment backend to use.",
+          "default": "virtualenv",
+          "enum": [
+            "virtualenv",
+            "uv"
+          ]
+        }
+      }
+    },
     "environments": {
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",

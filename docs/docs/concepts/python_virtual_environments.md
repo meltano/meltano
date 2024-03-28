@@ -5,7 +5,7 @@ layout: doc
 sidebar_position: 12
 ---
 
-# What are Python Virtual Environments
+## What are Python Virtual Environments
 
 Python Virtual Environments, also known as a venv, are a way to allow a
 Python application access to specific versions of the libraries it needs to run properly. In the Singer ecosystem
@@ -20,7 +20,7 @@ We're going to focus on the Meltano use case for Virtual Environments which is u
 1. Installing Meltano
 1. Installing Plugins (Taps, Targets, Transformers, etc)
 
-# Why should I care about Virtual Environments?
+## Why should I care about Virtual Environments?
 
 Ideally, you don't have to to worry about Virtual Environments while using Meltano,
 we recommend using pipx to install Meltano which manages the creation of venvs for you.
@@ -30,7 +30,7 @@ However, if you ever need to customize or build your own production pipeline (or
 how to install Meltano in an isolated way so that you don't have a conflict with dependecies within your own Operating System
 or other Python applications running on the same machine.
 
-# How do I use Virtual Environments?
+## How do I use Virtual Environments?
 
 We strongly suggest you create a directory where you want your virtual environments to be saved (e.g. `.venv/meltano/`).
 This can be any directory in your environment, but we recommend saving it in your Meltano project to make it easier to keep
@@ -48,7 +48,7 @@ And that's it! You've created a virtual environment.
 Feel free to explore the directory and compare it to your global python directory!
 You can navigate to the directory by running `cd .venv/meltano/`.
 
-## Activating Your Virtual Environment
+### Activating Your Virtual Environment
 
 Activate the virtual environment, and upgrade pip using:
 
@@ -86,7 +86,7 @@ pip install meltano
 Ensure you have `pipx` installed by reviewing the <a href="/getting-started/installation#install-pipx">Install pipx</a> instructions.</p>
 :::
 
-# How does meltano use Virtual Environments internally?
+## How does meltano use Virtual Environments internally?
 
 Whenever you run `meltano install`, Meltano creates a `.meltano/` directory in your project.
 This directory has a number of sub-directories (subject to change at any point, as this is an
