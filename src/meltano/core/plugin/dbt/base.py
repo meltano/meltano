@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
 from pathlib import Path
+
+import structlog
 
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin import BasePlugin, PluginType
@@ -18,7 +19,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class DbtInvoker(PluginInvoker):

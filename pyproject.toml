@@ -647,5 +647,6 @@ required-imports = ["from __future__ import annotations"]
 convention = "google"
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
+"logging.getLogger".msg = "Use `structlog.stdlib.get_logger` instead"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"

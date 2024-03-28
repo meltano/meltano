@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import enum
-import logging
 import os
 import typing as t
 import uuid
@@ -428,7 +427,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
-            logging.debug(f"Invoking: {popen_args}")  # noqa: G004
+            logger.debug(f"Invoking: {popen_args}")  # noqa: G004
 
             try:
                 yield (popen_args, popen_options, popen_env)

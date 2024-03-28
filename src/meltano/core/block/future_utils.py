@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 from asyncio import Task
+
+import structlog
 
 from meltano.core.runner import RunnerError
 from meltano.core.utils import human_size
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def all_done(tasks: list[Task], done: set[Task]) -> bool:
@@ -61,17 +64,17 @@ def handle_producer_line_length_limit_error(
     if not isinstance(exception, asyncio.LimitOverrunError):
         return
 
-    logging.error(
+    logger.error(
         "The extractor generated a message exceeding the message size limit "  # noqa: G004
         f"of {human_size(line_length_limit)} (half the buffer size "
         f"of {human_size(stream_buffer_size)}).",
     )
-    logging.error(
+    logger.error(
         "To let this message be processed, increase the 'elt.buffer_size' "
         "setting to at least double the size of the largest expected message, "
         "and try again.",
     )
-    logging.error(
+    logger.error(
         "To learn more, visit "
         "https://docs.meltano.com/reference/settings#eltbuffer_size",
     )

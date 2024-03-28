@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import glob
-import logging
 import os
 import re
 import shutil
@@ -17,6 +16,7 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
+import structlog
 from smart_open import open  # type: ignore
 
 from meltano.core.job_state import JobState
@@ -27,7 +27,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Iterator
     from io import TextIOWrapper
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class InvalidStateBackendConfigurationException(Exception):

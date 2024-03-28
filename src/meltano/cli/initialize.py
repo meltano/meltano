@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 
 import click
+import structlog
 
 from meltano.cli.params import database_uri_option
 from meltano.cli.utils import InstrumentedCmd
@@ -18,7 +18,7 @@ EXTRACTORS = "extractors"
 LOADERS = "loaders"
 ALL = "all"
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 path_type = click.Path(file_okay=False, path_type=Path)
 
 
@@ -52,7 +52,7 @@ def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
 
     if ctx.obj["project"]:
         root = ctx.obj["project"].root
-        logging.warning(f"Found meltano project at: {root}")  # noqa: G004
+        logger.warning(f"Found meltano project at: {root}")  # noqa: G004
 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False

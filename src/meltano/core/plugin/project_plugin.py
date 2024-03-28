@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import copy
-import logging
 import typing as t
+
+import structlog
 
 from meltano.core.plugin.base import PluginDefinition, PluginRef, PluginType, Variant
 from meltano.core.plugin.command import Command
@@ -13,7 +14,7 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class CyclicInheritanceError(Exception):
