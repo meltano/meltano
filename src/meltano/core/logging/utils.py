@@ -153,6 +153,7 @@ def setup_logging(  # noqa: WPS210
     logging_config.dictConfig(config)
     structlog.configure(
         processors=[
+            structlog.contextvars.merge_contextvars,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,
