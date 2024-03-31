@@ -230,12 +230,12 @@ def test_makedirs_decorator(tmp_path):
         return tmp_path.joinpath(*paths)
 
     @makedirs
-    def hierarchy(*ranks, **kwargs):  # noqa: ARG001
+    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ARG001
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, **kwargs):
-        return hierarchy(genus_name, species_name, **kwargs)
+    def species(genus_name, species_name, make_dirs: bool = True):  # noqa: ARG001
+        return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")
     assert cat.exists()
