@@ -1028,13 +1028,13 @@ files = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.28.0"
+version = "0.28.1"
 description = "A jsonschema CLI and pre-commit hook"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "check-jsonschema-0.28.0.tar.gz", hash = "sha256:defd6c5e944f07416170df33f218ab048c87129163601eec7b191fa076e91ca5"},
-    {file = "check_jsonschema-0.28.0-py3-none-any.whl", hash = "sha256:6611bb1b0994201a1ba71240bca705d3ebd306f8b45f65f09d8f33f786f9b203"},
+    {file = "check-jsonschema-0.28.1.tar.gz", hash = "sha256:0dbeb24a5c0cfca366906df835131acfeeeff58ce9d6ec7ec3ff7dd4b989d4a1"},
+    {file = "check_jsonschema-0.28.1-py3-none-any.whl", hash = "sha256:48adb15099c8becddf522e9e93881f5b04da90b0e3de619dbfd42e68bcf3af8f"},
 ]
 
 [package.dependencies]
@@ -1043,11 +1043,11 @@ importlib-resources = {version = ">=1.4.0", markers = "python_version < \"3.9\""
 jsonschema = ">=4.18.0,<5.0"
 regress = ">=0.4.0"
 requests = "<3.0"
-"ruamel.yaml" = "0.18.5"
+"ruamel.yaml" = "0.18.6"
 tomli = {version = ">=2.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
-dev = ["click-type-test (==0.0.7)", "coverage (<8)", "pytest (<9)", "pytest-xdist (<4)", "responses (==0.24.1)"]
+dev = ["click-type-test (==0.0.7)", "coverage (<8)", "pytest (<9)", "pytest-xdist (<4)", "responses (==0.25.0)"]
 docs = ["furo (==2024.1.29)", "sphinx (<8)", "sphinx-issues (<5)"]
 
 [[package]]
@@ -3519,13 +3519,13 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.18.5"
+version = "0.18.6"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "ruamel.yaml-0.18.5-py3-none-any.whl", hash = "sha256:a013ac02f99a69cdd6277d9664689eb1acba07069f912823177c5eced21a6ada"},
-    {file = "ruamel.yaml-0.18.5.tar.gz", hash = "sha256:61917e3a35a569c1133a8f772e1226961bf5a1198bea7e23f06a0841dea1ab0e"},
+    {file = "ruamel.yaml-0.18.6-py3-none-any.whl", hash = "sha256:57b53ba33def16c4f3d807c0ccbc00f8a6081827e81ba2491691b76882d0c636"},
+    {file = "ruamel.yaml-0.18.6.tar.gz", hash = "sha256:8b27e6a217e786c6fbe5634d8f3f11bc63e0f80f6a5890f28863d9c45aac311b"},
 ]
 
 [package.dependencies]
@@ -4407,4 +4407,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "0cd1bedf457c32da62a91906880c127d5f8150a82e77498c75c0fa2ac261df22"
+content-hash = "da41582ccb944eba37c05d78e74c60cf52e7010942ad3bf3afc56f69c67950c4"
