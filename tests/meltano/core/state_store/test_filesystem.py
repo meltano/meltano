@@ -18,7 +18,6 @@ from azure.storage.blob._models import BlobProperties  # noqa: WPS436
 from boto3 import client
 from botocore.stub import Stubber
 from dateutil.tz import tzutc
-from google.api_core.exceptions import NotFound as GCSNotFound
 from google.cloud.storage import Blob, Bucket
 
 from meltano.core.job_state import JobState
@@ -524,10 +523,8 @@ class TestGCSStateStoreManager:
         subject: GCSStateStoreManager,
     ):
         got_reader = False
-        mock_blob = MagicMock()
-        mock_blob.open.side_effect = GCSNotFound("No such object: nonexistent")
         mock_bucket = MagicMock()
-        mock_bucket.blob.return_value = mock_blob
+        mock_bucket.get_blob.return_value = None
         subject.client.bucket.return_value = mock_bucket
         try:
             with subject.get_reader("nonexistent"):
