@@ -537,7 +537,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             "Found plugin parent",
             plugin=plugin.name,
             parent=parent.name,
-            source=source,
+            source=source.name,
         )
         return parent
 
