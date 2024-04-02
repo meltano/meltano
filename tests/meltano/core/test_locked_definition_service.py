@@ -35,7 +35,7 @@ class TestLockedDefinitionService:
         path = subject.project.plugin_lock_path(
             definition.plugin_type,
             definition.name,
-            definition.variant,
+            variant_name=definition.variant,
         )
         with path.open("w") as file:
             json.dump(definition.canonical(), file)

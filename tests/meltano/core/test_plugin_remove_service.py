@@ -58,12 +58,12 @@ class TestPluginRemoveService:
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",
             "tap-gitlab",
-            "meltanolabs",
+            variant_name="meltanolabs",
         )
         target_csv_lockfile = subject.project.plugin_lock_path(
             "loaders",
             "target-csv",
-            "hotgluexyz",
+            variant_name="hotgluexyz",
         )
         tap_gitlab_lockfile.touch()
         target_csv_lockfile.touch()

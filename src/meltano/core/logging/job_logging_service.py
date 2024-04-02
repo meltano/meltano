@@ -8,6 +8,8 @@ from contextlib import contextmanager
 from meltano.core.utils import makedirs, slugify
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.project import Project
 
 MAX_FILE_SIZE = 2097152  # 2MB max
@@ -26,16 +28,35 @@ class JobLoggingService:
         self.project = project
 
     @makedirs
-    def logs_dir(self, state_id, *joinpaths):
-        return self.project.job_logs_dir(state_id, *joinpaths)
+    def logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):  # noqa: ARG002
+        """Return the logs directory for a given state_id.
+
+        Args:
+            state_id: The state ID for the logs.
+            joinpaths: Additional paths to join to the logs directory.
+            make_dirs: Whether to create the directory if it does not exist.
+
+        Returns:
+            The logs directory for the given state ID.
+        """
+        return self.project.job_logs_dir(state_id, *joinpaths, make_dirs=make_dirs)
 
     def generate_log_name(
         self,
         state_id: str,
         run_id: str,
         file_name: str = "elt.log",
-    ) -> str:
-        """Generate an internal etl log path and name."""
+    ) -> Path:
+        """Generate an internal etl log path and name.
+
+        Args:
+            state_id: The state ID for the log.
+            run_id: The run ID for the log.
+            file_name: The name of the log file.
+
+        Returns:
+            The full path to the log file.
+        """
         return self.logs_dir(state_id, str(run_id), file_name)
 
     @contextmanager
@@ -52,9 +73,9 @@ class JobLoggingService:
                 yield log_file
         except OSError:
             # Don't stop the Job running if you can not open the log file
-            # for writting: just return /dev/null
+            # for writing: just return /dev/null
             logging.error(
-                f"Could open log file {log_file_name!r} for writting. "  # noqa: G004
+                f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )
             with open(os.devnull, "w") as log_file:

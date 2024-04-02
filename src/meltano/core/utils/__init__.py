@@ -390,7 +390,7 @@ def makedirs(func):
     def decorate(*args, **kwargs):
         enabled = kwargs.pop("make_dirs", True)
 
-        path = func(*args, **kwargs)
+        path = func(*args, **kwargs, make_dirs=enabled)
 
         if not enabled:
             return path
