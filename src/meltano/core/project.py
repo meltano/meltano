@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from functools import cached_property
 from pathlib import Path
 
-import fasteners
+import fasteners  # type: ignore[import-untyped]
 from dotenv import dotenv_values
 
 from meltano.core import yaml
@@ -78,7 +78,7 @@ class Project(Versioned):  # noqa: WPS214
 
     def __init__(
         self,
-        root: os.PathLike,
+        root: StrPath,
         environment: Environment | None = None,
         readonly: bool = False,
     ):
@@ -208,7 +208,7 @@ class Project(Versioned):  # noqa: WPS214
             if os.name == "nt":
                 executable = Path(sys.executable).parent / "meltano.exe"
                 # Admin privileges are required to create symlinks on Windows
-                if ctypes.windll.shell32.IsUserAnAdmin():
+                if ctypes.windll.shell32.IsUserAnAdmin():  # type: ignore[attr-defined]
                     if executable.is_file():
                         project.run_dir().joinpath("bin").symlink_to(executable)
                     else:
