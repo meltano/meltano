@@ -96,7 +96,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -145,7 +145,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry
@@ -251,7 +251,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -273,7 +273,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry
@@ -306,7 +306,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -322,7 +322,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry
