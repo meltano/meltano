@@ -45,7 +45,11 @@ class LockedDefinitionService(PluginRepository):
         Raises:
             PluginNotFoundError: If the plugin definition could not be found.
         """
-        path = self.project.plugin_lock_path(plugin_type, plugin_name, variant_name)
+        path = self.project.plugin_lock_path(
+            plugin_type,
+            plugin_name,
+            variant_name=variant_name,
+        )
         try:
             standalone = StandalonePlugin.parse_json_file(path)
         except FileNotFoundError as err:

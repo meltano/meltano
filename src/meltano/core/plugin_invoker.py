@@ -390,7 +390,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         if self.venv_service:
             # Switch to plugin-specific venv
             venv = VirtualEnv(
-                self.project.venvs_dir(self.plugin.type, self.plugin.name),
+                self.project.venvs_dir(
+                    self.plugin.type,
+                    self.plugin.name,
+                    make_dirs=False,
+                ),
             )
             venv_dir = str(venv.bin_dir)
             env["VIRTUAL_ENV"] = str(venv.root)

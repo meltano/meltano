@@ -144,7 +144,7 @@ class TestProjectAddService:
         child_path = subject.project.plugin_lock_path(
             child.type,
             child.name,
-            child.variant,
+            variant_name=child.variant,
         )
         assert child_path.stem == "tap-mock-inherited-new--meltano"
         assert not child_path.exists()
@@ -161,7 +161,7 @@ class TestProjectAddService:
         grandchild_path = subject.project.plugin_lock_path(
             grandchild.type,
             grandchild.name,
-            grandchild.variant,
+            variant_name=grandchild.variant,
         )
         assert grandchild_path.stem == "tap-mock-inherited-new-2--meltano"
         assert not grandchild_path.exists()
