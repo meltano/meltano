@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.4.0 (2024-04-03)
+
+### ✨ New
+
+- [#8355](https://github.com/meltano/meltano/issues/8355) Support installing multiple plugins of any type -- _**Thanks @ReubenFrankel!**_
+
+### 🐛 Fixes
+
+- [#8447](https://github.com/meltano/meltano/issues/8447) `meltano run` no longer creates empty `venv` plugin directories for inherited plugins
+- [#8446](https://github.com/meltano/meltano/issues/8446) Added `run_id` and `job_name` properties to `meltano run` log messages
+
+### ⚙️ Under the Hood
+
+- [#8469](https://github.com/meltano/meltano/issues/8469) Fixed some log serialization issues with `meltano.core.proj…ec_plugins_service.DefinitionSource` and `meltano.core.plugin.project_plugin.ProjectPlugin`
+
+### 📚 Documentation Improvements
+
+- [#8449](https://github.com/meltano/meltano/issues/8449) Fixed a broken link to custom plugin definitions in the project concept page
+- [#8432](https://github.com/meltano/meltano/issues/8432) Added the 2024-Q1 changelog
+
 ## v3.3.2 (2024-03-06)
 
 ### 🐛 Fixes
