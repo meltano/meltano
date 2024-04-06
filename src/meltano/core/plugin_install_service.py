@@ -253,10 +253,8 @@ class PluginInstallService:  # noqa: WPS214
             self.status_cb(state)
 
         installing = [
-            self.install_plugin_async(plugin, reason)
+            self.install_plugin_async(plugin, reason, skip_installed)
             for plugin in new_plugins
-            if not skip_installed
-            or not self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
         ]
 
         states.extend(await asyncio.gather(*installing))
@@ -291,12 +289,14 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
+        skip_installed=False,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
+            skip_installed: Whether to skip the plugin if it is already installed.
 
         Returns:
             PluginInstallState state instance.
@@ -309,7 +309,13 @@ class PluginInstallService:  # noqa: WPS214
             ),
         )
 
-        if not plugin.is_installable() or self._is_mapping(plugin):
+        is_installed = self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
+
+        if (
+            (skip_installed and is_installed)
+            or not plugin.is_installable()
+            or self._is_mapping(plugin)
+        ):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
