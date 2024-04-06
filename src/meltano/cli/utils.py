@@ -433,6 +433,7 @@ def install_plugins(
     parallelism=None,
     clean=False,
     force=False,
+    skip_installed=False,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
@@ -442,7 +443,11 @@ def install_plugins(
         clean=clean,
         force=force,
     )
-    install_results = install_service.install_plugins(plugins, reason=reason)
+    install_results = install_service.install_plugins(
+        plugins,
+        reason=reason,
+        skip_installed=skip_installed,
+    )
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful

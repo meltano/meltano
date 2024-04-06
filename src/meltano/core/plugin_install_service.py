@@ -236,6 +236,7 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
+        skip_installed=False,
     ) -> tuple[PluginInstallState]:
         """
         Install all the provided plugins.
@@ -245,6 +246,7 @@ class PluginInstallService:  # noqa: WPS214
         Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
+            skip_installed: Whether to skip plugins that are already installed.
 
         Returns:
             Install state of installed plugins.
@@ -253,7 +255,13 @@ class PluginInstallService:  # noqa: WPS214
         for state in states:
             self.status_cb(state)
         states.extend(
-            asyncio.run(self.install_plugins_async(new_plugins, reason=reason)),
+            asyncio.run(
+                self.install_plugins_async(
+                    new_plugins,
+                    reason=reason,
+                    skip_installed=skip_installed,
+                )
+            ),
         )
         return states
 
@@ -261,18 +269,25 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
+        skip_installed=False,
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
+            skip_installed: Whether to skip plugins that are already installed.
 
         Returns:
             Install state of installed plugins.
         """
         return await asyncio.gather(
-            *[self.install_plugin_async(plugin, reason) for plugin in plugins],
+            *[
+                self.install_plugin_async(plugin, reason)
+                for plugin in plugins
+                if not skip_installed
+                or not self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
+            ],
         )
 
     def install_plugin(
