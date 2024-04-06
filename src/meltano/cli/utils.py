@@ -426,7 +426,7 @@ def install_status_update(install_state):
         click.secho(msg, fg="green")
 
 
-def install_plugins(
+async def install_plugins(
     project,
     plugins,
     reason=PluginInstallReason.INSTALL,
@@ -443,7 +443,7 @@ def install_plugins(
         clean=clean,
         force=force,
     )
-    install_results = install_service.install_plugins(
+    install_results = await install_service.install_plugins(
         plugins,
         reason=reason,
         skip_installed=skip_installed,

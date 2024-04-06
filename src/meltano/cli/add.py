@@ -22,6 +22,7 @@ from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.utils import run_async
 from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
@@ -114,7 +115,8 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
 )
 @pass_project()
 @click.pass_context
-def add(  # noqa: WPS238
+@run_async
+async def add(  # noqa: C901 WPS238
     ctx,
     project: Project,
     plugin_type: str,
@@ -198,7 +200,7 @@ def add(  # noqa: WPS238
     tracker.track_command_event(CliEvent.inflight)
 
     if not flags.get("no_install"):
-        success = install_plugins(
+        success = await install_plugins(
             project,
             plugins,
             reason=PluginInstallReason.ADD,

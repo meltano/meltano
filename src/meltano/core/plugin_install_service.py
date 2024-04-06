@@ -215,7 +215,7 @@ class PluginInstallService:  # noqa: WPS214
                 )
         return states, deduped_plugins
 
-    def install_all_plugins(
+    async def install_all_plugins(
         self,
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
@@ -230,42 +230,9 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return self.install_plugins(self.project.plugins.plugins(), reason=reason)
+        return await self.install_plugins(self.project.plugins.plugins(), reason=reason)
 
-    def install_plugins(
-        self,
-        plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
-        skip_installed=False,
-    ) -> tuple[PluginInstallState]:
-        """
-        Install all the provided plugins.
-
-        Blocks until all plugins are installed.
-
-        Args:
-            plugins: ProjectPlugin instances to install.
-            reason: Plugin install reason.
-            skip_installed: Whether to skip plugins that are already installed.
-
-        Returns:
-            Install state of installed plugins.
-        """
-        states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
-        for state in states:
-            self.status_cb(state)
-        states.extend(
-            asyncio.run(
-                self.install_plugins_async(
-                    new_plugins,
-                    reason=reason,
-                    skip_installed=skip_installed,
-                )
-            ),
-        )
-        return states
-
-    async def install_plugins_async(
+    async def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
@@ -281,14 +248,19 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return await asyncio.gather(
-            *[
-                self.install_plugin_async(plugin, reason)
-                for plugin in plugins
-                if not skip_installed
-                or not self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
-            ],
-        )
+        states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
+        for state in states:
+            self.status_cb(state)
+
+        installing = [
+            self.install_plugin_async(plugin, reason)
+            for plugin in new_plugins
+            if not skip_installed
+            or not self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
+        ]
+
+        states.extend(await asyncio.gather(*installing))
+        return states
 
     def install_plugin(
         self,

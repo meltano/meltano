@@ -71,8 +71,8 @@ class TestPluginInstallService:
         ]
 
     @pytest.mark.slow()
-    def test_install_all(self, subject):
-        all_plugins = subject.install_all_plugins()
+    async def test_install_all(self, subject):
+        all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
 
         assert all_plugins[2].plugin.name == "target-csv"
