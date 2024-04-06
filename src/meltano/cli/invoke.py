@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import sys
 import typing as t
@@ -14,18 +13,21 @@ from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
     PartialInstrumentedCmd,
+    install_plugins,
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import (
     PluginInvoker,
     UnknownCommandError,
     invoker_factory,
 )
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker
@@ -74,7 +76,8 @@ logger = logging.getLogger(__name__)
 )
 @click.pass_context
 @pass_project(migrate=True)
-def invoke(
+@run_async
+async def invoke(  # noqa: C901
     project: Project,
     ctx: click.Context,
     plugin_type: str,
@@ -118,18 +121,23 @@ def invoke(
         tracker.track_command_event(CliEvent.completed)
         return
 
+    await install_plugins(
+        project,
+        [plugin],
+        reason=PluginInstallReason.INVOKE,
+        skip_installed=True,
+    )
+
     invoker = invoker_factory(project, plugin)
     try:
-        exit_code = asyncio.run(
-            _invoke(
-                invoker,
-                plugin_args,
-                session,
-                dump,
-                command_name,
-                containers,
-                print_var=print_var,
-            ),
+        exit_code = await _invoke(
+            invoker,
+            plugin_args,
+            session,
+            dump,
+            command_name,
+            containers,
+            print_var=print_var,
         )
     except Exception as invoke_err:
         tracker.track_command_event(CliEvent.failed)
