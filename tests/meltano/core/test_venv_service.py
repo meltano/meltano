@@ -46,13 +46,17 @@ class TestVenvService:
         return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
-        file = project.run_dir("name", "test.file.txt")
+        run_dir = project.run_dir("name")
+        file = run_dir / "test.file.txt"
         file.touch()
         assert file.exists()
         assert file.is_file()
 
         subject.clean_run_files()
         assert not file.exists()
+        assert (
+            run_dir.exists()
+        ), "Expected all files in the run dir to be removed, but not the dir itself"
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")

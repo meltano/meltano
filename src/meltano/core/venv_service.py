@@ -293,8 +293,14 @@ class VenvService:  # noqa: WPS214
 
     def clean_run_files(self) -> None:
         """Destroy cached configuration files, if they exist."""
+        run_dir = self.project.run_dir(self.name, make_dirs=False)
+
         try:
-            shutil.rmtree(self.project.run_dir(self.name, make_dirs=False))
+            for path in run_dir.iterdir():
+                if path.is_dir():
+                    shutil.rmtree(path)
+                else:
+                    path.unlink()
         except FileNotFoundError:
             logger.debug("No cached configuration files to remove")
 
