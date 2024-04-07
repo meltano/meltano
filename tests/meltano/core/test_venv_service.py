@@ -47,13 +47,23 @@ class TestVenvService:
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
         run_dir = project.run_dir("name")
+
         file = run_dir / "test.file.txt"
         file.touch()
+
         assert file.exists()
         assert file.is_file()
 
+        sub_dir = run_dir / "test_dir"
+        sub_dir.mkdir()
+
+        assert sub_dir.exists()
+        assert sub_dir.is_dir()
+
         subject.clean_run_files()
+
         assert not file.exists()
+        assert not sub_dir.exists()
         assert (
             run_dir.exists()
         ), "Expected all files in the run dir to be removed, but not the dir itself"
