@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import platform
 import typing as t
@@ -41,11 +40,9 @@ class TestCliInvoke:
             ProjectPluginsService,
             "find_plugin",
             return_value=utility,
-        ), patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            return_value=process_mock,
-        ) as invoke_async:
+        ), patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+            invoke_async = AsyncMock(return_value=process_mock)
+            asyncio_mock.create_subprocess_exec = invoke_async
             yield invoke_async
 
     @pytest.fixture()
@@ -172,25 +169,11 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_exit_code(self, cli_runner, tap, plugin_invoker_factory, utility):
-        process_mock = Mock()
-        process_mock.name = "utility-mock"
-        process_mock.wait = AsyncMock(return_value=2)
+    def test_invoke_exit_code(self, cli_runner, mock_invoke):
+        mock_invoke.return_value.wait.return_value = 2
 
-        with patch(
-            "meltano.core.plugin_invoker.invoker_factory",
-            return_value=plugin_invoker_factory,
-        ), patch.object(
-            ProjectPluginsService,
-            "find_plugin",
-            return_value=utility,
-        ), patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            return_value=process_mock,
-        ):
-            basic = cli_runner.invoke(cli, ["invoke", tap.name])
-            assert basic.exit_code == 2
+        basic = cli_runner.invoke(cli, ["invoke", "utility-mock"])
+        assert basic.exit_code == 2
 
     def test_invoke_triggers(
         self,
