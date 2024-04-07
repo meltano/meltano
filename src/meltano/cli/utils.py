@@ -434,14 +434,15 @@ async def install_plugins(
     clean=False,
     force=False,
     skip_installed=False,
+    show_results: bool | None = None,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,
-        status_cb=install_status_update,
         parallelism=parallelism,
         clean=clean,
         force=force,
+        **dict.fromkeys(["status_cb"] if show_results else [], install_status_update),
     )
     install_results = await install_service.install_plugins(
         plugins,
@@ -452,6 +453,11 @@ async def install_plugins(
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
 
+    is_success = num_failed == 0
+
+    if show_results is False:
+        return is_success
+
     fg = "green"
     if num_failed >= 0 and num_successful == 0:
         fg = "red"
@@ -461,7 +467,8 @@ async def install_plugins(
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         click.secho(
-            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} "
+            "plugins",
             fg=fg,
         )
     if num_skipped:
@@ -471,7 +478,7 @@ async def install_plugins(
             fg=fg,
         )
 
-    return num_failed == 0
+    return is_success
 
 
 @contextmanager
