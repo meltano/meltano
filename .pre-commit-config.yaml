@@ -22,7 +22,7 @@ repos:
           - "poetry==1.6.1"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
@@ -60,7 +60,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v9.0.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
