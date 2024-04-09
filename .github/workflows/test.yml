@@ -96,7 +96,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -113,7 +113,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.2.0
+      uses: docker/setup-buildx-action@v3.3.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
@@ -145,7 +145,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry
@@ -251,7 +251,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -273,7 +273,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry
@@ -292,7 +292,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@v4.1.1
+      uses: codecov/codecov-action@v4.2.0
 
   mypy:
     name: "Static type checking"
@@ -306,7 +306,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -322,7 +322,7 @@ jobs:
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install nox
         pipx inject nox nox-poetry

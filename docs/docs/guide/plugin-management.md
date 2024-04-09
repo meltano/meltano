@@ -75,7 +75,7 @@ is repeated here for convenience, since you may want to update it to
 If this property is omitted, it is inherited from the discoverable [base plugin description](/concepts/plugins#project-plugins) identified by the `name` (and `variant`) instead.
 
 As mentioned above, directly adding a plugin to your [`meltano.yml` project file](/concepts/project#plugins)
-and [installing it](#installing-your-projects-plugins) using [`meltano install <type> <name>`](/reference/command-line-interface#install)
+and [installing it](#installing-your-projects-plugins) using [`meltano install [<type>|-] <name>`](/reference/command-line-interface#install)
 has the same effect as adding it using [`meltano add`](/reference/command-line-interface#add).
 
 #### Variants
@@ -367,7 +367,7 @@ by default, you'll need to explicitly run [`meltano install`](/reference/command
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
-To install a specific plugin in your project, use [`meltano install <type> <name>`](/reference/command-line-interface#install), e.g. `meltano install extractor tap-gitlab`. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+To install a specific plugin in your project, use [`meltano install [<type>|-] <name>`](/reference/command-line-interface#install), e.g. `meltano install extractor tap-gitlab` or `meltano install - tap-gitlab`. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
 ## Pinning a plugin to a specific version
 
@@ -513,7 +513,7 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
    ```bash
-   meltano install <type> <name>
+   meltano install [<type>|-] <name>
 
    # For example:
    meltano install extractor tap-gitlab
@@ -553,7 +553,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
    ```bash
-   meltano install <type> <name>
+   meltano install [<type>|-] <name>
 
    # For example:
    meltano install loader target-postgres
