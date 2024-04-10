@@ -552,4 +552,8 @@ async def install_pip_plugin(
         if force
         else pip_install_args,
         clean=clean,
+        env={
+            **os.environ,
+            **project.dotenv_env,
+        },
     )
