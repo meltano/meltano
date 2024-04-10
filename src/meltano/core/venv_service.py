@@ -251,12 +251,15 @@ class VenvService:  # noqa: WPS214
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
+        *,
+        env: dict[str, str | None] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
 
         Args:
             pip_install_args: Arguments passed to `pip install`.
             clean: Whether to not attempt to use an existing virtual environment.
+            env: Environment variables to pass to the subprocess.
         """
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
@@ -267,7 +270,7 @@ class VenvService:  # noqa: WPS214
 
         self.clean_run_files()
 
-        await self._pip_install(pip_install_args=pip_install_args, clean=clean)
+        await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
         self.write_fingerprint(pip_install_args)
 
     def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
@@ -324,7 +327,7 @@ class VenvService:  # noqa: WPS214
 
         async def extract_stderr(proc: Process):
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
-                "unicode_escape",
+                "utf-8",
                 errors="replace",
             )
 
@@ -345,8 +348,11 @@ class VenvService:  # noqa: WPS214
                 stderr=await err.stderr,
             ) from err
 
-    async def upgrade_pip(self) -> Process:
+    async def upgrade_pip(self, env: dict[str, str | None] | None = None) -> Process:
         """Upgrade the `pip` package to the latest version in the virtual environment.
+
+        Args:
+            env: Environment variables to pass to the subprocess.
 
         Raises:
             AsyncSubprocessError: Failed to upgrade pip to the latest version.
@@ -356,7 +362,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")  # noqa: G004
         try:
-            return await self._pip_install(("--upgrade", "pip"))
+            return await self._pip_install(("--upgrade", "pip"), env=env)
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.",  # noqa: EM101
@@ -410,12 +416,15 @@ class VenvService:  # noqa: WPS214
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
+        *,
+        env: dict[str, str | None] | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
 
         Args:
             pip_install_args: The arguments to pass to `pip install`.
             clean: Whether the installation should be done in a clean venv.
+            env: Environment variables to pass to the subprocess.
 
         Raises:
             AsyncSubprocessError: The command failed.
@@ -426,7 +435,7 @@ class VenvService:  # noqa: WPS214
         if clean:
             self.clean()
             await self.create()
-            await self.upgrade_pip()
+            await self.upgrade_pip(env=env)
 
         pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
@@ -442,7 +451,7 @@ class VenvService:  # noqa: WPS214
             if not proc.stdout:
                 return None
 
-            return (await proc.stdout.read()).decode("unicode_escape", errors="replace")
+            return (await proc.stdout.read()).decode("utf-8", errors="replace")
 
         try:
             return await exec_async(
@@ -454,6 +463,7 @@ class VenvService:  # noqa: WPS214
                 str(self.pip_log_path),
                 *pip_install_args,
                 extract_stderr=extract_stderr,
+                env=env,
             )
         except AsyncSubprocessError as err:
             logger.info(
