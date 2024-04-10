@@ -378,7 +378,11 @@ class VenvService:  # noqa: WPS214
                 stderr=await err.stderr,
             ) from err
 
-    async def upgrade_pip(self, env: dict[str, str | None] | None = None) -> Process:
+    async def upgrade_pip(
+        self,
+        *,
+        env: dict[str, str | None] | None = None,
+    ) -> Process | None:
         """Upgrade the `pip` package to the latest version in the virtual environment.
 
         Args:
@@ -617,6 +621,7 @@ class UvVenvService(VenvService):
     @override
     async def upgrade_pip(
         self,
+        *,
         env: dict[str, str | None] | None = None,
     ) -> Process | None:
         """No-op for `uv` virtual environments.
