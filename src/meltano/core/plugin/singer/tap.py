@@ -321,7 +321,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         )
         try:
             state = state_service.get_state(elt_context.job.job_name)
-        except Exception as err:
+        except Exception as err:  # pragma: no cover
             logger.error(
                 err.args[0],
                 state_backend=state_service.state_store_manager.label,
