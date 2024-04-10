@@ -306,18 +306,30 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
             try:
                 shutil.copy(custom_state_path, state_path)
-                logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
             except FileNotFoundError as err:
                 raise PluginExecutionError(
                     f"Could not find state file {custom_state_path}",  # noqa: EM102
                 ) from err
 
+            logger.info(f"Found state in {custom_state_filename}")  # noqa: G004
             return
-        # the `state.json` is stored in the database
-        if state := StateService(
+
+        # the `state.json` is stored in a state backend
+        state_service = StateService(
             project=elt_context.project,
             session=elt_context.session,
-        ).get_state(elt_context.job.job_name):
+        )
+        try:
+            state = state_service.get_state(elt_context.job.job_name)
+        except Exception as err:
+            logger.error(
+                err.args[0],
+                state_backend=state_service.state_store_manager.label,
+            )
+            msg = "Failed to retrieve state"
+            raise PluginExecutionError(msg) from err
+
+        if state:
             if state.get(SINGER_STATE_KEY):
                 with state_path.open("w") as state_file:
                     json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
