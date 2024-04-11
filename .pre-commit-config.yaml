@@ -22,7 +22,7 @@ repos:
           - "poetry==1.6.1"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
         exclude: ^src/meltano/core/cli_messages\.py$
