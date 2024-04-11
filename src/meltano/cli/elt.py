@@ -12,7 +12,12 @@ import click
 from structlog import stdlib as structlog_stdlib
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliEnvironmentBehavior,
+    CliError,
+    PartialInstrumentedCmd,
+    install_plugins,
+)
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -20,6 +25,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
@@ -406,9 +412,26 @@ async def _run_elt(
     context_builder: ELTContextBuilder,
     output_logger: OutputLogger,
 ):
+    elt_context = context_builder.context()
+    plugins = [elt_context.extractor, elt_context.loader]
+
+    if elt_context.only_transform:
+        plugins.append(elt_context.transformer)
+
+    await install_plugins(
+        elt_context.project,
+        plugins,
+        reason=(
+            PluginInstallReason.ELT
+            if elt_context.transformer
+            else PluginInstallReason.EL
+        ),
+        skip_installed=True,
+        show_results=False,
+    )
+
     async with _redirect_output(log, output_logger):
         try:
-            elt_context = context_builder.context()
             tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
             tracker.track_command_event(CliEvent.inflight)
 
