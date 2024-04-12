@@ -25,6 +25,18 @@ The following extras add support for other [state backends](/concepts/state_back
 - `gcs` - Google Cloud Storage.
 - `azure` - Azure Blob Storage.
 
+### Virtual Environment backends
+
+The following extras add support for different [virtual environment backends](/concepts/python_virtual_environments#how-does-meltano-use-virtual-environments-internally):
+
+- `uv` - Manage virtual environments with [astral.sh/uv](https://github.com/astral-sh/uv/).
+
+:::info
+  <p>
+  After you switch to a different virtual environment backend, it's recommended to reinstall all plugins with `meltano install --clean`.
+  </p>
+:::
+
 ## Extension Developer Kit (EDK)
 
 Meltano extensions are lightweight executables which allow you to integrate existing data tools with Meltano.
