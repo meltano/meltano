@@ -41,6 +41,7 @@ class PluginInstallReason(str, Enum):
     INSTALL = "install"
     INVOKE = "invoke"
     RUN = "run"
+    TEST = "test"
     UPGRADE = "upgrade"
 
 
