@@ -283,6 +283,31 @@ class TestUvVenvService:
     def subject(self, project):
         return UvVenvService(project=project, namespace="namespace", name="name")
 
+    def test_find_uv_builtin(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
+        service = UvVenvService(project=project, namespace="namespace", name="name")
+        assert service.uv == "/usr/bin/uv"
+
+    def test_find_uv_global(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+        def raise_import_error():
+            raise ImportError
+
+        monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
+        monkeypatch.setattr("shutil.which", lambda _: "/usr/bin/uv")
+
+        service = UvVenvService(project=project, namespace="namespace", name="name")
+        assert service.uv == "/usr/bin/uv"
+
+    def test_find_uv_not_found(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+        def raise_import_error():
+            raise ImportError
+
+        monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
+        monkeypatch.setattr("shutil.which", lambda _: None)
+
+        with pytest.raises(MeltanoError, match="Could not find the 'uv' executable"):
+            UvVenvService(project=project, namespace="namespace", name="name")
+
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: UvVenvService):

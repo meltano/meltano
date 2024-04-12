@@ -597,6 +597,9 @@ class UvVenvService(VenvService):
 
         Returns:
             A string representing the path to the `uv` executable.
+
+        Raises:
+            MeltanoError: The `uv` executable could not be found.
         """
         with contextlib.suppress(ImportError, FileNotFoundError):
             from uv import find_uv_bin
@@ -604,8 +607,14 @@ class UvVenvService(VenvService):
             return find_uv_bin()
 
         # Fall back to PATH.
-        uv = shutil.which("uv")  # pragma: no cover
-        return uv or "uv"  # pragma: no cover
+        uv = shutil.which("uv")
+
+        if not uv:
+            error = "Could not find the 'uv' executable"
+            instruction = "Please install 'meltano[uv]' or install 'uv' globally."
+            raise MeltanoError(error, instruction)
+
+        return uv
 
     def __init__(self, *args: t.Any, **kwargs: t.Any):
         """Initialize the `UvVenvService`.
