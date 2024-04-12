@@ -378,7 +378,7 @@ class VenvService:  # noqa: WPS214
                 stderr=await err.stderr,
             ) from err
 
-    async def upgrade_pip(
+    async def upgrade_installer(
         self,
         *,
         env: dict[str, str | None] | None = None,
@@ -540,7 +540,7 @@ class VenvService:  # noqa: WPS214
         if clean:
             self.clean()
             await self.create()
-            await self.upgrade_pip(env=env)
+            await self.upgrade_installer(env=env)
 
         pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
@@ -619,7 +619,7 @@ class UvVenvService(VenvService):
         logger.debug("Using uv executable at %s", self.uv)
 
     @override
-    async def upgrade_pip(
+    async def upgrade_installer(
         self,
         *,
         env: dict[str, str | None] | None = None,
