@@ -54,6 +54,7 @@ formatters:
     sort_keys: False
   json: # log format for json formatted logs
     (): meltano.core.logging.json_formatter
+    include_callsite_parameters: true # adds `pathname`, `lineno`, and `func_name` to each log entry
 
 handlers:
   console: # log to the console (stderr) using structured_colored formatter, logging everything at DEBUG level and up
