@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 import re
 import typing as t
@@ -7,7 +8,7 @@ from types import TracebackType
 
 import pytest
 
-from meltano.core.logging.formatters import console_log_formatter
+from meltano.core.logging.formatters import console_log_formatter, json_formatter
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -55,11 +56,12 @@ class TestLogFormatters:
         return logging.LogRecord(
             name="test",
             level=logging.INFO,
-            pathname="test",
+            pathname="/path/to/my_module.py",
             lineno=1,
             msg="test",
             args=None,
             exc_info=None,
+            func="my_func",
         )
 
     @pytest.fixture()
@@ -114,3 +116,11 @@ class TestLogFormatters:
         output = formatter.format(record_with_exception)
         assert "locals" in output
         assert "my_var = 'my_value'" in output
+
+    def test_json_formatter_callsite_parameters(self, record):
+        formatter = json_formatter(include_callsite_parameters=True)
+        output = formatter.format(record)
+        message_dict = json.loads(output)
+        assert message_dict["pathname"] == "/path/to/my_module.py"
+        assert message_dict["lineno"] == 1
+        assert message_dict["func_name"] == "my_func"
