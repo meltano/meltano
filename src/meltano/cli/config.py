@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 import tempfile
@@ -20,16 +19,19 @@ from meltano.cli.utils import (
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
+    install_plugins,
 )
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -393,8 +395,13 @@ def set_(
 
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
+@pass_project(migrate=True)
 @click.pass_context
-def test(ctx):
+@run_async
+async def test(
+    ctx,
+    project: Project,
+):
     """Test the configuration of a plugin."""
     invoker = ctx.obj["invoker"]
     tracker = ctx.obj["tracker"]
@@ -403,14 +410,18 @@ def test(ctx):
         raise CliError("Testing of the Meltano project configuration is not supported")  # noqa: EM101
 
     session = ctx.obj["session"]
+    plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
 
-    async def _validate():  # noqa: WPS430
-        plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
-        async with plugin_test_service.plugin_invoker.prepared(session):
-            return await plugin_test_service.validate()
+    await install_plugins(
+        project,
+        [plugin_test_service.plugin_invoker.plugin],
+        reason=PluginInstallReason.CONFIG_TEST,
+        skip_installed=True,
+    )
 
     try:
-        is_valid, detail = asyncio.run(_validate())
+        async with plugin_test_service.plugin_invoker.prepared(session):
+            is_valid, detail = await plugin_test_service.validate()
     except Exception:
         tracker.track_command_event(CliEvent.failed)
         raise

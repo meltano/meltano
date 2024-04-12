@@ -36,6 +36,7 @@ class PluginInstallReason(str, Enum):
     """Plugin install reason enum."""
 
     ADD = "add"
+    CONFIG_TEST = "config test"
     EL = "el"
     ELT = "elt"
     INSTALL = "install"
