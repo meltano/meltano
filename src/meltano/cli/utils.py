@@ -434,7 +434,7 @@ async def install_plugins(
     clean=False,
     force=False,
     skip_installed=False,
-    show_results: bool | None = None,
+    show_results=True,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
@@ -455,7 +455,7 @@ async def install_plugins(
 
     is_success = num_failed == 0
 
-    if show_results is False:
+    if not show_results:
         return is_success
 
     fg = "green"
