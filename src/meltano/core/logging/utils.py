@@ -149,6 +149,15 @@ def setup_logging(  # noqa: WPS210
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,
+            structlog.processors.CallsiteParameterAdder(
+                # Most folks probably don't need thread and process process IDs, so
+                # these three should be enough to start with.
+                parameters=(
+                    structlog.processors.CallsiteParameter.PATHNAME,
+                    structlog.processors.CallsiteParameter.LINENO,
+                    structlog.processors.CallsiteParameter.FUNC_NAME,
+                ),
+            ),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
