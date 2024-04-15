@@ -536,7 +536,6 @@ async def install_pip_plugin(
             name=plugin.venv_name,
         )
     elif backend == "uv":  # pragma: no cover
-        logger.warning("The uv backend is experimental")
         service = UvVenvService(
             project=project,
             python=plugin.python,

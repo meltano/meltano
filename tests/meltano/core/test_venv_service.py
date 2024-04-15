@@ -15,7 +15,7 @@ from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import install_pip_plugin
-from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv
+from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv, find_uv
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -281,24 +281,28 @@ class TestVirtualEnv:
 class TestUvVenvService:
     @pytest.fixture()
     def subject(self, project):
+        find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
 
-    def test_find_uv_builtin(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch):
+        find_uv.cache_clear()
         monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
-        service = UvVenvService(project=project, namespace="namespace", name="name")
-        assert service.uv == "/usr/bin/uv"
+        assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_global(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_global(self, monkeypatch: pytest.MonkeyPatch):
+        find_uv.cache_clear()
+
         def raise_import_error():
             raise ImportError
 
         monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
         monkeypatch.setattr("shutil.which", lambda _: "/usr/bin/uv")
 
-        service = UvVenvService(project=project, namespace="namespace", name="name")
-        assert service.uv == "/usr/bin/uv"
+        assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_not_found(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_not_found(self, monkeypatch: pytest.MonkeyPatch):
+        find_uv.cache_clear()
+
         def raise_import_error():
             raise ImportError
 
@@ -306,7 +310,7 @@ class TestUvVenvService:
         monkeypatch.setattr("shutil.which", lambda _: None)
 
         with pytest.raises(MeltanoError, match="Could not find the 'uv' executable"):
-            UvVenvService(project=project, namespace="namespace", name="name")
+            find_uv()
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
