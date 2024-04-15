@@ -316,6 +316,8 @@ class TestUvVenvService:
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: UvVenvService):
+        find_uv.cache_clear()
+
         # Make sure the venv exists already
         await subject.install(["cowsay"], clean=True)
 
@@ -337,6 +339,8 @@ class TestUvVenvService:
         assert "cowsay" in str(run.stdout)
 
     async def test_handle_installation_error(self, subject: UvVenvService):
+        find_uv.cache_clear()
+
         process = mock.Mock(spec=Process)
         process.stderr = "Some error"
 
