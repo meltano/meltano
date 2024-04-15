@@ -281,15 +281,15 @@ class TestVirtualEnv:
 class TestUvVenvService:
     @pytest.fixture()
     def subject(self, project):
+        find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
 
-    def test_find_uv_builtin(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch):
         find_uv.cache_clear()
         monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
-        service = UvVenvService(project=project, namespace="namespace", name="name")
-        assert service.uv == "/usr/bin/uv"
+        assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_global(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_global(self, monkeypatch: pytest.MonkeyPatch):
         find_uv.cache_clear()
 
         def raise_import_error():
@@ -298,10 +298,9 @@ class TestUvVenvService:
         monkeypatch.setattr("uv.find_uv_bin", raise_import_error)
         monkeypatch.setattr("shutil.which", lambda _: "/usr/bin/uv")
 
-        service = UvVenvService(project=project, namespace="namespace", name="name")
-        assert service.uv == "/usr/bin/uv"
+        assert find_uv() == "/usr/bin/uv"
 
-    def test_find_uv_not_found(self, project: Project, monkeypatch: pytest.MonkeyPatch):
+    def test_find_uv_not_found(self, monkeypatch: pytest.MonkeyPatch):
         find_uv.cache_clear()
 
         def raise_import_error():
@@ -311,13 +310,11 @@ class TestUvVenvService:
         monkeypatch.setattr("shutil.which", lambda _: None)
 
         with pytest.raises(MeltanoError, match="Could not find the 'uv' executable"):
-            UvVenvService(project=project, namespace="namespace", name="name")
+            find_uv()
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: UvVenvService):
-        find_uv.cache_clear()
-
         # Make sure the venv exists already
         await subject.install(["cowsay"], clean=True)
 
@@ -339,8 +336,6 @@ class TestUvVenvService:
         assert "cowsay" in str(run.stdout)
 
     async def test_handle_installation_error(self, subject: UvVenvService):
-        find_uv.cache_clear()
-
         process = mock.Mock(spec=Process)
         process.stderr = "Some error"
 
