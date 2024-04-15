@@ -42,7 +42,7 @@ StdErrExtractor: TypeAlias = t.Callable[[Process], t.Awaitable[t.Union[str, None
 
 
 @lru_cache(maxsize=None)
-def _find_uv() -> str:  # noqa: WPS605
+def find_uv() -> str:
     """Find the `uv` executable.
 
     Tries to import the `uv` package and use its `find_uv_bin` function to find the
@@ -627,7 +627,7 @@ class UvVenvService(VenvService):
             kwargs: Keyword arguments for the VenvService.
         """
         super().__init__(*args, **kwargs)
-        self.uv = _find_uv()
+        self.uv = find_uv()
         logger.debug("Using uv executable at %s", self.uv)
 
     @override
