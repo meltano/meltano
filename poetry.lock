@@ -4156,6 +4156,32 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "p
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
+name = "uv"
+version = "0.1.31"
+description = "An extremely fast Python package installer and resolver, written in Rust."
+optional = true
+python-versions = ">=3.8"
+files = [
+    {file = "uv-0.1.31-py3-none-linux_armv6l.whl", hash = "sha256:da4bc4a9f1373a52462fe2395c794c8b971c8b54d25e83228a092c16b42eec1f"},
+    {file = "uv-0.1.31-py3-none-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:eca2d8808b7972aeeb0aac6bd05e4bb4dcb6bdc709bc60addf5cac9c21cc7c07"},
+    {file = "uv-0.1.31-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:c2ba42a02fdd159d73c352026e6f669440606efc5b634143e9e696cac640c4d4"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:db7c079f018ecc9f845a81c2f0d80ac759341ed0ea712d4acd4d9f1ccdb7b65a"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4defd32ada473e8f2a19325e7f0b9607fcc5be4d911b343ef75ab2f2bc9a0f2b"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:f322dbfb1852499b8d9cf1932135d4a78f6605fd701eb77d0608da5116e993fa"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:e398795810e0dac7cfe179f6ea9406d40f939cea9d7c3e5834be86aaf1dede7c"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:b0ea20afb087b8952bd03ce2434064d2164328ae3dccfab0d2dab1bf2c13aed6"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c58fbf4b346eae235d60eab04d148726d982b25caa1162a030b6080d17c05445"},
+    {file = "uv-0.1.31-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:fa0058c437042654967cb53fcbef414c92504367a5519ecbc71fdb8d1300b843"},
+    {file = "uv-0.1.31-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:41d4ea56d0fe016b028b4737100d5195c2e6be0004b995ae3a9563ca5ca1808c"},
+    {file = "uv-0.1.31-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:d8883b63c4316d6dfa5523c3a054be225d9b0083a923d9ec95eb7649e8b2977a"},
+    {file = "uv-0.1.31-py3-none-musllinux_1_2_i686.whl", hash = "sha256:83647b7ae84cad7a0d851ca12c0c9bfc7523ab49d3407efe7a59d1d8709cbfb9"},
+    {file = "uv-0.1.31-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:6d23049581707514e69960b25a0d58d27e759d4f2e014b276f7d29c2b2d8e9fe"},
+    {file = "uv-0.1.31-py3-none-win32.whl", hash = "sha256:ca5251a1e6b83d87fc7a0beebc89001ae194c29cee5b9636295fde77974f6ba2"},
+    {file = "uv-0.1.31-py3-none-win_amd64.whl", hash = "sha256:a4c43102a3d20f1a550dc33de0bbf70e388ad397403cf6cbe2a8fb996de59f9c"},
+    {file = "uv-0.1.31.tar.gz", hash = "sha256:686e792582df3afa560952f0542b582bba8a51b6bb93ff902ab836bba3b665df"},
+]
+
+[[package]]
 name = "virtualenv"
 version = "20.25.1"
 description = "Virtual Python Environment builder"
@@ -4432,8 +4458,9 @@ mssql = ["pymssql"]
 postgres = ["psycopg"]
 psycopg2 = ["psycopg2-binary"]
 s3 = ["boto3"]
+uv = ["uv"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "0c140be3c4e569dc0321e89cde0307678c76e5493d4076e033cedb931a4d70f4"
+content-hash = "a1e6898e54ef3243e2870696868f5af9b2fac9050ddde61529033166f724869a"

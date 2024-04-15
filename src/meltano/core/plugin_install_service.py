@@ -23,7 +23,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
-from meltano.core.venv_service import VenvService
+from meltano.core.venv_service import UvVenvService, VenvService
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -520,15 +520,33 @@ async def install_pip_plugin(
         force: Whether to ignore the Python version required by plugins.
         env: Environment variables to use when expanding the pip install args.
         kwargs: Unused additional arguments for the installation of the plugin.
+
+    Raises:
+        ValueError: If the venv backend is not supported.
     """
     pip_install_args = get_pip_install_args(project, plugin, env=env)
+    backend = project.settings.get("venv.backend", "virtualenv")
 
-    await VenvService(
-        project=project,
-        python=plugin.python,
-        namespace=plugin.type,
-        name=plugin.venv_name,
-    ).install(
+    if backend == "virtualenv":
+        service = VenvService(
+            project=project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.venv_name,
+        )
+    elif backend == "uv":  # pragma: no cover
+        logger.warning("The uv backend is experimental")
+        service = UvVenvService(
+            project=project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.venv_name,
+        )
+    else:  # pragma: no cover
+        msg = f"Unsupported venv backend: {backend}"
+        raise ValueError(msg)
+
+    await service.install(
         pip_install_args=("--ignore-requires-python", *pip_install_args)
         if force
         else pip_install_args,

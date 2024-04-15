@@ -96,6 +96,16 @@ settings:
   kind: array
   value: ["https://sp.meltano.com"]
 
+# venv
+- name: venv.backend
+  value: virtualenv
+  kind: options
+  options:
+  - label: virtualenv
+    value: virtualenv
+  - label: uv
+    value: uv
+
 # Feature Flags
 # Global "experimental" flag.
 - name: experimental

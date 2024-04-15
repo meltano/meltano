@@ -22,6 +22,6 @@ ENV PATH="/venv/bin:${PATH}"
 
 # Installing the application the same way our users do when using PyPI
 RUN pip install --upgrade pip wheel && \
-    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3]==${MELTANO_VERSION}"
+    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3,uv]==${MELTANO_VERSION}"
 
 ENTRYPOINT ["meltano"]
