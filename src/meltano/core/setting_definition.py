@@ -16,7 +16,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
 
 if t.TYPE_CHECKING:
-    from ruamel.yaml import Representer
+    from ruamel.yaml import Node, Representer, ScalarNode
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
@@ -28,7 +28,7 @@ VALUE_PROCESSORS = {
 class EnvVar:
     """Environment Variable class."""
 
-    def __init__(self, definition: str):
+    def __init__(self, definition: str) -> None:
         """Instantiate new EnvVar.
 
         Args:
@@ -70,7 +70,7 @@ class EnvVar:
 class SettingMissingError(Error):
     """A setting is missing."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """Instantiate SettingMissingError.
 
         Args:
@@ -82,7 +82,7 @@ class SettingMissingError(Error):
 class YAMLEnum(str, Enum):
     """Serializable Enum class."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return as string.
 
         Returns:
@@ -104,7 +104,7 @@ class YAMLEnum(str, Enum):
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
     @classmethod
-    def to_yaml(cls, representer: Representer, node: t.Any):
+    def to_yaml(cls, representer: Representer, node: t.Any) -> ScalarNode:
         """Represent as yaml.
 
         Args:
@@ -120,8 +120,8 @@ class YAMLEnum(str, Enum):
     def from_yaml(
         cls,
         constructor,  # noqa: ARG003
-        node,
-    ):
+        node: Node,
+    ) -> YAMLEnum:
         """Construct from yaml.
 
         Args:
@@ -151,7 +151,7 @@ class SettingKind(YAMLEnum):
     HIDDEN = "hidden"
 
     @cached_property
-    def is_sensitive(self):
+    def is_sensitive(self) -> bool:
         """Return whether the setting kind is sensitive.
 
         Returns:
@@ -168,6 +168,12 @@ ParseValueExpectedType = t.TypeVar("ParseValueExpectedType")
 
 class SettingDefinition(NameEq, Canonical):
     """Meltano SettingDefinition class."""
+
+    name: str
+    kind: SettingKind | None
+    hidden: bool
+    sensitive: bool
+    _custom: bool
 
     def __init__(
         self,
@@ -225,8 +231,24 @@ class SettingDefinition(NameEq, Canonical):
         oauth = oauth or {}
 
         kind = SettingKind(kind) if kind else None
-        hidden = hidden or kind is SettingKind.HIDDEN or None
-        sensitive = sensitive or kind and kind.is_sensitive or None
+
+        # Handle deprecated SettingKind.HIDDEN
+        if kind is SettingKind.HIDDEN:
+            # Override kind if hidden flag is set
+            if hidden:
+                kind = SettingKind.STRING
+
+            # Prioritize kind over flag otherwise
+            hidden = True
+
+        # Handle deprecated SettingKind.PASSWORD and SettingKind.OAUTH
+        if kind and kind.is_sensitive:
+            # Override kind if sensitive flag is set
+            if sensitive:
+                kind = SettingKind.STRING
+
+            # Prioritize kind over flag otherwise
+            sensitive = True
 
         super().__init__(
             # Attributes will be listed in meltano.yml in this order:
@@ -263,7 +285,12 @@ class SettingDefinition(NameEq, Canonical):
         return f"<SettingDefinition {self.name} ({self.kind})>"
 
     @classmethod
-    def from_missing(cls, defs: t.Iterable[SettingDefinition], config: dict, **kwargs):
+    def from_missing(
+        cls,
+        defs: t.Iterable[SettingDefinition],
+        config: dict,
+        **kwargs,
+    ) -> list[SettingDefinition]:
         """Create SettingDefinition instances for missing settings.
 
         Args:
@@ -292,7 +319,7 @@ class SettingDefinition(NameEq, Canonical):
         value: t.Any,
         custom: bool = True,
         default: t.Any | bool = False,
-    ):
+    ) -> SettingDefinition:
         """Create SettingDefinition instance from key-value pair.
 
         Args:

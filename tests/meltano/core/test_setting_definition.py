@@ -71,3 +71,107 @@ class TestSettingDefinition:
         assert setting_definition.cast_value(None) is None
         with pytest.raises(ValueError, match="is not a valid choice"):
             setting_definition.cast_value("def")
+
+    @pytest.mark.parametrize(
+        ("setting_definition", "sensitive", "kind"),
+        (
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=True,
+                    kind=SettingKind.STRING,
+                ),
+                True,
+                SettingKind.STRING,
+                id="sensitive-string",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=True,
+                    kind=SettingKind.PASSWORD,
+                ),
+                True,
+                SettingKind.STRING,
+                id="sensitive-password",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=False,
+                    kind=None,
+                ),
+                False,
+                None,
+                id="sensitive-no-kind",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=False,
+                    kind=SettingKind.STRING,
+                ),
+                False,
+                SettingKind.STRING,
+                id="non-sensitive-string",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=False,
+                    kind=SettingKind.PASSWORD,
+                ),
+                True,
+                SettingKind.PASSWORD,
+                id="non-sensitive-password",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=False,
+                    kind=None,
+                ),
+                False,
+                None,
+                id="non-sensitive-no-kind",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=None,
+                    kind=SettingKind.STRING,
+                ),
+                None,
+                SettingKind.STRING,
+                id="no-sensitive-string",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=None,
+                    kind=SettingKind.PASSWORD,
+                ),
+                True,
+                SettingKind.PASSWORD,
+                id="no-sensitive-password",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    "test_setting",
+                    sensitive=None,
+                    kind=None,
+                ),
+                None,
+                None,
+                id="no-sensitive-no-kind",
+            ),
+        ),
+    )
+    def test_parse(
+        self,
+        setting_definition: SettingDefinition,
+        sensitive: bool,
+        kind: SettingKind,
+    ):
+        assert setting_definition.sensitive is sensitive
+        assert setting_definition.kind is kind
