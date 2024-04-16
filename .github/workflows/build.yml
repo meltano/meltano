@@ -3,8 +3,7 @@ name: Build and Publish to PyPI
 on:
   workflow_dispatch:
     inputs: {}
-  release:
-    types: [published]
+  push:
 
 permissions:
   contents: write  # Needed to upload artifacts to the release
@@ -35,7 +34,7 @@ jobs:
         cache: 'poetry'
 
     - name: Check version
-      if: ${{ github.event.release }}
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
       run: |
         version=$(poetry version | awk '{print $2}')
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
@@ -51,7 +50,7 @@ jobs:
         poetry run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: ${{ github.event.release }}
+      if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
@@ -71,6 +70,7 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     environment: publishing
+    if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
     steps:
     - name: Check out the repository
       uses: actions/checkout@v4.1.7
@@ -86,7 +86,6 @@ jobs:
         ls dist/
 
     - name: Upload wheel to release
-      if: ${{ github.event.release }}
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -96,5 +95,4 @@ jobs:
         file_glob: true
 
     - name: Publish
-      if: ${{ github.event.release }}
       uses: pypa/gh-action-pypi-publish@v1.9.0
