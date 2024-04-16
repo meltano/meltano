@@ -46,22 +46,27 @@ async def test_capture_subprocess_output() -> None:
     (
         pytest.param(
             LogFormat.colored,
-            "\x1b[2m2021-01-01T00:00:00Z\x1b[0m [\x1b[32m\x1b[1minfo     \x1b[0m] \x1b[1mtest                          \x1b[0m",  # noqa: E501
+            (
+                "\x1b[2m2021-01-01T00:00:00Z\x1b[0m "
+                "[\x1b[32m\x1b[1minfo     \x1b[0m] "
+                "\x1b[1mtest                          \x1b[0m "
+                "[\x1b[0m\x1b[1m\x1b[34mtest_logger\x1b[0m]\x1b[0m"
+            ),
             id="colored",
         ),
         pytest.param(
             LogFormat.uncolored,
-            "2021-01-01T00:00:00Z [info     ] test",
+            "2021-01-01T00:00:00Z [info     ] test                           [test_logger]",  # noqa: E501
             id="uncolored",
         ),
         pytest.param(
             LogFormat.json,
-            '{"event": "test", "level": "info", "timestamp": "2021-01-01T00:00:00Z"}',
+            '{"event": "test", "level": "info", "logger": "test_logger", "timestamp": "2021-01-01T00:00:00Z"}',  # noqa: E501
             id="json",
         ),
         pytest.param(
             LogFormat.key_value,
-            "timestamp='2021-01-01T00:00:00Z' level='info' event='test' logger=None",
+            "timestamp='2021-01-01T00:00:00Z' level='info' event='test' logger='test_logger'",  # noqa: E501
             id="key_value",
         ),
         pytest.param(
