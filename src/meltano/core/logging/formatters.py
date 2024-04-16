@@ -24,6 +24,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = (
     # Add the log level and a timestamp to the event_dict if the log entry
     # is not from structlog.
     structlog.stdlib.add_log_level,
+    structlog.stdlib.add_logger_name,
     TIMESTAMPER,
 )
 
