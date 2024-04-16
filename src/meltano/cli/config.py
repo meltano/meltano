@@ -417,6 +417,7 @@ async def test(
         [plugin_test_service.plugin_invoker.plugin],
         reason=PluginInstallReason.CONFIG_TEST,
         skip_installed=True,
+        log=logger,
     )
 
     try:

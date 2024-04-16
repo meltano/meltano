@@ -118,6 +118,7 @@ async def test(
         [c.invoker.plugin for c in collected.values() if c.tests_selection],
         reason=PluginInstallReason.TEST,
         skip_installed=True,
+        log=logger,
     )
 
     exit_codes = await _run_plugin_tests(session, collected.values())

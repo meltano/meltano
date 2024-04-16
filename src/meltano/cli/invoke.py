@@ -126,7 +126,7 @@ async def invoke(  # noqa: C901
         [plugin],
         reason=PluginInstallReason.INVOKE,
         skip_installed=True,
-        show_results=False,
+        log=logger,
     )
 
     invoker = invoker_factory(project, plugin)

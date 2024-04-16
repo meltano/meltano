@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import logging
 import os
 import signal
@@ -32,6 +33,8 @@ from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
 if t.TYPE_CHECKING:
+    import structlog
+
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -402,7 +405,7 @@ def add_required_plugins(
     return added_plugins
 
 
-def install_status_update(install_state):
+def install_status_update(install_state, log: structlog.stdlib.BoundLogger = None):
     """
     Print the status of plugin installation.
 
@@ -415,15 +418,19 @@ def install_status_update(install_state):
         PluginInstallStatus.SKIPPED,
     }:
         msg = f"{install_state.verb} {desc} '{plugin.name}'..."
-        click.secho(msg)
+        log.info(msg) if log else click.secho(msg)  # noqa: WPS428
     elif install_state.status is PluginInstallStatus.ERROR:
-        click.secho(install_state.message, fg="red")
-        click.secho(install_state.details, err=True)
+        msg = install_state.message
+        log.error(msg) if log else click.secho(msg, fg="red")  # noqa: WPS428
+
+        msg = install_state.details
+        log.error(msg) if log else click.secho(msg)  # noqa: WPS428
     elif install_state.status is PluginInstallStatus.WARNING:
-        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+        msg = f"Warning! {install_state.message}."
+        log.warning(msg) if log else click.secho(msg, fg="yellow")  # noqa: WPS428
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        click.secho(msg, fg="green")
+        logger.info(msg) if log else click.secho(msg, fg="green")  # noqa: WPS428
 
 
 async def install_plugins(
@@ -434,15 +441,15 @@ async def install_plugins(
     clean=False,
     force=False,
     skip_installed=False,
-    show_results=True,
+    log: structlog.stdlib.BoundLogger = None,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,
+        status_cb=functools.partial(install_status_update, log=log),
         parallelism=parallelism,
         clean=clean,
         force=force,
-        **dict.fromkeys(["status_cb"] if show_results else [], install_status_update),
     )
     install_results = await install_service.install_plugins(
         plugins,
@@ -453,32 +460,22 @@ async def install_plugins(
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
 
-    is_success = num_failed == 0
-
-    if not show_results:
-        return is_success
-
-    fg = "green"
+    fg, log_level = "green", logging.INFO
     if num_failed >= 0 and num_successful == 0:
-        fg = "red"
+        fg, log_level = "red", logging.ERROR
     elif num_failed > 0 and num_successful > 0:
-        fg = "yellow"
+        fg, log_level = "yellow", logging.WARNING
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(
-            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} "
-            "plugins",
-            fg=fg,
-        )
+        msg = f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins"
+        log.log(log_level, msg) if log else click.secho(msg, fg=fg)  # noqa: WPS428
     if num_skipped:
         verb = "Skipped installing"
-        click.secho(
-            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
-            fg=fg,
-        )
+        msg = f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins"
+        log.log(log_level, msg) if log else click.secho(msg, fg=fg)  # noqa: WPS428
 
-    return is_success
+    return num_failed == 0
 
 
 @contextmanager

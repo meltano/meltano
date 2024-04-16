@@ -427,7 +427,7 @@ async def _run_elt(
             else PluginInstallReason.EL
         ),
         skip_installed=True,
-        show_results=False,
+        log=logger,
     )
 
     async with _redirect_output(log, output_logger):
