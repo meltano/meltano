@@ -147,6 +147,7 @@ def setup_logging(
     structlog.configure(
         processors=[
             structlog.stdlib.add_log_level,
+            structlog.stdlib.add_logger_name,
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,
             structlog.processors.StackInfoRenderer(),
