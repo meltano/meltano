@@ -1,0 +1,37 @@
+---
+slug: 2024-q2-updates-and-changes
+title: 2024 Q2 Updates and Changes
+---
+
+## Meltano
+
+We've released version [3.4.0](https://github.com/meltano/meltano/releases/tag/v3.4.0) of Meltano.
+
+This release includes, among other things, the following changes:
+
+* Support for [uv](https://github.com/astral-sh/uv) to manage plugin installations. See how to enable it in the [Meltano documentation](https://docs.meltano.com/reference/settings/#venvbackend).
+* Support installing multiple plugins of any type. This is a QOL improvement for users who want to install multiple plugins at once. See how to use it in the [Meltano documentation](https://docs.meltano.com/reference/command-line-interface#install).
+
+A number of bug fixes and logging improvements were also made to the Meltano CLI.
+
+## MeltanoHub
+
+The Hub has seen some UX improvements and bug fixes, as well as the addition of new plugins:
+
+### Extractors
+
+* Added the Stitch Data variant of tap-zuora - [Hub Link](https://hub.meltano.com/extractors/tap-zuora--singer-io/)
+* Added the MeltanoLabs variant of tap-gohighlevel - [Hub Link](https://hub.meltano.com/extractors/tap-gohighlevel--meltanolabs/)
+
+### Loaders
+
+* Added the TicketSwap variant of target-redshift - [Hub Link](https://hub.meltano.com/loaders/target-redshift--ticketswap/)
+
+### Utilities
+
+## SDK
+
+We shipped X minor releases of the SDK:
+
+* [v0.37.0](https://github.com/meltano/sdk/releases/tag/v0.37.0)
+* [v0.38.0](https://github.com/meltano/sdk/releases/tag/v0.38.0)
