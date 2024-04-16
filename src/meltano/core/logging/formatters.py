@@ -34,6 +34,7 @@ def get_default_foreign_pre_chain() -> t.Sequence[Processor]:
     """
     return (
         structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
         structlog.processors.TimeStamper(
             fmt="iso",
             utc=not get_boolean_env_var("NO_UTC", default=False),
