@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import sys
 import typing as t
 
 import click
+import structlog
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -35,7 +35,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 @click.command(
