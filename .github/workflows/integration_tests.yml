@@ -50,7 +50,7 @@ jobs:
 
     - name: Install Poetry
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry --version
@@ -64,7 +64,7 @@ jobs:
 
     - name: Upgrade pip
       env:
-        PIP_CONSTRAINT: .github/workflows/resources/constraints.txt
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pip install pip
         pip --version

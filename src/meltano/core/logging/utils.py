@@ -135,14 +135,7 @@ def setup_logging(  # noqa: WPS210
         log_level: set log levels to provided level.
         log_config: a logging config suitable for use with `logging.config.dictConfig`.
     """
-    # Mimick Python 3.8's `force=True` kwarg to override any
-    # existing logger handlers
-    # See https://github.com/python/cpython/commit/cf67d6a934b51b1f97e72945b596477b271f70b8
-    root = logging.getLogger()
-    for handler in root.handlers[:]:
-        root.removeHandler(handler)
-        handler.close()
-
+    logging.basicConfig(force=True)
     log_level = log_level.upper()
 
     if project:

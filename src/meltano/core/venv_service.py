@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import hashlib
 import logging
 import os
@@ -12,19 +13,80 @@ import shutil
 import subprocess
 import sys
 import typing as t
-from functools import cached_property
+from asyncio.subprocess import Process
+from functools import cached_property, lru_cache
 from numbers import Number
 from pathlib import Path
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
-    from asyncio.subprocess import Process
     from collections.abc import Iterable
 
     from meltano.core.project import Project
 
+if sys.version_info < (3, 10):
+    from typing_extensions import TypeAlias
+else:
+    from typing import TypeAlias
+
+if sys.version_info < (3, 12):
+    from typing_extensions import override
+else:
+    from typing import override
+
+
 logger = logging.getLogger(__name__)
+
+StdErrExtractor: TypeAlias = t.Callable[[Process], t.Awaitable[t.Union[str, None]]]
+
+
+@lru_cache(maxsize=None)
+def find_uv() -> str:
+    """Find the `uv` executable.
+
+    Tries to import the `uv` package and use its `find_uv_bin` function to find the
+    `uv` executable. If that fails, falls back to using the `uv` executable on the
+    system PATH. If it can't be found on the PATH, returns `"uv"`.
+
+    Adapted from https://github.com/wntrblm/nox/blob/55c7eaf2eb03feb4a4b79e74966c542b75d61401/nox/virtualenv.py#L42-L54.
+
+    Copyright 2016 Alethea Katherine Flowers
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    Returns:
+        A string representing the path to the `uv` executable.
+
+    Raises:
+        MeltanoError: The `uv` executable could not be found.
+    """
+    logger.warning("The uv backend is experimental")
+
+    with contextlib.suppress(ImportError, FileNotFoundError):
+        from uv import find_uv_bin
+
+        return find_uv_bin()
+
+    # Fall back to PATH.
+    uv = shutil.which("uv")
+
+    if not uv:
+        error = "Could not find the 'uv' executable"
+        instruction = "Please install 'meltano[uv]' or install 'uv' globally."
+        raise MeltanoError(error, instruction)
+
+    return uv
 
 
 class VirtualEnv:
@@ -251,12 +313,15 @@ class VenvService:  # noqa: WPS214
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
+        *,
+        env: dict[str, str | None] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
 
         Args:
             pip_install_args: Arguments passed to `pip install`.
             clean: Whether to not attempt to use an existing virtual environment.
+            env: Environment variables to pass to the subprocess.
         """
         if not clean and self.requires_clean_install(pip_install_args):
             logger.debug(
@@ -267,7 +332,7 @@ class VenvService:  # noqa: WPS214
 
         self.clean_run_files()
 
-        await self._pip_install(pip_install_args=pip_install_args, clean=clean)
+        await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
         self.write_fingerprint(pip_install_args)
 
     def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
@@ -311,6 +376,30 @@ class VenvService:  # noqa: WPS214
             # If the VirtualEnv has never been created before do nothing
             logger.debug("No old virtual environment to remove")
 
+    async def create_venv(
+        self,
+        *,
+        extract_stderr: StdErrExtractor,
+    ) -> Process:
+        """Create a new virtual environment.
+
+        Args:
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+
+        Returns:
+            The Python process creating the virtual environment.
+        """
+        return await exec_async(
+            sys.executable,
+            "-m",
+            "virtualenv",
+            "--python",
+            self.venv.python_path,
+            str(self.venv.root),
+            extract_stderr=extract_stderr,
+        )
+
     async def create(self) -> Process:
         """Create a new virtual environment.
 
@@ -324,20 +413,12 @@ class VenvService:  # noqa: WPS214
 
         async def extract_stderr(proc: Process):
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
-                "unicode_escape",
+                "utf-8",
                 errors="replace",
             )
 
         try:
-            return await exec_async(
-                sys.executable,
-                "-m",
-                "virtualenv",
-                "--python",
-                self.venv.python_path,
-                str(self.venv.root),
-                extract_stderr=extract_stderr,
-            )
+            return await self.create_venv(extract_stderr=extract_stderr)
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 f"Could not create the virtualenv for '{self.namespace}/{self.name}'",  # noqa: EM102
@@ -345,8 +426,15 @@ class VenvService:  # noqa: WPS214
                 stderr=await err.stderr,
             ) from err
 
-    async def upgrade_pip(self) -> Process:
+    async def upgrade_installer(
+        self,
+        *,
+        env: dict[str, str | None] | None = None,
+    ) -> Process | None:
         """Upgrade the `pip` package to the latest version in the virtual environment.
+
+        Args:
+            env: Environment variables to pass to the subprocess.
 
         Raises:
             AsyncSubprocessError: Failed to upgrade pip to the latest version.
@@ -356,7 +444,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Upgrading pip for '{self.namespace}/{self.name}'")  # noqa: G004
         try:
-            return await self._pip_install(("--upgrade", "pip"))
+            return await self._pip_install(("--upgrade", "pip"), env=env)
         except AsyncSubprocessError as err:
             raise AsyncSubprocessError(
                 "Failed to upgrade pip to the latest version.",  # noqa: EM101
@@ -406,16 +494,90 @@ class VenvService:  # noqa: WPS214
             else absolute_executable
         )
 
+    async def install_pip_args(
+        self,
+        pip_install_args: t.Sequence[str],
+        *,
+        extract_stderr: StdErrExtractor = _extract_stderr,
+        env: dict[str, str | None] | None = None,
+    ) -> Process:
+        """Return the `pip install` arguments to use.
+
+        Args:
+            pip_install_args: The arguments to pass to `pip install`.
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+            env: Environment variables to pass to the subprocess.
+
+        Returns:
+            The process running `pip install` with the provided args.
+        """
+        return await exec_async(
+            str(self.exec_path("python")),
+            "-m",
+            "pip",
+            "install",
+            "--log",
+            str(self.pip_log_path),
+            *pip_install_args,
+            extract_stderr=extract_stderr,
+            env=env,
+        )
+
+    async def uninstall_package(self, package: str) -> Process:
+        """Uninstall a single package.
+
+        Args:
+            package: The package name.
+
+        Returns:
+            The process running `pip uninstall` with the provided package.
+        """
+        return await exec_async(
+            str(self.exec_path("python")),
+            "-m",
+            "pip",
+            "uninstall",
+            "--yes",
+            package,
+            extract_stderr=_extract_stderr,
+        )
+
+    async def handle_installation_error(
+        self,
+        err: AsyncSubprocessError,
+    ) -> AsyncSubprocessError:
+        """Handle an error that occurred during installation.
+
+        Args:
+            err: The error that occurred during installation.
+
+        Returns:
+            The error that occurred during installation with additional context.
+        """
+        logger.info(
+            "Logged pip install output to %s",  # noqa: WPS323
+            self.pip_log_path,
+        )
+        return AsyncSubprocessError(
+            f"Failed to install plugin '{self.name}'.",
+            err.process,
+            stderr=await err.stderr,
+        )
+
     async def _pip_install(
         self,
         pip_install_args: t.Sequence[str],
         clean: bool = False,
+        *,
+        env: dict[str, str | None] | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
 
         Args:
             pip_install_args: The arguments to pass to `pip install`.
             clean: Whether the installation should be done in a clean venv.
+            env: Environment variables to pass to the subprocess.
 
         Raises:
             AsyncSubprocessError: The command failed.
@@ -426,7 +588,7 @@ class VenvService:  # noqa: WPS214
         if clean:
             self.clean()
             await self.create()
-            await self.upgrade_pip()
+            await self.upgrade_installer(env=env)
 
         pip_install_args_str = shlex.join(pip_install_args)
         log_msg_prefix = (
@@ -442,26 +604,132 @@ class VenvService:  # noqa: WPS214
             if not proc.stdout:
                 return None
 
-            return (await proc.stdout.read()).decode("unicode_escape", errors="replace")
+            return (await proc.stdout.read()).decode("utf-8", errors="replace")
 
         try:
-            return await exec_async(
-                str(self.exec_path("python")),
-                "-m",
-                "pip",
-                "install",
-                "--log",
-                str(self.pip_log_path),
-                *pip_install_args,
+            return await self.install_pip_args(
+                pip_install_args,
                 extract_stderr=extract_stderr,
+                env=env,
             )
-        except AsyncSubprocessError as err:
-            logger.info(
-                "Logged pip install output to %s",  # noqa: WPS323
-                self.pip_log_path,
-            )
-            raise AsyncSubprocessError(
-                f"Failed to install plugin '{self.name}'.",  # noqa: EM102
-                err.process,
-                stderr=await err.stderr,
-            ) from err
+        except AsyncSubprocessError as err:  # noqa: WPS329
+            raise await self.handle_installation_error(err) from err
+
+
+class UvVenvService(VenvService):
+    """Manages virtual environments using `uv`."""
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any):
+        """Initialize the `UvVenvService`.
+
+        Args:
+            args: Positional arguments for the VenvService.
+            kwargs: Keyword arguments for the VenvService.
+        """
+        super().__init__(*args, **kwargs)
+        self.uv = find_uv()
+        logger.debug("Using uv executable at %s", self.uv)
+
+    @override
+    async def upgrade_installer(
+        self,
+        *,
+        env: dict[str, str | None] | None = None,
+    ) -> Process | None:
+        """No-op for `uv` virtual environments.
+
+        Args:
+            env: Environment variables to pass to the subprocess.
+        """
+
+    @override
+    async def install_pip_args(
+        self,
+        pip_install_args: t.Sequence[str],
+        *,
+        extract_stderr: StdErrExtractor = _extract_stderr,
+        env: dict[str, str | None] | None = None,
+    ) -> Process:
+        """Run `pip install` in the plugin's virtual environment.
+
+        Args:
+            pip_install_args: The arguments to pass to `pip install`.
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+            env: Environment variables to pass to the subprocess.
+
+        Returns:
+            The process running `pip install` with the provided args.
+        """
+        return await exec_async(
+            self.uv,
+            "pip",
+            "install",
+            "--python",
+            str(self.exec_path("python")),
+            *pip_install_args,
+            extract_stderr=extract_stderr,
+            env=env,
+        )
+
+    @override
+    async def uninstall_package(self, package: str) -> Process:
+        """Uninstall a single package using `uv`.
+
+        Args:
+            package: The package name.
+
+        Returns:
+            The process running `pip uninstall` with the provided package.
+        """
+        return await exec_async(
+            self.uv,
+            "pip",
+            "uninstall",
+            "--python",
+            str(self.exec_path("python")),
+            package,
+        )
+
+    @override
+    async def handle_installation_error(
+        self,
+        err: AsyncSubprocessError,
+    ) -> AsyncSubprocessError:
+        """Handle an error that occurred during installation.
+
+        Args:
+            err: The subprocess error that occurred during installation.
+
+        Returns:
+            The error that occurred during installation with additional context.
+        """
+        return AsyncSubprocessError(
+            f"Failed to install plugin '{self.name}'.",
+            err.process,
+            stderr=await err.stderr,
+        )
+
+    @override
+    async def create_venv(
+        self,
+        *,
+        extract_stderr: StdErrExtractor,
+    ) -> Process:
+        """Create a new virtual environment using `uv`.
+
+        Args:
+            extract_stderr: Async function that is provided the completed failed
+                process, and returns its error string or `None`.
+
+        Returns:
+            The Python process creating the virtual environment.
+        """
+        return await exec_async(
+            self.uv,
+            "virtualenv",
+            "--python",
+            self.venv.python_path,
+            str(self.venv.root),
+            extract_stderr=extract_stderr,
+        )

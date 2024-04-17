@@ -36,6 +36,20 @@ class TestCliInstall:
                 force=False,
             )
 
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+
+            result = cli_runner.invoke(cli, ["install", "-"])
+            assert_cli_runner(result)
+
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap, tap_gitlab, target, dbt],
+                parallelism=None,
+                clean=False,
+                force=False,
+            )
+
     @pytest.mark.usefixtures("dbt")
     def test_install_type(
         self,
@@ -159,6 +173,25 @@ class TestCliInstall:
             install_plugin_mock.assert_called_once_with(
                 project,
                 [tap, tap_gitlab],
+                parallelism=None,
+                clean=False,
+                force=False,
+            )
+
+    @pytest.mark.usefixtures("dbt")
+    def test_install_multiple_any_type(self, project, tap, target, dbt, cli_runner):
+        with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+
+            result = cli_runner.invoke(
+                cli,
+                ["install", "-", tap.name, target.name, dbt.name],
+            )
+            assert_cli_runner(result)
+
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap, target, dbt],
                 parallelism=None,
                 clean=False,
                 force=False,

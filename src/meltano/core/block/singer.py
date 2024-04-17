@@ -206,8 +206,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         """Close the underlying process stdin if the block is a consumer."""
         if self.consumer:
             self.process_handle.stdin.close()
-            with suppress(AttributeError):  # `wait_closed` is Python 3.8+ (see #3347)
-                await self.process_handle.stdin.wait_closed()
+            await self.process_handle.stdin.wait_closed()
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
