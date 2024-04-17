@@ -1307,9 +1307,15 @@ class TestCliRunScratchpadOne:
 
 
 class TestUUIDParamType:
-    def test_valid_uuid(self):
+    @pytest.mark.parametrize(
+        "value",
+        (
+            pytest.param("123e4567-e89b-12d3-a456-426614174000", id="with hyphens"),
+            pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
+        ),
+    )
+    def test_valid_uuid(self, value: str):
         param = UUIDParamType()
-        value = "123e4567-e89b-12d3-a456-426614174000"
         assert param.convert(value, None, None) == uuid.UUID(value)
 
     def test_invalid_uuid(self):
