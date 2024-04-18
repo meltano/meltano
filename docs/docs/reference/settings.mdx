@@ -884,6 +884,24 @@ export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS="path/to/creds.json"
 - Options: `virtualenv`, `uv`
 - Default: `virtualenv`
 
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set venv.backend uv
+meltano install --clean
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+MELTANO_VENV_BACKEND=uv meltano install --clean
+```
+
+  </TabItem>
+</Tabs>
+
 ## Snowplow Tracking
 
 ### `snowplow.collector_endpoints`
