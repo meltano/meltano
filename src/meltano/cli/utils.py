@@ -20,6 +20,7 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
 )
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
@@ -402,7 +403,7 @@ def add_required_plugins(
     return added_plugins
 
 
-def install_status_update(install_state):
+def install_status_update(install_state: PluginInstallState):
     """
     Print the status of plugin installation.
 
@@ -415,15 +416,15 @@ def install_status_update(install_state):
         PluginInstallStatus.SKIPPED,
     }:
         msg = f"{install_state.verb} {desc} '{plugin.name}'..."
-        click.secho(msg)
+        logger.info(msg)
     elif install_state.status is PluginInstallStatus.ERROR:
-        click.secho(install_state.message, fg="red")
-        click.secho(install_state.details, err=True)
+        logger.error(install_state.message)
+        logger.info(install_state.details)
     elif install_state.status is PluginInstallStatus.WARNING:
-        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+        logger.warning(install_state.message)
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        click.secho(msg, fg="green")
+        logger.info(msg)
 
 
 def install_plugins(
