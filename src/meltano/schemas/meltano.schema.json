@@ -988,7 +988,7 @@
             "@weekly",
             "0 0 * * *"
           ],
-          "pattern": "^((@(hourly|daily|weekly|monthly|yearly|once))|((((\\d+,)+\\d+|(\\d+(\\/|-)\\d+)|\\d+|\\*) ?){5,6}))$"
+          "pattern": "^((@(hourly|daily|weekly|monthly|yearly|once))|((((\\d+,)+\\d+|(\\d+|\\*)(\\/|-)\\d+|\\d+|\\*) ?){5,6}))$"
         },
         "transform": {
           "type": "string",
