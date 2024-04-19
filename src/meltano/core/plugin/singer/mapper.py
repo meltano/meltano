@@ -58,10 +58,10 @@ class SingerMapper(SingerPlugin):
 
         config_payload: dict = {}
         with open(config_path, "w") as config_file:
-            config_payload = (
-                self._get_mapping_config(invoker.plugin.extra_config)
-                or invoker.plugin_config_processed
-            )
+            config_payload = {
+                **self._get_mapping_config(invoker.plugin.extra_config),
+                **invoker.plugin_config_processed,
+            }
             json.dump(config_payload, config_file, indent=2)
 
         logger.debug(
@@ -73,7 +73,12 @@ class SingerMapper(SingerPlugin):
         )
 
     @staticmethod
-    def _get_mapping_config(extra_config: dict) -> dict | None:
-        for mapping in extra_config.get("_mappings", []):  # noqa: RET503
-            if mapping.get("name") == extra_config.get("_mapping_name"):
-                return mapping["config"]
+    def _get_mapping_config(extra_config: dict) -> dict:
+        return next(
+            (
+                mapping.get("config", {})
+                for mapping in extra_config.get("_mappings", [])
+                if mapping.get("name") == extra_config.get("_mapping_name")
+            ),
+            {},
+        )
