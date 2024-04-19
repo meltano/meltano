@@ -59,8 +59,8 @@ class SingerMapper(SingerPlugin):
         config_payload: dict = {}
         with open(config_path, "w") as config_file:
             config_payload = {
-                **self._get_mapping_config(invoker.plugin.extra_config),
                 **invoker.plugin_config_processed,
+                **self._get_mapping_config(invoker.plugin.extra_config),
             }
             json.dump(config_payload, config_file, indent=2)
 
