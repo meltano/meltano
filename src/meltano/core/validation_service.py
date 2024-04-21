@@ -10,7 +10,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 
 if t.TYPE_CHECKING:
-    from sqlalchemy.orm.session import sessionmaker
+    from sqlalchemy.orm.session import Session
 
     from meltano.core.project import Project
 
@@ -94,7 +94,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         for name in self.tests_selection:
             self.tests_selection[name] = True
 
-    async def run_all(self, session: sessionmaker) -> dict[str, int]:
+    async def run_all(self, session: Session) -> dict[str, int]:
         """Run all validators defined in a plugin.
 
         Args:
