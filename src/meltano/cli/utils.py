@@ -448,23 +448,23 @@ def install_plugins(
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
 
-    fg = "green"
+    level = logging.INFO
     if num_failed >= 0 and num_successful == 0:
-        fg = "red"
+        level = logging.ERROR
     elif num_failed > 0 and num_successful > 0:
-        fg = "yellow"
+        level = logging.WARNING
 
     if len(plugins) > 1:
         verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(
+        logger.log(
+            level,
             f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
-            fg=fg,
         )
     if num_skipped:
         verb = "Skipped installing"
-        click.secho(
+        logger.log(
+            level,
             f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
-            fg=fg,
         )
 
     return num_failed == 0
