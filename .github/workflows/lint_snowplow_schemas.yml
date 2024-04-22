@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.1.3
 
       - name: Iglu Schema Lint
         uses: ./.github/actions/igluctl-lint
