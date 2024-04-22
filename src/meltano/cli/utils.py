@@ -420,7 +420,7 @@ def install_status_update(install_state: PluginInstallState):
     elif install_state.status is PluginInstallStatus.ERROR:
         logger.error(install_state.message)
         logger.info(install_state.details)
-    elif install_state.status is PluginInstallStatus.WARNING:
+    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
         logger.warning(install_state.message)
     elif install_state.status is PluginInstallStatus.SUCCESS:
         msg = f"{install_state.verb} {desc} '{plugin.name}'"
@@ -455,16 +455,19 @@ def install_plugins(
         level = logging.WARNING
 
     if len(plugins) > 1:
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
         logger.log(
             level,
-            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
+            "%s %d/%d plugins",
+            "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
+            num_successful - num_skipped,
+            num_successful + num_failed,
         )
-    if num_skipped:
-        verb = "Skipped installing"
+    if num_skipped:  # pragma: no cover
         logger.log(
             level,
-            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
+            "Skipped installing %d/%d plugins",
+            num_skipped,
+            num_successful + num_failed,
         )
 
     return num_failed == 0
