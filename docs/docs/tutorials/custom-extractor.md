@@ -324,7 +324,7 @@ You can leave the capabilities and settings fields blank for now. The command wi
 ```
 Added extractor 'tap-jsonplaceholder' to your Meltano project
 
-2024-04-23T00:25:40.604941Z [info     ] Installing extractor 'tap-jsonplaceholder'...
+2024-01-01T00:25:40.604941Z [info     ] Installing extractor 'tap-jsonplaceholder'...
 2024-01-01T00:25:53.152127Z [info     ] Installed extractor 'tap-jsonplaceholder'
 
 ```
