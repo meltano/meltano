@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from collections import namedtuple
 
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -15,13 +14,16 @@ if t.TYPE_CHECKING:
 
     from meltano.core.job import Job
     from meltano.core.logging.output_logger import OutputLogger
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
-class PluginContext(
-    namedtuple("PluginContext", "plugin settings_service session"),  # noqa: WPS606
-):
+class PluginContext(t.NamedTuple):
     """Plugin Context container."""
+
+    plugin: ProjectPlugin
+    settings_service: PluginSettingsService
+    session: Session
 
     def __getattr__(self, attr: str) -> t.Any:
         """Get plugin attribute.

@@ -26,6 +26,7 @@ from .future_utils import first_failed_future, handle_producer_line_length_limit
 from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
+    import uuid
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -56,6 +57,7 @@ class ELBContext:  # noqa: WPS230
         state_id_suffix: str | None = None,
         base_output_logger: OutputLogger | None = None,
         merge_state: bool | None = False,
+        run_id: uuid.UUID | None = None,
     ):
         """Use an ELBContext to pass information on to ExtractLoadBlocks.
 
@@ -69,6 +71,7 @@ class ELBContext:  # noqa: WPS230
             state_id_suffix: The state ID suffix to use.
             base_output_logger: The base logger to use.
             merge_state: Whether to merge state at the end of run.
+            run_id: The run ID to use.
         """
         self.project = project
         self.session = session
@@ -78,6 +81,7 @@ class ELBContext:  # noqa: WPS230
         self.update_state = update_state
         self.state_id_suffix = state_id_suffix
         self.merge_state = merge_state
+        self.run_id = run_id
 
         # not yet used but required to satisfy the interface
         self.dry_run = False
@@ -122,6 +126,7 @@ class ELBContextBuilder:  # noqa: WPS214
         self._env = {}
         self._blocks = []
         self._merge_state = False
+        self._run_id: uuid.UUID | None = None
 
         self._base_output_logger = None
 
@@ -201,6 +206,18 @@ class ELBContextBuilder:  # noqa: WPS214
         self._state_id_suffix = state_id_suffix
         return self
 
+    def with_run_id(self, run_id: uuid.UUID | None):
+        """Set a run ID for this run.
+
+        Args:
+            run_id: The run ID value.
+
+        Returns:
+            self
+        """
+        self._run_id = run_id
+        return self
+
     def make_block(
         self,
         plugin: ProjectPlugin,
@@ -221,7 +238,7 @@ class ELBContextBuilder:  # noqa: WPS214
             block_ctx=ctx,
             project=self.project,
             plugin_invoker=self.invoker_for(ctx),
-            plugin_args=plugin_args,
+            plugin_args=plugin_args or (),
         )
         self._blocks.append(block)
         self._env.update(ctx.env)
@@ -297,6 +314,7 @@ class ELBContextBuilder:  # noqa: WPS214
             state_id_suffix=self._state_id_suffix,
             base_output_logger=self._base_output_logger,
             merge_state=self._merge_state,
+            run_id=self._run_id,
         )
 
 
@@ -306,7 +324,7 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
     def __init__(
         self,
         context: ELBContext,
-        blocks: tuple[IOBlock],
+        blocks: tuple[IOBlock, ...],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
@@ -330,6 +348,9 @@ class ExtractLoadBlocks(BlockSet):  # noqa: WPS214
                 self.tail,
             )
             self.context.job = Job(job_name=state_id)
+            if self.context.run_id:
+                self.context.job.run_id = self.context.run_id
+
             job_logging_service = JobLoggingService(self.context.project)
             log_file = job_logging_service.generate_log_name(
                 self.context.job.job_name,
