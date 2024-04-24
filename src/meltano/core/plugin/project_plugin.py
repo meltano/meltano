@@ -49,6 +49,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
 
     VARIANT_ATTR = "variant"
 
+    name: str
     variant: str | None
 
     def __init__(
