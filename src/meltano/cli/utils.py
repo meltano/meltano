@@ -415,16 +415,14 @@ def install_status_update(install_state: PluginInstallState):
         PluginInstallStatus.RUNNING,
         PluginInstallStatus.SKIPPED,
     }:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'..."
-        logger.info(msg)
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
     elif install_state.status is PluginInstallStatus.ERROR:
         logger.error(install_state.message)
         logger.info(install_state.details)
     elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
         logger.warning(install_state.message)
     elif install_state.status is PluginInstallStatus.SUCCESS:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        logger.info(msg)
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
 
 
 def install_plugins(
