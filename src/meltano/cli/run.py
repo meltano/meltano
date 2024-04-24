@@ -175,7 +175,6 @@ async def run(
         parser.plugins,
         reason=PluginInstallReason.RUN,
         skip_installed=True,
-        log=logger,
     )
 
     try:

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import functools
 import logging
 import os
 import signal
@@ -21,6 +20,7 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
 )
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
@@ -33,8 +33,6 @@ from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
 if t.TYPE_CHECKING:
-    import structlog
-
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -405,7 +403,7 @@ def add_required_plugins(
     return added_plugins
 
 
-def install_status_update(install_state, log: structlog.stdlib.BoundLogger = None):
+def install_status_update(install_state: PluginInstallState):
     """
     Print the status of plugin installation.
 
@@ -417,20 +415,14 @@ def install_status_update(install_state, log: structlog.stdlib.BoundLogger = Non
         PluginInstallStatus.RUNNING,
         PluginInstallStatus.SKIPPED,
     }:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'..."
-        log.info(msg) if log else click.secho(msg)  # noqa: WPS428
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
     elif install_state.status is PluginInstallStatus.ERROR:
-        msg = install_state.message
-        log.error(msg) if log else click.secho(msg, fg="red")  # noqa: WPS428
-
-        msg = install_state.details
-        log.error(msg) if log else click.secho(msg)  # noqa: WPS428
-    elif install_state.status is PluginInstallStatus.WARNING:
-        msg = f"Warning! {install_state.message}."
-        log.warning(msg) if log else click.secho(msg, fg="yellow")  # noqa: WPS428
+        logger.error(install_state.message)
+        logger.info(install_state.details)
+    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
+        logger.warning(install_state.message)
     elif install_state.status is PluginInstallStatus.SUCCESS:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        logger.info(msg) if log else click.secho(msg, fg="green")  # noqa: WPS428
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
 
 
 async def install_plugins(
@@ -441,12 +433,11 @@ async def install_plugins(
     clean=False,
     force=False,
     skip_installed=False,
-    log: structlog.stdlib.BoundLogger = None,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
         project,
-        status_cb=functools.partial(install_status_update, log=log),
+        status_cb=install_status_update,
         parallelism=parallelism,
         clean=clean,
         force=force,
@@ -460,20 +451,27 @@ async def install_plugins(
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
 
-    fg, log_level = "green", logging.INFO
+    level = logging.INFO
     if num_failed >= 0 and num_successful == 0:
-        fg, log_level = "red", logging.ERROR
+        level = logging.ERROR
     elif num_failed > 0 and num_successful > 0:
-        fg, log_level = "yellow", logging.WARNING
+        level = logging.WARNING
 
     if len(plugins) > 1:
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        msg = f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins"
-        log.log(log_level, msg) if log else click.secho(msg, fg=fg)  # noqa: WPS428
-    if num_skipped:
-        verb = "Skipped installing"
-        msg = f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins"
-        log.log(log_level, msg) if log else click.secho(msg, fg=fg)  # noqa: WPS428
+        logger.log(
+            level,
+            "%s %d/%d plugins",
+            "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
+            num_successful - num_skipped,
+            num_successful + num_failed,
+        )
+    if num_skipped:  # pragma: no cover
+        logger.log(
+            level,
+            "Skipped installing %d/%d plugins",
+            num_skipped,
+            num_successful + num_failed,
+        )
 
     return num_failed == 0
 
