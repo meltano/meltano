@@ -334,7 +334,7 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap,
             "apply_catalog_rules",
-        ), mock.patch("meltano.cli.elt.install_plugins"), mock.patch(
+        ), mock.patch("meltano.cli.params.install_plugins"), mock.patch(
             "meltano.core.plugin_invoker.asyncio"
         ) as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec

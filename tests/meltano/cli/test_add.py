@@ -82,7 +82,7 @@ class TestCliAdd:
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", plugin_type.singular, plugin_name])
 
@@ -125,11 +125,11 @@ class TestCliAdd:
 
     @pytest.mark.order(1)
     def test_add_multiple(self, project: Project, cli_runner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             cli_runner.invoke(cli, ["add", "extractors", "tap-gitlab"])
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             res = cli_runner.invoke(
                 cli,
                 ["add", "extractors", "tap-gitlab", "tap-adwords", "tap-facebook"],
@@ -168,7 +168,7 @@ class TestCliAdd:
 
     @pytest.mark.order(1)
     def test_add_different_variant(self, cli_runner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
             assert res.exit_code == 0, res.stdout
@@ -309,7 +309,7 @@ class TestCliAdd:
             project.plugins.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
     def test_add_variant(self, project: Project, cli_runner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -338,7 +338,7 @@ class TestCliAdd:
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
             # Inheriting from a BasePlugin using --as
@@ -445,7 +445,7 @@ class TestCliAdd:
             ["tap_custom", pip_url, executable, "foo,bar", "baz,qux"],
         )
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -497,7 +497,7 @@ class TestCliAdd:
             ],
         )
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -535,7 +535,7 @@ class TestCliAdd:
             )
 
     def test_add_custom_variant(self, project: Project, cli_runner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -593,7 +593,7 @@ class TestCliAdd:
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -662,7 +662,7 @@ class TestCliAdd:
         ),
     )
     @pytest.mark.usefixtures("reset_project_context")
-    @mock.patch("meltano.cli.add.install_plugins")
+    @mock.patch("meltano.cli.params.install_plugins")
     @mock.patch("meltano.cli.add.requests.get")
     def test_add_from_ref(
         self,
@@ -801,7 +801,7 @@ class TestCliAdd:
             venv_mock.assert_called_once_with(python)
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(
                 cli,
@@ -823,7 +823,7 @@ class TestCliAdd:
 
     @pytest.mark.usefixtures("reset_project_context")
     def test_add_update(self, cli_runner):
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
             assert res.exit_code == 0, res.stdout
@@ -859,7 +859,7 @@ class TestCliAdd:
         )
         lockfile.touch()
 
-        with mock.patch("meltano.cli.add.install_plugins") as install_plugin_mock:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
             res = cli_runner.invoke(cli, ["add", "utility", "utility-mock"])
             assert res.exit_code == 0, res.stdout
