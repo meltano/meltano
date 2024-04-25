@@ -13,13 +13,12 @@ import dotenv
 import structlog
 
 from meltano.cli.interactive import InteractiveConfig
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
     InstrumentedGroup,
     PartialInstrumentedCmd,
-    install_plugins,
 )
 from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
@@ -397,10 +396,12 @@ def set_(
 @config.command(cls=PartialInstrumentedCmd, name="test")
 @pass_project(migrate=True)
 @click.pass_context
+@install_option
 @run_async
 async def test(
     ctx,
     project: Project,
+    install_plugins: InstallPlugins,
 ):
     """Test the configuration of a plugin."""
     invoker = ctx.obj["invoker"]

@@ -8,12 +8,11 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
     PartialInstrumentedCmd,
-    install_plugins,
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
@@ -74,6 +73,7 @@ logger = structlog.stdlib.get_logger(__name__)
     is_flag=True,
     help="Execute plugins using containers where possible.",
 )
+@install_option
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -85,6 +85,7 @@ async def invoke(  # noqa: C901
     list_commands: bool,
     plugin_name: str,
     plugin_args: tuple[str, ...],
+    install_plugins: InstallPlugins,
     containers: bool = False,
     print_var: str | None = None,
 ):

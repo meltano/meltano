@@ -8,13 +8,8 @@ import uuid
 import click
 import structlog
 
-from meltano.cli.params import pass_project
-from meltano.cli.utils import (
-    CliEnvironmentBehavior,
-    CliError,
-    PartialInstrumentedCmd,
-    install_plugins,
-)
+from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -99,6 +94,7 @@ class UUIDParamType(click.ParamType):
     "blocks",
     nargs=-1,
 )
+@install_option
 @pass_project(migrate=True)
 @click.pass_context
 @run_async
@@ -113,6 +109,7 @@ async def run(
     merge_state: bool,
     run_id: uuid.UUID | None,
     blocks: list[str],
+    install_plugins: InstallPlugins,
 ):
     """
     Run a set of command blocks in series.

@@ -9,11 +9,10 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     InstrumentedCmd,
-    install_plugins,
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
@@ -85,11 +84,13 @@ class CommandLineRunner(ValidationsRunner):
     required=False,
     nargs=-1,
 )
+@install_option
 @pass_project(migrate=True)
 @run_async
 async def test(
     project: Project,
     all_tests: bool,
+    install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...] = (),
 ):
     """

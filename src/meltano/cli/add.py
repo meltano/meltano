@@ -9,14 +9,13 @@ from urllib.parse import urlparse
 import click
 import requests
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
-    install_plugins,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -103,11 +102,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     is_flag=True,
     help="Update an existing plugin.",
 )
-@click.option(
-    "--no-install",
-    is_flag=True,
-    help="Do not install the plugin after adding it to the project.",
-)
+@install_option
 @click.option(
     "--force-install",
     is_flag=True,
@@ -121,6 +116,7 @@ async def add(  # noqa: C901 WPS238
     project: Project,
     plugin_type: str,
     plugin_name: str,
+    install_plugins: InstallPlugins,
     inherit_from: str | None = None,
     variant: str | None = None,
     as_name: str | None = None,
@@ -199,17 +195,16 @@ async def add(  # noqa: C901 WPS238
     )
     tracker.track_command_event(CliEvent.inflight)
 
-    if not flags.get("no_install"):
-        success = await install_plugins(
-            project,
-            plugins,
-            reason=PluginInstallReason.ADD,
-            force=flags.get("force_install", False),
-        )
+    success = await install_plugins(
+        project,
+        plugins,
+        reason=PluginInstallReason.ADD,
+        force=flags.get("force_install", False),
+    )
 
-        if not success:
-            tracker.track_command_event(CliEvent.failed)
-            raise CliError("Failed to install plugin(s)")  # noqa: EM101
+    if success is False:
+        tracker.track_command_event(CliEvent.failed)
+        raise CliError("Failed to install plugin(s)")  # noqa: EM101
 
     _print_plugins(plugins)
     tracker.track_command_event(CliEvent.completed)
