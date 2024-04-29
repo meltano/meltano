@@ -95,7 +95,7 @@ def install(  # noqa: C901
         tracker.track_command_event(CliEvent.aborted)
         raise
 
-    click.echo(f"Installing {len(plugins)} plugins...")
+    logger.info("Installing %d plugins", len(plugins))
     tracker.add_contexts(
         PluginsTrackingContext([(candidate, None) for candidate in plugins]),
     )

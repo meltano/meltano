@@ -20,6 +20,7 @@ from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFou
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
+    PluginInstallState,
     PluginInstallStatus,
 )
 from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
@@ -402,7 +403,7 @@ def add_required_plugins(
     return added_plugins
 
 
-def install_status_update(install_state):
+def install_status_update(install_state: PluginInstallState):
     """
     Print the status of plugin installation.
 
@@ -414,16 +415,14 @@ def install_status_update(install_state):
         PluginInstallStatus.RUNNING,
         PluginInstallStatus.SKIPPED,
     }:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'..."
-        click.secho(msg)
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
     elif install_state.status is PluginInstallStatus.ERROR:
-        click.secho(install_state.message, fg="red")
-        click.secho(install_state.details, err=True)
-    elif install_state.status is PluginInstallStatus.WARNING:
-        click.secho(f"Warning! {install_state.message}.", fg="yellow")
+        logger.error(install_state.message)
+        logger.info(install_state.details)
+    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
+        logger.warning(install_state.message)
     elif install_state.status is PluginInstallStatus.SUCCESS:
-        msg = f"{install_state.verb} {desc} '{plugin.name}'"
-        click.secho(msg, fg="green")
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
 
 
 def install_plugins(
@@ -447,23 +446,26 @@ def install_plugins(
     num_skipped = len([status for status in install_results if status.skipped])
     num_failed = len(install_results) - num_successful
 
-    fg = "green"
+    level = logging.INFO
     if num_failed >= 0 and num_successful == 0:
-        fg = "red"
+        level = logging.ERROR
     elif num_failed > 0 and num_successful > 0:
-        fg = "yellow"
+        level = logging.WARNING
 
     if len(plugins) > 1:
-        verb = "Updated" if reason == PluginInstallReason.UPGRADE else "Installed"
-        click.secho(
-            f"{verb} {num_successful-num_skipped}/{num_successful+num_failed} plugins",
-            fg=fg,
+        logger.log(
+            level,
+            "%s %d/%d plugins",
+            "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
+            num_successful - num_skipped,
+            num_successful + num_failed,
         )
-    if num_skipped:
-        verb = "Skipped installing"
-        click.secho(
-            f"{verb} {num_skipped}/{num_successful+num_failed} plugins",
-            fg=fg,
+    if num_skipped:  # pragma: no cover
+        logger.log(
+            level,
+            "Skipped installing %d/%d plugins",
+            num_skipped,
+            num_successful + num_failed,
         )
 
     return num_failed == 0
