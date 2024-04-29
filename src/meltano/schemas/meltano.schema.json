@@ -589,6 +589,11 @@
               "type": "string"
             },
             "default": []
+          },
+          "no_catalog_cache": {
+            "type": "boolean",
+            "description": "A boolean that determines if the catalog cache should be ignored.",
+            "default": false
           }
         }
       },

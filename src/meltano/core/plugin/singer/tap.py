@@ -185,6 +185,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             value_processor="nest_object",
         ),
         SettingDefinition(name="_select_filter", kind=SettingKind.ARRAY, value=[]),
+        SettingDefinition(
+            name="_no_catalog_cache", kind=SettingKind.BOOLEAN, value=False
+        ),
     ]
 
     def exec_args(self, plugin_invoker):
@@ -375,7 +378,17 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         """
         catalog_path = plugin_invoker.files["catalog"]
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
-        if catalog_path.exists():
+        elt_context = plugin_invoker.context
+
+        use_catalog_cache = True
+        if (
+            elt_context
+            and elt_context.catalog_refresh
+            or plugin_invoker.plugin_config_extras["_no_catalog_cache"]
+        ):
+            use_catalog_cache = False
+
+        if catalog_path.exists() and use_catalog_cache:
             with suppress(FileNotFoundError):
                 cached_key = catalog_cache_key_path.read_text()
                 new_cache_key = self.catalog_cache_key(plugin_invoker)

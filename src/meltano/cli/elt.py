@@ -57,6 +57,10 @@ class ELOptions:
         help="Perform a full refresh (ignore state left behind by any previous runs).",
         is_flag=True,
     )
+    catalog_refresh = click.option(
+        "--catalog-refresh",
+        help="Invalidates catalog cache and forces running discovery before this run.",
+    )
     select = click.option(
         "--select",
         "-s",
@@ -108,6 +112,7 @@ class ELOptions:
 @ELOptions.loader
 @ELOptions.dry
 @ELOptions.full_refresh
+@ELOptions.catalog_refresh
 @ELOptions.select
 @ELOptions.exclude
 @ELOptions.catalog
@@ -126,6 +131,7 @@ async def el(  # WPS408
     loader: str,
     dry: bool,
     full_refresh: bool,
+    catalog_refresh: bool,
     select: list[str],
     exclude: list[str],
     catalog: str,
@@ -153,6 +159,7 @@ async def el(  # WPS408
         None,
         dry,
         full_refresh,
+        catalog_refresh,
         select,
         exclude,
         catalog,
@@ -174,6 +181,7 @@ async def el(  # WPS408
 @ELOptions.transform
 @ELOptions.dry
 @ELOptions.full_refresh
+@ELOptions.catalog_refresh
 @ELOptions.select
 @ELOptions.exclude
 @ELOptions.catalog
@@ -193,6 +201,7 @@ async def elt(  # WPS408
     transform: str,
     dry: bool,
     full_refresh: bool,
+    catalog_refresh: bool,
     select: list[str],
     exclude: list[str],
     catalog: str,
@@ -221,6 +230,7 @@ async def elt(  # WPS408
         transform,
         dry,
         full_refresh,
+        catalog_refresh,
         select,
         exclude,
         catalog,
@@ -240,6 +250,7 @@ async def _run_el_command(
     transform: str | None,
     dry: bool,
     full_refresh: bool,
+    catalog_refresh: bool,
     select: list[str],
     exclude: list[str],
     catalog: str,
@@ -285,6 +296,7 @@ async def _run_el_command(
             transform,
             dry_run=dry,
             full_refresh=full_refresh,
+            catalog_refresh=catalog_refresh,
             select_filter=select_filter,
             catalog=catalog,
             state=state,
@@ -313,6 +325,7 @@ def _elt_context_builder(
     transform,
     dry_run=False,
     full_refresh=False,
+    catalog_refresh=False,
     select_filter=None,
     catalog=None,
     state=None,
@@ -333,6 +346,7 @@ def _elt_context_builder(
         .with_dry_run(dry_run)
         .with_only_transform(transform == "only")
         .with_full_refresh(full_refresh)
+        .with_catalog_refresh(catalog_refresh)
         .with_select_filter(select_filter)
         .with_catalog(catalog)
         .with_state(state)
