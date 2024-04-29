@@ -21,8 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4.1.2
+        uses: actions/checkout@v4.1.4
 
       - name: GitHub dependency vulnerability check
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: actions/dependency-review-action@v4.2.5
+        uses: actions/dependency-review-action@V4.3.0

@@ -51,7 +51,7 @@ jobs:
         echo "dry_run=${{ format('{0}', github.event.inputs.dry_run) || env.DEFAULT_DRY_RUN }}" >> $GITHUB_ENV
         echo "registry=${{ github.event.inputs.registry || env.DEFAULT_REGISTRY }}" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v4.1.2
+    - uses: actions/checkout@v4.1.4
 
     - name: Get Meltano version
       id: get-meltano-version

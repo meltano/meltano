@@ -18,6 +18,8 @@ from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.task_sets_service import TaskSetsService
 
 if t.TYPE_CHECKING:
+    import uuid
+
     import structlog
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -74,6 +76,7 @@ class BlockParser:  # noqa: D101
         force: bool | None = False,
         state_id_suffix: str | None = None,
         merge_state: bool | None = False,
+        run_id: uuid.UUID | None = None,
     ):
         """
         Parse a meltano run command invocation into a list of blocks.
@@ -89,6 +92,7 @@ class BlockParser:  # noqa: D101
                 to all found sets).
             state_id_suffix: State ID suffix to use.
             merge_state: Whether to merge state at end of run.
+            run_id: Custom run ID to use.
 
         Raises:
             ClickException: If a block name is not found.
@@ -104,6 +108,7 @@ class BlockParser:  # noqa: D101
         self._commands: dict[int, str] = {}
         self._mappings_ref: dict[int, str] = {}
         self._merge_state = merge_state
+        self._run_id = run_id
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
 
@@ -244,6 +249,7 @@ class BlockParser:  # noqa: D101
             .with_no_state_update(self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
             .with_merge_state(self._merge_state)
+            .with_run_id(self._run_id)
         )
 
         if self._plugins[offset].type != PluginType.EXTRACTORS:

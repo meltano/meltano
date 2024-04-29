@@ -34,7 +34,7 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v4.1.2
+    - uses: actions/checkout@v4.1.4
       with:
         fetch-depth: 0
 

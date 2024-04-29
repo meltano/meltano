@@ -443,6 +443,10 @@ To pin the latest version:
 
 If you need to fetch packages from a custom Python Package Index (PyPI), you can set the `PIP_INDEX_URL` environment variable to your custom URL before running `meltano install`.
 
+:::info
+Starting with Meltano 3.4.0, `PIP_*` environment variables can also be set in your project's `.env` file.
+:::
+
 In a `Dockerfile`, this would look like:
 
 ```dockerfile
