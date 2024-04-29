@@ -24,6 +24,13 @@ class StateIDLockedError(Exception):
 class StateStoreManager(ABC):
     """Base state store manager."""
 
+    def __init__(self, **kwargs):  # noqa: B027
+        """Initialize state store manager.
+
+        Args:
+            kwargs: additional keyword arguments
+        """
+
     @abstractproperty
     def label(self) -> str:
         """Get the label for the StateStoreManager."""
