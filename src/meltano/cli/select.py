@@ -94,7 +94,7 @@ async def select(
                 project,
                 extractor,
                 show_all=flags["all"],
-                refresh=flags["catalog-refresh"],
+                refresh=flags["catalog_refresh"],
             )
         else:
             update(
