@@ -122,7 +122,12 @@ def update(
     select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
-async def show(project, extractor, show_all=False, refresh=False):
+async def show(
+    project: Project,
+    extractor: str,
+    show_all: bool = False,
+    refresh: bool = False,
+) -> None:
     """Show selected."""
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)

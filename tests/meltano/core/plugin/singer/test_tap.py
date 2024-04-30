@@ -291,7 +291,7 @@ class TestSingerTap:
                 mocked_run_discovery.reset_mock()
                 await subject.discover_catalog(invoker)
 
-                assert mocked_run_discovery.called
+                mocked_run_discovery.assert_called_once()
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 

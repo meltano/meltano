@@ -60,6 +60,7 @@ class ELOptions:
     catalog_refresh = click.option(
         "--catalog-refresh",
         help="Invalidates catalog cache and forces running discovery before this run.",
+        is_flag=True,
     )
     select = click.option(
         "--select",
