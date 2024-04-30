@@ -85,7 +85,7 @@ class ELTContext:  # noqa: WPS230
 
     def __init__(
         self,
-        project,
+        project: Project,
         job: Job | None = None,
         session=None,
         extractor: PluginContext | None = None,
