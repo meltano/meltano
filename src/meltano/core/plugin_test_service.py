@@ -7,7 +7,6 @@ import json
 import logging
 import typing as t
 from abc import ABC, abstractmethod
-from signal import SIGTERM
 
 from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.error import PluginNotSupportedError
@@ -81,7 +80,9 @@ class ExtractorTestService(PluginTestService):
         except Exception as exc:
             return False, str(exc)
 
-        last_line = None
+        record_message_received: bool = False
+        last_line: str | None = None
+
         while process.stdout and not process.stdout.at_eof():
             data = await process.stdout.readline()
             line = data.decode("utf-8").strip()
@@ -94,18 +95,15 @@ class ExtractorTestService(PluginTestService):
             except (json.decoder.JSONDecodeError, KeyError):
                 continue
 
-            if message_type == "RECORD":
+            record_message_received = message_type == "RECORD"
+            if record_message_received:
                 process.terminate()
                 break
 
         returncode = await process.wait()
         logger.debug("Process return code: %s", returncode)
 
-        # Considered valid if subprocess is terminated (|exit status| == 15) on
-        # RECORD message received
-        # https://docs.python.org/3/library/subprocess.html#subprocess.Popen.terminate
-        # https://docs.python.org/3/library/subprocess.html#subprocess.Popen.returncode
         return (
-            abs(returncode) == SIGTERM,
+            record_message_received,
             last_line if returncode else "No RECORD message received",
         )
