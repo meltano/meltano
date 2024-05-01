@@ -7,11 +7,12 @@ from contextlib import closing
 
 import click
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.select_service import SelectService
 from meltano.core.utils import run_async
 
@@ -69,6 +70,7 @@ def selection_mark(selection):
     is_flag=True,
     help="Exclude all attributes that match specified pattern.",
 )
+@install_option
 @pass_project(migrate=True)
 @run_async
 async def select(
@@ -76,6 +78,7 @@ async def select(
     extractor: str,
     entities_filter: str,
     attributes_filter: str,
+    install_plugins: InstallPlugins,
     **flags: dict[str, bool],
 ):
     """
@@ -85,7 +88,7 @@ async def select(
     """
     try:
         if flags["list"]:
-            await show(project, extractor, show_all=flags["all"])
+            await show(project, extractor, install_plugins, show_all=flags["all"])
         else:
             update(
                 project,
@@ -112,10 +115,17 @@ def update(
     select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
-async def show(project, extractor, show_all=False):
+async def show(project, extractor, install_plugins: InstallPlugins, show_all=False):
     """Show selected."""
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
+
+    await install_plugins(
+        project,
+        [select_service.extractor],
+        PluginInstallReason.SELECT,
+        skip_installed=True,
+    )
 
     with closing(Session()) as session:
         list_all = await select_service.list_all(session)
