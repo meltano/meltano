@@ -99,6 +99,7 @@ class ExtractorTestService(PluginTestService):
                 break
 
         returncode = await process.wait()
+        logger.debug("Process return code: %s", returncode)
 
         # Considered valid if subprocess is terminated (|exit status| == 15) on
         # RECORD message received
