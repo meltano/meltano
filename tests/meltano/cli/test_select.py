@@ -74,5 +74,5 @@ class TestCliSelect:
         )
         assert_cli_runner(result)
 
-        assert "[SelectionType.SELECTED] users.id" in result.stdout
-        assert "[SelectionType.EXCLUDED] users.name" in result.stdout
+        assert "[selected ] users.id" in result.stdout
+        assert "[excluded ] users.name" in result.stdout
