@@ -1093,6 +1093,21 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert ListSelectedExecutor.node_selection(node) == selection_type
 
 
+class TestSelectionType:
+    def test_selection_type_addition(self):
+        st = SelectionType
+        assert st.EXCLUDED + st.EXCLUDED == st.EXCLUDED
+        assert st.SELECTED + st.EXCLUDED == st.EXCLUDED
+        assert st.AUTOMATIC + st.EXCLUDED == st.EXCLUDED
+        assert st.SELECTED + st.AUTOMATIC == st.AUTOMATIC
+        assert st.SELECTED + st.SELECTED == st.SELECTED
+
+    def test_selection_type_repr(self):
+        assert f"{SelectionType.EXCLUDED}" == "excluded"
+        assert f"{SelectionType.AUTOMATIC}" == "automatic"
+        assert f"{SelectionType.SELECTED}" == "selected"
+
+
 class TestMetadataExecutor:
     @pytest.fixture()
     def catalog(self, request):
