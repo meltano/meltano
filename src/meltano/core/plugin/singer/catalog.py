@@ -295,6 +295,7 @@ class CatalogNode(Enum):
     METADATA = auto()
 
 
+# TODO: Move to `enum.StrEnum` when support for Python 3.8 is dropped
 class SelectionType(str, ReprEnum):
     """A valid stream or property selection type."""
 
