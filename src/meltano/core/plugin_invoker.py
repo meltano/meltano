@@ -23,6 +23,8 @@ from meltano.core.venv_service import VenvService, VirtualEnv
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from sqlalchemy.orm import Session
+
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -205,7 +207,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             for _key, filename in plugin_files.items()
         }
 
-    async def prepare(self, session):
+    async def prepare(self, session: Session):
         """Prepare plugin config.
 
         Args:
@@ -240,7 +242,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session):
+    async def prepared(self, session: Session):
         """Context manager that prepares plugin config.
 
         Args:

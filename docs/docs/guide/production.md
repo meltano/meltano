@@ -185,7 +185,7 @@ or any of dozens of other orchestration tools.
 
 ### Airflow orchestrator
 
-If you've added Airflow to your Meltano project as an [orchestrator](/guide/orchestration),
+If you've added Airflow to your Meltano project as an [orchestrator utility](/guide/orchestration),
 you can have it automatically run your project's [scheduled pipelines](/guide/orchestration)
 by starting [its scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html)
 using `meltano invoke airflow scheduler`.

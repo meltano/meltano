@@ -54,8 +54,7 @@ This approach caused some challenges around getting new features implemented and
 - extractor (Singer Taps e.g. tap-github)
 - loader (Singer Targets e.g. target-snowflake)
 - transformer (dbt Adapters e.g. dbt-snowflake)
-- orchestrator (e.g. Airflow, Dagster)
-- utility (e.g. SqlFluff)
+- utility (e.g. SqlFluff, Airflow, Dagster)
 
 The new approach is to group all non-EL plugins under the `utility` plugin type, leaving only the following plugin types:
 

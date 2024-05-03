@@ -869,19 +869,19 @@ schedules:
    meltano schedule list
    ```
 
-1. Add the [Apache Airflow](https://airflow.apache.org/) orchestrator to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
+1. Add the [Apache Airflow](https://airflow.apache.org/) utility to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
 
    ```bash
-   meltano add orchestrator airflow
+   meltano add utility airflow
    ```
 
    This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
 
    ```yml
    plugins:
-     orchestrators:
+     utilities:
        - name: airflow
-         pip_url: apache-airflow==1.10.14
+         pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
    ```
 
    It will also automatically add a

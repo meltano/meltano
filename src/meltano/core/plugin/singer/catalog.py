@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import re
+import sys
 import typing as t
 from collections import OrderedDict
 from enum import Enum, auto
@@ -10,6 +11,11 @@ from functools import singledispatch
 import structlog
 
 from meltano.core.behavior.visitor import visit_with
+
+if sys.version_info < (3, 11):
+    ReprEnum = Enum
+else:
+    from enum import ReprEnum
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -293,7 +299,8 @@ class CatalogNode(Enum):
     METADATA = auto()
 
 
-class SelectionType(str, Enum):
+# TODO: Move to `enum.StrEnum` when support for Python 3.8 is dropped
+class SelectionType(str, ReprEnum):
     """A valid stream or property selection type."""
 
     SELECTED = "selected"
