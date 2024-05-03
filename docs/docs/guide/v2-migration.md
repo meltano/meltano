@@ -58,6 +58,13 @@ meltano remove files dbt
 Removing a file bundle _does not_ remove any files from your `transform/` directory.
 Manually remove `transform/profile/profiles.yml` to complete clean-up (as adapter-specific installs come with their own `profiles.yml` in `transform/profiles/<adapter name>/profiles.yml`).
 
+### Migrate from orchestrators to utilities
+
+If you have been using Meltano orchestrators to schedule your ELT jobs, we recommend migrating to the new [utilities](https://hub.meltano.com/utilities/):
+
+* [Airflow](https://hub.meltano.com/utilities/airflow)
+* [Dagster](https://hub.meltano.com/utilities/dagster)
+
 ## Removed
 
 ### `model` and `dashboard` plugin types

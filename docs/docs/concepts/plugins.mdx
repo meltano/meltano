@@ -886,7 +886,7 @@ Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for
 
 Meltano supports [Apache Airflow](https://airflow.apache.org/) out of the box, but can be used with any tool capable of reading the output of [`meltano schedule list --format=json`](/reference/command-line-interface#schedule) and executing each pipeline's [`meltano run`](/reference/command-line-interface#run) command on a schedule.
 
-When the `airflow` orchestrator is added to your project using [`meltano add`](/reference/command-line-interface#add),
+When the `airflow` utility is added to your project using [`meltano add`](/reference/command-line-interface#add),
 its related [file bundle](#file-bundles) will automatically be added as well.
 
 ### Transformers
