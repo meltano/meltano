@@ -206,9 +206,9 @@ class TestOutputLogger:
             "redirect_log_handler",
             redirect_handler,
         ), logging_out.redirect_logging():
-            logging.info("info")
-            logging.warning("warning")
-            logging.error("error")
+            logging.info("info")  # noqa: TID251
+            logging.warning("warning")  # noqa: TID251
+            logging.error("error")  # noqa: TID251
 
         with open(subject.file) as logf:
             log_file_contents = [json.loads(line) for line in logf.readlines()]

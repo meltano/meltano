@@ -91,4 +91,4 @@ def pg_stats(request, session):
     from meltano.core.job import Job
 
     jobs = session.query(Job).all()
-    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: WPS323
+    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: TID251, WPS323

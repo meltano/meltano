@@ -42,7 +42,7 @@ def vacuum_db(engine_sessionmaker):
     try:
         yield
     finally:
-        logging.debug("Cleaning system database...")
+        logging.debug("Cleaning system database...")  # noqa: TID251
         engine, _ = engine_sessionmaker
         close_all_sessions()
         metadata = MetaData()
