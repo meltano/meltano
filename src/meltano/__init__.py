@@ -3,4 +3,4 @@
 from __future__ import annotations
 
 # Managed by commitizen
-__version__ = "3.4.1b1"
+__version__ = "3.4.1"
