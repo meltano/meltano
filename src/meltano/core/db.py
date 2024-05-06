@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import time
 import typing as t
 from urllib.parse import urlparse
 
+import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
@@ -23,6 +23,7 @@ if t.TYPE_CHECKING:
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = {}
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class MeltanoDatabaseCompatibilityError(MeltanoError):
@@ -89,7 +90,7 @@ def project_engine(
         )
         + (parsed_db_uri.hostname or ""),
     ).geturl()
-    logging.debug(
+    logger.debug(
         f"Creating DB engine for project at {str(project.root)!r} "  # noqa: G004
         f"with DB URI {sanitized_db_uri!r}",
     )
@@ -142,13 +143,13 @@ def connect(
             return engine.connect()
         except OperationalError:
             if attempt >= max_retries:
-                logging.error(
+                logger.error(
                     f"Could not connect to the database after {attempt} "  # noqa: G004
                     "attempts. Max retries exceeded.",
                 )
                 raise
             attempt += 1
-            logging.info(
+            logger.info(
                 f"DB connection failed. Will retry after {retry_timeout}s. "  # noqa: G004
                 f"Attempt {attempt}/{max_retries}",
             )
@@ -210,9 +211,9 @@ def ensure_schema_exists(
             conn.execute(grant_select_schema)
             conn.execute(grant_usage_schema)
 
-    logging.info(f"Schema {schema_name} has been created successfully.")  # noqa: G004
+    logger.info(f"Schema {schema_name} has been created successfully.")  # noqa: G004
     for role in grant_roles:
-        logging.info(f"Usage has been granted for role: {role}.")  # noqa: G004
+        logger.info(f"Usage has been granted for role: {role}.")  # noqa: G004
 
 
 def check_database_compatibility(engine: Engine) -> None:

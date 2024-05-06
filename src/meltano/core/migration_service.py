@@ -6,6 +6,7 @@ import logging
 import typing as t
 
 import click
+import structlog
 from alembic import command
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
@@ -16,6 +17,7 @@ from meltano.migrations import LOCK_PATH, MIGRATION_DIR
 if t.TYPE_CHECKING:
     from sqlalchemy.engine import Engine
 
+logger = structlog.stdlib.get_logger(__name__)
 SPLAT = "*"
 
 
@@ -81,7 +83,7 @@ class MigrationService:
             script = ScriptDirectory.from_config(cfg)
             # let's make sure we actually need to migrate
 
-            migration_logger = logging.getLogger("alembic.runtime.migration")
+            migration_logger = logging.getLogger("alembic.runtime.migration")  # noqa: TID251
             original_log_level = migration_logger.getEffectiveLevel()
             if silent:
                 migration_logger.setLevel(logging.ERROR)
@@ -107,7 +109,7 @@ class MigrationService:
                 if not silent:
                     click.secho("System database up-to-date.")
             except Exception as ex:
-                logging.exception(str(ex))
+                logger.exception(str(ex))
                 raise MigrationError(
                     "Cannot upgrade the system database. It might be corrupted or "  # noqa: EM101
                     "was created before database migrations where introduced (v0.34.0)",

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import logging
 import os
 import sys
 import typing as t
+
+import structlog
 
 from meltano.cli import (  # noqa: WPS235
     add,
@@ -71,7 +72,7 @@ exit_event_tracker: Tracker | None = None
 
 setup_logging()
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
 Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to

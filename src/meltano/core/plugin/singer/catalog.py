@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import fnmatch
-import logging
 import re
 import sys
 import typing as t
 from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
+
+import structlog
 
 from meltano.core.behavior.visitor import visit_with
 
@@ -16,8 +17,11 @@ if sys.version_info < (3, 11):
 else:
     from enum import ReprEnum
 
+logger = structlog.stdlib.get_logger(__name__)
+
 Node = t.Dict[str, t.Any]
 T = t.TypeVar("T", bound="CatalogRule")
+
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
 
@@ -322,7 +326,7 @@ def visit(  # noqa: D103
     executor,  # noqa: ARG001
     path: str = "",
 ):
-    logging.debug("Skipping node at '%s'", path)  # noqa: WPS323
+    logger.debug("Skipping node at '%s'", path)  # noqa: WPS323
 
 
 @visit.register(dict)
@@ -339,7 +343,7 @@ def _(node: dict, executor, path=""):
         node_type = CatalogNode.METADATA
 
     if node_type:
-        logging.debug("Visiting %s at '%s'.", node_type, path)  # noqa: WPS323
+        logger.debug("Visiting %s at '%s'.", node_type, path)  # noqa: WPS323
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
@@ -368,8 +372,8 @@ class CatalogExecutor:
 
         try:
             dispatch[node_type](node, path)
-        except KeyError:
-            logging.debug("Unknown node type '%s'.", node_type)  # noqa: WPS323
+        except KeyError:  # pragma: no cover
+            logger.debug("Unknown node type '%s'.", node_type)  # noqa: WPS323
 
     def stream_node(self, node: Node, path: str):
         """Process stream node."""
@@ -459,7 +463,7 @@ class MetadataExecutor(CatalogExecutor):
         tap_stream_id = self._stream["tap_stream_id"]
         breadcrumb = node["breadcrumb"]
 
-        logging.debug(
+        logger.debug(
             "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323, E501
             tap_stream_id,
             breadcrumb,
@@ -484,7 +488,7 @@ class MetadataExecutor(CatalogExecutor):
             return
 
         node[key] = value
-        logging.debug("Setting '%s.%s' to '%s'", path, key, value)  # noqa: WPS323
+        logger.debug("Setting '%s.%s' to '%s'", path, key, value)  # noqa: WPS323
 
 
 class SelectExecutor(MetadataExecutor):
@@ -549,7 +553,7 @@ class SchemaExecutor(CatalogExecutor):
         """Set node payload from a clean mapping."""
         node.clear()
         node.update(payload)
-        logging.debug("Setting '%s' to %r", path, payload)  # noqa: WPS323
+        logger.debug("Setting '%s' to %r", path, payload)  # noqa: WPS323
 
 
 class ListExecutor(CatalogExecutor):

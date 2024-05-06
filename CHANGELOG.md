@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.4.1b1 (2024-05-06)
+
+### 🐛 Fixes
+
+- [#8509](https://github.com/meltano/meltano/issues/8509) Mapper configuration is no longer ignored and is passed to direct mapper invocations as well as mappings in pipelines
+- [#8527](https://github.com/meltano/meltano/issues/8527) Made the output of `meltano select ... list` consistent between different Python versions
+- [#8213](https://github.com/meltano/meltano/issues/8213) `meltano config <plugin> test` false-negative on Windows -- _**Thanks @ReubenFrankel!**_
+- [#8508](https://github.com/meltano/meltano/issues/8508) Cron regex pattern on meltano.schema.json -- _**Thanks @sabino!**_
+
+### ⚙️ Under the Hood
+
+- [#8470](https://github.com/meltano/meltano/issues/8470) Started enforcing usage of `structlog.stdlib.get_logger` over `logging.getLogger` and banned use of the root logger
+- [#8510](https://github.com/meltano/meltano/issues/8510) Plugin installation status is now logged instead of printed
+
+### 📚 Documentation Improvements
+
+- [#8524](https://github.com/meltano/meltano/issues/8524) Changed references of Airflow `orchestrator` to `utility`
+- [#8506](https://github.com/meltano/meltano/issues/8506) Document `venv.backend` usage to configure `uv`
+
 ## v3.4.0 (2024-04-18)
 
 ### ✨ New
