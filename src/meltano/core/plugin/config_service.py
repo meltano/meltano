@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-import logging
 import os
 import shutil
 import typing as t
 from pathlib import Path
 
+import structlog
+
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginConfigService:
@@ -47,7 +50,7 @@ class PluginConfigService:
                 shutil.copy(src, dst)
                 stubbed.append(dst)
             except FileNotFoundError:
-                logging.debug(
+                logger.debug(
                     f"Could not find {src.name} in {src.resolve()}, skipping.",  # noqa: G004
                 )
 

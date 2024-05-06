@@ -197,7 +197,7 @@ class Out:  # noqa: WPS230
         Yields:
             With the side-effect of redirecting logging.
         """  # noqa: DAR401
-        logger = logging.getLogger()
+        logger = logging.getLogger()  # noqa: TID251
         logger.addHandler(self.redirect_log_handler)
         ignored_errors = (
             KeyboardInterrupt,

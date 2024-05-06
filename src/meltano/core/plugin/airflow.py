@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import configparser
-import logging
 import os
 import subprocess
 from contextlib import suppress
 
+import structlog
 from packaging.version import Version
 
 from meltano.core.behavior.hookable import hook
@@ -15,6 +15,8 @@ from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import BasePlugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class AirflowInvoker(PluginInvoker):
@@ -72,7 +74,7 @@ class Airflow(BasePlugin):
             invoker: the active PluginInvoker
         """
         airflow_cfg_path = invoker.files["config"]
-        logging.debug(f"Generated default '{str(airflow_cfg_path)}'")  # noqa: G004
+        logger.debug(f"Generated default '{str(airflow_cfg_path)}'")  # noqa: G004
 
         # open the configuration and update it
         # now we let's update the config to use our stubs
@@ -80,16 +82,16 @@ class Airflow(BasePlugin):
 
         with airflow_cfg_path.open() as airflow_cfg_file_to_read:
             airflow_cfg.read_file(airflow_cfg_file_to_read)
-            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")  # noqa: G004
+            logger.debug(f"Loaded '{str(airflow_cfg_path)}'")  # noqa: G004
 
         config = invoker.plugin_config_processed
         for section, section_config in config.items():
             airflow_cfg[section].update(section_config)
-            logging.debug(f"\tUpdated section [{section}] with {section_config}")  # noqa: G004
+            logger.debug(f"\tUpdated section [{section}] with {section_config}")  # noqa: G004
 
         with airflow_cfg_path.open("w") as airflow_cfg_file_to_write:
             airflow_cfg.write(airflow_cfg_file_to_write)
-            logging.debug(f"Saved '{str(airflow_cfg_path)}'")  # noqa: G004
+            logger.debug(f"Saved '{str(airflow_cfg_path)}'")  # noqa: G004
 
     @hook("before_install")
     async def setup_env(self, *args, **kwargs):  # noqa: ARG002
@@ -171,7 +173,7 @@ class Airflow(BasePlugin):
                 handle,
             )
 
-        logging.debug("Completed `airflow initdb`")
+        logger.debug("Completed `airflow initdb`")
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker: PluginInvoker):
@@ -183,4 +185,4 @@ class Airflow(BasePlugin):
         config_file = invoker.files["config"]
         with suppress(FileNotFoundError):
             config_file.unlink()
-            logging.debug(f"Deleted configuration at {config_file}")  # noqa: G004
+            logger.debug(f"Deleted configuration at {config_file}")  # noqa: G004

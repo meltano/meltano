@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import hashlib
-import logging
 import os
 import platform
 import shlex
@@ -17,6 +16,8 @@ from asyncio.subprocess import Process
 from functools import cached_property, lru_cache
 from numbers import Number
 from pathlib import Path
+
+import structlog
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
@@ -36,7 +37,7 @@ else:
     from typing import override
 
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 StdErrExtractor: TypeAlias = t.Callable[[Process], t.Awaitable[t.Union[str, None]]]
 

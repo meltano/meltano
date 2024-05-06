@@ -383,7 +383,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 if cached_key == new_cache_key:
                     logger.debug("Using cached catalog file")
                     return
-            logging.debug("Cached catalog is outdated, running discovery...")
+            logger.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
         with suppress(FileNotFoundError):

@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
-import logging
 import typing as t
 from datetime import datetime
+
+from structlog.stdlib import get_logger
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
@@ -19,7 +20,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class BookmarkWriter:

@@ -5,6 +5,7 @@ import logging
 import platform
 import sys
 import tempfile
+import typing as t
 
 import mock
 import pytest
@@ -22,7 +23,9 @@ def assert_lines(output, *lines):
 class TestOutputLogger:
     @pytest.fixture()
     def log(self, tmp_path):
-        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+        file = tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+        yield file
+        file.close()
 
     @pytest.fixture()
     def subject(self, log):
@@ -46,14 +49,18 @@ class TestOutputLogger:
             structlog.configure(**original_config)
 
     @pytest.fixture(name="redirect_handler")
-    def redirect_handler(self, subject: OutputLogger) -> logging.Handler:
+    def redirect_handler(
+        self,
+        subject: OutputLogger,
+    ) -> t.Generator[logging.Handler, None, None]:
         formatter = structlog.stdlib.ProcessorFormatter(
             # use a json renderer so output is easier to verify
             processor=structlog.processors.JSONRenderer(),
         )
         handler = logging.FileHandler(subject.file)
         handler.setFormatter(formatter)
-        return handler
+        yield handler
+        handler.close()
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log")
@@ -186,7 +193,7 @@ class TestOutputLogger:
     )
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log", "log_output")
-    async def test_logging_redirect(self, subject, redirect_handler):
+    async def test_logging_redirect(self, subject: OutputLogger, redirect_handler):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -199,9 +206,9 @@ class TestOutputLogger:
             "redirect_log_handler",
             redirect_handler,
         ), logging_out.redirect_logging():
-            logging.info("info")
-            logging.warning("warning")
-            logging.error("error")
+            logging.info("info")  # noqa: TID251
+            logging.warning("warning")  # noqa: TID251
+            logging.error("error")  # noqa: TID251
 
         with open(subject.file) as logf:
             log_file_contents = [json.loads(line) for line in logf.readlines()]

@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
+
+import structlog
 
 from .finder import JobFinder
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def fail_stale_jobs(session: Session, state_id: str | None = None) -> None:
