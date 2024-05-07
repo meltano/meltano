@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import functools
-import logging
 import os
 import shlex
 import sys
@@ -13,6 +12,8 @@ from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
 from multiprocessing import cpu_count
+
+import structlog
 
 from meltano.core.error import (
     AsyncSubprocessError,
@@ -29,7 +30,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class PluginInstallReason(str, Enum):

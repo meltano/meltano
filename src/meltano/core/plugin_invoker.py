@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import enum
-import logging
 import os
 import typing as t
 import uuid
@@ -23,6 +22,8 @@ from meltano.core.venv_service import VenvService, VirtualEnv
 
 if t.TYPE_CHECKING:
     from pathlib import Path
+
+    from sqlalchemy.orm import Session
 
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin import PluginRef
@@ -206,7 +207,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             for _key, filename in plugin_files.items()
         }
 
-    async def prepare(self, session):
+    async def prepare(self, session: Session):
         """Prepare plugin config.
 
         Args:
@@ -241,7 +242,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session):
+    async def prepared(self, session: Session):
         """Context manager that prepares plugin config.
 
         Args:
@@ -428,7 +429,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             popen_options = {**self.Popen_options(), **kwargs}
             popen_env = {**self.env(), **env}
             popen_args = self.exec_args(*args, command=command, env=popen_env)
-            logging.debug(f"Invoking: {popen_args}")  # noqa: G004
+            logger.debug(f"Invoking: {popen_args}")  # noqa: G004
 
             try:
                 yield (popen_args, popen_options, popen_env)

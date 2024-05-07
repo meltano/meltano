@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
 from datetime import date, datetime
 
+import structlog
 from croniter import croniter
 
 from meltano.core.error import MeltanoError
@@ -22,6 +22,8 @@ if t.TYPE_CHECKING:
     import subprocess
 
     from meltano.core.project import Project
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ScheduleAlreadyExistsError(MeltanoError):
@@ -192,7 +194,7 @@ class ScheduleService:  # noqa: WPS214
             settings_service = PluginSettingsService(self.project, extractor_plugin)
             start_date = settings_service.get("start_date", session=session)
         except SettingMissingError:
-            logging.debug(f"`start_date` not found in {extractor_plugin}.")  # noqa: G004
+            logger.debug(f"`start_date` not found in {extractor_plugin}.")  # noqa: G004
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

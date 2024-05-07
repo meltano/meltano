@@ -170,7 +170,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     Args:
         log_level: set log levels to provided level.
     """
-    root_logger = logging.getLogger()
+    root_logger = logging.getLogger()  # noqa: TID251
     root_logger.setLevel(log_level)
     for handler in root_logger.handlers:
         if handler.name == "console":

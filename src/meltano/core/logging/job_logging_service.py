@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import logging
 import os
 import typing as t
 from contextlib import contextmanager
+
+import structlog
 
 from meltano.core.utils import makedirs, slugify
 
@@ -12,6 +13,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
+logger = structlog.stdlib.get_logger(__name__)
 MAX_FILE_SIZE = 2097152  # 2MB max
 
 
@@ -74,7 +76,7 @@ class JobLoggingService:
         except OSError:
             # Don't stop the Job running if you can not open the log file
             # for writing: just return /dev/null
-            logging.error(
+            logger.error(
                 f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )

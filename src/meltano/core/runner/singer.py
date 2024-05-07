@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import asyncio
-import logging
 import subprocess
 import sys
 import typing as t
+
+import structlog
 
 from meltano.core.logging import capture_subprocess_output
 from meltano.core.plugin import PluginType
@@ -16,19 +17,22 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin_invoker import PluginInvoker
 
 
+logger = structlog.stdlib.get_logger(__name__)
+
+
 class SingerRunner(Runner):
     def __init__(self, elt_context: ELTContext):
         self.context = elt_context
 
     def stop(self, process, **wait_args):
-        while True:
+        while True:  # pragma: no cover
             try:
                 code = process.wait(**wait_args)
-                logging.debug(f"{process} exited with {code}")  # noqa: G004
+                logger.debug(f"{process} exited with {code}")  # noqa: G004
                 return code
             except subprocess.TimeoutExpired:
                 process.kill()
-                logging.error(f"{process} was killed.")  # noqa: G004
+                logger.error(f"{process} was killed.")  # noqa: G004
 
     async def invoke(  # noqa: WPS210, WPS213, WPS217, WPS231, WPS238
         self,
@@ -201,9 +205,9 @@ class SingerRunner(Runner):
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
     def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
-        logging.info("Dry run:")
-        logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
-        logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
+        logger.info("Dry run:")
+        logger.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
+        logger.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
     async def run(
         self,
@@ -242,20 +246,20 @@ class SingerRunner(Runner):
             return
 
         exception = exception.__context__  # noqa: WPS609
-        if not isinstance(exception, asyncio.LimitOverrunError):
+        if not isinstance(exception, asyncio.LimitOverrunError):  # pragma: no cover
             return
 
-        logging.error(
+        logger.error(
             f"The extractor generated a message exceeding the message size "  # noqa: G004
             f"limit of {human_size(line_length_limit)} (half the buffer size "
             f"of {human_size(stream_buffer_size)}).",
         )
-        logging.error(
+        logger.error(
             "To let this message be processed, increase the 'elt.buffer_size' "
             "setting to at least double the size of the largest expected "
             "message, and try again.",
         )
-        logging.error(
+        logger.error(
             "To learn more, visit "
             "https://docs.meltano.com/reference/settings#eltbuffer_size",
         )

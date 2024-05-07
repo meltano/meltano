@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import errno
-import logging
 import os
 import sys
 import threading
@@ -13,6 +12,7 @@ from functools import cached_property
 from pathlib import Path
 
 import fasteners  # type: ignore[import-untyped]
+import structlog
 from dotenv import dotenv_values
 
 from meltano.core import yaml
@@ -42,7 +42,7 @@ if t.TYPE_CHECKING:
 
 StrPath: TypeAlias = t.Union[str, os.PathLike]
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"

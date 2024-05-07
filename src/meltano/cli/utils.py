@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from enum import Enum, auto
 
 import click
+import structlog
 from click_default_group import DefaultGroup
 from click_didyoumean import DYMGroup
 
@@ -40,7 +41,7 @@ if t.TYPE_CHECKING:
 
 setup_logging()
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class CliError(Exception):

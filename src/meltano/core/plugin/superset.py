@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import subprocess
 from contextlib import suppress
 
@@ -106,7 +105,7 @@ class Superset(BasePlugin):
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config_file.write("\n".join(config_script_lines))
-        logging.debug(f"Created configuration at {config_path}")  # noqa: G004
+        logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_invoke")
     async def db_upgrade_hook(
@@ -140,7 +139,7 @@ class Superset(BasePlugin):
                 handle,
             )
 
-        logging.debug("Completed `superset db upgrade`")
+        logger.debug("Completed `superset db upgrade`")
 
     @hook("before_invoke")
     async def init_hook(
@@ -173,7 +172,7 @@ class Superset(BasePlugin):
                 handle,
             )
 
-        logging.debug("Completed `superset init`")
+        logger.debug("Completed `superset init`")
 
     @hook("before_cleanup")
     async def before_cleanup(self, invoker: PluginInvoker):
@@ -185,4 +184,4 @@ class Superset(BasePlugin):
         config_file = invoker.files["config"]
         with suppress(FileNotFoundError):
             config_file.unlink()
-            logging.debug(f"Deleted configuration at {config_file}")  # noqa: G004
+            logger.debug(f"Deleted configuration at {config_file}")  # noqa: G004

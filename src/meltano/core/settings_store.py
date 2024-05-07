@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
 from abc import ABC, abstractmethod
 from contextlib import contextmanager, suppress
@@ -13,6 +12,7 @@ from operator import eq
 
 import dotenv
 import sqlalchemy
+import structlog
 
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import Error, ProjectReadonly
@@ -26,7 +26,7 @@ if t.TYPE_CHECKING:
     from meltano.core.settings_service import SettingsService
 
 
-logger = logging.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class ConflictingSettingValueException(Exception):  # noqa: N818
