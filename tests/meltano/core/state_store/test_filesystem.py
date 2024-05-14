@@ -178,6 +178,36 @@ class TestLocalFilesystemStateStoreManager:
                     json.dumps({"completed": expected_state}),
                 ) == JobState.from_file(state_id, state_file)
 
+    def test_set_partial_state(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path: str,
+        state_ids_with_expected_states,
+    ):
+        def _get_state_path(state_id: str) -> str:
+            return os.path.join(
+                state_path,
+                encode_if_on_windows(state_id),
+                "state.json",
+            )
+
+        def _seed_state(state_id: str, state: dict) -> None:
+            state_file = Path(_get_state_path(state_id))
+            state_file.parent.mkdir(parents=True, exist_ok=True)
+            state_file.write_text(json.dumps({"partial": state}))
+
+        for state_id, expected_state in state_ids_with_expected_states:
+            _seed_state(state_id, expected_state)
+            subject.set(
+                JobState.from_json(state_id, json.dumps({"partial": expected_state})),
+            )
+        for state_id, expected_state in state_ids_with_expected_states:
+            with open(_get_state_path(state_id)) as state_file:
+                assert JobState.from_json(
+                    state_id,
+                    json.dumps({"partial": expected_state}),
+                ) == JobState.from_file(state_id, state_file)
+
     def test_delete(
         self,
         subject: LocalFilesystemStateStoreManager,
