@@ -190,6 +190,8 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
 
+- `--python`: The Python version to use for the plugin. See [the setting documentation](/reference/settings#python) for more information.
+
 ### Using `add` with Environments
 
 The `add` command does not run relative to a [Meltano Environment](https://docs.meltano.com/concepts/environments). The `--environment` flag and [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored if set.
