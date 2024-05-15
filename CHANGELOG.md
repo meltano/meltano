@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.4.2 (2024-05-15)
+
+### 🐛 Fixes
+
+- [#8542](https://github.com/meltano/meltano/issues/8542) State from interrupted pipelines or using the `--merge-state` flag no longer causes crashes
+
+### 📚 Documentation Improvements
+
+- [#8544](https://github.com/meltano/meltano/issues/8544) Added YAML docs examples of global and per-plugin `python` executable option
+
+## v3.4.1 (2024-05-06)
+
 ## v3.4.1b1 (2024-05-06)
 
 ### 🐛 Fixes
