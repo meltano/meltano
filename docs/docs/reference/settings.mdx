@@ -31,13 +31,27 @@ to list all available settings with their names, environment variables, and curr
 
 ### <a name="plugin-python"></a>`python`
 
-The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`.
+The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`. You can set it at the time you add a plugin using [`meltano add --python <python>`](/reference/command-line-interface#add).
 
 If not specified, [the top-level `python` setting will be used](#project-python), or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).
 
 This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
 
 This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
+
+Example:
+
+```yaml
+plugins:
+  extractors:
+  - name: tap-gitlab
+    variant: meltanolabs
+    python: /path/to/python3.10
+  loaders:
+  - name: target-postgres
+    variant: meltanolabs
+    python: python3.10 # if it's in your $PATH
+```
 
 ## Your Meltano project
 
@@ -56,6 +70,15 @@ If not specified, the python executable that was used to run Meltano will be use
 This setting only applies when creating new virtual environments. If you've already created a virtual environment and you'd like to use a new Python version for it, you'll need to delete it from within `.meltano/`, then run `meltano install` for that plugin again.
 
 This setting only applies to base plugins, which have their own virtual environment. Inherited plugins necessarily use the same virtual environment (and thus, the Python version) as their base plugin.
+
+Example:
+
+```yaml
+python: /path/to/python3.10 # or just python3.10 if it's in your $PATH
+plugins:
+  extractors: ...
+  loaders: ...
+```
 
 ### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
 
