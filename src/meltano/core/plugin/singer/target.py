@@ -81,7 +81,8 @@ class BookmarkWriter:
                 json.dumps(job.payload),
                 job.payload_flags,
             )
-        except Exception:
+        except Exception:  # pragma: no cover
+            logger.debug("Failed to persist state", exc_info=True)
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
                 "incremental state has not been updated",

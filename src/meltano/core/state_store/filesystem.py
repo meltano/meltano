@@ -316,7 +316,8 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                             state.state_id,
                             current_state_reader,
                         )
-                        state_to_write = current_state.merge_partial(state)
+                        current_state.merge_partial(state)
+                        state_to_write = current_state
                 except Exception as e:
                     if self.is_file_not_found_error(e):
                         state_to_write = state
