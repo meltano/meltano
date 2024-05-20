@@ -6,18 +6,18 @@
 
 # Default owners
 
-- @edgarrmondragon @WillDaSilva
+* @edgarrmondragon @WillDaSilva
 
 # CI
 .github/actions/ @WillDaSilva @meltano/engineering
 .github/workflows/ @WillDaSilva @meltano/engineering
 
 # Docs (General)
-/docs/ @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
-/README.md @sbalnojan @tayloramurphy @meltano/engineering @meltano/marketing
+/docs/ @tayloramurphy @meltano/engineering @meltano/marketing
+/README.md @tayloramurphy @meltano/engineering @meltano/marketing
 
 # Docs (Contributing)
-/CONTRIBUTING.md @sbalnojan @tayloramurphy @meltano/engineering
+/CONTRIBUTING.md @tayloramurphy @meltano/engineering
 
 # Integration tests
 /docs/example-library/ @meltano/product @meltano/engineering
