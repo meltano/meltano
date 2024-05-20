@@ -73,7 +73,7 @@ python-slugify = "^8.0.4"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
 questionary = "^2.0.1"
-requests = "^2.31.0"
+requests = "^2.32.0"
 rich = "^13.7.1"
 "ruamel.yaml" = "^0.18.6"
 setuptools = {version = "^69.5.1", python = ">=3.12"}
