@@ -207,6 +207,7 @@ const config = {
           hideable: true,
         },
       },
+      // https://www.docusaurus.io/docs/search
       algolia: {
         appId: 'RH6DR0I7R7',
         apiKey: '6d3c8732a3b6feb9fdae6de7b68de90e',
