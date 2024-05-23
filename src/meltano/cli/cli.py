@@ -18,6 +18,7 @@ from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, setup_logging
+from meltano.core.logging.server import LoggingServer
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -74,6 +75,10 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
+@click.option(
+    "--logging-server",
+    is_flag=True,
+)
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(
@@ -84,6 +89,7 @@ def cli(
     environment: str,
     no_environment: bool,
     cwd: Path | None,
+    logging_server: bool,
 ) -> None:
     """Your CLI for ELT+
 
@@ -91,6 +97,8 @@ def cli(
     Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
     ctx.ensure_object(dict)
+    if logging_server:
+        ctx.with_resource(LoggingServer())
 
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
