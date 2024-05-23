@@ -83,6 +83,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.option(
     "--logging-server",
     is_flag=True,
+    help="Start a logging server to receive logs from other plugins.",
 )
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
