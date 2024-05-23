@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 import typing as t
 import uuid
 
@@ -13,6 +14,7 @@ from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumen
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
+from meltano.core.logging.server import LogRecordSocketReceiver
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
@@ -143,6 +145,18 @@ async def run(
 
     tracker: Tracker = ctx.obj["tracker"]
 
+    # Start server LogRecordSocketReceiver in a separate thread
+    # 1. create a new instance of LogRecordSocketReceiver
+    tcpserver = LogRecordSocketReceiver()
+
+    # 2. start the server in a separate thread
+    def start_tcp_server():
+        logger.info("About to start TCP server...")
+        tcpserver.serve_until_stopped()
+
+    tcp_server_thread = threading.Thread(target=start_tcp_server)
+    tcp_server_thread.start()
+
     try:
         parser = BlockParser(
             logger,
@@ -176,6 +190,9 @@ async def run(
         tracker.track_command_event(CliEvent.failed)
         raise err
     tracker.track_command_event(CliEvent.completed)
+
+    # Stop the server
+    tcpserver.abort = 1
 
 
 async def _run_blocks(
