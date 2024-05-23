@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import platform
 import sys
+import threading
 import typing as t
 from pathlib import Path
 
@@ -18,6 +19,7 @@ from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
 from meltano.core.logging import LEVELS, setup_logging
+from meltano.core.logging.server import LogRecordSocketReceiver
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -44,6 +46,31 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
             kwargs: Keyword arguments for the Click group.
         """
         return super().main(*args, windows_expand_args=False, **kwargs)
+
+
+class LoggingServer:
+    """A context manager that starts and stops the logging server."""
+
+    def __init__(self) -> None:
+        """Initialize the logging server."""
+        self.tcpserver = LogRecordSocketReceiver()
+
+    def __enter__(self) -> None:
+        """Start the logging server context manager."""
+        # Start server LogRecordSocketReceiver in a separate thread
+        # 1. create a new instance of LogRecordSocketReceiver
+
+        def start_tcp_server():
+            logger.info("About to start TCP server...")
+            self.tcpserver.serve_until_stopped()
+
+        # 2. start the server in a separate thread
+        tcp_server_thread = threading.Thread(target=start_tcp_server)
+        tcp_server_thread.start()
+
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
+        """Stop the logging server."""
+        self.tcpserver.abort = 1
 
 
 @click.group(
@@ -74,6 +101,10 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     type=click.Path(exists=True, file_okay=False, resolve_path=True, path_type=Path),
     help="Run Meltano as if it had been started in the specified directory.",
 )
+@click.option(
+    "--logging-server",
+    is_flag=True,
+)
 @click.version_option(prog_name="meltano", package_name="meltano")
 @click.pass_context
 def cli(  # noqa: C901,WPS231
@@ -83,6 +114,7 @@ def cli(  # noqa: C901,WPS231
     environment: str,
     no_environment: bool,
     cwd: Path | None,
+    logging_server: bool,
 ):  # noqa: WPS231
     """
     Your CLI for ELT+
@@ -90,6 +122,8 @@ def cli(  # noqa: C901,WPS231
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D400
     ctx.ensure_object(dict)
+    if logging_server:
+        ctx.with_resource(LoggingServer())
 
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
