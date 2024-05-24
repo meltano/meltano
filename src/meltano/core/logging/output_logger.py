@@ -41,7 +41,7 @@ class OutputLogger:
         self,
         name: str,
         logger=None,
-        write_level: int | None = logging.INFO,
+        write_level: int = logging.INFO,
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
 

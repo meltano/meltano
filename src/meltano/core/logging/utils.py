@@ -21,7 +21,7 @@ from meltano.core.utils import get_no_color_flag
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-LEVELS = {  # noqa: WPS407
+LEVELS: dict[str, int] = {  # noqa: WPS407
     "debug": logging.DEBUG,
     "info": logging.INFO,
     "warning": logging.WARNING,
@@ -34,7 +34,7 @@ FORMAT = (
 )
 
 
-def parse_log_level(log_level: dict[str, int]) -> int:
+def parse_log_level(log_level: str) -> int:
     """Parse a level descriptor into an logging level.
 
     Args:
@@ -46,7 +46,7 @@ def parse_log_level(log_level: dict[str, int]) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def read_config(config_file: str | None = None) -> dict:
+def read_config(config_file: os.PathLike | None = None) -> dict | None:
     """Read a logging config yaml from disk.
 
     Args:
@@ -126,7 +126,7 @@ def default_config(log_level: str) -> dict:
 def setup_logging(  # noqa: WPS210
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
-    log_config: dict | None = None,
+    log_config: os.PathLike | None = None,
 ) -> None:
     """Configure logging for a meltano project.
 
