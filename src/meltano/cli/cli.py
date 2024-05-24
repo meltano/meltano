@@ -43,7 +43,8 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
             args: Positional arguments for the Click group.
             kwargs: Keyword arguments for the Click group.
         """
-        return super().main(*args, windows_expand_args=False, **kwargs)
+        # TODO: Fix "Return statement in function which does not return"?
+        return super().main(*args, windows_expand_args=False, **kwargs)  # type: ignore[misc]
 
 
 @click.group(
@@ -56,7 +57,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     # NOTE: This CLI option normalization applies to all subcommands.
     context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
-@click.option("--log-level", type=click.Choice(LEVELS.keys()))
+@click.option("--log-level", type=click.Choice(tuple(LEVELS)))
 @click.option(
     "--log-config",
     type=str,

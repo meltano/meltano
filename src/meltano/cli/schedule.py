@@ -27,6 +27,8 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import coerce_datetime
 
 if t.TYPE_CHECKING:
+    import datetime
+
     from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
@@ -54,13 +56,13 @@ def schedule(project, ctx):
 
 
 def _add_elt(
-    ctx,
+    ctx: click.Context,
     name: str,
     extractor: str,
     loader: str,
     transform: str,
     interval: str,
-    start_date: str | None,
+    start_date: datetime.datetime | None,
 ):
     """Add a new legacy elt schedule."""
     project: Project = ctx.obj["project"]
@@ -122,7 +124,16 @@ def _add_job(ctx, name: str, job: str, interval: str):
 )
 @click.option("--start-date", type=click.DateTime(), default=None, help="ELT Only")
 @click.pass_context
-def add(ctx, name, job, extractor, loader, transform, interval, start_date):
+def add(
+    ctx: click.Context,
+    name: str,
+    job: str | None,
+    extractor: str | None,
+    loader: str | None,
+    transform: str,
+    interval: str,
+    start_date: datetime.datetime | None,
+):
     """
     Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
@@ -169,12 +180,13 @@ def _format_job_list_output(entry: Schedule, job: TaskSets) -> dict:
 
 def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     start_date = coerce_datetime(entry.start_date)
-    if start_date:
-        start_date = start_date.date().isoformat()
+    start_date_str = start_date.date().isoformat() if start_date else None
 
     last_successful_run = entry.last_successful_run(session)
     last_successful_run_ended_at = (
-        last_successful_run.ended_at.isoformat() if last_successful_run else None
+        last_successful_run.ended_at.isoformat()
+        if last_successful_run.ended_at
+        else None
     )
 
     return {
@@ -183,7 +195,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
         "loader": entry.loader,
         "transform": entry.transform,
         "interval": entry.interval,
-        "start_date": start_date,
+        "start_date": start_date_str,
         "env": entry.env,
         "cron_interval": entry.cron_interval,
         "last_successful_run_ended_at": last_successful_run_ended_at,
@@ -193,11 +205,17 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
 
 @schedule.command(  # noqa: WPS125
     cls=PartialInstrumentedCmd,
+    name="list",
     short_help="List available schedules.",
 )
-@click.option("--format", type=click.Choice(("json", "text")), default="text")
+@click.option(
+    "--format",
+    "list_format",
+    type=click.Choice(("json", "text")),
+    default="text",
+)
 @click.pass_context
-def list(ctx, format):  # noqa: WPS125
+def list_schedulers(ctx: click.Context, list_format: str) -> None:  # noqa: C901
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -208,7 +226,7 @@ def list(ctx, format):  # noqa: WPS125
     try:
         fail_stale_jobs(session)
 
-        if format == "text":
+        if list_format == "text":
             transform_elt_markers = {
                 "run": ("→", "→"),
                 "only": ("×", "→"),
@@ -223,14 +241,14 @@ def list(ctx, format):  # noqa: WPS125
                         f"{task_sets_service.get(txt_schedule.job).tasks}",
                     )
                 else:
-                    markers = transform_elt_markers[txt_schedule.transform]
+                    markers = transform_elt_markers[txt_schedule.transform]  # type: ignore[index]
                     click.echo(
                         f"[{txt_schedule.interval}] elt {txt_schedule.name}: "
                         f"{txt_schedule.extractor} {markers[0]} "
                         f"{txt_schedule.loader} {markers[1]} transforms",
                     )
 
-        elif format == "json":
+        elif list_format == "json":
             job_schedules = []
             elt_schedules = []
             for json_schedule in schedule_service.schedules():
@@ -263,7 +281,7 @@ def list(ctx, format):  # noqa: WPS125
 @click.argument("name")
 @click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def run(ctx, name, elt_options):
+def run(ctx: click.Context, name: str, elt_options: tuple[str]):
     """Run a schedule."""
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
@@ -357,7 +375,7 @@ def _update_elt_schedule(
 
 
 class CronParam(click.ParamType):
-    """Custom type definition for cron prameter."""
+    """Custom type definition for cron parameter."""
 
     name = "cron"
 
@@ -390,7 +408,15 @@ class CronParam(click.ParamType):
     help="Update the transform flag for an elt schedule.",
 )
 @click.pass_context
-def set_cmd(ctx, name, interval, job, extractor, loader, transform):
+def set_cmd(
+    ctx: click.Context,
+    name: str,
+    interval: str | None,
+    job: str | None,
+    extractor: str | None,
+    loader: str | None,
+    transform: str | None,
+):
     """Update a schedule.
 
     Usage:

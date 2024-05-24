@@ -230,7 +230,7 @@ def config(  # noqa: WPS231
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
-def list_settings(ctx, extras: bool):
+def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]

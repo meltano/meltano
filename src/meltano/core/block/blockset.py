@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import typing as t
 from abc import ABCMeta, abstractmethod
+
+if t.TYPE_CHECKING:
+    from meltano.core.block.ioblock import IOBlock
 
 
 class BlockSetValidationError(Exception):
@@ -26,6 +30,8 @@ class BlockSet(metaclass=ABCMeta):
     `terminate`, and `validate_set` method currently satisfies the `BlockSet`
     interface.
     """
+
+    blocks: tuple[IOBlock, ...]
 
     @abstractmethod
     async def run(self) -> None:
