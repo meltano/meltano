@@ -47,8 +47,8 @@ azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.30.1", optional = true}
 azure-identity = {version = "^1.16.0", optional = true}
 azure-storage-blob = {version = "^12.20.0", optional = true}
-boto3 = {version = "^1.34.108", optional = true}
-check-jsonschema = "^0.28.3"
+boto3 = {version = "^1.34.113", optional = true}
+check-jsonschema = "^0.28.4"
 click = "^8.1"
 click-default-group = "^1.2.4"
 click-didyoumean = "^0.3.1"
@@ -73,7 +73,7 @@ python-slugify = "^8.0.4"
 python-ulid = "^1.1.0"
 pyyaml = "^6.0.1"
 questionary = "^2.0.1"
-requests = "^2.32.0"
+requests = "^2.32.2"
 rich = "^13.7.1"
 "ruamel.yaml" = "^0.18.6"
 setuptools = {version = "^69.5.1", python = ">=3.12"}
@@ -82,11 +82,11 @@ snowplow-tracker = "^1.0.2"
 sqlalchemy = "^2.0.30"
 structlog = "^24.1.0"
 tabulate = "^0.9.0"
-typing-extensions = "^4.11.0"
+typing-extensions = "^4.12.0"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-uv = { version = ">=0.1.24,<0.2", optional = true }
+uv = { version = ">=0.1.24,<0.3", optional = true }
 virtualenv = "^20.26.2"
 yaspin = "^2.3.0"
 
