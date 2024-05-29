@@ -125,7 +125,7 @@ async def invoke(  # noqa: C901
     await install_plugins(
         project,
         [plugin],
-        reason=PluginInstallReason.INVOKE,
+        reason=PluginInstallReason.JIT,
         skip_installed=True,
     )
 

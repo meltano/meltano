@@ -37,14 +37,8 @@ class PluginInstallReason(str, Enum):
     """Plugin install reason enum."""
 
     ADD = "add"
-    CONFIG_TEST = "config test"
-    EL = "el"
-    ELT = "elt"
     INSTALL = "install"
-    INVOKE = "invoke"
-    RUN = "run"
-    SELECT = "select"
-    TEST = "test"
+    JIT = "just-in-time"
     UPGRADE = "upgrade"
 
 

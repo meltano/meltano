@@ -123,7 +123,7 @@ async def show(project, extractor, install_plugins: InstallPlugins, show_all=Fal
     await install_plugins(
         project,
         [select_service.extractor],
-        PluginInstallReason.SELECT,
+        PluginInstallReason.JIT,
         skip_installed=True,
     )
 

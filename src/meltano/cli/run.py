@@ -170,7 +170,7 @@ async def run(
     await install_plugins(
         project,
         parser.plugins,
-        reason=PluginInstallReason.RUN,
+        reason=PluginInstallReason.JIT,
         skip_installed=True,
     )
 

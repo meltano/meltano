@@ -440,11 +440,7 @@ async def _run_elt(
     await install_plugins(
         elt_context.project,
         plugins,
-        reason=(
-            PluginInstallReason.ELT
-            if elt_context.transformer
-            else PluginInstallReason.EL
-        ),
+        reason=PluginInstallReason.JIT,
         skip_installed=True,
     )
 

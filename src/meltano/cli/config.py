@@ -416,7 +416,7 @@ async def test(
     await install_plugins(
         project,
         [plugin_test_service.plugin_invoker.plugin],
-        reason=PluginInstallReason.CONFIG_TEST,
+        reason=PluginInstallReason.JIT,
         skip_installed=True,
     )
 
