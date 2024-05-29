@@ -215,7 +215,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     default="text",
 )
 @click.pass_context
-def list_schedulers(ctx: click.Context, list_format: str) -> None:  # noqa: C901
+def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
