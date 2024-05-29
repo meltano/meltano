@@ -292,7 +292,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@v4.4.0
+      uses: codecov/codecov-action@v4.4.1
 
   mypy:
     name: "Static type checking"
