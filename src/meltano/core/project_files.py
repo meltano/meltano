@@ -7,11 +7,10 @@ from collections import OrderedDict
 from copy import copy
 
 import structlog
-from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
-from meltano.core.utils import deep_merge
+from meltano.core.utils import atomic_write, deep_merge
 
 if t.TYPE_CHECKING:
     from os import PathLike
@@ -365,6 +364,6 @@ class ProjectFiles:  # noqa: WPS214
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: t.Mapping):
-        with atomic_write(file_path, overwrite=True) as fl:
+    def _write_file(self, file_path: PathLike[str], contents: t.Mapping):
+        with atomic_write(file_path) as fl:
             yaml.dump(contents, fl)

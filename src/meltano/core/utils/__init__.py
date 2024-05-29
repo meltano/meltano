@@ -11,10 +11,11 @@ import os
 import platform
 import re
 import sys
+import tempfile
 import traceback
 import typing as t
 import unicodedata
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time, timezone
 from enum import IntEnum
@@ -891,3 +892,18 @@ def sanitize_filename(filename: str) -> str:
         _sanitize_filename_transformations,
         filename,
     )
+
+
+@contextmanager
+def atomic_write(path: str | os.PathLike[str]) -> t.Generator[t.IO[str], None, None]:
+    """Write to and replace a file atomically.
+
+    Args:
+        path: The path to the file to write to.
+
+    Yields:
+        The file object to write to.
+    """
+    with tempfile.NamedTemporaryFile(mode="w", dir=os.path.dirname(path)) as f:
+        yield f
+        os.replace(f.name, path)
