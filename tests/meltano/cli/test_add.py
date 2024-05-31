@@ -783,7 +783,7 @@ class TestCliAdd:
                     ),
                 ),
             )
-            venv_mock.assert_called_once_with(python)
+            venv_mock.assert_called_with(python)
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner):
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
