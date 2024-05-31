@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import yaml
@@ -113,3 +114,29 @@ class TestPluginInstallService:
             "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
             "python-json-logger",
         ]
+
+    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    async def test_skip_installed(
+        self,
+        project: Project,
+        subject: PluginInstallService,
+    ):
+        project.refresh()
+
+        plugin = next(project.plugins.plugins())
+        state = await subject.install_plugin_async(plugin, skip_installed=True)
+
+        assert not state.skipped, "Expected plugin with no venv to be installed"
+
+        state = await subject.install_plugin_async(plugin, skip_installed=True)
+
+        assert (
+            state.skipped
+        ), "Expected plugin with venv and matching fingerprint to not be installed"
+
+        plugin.pip_url = "changed"
+        state = await subject.install_plugin_async(plugin, skip_installed=True)
+
+        assert (
+            not state.skipped
+        ), "Expected plugin with venv and non-matching fingerprint to be installed"

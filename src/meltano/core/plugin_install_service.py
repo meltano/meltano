@@ -24,7 +24,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
-from meltano.core.venv_service import UvVenvService, VenvService
+from meltano.core.venv_service import UvVenvService, VenvService, fingerprint
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -311,10 +311,21 @@ class PluginInstallService:  # noqa: WPS214
             ),
         )
 
-        is_installed = self.project.plugin_dir(plugin, "venv", make_dirs=False).exists()
+        env = self.plugin_installation_env(plugin)
+        venv_service = VenvService(
+            project=self.project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.venv_name,
+        )
+
+        requires_install = (
+            fingerprint(get_pip_install_args(self.project, plugin, env))
+            != venv_service.read_fingerprint()
+        )
 
         if (
-            (skip_installed and is_installed)
+            (skip_installed and not requires_install)
             or not plugin.is_installable()
             or self._is_mapping(plugin)
         ):
@@ -340,7 +351,7 @@ class PluginInstallService:  # noqa: WPS214
                     reason=reason,
                     clean=self.clean,
                     force=self.force,
-                    env=self.plugin_installation_env(plugin),
+                    env=env,
                 )
                 state = PluginInstallState(
                     plugin=plugin,
