@@ -116,13 +116,12 @@ class TestPluginInstallService:
         ]
 
     @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @pytest.mark.usefixtures("reset_project_context")
     async def test_skip_installed(
         self,
         project: Project,
         subject: PluginInstallService,
     ):
-        project.refresh()
-
         plugin = next(project.plugins.plugins())
         state = await subject.install_plugin_async(plugin, skip_installed=True)
 

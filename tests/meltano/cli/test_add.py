@@ -24,7 +24,6 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
-    from meltano.core.project_init_service import ProjectInitService
 
 plugin_ref = plugins_dir / "extractors" / "tap-custom" / "test.yml"
 fails_on_windows = pytest.mark.xfail(
@@ -34,20 +33,6 @@ fails_on_windows = pytest.mark.xfail(
 
 
 class TestCliAdd:
-    @pytest.fixture()
-    def reset_project_context(
-        self,
-        project: Project,
-        project_init_service: ProjectInitService,
-    ):
-        shutil.rmtree(".", ignore_errors=True)
-        project_init_service.create_files(project)
-
-        project.refresh()
-
-        for plugin_type in PluginType:
-            project.meltano.plugins[plugin_type].clear()
-
     @pytest.mark.order(0)
     @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "default_variant", "required_plugin_refs"),
