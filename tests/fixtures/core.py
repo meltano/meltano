@@ -2423,7 +2423,12 @@ def reset_project_context(
     project: Project,
     project_init_service: ProjectInitService,
 ):
-    shutil.rmtree(".", ignore_errors=True)
+    for path in project.root.iterdir():
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+
     project_init_service.create_files(project)
 
     project.refresh()
