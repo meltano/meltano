@@ -120,7 +120,7 @@ async def show(project, extractor, install_plugins: InstallPlugins, show_all=Fal
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
 
-    await install_plugins(
+    await install_plugins(  # pragma: no cover
         project,
         [select_service.extractor],
         PluginInstallReason.JIT,
