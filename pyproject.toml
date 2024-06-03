@@ -503,9 +503,7 @@ module = [
   "meltano.cli.install",
   "meltano.cli.interactive.*",
   "meltano.cli.invoke",
-  "meltano.cli.select",
   "meltano.cli.state",
-  "meltano.cli.utils",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
   "meltano.core.elt_context",
@@ -545,6 +543,13 @@ module = [
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
+]
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+  "click_default_group.*",  # https://github.com/click-contrib/click-default-group/issues/26
+  "click_didyoumean.*",     # Unreleased, https://github.com/click-contrib/click-didyoumean/commit/048b275077382e5a80bdf05b02830013eb37ddd1
 ]
 
 [build-system]
