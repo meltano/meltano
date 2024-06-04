@@ -110,6 +110,17 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 </Termy>
 
 <br />
+
+:::tip
+<p>Installing dbt-postgres may <a href="https://github.com/dbt-labs/dbt-postgres/issues/96">require building <code>psycopg2</code> from source</a>. An easy workaround is to constrain <code>dbt-postgres</code> in the plugin's <code>pip_url</code> in your <code>meltano.yml</code> file:</p>
+
+```yaml
+  utilities:
+  - name: dbt-postgres
+    pip_url: dbt-core dbt-postgres<1.8 git+https://github.com/meltano/dbt-ext.git@main
+```
+:::
+
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
 
 ## Configure dbt
@@ -229,8 +240,19 @@ Extension executing `dbt run`...
 20:45:15  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 #
 ```
-
 </Termy>
+
+<br />
+
+:::tip
+<p>If you encounter an error related to dbt not being to clean files outside of the project directory, you can add the following to your <code>meltano.yml</code> file:</p>
+
+```yaml
+version: 1
+env:
+  DBT_CLEAN_PROJECT_FILES_ONLY: "false"
+```
+:::
 
 You can check the data inside the database using your favourite SQL editor. There should now be a table inside the `analytics` schema called `authors` populated with data.
 
