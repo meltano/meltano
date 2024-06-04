@@ -281,6 +281,7 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
 
+  ```yaml title="meltano.yml"
     extractors:
     - name: tap-example
       config: {
@@ -579,8 +580,7 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
 
 :::info
 
-<p>Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to <a href="https://hub.meltano.com/">MeltanoHub</a> for more help troubleshooting or join the <a href="https://meltano.com/slack">Meltano Slack workspace</a> to ask questions.
-</p>
+<p>Sometimes extractors and loaders expect that certain dependencies are already installed. If you run into any issues while installing, refer to <a href="https://hub.meltano.com/">MeltanoHub</a> for more help troubleshooting or join the <a href="https://meltano.com/slack">Meltano Slack workspace</a> to ask questions.</p>
 
 :::
 
@@ -670,12 +670,14 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
 
+  ```yaml title="meltano.yml"
     loaders:
     - name: target-example
       config: {
         "setting": "value",
         "another_setting": true
       }
+  ```
 
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 :::
@@ -920,7 +922,7 @@ schedules:
    --email melty@meltano.com
    ```
 
-   The web interface and DAG overview will be available at <http://localhost:8080>.
+   The web interface and DAG overview will be available at http://localhost:8080.
 
 ### Transform Loaded Data for Analysis
 

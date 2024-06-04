@@ -391,7 +391,7 @@ If the plugin's `pip_url` is set to a package name, e.g. `tap-shopify`, [`pip in
 
 To pin the latest version:
 
-1. Determine the latest version of the package by browsing to `https://pypi.org/project/<package>`, e.g. <https://pypi.org/project/tap-shopify>.
+1. Determine the latest version of the package by browsing to `https://pypi.org/project/<package>`, e.g. https://pypi.org/project/tap-shopify.
 
    At the time of writing, the latest version of `tap-shopify` is `1.2.6`.
 
@@ -414,10 +414,10 @@ If the plugin's `pip_url` is set to a `git+http(s)` URL, e.g. `git+https://gitla
 
 To pin the latest version:
 
-1. Determine the latest version of the package by browsing to the `https://` part of the repository URL, e.g. <https://gitlab.com/meltano/tap-gitlab> or <https://github.com/adswerve/target-bigquery>, and finding the latest Git tag.
+1. Determine the latest version of the package by browsing to the `https://` part of the repository URL, e.g. https://gitlab.com/meltano/tap-gitlab or https://github.com/adswerve/target-bigquery, and finding the latest Git tag.
 
-   At the time of writing, the [latest tag](https://gitlab.com/meltano/tap-gitlab/-/tags) of <https://gitlab.com/meltano/tap-gitlab> is `v0.9.11`,
-   and the [latest tag](https://github.com/adswerve/target-bigquery/tags) of <https://github.com/adswerve/target-bigquery> is`v0.10.2`.
+   At the time of writing, the [latest tag](https://gitlab.com/meltano/tap-gitlab/-/tags) of https://gitlab.com/meltano/tap-gitlab is `v0.9.11`,
+   and the [latest tag](https://github.com/adswerve/target-bigquery/tags) of https://github.com/adswerve/target-bigquery is`v0.10.2`.
 
    If no tags are available, you can also use the SHA of the latest commit, e.g.
    [`2657b89e8896face4ce320a03b8413bbc196cec9`](https://gitlab.com/meltano/tap-gitlab/-/commit/2657b89e8896face4ce320a03b8413bbc196cec9) or

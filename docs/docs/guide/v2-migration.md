@@ -62,8 +62,8 @@ Manually remove `transform/profile/profiles.yml` to complete clean-up (as adapte
 
 If you have been using Meltano orchestrators to schedule your ELT jobs, we recommend migrating to the new [utilities](https://hub.meltano.com/utilities/):
 
-* [Airflow](https://hub.meltano.com/utilities/airflow)
-* [Dagster](https://hub.meltano.com/utilities/dagster)
+- [Airflow](https://hub.meltano.com/utilities/airflow)
+- [Dagster](https://hub.meltano.com/utilities/dagster)
 
 ## Removed
 
@@ -127,964 +127,628 @@ If for any reason you wish to keep sourcing or writing setting values to depreca
 
 <table>
   <tr>
-   <td>Plugin
-   </td>
-   <td>Variant
-   </td>
-   <td>Deprecated
-   </td>
-   <td>Replacement
-   </td>
+    <td>Plugin</td>
+    <td>Variant</td>
+    <td>Deprecated</td>
+    <td>Replacement</td>
   </tr>
   <tr>
-   <td rowspan="18" >meltano
-   </td>
-   <td rowspan="18" >
-   </td>
-   <td>MELTANO_LOG_LEVEL
-   </td>
-   <td>MELTANO_CLI_LOG_LEVEL
-   </td>
+    <td rowspan="18">meltano</td>
+    <td rowspan="18"></td>
+    <td>MELTANO_LOG_LEVEL</td>
+    <td>MELTANO_CLI_LOG_LEVEL</td>
   </tr>
   <tr>
-   <td>MELTANO_LOG_CONFIG
-   </td>
-   <td>MELTANO_CLI_LOG_CONFIG
-   </td>
+    <td>MELTANO_LOG_CONFIG</td>
+    <td>MELTANO_CLI_LOG_CONFIG</td>
   </tr>
   <tr>
-   <td>MELTANO_API_HOSTNAME
-   </td>
-   <td>MELTANO_UI_BIND_HOST
-   </td>
+    <td>MELTANO_API_HOSTNAME</td>
+    <td>MELTANO_UI_BIND_HOST</td>
   </tr>
   <tr>
-   <td>MELTANO_API_PORT
-   </td>
-   <td>MELTANO_UI_BIND_PORT
-   </td>
+    <td>MELTANO_API_PORT</td>
+    <td>MELTANO_UI_BIND_PORT</td>
   </tr>
   <tr>
-   <td>PORT
-   </td>
-   <td>MELTANO_UI_BIND_PORT
-   </td>
+    <td>PORT</td>
+    <td>MELTANO_UI_BIND_PORT</td>
   </tr>
   <tr>
-   <td>WORKERS
-   </td>
-   <td>MELTANO_UI_WORKERS
-   </td>
+    <td>WORKERS</td>
+    <td>MELTANO_UI_WORKERS</td>
   </tr>
   <tr>
-   <td>WEB_CONCURRENCY
-   </td>
-   <td>MELTANO_UI_WORKERS
-   </td>
+    <td>WEB_CONCURRENCY</td>
+    <td>MELTANO_UI_WORKERS</td>
   </tr>
   <tr>
-   <td>FORWARDED_ALLOW_IPS
-   </td>
-   <td>MELTANO_UI_FORWARDED_ALLOW_IPS
-   </td>
+    <td>FORWARDED_ALLOW_IPS</td>
+    <td>MELTANO_UI_FORWARDED_ALLOW_IPS</td>
   </tr>
   <tr>
-   <td>MELTANO_READONLY
-   </td>
-   <td>MELTANO_UI_READONLY
-   </td>
+    <td>MELTANO_READONLY</td>
+    <td>MELTANO_UI_READONLY</td>
   </tr>
   <tr>
-   <td>MELTANO_AUTHENTICATION
-   </td>
-   <td>MELTANO_UI_AUTHENTICATION
-   </td>
+    <td>MELTANO_AUTHENTICATION</td>
+    <td>MELTANO_UI_AUTHENTICATION</td>
   </tr>
   <tr>
-   <td>MELTANO_NOTIFICATION
-   </td>
-   <td>MELTANO_UI_NOTIFICATION
-   </td>
+    <td>MELTANO_NOTIFICATION</td>
+    <td>MELTANO_UI_NOTIFICATION</td>
   </tr>
   <tr>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_ID
-   </td>
-   <td>MELTANO_OAUTH_SERVICE_GOOGLE_ADWORDS_CLIENT_ID
-   </td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_ID</td>
+    <td>MELTANO_OAUTH_SERVICE_GOOGLE_ADWORDS_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET
-   </td>
-   <td>MELTANO_OAUTH_SERVICE_GOOGLE_ADWORDS_CLIENT_SECRET
-   </td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET</td>
+    <td>MELTANO_OAUTH_SERVICE_GOOGLE_ADWORDS_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>OAUTH_GITLAB_APPLICATION_ID
-   </td>
-   <td>MELTANO_OAUTH_GITLAB_CLIENT_ID
-   </td>
+    <td>OAUTH_GITLAB_APPLICATION_ID</td>
+    <td>MELTANO_OAUTH_GITLAB_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>OAUTH_GITLAB_SECRET
-   </td>
-   <td>MELTANO_OAUTH_GITLAB_CLIENT_SECRET
-   </td>
+    <td>OAUTH_GITLAB_SECRET</td>
+    <td>MELTANO_OAUTH_GITLAB_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>MELTANO_CLI_TRACKING_ID
-   </td>
-   <td>MELTANO_TRACKING_IDS_CLI
-   </td>
+    <td>MELTANO_CLI_TRACKING_ID</td>
+    <td>MELTANO_TRACKING_IDS_CLI</td>
   </tr>
   <tr>
-   <td>MELTANO_UI_TRACKING_ID
-   </td>
-   <td>MELTANO_TRACKING_IDS_UI
-   </td>
+    <td>MELTANO_UI_TRACKING_ID</td>
+    <td>MELTANO_TRACKING_IDS_UI</td>
   </tr>
   <tr>
-   <td>MELTANO_EMBED_TRACKING_ID
-   </td>
-   <td>MELTANO_TRACKING_IDS_UI_EMBED
-   </td>
+    <td>MELTANO_EMBED_TRACKING_ID</td>
+    <td>MELTANO_TRACKING_IDS_UI_EMBED</td>
   </tr>
-  <tr>
-   <td>dbt-bigquery
-   </td>
-   <td>meltano
-   </td>
-   <td>DBT_PROFILES_DIR
-   </td>
-   <td>DBT_BIGQUERY_PROFILES_DIR
-   </td>
+  <tr>
+    <td>dbt-bigquery</td>
+    <td>meltano</td>
+    <td>DBT_PROFILES_DIR</td>
+    <td>DBT_BIGQUERY_PROFILES_DIR</td>
   </tr>
   <tr>
-   <td>dbt-postgres
-   </td>
-   <td>meltano
-   </td>
-   <td>DBT_PROFILES_DIR
-   </td>
-   <td>DBT_POSTGRES_PROFILES_DIR
-   </td>
+    <td>dbt-postgres</td>
+    <td>meltano</td>
+    <td>DBT_PROFILES_DIR</td>
+    <td>DBT_POSTGRES_PROFILES_DIR</td>
   </tr>
   <tr>
-   <td>dbt-redshift
-   </td>
-   <td>meltano
-   </td>
-   <td>DBT_PROFILES_DIR
-   </td>
-   <td>DBT_REDSHIFT_PROFILES_DIR
-   </td>
+    <td>dbt-redshift</td>
+    <td>meltano</td>
+    <td>DBT_PROFILES_DIR</td>
+    <td>DBT_REDSHIFT_PROFILES_DIR</td>
   </tr>
   <tr>
-   <td>dbt-snowflake
-   </td>
-   <td>meltano
-   </td>
-   <td>DBT_PROFILES_DIR
-   </td>
-   <td>DBT_SNOWFLAKE_PROFILES_DIR
-   </td>
+    <td>dbt-snowflake</td>
+    <td>meltano</td>
+    <td>DBT_PROFILES_DIR</td>
+    <td>DBT_SNOWFLAKE_PROFILES_DIR</td>
   </tr>
-  <tr>
-   <td rowspan="6" >tap-adwords
-   </td>
-   <td rowspan="3" >meltano
-   </td>
-   <td>OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-   </td>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_ID
-   </td>
+  <tr>
+    <td rowspan="6">tap-adwords</td>
+    <td rowspan="3">meltano</td>
+    <td>OAUTH_GOOGLE_ADWORDS_CLIENT_ID</td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-   </td>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET
-   </td>
+    <td>OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET</td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
-   </td>
-   <td>TAP_ADWORDS_DEVELOPER_TOKEN
-   </td>
+    <td>OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN</td>
+    <td>TAP_ADWORDS_DEVELOPER_TOKEN</td>
   </tr>
   <tr>
-   <td rowspan="3" >singer-io
-   </td>
-   <td>OAUTH_GOOGLE_ADWORDS_CLIENT_ID
-   </td>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_ID
-   </td>
+    <td rowspan="3">singer-io</td>
+    <td>OAUTH_GOOGLE_ADWORDS_CLIENT_ID</td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET
-   </td>
-   <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET
-   </td>
+    <td>OAUTH_GOOGLE_ADWORDS_CLIENT_SECRET</td>
+    <td>TAP_ADWORDS_OAUTH_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN
-   </td>
-   <td>TAP_ADWORDS_DEVELOPER_TOKEN
-   </td>
+    <td>OAUTH_GOOGLE_ADWORDS_DEVELOPER_TOKEN</td>
+    <td>TAP_ADWORDS_DEVELOPER_TOKEN</td>
   </tr>
   <tr>
-   <td>tap-bigquery
-   </td>
-   <td>anelendata
-   </td>
-   <td>GOOGLE_APPLICATION_CREDENTIALS
-   </td>
-   <td>TAP_BIGQUERY_CREDENTIALS_PATH
-   </td>
+    <td>tap-bigquery</td>
+    <td>anelendata</td>
+    <td>GOOGLE_APPLICATION_CREDENTIALS</td>
+    <td>TAP_BIGQUERY_CREDENTIALS_PATH</td>
   </tr>
   <tr>
-   <td rowspan="3" >tap-bing-ads
-   </td>
-   <td rowspan="3" >singer-io
-   </td>
-   <td>OAUTH_BING_ADS_CLIENT_ID
-   </td>
-   <td>TAP_BING_ADS_OAUTH_CLIENT_ID
-   </td>
+    <td rowspan="3">tap-bing-ads</td>
+    <td rowspan="3">singer-io</td>
+    <td>OAUTH_BING_ADS_CLIENT_ID</td>
+    <td>TAP_BING_ADS_OAUTH_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>OAUTH_BING_ADS_CLIENT_SECRET
-   </td>
-   <td>TAP_BING_ADS_OAUTH_CLIENT_SECRET
-   </td>
+    <td>OAUTH_BING_ADS_CLIENT_SECRET</td>
+    <td>TAP_BING_ADS_OAUTH_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>OAUTH_BING_ADS_DEVELOPER_TOKEN
-   </td>
-   <td>TAP_BING_ADS_DEVELOPER_TOKEN
-   </td>
+    <td>OAUTH_BING_ADS_DEVELOPER_TOKEN</td>
+    <td>TAP_BING_ADS_DEVELOPER_TOKEN</td>
   </tr>
   <tr>
-   <td rowspan="2" >tap-csv
-   </td>
-   <td>meltano
-   </td>
-   <td>TAP_CSV_FILES_DEFINITION
-   </td>
-   <td>TAP_CSV_CSV_FILES_DEFINITION
-   </td>
+    <td rowspan="2">tap-csv</td>
+    <td>meltano</td>
+    <td>TAP_CSV_FILES_DEFINITION</td>
+    <td>TAP_CSV_CSV_FILES_DEFINITION</td>
   </tr>
   <tr>
-   <td>meltanolabs
-   </td>
-   <td>TAP_CSV_FILES_DEFINITION
-   </td>
-   <td>TAP_CSV_CSV_FILES_DEFINITION
-   </td>
+    <td>meltanolabs</td>
+    <td>TAP_CSV_FILES_DEFINITION</td>
+    <td>TAP_CSV_CSV_FILES_DEFINITION</td>
   </tr>
   <tr>
-   <td rowspan="10" >tap-gitlab
-   </td>
-   <td rowspan="5" >meltano
-   </td>
-   <td>GITLAB_API_GROUPS
-   </td>
-   <td>TAP_GITLAB_GROUPS
-   </td>
+    <td rowspan="10">tap-gitlab</td>
+    <td rowspan="5">meltano</td>
+    <td>GITLAB_API_GROUPS</td>
+    <td>TAP_GITLAB_GROUPS</td>
   </tr>
   <tr>
-   <td>GITLAB_API_PROJECTS
-   </td>
-   <td>TAP_GITLAB_PROJECTS
-   </td>
+    <td>GITLAB_API_PROJECTS</td>
+    <td>TAP_GITLAB_PROJECTS</td>
   </tr>
   <tr>
-   <td>GITLAB_API_START_DATE
-   </td>
-   <td>TAP_GITLAB_START_DATE
-   </td>
+    <td>GITLAB_API_START_DATE</td>
+    <td>TAP_GITLAB_START_DATE</td>
   </tr>
   <tr>
-   <td>GITLAB_API_TOKEN
-   </td>
-   <td>TAP_GITLAB_PRIVATE_TOKEN
-   </td>
+    <td>GITLAB_API_TOKEN</td>
+    <td>TAP_GITLAB_PRIVATE_TOKEN</td>
   </tr>
   <tr>
-   <td>GITLAB_API_ULTIMATE_LICENSE
-   </td>
-   <td>TAP_GITLAB_ULTIMATE_LICENSE
-   </td>
+    <td>GITLAB_API_ULTIMATE_LICENSE</td>
+    <td>TAP_GITLAB_ULTIMATE_LICENSE</td>
   </tr>
   <tr>
-   <td rowspan="5" >meltanolabs
-   </td>
-   <td>GITLAB_API_GROUPS
-   </td>
-   <td>TAP_GITLAB_GROUPS
-   </td>
+    <td rowspan="5">meltanolabs</td>
+    <td>GITLAB_API_GROUPS</td>
+    <td>TAP_GITLAB_GROUPS</td>
   </tr>
   <tr>
-   <td>GITLAB_API_PROJECTS
-   </td>
-   <td>TAP_GITLAB_PROJECTS
-   </td>
+    <td>GITLAB_API_PROJECTS</td>
+    <td>TAP_GITLAB_PROJECTS</td>
   </tr>
   <tr>
-   <td>GITLAB_API_START_DATE
-   </td>
-   <td>TAP_GITLAB_START_DATE
-   </td>
+    <td>GITLAB_API_START_DATE</td>
+    <td>TAP_GITLAB_START_DATE</td>
   </tr>
   <tr>
-   <td>GITLAB_API_TOKEN
-   </td>
-   <td>TAP_GITLAB_PRIVATE_TOKEN
-   </td>
+    <td>GITLAB_API_TOKEN</td>
+    <td>TAP_GITLAB_PRIVATE_TOKEN</td>
   </tr>
   <tr>
-   <td>GITLAB_API_ULTIMATE_LICENSE
-   </td>
-   <td>TAP_GITLAB_ULTIMATE_LICENSE
-   </td>
+    <td>GITLAB_API_ULTIMATE_LICENSE</td>
+    <td>TAP_GITLAB_ULTIMATE_LICENSE</td>
   </tr>
   <tr>
-   <td rowspan="9" >tap-google-analytics
-   </td>
-   <td rowspan="9" >meltano
-   </td>
-   <td>GOOGLE_ANALYTICS_API_CLIENT_SECRETS
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_KEY_FILE_LOCATION
-   </td>
+    <td rowspan="9">tap-google-analytics</td>
+    <td rowspan="9">meltano</td>
+    <td>GOOGLE_ANALYTICS_API_CLIENT_SECRETS</td>
+    <td>TAP_GOOGLE_ANALYTICS_KEY_FILE_LOCATION</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_END_DATE
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_END_DATE
-   </td>
+    <td>GOOGLE_ANALYTICS_API_END_DATE</td>
+    <td>TAP_GOOGLE_ANALYTICS_END_DATE</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_ACCESS_TOKEN
-   </td>
+    <td>GOOGLE_ANALYTICS_API_OAUTH_ACCESS_TOKEN</td>
+    <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_ACCESS_TOKEN</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_ID
-   </td>
+    <td>GOOGLE_ANALYTICS_API_OAUTH_CLIENT_ID</td>
+    <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_ID</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_SECRET
-   </td>
+    <td>GOOGLE_ANALYTICS_API_OAUTH_CLIENT_SECRET</td>
+    <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_REFRESH_TOKEN
-   </td>
+    <td>GOOGLE_ANALYTICS_API_OAUTH_REFRESH_TOKEN</td>
+    <td>TAP_GOOGLE_ANALYTICS_OAUTH_CREDENTIALS_REFRESH_TOKEN</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_REPORTS
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_REPORTS
-   </td>
+    <td>GOOGLE_ANALYTICS_API_REPORTS</td>
+    <td>TAP_GOOGLE_ANALYTICS_REPORTS</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_START_DATE
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_START_DATE
-   </td>
+    <td>GOOGLE_ANALYTICS_API_START_DATE</td>
+    <td>TAP_GOOGLE_ANALYTICS_START_DATE</td>
   </tr>
   <tr>
-   <td>GOOGLE_ANALYTICS_API_VIEW_ID
-   </td>
-   <td>TAP_GOOGLE_ANALYTICS_VIEW_ID
-   </td>
+    <td>GOOGLE_ANALYTICS_API_VIEW_ID</td>
+    <td>TAP_GOOGLE_ANALYTICS_VIEW_ID</td>
   </tr>
   <tr>
-   <td>tap-pendo
-   </td>
-   <td>singer-io
-   </td>
-   <td>TAP_PENDO_INTEGRATION_KEY
-   </td>
-   <td>TAP_PENDO_X_PENDO_INTEGRATION_KEY
-   </td>
+    <td>tap-pendo</td>
+    <td>singer-io</td>
+    <td>TAP_PENDO_INTEGRATION_KEY</td>
+    <td>TAP_PENDO_X_PENDO_INTEGRATION_KEY</td>
   </tr>
   <tr>
-   <td rowspan="5" >tap-stripe
-   </td>
-   <td rowspan="2" >meltano
-   </td>
-   <td>STRIPE_ACCOUNT_ID
-   </td>
-   <td>TAP_STRIPE_ACCOUNT_ID
-   </td>
+    <td rowspan="5">tap-stripe</td>
+    <td rowspan="2">meltano</td>
+    <td>STRIPE_ACCOUNT_ID</td>
+    <td>TAP_STRIPE_ACCOUNT_ID</td>
   </tr>
   <tr>
-   <td>STRIPE_API_KEY
-   </td>
-   <td>TAP_STRIPE_CLIENT_SECRET
-   </td>
+    <td>STRIPE_API_KEY</td>
+    <td>TAP_STRIPE_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>prratek
-   </td>
-   <td>STRIPE_API_KEY
-   </td>
-   <td>TAP_STRIPE_API_KEY
-   </td>
+    <td>prratek</td>
+    <td>STRIPE_API_KEY</td>
+    <td>TAP_STRIPE_API_KEY</td>
   </tr>
   <tr>
-   <td rowspan="2" >singer-io
-   </td>
-   <td>STRIPE_ACCOUNT_ID
-   </td>
-   <td>TAP_STRIPE_ACCOUNT_ID
-   </td>
+    <td rowspan="2">singer-io</td>
+    <td>STRIPE_ACCOUNT_ID</td>
+    <td>TAP_STRIPE_ACCOUNT_ID</td>
   </tr>
   <tr>
-   <td>STRIPE_API_KEY
-   </td>
-   <td>TAP_STRIPE_CLIENT_SECRET
-   </td>
+    <td>STRIPE_API_KEY</td>
+    <td>TAP_STRIPE_CLIENT_SECRET</td>
   </tr>
   <tr>
-   <td>target-bigquery
-   </td>
-   <td>adswerve
-   </td>
-   <td>GOOGLE_APPLICATION_CREDENTIALS
-   </td>
-   <td>TARGET_BIGQUERY_CREDENTIALS_PATH
-   </td>
+    <td>target-bigquery</td>
+    <td>adswerve</td>
+    <td>GOOGLE_APPLICATION_CREDENTIALS</td>
+    <td>TARGET_BIGQUERY_CREDENTIALS_PATH</td>
   </tr>
   <tr>
-   <td rowspan="37" >target-postgres
-   </td>
-   <td rowspan="17" >datamill-co
-   </td>
-   <td>PG_ADDRESS
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_HOST
-   </td>
+    <td rowspan="37">target-postgres</td>
+    <td rowspan="17">datamill-co</td>
+    <td>PG_ADDRESS</td>
+    <td>TARGET_POSTGRES_POSTGRES_HOST</td>
   </tr>
   <tr>
-   <td>PG_DATABASE
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_DATABASE
-   </td>
+    <td>PG_DATABASE</td>
+    <td>TARGET_POSTGRES_POSTGRES_DATABASE</td>
   </tr>
   <tr>
-   <td>PG_PASSWORD
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_PASSWORD
-   </td>
+    <td>PG_PASSWORD</td>
+    <td>TARGET_POSTGRES_POSTGRES_PASSWORD</td>
   </tr>
   <tr>
-   <td>PG_PORT
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_PORT
-   </td>
+    <td>PG_PORT</td>
+    <td>TARGET_POSTGRES_POSTGRES_PORT</td>
   </tr>
   <tr>
-   <td>PG_SCHEMA
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SCHEMA
-   </td>
+    <td>PG_SCHEMA</td>
+    <td>TARGET_POSTGRES_POSTGRES_SCHEMA</td>
   </tr>
   <tr>
-   <td>PG_USERNAME
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_USERNAME
-   </td>
+    <td>PG_USERNAME</td>
+    <td>TARGET_POSTGRES_POSTGRES_USERNAME</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_DATABASE
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_DATABASE
-   </td>
+    <td>TARGET_POSTGRES_DATABASE</td>
+    <td>TARGET_POSTGRES_POSTGRES_DATABASE</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_HOST
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_HOST
-   </td>
+    <td>TARGET_POSTGRES_HOST</td>
+    <td>TARGET_POSTGRES_POSTGRES_HOST</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_PASSWORD
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_PASSWORD
-   </td>
+    <td>TARGET_POSTGRES_PASSWORD</td>
+    <td>TARGET_POSTGRES_POSTGRES_PASSWORD</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_PORT
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_PORT
-   </td>
+    <td>TARGET_POSTGRES_PORT</td>
+    <td>TARGET_POSTGRES_POSTGRES_PORT</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SCHEMA
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SCHEMA
-   </td>
+    <td>TARGET_POSTGRES_SCHEMA</td>
+    <td>TARGET_POSTGRES_POSTGRES_SCHEMA</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SSLCERT
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SSLCERT
-   </td>
+    <td>TARGET_POSTGRES_SSLCERT</td>
+    <td>TARGET_POSTGRES_POSTGRES_SSLCERT</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SSLCRL
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SSLCRL
-   </td>
+    <td>TARGET_POSTGRES_SSLCRL</td>
+    <td>TARGET_POSTGRES_POSTGRES_SSLCRL</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SSLKEY
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SSLKEY
-   </td>
+    <td>TARGET_POSTGRES_SSLKEY</td>
+    <td>TARGET_POSTGRES_POSTGRES_SSLKEY</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SSLMODE
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SSLMODE
-   </td>
+    <td>TARGET_POSTGRES_SSLMODE</td>
+    <td>TARGET_POSTGRES_POSTGRES_SSLMODE</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_SSLROOTCERT
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_SSLROOTCERT
-   </td>
+    <td>TARGET_POSTGRES_SSLROOTCERT</td>
+    <td>TARGET_POSTGRES_POSTGRES_SSLROOTCERT</td>
   </tr>
   <tr>
-   <td>TARGET_POSTGRES_USERNAME
-   </td>
-   <td>TARGET_POSTGRES_POSTGRES_USERNAME
-   </td>
+    <td>TARGET_POSTGRES_USERNAME</td>
+    <td>TARGET_POSTGRES_POSTGRES_USERNAME</td>
   </tr>
   <tr>
-   <td rowspan="14" >meltano
-   </td>
-   <td>PG_ADDRESS
-   </td>
-   <td>TARGET_POSTGRES_HOST
-   </td>
+    <td rowspan="14">meltano</td>
+    <td>PG_ADDRESS</td>
+    <td>TARGET_POSTGRES_HOST</td>
   </tr>
   <tr>
-   <td>PG_DATABASE
-   </td>
-   <td>TARGET_POSTGRES_DBNAME
-   </td>
+    <td>PG_DATABASE</td>
+    <td>TARGET_POSTGRES_DBNAME</td>
   </tr>
   <tr>
-   <td>PG_PASSWORD
-   </td>
-   <td>TARGET_POSTGRES_PASSWORD
-   </td>
+    <td>PG_PASSWORD</td>
+    <td>TARGET_POSTGRES_PASSWORD</td>
   </tr>
   <tr>
-   <td>PG_PORT
-   </td>
-   <td>TARGET_POSTGRES_PORT
-   </td>
+    <td>PG_PORT</td>
+    <td>TARGET_POSTGRES_PORT</td>
   </tr>
   <tr>
-   <td>PG_SCHEMA
-   </td>
-   <td>TARGET_POSTGRES_SCHEMA
-   </td>
+    <td>PG_SCHEMA</td>
+    <td>TARGET_POSTGRES_SCHEMA</td>
   </tr>
   <tr>
-   <td>PG_URL
-   </td>
-   <td>TARGET_POSTGRES_URL
-   </td>
+    <td>PG_URL</td>
+    <td>TARGET_POSTGRES_URL</td>
   </tr>
   <tr>
-   <td>PG_USERNAME
-   </td>
-   <td>TARGET_POSTGRES_USER
-   </td>
+    <td>PG_USERNAME</td>
+    <td>TARGET_POSTGRES_USER</td>
   </tr>
   <tr>
-   <td>POSTGRES_DBNAME
-   </td>
-   <td>TARGET_POSTGRES_DBNAME
-   </td>
+    <td>POSTGRES_DBNAME</td>
+    <td>TARGET_POSTGRES_DBNAME</td>
   </tr>
   <tr>
-   <td>POSTGRES_HOST
-   </td>
-   <td>TARGET_POSTGRES_HOST
-   </td>
+    <td>POSTGRES_HOST</td>
+    <td>TARGET_POSTGRES_HOST</td>
   </tr>
   <tr>
-   <td>POSTGRES_PASSWORD
-   </td>
-   <td>TARGET_POSTGRES_PASSWORD
-   </td>
+    <td>POSTGRES_PASSWORD</td>
+    <td>TARGET_POSTGRES_PASSWORD</td>
   </tr>
   <tr>
-   <td>POSTGRES_PORT
-   </td>
-   <td>TARGET_POSTGRES_PORT
-   </td>
+    <td>POSTGRES_PORT</td>
+    <td>TARGET_POSTGRES_PORT</td>
   </tr>
   <tr>
-   <td>POSTGRES_SCHEMA
-   </td>
-   <td>TARGET_POSTGRES_SCHEMA
-   </td>
+    <td>POSTGRES_SCHEMA</td>
+    <td>TARGET_POSTGRES_SCHEMA</td>
   </tr>
   <tr>
-   <td>POSTGRES_URL
-   </td>
-   <td>TARGET_POSTGRES_URL
-   </td>
+    <td>POSTGRES_URL</td>
+    <td>TARGET_POSTGRES_URL</td>
   </tr>
   <tr>
-   <td>POSTGRES_USER
-   </td>
-   <td>TARGET_POSTGRES_USER
-   </td>
+    <td>POSTGRES_USER</td>
+    <td>TARGET_POSTGRES_USER</td>
   </tr>
   <tr>
-   <td rowspan="6" >transferwise
-   </td>
-   <td>PG_ADDRESS
-   </td>
-   <td>TARGET_POSTGRES_HOST
-   </td>
+    <td rowspan="6">transferwise</td>
+    <td>PG_ADDRESS</td>
+    <td>TARGET_POSTGRES_HOST</td>
   </tr>
   <tr>
-   <td>PG_DATABASE
-   </td>
-   <td>TARGET_POSTGRES_DBNAME
-   </td>
+    <td>PG_DATABASE</td>
+    <td>TARGET_POSTGRES_DBNAME</td>
   </tr>
   <tr>
-   <td>PG_PASSWORD
-   </td>
-   <td>TARGET_POSTGRES_PASSWORD
-   </td>
+    <td>PG_PASSWORD</td>
+    <td>TARGET_POSTGRES_PASSWORD</td>
   </tr>
   <tr>
-   <td>PG_PORT
-   </td>
-   <td>TARGET_POSTGRES_PORT
-   </td>
+    <td>PG_PORT</td>
+    <td>TARGET_POSTGRES_PORT</td>
   </tr>
   <tr>
-   <td>PG_SCHEMA
-   </td>
-   <td>TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA
-   </td>
+    <td>PG_SCHEMA</td>
+    <td>TARGET_POSTGRES_DEFAULT_TARGET_SCHEMA</td>
   </tr>
   <tr>
-   <td>PG_USERNAME
-   </td>
-   <td>TARGET_POSTGRES_USER
-   </td>
+    <td>PG_USERNAME</td>
+    <td>TARGET_POSTGRES_USER</td>
   </tr>
   <tr>
-   <td rowspan="5" >target-redshift
-   </td>
-   <td rowspan="5" >transferwise
-   </td>
-   <td>AWS_ACCESS_KEY_ID
-   </td>
-   <td>TARGET_REDSHIFT_AWS_ACCESS_KEY_ID
-   </td>
+    <td rowspan="5">target-redshift</td>
+    <td rowspan="5">transferwise</td>
+    <td>AWS_ACCESS_KEY_ID</td>
+    <td>TARGET_REDSHIFT_AWS_ACCESS_KEY_ID</td>
   </tr>
   <tr>
-   <td>AWS_PROFILE
-   </td>
-   <td>TARGET_REDSHIFT_AWS_PROFILE
-   </td>
+    <td>AWS_PROFILE</td>
+    <td>TARGET_REDSHIFT_AWS_PROFILE</td>
   </tr>
   <tr>
-   <td>AWS_SECRET_ACCESS_KEY
-   </td>
-   <td>TARGET_REDSHIFT_AWS_SECRET_ACCESS_KEY
-   </td>
+    <td>AWS_SECRET_ACCESS_KEY</td>
+    <td>TARGET_REDSHIFT_AWS_SECRET_ACCESS_KEY</td>
   </tr>
   <tr>
-   <td>AWS_SESSION_TOKEN
-   </td>
-   <td>TARGET_REDSHIFT_AWS_SESSION_TOKEN
-   </td>
+    <td>AWS_SESSION_TOKEN</td>
+    <td>TARGET_REDSHIFT_AWS_SESSION_TOKEN</td>
   </tr>
   <tr>
-   <td>TARGET_REDSHIFT_SCHEMA
-   </td>
-   <td>TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA
-   </td>
+    <td>TARGET_REDSHIFT_SCHEMA</td>
+    <td>TARGET_REDSHIFT_DEFAULT_TARGET_SCHEMA</td>
   </tr>
   <tr>
-   <td rowspan="39" >target-snowflake
-   </td>
-   <td rowspan="15" >datamill-co
-   </td>
-   <td>SF_ACCOUNT
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_ACCOUNT
-   </td>
+    <td rowspan="39">target-snowflake</td>
+    <td rowspan="15">datamill-co</td>
+    <td>SF_ACCOUNT</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_ACCOUNT</td>
   </tr>
   <tr>
-   <td>SF_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_DATABASE
-   </td>
+    <td>SF_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_DATABASE</td>
   </tr>
   <tr>
-   <td>SF_PASSWORD
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_PASSWORD
-   </td>
+    <td>SF_PASSWORD</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_PASSWORD</td>
   </tr>
   <tr>
-   <td>SF_ROLE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE
-   </td>
+    <td>SF_ROLE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE</td>
   </tr>
   <tr>
-   <td>SF_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_SCHEMA
-   </td>
+    <td>SF_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_SCHEMA</td>
   </tr>
   <tr>
-   <td>SF_USER
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME
-   </td>
+    <td>SF_USER</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME</td>
   </tr>
   <tr>
-   <td>SF_WAREHOUSE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_WAREHOUSE
-   </td>
+    <td>SF_WAREHOUSE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_WAREHOUSE</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_ACCOUNT
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_ACCOUNT
-   </td>
+    <td>TARGET_SNOWFLAKE_ACCOUNT</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_ACCOUNT</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_DATABASE
-   </td>
+    <td>TARGET_SNOWFLAKE_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_DATABASE</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_PASSWORD
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_PASSWORD
-   </td>
+    <td>TARGET_SNOWFLAKE_PASSWORD</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_PASSWORD</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_ROLE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE
-   </td>
+    <td>TARGET_SNOWFLAKE_ROLE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_SCHEMA
-   </td>
+    <td>TARGET_SNOWFLAKE_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_SCHEMA</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_USERNAME
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME
-   </td>
+    <td>TARGET_SNOWFLAKE_USERNAME</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_USERNAME
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME
-   </td>
+    <td>TARGET_SNOWFLAKE_USERNAME</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_USERNAME</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_WAREHOUSE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_WAREHOUSE
-   </td>
+    <td>TARGET_SNOWFLAKE_WAREHOUSE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_WAREHOUSE</td>
   </tr>
   <tr>
-   <td rowspan="14" >meltano
-   </td>
-   <td>SF_ACCOUNT
-   </td>
-   <td>TARGET_SNOWFLAKE_ACCOUNT
-   </td>
+    <td rowspan="14">meltano</td>
+    <td>SF_ACCOUNT</td>
+    <td>TARGET_SNOWFLAKE_ACCOUNT</td>
   </tr>
   <tr>
-   <td>SF_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_DATABASE
-   </td>
+    <td>SF_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_DATABASE</td>
   </tr>
   <tr>
-   <td>SF_PASSWORD
-   </td>
-   <td>TARGET_SNOWFLAKE_PASSWORD
-   </td>
+    <td>SF_PASSWORD</td>
+    <td>TARGET_SNOWFLAKE_PASSWORD</td>
   </tr>
   <tr>
-   <td>SF_ROLE
-   </td>
-   <td>TARGET_SNOWFLAKE_ROLE
-   </td>
+    <td>SF_ROLE</td>
+    <td>TARGET_SNOWFLAKE_ROLE</td>
   </tr>
   <tr>
-   <td>SF_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_SCHEMA
-   </td>
+    <td>SF_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_SCHEMA</td>
   </tr>
   <tr>
-   <td>SF_USER
-   </td>
-   <td>TARGET_SNOWFLAKE_USERNAME
-   </td>
+    <td>SF_USER</td>
+    <td>TARGET_SNOWFLAKE_USERNAME</td>
   </tr>
   <tr>
-   <td>SF_WAREHOUSE
-   </td>
-   <td>TARGET_SNOWFLAKE_WAREHOUSE
-   </td>
+    <td>SF_WAREHOUSE</td>
+    <td>TARGET_SNOWFLAKE_WAREHOUSE</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_ACCOUNT
-   </td>
-   <td>TARGET_SNOWFLAKE_ACCOUNT
-   </td>
+    <td>SNOWFLAKE_ACCOUNT</td>
+    <td>TARGET_SNOWFLAKE_ACCOUNT</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_DATABASE
-   </td>
+    <td>SNOWFLAKE_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_DATABASE</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_PASSWORD
-   </td>
-   <td>TARGET_SNOWFLAKE_PASSWORD
-   </td>
+    <td>SNOWFLAKE_PASSWORD</td>
+    <td>TARGET_SNOWFLAKE_PASSWORD</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_ROLE
-   </td>
-   <td>TARGET_SNOWFLAKE_ROLE
-   </td>
+    <td>SNOWFLAKE_ROLE</td>
+    <td>TARGET_SNOWFLAKE_ROLE</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_SCHEMA
-   </td>
+    <td>SNOWFLAKE_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_SCHEMA</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_USERNAME
-   </td>
-   <td>TARGET_SNOWFLAKE_USERNAME
-   </td>
+    <td>SNOWFLAKE_USERNAME</td>
+    <td>TARGET_SNOWFLAKE_USERNAME</td>
   </tr>
   <tr>
-   <td>SNOWFLAKE_WAREHOUSE
-   </td>
-   <td>TARGET_SNOWFLAKE_WAREHOUSE
-   </td>
+    <td>SNOWFLAKE_WAREHOUSE</td>
+    <td>TARGET_SNOWFLAKE_WAREHOUSE</td>
   </tr>
   <tr>
-   <td rowspan="10" >transferwise
-   </td>
-   <td>SF_ACCOUNT
-   </td>
-   <td>TARGET_SNOWFLAKE_ACCOUNT
-   </td>
+    <td rowspan="10">transferwise</td>
+    <td>SF_ACCOUNT</td>
+    <td>TARGET_SNOWFLAKE_ACCOUNT</td>
   </tr>
   <tr>
-   <td>SF_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_DBNAME
-   </td>
+    <td>SF_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_DBNAME</td>
   </tr>
   <tr>
-   <td>SF_PASSWORD
-   </td>
-   <td>TARGET_SNOWFLAKE_PASSWORD
-   </td>
+    <td>SF_PASSWORD</td>
+    <td>TARGET_SNOWFLAKE_PASSWORD</td>
   </tr>
   <tr>
-   <td>SF_ROLE
-   </td>
-   <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE
-   </td>
+    <td>SF_ROLE</td>
+    <td>TARGET_SNOWFLAKE_SNOWFLAKE_ROLE</td>
   </tr>
   <tr>
-   <td>SF_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA
-   </td>
+    <td>SF_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA</td>
   </tr>
   <tr>
-   <td>SF_USER
-   </td>
-   <td>TARGET_SNOWFLAKE_USER
-   </td>
+    <td>SF_USER</td>
+    <td>TARGET_SNOWFLAKE_USER</td>
   </tr>
   <tr>
-   <td>SF_WAREHOUSE
-   </td>
-   <td>TARGET_SNOWFLAKE_WAREHOUSE
-   </td>
+    <td>SF_WAREHOUSE</td>
+    <td>TARGET_SNOWFLAKE_WAREHOUSE</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_DATABASE
-   </td>
-   <td>TARGET_SNOWFLAKE_DBNAME
-   </td>
+    <td>TARGET_SNOWFLAKE_DATABASE</td>
+    <td>TARGET_SNOWFLAKE_DBNAME</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_SCHEMA
-   </td>
-   <td>TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA
-   </td>
+    <td>TARGET_SNOWFLAKE_SCHEMA</td>
+    <td>TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA</td>
   </tr>
   <tr>
-   <td>TARGET_SNOWFLAKE_USERNAME
-   </td>
-   <td>TARGET_SNOWFLAKE_USER
-   </td>
+    <td>TARGET_SNOWFLAKE_USERNAME</td>
+    <td>TARGET_SNOWFLAKE_USER</td>
   </tr>
   <tr>
-   <td rowspan="2" >target-sqlite
-   </td>
-   <td>meltano
-   </td>
-   <td>SQLITE_DATABASE
-   </td>
-   <td>TARGET_SQLITE_DATABASE
-   </td>
+    <td rowspan="2">target-sqlite</td>
+    <td>meltano</td>
+    <td>SQLITE_DATABASE</td>
+    <td>TARGET_SQLITE_DATABASE</td>
   </tr>
   <tr>
-   <td>meltanolabs
-   </td>
-   <td>SQLITE_DATABASE
-   </td>
-   <td>TARGET_SQLITE_DATABASE
-   </td>
+    <td>meltanolabs</td>
+    <td>SQLITE_DATABASE</td>
+    <td>TARGET_SQLITE_DATABASE</td>
   </tr>
 </table>
 
