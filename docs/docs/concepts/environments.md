@@ -80,7 +80,7 @@ plugins:
 
 ## Inheritance
 
-Environments are most powerful when [inheriting](plugins#plugin-inheritance) from a base plugin definition.
+Environments are most powerful when [inheriting](/concepts/plugins/#plugin-inheritance) from a base plugin definition.
 Configuration that is set in an environment can be used to add or override configuration set in the base plugin configuration.
 This enables reuse of configuration common to multiple environments while making it easy to switch configuration for a specific environment.
 
