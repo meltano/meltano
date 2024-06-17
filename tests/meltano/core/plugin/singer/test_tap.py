@@ -216,6 +216,7 @@ class TestSingerTap:
         session,
         plugin_invoker_factory,
         subject,
+        monkeypatch,
     ):
         invoker = plugin_invoker_factory(subject)
 
@@ -264,6 +265,33 @@ class TestSingerTap:
                 await subject.discover_catalog(invoker)
 
                 assert mocked_run_discovery.called
+                assert json.loads(catalog_path.read_text()) == {"discovered": True}
+                assert not catalog_cache_key_path.exists()
+
+                # Apply catalog rules to store the cache key again
+                subject.apply_catalog_rules(invoker)
+                assert catalog_cache_key_path.exists()
+
+        monkeypatch.setitem(
+            invoker.settings_service.config_override,
+            "_use_cached_catalog",
+            False,
+        )
+
+        async with invoker.prepared(session):
+            with mock.patch.object(
+                SingerTap,
+                "run_discovery",
+                side_effect=mock_discovery,
+            ) as mocked_run_discovery:
+                assert catalog_cache_key_path.exists()
+
+                # with _use_cached_catalog = false, discovery should be invoked
+                # again even with a stored cache key.
+                mocked_run_discovery.reset_mock()
+                await subject.discover_catalog(invoker)
+
+                mocked_run_discovery.assert_called_once()
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
