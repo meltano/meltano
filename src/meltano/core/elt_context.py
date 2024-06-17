@@ -95,7 +95,7 @@ class ELTContext:  # noqa: WPS230
         only_transform: bool | None = False,
         dry_run: bool | None = False,
         full_refresh: bool | None = False,
-        catalog_refresh: bool | None = False,
+        refresh_catalog: bool | None = False,
         select_filter: list | None = None,
         catalog: str | None = None,
         state: str | None = None,
@@ -115,7 +115,7 @@ class ELTContext:  # noqa: WPS230
             only_transform: Flag. Only run transform.
             dry_run: Flag. Don't actually run.
             full_refresh: Flag. Ignore previous captured state.
-            catalog_refresh: Flag. Ignore cached catalog.
+            refresh_catalog: Flag. Ignore cached catalog.
             select_filter: Select filters to apply to extractor.
             catalog: Catalog to pass to extractor.
             state: State to pass to extractor.
@@ -134,7 +134,7 @@ class ELTContext:  # noqa: WPS230
         self.only_transform = only_transform
         self.dry_run = dry_run
         self.full_refresh = full_refresh
-        self.catalog_refresh = catalog_refresh
+        self.refresh_catalog = refresh_catalog
         self.select_filter = select_filter or []
         self.catalog = catalog
         self.state = state
@@ -223,7 +223,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._only_transform = False
         self._dry_run = False
         self._full_refresh = False
-        self._catalog_refresh = False
+        self._refresh_catalog = False
         self._select_filter = None
         self._catalog = None
         self._state = None
@@ -344,16 +344,16 @@ class ELTContextBuilder:  # noqa: WPS214
         self._full_refresh = full_refresh
         return self
 
-    def with_catalog_refresh(self, catalog_refresh: bool) -> ELTContextBuilder:
+    def with_refresh_catalog(self, refresh_catalog: bool) -> ELTContextBuilder:
         """Ignore cached catalog.
 
         Args:
-            catalog_refresh: Whether ignore cached catalog.
+            refresh_catalog: Whether ignore cached catalog.
 
         Returns:
             Updated ELTContextBuilder instance.
         """
-        self._catalog_refresh = catalog_refresh
+        self._refresh_catalog = refresh_catalog
         return self
 
     def with_merge_state(self, merge_state: bool):
@@ -518,7 +518,7 @@ class ELTContextBuilder:  # noqa: WPS214
             only_transform=self._only_transform,
             dry_run=self._dry_run,
             full_refresh=self._full_refresh,
-            catalog_refresh=self._catalog_refresh,
+            refresh_catalog=self._refresh_catalog,
             select_filter=self._select_filter,
             catalog=self._catalog,
             state=self._state,

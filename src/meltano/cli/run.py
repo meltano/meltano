@@ -62,7 +62,7 @@ class UUIDParamType(click.ParamType):
     is_flag=True,
 )
 @click.option(
-    "--catalog-refresh",
+    "--refresh-catalog",
     help="Invalidates catalog cache and forces running discovery before this run.",
     is_flag=True,
 )
@@ -106,7 +106,7 @@ async def run(
     project: Project,
     dry_run: bool,
     full_refresh: bool,
-    catalog_refresh: bool,
+    refresh_catalog: bool,
     no_state_update: bool,
     force: bool,
     state_id_suffix: str,
@@ -149,7 +149,7 @@ async def run(
             project,
             blocks,
             full_refresh=full_refresh,
-            catalog_refresh=catalog_refresh,
+            refresh_catalog=refresh_catalog,
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,

@@ -385,7 +385,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         use_catalog_cache = True
         if (
             elt_context
-            and elt_context.catalog_refresh
+            and elt_context.refresh_catalog
             or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]
         ):
             use_catalog_cache = False

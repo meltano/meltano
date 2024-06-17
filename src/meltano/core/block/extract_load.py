@@ -52,7 +52,7 @@ class ELBContext:  # noqa: WPS230
         session: Session | None = None,
         job: Job | None = None,
         full_refresh: bool | None = False,
-        catalog_refresh: bool | None = False,
+        refresh_catalog: bool | None = False,
         force: bool | None = False,
         update_state: bool | None = True,
         state_id_suffix: str | None = None,
@@ -67,7 +67,7 @@ class ELBContext:  # noqa: WPS230
             session: The session to use.
             job: The job within this context should run.
             full_refresh: Whether this is a full refresh.
-            catalog_refresh: whether cached catalog should be ignored.
+            refresh_catalog: whether cached catalog should be ignored.
             force: Whether to force the execution of the job if it is stale.
             update_state: Whether to update the state of the job.
             state_id_suffix: The state ID suffix to use.
@@ -79,7 +79,7 @@ class ELBContext:  # noqa: WPS230
         self.session = session
         self.job = job
         self.full_refresh = full_refresh
-        self.catalog_refresh = catalog_refresh
+        self.refresh_catalog = refresh_catalog
         self.force = force
         self.update_state = update_state
         self.state_id_suffix = state_id_suffix
@@ -123,7 +123,7 @@ class ELBContextBuilder:  # noqa: WPS214
 
         self._job = None
         self._full_refresh = False
-        self._catalog_refresh = False
+        self._refresh_catalog = False
         self._state_update = True
         self._force = False
         self._state_id_suffix = None
@@ -171,16 +171,16 @@ class ELBContextBuilder:  # noqa: WPS214
         self._full_refresh = full_refresh
         return self
 
-    def with_catalog_refresh(self, catalog_refresh: bool):
+    def with_refresh_catalog(self, refresh_catalog: bool):
         """Set whether cached catalog should be ignored.
 
         Args:
-            catalog_refresh : whether cached catalog should be ignored.
+            refresh_catalog : whether cached catalog should be ignored.
 
         Returns:
             self
         """
-        self._catalog_refresh = catalog_refresh
+        self._refresh_catalog = refresh_catalog
         return self
 
     def with_no_state_update(self, no_state_update: bool):
@@ -325,7 +325,7 @@ class ELBContextBuilder:  # noqa: WPS214
             session=self.session,
             job=self._job,
             full_refresh=self._full_refresh,
-            catalog_refresh=self._catalog_refresh,
+            refresh_catalog=self._refresh_catalog,
             force=self._force,
             update_state=self._state_update,
             state_id_suffix=self._state_id_suffix,

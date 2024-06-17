@@ -58,7 +58,7 @@ def selection_mark(selection):
     help="Show all the tap attributes with their selected status.",
 )
 @click.option(
-    "--catalog-refresh",
+    "--refresh-catalog",
     is_flag=True,
     help="Invalidate the catalog cache and refresh the catalog.",
 )
@@ -94,7 +94,7 @@ async def select(
                 project,
                 extractor,
                 show_all=flags["all"],
-                refresh=flags["catalog_refresh"],
+                refresh=flags["refresh_catalog"],
             )
         else:
             update(

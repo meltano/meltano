@@ -971,7 +971,7 @@ meltano --environment=<ENVIRONMENT> run tap-gitlab target-postgres
 meltano run tap-gitlab one-mapping another-mapping target-postgres
 meltano run tap-gitlab target-postgres simple-job
 meltano run --state-id-suffix=<STATE_ID_SUFFIX> tap-gitlab target-postgres
-meltano run --catalog-refresh tap-salesforce target-postgres
+meltano run --refresh-catalog tap-salesforce target-postgres
 ```
 
 #### Parameters
@@ -986,7 +986,7 @@ meltano run --catalog-refresh tap-salesforce target-postgres
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
-- `--catalog-refresh` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
 
 Examples:
 
