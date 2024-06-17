@@ -181,6 +181,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_CLOUDWATCH_AWS_REGION_NAME": "us-west-2",
           "TAP_CLOUDWATCH_BATCH_INCREMENT_S": "3600",
           "TAP_CLOUDWATCH_LOG_GROUP_NAME": "API-Gateway-Execution-Logs_i32s35df22/prod",
@@ -190,7 +191,8 @@
           "TAP_CLOUDWATCH__METADATA": "{}",
           "TAP_CLOUDWATCH__SCHEMA": "{}",
           "TAP_CLOUDWATCH__SELECT": "[\"*.*\"]",
-          "TAP_CLOUDWATCH__SELECT_FILTER": "[]"
+          "TAP_CLOUDWATCH__SELECT_FILTER": "[]",
+          "TAP_CLOUDWATCH__USE_CACHED_CATALOG": "true"
         },
         "executable": "tap-cloudwatch",
         "label": "Cloudwatch",
@@ -358,11 +360,13 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"plugins.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_MELTANOHUB__LOAD_SCHEMA": "tap_meltanohub",
           "TAP_MELTANOHUB__METADATA": "{}",
           "TAP_MELTANOHUB__SCHEMA": "{}",
           "TAP_MELTANOHUB__SELECT": "[\"plugins.*\"]",
-          "TAP_MELTANOHUB__SELECT_FILTER": "[]"
+          "TAP_MELTANOHUB__SELECT_FILTER": "[]",
+          "TAP_MELTANOHUB__USE_CACHED_CATALOG": "true"
         },
         "label": "Meltanohub",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/meltanohub.png",
@@ -462,12 +466,14 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SPREADSHEETS_ANYWHERE_TABLES": "[{\"path\": \"https://ip-ranges.amazonaws.com\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"ip_prefix\"], \"name\": \"aws_ips\", \"pattern\": \"ip-ranges.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://www.gstatic.com/ipranges\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"gcp_ips\", \"pattern\": \"cloud.json\", \"json_path\": \"prefixes\"}, {\"path\": \"https://download.microsoft.com/download/7/1/D/71D86715-5596-4529-9B13-DA13A5DE5B63\", \"format\": \"json\", \"start_date\": \"2020-01-01T00:00:00Z\", \"key_properties\": [\"id\"], \"name\": \"azure_ips\", \"pattern\": \"ServiceTags_Public_20230116.json\", \"json_path\": \"values\"}]",
           "TAP_SPREADSHEETS_ANYWHERE__LOAD_SCHEMA": "tap_spreadsheets_anywhere",
           "TAP_SPREADSHEETS_ANYWHERE__METADATA": "{}",
           "TAP_SPREADSHEETS_ANYWHERE__SCHEMA": "{}",
           "TAP_SPREADSHEETS_ANYWHERE__SELECT": "[\"*.*\"]",
-          "TAP_SPREADSHEETS_ANYWHERE__SELECT_FILTER": "[]"
+          "TAP_SPREADSHEETS_ANYWHERE__SELECT_FILTER": "[]",
+          "TAP_SPREADSHEETS_ANYWHERE__USE_CACHED_CATALOG": "true"
         },
         "label": "Spreadsheets Anywhere",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/spreadsheets-anywhere.png",
@@ -524,6 +530,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"users.*\", \"channels.*\", \"messages.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_CHANNEL_TYPES": "[\"private_channel\"]",
           "TAP_SLACK_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
@@ -533,7 +540,8 @@
           "TAP_SLACK__METADATA": "{}",
           "TAP_SLACK__SCHEMA": "{}",
           "TAP_SLACK__SELECT": "[\"users.*\", \"channels.*\", \"messages.*\"]",
-          "TAP_SLACK__SELECT_FILTER": "[]"
+          "TAP_SLACK__SELECT_FILTER": "[]",
+          "TAP_SLACK__USE_CACHED_CATALOG": "true"
         },
         "label": "Slack",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/slack.png",
@@ -693,6 +701,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_CHANNEL_TYPES": "[\"public_channel\"]",
           "TAP_SLACK_PUBLIC_AUTO_JOIN_CHANNELS": "false",
@@ -705,6 +714,7 @@
           "TAP_SLACK_PUBLIC__SCHEMA": "{}",
           "TAP_SLACK_PUBLIC__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
           "TAP_SLACK_PUBLIC__SELECT_FILTER": "[]",
+          "TAP_SLACK_PUBLIC__USE_CACHED_CATALOG": "true",
           "TAP_SLACK_SELECTED_CHANNELS": "[]",
           "TAP_SLACK_START_DATE": "2021-01-01",
           "TAP_SLACK_THREAD_LOOKBACK_DAYS": "7",
@@ -712,7 +722,8 @@
           "TAP_SLACK__METADATA": "{}",
           "TAP_SLACK__SCHEMA": "{}",
           "TAP_SLACK__SELECT": "[\"channels.*\", \"messages.*\", \"threads.*\"]",
-          "TAP_SLACK__SELECT_FILTER": "[]"
+          "TAP_SLACK__SELECT_FILTER": "[]",
+          "TAP_SLACK__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-slack",
         "name": "tap-slack-public",
@@ -747,6 +758,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GOOGLE_ANALYTICS_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
           "TAP_GOOGLE_ANALYTICS_START_DATE": "2022-02-20",
           "TAP_GOOGLE_ANALYTICS_VIEW_ID": "188392047",
@@ -754,7 +766,8 @@
           "TAP_GOOGLE_ANALYTICS__METADATA": "{}",
           "TAP_GOOGLE_ANALYTICS__SCHEMA": "{}",
           "TAP_GOOGLE_ANALYTICS__SELECT": "[\"*.*\"]",
-          "TAP_GOOGLE_ANALYTICS__SELECT_FILTER": "[]"
+          "TAP_GOOGLE_ANALYTICS__SELECT_FILTER": "[]",
+          "TAP_GOOGLE_ANALYTICS__USE_CACHED_CATALOG": "true"
         },
         "label": "Google Analytics (Universal Analytics API - Deprecated)",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/google-analytics.png",
@@ -901,6 +914,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"projects.*\", \"merge_requests.*\", \"issues.*\", \"!issues.description\", \"!issues.title\", \"!merge_requests.description\", \"!merge_requests.title\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GITLAB_API_URL": "https://gitlab.com",
           "TAP_GITLAB_FETCH_MERGE_REQUEST_COMMITS": "false",
           "TAP_GITLAB_FETCH_PIPELINES_EXTENDED": "false",
@@ -913,7 +927,8 @@
           "TAP_GITLAB__METADATA": "{}",
           "TAP_GITLAB__SCHEMA": "{}",
           "TAP_GITLAB__SELECT": "[\"projects.*\", \"merge_requests.*\", \"issues.*\", \"!issues.description\", \"!issues.title\", \"!merge_requests.description\", \"!merge_requests.title\"]",
-          "TAP_GITLAB__SELECT_FILTER": "[]"
+          "TAP_GITLAB__SELECT_FILTER": "[]",
+          "TAP_GITLAB__USE_CACHED_CATALOG": "true"
         },
         "label": "GitLab",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/gitlab.png",
@@ -1023,12 +1038,14 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*.*\", \"!traffic_*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GITHUB_START_DATE": "2020-01-01",
           "TAP_GITHUB__LOAD_SCHEMA": "tap_github",
           "TAP_GITHUB__METADATA": "{}",
           "TAP_GITHUB__SCHEMA": "{}",
           "TAP_GITHUB__SELECT": "[\"*.*\", \"!traffic_*.*\"]",
-          "TAP_GITHUB__SELECT_FILTER": "[]"
+          "TAP_GITHUB__SELECT_FILTER": "[]",
+          "TAP_GITHUB__USE_CACHED_CATALOG": "true"
         },
         "label": "GitHub",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
@@ -1176,6 +1193,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GITHUB_MELTANO_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
           "TAP_GITHUB_MELTANO_START_DATE": "2020-01-01",
           "TAP_GITHUB_MELTANO_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
@@ -1185,6 +1203,7 @@
           "TAP_GITHUB_MELTANO__SCHEMA": "{}",
           "TAP_GITHUB_MELTANO__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
           "TAP_GITHUB_MELTANO__SELECT_FILTER": "[]",
+          "TAP_GITHUB_MELTANO__USE_CACHED_CATALOG": "true",
           "TAP_GITHUB_ORGANIZATIONS": "[\"MeltanoLabs\", \"meltano\"]",
           "TAP_GITHUB_START_DATE": "2020-01-01",
           "TAP_GITHUB_STREAM_MAPS": "{\"issues.__filter__\": \"record['type'] = 'issue'\"}",
@@ -1193,7 +1212,8 @@
           "TAP_GITHUB__METADATA": "{}",
           "TAP_GITHUB__SCHEMA": "{}",
           "TAP_GITHUB__SELECT": "[\"repositories.*\", \"pull_requests.*\", \"issues.*\", \"!issues.body\", \"!issues.title\", \"!pull_requests.body\", \"!pull_requests.title\"]",
-          "TAP_GITHUB__SELECT_FILTER": "[]"
+          "TAP_GITHUB__SELECT_FILTER": "[]",
+          "TAP_GITHUB__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-github",
         "name": "tap-github-meltano",
@@ -1242,6 +1262,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GITHUB_METRICS_LOG_LEVEL": "DEBUG",
           "TAP_GITHUB_SEARCHES": "[{\"name\": \"tap non-forks\", \"query\": \"tap- fork:false language:Python singer in:readme\"}, {\"name\": \"target non-forks\", \"query\": \"target- fork:false language:Python singer in:readme\"}]",
           "TAP_GITHUB_SEARCH_METRICS_LOG_LEVEL": "DEBUG",
@@ -1255,6 +1276,7 @@
           "TAP_GITHUB_SEARCH__SCHEMA": "{}",
           "TAP_GITHUB_SEARCH__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
           "TAP_GITHUB_SEARCH__SELECT_FILTER": "[]",
+          "TAP_GITHUB_SEARCH__USE_CACHED_CATALOG": "true",
           "TAP_GITHUB_START_DATE": "2022-02-13",
           "TAP_GITHUB_STREAM_MAPS": "{\"repositories.__filter__\": \"('tap-' in name or 'target-' in full_name) and name != 'singer-tap-template' and name != 'singer-target-template'\\n\", \"issues.__filter__\": \"record['type'] = 'issue'\"}",
           "TAP_GITHUB_STREAM_MAPS_ISSUES___FILTER__": "record['type'] = 'issue'",
@@ -1263,7 +1285,8 @@
           "TAP_GITHUB__METADATA": "{}",
           "TAP_GITHUB__SCHEMA": "{}",
           "TAP_GITHUB__SELECT": "[\"repositories.*\", \"readme.*\", \"issues.*\", \"pull_requests.*\"]",
-          "TAP_GITHUB__SELECT_FILTER": "[]"
+          "TAP_GITHUB__SELECT_FILTER": "[]",
+          "TAP_GITHUB__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-github",
         "name": "tap-github-search",
@@ -1302,6 +1325,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "STAGING_PROD",
           "TAP_SNOWFLAKE_INSECURE_MODE": "False",
@@ -1312,7 +1336,8 @@
           "TAP_SNOWFLAKE__METADATA": "{}",
           "TAP_SNOWFLAKE__SCHEMA": "{}",
           "TAP_SNOWFLAKE__SELECT": "[\"*.*\"]",
-          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__USE_CACHED_CATALOG": "true"
         },
         "label": "Snowflake",
         "logo_url": "https://hub.meltano.com/assets/logos/extractors/snowflake.png",
@@ -1415,6 +1440,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "STAGING_PROD",
           "TAP_SNOWFLAKE_INSECURE_MODE": "False",
@@ -1431,6 +1457,7 @@
           "TAP_SNOWFLAKE_METRICS__SCHEMA": "{}",
           "TAP_SNOWFLAKE_METRICS__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
           "TAP_SNOWFLAKE_METRICS__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_METRICS__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ROLE": "STAGING",
           "TAP_SNOWFLAKE_TABLES": "STAGING_PROD.MELTANO_HUB.FACT_VARIANT_HUB_METRICS",
           "TAP_SNOWFLAKE_USER": "STAGING",
@@ -1440,7 +1467,8 @@
           "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
           "TAP_SNOWFLAKE__SCHEMA": "{}",
           "TAP_SNOWFLAKE__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
-          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-snowflake",
         "metadata": {
@@ -1489,6 +1517,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_AUDIT_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_AUDIT_DBNAME": "STAGING_PROD",
@@ -1503,6 +1532,7 @@
           "TAP_SNOWFLAKE_AUDIT__SCHEMA": "{}",
           "TAP_SNOWFLAKE_AUDIT__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
           "TAP_SNOWFLAKE_AUDIT__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_AUDIT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_DBNAME": "STAGING_PROD",
           "TAP_SNOWFLAKE_INSECURE_MODE": "False",
           "TAP_SNOWFLAKE_ROLE": "STAGING",
@@ -1514,7 +1544,8 @@
           "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
           "TAP_SNOWFLAKE__SCHEMA": "{}",
           "TAP_SNOWFLAKE__SELECT": "[\"*HUB_METRICS_AUDIT.UPDATED_DATE\", \"*HUB_METRICS_AUDIT.METRIC_TYPE\"]",
-          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-snowflake",
         "metadata": {
@@ -1546,6 +1577,7 @@
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+          "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "STAGING_PROD",
           "TAP_SNOWFLAKE_INSECURE_MODE": "False",
@@ -1563,6 +1595,7 @@
           "TAP_SNOWFLAKE_SINGER_ACTIVITY__SCHEMA": "{}",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_TABLES": "STAGING_PROD.SLACK_NOTIFICATIONS.SLACK_ALERTS",
           "TAP_SNOWFLAKE_USER": "STAGING",
           "TAP_SNOWFLAKE_WAREHOUSE": "STAGING",
@@ -1571,7 +1604,8 @@
           "TAP_SNOWFLAKE__METADATA___REPLICATION_METHOD": "FULL_TABLE",
           "TAP_SNOWFLAKE__SCHEMA": "{}",
           "TAP_SNOWFLAKE__SELECT": "[\"*SLACK_ALERTS.TITLE\", \"*SLACK_ALERTS.BODY\"]",
-          "TAP_SNOWFLAKE__SELECT_FILTER": "[]"
+          "TAP_SNOWFLAKE__SELECT_FILTER": "[]",
+          "TAP_SNOWFLAKE__USE_CACHED_CATALOG": "true"
         },
         "inherit_from": "tap-snowflake",
         "metadata": {
