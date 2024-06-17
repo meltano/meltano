@@ -256,10 +256,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.10'
+        python-version: '3.12'
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
@@ -311,10 +311,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Setup Python 3.10
+    - name: Setup Python 3.12
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.10'
+        python-version: '3.12'
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
