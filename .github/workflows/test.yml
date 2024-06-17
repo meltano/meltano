@@ -92,7 +92,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.6
+      uses: actions/checkout@v4.1.7
 
     - name: Install Poetry
       env:
@@ -247,7 +247,7 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.6
+      uses: actions/checkout@v4.1.7
 
     - name: Install Poetry
       env:
@@ -256,10 +256,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Set up Python 3.10
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.10'
+        python-version: '3.12'
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
@@ -292,7 +292,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@v4.4.1
+      uses: codecov/codecov-action@v4.5.0
 
   mypy:
     name: "Static type checking"
@@ -302,7 +302,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.6
+      uses: actions/checkout@v4.1.7
 
     - name: Install Poetry
       env:
@@ -311,10 +311,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Setup Python 3.10
+    - name: Setup Python 3.12
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: '3.10'
+        python-version: '3.12'
         architecture: x64
         # Nox uses pip, so we cache with pip
         cache: 'pip'
