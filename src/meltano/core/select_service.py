@@ -44,7 +44,7 @@ class SelectService:
         invoker = invoker_factory(self.project, self.extractor)
 
         if refresh:
-            invoker.settings_service.config_override["_no_catalog_cache"] = True
+            invoker.settings_service.config_override["_use_cached_catalog"] = False
 
         async with invoker.prepared(session):
             catalog_json = await invoker.dump("catalog")

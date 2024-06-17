@@ -274,8 +274,8 @@ class TestSingerTap:
 
         monkeypatch.setitem(
             invoker.settings_service.config_override,
-            "_no_catalog_cache",
-            True,
+            "_use_cached_catalog",
+            False,
         )
 
         async with invoker.prepared(session):
@@ -286,7 +286,7 @@ class TestSingerTap:
             ) as mocked_run_discovery:
                 assert catalog_cache_key_path.exists()
 
-                # with _no_catalog_cache = true, discovery should be invoked
+                # with _use_cached_catalog = false, discovery should be invoked
                 # again even with a stored cache key.
                 mocked_run_discovery.reset_mock()
                 await subject.discover_catalog(invoker)

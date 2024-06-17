@@ -186,7 +186,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         ),
         SettingDefinition(name="_select_filter", kind=SettingKind.ARRAY, value=[]),
         SettingDefinition(
-            name="_no_catalog_cache", kind=SettingKind.BOOLEAN, value=False
+            name="_use_cached_catalog",
+            kind=SettingKind.BOOLEAN,
+            value=True,
         ),
     ]
 
@@ -384,7 +386,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         if (
             elt_context
             and elt_context.catalog_refresh
-            or plugin_invoker.plugin_config_extras["_no_catalog_cache"]
+            or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]
         ):
             use_catalog_cache = False
 

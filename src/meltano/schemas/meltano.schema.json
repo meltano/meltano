@@ -590,10 +590,10 @@
             },
             "default": []
           },
-          "no_catalog_cache": {
+          "use_cached_catalog": {
             "type": "boolean",
-            "description": "A boolean that determines if the catalog cache should be ignored.",
-            "default": false
+            "description": "A boolean that determines if the catalog cache should be used or ignored.",
+            "default": true
           }
         }
       },
