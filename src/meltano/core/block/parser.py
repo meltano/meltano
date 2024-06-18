@@ -72,6 +72,7 @@ class BlockParser:  # noqa: D101
         project,
         blocks: list[str],
         full_refresh: bool | None = False,
+        refresh_catalog: bool | None = False,
         no_state_update: bool | None = False,
         force: bool | None = False,
         state_id_suffix: str | None = None,
@@ -87,6 +88,7 @@ class BlockParser:  # noqa: D101
             blocks: List of block names to parse.
             full_refresh: Whether to perform a full refresh (applies to all
                 found sets).
+            refresh_catalog: Whether to ignore cached catalog.
             no_state_update: Whether to run with or without state updates.
             force: Whether to force a run if a job is already running (applies
                 to all found sets).
@@ -101,6 +103,7 @@ class BlockParser:  # noqa: D101
         self.project = project
 
         self._full_refresh = full_refresh
+        self._refresh_catalog = refresh_catalog
         self._no_state_update = no_state_update
         self._force = force
         self._state_id_suffix = state_id_suffix
@@ -246,6 +249,7 @@ class BlockParser:  # noqa: D101
             ELBContextBuilder(self.project)
             .with_force(self._force)
             .with_full_refresh(self._full_refresh)
+            .with_refresh_catalog(self._refresh_catalog)
             .with_no_state_update(self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
             .with_merge_state(self._merge_state)

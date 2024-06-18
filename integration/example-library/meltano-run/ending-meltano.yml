@@ -1,4 +1,6 @@
 version: 1
+env:
+  DBT_CLEAN_PROJECT_FILES_ONLY: 'false'
 default_environment: dev
 project_id: 90f75496-2018-4b3a-97ac-9662e11c0094
 send_anonymous_usage_stats: false
@@ -11,10 +13,10 @@ plugins:
   - name: target-postgres
     variant: transferwise
     pip_url: pipelinewise-target-postgres
-  transformers:
+  utilities:
   - name: dbt-postgres
     variant: dbt-labs
-    pip_url: dbt-core~=1.3.0 dbt-postgres~=1.3.0
+    pip_url: dbt-core dbt-postgres git+https://github.com/meltano/dbt-ext.git@main
 environments:
 - name: dev
   config:
@@ -33,7 +35,7 @@ environments:
           user: postgres
           dbname: warehouse
           default_target_schema: public
-      transformers:
+      utilities:
       - name: dbt-postgres
         config:
           host: localhost

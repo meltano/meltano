@@ -63,6 +63,11 @@ class UUIDParamType(click.ParamType):
     is_flag=True,
 )
 @click.option(
+    "--refresh-catalog",
+    help="Invalidates catalog cache and forces running discovery before this run.",
+    is_flag=True,
+)
+@click.option(
     "--no-state-update",
     help="Run without state saving. Applies to all pipelines.",
     is_flag=True,
@@ -103,6 +108,7 @@ async def run(
     project: Project,
     dry_run: bool,
     full_refresh: bool,
+    refresh_catalog: bool,
     no_state_update: bool,
     force: bool,
     state_id_suffix: str,
@@ -146,6 +152,7 @@ async def run(
             project,
             blocks,
             full_refresh=full_refresh,
+            refresh_catalog=refresh_catalog,
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,

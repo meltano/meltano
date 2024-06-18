@@ -1,4 +1,6 @@
 version: 1
+env:
+  DBT_CLEAN_PROJECT_FILES_ONLY: 'false'
 default_environment: dev
 project_id: 90f75496-2018-4b3a-97ac-9662e11c0094
 send_anonymous_usage_stats: false

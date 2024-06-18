@@ -63,7 +63,7 @@ meltano run --dry-run gitlab-to-postgres
 The meltano.yml didn't include dbt, so let's install that and get it configured to use our database:
 
 ```shell
-meltano add transformer dbt-postgres
+meltano add utility dbt-postgres
 meltano --environment=dev config dbt-postgres set host localhost
 meltano --environment=dev config dbt-postgres set user postgres
 meltano --environment=dev config dbt-postgres set password postgres
@@ -75,6 +75,7 @@ meltano --environment=dev config dbt-postgres set schema analytics
 ### Prep the `dbt` transform for this demo
 
 ```shell
+meltano invoke dbt-postgres:initialize
 mkdir ./transform/models/tap_gitlab
 touch  ./transform/models/tap_gitlab/source.yml
 ```

@@ -1068,7 +1068,12 @@ def discovery():  # noqa: WPS213
                                 "kind": "object",
                                 "value": {"nested": "from_default"},
                             },
-                            {"name": "hidden", "kind": "hidden", "value": 42},
+                            {
+                                "name": "hidden",
+                                "kind": "integer",
+                                "value": 42,
+                                "hidden": True,
+                            },
                             {"name": "boolean", "kind": "boolean"},
                             {"name": "auth.username"},
                             {"name": "auth.password", "sensitive": True},

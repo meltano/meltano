@@ -59,6 +59,11 @@ def selection_mark(selection):
     help="Show all the tap attributes with their selected status.",
 )
 @click.option(
+    "--refresh-catalog",
+    is_flag=True,
+    help="Invalidate the catalog cache and refresh the catalog.",
+)
+@click.option(
     "--rm",
     "--remove",
     "remove",
@@ -88,7 +93,13 @@ async def select(
     """
     try:
         if flags["list"]:
-            await show(project, extractor, install_plugins, show_all=flags["all"])
+            await show(
+                project,
+                extractor,
+                install_plugins=install_plugins,
+                show_all=flags["all"],
+                refresh=flags["refresh_catalog"],
+            )
         else:
             update(
                 project,
@@ -115,7 +126,13 @@ def update(
     select_service.update(entities_filter, attributes_filter, exclude, remove)
 
 
-async def show(project, extractor, install_plugins: InstallPlugins, show_all=False):
+async def show(
+    project: Project,
+    extractor: str,
+    install_plugins: InstallPlugins,
+    show_all: bool = False,
+    refresh: bool = False,
+) -> None:
     """Show selected."""
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
@@ -128,7 +145,7 @@ async def show(project, extractor, install_plugins: InstallPlugins, show_all=Fal
     )
 
     with closing(Session()) as session:
-        list_all = await select_service.list_all(session)
+        list_all = await select_service.list_all(session, refresh)
 
     # legend
     click.secho("Legend:")

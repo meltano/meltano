@@ -34,14 +34,14 @@ jobs:
       pull-requests: write  # to create and update PRs
 
     steps:
-    - uses: actions/checkout@v4.1.6
+    - uses: actions/checkout@v4.1.7
       with:
         fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5.1.0
       with:
-        python-version: "3.10"
+        python-version: "3.12"
         architecture: x64
 
     - name: Bump version
