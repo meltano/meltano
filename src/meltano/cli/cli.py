@@ -17,7 +17,7 @@ from meltano import (
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
-from meltano.core.logging import LEVELS, setup_logging
+from meltano.core.logging import LEVELS, LogFormat, setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
@@ -58,6 +58,11 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 )
 @click.option("--log-level", type=click.Choice(tuple(LEVELS)))
 @click.option(
+    "--log-format",
+    type=click.Choice(tuple(LogFormat)),
+    help="A shortcut for setting the format of the log output.",
+)
+@click.option(
     "--log-config",
     type=str,
     help="Path to a python logging yaml config file.",
@@ -80,6 +85,7 @@ def cli(
     ctx: click.Context,
     *,
     log_level: str,
+    log_format: str,
     log_config: str,
     environment: str,
     no_environment: bool,
@@ -97,6 +103,9 @@ def cli(
 
     if log_config:
         ProjectSettingsService.config_override["cli.log_config"] = log_config
+
+    if log_format:
+        ProjectSettingsService.config_override["cli.log_format"] = log_format
 
     ctx.obj["explicit_no_environment"] = no_environment
     no_color = get_no_color_flag()
