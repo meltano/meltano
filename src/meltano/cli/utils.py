@@ -207,7 +207,7 @@ def _prompt_plugin_capabilities(plugin_type):
     )
 
 
-def _prompt_plugin_settings(plugin_type):
+def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
     if plugin_type not in {
         PluginType.EXTRACTORS,
         PluginType.LOADERS,
@@ -239,7 +239,7 @@ def _prompt_plugin_settings(plugin_type):
         "\nDefault: no settings\n",
     )
 
-    settings: dict | None = None
+    settings = None
     while settings is None:  # noqa:  WPS426  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
@@ -304,10 +304,12 @@ def add_plugin(  # noqa: C901
         # exclude unspecified properties
         plugin_definition.extras.clear()
 
-        plugin_attrs = plugin_definition.canonical()
+        plugin_attrs = plugin_definition.canonical()  # type: ignore[assignment]
 
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
+
+    plugin: ProjectContext | PluginRef
 
     try:
         plugin = add_service.add(
@@ -645,7 +647,9 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
         enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
-        super().invoke(ctx)
+        # Typing these mixin hierarchies is a bit messy, so we'll just ignore it here
+        # https://mypy.readthedocs.io/en/latest/more_types.html#mixin-classes
+        super().invoke(ctx)  # type: ignore
 
 
 class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup, DYMGroup):

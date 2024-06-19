@@ -23,7 +23,7 @@ from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 if t.TYPE_CHECKING:
     from collections import abc
 
-    from sqlalchemy.orm.session import sessionmaker
+    from sqlalchemy.orm.session import Session
 
     from meltano.core.project import Project
 
@@ -127,7 +127,7 @@ async def test(
 
 
 async def _run_plugin_tests(
-    session: sessionmaker,
+    session: Session,
     runners: abc.Iterable[ValidationsRunner],
 ) -> dict[str, dict[str, int]]:
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}

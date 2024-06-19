@@ -81,7 +81,7 @@ class ELOptions:
     state = click.option("--state", help="Extractor state file.")
     dump = click.option(
         "--dump",
-        type=click.Choice(DUMPABLES.keys()),
+        type=click.Choice(tuple(DUMPABLES)),
         help="Dump content of pipeline-specific generated file.",
     )
     state_id = click.option(

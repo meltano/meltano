@@ -84,7 +84,7 @@ async def select(
     entities_filter: str,
     attributes_filter: str,
     install_plugins: InstallPlugins,
-    **flags: dict[str, bool],
+    **flags: bool,
 ):
     """
     Manage extractor selection patterns.
