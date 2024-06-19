@@ -36,15 +36,14 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> t.NoReturn:
+    def main(self, *args, **kwargs) -> t.Any:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:
             args: Positional arguments for the Click group.
             kwargs: Keyword arguments for the Click group.
         """
-        # TODO: Fix "Return statement in function which does not return"?
-        return super().main(*args, windows_expand_args=False, **kwargs)  # type: ignore[misc]
+        return super().main(*args, windows_expand_args=False, **kwargs)
 
 
 @click.group(
