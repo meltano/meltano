@@ -57,7 +57,7 @@ class TestExtractorTestService:
 
     @pytest.mark.asyncio()
     async def test_validate_success(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             return_value=b"%b" % MOCK_RECORD_MESSAGE.encode(),
@@ -70,7 +70,7 @@ class TestExtractorTestService:
 
     @pytest.mark.asyncio()
     async def test_validate_success_ignore_non_json(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             side_effect=(b"Not JSON", b"%b" % MOCK_RECORD_MESSAGE.encode()),
@@ -83,7 +83,7 @@ class TestExtractorTestService:
 
     @pytest.mark.asyncio()
     async def test_validate_success_ignore_non_record_msg(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             side_effect=(
@@ -99,7 +99,7 @@ class TestExtractorTestService:
 
     @pytest.mark.asyncio()
     async def test_validate_success_stop_after_record_msg(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             side_effect=(
@@ -118,7 +118,7 @@ class TestExtractorTestService:
 
     @pytest.mark.asyncio()
     async def test_validate_failure_no_record_msg(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             return_value=(b"%b" % MOCK_STATE_MESSAGE.encode()),
@@ -130,11 +130,12 @@ class TestExtractorTestService:
         is_valid, detail = await ExtractorTestService(self.mock_invoker).validate()
 
         assert not is_valid
-        assert "No RECORD message received" in detail
+        assert detail is not None
+        assert "No RECORD or BATCH message received" in detail
 
     @pytest.mark.asyncio()
     async def test_validate_failure_subprocess_err(self):
-        self.mock_invoke.sterr.at_eof.side_effect = True
+        self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
             side_effect=(

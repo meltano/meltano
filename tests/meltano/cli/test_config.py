@@ -72,13 +72,14 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_test(self, cli_runner, tap):
+    @pytest.mark.parametrize("message_type", ("RECORD", "BATCH"))
+    def test_config_test(self, cli_runner, tap, message_type: str):
         mock_invoke = mock.Mock()
-        mock_invoke.sterr.at_eof.side_effect = True
+        mock_invoke.stderr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
         mock_invoke.wait = AsyncMock(return_value=-SIGTERM)
         mock_invoke.returncode = -SIGTERM
-        payload = json.dumps({"type": "RECORD"}).encode()
+        payload = json.dumps({"type": message_type}).encode()
         mock_invoke.stdout.readline = AsyncMock(return_value=b"%b" % payload)
 
         with mock.patch(
