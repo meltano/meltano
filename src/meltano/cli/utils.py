@@ -612,10 +612,6 @@ def enact_environment_behavior(
         activate_explicitly_provided_environment(ctx, ctx.obj["project"])
 
 
-class Invokable(t.Protocol):
-    def invoke(self, ctx: click.Context) -> None: ...
-
-
 class InstrumentedCmdMixin:
     """Shared functionality for all instrumented commands."""
 
@@ -646,7 +642,7 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
         enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
-        # Typing these mixin hierarchy is a bit messy, so we'll just ignore it here
+        # Typing these mixin hierarchies is a bit messy, so we'll just ignore it here
         # https://mypy.readthedocs.io/en/latest/more_types.html#mixin-classes
         super().invoke(ctx)  # type: ignore
 
