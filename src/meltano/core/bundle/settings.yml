@@ -93,6 +93,20 @@ settings:
   env_specific: true
 - name: cli.log_config
   value: logging.yaml
+- name: cli.log_format
+  kind: options
+  options:
+  - label: Colored
+    value: colored
+  - label: Uncolored
+    value: uncolored
+  - label: JSON
+    value: json
+  - label: Key-Value
+    value: key_value
+  - label: Plain
+    value: plain
+  value: colored
 
 # Snowplow Tracking
 - name: snowplow.collector_endpoints

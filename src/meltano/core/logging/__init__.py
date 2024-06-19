@@ -14,13 +14,21 @@ from .job_logging_service import (
     SizeThresholdJobLogException,
 )
 from .output_logger import OutputLogger
-from .utils import DEFAULT_LEVEL, LEVELS, capture_subprocess_output, setup_logging
+from .utils import (
+    DEFAULT_LEVEL,
+    LEVELS,
+    LogFormat,
+    capture_subprocess_output,
+    setup_logging,
+)
 
 __all__ = [
     "DEFAULT_LEVEL",
     "LEVELS",
     "JobLoggingService",
+    "LogFormat",
     "MissingJobLogException",
+    "OutputLogger",
     "OutputLogger",
     "SizeThresholdJobLogException",
     "capture_subprocess_output",
