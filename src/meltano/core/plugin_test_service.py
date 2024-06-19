@@ -65,7 +65,7 @@ class PluginTestService(ABC):
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> tuple[bool, str]:
+    async def validate(self) -> tuple[bool, str | None]:  # noqa: C901
         """Validate extractor configuration.
 
         Returns:
@@ -96,7 +96,7 @@ class ExtractorTestService(PluginTestService):
             except (json.decoder.JSONDecodeError, KeyError):
                 continue
 
-            record_message_received = message_type == "RECORD"
+            record_message_received = message_type in {"RECORD", "BATCH"}
             if record_message_received:
                 process.terminate()
                 break
@@ -106,5 +106,5 @@ class ExtractorTestService(PluginTestService):
 
         return (
             record_message_received,
-            last_line if returncode else "No RECORD message received",
+            last_line if returncode else "No RECORD or BATCH message received",
         )
