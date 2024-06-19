@@ -27,6 +27,8 @@ logger = structlog.getLogger(__name__)
 class PluginCommandBlock(metaclass=ABCMeta):
     """Basic PluginCommand interface specification."""
 
+    string_id: str
+
     @property
     @abstractmethod
     def name(self) -> str:

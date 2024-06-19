@@ -500,29 +500,10 @@ warn_unused_ignores = true
 ignore_errors = true
 module = [
   "meltano.cli.add",
-  "meltano.cli.cli",
-  "meltano.cli.compile",
-  "meltano.cli.docs",
-  "meltano.cli.dragon",
-  "meltano.cli.elt",
-  "meltano.cli.environment",
-  "meltano.cli.hub",
-  "meltano.cli.initialize",
   "meltano.cli.install",
   "meltano.cli.interactive.*",
   "meltano.cli.invoke",
-  "meltano.cli.job",
-  "meltano.cli.lock",
-  "meltano.cli.params",
-  "meltano.cli.remove",
-  "meltano.cli.run",
-  "meltano.cli.schedule",
-  "meltano.cli.schema",
-  "meltano.cli.select",
   "meltano.cli.state",
-  "meltano.cli.upgrade",
-  "meltano.cli.utils",
-  "meltano.cli.validate",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
   "meltano.core.elt_context",
@@ -562,6 +543,13 @@ module = [
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
+]
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+  "click_default_group.*",  # https://github.com/click-contrib/click-default-group/issues/26
+  "click_didyoumean.*",     # Unreleased, https://github.com/click-contrib/click-didyoumean/commit/048b275077382e5a80bdf05b02830013eb37ddd1
 ]
 
 [build-system]

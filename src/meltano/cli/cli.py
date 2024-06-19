@@ -36,7 +36,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> t.NoReturn:
+    def main(self, *args, **kwargs) -> t.Any:
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:
@@ -56,7 +56,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     # NOTE: This CLI option normalization applies to all subcommands.
     context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
-@click.option("--log-level", type=click.Choice(LEVELS.keys()))
+@click.option("--log-level", type=click.Choice(tuple(LEVELS)))
 @click.option(
     "--log-config",
     type=str,

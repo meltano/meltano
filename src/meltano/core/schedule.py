@@ -27,6 +27,15 @@ CRON_INTERVALS: dict[str, str | None] = {
 class Schedule(NameEq, Canonical):  # noqa: WPS230
     """A schedule is an elt command or a job configured to run at a certain interval."""
 
+    name: str
+    extractor: str | None
+    loader: str | None
+    transform: str | None
+    interval: str | None
+    start_date: datetime.datetime | None
+    job: str | None
+    env: dict[str, str]
+
     def __init__(
         self,
         *,
