@@ -44,6 +44,7 @@ python_versions = ("3.8", "3.9", "3.10", "3.11", "3.12")
 main_python_version = "3.12"
 pytest_deps = (
     "backoff",
+    "backports.zoneinfo; python_version<='3.8'",
     "colorama",  # colored output in Windows
     "mock",
     "moto",

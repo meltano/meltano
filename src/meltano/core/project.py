@@ -322,7 +322,7 @@ class Project(Versioned):
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
-    def meltano_update(self):  # noqa: ANN201
+    def meltano_update(self) -> t.Generator[MeltanoFileTypeHint, None, None]:
         """Yield the current meltano configuration.
 
         Update the meltanofile if the context ends gracefully.

@@ -301,7 +301,7 @@ class Job(SystemModel):
         self.ended_at = datetime.now(timezone.utc)
         self.transit(State.FAIL)
         if error:
-            self.payload.update({"error": str(error)})
+            self.payload["error"] = str(error)
 
     def success(self) -> None:
         """Mark the job as having succeeded."""

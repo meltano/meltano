@@ -184,7 +184,7 @@ class ProjectFiles:
             )
             raise Exception("Duplicate plugin name found.")  # noqa: EM101
 
-        self._plugin_file_map.update({key: str(include_path)})
+        self._plugin_file_map[key] = str(include_path)
 
     def _index_file(
         self,

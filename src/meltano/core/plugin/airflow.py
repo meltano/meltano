@@ -86,7 +86,7 @@ class Airflow(BasePlugin):
 
         config = invoker.plugin_config_processed
         for section, section_config in config.items():
-            airflow_cfg[section].update(section_config)
+            airflow_cfg[section] |= section_config
             logger.debug(f"\tUpdated section [{section}] with {section_config}")  # noqa: G004
 
         with airflow_cfg_path.open("w") as airflow_cfg_file_to_write:

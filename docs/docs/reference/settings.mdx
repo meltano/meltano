@@ -555,6 +555,41 @@ meltano --log-level=debug ...
   </TabItem>
 </Tabs>
 
+### `cli.log_format`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_FORMAT`.
+- `meltano` CLI option: `--log-format`
+- Options: `colored`, `uncolored`, `json`, `key_value`
+- Default: `colored`
+
+A shortcut for setting the format of the log output. Ignored if a local logging config is found.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set cli log_format json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_CLI_LOG_FORMAT=json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="command" label="command" default>
+
+```bash
+meltano --log-format=json ...
+```
+
+  </TabItem>
+</Tabs>
+
 ### `cli.log_config`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_CONFIG`.

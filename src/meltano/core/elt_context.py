@@ -481,7 +481,7 @@ class ELTContextBuilder:
                 config=config,
             )
 
-            env.update(extractor.env)
+            env |= extractor.env
 
         loader = None
         if self._loader:
@@ -490,7 +490,7 @@ class ELTContextBuilder:
                 env=env.copy(),
             )
 
-            env.update(loader.env)
+            env |= loader.env
 
         transform = None
         if self._transform:
@@ -499,7 +499,7 @@ class ELTContextBuilder:
                 env=env.copy(),
             )
 
-            env.update(transform.env)
+            env |= transform.env
 
         transformer = None
         if self._transformer:
