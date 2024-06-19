@@ -417,7 +417,14 @@ def test(ctx):
 
     if not is_valid:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError("\n".join(("Plugin configuration is invalid", detail)))
+        raise CliError(
+            "\n".join(
+                (
+                    "Plugin configuration is invalid",
+                    detail or "Plugin did not emit any output",
+                )
+            )
+        )
 
     click.secho("Plugin configuration is valid", fg="green")
     tracker.track_command_event(CliEvent.completed)
