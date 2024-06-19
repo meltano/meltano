@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-import os
 import platform
 import re
-import shutil
 import subprocess
 import typing as t
 from pathlib import Path
@@ -23,6 +21,7 @@ from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
+from meltano.core.project_init_service import ProjectInitService
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -32,16 +31,15 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 class TestCli:
     @pytest.fixture()
-    def test_cli_project(self, tmp_path: Path, project_init_service):
+    def cli_project(self, tmp_path: Path):
         """Return the non-activated project."""
-        os.chdir(tmp_path)
+        project_init_service = ProjectInitService(tmp_path)
         project = project_init_service.init(activate=False)
         Project._default = None
         try:
             yield project
         finally:
             Project.deactivate()
-            shutil.rmtree(project.root)
 
     @pytest.fixture()
     def deactivate_project(self) -> None:
@@ -60,8 +58,8 @@ class TestCli:
             Project.deactivate()
 
     @pytest.mark.order(0)
-    def test_activate_project(self, test_cli_project, cli_runner, pushd) -> None:
-        project = test_cli_project
+    def test_activate_project(self, cli_project, cli_runner, pushd) -> None:
+        project = cli_project
 
         pushd(project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
@@ -79,38 +77,38 @@ class TestCli:
     @pytest.mark.order(2)
     def test_activate_project_readonly_env(
         self,
-        test_cli_project,
+        cli_project,
         cli_runner,
         pushd,
         monkeypatch,
     ) -> None:
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
         assert Project._default is None
-        pushd(test_cli_project.root)
+        pushd(cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
         assert Project._default.readonly
 
     @pytest.mark.order(2)
     def test_activate_project_readonly_dotenv(
         self,
-        test_cli_project,
+        cli_project,
         cli_runner,
         pushd,
     ) -> None:
-        test_cli_project.settings.set("project_readonly", value=True)
+        cli_project.settings.set("project_readonly", value=True)
         assert Project._default is None
-        pushd(test_cli_project.root)
+        pushd(cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
         assert Project._default.readonly
 
     def test_environment_precedence(
         self,
-        project: Project,
+        cli_project: Project,
         pushd,
         cli_runner: MeltanoCliRunner,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        pushd(project.root)
+        pushd(cli_project.root)
         monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
         environment_names = {
             name: f"env_set_from_{name}" for name in ("dotenv", "cli_option", "env_var")
@@ -255,10 +253,10 @@ class TestCli:
     def test_cwd_option(
         self,
         cli_runner,
-        test_cli_project,
+        cli_project,
         tmp_path: Path,
     ) -> t.NoReturn:
-        project = test_cli_project
+        project = cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
             assert Path().resolve() == project.root_dir()
@@ -327,6 +325,93 @@ class TestCli:
                 cwd=tmp_path,
             ).stderr
         )
+
+    def test_cli_log_level_option(
+        self,
+        cli_runner: MeltanoCliRunner,
+        cli_project: Project,
+        pushd,
+    ) -> None:
+        pushd(cli_project.root)
+        log_level = "warning"
+
+        # Mock ProjectSettingsService.config_override to avoid side effects
+        with mock.patch(
+            "meltano.core.project.ProjectSettingsService.config_override",
+            new_callable=mock.PropertyMock,
+            return_value={},
+        ):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "--log-level",
+                    log_level,
+                    "hub",
+                    "ping",
+                ],
+            )
+            assert result.exit_code == 0, result.exception
+
+            settings = Project._default.settings
+            assert settings.config_override["cli.log_level"] == log_level
+
+    def test_cli_log_config_option(
+        self,
+        cli_runner: MeltanoCliRunner,
+        cli_project: Project,
+        pushd,
+    ) -> None:
+        pushd(cli_project.root)
+        filepath = cli_project.root / "path/to/logging.yml"
+
+        # Mock ProjectSettingsService.config_override to avoid side effects
+        with mock.patch(
+            "meltano.core.project.ProjectSettingsService.config_override",
+            new_callable=mock.PropertyMock,
+            return_value={},
+        ):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "--log-config",
+                    str(filepath),
+                    "hub",
+                    "ping",
+                ],
+            )
+            assert result.exit_code == 0, result.exception
+
+            settings = Project._default.settings
+            assert settings.config_override["cli.log_config"] == str(filepath)
+
+    def test_cli_log_format_option(
+        self,
+        cli_runner: MeltanoCliRunner,
+        cli_project: Project,
+        pushd,
+    ) -> None:
+        pushd(cli_project.root)
+        log_format = "json"
+
+        # Mock ProjectSettingsService.config_override to avoid side effects
+        with mock.patch(
+            "meltano.core.project.ProjectSettingsService.config_override",
+            new_callable=mock.PropertyMock,
+            return_value={},
+        ):
+            result = cli_runner.invoke(
+                cli,
+                [
+                    "--log-format",
+                    log_format,
+                    "hub",
+                    "ping",
+                ],
+            )
+            assert result.exit_code == 0, result.exception
+
+            settings = Project._default.settings
+            assert settings.config_override["cli.log_format"] == log_format
 
 
 def _get_dummy_logging_config(*, colors=True):

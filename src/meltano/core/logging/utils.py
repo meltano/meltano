@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import enum
 import logging
 import os
 import typing as t
@@ -34,6 +35,24 @@ FORMAT = (
 )
 
 
+# TODO: Use StrEnum on Python 3.9+
+class LogFormat(str, enum.Enum):
+    """Log format options."""
+
+    colored = "colored"
+    uncolored = "uncolored"
+    json = "json"
+    key_value = "key_value"
+
+    def __repr__(self) -> str:
+        """Return the repr() of the enum member.
+
+        Returns:
+            Value of the enum as a string.
+        """
+        return self.value
+
+
 def parse_log_level(log_level: str) -> int:
     """Parse a level descriptor into an logging level.
 
@@ -62,40 +81,76 @@ def read_config(config_file: os.PathLike | None = None) -> dict | None:
         return None
 
 
-def default_config(log_level: str) -> dict:
+def default_config(
+    log_level: str,
+    *,
+    log_format: LogFormat = LogFormat.colored,
+) -> dict:
     """Generate a default logging config.
 
     Args:
         log_level: set log levels to provided level.
+        log_format: set log format to provided format.
 
     Returns:
          A logging config suitable for use with `logging.config.dictConfig`.
     """
-    no_color = get_no_color_flag()
+    if log_format == LogFormat.colored:
+        no_color = get_no_color_flag()
 
-    if no_color:
-        formatter = rich_exception_formatter_factory(no_color=True)
+        if no_color:
+            formatter = rich_exception_formatter_factory(no_color=True)
+        else:
+            formatter = rich_exception_formatter_factory(color_system="truecolor")
+        formatter_config = {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(
+                colors=not no_color,
+                exception_formatter=formatter,
+            ),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        }
+
+    elif log_format == LogFormat.json:
+        formatter_config = {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        }
+    elif log_format == LogFormat.key_value:
+        formatter_config = {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(
+                key_order=["timestamp", "level", "event", "logger"]
+            ),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        }
+    elif log_format == LogFormat.uncolored:
+        formatter_config = {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(
+                colors=False,
+                exception_formatter=rich_exception_formatter_factory(no_color=True),
+            ),
+            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+        }
     else:
-        formatter = rich_exception_formatter_factory(color_system="truecolor")
+        formatter_config = {
+            "()": logging.Formatter,
+            "fmt": FORMAT,
+        }
 
     return {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "colored": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.dev.ConsoleRenderer(
-                    colors=not no_color,
-                    exception_formatter=formatter,
-                ),
-                "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
-            },
+            log_format: formatter_config,
         },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
                 "level": log_level.upper(),
-                "formatter": "colored",
+                "formatter": log_format,
                 "stream": "ext://sys.stderr",
             },
         },
@@ -127,6 +182,7 @@ def setup_logging(
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: os.PathLike | None = None,
+    log_format: LogFormat = LogFormat.colored,
 ) -> None:
     """Configure logging for a meltano project.
 
@@ -134,15 +190,17 @@ def setup_logging(
         project: the meltano project
         log_level: set log levels to provided level.
         log_config: a logging config suitable for use with `logging.config.dictConfig`.
+        log_format: set log format to provided format.
     """
     logging.basicConfig(force=True)
     log_level = log_level.upper()
 
     if project:
         log_config = log_config or project.settings.get("cli.log_config")
-        log_level = project.settings.get("cli.log_level")
+        log_level = str(project.settings.get("cli.log_level"))
+        log_format = LogFormat(project.settings.get("cli.log_format"))
 
-    config = read_config(log_config) or default_config(log_level)
+    config = read_config(log_config) or default_config(log_level, log_format=log_format)
     logging_config.dictConfig(config)
     structlog.configure(
         processors=[
