@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -35,13 +35,13 @@ class TestJobFinder:
         is_stale,
         session,
     ):
-        started_at = datetime.utcnow()
+        started_at = datetime.now(timezone.utc)
         if started_at_hours_ago:
             started_at -= timedelta(hours=started_at_hours_ago)
 
         last_heartbeat_at = None
         if last_heartbeat_at_minutes_ago is not None:
-            last_heartbeat_at = datetime.utcnow() - timedelta(
+            last_heartbeat_at = datetime.now(timezone.utc) - timedelta(
                 minutes=last_heartbeat_at_minutes_ago,
             )
 
@@ -60,7 +60,7 @@ class TestJobFinder:
     def test_stale(self, session):
         job = Job(job_name="test")
         job.start()
-        job.last_heartbeat_at = datetime.utcnow() - timedelta(minutes=10)
+        job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
         job.save(session)
 
         assert job in JobFinder(state_id=job.job_name).stale(session)

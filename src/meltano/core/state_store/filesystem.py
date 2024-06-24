@@ -10,7 +10,7 @@ import typing as t
 from abc import abstractmethod, abstractproperty
 from base64 import b64decode, b64encode
 from contextlib import contextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import reduce
 from pathlib import Path
 from time import sleep
@@ -215,9 +215,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         lock_path = self.get_lock_path(state_id)
         try:
             with self.get_reader(lock_path) as reader:
-                locked_at = datetime.fromtimestamp(float(reader.read()))
-                if locked_at and locked_at < datetime.utcnow() - timedelta(
-                    seconds=self.lock_timeout_seconds,
+                locked_at = datetime.fromtimestamp(
+                    float(reader.read()),
+                    tz=timezone.utc,
+                )
+                if locked_at and locked_at < (
+                    datetime.now(timezone.utc)
+                    - timedelta(
+                        seconds=self.lock_timeout_seconds,
+                    )
                 ):
                     self.delete(lock_path)
                     return False
@@ -255,7 +261,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             while self.is_locked(state_id):
                 sleep(retry_seconds)
             with self.get_writer(lock_path) as writer:
-                writer.write(str(datetime.utcnow().timestamp()))
+                writer.write(str(datetime.now(timezone.utc).timestamp()))
             yield
         finally:
             self.delete(lock_path)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
 
 import mock
 import pytest
@@ -180,7 +180,7 @@ class TestScheduleService:
                 start_date=start_date,
             )
 
-        mock_date = datetime(2002, 1, 1)  # noqa: WPS432
+        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)  # noqa: WPS432
 
         # when a start_date is set, the schedule should use it
         schedule = add_elt("with_start_date", mock_date)
