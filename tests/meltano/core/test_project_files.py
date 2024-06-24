@@ -83,7 +83,14 @@ class TestProjectFiles:
                     "loader": "target-meltano-yml",
                     "transform": "skip",
                     "interval": "@daily",
-                    "start_date": datetime.datetime(2020, 8, 5, 0, 0),  # noqa: DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        5,
+                        0,
+                        0,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                 },
             ],
             "environments": [
@@ -182,7 +189,12 @@ class TestProjectFiles:
                     "extractor": "tap-meltano-yml",
                     "loader": "target-meltano-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        5,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "interval": "@daily",
                 },
                 {
@@ -190,7 +202,12 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-2-yml",
                     "loader": "target-subconfig-2-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        4,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "interval": "@daily",
                 },
                 {
@@ -198,7 +215,12 @@ class TestProjectFiles:
                     "extractor": "tap-subconfig-1-yml",
                     "loader": "target-subconfig-1-yml",
                     "transform": "skip",
-                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        6,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "interval": "@daily",
                 },
             ],
@@ -279,7 +301,12 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-meltano-yml",
                     "name": "modified-test-meltano-yml",
-                    "start_date": datetime.datetime(2020, 8, 5),  # noqa: WPS432, DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        5,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "transform": "skip",
                 },
                 {
@@ -287,7 +314,12 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-subconfig-2-yml",
                     "name": "test-subconfig-2-yml",
-                    "start_date": datetime.datetime(2020, 8, 4),  # noqa: WPS432, DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        4,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "transform": "skip",
                 },
                 {
@@ -295,7 +327,12 @@ class TestProjectFiles:
                     "interval": "@daily",
                     "loader": "target-subconfig-1-yml",
                     "name": "test-subconfig-1-yml",
-                    "start_date": datetime.datetime(2020, 8, 6),  # noqa: WPS432, DTZ001
+                    "start_date": datetime.datetime(
+                        2020,
+                        8,
+                        6,
+                        tzinfo=datetime.timezone.utc,
+                    ),
                     "transform": "skip",
                 },
             ],
@@ -355,7 +392,7 @@ class TestProjectFiles:
               extractor: tap-meltano-yml
               loader: target-meltano-yml
               transform: only  # Only update dbt models
-              start_date: 2020-08-05 00:00:00
+              start_date: 2020-08-05T00:00:00Z
               interval: '@daily' # Run daily
 
             jobs:  # My jobs
@@ -413,7 +450,7 @@ class TestProjectFiles:
               extractor: tap-subconfig-2-yml
               loader: target-subconfig-2-yml
               transform: skip
-              start_date: 2020-08-04 00:00:00
+              start_date: 2020-08-04T00:00:00Z
               interval: '@daily' # Run daily
 
             environments:
