@@ -15,7 +15,7 @@ schedules:
   extractor: tap-meltano-yml
   loader: target-meltano-yml
   transform: skip
-  start_date: 2020-08-05 00:00:00
+  start_date: 2020-08-05T00:00:00Z
   interval: '@daily' # Run daily
 
 jobs:  # My jobs

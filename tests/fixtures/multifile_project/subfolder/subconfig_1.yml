@@ -10,7 +10,7 @@ schedules:
     extractor: tap-subconfig-1-yml
     loader: target-subconfig-1-yml
     transform: skip
-    start_date: 2020-08-06 00:00:00
+    start_date: 2020-08-06T00:00:00Z
     interval: '@daily' # Run daily
 
 environments:

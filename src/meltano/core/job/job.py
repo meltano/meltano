@@ -8,7 +8,7 @@ import signal
 import typing as t
 import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from enum import IntFlag as EnumIntFlag
 
@@ -19,7 +19,13 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import GUIDType, IntFlag, IntPK, JSONEncodedDict
+from meltano.core.sqlalchemy import (
+    DateTimeUTC,
+    GUIDType,
+    IntFlag,
+    IntPK,
+    JSONEncodedDict,
+)
 
 HEARTBEATLESS_JOB_VALID_HOURS = 24
 HEARTBEAT_VALID_MINUTES = 5
@@ -106,9 +112,11 @@ class Job(SystemModel):  # noqa: WPS214
     job_name: Mapped[t.Optional[str]]  # noqa: UP007
     run_id: Mapped[GUIDType]
     _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP007
-    started_at: Mapped[t.Optional[datetime]]  # noqa: UP007
-    last_heartbeat_at: Mapped[t.Optional[datetime]]  # noqa: UP007
-    ended_at: Mapped[t.Optional[datetime]]  # noqa: UP007
+    started_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
+    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
+        DateTimeUTC,
+    )
+    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
     payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
     trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
@@ -185,7 +193,7 @@ class Job(SystemModel):  # noqa: WPS214
             timestamp = self.started_at
             valid_for = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
 
-        return datetime.utcnow() - timestamp > valid_for
+        return datetime.now(timezone.utc) - timestamp > valid_for
 
     def has_error(self):
         """Return whether a job has failed.
@@ -281,7 +289,7 @@ class Job(SystemModel):  # noqa: WPS214
 
     def start(self):
         """Mark the job has having started."""
-        self.started_at = datetime.utcnow()
+        self.started_at = datetime.now(timezone.utc)
         self.transit(State.RUNNING)
 
     def fail(self, error=None):
@@ -290,14 +298,14 @@ class Job(SystemModel):  # noqa: WPS214
         Args:
             error: the error to associate with the job's failure
         """
-        self.ended_at = datetime.utcnow()
+        self.ended_at = datetime.now(timezone.utc)
         self.transit(State.FAIL)
         if error:
             self.payload.update({"error": str(error)})
 
     def success(self):
         """Mark the job as having succeeded."""
-        self.ended_at = datetime.utcnow()
+        self.ended_at = datetime.now(timezone.utc)
         self.transit(State.SUCCESS)
 
     def fail_stale(self):
@@ -346,7 +354,7 @@ class Job(SystemModel):  # noqa: WPS214
 
     def _heartbeat(self):
         """Update last_heartbeat_at for this job in the db."""
-        self.last_heartbeat_at = datetime.utcnow()
+        self.last_heartbeat_at = datetime.now(timezone.utc)
 
     async def _heartbeater(self, session):
         """Heartbeat to the db every second.

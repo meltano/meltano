@@ -6,6 +6,7 @@ import json
 import re
 import typing as t
 from datetime import datetime as dt
+from datetime import timezone as tz
 from functools import partial, reduce
 from operator import xor
 
@@ -167,7 +168,7 @@ def copy_state(
 
     logger.info(
         f"State for {dst_state_id} was successfully copied from "  # noqa: G004
-        f"{src_state_id} at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
+        f"{src_state_id} at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
     )
 
 
@@ -197,7 +198,7 @@ def move_state(
 
     logger.info(
         f"State for {src_state_id} was successfully moved to {dst_state_id} "  # noqa: G004
-        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
     )
 
 
@@ -248,7 +249,7 @@ def merge_state(
         state_service.merge_state(from_state_id, state_id)
     logger.info(
         f"State for {state_id} was successfully "  # noqa: G004
-        f"merged at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
+        f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
     )
 
 
@@ -289,7 +290,7 @@ def set_state(
         state_service.set_state(state_id, state)
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
-        f"at {dt.utcnow():%Y-%m-%d %H:%M:%S}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
     )
 
 
