@@ -153,8 +153,8 @@ source = [
   "tests",
 ]
 omit = [
-  "src/meltano/migrations/env.py",
-  "src/meltano/cli/interactive/*",
+  "**/meltano/migrations/env.py",
+  "**/meltano/cli/interactive/*",
 ]
 
 [tool.coverage.paths]
