@@ -482,11 +482,11 @@ class SettingDefinition(NameEq, Canonical):
                 return int(value)
             if self.kind == SettingKind.OBJECT:
                 value = dict(
-                    self._parse_value(value, "object", Mapping),  # type: ignore
+                    self._parse_value(value, "object", Mapping),  # type: ignore[type-abstract]
                 )
             elif self.kind == SettingKind.ARRAY:
                 value = list(
-                    self._parse_value(value, "array", Sequence),  # type: ignore
+                    self._parse_value(value, "array", Sequence),  # type: ignore[type-abstract]
                 )
 
         if (
