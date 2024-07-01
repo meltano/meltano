@@ -35,7 +35,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
 
     if sys.version_info < (3, 10):
-        from typing import TypeAlias
+        from typing import TypeAlias  # noqa: ICN003
     else:
         from typing_extensions import TypeAlias
 
