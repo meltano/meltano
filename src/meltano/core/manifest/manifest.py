@@ -13,7 +13,7 @@ from operator import getitem
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-import flatten_dict  # type: ignore
+import flatten_dict
 import structlog
 import yaml
 
@@ -269,7 +269,7 @@ class Manifest:  # noqa: WPS214
             `NotImplemented` if the key is not "env"; `None` otherwise.
         """
         if key != "env":
-            return NotImplemented  # type: ignore
+            return NotImplemented  # type: ignore[return-value]
         data[key] = self.sanitize_env_vars(  # noqa: RET503
             {
                 **expand_env_vars(

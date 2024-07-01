@@ -17,7 +17,7 @@ from time import sleep
 from urllib.parse import urlparse
 
 import structlog
-from smart_open import open  # type: ignore
+from smart_open import open
 
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
