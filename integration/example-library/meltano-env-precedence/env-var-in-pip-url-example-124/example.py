@@ -1,4 +1,4 @@
-"""Example Python module which provides a Meltano-invocable echo command."""
+"""Example Python module which provides a Meltano-invocable echo command."""  # noqa: INP001
 
 from __future__ import annotations
 

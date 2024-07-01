@@ -8,7 +8,7 @@ python scripts/generate_docker_tags.py \
     -p 3.9 \
     -d 3.9 \
     -r docker.io
-"""
+"""  # noqa: INP001
 
 from __future__ import annotations
 
