@@ -29,12 +29,12 @@ if t.TYPE_CHECKING:
 if sys.version_info < (3, 10):
     from typing_extensions import TypeAlias
 else:
-    from typing import TypeAlias
+    from typing import TypeAlias  # noqa: ICN003
 
 if sys.version_info < (3, 12):
     from typing_extensions import override
 else:
-    from typing import override
+    from typing import override  # noqa: ICN003
 
 
 logger = structlog.stdlib.get_logger(__name__)
