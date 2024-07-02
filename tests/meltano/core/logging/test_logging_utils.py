@@ -30,4 +30,4 @@ async def test_capture_subprocess_output():
     reader = AsyncReader(input_lines)
 
     await capture_subprocess_output(reader, LineWriter())
-    assert ["LINE\n", "LINE 2\n", "�\n"] == output_lines
+    assert output_lines == ["LINE\n", "LINE 2\n", "�\n"]
