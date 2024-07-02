@@ -431,6 +431,7 @@ def install_status_update(install_state: PluginInstallState):
 async def install_plugins(
     project,
     plugins,
+    *,
     reason=PluginInstallReason.INSTALL,
     parallelism=None,
     clean=False,

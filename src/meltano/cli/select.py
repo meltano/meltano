@@ -140,7 +140,7 @@ async def show(
     await install_plugins(  # pragma: no cover
         project,
         [select_service.extractor],
-        PluginInstallReason.JIT,
+        reason=PluginInstallReason.JIT,
         skip_installed=True,
     )
 
