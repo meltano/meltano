@@ -24,7 +24,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
-from meltano.core.venv_service import UvVenvService, VenvService
+from meltano.core.venv_service import UvVenvService, VenvService, fingerprint
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -38,6 +38,7 @@ class PluginInstallReason(str, Enum):
 
     ADD = "add"
     INSTALL = "install"
+    JIT = "just-in-time"
     UPGRADE = "upgrade"
 
 
@@ -216,7 +217,7 @@ class PluginInstallService:  # noqa: WPS214
                 )
         return states, deduped_plugins
 
-    def install_all_plugins(
+    async def install_all_plugins(
         self,
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
@@ -231,21 +232,20 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return self.install_plugins(self.project.plugins.plugins(), reason=reason)
+        return await self.install_plugins(self.project.plugins.plugins(), reason=reason)
 
-    def install_plugins(
+    async def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
+        skip_installed=False,
     ) -> tuple[PluginInstallState]:
-        """
-        Install all the provided plugins.
-
-        Blocks until all plugins are installed.
+        """Install all the provided plugins.
 
         Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
+            skip_installed: Whether to skip plugins that are already installed.
 
         Returns:
             Install state of installed plugins.
@@ -253,28 +253,14 @@ class PluginInstallService:  # noqa: WPS214
         states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
         for state in states:
             self.status_cb(state)
-        states.extend(
-            asyncio.run(self.install_plugins_async(new_plugins, reason=reason)),
-        )
+
+        installing = [
+            self.install_plugin_async(plugin, reason, skip_installed)
+            for plugin in new_plugins
+        ]
+
+        states.extend(await asyncio.gather(*installing))
         return states
-
-    async def install_plugins_async(
-        self,
-        plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
-        """Install all the provided plugins.
-
-        Args:
-            plugins: ProjectPlugin instances to install.
-            reason: Plugin install reason.
-
-        Returns:
-            Install state of installed plugins.
-        """
-        return await asyncio.gather(
-            *[self.install_plugin_async(plugin, reason) for plugin in plugins],
-        )
 
     def install_plugin(
         self,
@@ -305,12 +291,14 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
+        skip_installed=False,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
+            skip_installed: Whether to skip the plugin if it is already installed.
 
         Returns:
             PluginInstallState state instance.
@@ -323,7 +311,24 @@ class PluginInstallService:  # noqa: WPS214
             ),
         )
 
-        if not plugin.is_installable() or self._is_mapping(plugin):
+        env = self.plugin_installation_env(plugin)
+        venv_service = VenvService(
+            project=self.project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.venv_name,
+        )
+
+        requires_install = (
+            fingerprint(get_pip_install_args(self.project, plugin, env))
+            != venv_service.read_fingerprint()
+        )
+
+        if (
+            (skip_installed and not requires_install)
+            or not plugin.is_installable()
+            or self._is_mapping(plugin)
+        ):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -346,7 +351,7 @@ class PluginInstallService:  # noqa: WPS214
                     reason=reason,
                     clean=self.clean,
                     force=self.force,
-                    env=self.plugin_installation_env(plugin),
+                    env=env,
                 )
                 state = PluginInstallState(
                     plugin=plugin,

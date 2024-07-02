@@ -13,6 +13,7 @@ from meltano.core.block.parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -59,7 +60,8 @@ logger = structlog.getLogger(__name__)
 )
 @click.pass_context
 @pass_project(migrate=True)
-def install(  # noqa: C901
+@run_async
+async def install(  # noqa: C901
     project: Project,
     ctx: click.Context,
     plugin_type: str,
@@ -101,7 +103,7 @@ def install(  # noqa: C901
     )
     tracker.track_command_event(CliEvent.inflight)
 
-    success = install_plugins(
+    success = await install_plugins(
         project,
         plugins,
         parallelism=parallelism,

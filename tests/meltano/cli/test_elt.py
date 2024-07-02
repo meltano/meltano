@@ -13,6 +13,7 @@ from meltano.cli.utils import CliError
 from meltano.core.job import Job, State
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
@@ -188,6 +189,14 @@ def dbt_process(process_mock_factory, dbt):
     return dbt
 
 
+@pytest.fixture(autouse=True)
+def mock_plugin_installation_env():
+    with mock.patch.object(
+        PluginInstallService, "plugin_installation_env"
+    ) as plugin_installation_env:
+        yield plugin_installation_env
+
+
 class TestWindowsELT:
     @pytest.mark.skipif(
         platform.system() != "Windows",
@@ -325,7 +334,9 @@ class TestCliEltScratchpadOne:
         with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
             SingerTap,
             "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        ), mock.patch("meltano.cli.params.install_plugins"), mock.patch(
+            "meltano.core.plugin_invoker.asyncio"
+        ) as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             monkeypatch.setenv("MELTANO_CLI_LOG_LEVEL", "debug")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 import subprocess
 import sys
@@ -135,10 +136,12 @@ class UpgradeService:  # noqa: WPS214
             click.echo("Nothing to update")
             return
 
-        success = install_plugins(
-            self.project,
-            file_plugins,
-            reason=PluginInstallReason.UPGRADE,
+        success = asyncio.run(
+            install_plugins(
+                self.project,
+                file_plugins,
+                reason=PluginInstallReason.UPGRADE,
+            )
         )
         if not success:
             raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
