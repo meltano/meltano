@@ -17,7 +17,7 @@ InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
 
 
 def _install_plugins_fn(_ctx, _param, value: bool) -> InstallPlugins:
-    return install_plugins if value else async_noop
+    return install_plugins if value else async_noop  # type: ignore[return-value]
 
 
 def database_uri_option(func):

@@ -441,7 +441,7 @@ async def _redirect_output(log, output_logger):
 
 async def _run_elt(
     tracker: Tracker,
-    log: structlog.BoundLogger,
+    log: structlog.stdlib.BoundLogger,
     context_builder: ELTContextBuilder,
     output_logger: OutputLogger,
     install_plugins: InstallPlugins,
