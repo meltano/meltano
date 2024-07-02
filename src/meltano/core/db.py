@@ -53,7 +53,7 @@ class NullConnectionStringError(MeltanoError):
         "to check for missing environment variables"
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the exception."""
         super().__init__(self.REASON, self.INSTRUCTION)
 

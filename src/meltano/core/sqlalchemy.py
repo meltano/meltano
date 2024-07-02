@@ -11,6 +11,9 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
 from typing_extensions import Annotated
 
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine.interfaces import Dialect
+
 
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
@@ -24,18 +27,18 @@ class JSONEncodedDict(TypeDecorator):
 
     def process_bind_param(  # noqa: D102
         self,
-        value,
-        dialect,  # noqa: ARG002
-    ):
+        value: t.Any,  # noqa: ANN401
+        dialect: Dialect,  # noqa: ARG002
+    ) -> str | None:
         if value is not None:
             value = json.dumps(value)
 
         return value
 
-    def process_result_value(  # noqa: D102
+    def process_result_value(  # noqa: ANN201, D102
         self,
-        value,
-        dialect,  # noqa: ARG002
+        value: str | None,
+        dialect: Dialect,  # noqa: ARG002
     ):
         if value is not None:
             value = json.loads(value)
@@ -49,9 +52,9 @@ class IntFlag(TypeDecorator):
     # force the cast to INTEGER
     def process_bind_param(  # noqa: D102
         self,
-        value,
-        dialect,  # noqa: ARG002
-    ):
+        value: t.Any,  # noqa: ANN001, ANN401
+        dialect: Dialect,  # noqa: ARG002
+    ) -> int:
         return int(value)
 
 
@@ -68,13 +71,17 @@ class GUID(TypeDecorator):
     impl = CHAR
     cache_ok = True
 
-    def load_dialect_impl(self, dialect):
+    def load_dialect_impl(self, dialect: Dialect):  # noqa: ANN201, D102
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         type_descriptor_length = 32
         return dialect.type_descriptor(CHAR(type_descriptor_length))
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(  # noqa: D102
+        self,
+        value: uuid.UUID | None,
+        dialect: Dialect,
+    ) -> str | None:  # noqa: ANN001
         if value is None:
             return value
         if dialect.name == "postgresql":
@@ -85,9 +92,9 @@ class GUID(TypeDecorator):
 
     def process_result_value(  # noqa: D102
         self,
-        value,
-        dialect,  # noqa: ARG002
-    ):
+        value: str | uuid.UUID | None,
+        dialect: Dialect,  # noqa: ARG002
+    ) -> uuid.UUID | None:
         if value is None:
             return value
         if not isinstance(value, uuid.UUID):
@@ -101,11 +108,16 @@ class DateTimeUTC(TypeDecorator):
     impl = DateTime
     cache_ok = True
 
-    def process_bind_param(self, value: datetime.datetime | None, _dialect: str):
+    def process_bind_param(
+        self,
+        value: datetime.datetime | None,
+        dialect: Dialect,  # noqa: ARG002
+    ) -> datetime.datetime | None:
         """Convert the datetime value to UTC and remove the timezone.
 
         Args:
             value: The datetime value to convert.
+            dialect: The SQLAlchemy dialect.
 
         Returns:
             The converted datetime value.
@@ -117,11 +129,16 @@ class DateTimeUTC(TypeDecorator):
             value = value.astimezone(datetime.timezone.utc)
         return value.replace(tzinfo=None)
 
-    def process_result_value(self, value: datetime.datetime | None, _dialect: str):
+    def process_result_value(
+        self,
+        value: datetime.datetime | None,
+        dialect: Dialect,  # noqa: ARG002
+    ) -> datetime.datetime | None:
         """Convert the naive datetime value to UTC.
 
         Args:
             value: The datetime value to convert.
+            dialect: The SQLAlchemy dialect.
 
         Returns:
             The converted datetime value.

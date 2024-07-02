@@ -21,6 +21,8 @@ from meltano.core.state_store import state_store_manager_from_project_settings
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.core.state_store.base import StateStoreManager
+
 logger = structlog.getLogger(__name__)
 
 
@@ -43,9 +45,9 @@ class StateService:  # noqa: WPS214
         """
         self.project = project or Project.find()
         self.session = session
-        self._state_store_manager = None
+        self._state_store_manager: StateStoreManager | None = None
 
-    def list_state(self, state_id_pattern: str | None = None):
+    def list_state(self, state_id_pattern: str | None = None) -> dict[str, t.Any]:
         """List all state found in the db.
 
         Args:
@@ -84,7 +86,7 @@ class StateService:  # noqa: WPS214
         raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 
     @property
-    def state_store_manager(self):
+    def state_store_manager(self) -> StateStoreManager:
         """Initialize and return the correct StateStoreManager.
 
         Returns:
@@ -98,7 +100,7 @@ class StateService:  # noqa: WPS214
         return self._state_store_manager
 
     @staticmethod
-    def validate_state(state: dict[str, t.Any]):
+    def validate_state(state: dict[str, t.Any]) -> None:
         """Check that the given state str is valid.
 
         Args:
@@ -117,8 +119,8 @@ class StateService:  # noqa: WPS214
         job: Job | str,
         new_state: str,
         payload_flags: Payload = Payload.STATE,
-        validate=True,
-    ):
+        validate: bool = True,
+    ) -> None:
         """Add state for the given Job.
 
         Args:
@@ -149,7 +151,7 @@ class StateService:  # noqa: WPS214
         )
         self.state_store_manager.set(job_state)
 
-    def get_state(self, state_id: str):
+    def get_state(self, state_id: str) -> t.Any:  # noqa: ANN401
         """Get state for the given state_id.
 
         Args:
@@ -162,7 +164,7 @@ class StateService:  # noqa: WPS214
             return json.loads(state.json_merged())
         return {}
 
-    def set_state(self, state_id: str, new_state: str, validate: bool = True):
+    def set_state(self, state_id: str, new_state: str, validate: bool = True) -> None:
         """Set the state for the state_id.
 
         Args:
@@ -177,7 +179,7 @@ class StateService:  # noqa: WPS214
             validate=validate,
         )
 
-    def clear_state(self, state_id, save: bool = True):  # noqa: ARG002
+    def clear_state(self, state_id: str, save: bool = True) -> None:  # noqa: ARG002
         """Clear the state for the state_id.
 
         Args:
@@ -186,7 +188,7 @@ class StateService:  # noqa: WPS214
         """
         self.state_store_manager.clear(state_id)
 
-    def merge_state(self, state_id_src: str, state_id_dst: str):
+    def merge_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Merge state from state_id_src into state_id_dst.
 
         Args:
@@ -199,7 +201,7 @@ class StateService:  # noqa: WPS214
             payload_flags=Payload.INCOMPLETE_STATE,
         )
 
-    def copy_state(self, state_id_src: str, state_id_dst: str):
+    def copy_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Copy state from Job state_id_src onto Job state_id_dst.
 
         Args:
@@ -208,7 +210,7 @@ class StateService:  # noqa: WPS214
         """
         self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
 
-    def move_state(self, state_id_src: str, state_id_dst: str):
+    def move_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Move state from Job state_id_src to Job state_id_dst.
 
         Args:

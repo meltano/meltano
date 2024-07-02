@@ -31,7 +31,7 @@ logger = structlog.getLogger(__name__)
 TEST_LINE_LENGTH = 60
 
 
-def write_sep_line(title: str, sepchar: str, **kwargs):
+def write_sep_line(title: str, sepchar: str, **kwargs) -> None:  # noqa: ANN003
     """Write a separator line in the terminal."""
     terminal_width, _ = shutil.get_terminal_size()
     char_count = (
@@ -88,7 +88,7 @@ def test(
     project: Project,
     all_tests: bool,
     plugin_tests: tuple[str, ...] = (),
-):
+) -> None:
     """
     Run validations using plugins' tests.
 
@@ -122,7 +122,7 @@ async def _run_plugin_tests(
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: dict[str, dict[str, int]]):
+def _report_and_exit(results: dict[str, dict[str, int]]) -> None:
     exit_code = 0
     failed_count = 0
     passed_count = 0

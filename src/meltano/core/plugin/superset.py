@@ -21,7 +21,7 @@ logger = structlog.getLogger(__name__)
 class SupersetInvoker(PluginInvoker):
     """Invoker that prepares env for Superset."""
 
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Environment variables for Superset.
 
         Returns:
@@ -46,7 +46,7 @@ class Superset(BasePlugin):
     EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return the configuration files required by the plugin.
 
         Returns:
@@ -58,8 +58,8 @@ class Superset(BasePlugin):
     async def before_configure(
         self,
         invoker: SupersetInvoker,
-        session,  # noqa: ARG002
-    ):  # noqa: WPS217
+        session,  # noqa: ANN001, ARG002
+    ) -> None:  # noqa: WPS217
         """Write plugin configuration to superset_config.py.
 
         Args:
@@ -112,7 +112,7 @@ class Superset(BasePlugin):
         self,
         invoker: PluginInvoker,
         exec_args: list[str],  # noqa: ARG002
-    ):
+    ) -> None:
         """Create or upgrade metadata database.
 
         Args:
@@ -146,7 +146,7 @@ class Superset(BasePlugin):
         self,
         invoker: PluginInvoker,
         exec_args: list[str],  # noqa: ARG002
-    ):
+    ) -> None:
         """Create default roles and permissions.
 
         Args:
@@ -175,7 +175,7 @@ class Superset(BasePlugin):
         logger.debug("Completed `superset init`")
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker: PluginInvoker):
+    async def before_cleanup(self, invoker: PluginInvoker) -> None:
         """Delete the config file.
 
         Args:

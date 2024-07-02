@@ -214,7 +214,7 @@ class TestCliUpgrade:
 
     @mock_aws
     @pytest.mark.usefixtures("project")
-    def test_upgrade_state(self, cli_runner, monkeypatch):
+    def test_upgrade_state(self, cli_runner, monkeypatch: pytest.MonkeyPatch):
         state_ids = [f"dev:tap-{i}-to-target-{i}" for i in range(10)]
         conn = boto3.resource("s3", region_name="us-east-1")
         bucket = conn.create_bucket(Bucket="test-state-bucket")

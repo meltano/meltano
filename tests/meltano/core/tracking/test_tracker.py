@@ -401,7 +401,7 @@ class TestTracker:
     def test_project_context_send_anonymous_usage_stats_source(
         self,
         project: Project,
-        monkeypatch,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         def get_source():
             return ProjectContext(project, uuid.uuid4()).to_json()["data"][
@@ -424,8 +424,8 @@ class TestTracker:
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
-        caplog,
-        monkeypatch,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         endpoints = """
             [

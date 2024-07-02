@@ -45,7 +45,7 @@ class InvalidTasksError(Exception):
         super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
-def _flat_split(items):
+def _flat_split(items):  # noqa: ANN001, ANN202
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)

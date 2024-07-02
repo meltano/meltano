@@ -19,7 +19,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
-    def __init__(self, session: Session, **kwargs):
+    def __init__(self, session: Session, **kwargs: t.Any):
         """Initialize the DBStateStoreManager.
 
         Args:
@@ -60,7 +60,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id):
+    def get(self, state_id: str) -> JobState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -73,7 +73,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
 
-    def clear(self, state_id):
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -85,7 +85,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
-    def get_state_ids(self, pattern: str | None = None):
+    def get_state_ids(self, pattern: str | None = None) -> list[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -95,18 +95,18 @@ class DBStateStoreManager(StateStoreManager):
             Generator yielding names of available jobs
         """
         if pattern:
-            return (
+            return [
                 job_state.state_id
                 for job_state in self.session.query(JobState)
                 .filter(JobState.state_id.like(pattern.replace("*", "%")))
                 .all()
-            )
-        return (
+            ]
+        return [
             record[0]
             for record in self.session.execute(select(JobState.state_id)).all()
-        )
+        ]
 
-    def acquire_lock(self, state_id):
+    def acquire_lock(self, state_id: str) -> None:
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
@@ -117,7 +117,7 @@ class DBStateStoreManager(StateStoreManager):
         """
         # noqa: WPS428
 
-    def release_lock(self, state_id):
+    def release_lock(self, state_id: str) -> None:
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.

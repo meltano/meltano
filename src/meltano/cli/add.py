@@ -115,7 +115,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
 @pass_project()
 @click.pass_context
 def add(  # noqa: WPS238
-    ctx,
+    ctx,  # noqa: ANN001
     project: Project,
     plugin_type: str,
     plugin_name: str,
@@ -124,8 +124,8 @@ def add(  # noqa: WPS238
     as_name: str | None = None,
     plugin_yaml: dict | None = None,
     python: str | None = None,
-    **flags,
-):
+    **flags,  # noqa: ANN003
+) -> None:
     """
     Add a plugin to your project.
 
@@ -213,7 +213,7 @@ def add(  # noqa: WPS238
     tracker.track_command_event(CliEvent.completed)
 
 
-def _print_plugins(plugins):
+def _print_plugins(plugins) -> None:  # noqa: ANN001
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

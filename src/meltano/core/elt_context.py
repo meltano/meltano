@@ -25,7 +25,7 @@ class PluginContext(t.NamedTuple):
     settings_service: PluginSettingsService
     session: Session
 
-    def __getattr__(self, attr: str) -> t.Any:
+    def __getattr__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Get plugin attribute.
 
         Args:
@@ -36,7 +36,7 @@ class PluginContext(t.NamedTuple):
         """
         return getattr(self.plugin, attr)
 
-    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:
+    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Get plugin config by name.
 
         Args:
@@ -48,7 +48,7 @@ class PluginContext(t.NamedTuple):
         """
         return self.settings_service.get(name, session=self.session, **kwargs)
 
-    def config_dict(self, **kwargs) -> dict:
+    def config_dict(self, **kwargs) -> dict:  # noqa: ANN003
         """Get plugins config dict.
 
         Args:
@@ -59,7 +59,7 @@ class PluginContext(t.NamedTuple):
         """
         return self.settings_service.as_dict(session=self.session, **kwargs)
 
-    def config_env(self, **kwargs) -> dict[str, str]:
+    def config_env(self, **kwargs) -> dict[str, str]:  # noqa: ANN003
         """Get plugins config environment.
 
         Args:
@@ -87,7 +87,7 @@ class ELTContext:  # noqa: WPS230
         self,
         project: Project,
         job: Job | None = None,
-        session=None,
+        session=None,  # noqa: ANN001
         extractor: PluginContext | None = None,
         loader: PluginContext | None = None,
         transform: PluginContext | None = None,
@@ -143,7 +143,7 @@ class ELTContext:  # noqa: WPS230
         self.merge_state = merge_state
 
     @property
-    def elt_run_dir(self):
+    def elt_run_dir(self):  # noqa: ANN201
         """Get the ELT run directory.
 
         Returns:
@@ -356,7 +356,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_merge_state(self, merge_state: bool):
+    def with_merge_state(self, merge_state: bool):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -404,7 +404,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._state = state
         return self
 
-    def set_base_output_logger(self, base_output_logger: OutputLogger):  # noqa: WPS615
+    def set_base_output_logger(self, base_output_logger: OutputLogger) -> None:  # noqa: WPS615
         """Set the base output logger for use in this ELTContext.
 
         Args:

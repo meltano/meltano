@@ -122,7 +122,7 @@ class UpgradeService:  # noqa: WPS214
         click.echo()
         return True
 
-    def update_files(self):
+    def update_files(self) -> None:
         """Update the files managed by Meltano inside the current project.
 
         Raises:
@@ -143,7 +143,7 @@ class UpgradeService:  # noqa: WPS214
         if not success:
             raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
 
-    def migrate_database(self):
+    def migrate_database(self) -> None:
         """Migrate the Meltano database.
 
         Raises:
@@ -159,7 +159,7 @@ class UpgradeService:  # noqa: WPS214
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def migrate_state(self):
+    def migrate_state(self) -> None:
         """Move cloud state files to deduplicated prefix paths.
 
         See: https://github.com/meltano/meltano/issues/7938
@@ -168,7 +168,7 @@ class UpgradeService:  # noqa: WPS214
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
             click.secho("Applying migrations to project state...", fg="blue")
-            for filepath in state_service.state_store_manager.list_all_files():
+            for filepath in manager.list_all_files():
                 parts = filepath.split(manager.delimiter)
                 if (
                     parts[-1] == "state.json"
@@ -188,7 +188,7 @@ class UpgradeService:  # noqa: WPS214
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
+    def upgrade(self, skip_package: bool = False, **kwargs: t.Any) -> None:  # noqa: WPS213
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command

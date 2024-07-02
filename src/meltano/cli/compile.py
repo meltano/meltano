@@ -58,7 +58,7 @@ def compile_command(
     directory: Path,
     lint: bool,
     indent: int,
-):
+) -> None:
     """
     Compile a Meltano project into environment-specific manifest files.
 

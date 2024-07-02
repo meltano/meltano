@@ -24,7 +24,7 @@ ENVIRONMENT_SERVICE_KEY = "environment_service"
 )
 @click.pass_context
 @pass_project(migrate=True)
-def meltano_environment(project: Project, ctx: click.Context):
+def meltano_environment(project: Project, ctx: click.Context) -> None:
     """
     Manage Environments.
 
@@ -36,7 +36,7 @@ def meltano_environment(project: Project, ctx: click.Context):
 @meltano_environment.command(cls=PartialInstrumentedCmd)
 @click.argument("name")
 @click.pass_context
-def add(ctx: click.Context, name: str):
+def add(ctx: click.Context, name: str) -> None:
     """Add a new environment."""
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
@@ -52,7 +52,7 @@ def add(ctx: click.Context, name: str):
 @meltano_environment.command(cls=PartialInstrumentedCmd)
 @click.argument("name")
 @click.pass_context
-def remove(ctx: click.Context, name: str):
+def remove(ctx: click.Context, name: str) -> None:
     """Remove an environment."""
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
@@ -67,7 +67,7 @@ def remove(ctx: click.Context, name: str):
 
 @meltano_environment.command(cls=PartialInstrumentedCmd, name="list")
 @click.pass_context
-def list_environments(ctx: click.Context):
+def list_environments(ctx: click.Context) -> None:
     """List available environments."""
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]

@@ -28,7 +28,7 @@ ExceptionContextJSON = t.Dict[
 class ExceptionContext(SelfDescribingJson):
     """Exception context for the Snowplow tracker."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Init the exceptions context with the exceptions currently being handled."""
         ex = sys.exc_info()[1]
         super().__init__(

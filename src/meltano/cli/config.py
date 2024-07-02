@@ -66,7 +66,7 @@ def _get_store_choices() -> list[SettingValueStore]:
     return writables
 
 
-def _use_meltano_env(func):
+def _use_meltano_env(func):  # noqa: ANN001, ANN202
     """Override the 'meltano_yml' choice for a config command's 'store' argument.
 
     If an --environment flag is passed, the decorated command will use
@@ -81,7 +81,7 @@ def _use_meltano_env(func):
     """
 
     @wraps(func)
-    def _wrapper(*args, **kwargs):
+    def _wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         store = kwargs.pop("store")
         if store not in {SettingValueStore.MELTANO_YML, SettingValueStore.MELTANO_ENV}:
             return func(*args, **kwargs, store=store)
@@ -96,7 +96,7 @@ def _use_meltano_env(func):
     return _wrapper
 
 
-def get_label(metadata) -> str:
+def get_label(metadata) -> str:  # noqa: ANN001
     """Get the label for an environment variable's source.
 
     Args:
@@ -140,14 +140,14 @@ def get_label(metadata) -> str:
 @pass_project(migrate=True)
 @click.pass_context
 def config(  # noqa: WPS231
-    ctx,
+    ctx,  # noqa: ANN001
     project: Project,
     plugin_type: str,
     plugin_name: str,
     config_format: str,
     extras: bool,
     safe: bool,
-):
+) -> None:
     """
     Display Meltano or plugin configuration.
 
@@ -230,7 +230,7 @@ def config(  # noqa: WPS231
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
-def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
+def list_settings(ctx: click.Context, extras: bool) -> None:  # noqa: C901
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings = ctx.obj["settings"]
     session = ctx.obj["session"]
@@ -330,7 +330,7 @@ def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
 )
 @click.pass_context
 @_use_meltano_env
-def reset(ctx, store):
+def reset(ctx, store) -> None:  # noqa: ANN001
     """Clear the configuration (back to defaults)."""
     store = SettingValueStore(store)
 
@@ -370,11 +370,11 @@ def reset(ctx, store):
 def set_(
     ctx: click.core.Context,
     setting_name: tuple[str, ...],
-    value: t.Any,
+    value: t.Any,  # noqa: ANN401
     store: str,
     interactive: bool,
     from_file: t.TextIO,
-):
+) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
@@ -394,7 +394,7 @@ def set_(
 
 @config.command(cls=PartialInstrumentedCmd, name="test")
 @click.pass_context
-def test(ctx):
+def test(ctx) -> None:  # noqa: ANN001
     """Test the configuration of a plugin."""
     invoker = ctx.obj["invoker"]
     tracker = ctx.obj["tracker"]
@@ -404,7 +404,7 @@ def test(ctx):
 
     session = ctx.obj["session"]
 
-    async def _validate():  # noqa: WPS430
+    async def _validate():  # noqa: ANN202, WPS430
         plugin_test_service = PluginTestServiceFactory(invoker).get_test_service()
         async with plugin_test_service.plugin_invoker.prepared(session):
             return await plugin_test_service.validate()
@@ -439,7 +439,7 @@ def test(ctx):
 )
 @click.pass_context
 @_use_meltano_env
-def unset(ctx, setting_name, store):
+def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     """Unset the configurations' setting called `<name>`."""
     store = SettingValueStore(store)
 

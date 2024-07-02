@@ -61,7 +61,7 @@ class JobState(SystemModel):  # noqa: WPS214
         )
 
     @classmethod  # noqa: WPS210
-    def from_job_history(cls, session: Session, state_id: str):  # noqa: WPS210
+    def from_job_history(cls, session: Session, state_id: str):  # noqa: ANN206, WPS210
         """Build JobState from job run history.
 
         Args:
@@ -154,7 +154,7 @@ class JobState(SystemModel):  # noqa: WPS214
     def merge_partial(
         self,
         state: JobState,
-    ):
+    ) -> None:
         """Merge provided partial state onto this JobState.
 
         Args:
@@ -173,7 +173,7 @@ class JobState(SystemModel):  # noqa: WPS214
         """
         return bool(self.completed_state)
 
-    def to_file(self, file_obj: TextIOWrapper):
+    def to_file(self, file_obj: TextIOWrapper) -> None:
         """Persist JobState to a file-like object.
 
         Args:

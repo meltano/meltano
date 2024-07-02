@@ -69,7 +69,7 @@ class PluginInstallState:
     details: str | None = None
 
     @cached_property
-    def successful(self):
+    def successful(self):  # noqa: ANN201
         """Plugin install success status.
 
         Returns:
@@ -78,7 +78,7 @@ class PluginInstallState:
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @cached_property
-    def skipped(self):
+    def skipped(self):  # noqa: ANN201
         """Plugin install skipped status.
 
         Returns:
@@ -109,7 +109,7 @@ class PluginInstallState:
         return "Errored"
 
 
-def with_semaphore(func):
+def with_semaphore(func):  # noqa: ANN001, ANN201
     """Gate access to the method using its class's semaphore.
 
     Args:
@@ -120,7 +120,7 @@ def with_semaphore(func):
     """
 
     @functools.wraps(func)  # noqa: WPS430
-    async def wrapper(self, *args, **kwargs):  # noqa: WPS430
+    async def wrapper(self, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202, WPS430
         async with self.semaphore:
             return await func(self, *args, **kwargs)
 
@@ -167,7 +167,7 @@ class PluginInstallService:  # noqa: WPS214
         return self._parallelism
 
     @cached_property
-    def semaphore(self):
+    def semaphore(self):  # noqa: ANN201
         """An asyncio semaphore with a counter starting at `self.parallelism`.
 
         Returns:
@@ -176,7 +176,7 @@ class PluginInstallService:  # noqa: WPS214
         return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
-    def remove_duplicates(
+    def remove_duplicates(  # noqa: ANN205
         plugins: t.Iterable[ProjectPlugin],
         reason: PluginInstallReason,
     ):
@@ -218,7 +218,7 @@ class PluginInstallService:  # noqa: WPS214
 
     def install_all_plugins(
         self,
-        reason=PluginInstallReason.INSTALL,
+        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> tuple[PluginInstallState]:
         """
         Install all the plugins for the project.
@@ -236,7 +236,7 @@ class PluginInstallService:  # noqa: WPS214
     def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
+        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> tuple[PluginInstallState]:
         """
         Install all the provided plugins.
@@ -261,7 +261,7 @@ class PluginInstallService:  # noqa: WPS214
     async def install_plugins_async(
         self,
         plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
+        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
@@ -279,7 +279,7 @@ class PluginInstallService:  # noqa: WPS214
     def install_plugin(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,
+        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> PluginInstallState:
         """
         Install a plugin.
@@ -304,7 +304,7 @@ class PluginInstallService:  # noqa: WPS214
     async def install_plugin_async(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,
+        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
@@ -464,7 +464,7 @@ class PluginInstaller(t.Protocol):
         *,
         project: Project,
         plugin: ProjectPlugin,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
         """Install the plugin.
 
@@ -511,8 +511,8 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     env: t.Mapping[str, str] | None = None,
-    **kwargs,  # noqa: ARG001
-):
+    **kwargs,  # noqa: ANN003, ARG001
+) -> None:
     """Install the plugin with pip.
 
     Args:

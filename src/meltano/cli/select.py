@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def selection_color(selection):
+def selection_color(selection) -> t.Optional[str]:  # noqa: ANN001, UP007
     """Return the appropriate colour for given SelectionType."""
     if selection is SelectionType.SELECTED:
         return "bright_green"
@@ -30,7 +30,7 @@ def selection_color(selection):
     return None
 
 
-def selection_mark(selection):
+def selection_mark(selection) -> str:  # noqa: ANN001
     """
     Return the mark to indicate the selection type of an attribute.
 
@@ -82,7 +82,7 @@ async def select(
     entities_filter: str,
     attributes_filter: str,
     **flags: bool,
-):
+) -> None:
     """
     Manage extractor selection patterns.
 
@@ -110,13 +110,13 @@ async def select(
 
 
 def update(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
-    exclude=False,
-    remove=False,
-):
+    project,  # noqa: ANN001
+    extractor,  # noqa: ANN001
+    entities_filter,  # noqa: ANN001
+    attributes_filter,  # noqa: ANN001
+    exclude=False,  # noqa: ANN001
+    remove=False,  # noqa: ANN001
+) -> None:
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
     select_service.update(entities_filter, attributes_filter, exclude, remove)

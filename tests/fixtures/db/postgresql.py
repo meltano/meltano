@@ -19,7 +19,7 @@ def recreate_database(engine, db_name):
 
 
 @pytest.fixture(scope="session")
-def engine_uri(worker_id: str):
+def engine_uri(worker_id: str) -> str:
     host = os.getenv("POSTGRES_ADDRESS")
     port = os.getenv("POSTGRES_PORT", 5432)
     user = os.getenv("POSTGRES_USER")

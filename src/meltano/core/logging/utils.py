@@ -180,7 +180,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
 class SubprocessOutputWriter(t.Protocol):
     """A basic interface suitable for use with `capture_subprocess_output`."""
 
-    def writeline(self, line: str):
+    def writeline(self, line: str) -> None:
         """Write the provided line to an output.
 
         Args:
@@ -188,7 +188,7 @@ class SubprocessOutputWriter(t.Protocol):
         """
 
 
-async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
+async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes) -> bool:
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
         try:

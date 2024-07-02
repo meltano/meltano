@@ -57,7 +57,7 @@ class MeltanoInvoker:
             env=self._executable_env(env),
         )
 
-    def _executable_path(self, command):
+    def _executable_path(self, command):  # noqa: ANN001, ANN202
         if command == MELTANO_COMMAND:
             # This symlink is created by Project.activate
             executable_symlink = self.project.run_dir().joinpath("bin")

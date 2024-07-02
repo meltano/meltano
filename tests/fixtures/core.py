@@ -2162,7 +2162,7 @@ def create_state_id(description: str, env: str = "dev") -> str:
 
 
 @pytest.fixture()
-def num_params():
+def num_params() -> int:
     return 10
 
 

@@ -12,7 +12,7 @@ from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
 
 
-def database_uri_option(func):
+def database_uri_option(func):  # noqa: ANN001, ANN201
     """Database URI Click option decorator.
 
     args:
@@ -20,7 +20,7 @@ def database_uri_option(func):
     """
 
     @click.option("--database-uri", help="System database URI.")
-    def decorate(*args, database_uri=None, **kwargs):
+    def decorate(*args, database_uri=None, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
         if database_uri:
             ProjectSettingsService.config_override["database_uri"] = database_uri
 
@@ -34,7 +34,7 @@ class pass_project:  # noqa: N801
 
     __name__ = "project"
 
-    def __init__(self, migrate=False):
+    def __init__(self, migrate=False) -> None:  # noqa: ANN001
         """Instantiate decorator.
 
         args:
@@ -42,7 +42,7 @@ class pass_project:  # noqa: N801
         """
         self.migrate = migrate
 
-    def __call__(self, func):
+    def __call__(self, func):  # noqa: ANN001, ANN204
         """Return decorated function.
 
         args:
@@ -50,7 +50,7 @@ class pass_project:  # noqa: N801
         """
 
         @database_uri_option
-        def decorate(*args, **kwargs):
+        def decorate(*args, **kwargs) -> None:  # noqa: ANN002, ANN003
             ctx = click.get_current_context()
 
             project = ctx.obj["project"]

@@ -221,11 +221,15 @@ class VirtualEnv:
         )
 
 
-async def _extract_stderr(_):
+async def _extract_stderr(_) -> None:
     return None  # pragma: no cover
 
 
-async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
+async def exec_async(
+    *args: t.Any,
+    extract_stderr: StdErrExtractor = _extract_stderr,
+    **kwargs: t.Any,
+) -> Process:
     """Run an executable asynchronously in a subprocess.
 
     Args:
@@ -347,7 +351,7 @@ class VenvService:  # noqa: WPS214
             Whether virtual environment doesn't exist or can't be reused.
         """
 
-        def checks():  # A generator is used to perform the checks lazily
+        def checks():  # A generator is used to perform the checks lazily  # noqa: ANN202, E501
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -412,7 +416,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
-        async def extract_stderr(proc: Process):
+        async def extract_stderr(proc: Process) -> str:
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",

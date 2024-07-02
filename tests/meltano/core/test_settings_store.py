@@ -221,7 +221,7 @@ class TestAutoStoreManager:
         project,
         dummy_settings_service,
         set_value_store,
-        monkeypatch,
+        monkeypatch: pytest.MonkeyPatch,
         environment,
     ):
         value, metadata = subject.get("regular")
@@ -309,7 +309,7 @@ class TestAutoStoreManager:
         project,
         unsupported,
         assert_value_source,
-        monkeypatch,
+        monkeypatch: pytest.MonkeyPatch,
         environment,
     ):
         def set_value(value):

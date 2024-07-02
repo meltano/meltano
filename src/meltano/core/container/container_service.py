@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def stop_container(container: DockerContainer):
+def stop_container(container: DockerContainer) -> None:
     """Stop a Docker container.
 
     Args:

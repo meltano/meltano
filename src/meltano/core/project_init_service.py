@@ -93,7 +93,7 @@ class ProjectInitService:
 
         return project
 
-    def create_dot_meltano_dir(self, project: Project):
+    def create_dot_meltano_dir(self, project: Project) -> None:
         """Create .meltano directory.
 
         Args:
@@ -105,7 +105,7 @@ class ProjectInitService:
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 
-    def create_files(self, project: Project):
+    def create_files(self, project: Project) -> None:
         """Create project files.
 
         Args:
@@ -128,7 +128,7 @@ class ProjectInitService:
                 click.secho("   |--", fg="yellow", nl=False)
                 click.echo(f" {path} (skipped)")
 
-    def set_send_anonymous_usage_stats(self, project: Project):
+    def set_send_anonymous_usage_stats(self, project: Project) -> None:
         """Set Anonymous Usage Stats flag.
 
         Args:
@@ -142,7 +142,7 @@ class ProjectInitService:
                 store=SettingValueStore.MELTANO_YML,
             )
 
-    def create_system_database(self, project: Project):
+    def create_system_database(self, project: Project) -> None:
         """Create Meltano System DB.
 
         Args:
@@ -165,7 +165,7 @@ class ProjectInitService:
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
-    def echo_instructions(self, project: Project):
+    def echo_instructions(self, project: Project) -> None:
         """Echo Next Steps to Click CLI.
 
         Args:

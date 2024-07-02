@@ -11,7 +11,7 @@ from meltano.cli.utils import InstrumentedCmd
     cls=InstrumentedCmd,
     short_help="Open the Meltano docs in your browser.",
 )
-def docs():
+def docs() -> None:
     """Open the Meltano docs in the system browser."""
     click.launch("https://docs.meltano.com/")  # pragma: no cover
     click.secho("Opening the docs...", fg="green")
