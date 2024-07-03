@@ -22,7 +22,7 @@
   force = true
 
 [[redirects]]
-  from = "https://docs.meltano.com/cloud/*"
+  from = "/cloud/*"
   to = "https://docs.arch.dev/"
   status = 301
   force = true
