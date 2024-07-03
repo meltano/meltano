@@ -7,6 +7,7 @@ import subprocess
 import sys
 import typing as t
 from asyncio.subprocess import Process
+from pathlib import Path
 
 import mock
 import pytest
@@ -263,13 +264,12 @@ class TestVirtualEnv:
             "os.access",
             return_value=True,
         ):
-            assert (
-                VirtualEnv(
-                    root,
-                    python="/usr/bin/test-python-executable",
-                ).python_path
-                == "/usr/bin/test-python-executable"
-            )
+            path_str = "/usr/bin/test-python-executable"
+            venv = VirtualEnv(root, python=path_str)
+            assert venv.python_path == path_str
+
+            venv = VirtualEnv(root, python=Path(path_str))
+            assert venv.python_path == str(Path(path_str).resolve())
 
         with mock.patch(
             "shutil.which",
@@ -288,6 +288,12 @@ class TestVirtualEnv:
             match="Python executable 'test-python-executable' was not found",
         ):
             VirtualEnv(root, python="test-python-executable")
+
+        with pytest.raises(
+            MeltanoError,
+            match="not the number 3.11",
+        ):
+            VirtualEnv(root, python=3.11)
 
 
 class TestUvVenvService:
