@@ -184,7 +184,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--no-install`: Do not install the plugin after adding it to the project.
+- `--[no-]install`: Whether or not to install the plugin after adding it to the project (default: `--install`).
 - `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
@@ -316,6 +316,7 @@ meltano config <plugin> reset --store=db # reset in system database
 
 # Test the plugin's current configuration, if supported.
 meltano config <plugin> test
+meltano config --no-install <plugin> test # prevent auto-install of plugin
 ```
 
 If multiple plugins share the same name, you can provide an additional `--plugin-type` argument to disambiguate:
@@ -543,6 +544,8 @@ meltano el <extractor> <loader> [--state-id TEXT]
   - `loader-config`: Dump the loader [config file](https://hub.meltano.com/singer/spec#config-files) that would be passed to the target's executable using the `--config` option.
 
   Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano el ... --dump=state > state.json`.
+
+- A `--[no-]install` option can be passed to control whether or not to install the plugins to the project before running, if required (default: `--install`).
 
 #### Examples
 
@@ -832,6 +835,12 @@ meltano invoke --dump=config <plugin>
 meltano invoke --dump=catalog <plugin>
 ```
 
+By default, `meltano invoke` will attempt to install the plugin before invoking it. Use `--no-install` to skip this behavior:
+
+```bash
+meltano invoke --no-install <plugin>
+```
+
 Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano invoke --dump=catalog <plugin> > state.json`.
 
 ### Using `invoke` with Environments
@@ -987,6 +996,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
+- `--[no-]install`: Whether or not to install the plugins to the project before running, if required (default: `--install`).
 
 Examples:
 
@@ -1296,6 +1306,7 @@ meltano select tap-gitlab --exclude "*" "*_url"
 
 # List selected (enabled) entities and attributes
 meltano select tap-gitlab --list
+meltano select --no-install tap-gitlab --list # prevent auto-install of plugin
 ```
 
 Example output:
@@ -1583,6 +1594,7 @@ meltano test --all
 
 # Run all available tests for one or more selected plugins
 meltano test <plugin1> <plugin2>
+meltano test --no-install <plugin1> <plugin2> # prevent auto-install of plugins
 
 # Run a named test for a single plugin
 meltano test <plugin>:<test-name>
