@@ -22,9 +22,7 @@ if t.TYPE_CHECKING:
 
 
 def _check_venv_created_with_python(project: Project, python: str | None):
-    with mock.patch(
-        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
-    ) as venv_mock:
+    with mock.patch("meltano.core.venv_service._resolve_python_path") as venv_mock:
         VenvService(project=project)
         venv_mock.assert_called_once_with(python)
 
@@ -35,7 +33,7 @@ async def _check_venv_created_with_python_for_plugin(
     python: str | None,
 ):
     with mock.patch(
-        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+        "meltano.core.venv_service._resolve_python_path"
     ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
         await install_pip_plugin(project=project, plugin=plugin)
         venv_mock.assert_called_once_with(python)

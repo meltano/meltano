@@ -90,6 +90,30 @@ def find_uv() -> str:
     return uv
 
 
+def _resolve_python_path(python: Path | str | None) -> str:
+    python_path: str | None = None
+
+    if python is None:
+        python_path = sys.executable
+    elif isinstance(python, Path):
+        python_path = str(python.resolve())
+    elif isinstance(python, Number):
+        raise MeltanoError(
+            "Python must be specified as an executable name or path, "  # noqa: EM102
+            f"not the number {python!r}",
+        )
+    else:
+        python_path = python if os.path.exists(python) else shutil.which(python)
+
+    if python_path is None:
+        raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
+
+    if not os.access(python_path, os.X_OK):
+        raise MeltanoError(f"{python_path!r} is not executable")  # noqa: EM102
+
+    return python_path
+
+
 class VirtualEnv:
     """Info about a single virtual environment."""
 
@@ -118,32 +142,8 @@ class VirtualEnv:
         if self._system not in self._SUPPORTED_PLATFORMS:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
-        self.python_path = self._resolve_python_path(python)
+        self.python_path = _resolve_python_path(python)
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
-
-    @staticmethod
-    def _resolve_python_path(python: Path | str | None) -> str:
-        python_path: str | None = None
-
-        if python is None:
-            python_path = sys.executable
-        elif isinstance(python, Path):
-            python_path = str(python.resolve())
-        elif isinstance(python, Number):
-            raise MeltanoError(
-                "Python must be specified as an executable name or path, "  # noqa: EM102
-                f"not the number {python!r}",
-            )
-        else:
-            python_path = python if os.path.exists(python) else shutil.which(python)
-
-        if python_path is None:
-            raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
-
-        if not os.access(python_path, os.X_OK):
-            raise MeltanoError(f"{python_path!r} is not executable")  # noqa: EM102
-
-        return python_path
 
     @cached_property
     def lib_dir(self) -> Path:
