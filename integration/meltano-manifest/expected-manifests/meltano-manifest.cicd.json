@@ -31,7 +31,7 @@
         null
       ]
     },
-    "meltano.cloud": {
+    "example.service": {
       "environment-cicd-key1": "environment-cicd-value1",
       "environment-cicd-key2": "environment-cicd-value2",
       "key1": "overwrite-key-1",
@@ -1656,7 +1656,7 @@
               null
             ]
           },
-          "meltano.cloud": {
+          "example.service": {
             "loader-key1": "loader-value1",
             "loader-key2": "loader-value2"
           }

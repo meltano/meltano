@@ -27,7 +27,7 @@ you can skip steps 1 through 3 and refer primarily to the "Containerized Meltano
 
 ## Managed Hosting Options
 
-[Meltano Cloud](https://meltano.com/cloud) has been [shut down in favor of Arch](https://meltano.com/blog/were-bringing-powerful-data-engineering-capabilities-to-software-teams-with-arch/).
+Meltano Cloud has been [shut down in favor of Arch](https://meltano.com/blog/were-bringing-powerful-data-engineering-capabilities-to-software-teams-with-arch/).
 
 Consider running your Meltano pipelines using a managed Airflow service like [Astronomer](https://www.astronomer.io/), [Google Cloud Composer](https://cloud.google.com/composer/), or [Amazon MWAA](https://docs.aws.amazon.com/mwaa).
 

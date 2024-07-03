@@ -16,7 +16,7 @@
         null
       ]
     },
-    "meltano.cloud": {
+    "example.service": {
       "key1": "value1",
       "key2": "value2"
     }
@@ -1651,7 +1651,7 @@
               null
             ]
           },
-          "meltano.cloud": {
+          "example.service": {
             "loader-key1": "loader-value1",
             "loader-key2": "loader-value2"
           }
