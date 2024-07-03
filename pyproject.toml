@@ -550,6 +550,8 @@ ignore_missing_imports = true
 module = [
   "click_default_group.*",  # https://github.com/click-contrib/click-default-group/issues/26
   "click_didyoumean.*",     # Unreleased, https://github.com/click-contrib/click-didyoumean/commit/048b275077382e5a80bdf05b02830013eb37ddd1
+  "flatten_dict.*",         # Stale package, https://github.com/ianlini/flatten-dict
+  "smart_open.*",           # https://github.com/piskvorky/smart_open/issues/772
 ]
 
 [build-system]
@@ -590,6 +592,7 @@ select = [
   "I",   # isort
   "ISC", # flake8-implicit-str-concat
   "N",   # pep8-naming
+  "PGH", # pygrep-hooks
   "PIE", # flake8-pie
   "PT",  # flake8-pytest-style
   "Q",   # flake8-quotes

@@ -650,7 +650,7 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
         # Typing these mixin hierarchies is a bit messy, so we'll just ignore it here
         # https://mypy.readthedocs.io/en/latest/more_types.html#mixin-classes
-        super().invoke(ctx)  # type: ignore
+        super().invoke(ctx)  # type: ignore[misc]
 
 
 class InstrumentedDefaultGroup(InstrumentedGroupMixin, DefaultGroup, DYMGroup):
