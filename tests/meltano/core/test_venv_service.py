@@ -116,12 +116,12 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:
-            assert (
-                fingerprint_file.read()
-                # sha256 of "example"
-                == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
-            )
+        fingerprint = (venv_dir / ".meltano_plugin_fingerprint").read_text()
+        assert (
+            fingerprint
+            # sha256 of "example"
+            == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+        )
 
         # ensure that log file was created and is not empty
         assert subject.pip_log_path.exists()

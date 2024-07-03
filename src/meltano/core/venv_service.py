@@ -119,6 +119,7 @@ class VirtualEnv:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
         self.python_path = self._resolve_python_path(python)
+        self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
 
     @staticmethod
     def _resolve_python_path(python: Path | str | None) -> str:
@@ -220,6 +221,25 @@ class VirtualEnv:
             ),
         )
 
+    def read_fingerprint(self) -> str | None:
+        """Get the fingerprint of the existing virtual environment.
+
+        Returns:
+            The fingerprint of the existing virtual environment if it exists.
+            `None` otherwise.
+        """
+        if not self.plugin_fingerprint_path.exists():
+            return None
+        return self.plugin_fingerprint_path.read_text()
+
+    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
+        """Save the fingerprint for this installation.
+
+        Args:
+            pip_install_args: The arguments being passed to `pip install`.
+        """
+        self.plugin_fingerprint_path.write_text(fingerprint(pip_install_args))
+
 
 async def _extract_stderr(_):
     return None  # pragma: no cover
@@ -302,7 +322,6 @@ class VenvService:  # noqa: WPS214
             self.project.venvs_dir(namespace, name, make_dirs=False),
             python or project.settings.get("python"),
         )
-        self.plugin_fingerprint_path = self.venv.root / ".meltano_plugin_fingerprint"
         self.pip_log_path = self.project.logs_dir(
             "pip",
             self.namespace,
@@ -334,7 +353,7 @@ class VenvService:  # noqa: WPS214
         self.clean_run_files()
 
         await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
-        self.write_fingerprint(pip_install_args)
+        self.venv.write_fingerprint(pip_install_args)
 
     def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
         """Determine whether a clean install is needed.
@@ -351,7 +370,7 @@ class VenvService:  # noqa: WPS214
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
-            existing_fingerprint = self.read_fingerprint()
+            existing_fingerprint = self.venv.read_fingerprint()
             yield existing_fingerprint is None
             yield existing_fingerprint != fingerprint(pip_install_args)
 
@@ -457,27 +476,6 @@ class VenvService:  # noqa: WPS214
                 "Failed to upgrade pip to the latest version.",  # noqa: EM101
                 err.process,
             ) from err
-
-    def read_fingerprint(self) -> str | None:
-        """Get the fingerprint of the existing virtual environment.
-
-        Returns:
-            The fingerprint of the existing virtual environment if it exists.
-            `None` otherwise.
-        """
-        if not self.plugin_fingerprint_path.exists():
-            return None
-        with open(self.plugin_fingerprint_path) as fingerprint_file:
-            return fingerprint_file.read()
-
-    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
-        """Save the fingerprint for this installation.
-
-        Args:
-            pip_install_args: The arguments being passed to `pip install`.
-        """
-        with open(self.plugin_fingerprint_path, "w") as fingerprint_file:
-            fingerprint_file.write(fingerprint(pip_install_args))
 
     def exec_path(self, executable: str) -> Path:
         """Return the absolute path for the given executable in the virtual environment.
