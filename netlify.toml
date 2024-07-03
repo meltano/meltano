@@ -20,3 +20,9 @@
   to = "https://docs.meltano.com/guide/troubleshooting/:splat"
   status = 301
   force = true
+
+[[redirects]]
+  from = "https://docs.meltano.com/cloud/*"
+  to = "https://docs.arch.dev/"
+  status = 301
+  force = true
