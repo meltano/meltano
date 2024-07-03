@@ -273,4 +273,3 @@ After seeing these plugins in the wild for several weeks, hundreds of successful
 
 We hope the community continue to test these out and push the integration further.
 Please open any issues or features requests related to the wrapper on [MeltanoLabs/tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper).
-
