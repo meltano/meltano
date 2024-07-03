@@ -301,9 +301,6 @@ To better integrate with software other than the core Meltano library and CLI, `
 
 ```yaml
 annotations:
-  meltano.cloud: {
-    # Meltano Cloud config
-  }
   arbitrary-third-party-tool: {
     # Configuration for the third party tool
   }
