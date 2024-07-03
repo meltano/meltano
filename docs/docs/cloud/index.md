@@ -9,8 +9,8 @@ sidebar_class_name: hidden
 
 :::info
 
-<p><strong>Meltano Cloud is currently in Beta.</strong></p>
-<p>While in Beta, functionality is not guaranteed and subject to change. <br /> If you're interested in using Meltano Cloud please join our <a href="https://meltano.com/cloud/">waitlist</a>.</p>
+<p><strong>Meltano Cloud has been shut down in favor of Arch.</strong></p>
+<p>Read the announcement on <a href="https://meltano.com/blog/were-bringing-powerful-data-engineering-capabilities-to-software-teams-with-arch/">our blog</a>.</p>
 
 :::
 

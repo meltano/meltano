@@ -155,7 +155,7 @@ The short answer is: It depends where its deployed!
 
 The main potential challenge with putting this into production is if you use Docker to package and deploy your Meltano project. If you're able to set up Docker-in-docker, then a Dockerized Meltano project with tap-airbyte-wrapper will work as expected. Since each Airbyte connector is itself a Docker image, running inside a dockerized Meltano project would require “docker in docker” which has some possible challenges around privileges and permissions on certain systems.
 
-For example, AWS ECS does not support docker in docker and Meltano Cloud does not currently have plans to support container based connectors at this time either. Although a simple EC2 instance with Docker available would work as expected.
+For example, AWS ECS does not support docker in docker. Although a simple EC2 instance with Docker available would work as expected.
 
 Within [Github Codespaces](https://github.com/features/codespaces), adding support for docker-in-docker was as easy as [adding a few lines](https://github.com/meltano/meltano-codespace-ready/commit/5ffb9fb6e3232142c8e2307340c0a4fb66379db4) to the devcontainer.json file.
 
@@ -274,8 +274,3 @@ After seeing these plugins in the wild for several weeks, hundreds of successful
 We hope the community continue to test these out and push the integration further.
 Please open any issues or features requests related to the wrapper on [MeltanoLabs/tap-airbyte-wrapper](https://github.com/MeltanoLabs/tap-airbyte-wrapper).
 
-### Will this be able to run on Meltano Cloud?
-
-We don't currently have plans for supporting Airbyte, or other container based connectors, in Meltano Cloud.
-
-If this is something you’re interested in, please reach out to us via the [Meltano Cloud Waitlist](https://meltano.com/cloud/) or on [Slack](https://meltano.com/slack).
