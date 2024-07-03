@@ -1,7 +1,7 @@
 version: 1
 default_environment: userdev
 annotations:
-  meltano.cloud:
+  example.service:
     key1: value1
     key2: value2
   airflow:

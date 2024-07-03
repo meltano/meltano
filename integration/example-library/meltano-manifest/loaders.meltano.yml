@@ -2,7 +2,7 @@ plugins:
   loaders:
   - name: target-yaml
     annotations:
-      meltano.cloud:
+      example.service:
         loader-key1: loader-value1
         loader-key2: loader-value2
       airflow:

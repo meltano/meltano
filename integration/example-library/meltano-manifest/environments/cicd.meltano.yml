@@ -1,7 +1,7 @@
 environments:
 - name: cicd
   annotations:
-    meltano.cloud:
+    example.service:
       key1: overwrite-key-1
       environment-cicd-key1: environment-cicd-value1
       environment-cicd-key2: environment-cicd-value2
