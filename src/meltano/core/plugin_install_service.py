@@ -190,7 +190,7 @@ class PluginInstallService:
     def remove_duplicates(
         plugins: t.Iterable[ProjectPlugin],
         reason: PluginInstallReason,
-    ):
+    ) -> tuple[list[PluginInstallState], list[ProjectPlugin]]:
         """Deduplicate list of plugins, keeping the last occurrences.
 
         Trying to install multiple plugins into the same venv via `asyncio.run`
@@ -207,8 +207,8 @@ class PluginInstallService:
             skipped plugins) and a deduplicated list of plugins to install.
         """
         seen_venvs = set()
-        deduped_plugins = []
-        states = []
+        deduped_plugins: list[ProjectPlugin] = []
+        states: list[PluginInstallState] = []
         for plugin in plugins:
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
@@ -230,7 +230,7 @@ class PluginInstallService:
     async def install_all_plugins(
         self,
         reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
+    ) -> list[PluginInstallState]:
         """
         Install all the plugins for the project.
 
@@ -248,7 +248,7 @@ class PluginInstallService:
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
+    ) -> list[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
@@ -434,7 +434,9 @@ class PluginInstallService:
             A boolean determining if the given plugin is a mapping (of type
             `PluginType.MAPPERS`).
         """
-        return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
+        return plugin.type == PluginType.MAPPERS and bool(
+            plugin.extra_config.get("_mapping")
+        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -528,8 +530,8 @@ def get_pip_install_args(
     ) as strict_env_var_mode:
         return shlex.split(
             expand_env_vars(
-                plugin.pip_url,
-                env,
+                plugin.pip_url or "",
+                env or {},
                 if_missing=if_missing or EnvVarMissingBehavior(strict_env_var_mode),
             )
             or "",
