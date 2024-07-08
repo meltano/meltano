@@ -114,7 +114,7 @@ schedules:
   extractor: tap-google-analytics
   loader: target-postgres
   transform: skip
-  start_date: 2022-08-24 00:00:00
+  start_date: 2024-08-24 00:00:00
   env:
     SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
 ```
@@ -294,7 +294,7 @@ To see what name or alias a setting's value is being derived from, you can run `
 ```shell
 $ export MY_CUSTOM_TAP_USERNAME=some_username
 $ meltano config my-custom-tap list
-2022-06-22T10:00:00Z [info     ] Environment 'dev' is active
+2024-06-22T10:00:00Z [info     ] Environment 'dev' is active
 password [env: MY_CUSTOM_TAP_PASSWORD] current value: (redacted) (from the MY_CUSTOM_TAP_PASSWORD variable in `.env`)
 my_custom_tap_username [env: MY_CUSTOM_TAP_MY_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME, MY_CUSTOM_TAP_USERNAME] current value: 'some_username' (from the MY_CUSTOM_TAP_USERNAME variable in the environment)
 ```

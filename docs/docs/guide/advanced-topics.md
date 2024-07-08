@@ -222,7 +222,7 @@ Because with Meltano you would be using a different loader (aka destination or t
 
 The first may be possible only if your data source allows you to quickly backfill data. You can do a full sync with your Meltano pipeline to get all of the data into the new format and then switch any downstream process to point at this new table. However, for many sources this may not be possible.
 
-Another option would be to stop your Airbyte pipeline and have the Meltano pipeline start at that point. For example, if the Airbyte pipeline stops on 2022-12-31 you could have the Meltano pipeline start at 2023-01-01 and write to a different table. You could then use a tool like dbt to transform both tables into a common format and then union them together into a single source.
+Another option would be to stop your Airbyte pipeline and have the Meltano pipeline start at that point. For example, if the Airbyte pipeline stops on 2023-12-31 you could have the Meltano pipeline start at 2024-01-01 and write to a different table. You could then use a tool like dbt to transform both tables into a common format and then union them together into a single source.
 
 There are tradeoffs for both of these methods and you would have to determine where to best invest your time depending on your needs.
 

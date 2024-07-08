@@ -196,7 +196,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Meltano.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Arch Data, Inc.`,
       },
       prism: {
         theme: lightCodeTheme,

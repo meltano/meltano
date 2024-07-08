@@ -27,14 +27,14 @@ We'll assume you have [Meltano installed](/getting-started/installation) already
 
 ```console
 $ meltano --version
-meltano, version 2.19.0
+meltano, version 3.4.0
 ```
 
 </Termy>
 
 <br />
 
-This tutorial is written using meltano >= v2.0.0.
+This tutorial is written using meltano >= v3.0.0.
 
 If you don't have a GitHub account to follow along, you could either exchange the commands for a different tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
@@ -116,7 +116,7 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 1.  Add the GitHub extractor
 
 ```bash
-meltano add extractor tap-github --variant=meltanolabs
+meltano add extractor tap-github
 ```
 
 <br />
@@ -124,17 +124,16 @@ meltano add extractor tap-github --variant=meltanolabs
 <Termy>
 
 ```console
-$ meltano add extractor tap-github --variant=meltanolabs
-2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
+$ meltano add extractor tap-github
 Added extractor 'tap-github' to your Meltano project
 Variant:        meltanolabs (default)
 Repository:     https://github.com/meltanolabs/tap-github
-Documentation:  https://hub.meltano.com/extractors/tap-github
+Documentation:  https://hub.meltano.com/extractors/tap-github--meltanolabs
 
 2024-01-01T00:25:40.604941Z [info     ] Installing extractor 'tap-github'
 2024-01-01T00:25:53.152127Z [info     ] Installed extractor 'tap-github'
 
-To learn more about extractor 'tap-github', visit https://hub.meltano.com/extractors/tap-github
+To learn more about extractor 'tap-github', visit https://hub.meltano.com/extractors/tap-github--meltanolabs
 ```
 
 </Termy>
@@ -165,7 +164,7 @@ If you see the extractor's help message printed, the plugin was definitely insta
 
 ```console
 $ meltano invoke tap-github --help
-2022-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
+2024-09-19T09:32:05.162591Z [info     ] Environment 'dev' is active
 Usage: tap-github [OPTIONS]
 
   Execute the Singer tap.
@@ -239,7 +238,7 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
     extractors:
       - name: tap-github
         config:
-          start_date: '2022-01-01'
+          start_date: '2024-01-01'
           repositories:
           - sbalnojan/meltano-lightdash
 ```
@@ -253,7 +252,7 @@ TAP_GITHUB_AUTH_TOKEN='ghp_XXX' # your token!
 3. Double check the config by running [`meltano config tap-github`](/reference/command-line-interface#config):
 
 ```bash
-meltano config tap-github
+meltano config tap-github list
 ```
 
 <br />
@@ -262,16 +261,17 @@ meltano config tap-github
 
 ```console
 $ meltano config tap-github
-2022-09-19T11:26:22.888257Z [info     ] Environment 'dev' is active
-2022-09-19T11:26:23.573556Z [info     ] The default environment (dev) will be ignored for `meltano config`. To configure a specific Environment, please use option `--environment=[]`.
+2024-07-08T16:27:36.433823Z [info     ] The default environment 'dev' will be ignored for `meltano config`. To configure a specific environment, please use the option `--environment=<environment name>`.
 
-{
-  "auth_token": "ghp_XXX",
-  "repositories": [
-  &ensp;&ensp;"sbalnojan/meltano-lightdash"
-  ],
-  "start_date": "2022-01-01"
-}
+additional_auth_tokens [env: TAP_GITHUB_ADDITIONAL_AUTH_TOKENS] current value: None (default)
+        Additional Auth Tokens: List of GitHub tokens to authenticate with. Streams will loop through them when hitting rate limits.
+auth_token [env: TAP_GITHUB_AUTH_TOKEN] current value: (redacted) (from the TAP_GITHUB_AUTH_TOKEN variable in `.env`)
+        Auth Token: GitHub token to authenticate with.
+...
+repositories [env: TAP_GITHUB_REPOSITORIES] current value: ['meltano/meltnao', 'meltano/hub', 'meltano/sdk'] (from `meltano.yml`)
+        Repositories: An array of strings containing the github repos to be included
+...
+start_date [env: TAP_GITHUB_START_DATE] current value: '2024-01-01' (from `meltano.yml`)
 ```
 
 </Termy>
@@ -345,7 +345,7 @@ plugins:
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/tap-github.git
     config:
-      start_date: '2022-01-01'
+      start_date: '2024-01-01'
       repositories:
       - sbalnojan/meltano-lightdash
     select:
@@ -406,14 +406,14 @@ meltano run tap-github target-jsonl
 
 ```console
 $ meltano run tap-github target-jsonl
-2022-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
-2022-09-19T13:53:41.062802Z [info     ] Found state from 2022-09-19 13:53:17.415907.
-2022-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
-2022-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
-2022-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
-2022-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
-2022-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2022-09-19 13:53:43.734535.
-2022-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
+2024-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
+2024-09-19T13:53:41.062802Z [info     ] Found state from 2024-09-19 13:53:17.415907.
+2024-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
+2024-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
+2024-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
+2024-09-19T13:53:43.561190Z [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 1, "tags": {"endpoint": "commits"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github</span>
+2024-09-19T13:53:43.735250Z [info     ] Incremental state has been updated at 2024-09-19 13:53:43.734535.
+2024-09-19T13:53:43.820467Z [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True</span>
 ```
 
 </Termy>
@@ -427,7 +427,7 @@ You can verify that it worked by looking inside the newly created file called `o
 
 ```console
 $ cat output/commits.jsonl
-{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2022-09-14T12:41:21Z"}
+{"sha": "409bdd601e0531833665f538bccecd0f69e101c0", "node_id": "C_kwDOH_twHNoAKDQwOWJkZDYwMWUwNTMxODMzNjY1ZjUzOGJjY2VjZDBmNjllMTAxYzA", "url": "https://api.github.com/repos/sbalnojan/meltano-lightdash/commits/409bdd601e0531833665f538bccecd0f69e101c0", "commit_timestamp": "2024-09-14T12:41:21Z"}
 ```
 
 </Termy>
