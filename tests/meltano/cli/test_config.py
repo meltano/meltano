@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import io
 import json
 import platform
 import typing as t
 from signal import SIGTERM
 
+import dotenv
 import pytest
 from mock import AsyncMock, mock
 
@@ -15,12 +17,14 @@ from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from click.testing import CliRunner
+
     from meltano.core.project import Project
 
 
 class TestCliConfig:
     @pytest.mark.usefixtures("project")
-    def test_config(self, cli_runner, tap):
+    def test_config(self, cli_runner: CliRunner, tap):
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -30,6 +34,12 @@ class TestCliConfig:
 
         json_config = json.loads(result.stdout)
         assert json_config["test"] == "mock"
+
+        result = cli_runner.invoke(cli, ["config", "--format=env", tap.name])
+        assert_cli_runner(result)
+
+        env_config = dotenv.dotenv_values(stream=io.StringIO(result.stdout))
+        assert env_config["TAP_MOCK_TEST"] == "mock"
 
     @pytest.mark.usefixtures("project")
     def test_config_extras(self, cli_runner, tap):
