@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Script to generate docker tags for Meltano images.
 
 Usage:
