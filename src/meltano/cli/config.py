@@ -33,6 +33,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.project_settings_service import ProjectSettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -199,10 +200,17 @@ def config(  # noqa: WPS231
                     extras=extras,
                     process=process,
                     session=session,
+                    redacted=safe,
+                    redacted_value="*****",
                 )
                 click.echo(json.dumps(json_config, indent=2))
             elif config_format == "env":
-                env = settings.as_env(extras=extras, session=session)
+                env = settings.as_env(
+                    extras=extras,
+                    session=session,
+                    redacted=safe,
+                    redacted_value="*****",
+                )
 
                 with tempfile.NamedTemporaryFile() as temp_dotenv:
                     path = temp_dotenv.name
@@ -232,7 +240,7 @@ def config(  # noqa: WPS231
 @click.pass_context
 def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
-    settings = ctx.obj["settings"]
+    settings: ProjectSettingsService | PluginSettingsService = ctx.obj["settings"]
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
     safe: bool = ctx.obj["safe"]
@@ -289,7 +297,7 @@ def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
         if source is SettingValueStore.DEFAULT:
             label = "default"
         elif source is SettingValueStore.INHERITED:
-            label = f"inherited from '{settings.plugin.parent.name}'"
+            label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]
         else:
             label = f"{get_label(config_metadata)}"
 
