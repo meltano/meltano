@@ -590,6 +590,7 @@ select = [
   "F",   # pyflakes
   "G",   # flake8-logging-format
   "I",   # isort
+  "INP", # flake8-no-pep420
   "ISC", # flake8-implicit-str-concat
   "N",   # pep8-naming
   "PGH", # pygrep-hooks
@@ -618,6 +619,7 @@ unfixable = [
 ]
 "tests/**" = [
   "S101", # Allow 'assert' in tests
+  "INP",  # Don't require __init__.py files in tests directories
 ]
 
 [tool.ruff.lint.flake8-annotations]
