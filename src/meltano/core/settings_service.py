@@ -198,19 +198,6 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
         return {**os.environ, **self.env_override}
 
-    @classmethod
-    def unredact(cls, values: dict, *, redacted_value: str = REDACTED_VALUE) -> dict:
-        """Remove any redacted values in a dictionary.
-
-        Args:
-            values: the dictionary to remove redacted values from
-            redacted_value: the value to use when redacting the setting
-
-        Returns:
-            the unredacted dictionary
-        """
-        return {key: val for key, val in values.items() if val != redacted_value}
-
     def config_with_metadata(
         self,
         prefix: str | None = None,
