@@ -137,6 +137,31 @@ class TestCliConfig:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    def test_config_list_inherited(
+        self,
+        cli_runner,
+        tap,
+        inherited_tap,
+        session,
+        plugin_settings_service_factory,
+    ):
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "secure",
+            "thisisatest",
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        result = cli_runner.invoke(cli, ["config", inherited_tap.name, "list"])
+        assert_cli_runner(result)
+
+        assert (
+            f"secure [env: TAP_MOCK_INHERITED_SECURE] current value: {REDACTED_VALUE} "
+            f"(inherited from '{tap.name}')"
+        ) in result.stdout
+
+    @pytest.mark.usefixtures("project")
     def test_config_list_unsafe(
         self,
         cli_runner,
