@@ -326,7 +326,7 @@ meltano config <plugin> set <setting> <value>
 
 # For example:
 meltano config tap-gitlab set projects "meltano/meltano meltano/tap-gitlab"
-meltano config tap-gitlab set start_date 2021-03-01T00:00:00Z
+meltano config tap-gitlab set start_date 2024-03-01T00:00:00Z
 meltano config tap-gitlab set private_token my_private_token
 ```
 
@@ -341,7 +341,7 @@ environments:
           - name: tap-gitlab
             config:
               projects: meltano/meltano meltano/tap-gitlab
-              start_date: "2021-10-01T00:00:00Z"
+              start_date: "2024-10-01T00:00:00Z"
 ```
 
 Sensitive configuration (like `private_token`) will instead be stored in your project's [`.env` file](/concepts/project#env) so that it will not be checked into version control:
@@ -370,7 +370,7 @@ export TAP_GITLAB_PRIVATE_TOKEN=my_private_token
      "ultimate_license": false,
      "fetch_merge_request_commits": false,
      "fetch_pipelines_extended": false,
-     "start_date": "2022-03-01T00:00:00Z"
+     "start_date": "2024-03-01T00:00:00Z"
    }
    ```
 
@@ -438,7 +438,7 @@ _To learn more about selecting entities and attributes for extraction, refer to 
              - name: tap-gitlab
                config:
                  projects: meltano/meltano meltano/tap-gitlab
-                 start_date: "2022-03-01T00:00:00Z"
+                 start_date: "2024-03-01T00:00:00Z"
                select:
                  - commits.id
                  - commits.project_id

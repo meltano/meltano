@@ -51,7 +51,7 @@ To refresh your database tables after the configuration changes you can run `mel
 
 ```console
 $ meltano run --full-refresh tap-github target-postgres
-2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
+2024-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
 {"type": "STATE", "value":  [...]}
 INFO Starting sync of repository: sbalnojan/meltano-lightdash
 ---> 100%
@@ -61,11 +61,11 @@ INFO METRIC: {"type": "timer", "metric": [...]
 
 {"type": "RECORD", "stream": "commits", "record": {"sha": "c771a832720c0f87b3ce53ac12bdcbf742df4e3d", "commit": {"author": {"name": "Horst", "email":
 [...]
-"sbalnojan/meltano-lightdash"}, "time_extracted": "2022-09-22T07:37:06.289545Z"}
+"sbalnojan/meltano-lightdash"}, "time_extracted": "2024-09-22T07:37:06.289545Z"}
 
 ...[many more records]...
 
-{"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-lightdash": {"commits": {"since": "2022-09-22T07:37:06.289545Z"}}}}}
+{"type": "STATE", "value": {"bookmarks": {"sbalnojan/meltano-lightdash": {"commits": {"since": "2024-09-22T07:37:06.289545Z"}}}}}
 
 ```
 
@@ -81,7 +81,7 @@ dbt uses different [adapters](https://docs.getdbt.com/docs/supported-data-platfo
 
 ```console
 $ meltano add utility dbt-postgres
-2022-09-22T11:32:35.601357Z [info     ] Environment 'dev' is active
+2024-09-22T11:32:35.601357Z [info     ] Environment 'dev' is active
 Added utility 'dbt-postgres' to your Meltano project
 ...
 2024-01-01T00:25:40.604941Z [info     ] Installing utility 'dbt-postgres'
@@ -102,7 +102,7 @@ Next you can run the `initialize` command to have the transformer utility popula
 
 ```console
 $ meltano invoke dbt-postgres:initialize
-2022-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
+2024-09-22T07:36:52.985090Z [info     ] Environment 'dev' is active
 creating dbt profiles directory path=PosixPath('/[...]/my-meltano-project/transform/profiles/postgres')
 dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath('/[...]/my-meltano-project/transform/profiles/postgres') dbt_project_dir=PosixPath('/[...]/my-meltano-project/transform')
 ```
@@ -213,7 +213,7 @@ To create the actual table, we run the dbt model via `meltano invoke dbt-postgre
 
 ```console
 $ meltano invoke dbt-postgres:run
-2022-09-22T12:30:31.842691Z [info     ] Environment 'dev' is active
+2024-09-22T12:30:31.842691Z [info     ] Environment 'dev' is active
 Extension executing `dbt clean`...
 [...]
 20:45:09  Finished cleaning all paths.
@@ -278,11 +278,11 @@ $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 
 [info     ] INFO METRIC: {"type": "counter", "metric": "record_count", "value": 21 [...]
 
-[info     ] time=2022-09-22 12:42:57 name=target_postgres level=INFO message=Table '"commits"' [...]
+[info     ] time=2024-09-22 12:42:57 name=target_postgres level=INFO message=Table '"commits"' [...]
 
 [...]
 ---> 100%
-[info     ] Incremental state has been updated at 2022-09-22 12:42:58.260520.
+[info     ] Incremental state has been updated at 2024-09-22 12:42:58.260520.
 [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
 [info     ] 12:43:19  Running with dbt=1.1.2 cmd_type=command name=dbt-postgres stdio=stderr
 
