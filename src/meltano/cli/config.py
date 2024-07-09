@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import stat
 import tempfile
 import typing as t
 from functools import wraps
@@ -214,6 +216,10 @@ def config(  # noqa: WPS231
 
                 with tempfile.NamedTemporaryFile() as temp_dotenv:
                     path = temp_dotenv.name
+                    os.chmod(
+                        path,
+                        stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH,
+                    )
                     for key, value in env.items():
                         dotenv.set_key(path, key, value)
 
