@@ -412,7 +412,7 @@ plugins:
       config:
         # Configured values:
         username: me@example.com
-        start_date: '2021-01-01'
+        start_date: '2024-01-01'
       settings:
         - name: username
         - name: password

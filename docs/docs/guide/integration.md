@@ -92,7 +92,7 @@ This will add the [selection rules](/concepts/plugins#select-extra) to your [`me
           - name: tap-gitlab
             config:
               projects: meltano/meltano meltano/tap-gitlab
-              start_date: "2022-03-01T00:00:00Z"
+              start_date: "2024-03-01T00:00:00Z"
             select:
               - commits.id
               - commits.project_id
