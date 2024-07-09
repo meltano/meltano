@@ -296,9 +296,12 @@ class TestPluginSettingsService:
 
         # ensure values are redacted when they are set
         subject.set("secure", "thisisatest", store=store, session=session)
-        config = subject.as_dict(redacted=True, session=session)
 
+        config = subject.as_dict(redacted=True, session=session)
         assert config["secure"] == REDACTED_VALUE
+
+        config = subject.as_dict(redacted=True, session=session, redacted_value="*****")
+        assert config["secure"] == "*****"
 
         # although setting the REDACTED_VALUE does nothing
         subject.set("secure", REDACTED_VALUE, store=store, session=session)

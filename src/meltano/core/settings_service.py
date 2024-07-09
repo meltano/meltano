@@ -198,18 +198,6 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         """
         return {**os.environ, **self.env_override}
 
-    @classmethod
-    def unredact(cls, values: dict) -> dict:
-        """Remove any redacted values in a dictionary.
-
-        Args:
-            values: the dictionary to remove redacted values from
-
-        Returns:
-            the unredacted dictionary
-        """
-        return {key: val for key, val in values.items() if val != REDACTED_VALUE}
-
     def config_with_metadata(
         self,
         prefix: str | None = None,
@@ -318,6 +306,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         source_manager: SettingsStoreManager | None = None,
         setting_def: SettingDefinition | None = None,
         expand_env_vars: bool = True,
+        redacted_value: str = REDACTED_VALUE,
         **kwargs,
     ):
         """Get a setting with associated metadata.
@@ -329,6 +318,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             source_manager: the `SettingsStoreManager` to use
             setting_def: get this `SettingDefinition` instead of name
             expand_env_vars: Whether to expand nested environment variables
+            redacted_value: the value to use when redacting the setting
             **kwargs: additional keyword args to pass during
                 `SettingsStoreManager` instantiation
 
@@ -425,7 +415,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             # so we redact all `passwords`
             if redacted and value and setting_def.is_redacted:
                 metadata["redacted"] = True
-                value = REDACTED_VALUE
+                value = redacted_value
 
         self.log(f"Got setting {name!r} with metadata: {metadata}")
 
@@ -472,6 +462,8 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         path: str | list[str],
         value,
         store=SettingValueStore.AUTO,
+        *,
+        redacted_value: str = REDACTED_VALUE,
         **kwargs,
     ):
         """Set the value and metadata for a setting.
@@ -480,6 +472,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             path: the key for the setting
             value: the value to set the setting to
             store: the store to set the value in
+            redacted_value: the value to use when redacting the setting
             **kwargs: additional keyword args to pass during
                 `SettingsStoreManager` instantiation
 
@@ -501,7 +494,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
 
-        if value == REDACTED_VALUE:
+        if value == redacted_value:
             metadata["redacted"] = True
             return None, metadata
 
