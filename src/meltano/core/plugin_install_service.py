@@ -23,7 +23,12 @@ from meltano.core.error import (
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
+from meltano.core.utils import (
+    EnvironmentVariableNotSetError,
+    EnvVarMissingBehavior,
+    expand_env_vars,
+    noop,
+)
 from meltano.core.venv_service import (
     UvVenvService,
     VenvService,
@@ -317,14 +322,9 @@ class PluginInstallService:  # noqa: WPS214
         )
 
         env = self.plugin_installation_env(plugin)
-        venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
-        requires_install = (
-            fingerprint(get_pip_install_args(self.project, plugin, env))
-            != venv.read_fingerprint()
-        )
 
         if (
-            (skip_installed and not requires_install)
+            (skip_installed and not self._requires_install(plugin, env=env))
             or not plugin.is_installable()
             or self._is_mapping(plugin)
         ):
@@ -393,6 +393,25 @@ class PluginInstallService:  # noqa: WPS214
             )
             self.status_cb(state)
             return state
+
+    def _requires_install(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        env: t.Mapping[str, str] = None,
+    ) -> bool:
+        try:
+            pip_install_args = get_pip_install_args(
+                self.project,
+                plugin,
+                env,
+                if_missing=EnvVarMissingBehavior.raise_exception,
+            )
+        except EnvironmentVariableNotSetError:
+            return False
+
+        venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
+        return fingerprint(pip_install_args) != venv.read_fingerprint()
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:
@@ -483,6 +502,7 @@ def get_pip_install_args(
     project: Project,
     plugin: ProjectPlugin,
     env: t.Mapping[str, str] | None = None,
+    if_missing: EnvVarMissingBehavior | None = None,
 ) -> list[str]:
     """Get the pip install arguments for the given plugin.
 
@@ -490,6 +510,8 @@ def get_pip_install_args(
         project: Meltano Project.
         plugin: `ProjectPlugin` to get pip install arguments for.
         env: Optional environment variables to use when expanding the pip install args.
+        if_missing: The behaviour flow to follow when a environment variable is not
+            present when expanding the pip URL
 
     Returns:
         The list of pip install arguments for the given plugin.
@@ -502,7 +524,7 @@ def get_pip_install_args(
             expand_env_vars(
                 plugin.pip_url,
                 env,
-                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                if_missing=if_missing or EnvVarMissingBehavior(strict_env_var_mode),
             )
             or "",
         )

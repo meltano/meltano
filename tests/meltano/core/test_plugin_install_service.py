@@ -139,3 +139,10 @@ class TestPluginInstallService:
         assert (
             not state.skipped
         ), "Expected plugin with venv and non-matching fingerprint to be installed"
+
+        plugin.pip_url = "$MISSING_ENV_VAR"
+        state = await subject.install_plugin_async(plugin, skip_installed=True)
+
+        assert (
+            state.skipped
+        ), "Expected plugin with missing env var in pip URL to not be installed"
