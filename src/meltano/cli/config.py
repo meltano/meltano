@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-import stat
 import tempfile
 import typing as t
 from functools import wraps
@@ -214,16 +213,12 @@ def config(  # noqa: WPS231
                     redacted_value="*****",
                 )
 
-                with tempfile.NamedTemporaryFile() as temp_dotenv:
-                    path = temp_dotenv.name
-                    os.chmod(
-                        path,
-                        stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH,
-                    )
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    path = os.path.join(temp_dir, ".env")
                     for key, value in env.items():
                         dotenv.set_key(path, key, value)
 
-                    dotenv_content = Path(temp_dotenv.name).read_text()
+                    dotenv_content = Path(path).read_text()
 
                 click.echo(dotenv_content)
     except Exception:
