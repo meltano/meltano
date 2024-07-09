@@ -141,7 +141,7 @@ async def show(
         project,
         [select_service.extractor],
         reason=PluginInstallReason.JIT,
-        skip_installed=True,
+        auto_install=True,
     )
 
     with closing(Session()) as session:

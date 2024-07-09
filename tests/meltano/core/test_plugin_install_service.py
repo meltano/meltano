@@ -117,31 +117,31 @@ class TestPluginInstallService:
 
     @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
-    async def test_skip_installed(
+    async def test_auto_install(
         self,
         project: Project,
         subject: PluginInstallService,
     ):
         plugin = next(project.plugins.plugins())
-        state = await subject.install_plugin_async(plugin, skip_installed=True)
+        state = await subject.install_plugin_async(plugin, auto_install=True)
 
         assert not state.skipped, "Expected plugin with no venv to be installed"
 
-        state = await subject.install_plugin_async(plugin, skip_installed=True)
+        state = await subject.install_plugin_async(plugin, auto_install=True)
 
         assert (
             state.skipped
         ), "Expected plugin with venv and matching fingerprint to not be installed"
 
         plugin.pip_url = "changed"
-        state = await subject.install_plugin_async(plugin, skip_installed=True)
+        state = await subject.install_plugin_async(plugin, auto_install=True)
 
         assert (
             not state.skipped
         ), "Expected plugin with venv and non-matching fingerprint to be installed"
 
         plugin.pip_url = "$MISSING_ENV_VAR"
-        state = await subject.install_plugin_async(plugin, skip_installed=True)
+        state = await subject.install_plugin_async(plugin, auto_install=True)
 
         assert (
             state.skipped

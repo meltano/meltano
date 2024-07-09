@@ -248,14 +248,15 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-        skip_installed=False,
+        auto_install=False,
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
-            skip_installed: Whether to skip plugins that are already installed.
+            auto_install: Whether this is an auto-install operation and plugins should
+                be evaluated for required install.
 
         Returns:
             Install state of installed plugins.
@@ -265,7 +266,7 @@ class PluginInstallService:  # noqa: WPS214
             self.status_cb(state)
 
         installing = [
-            self.install_plugin_async(plugin, reason, skip_installed)
+            self.install_plugin_async(plugin, reason, auto_install)
             for plugin in new_plugins
         ]
 
@@ -301,14 +302,15 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
-        skip_installed=False,
+        auto_install=False,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
-            skip_installed: Whether to skip the plugin if it is already installed.
+            auto_install: Whether this is an auto-install operation and the plugin
+                    should be evaluated for required install.
 
         Returns:
             PluginInstallState state instance.
@@ -324,7 +326,7 @@ class PluginInstallService:  # noqa: WPS214
         env = self.plugin_installation_env(plugin)
 
         if (
-            (skip_installed and not self._requires_install(plugin, env=env))
+            (auto_install and not self._requires_install(plugin, env=env))
             or not plugin.is_installable()
             or self._is_mapping(plugin)
         ):

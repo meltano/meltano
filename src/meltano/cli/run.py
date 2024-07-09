@@ -178,7 +178,7 @@ async def run(
         project,
         parser.plugins,
         reason=PluginInstallReason.JIT,
-        skip_installed=True,
+        auto_install=True,
     )
 
     try:

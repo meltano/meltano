@@ -417,7 +417,7 @@ async def test(
         project,
         [plugin_test_service.plugin_invoker.plugin],
         reason=PluginInstallReason.JIT,
-        skip_installed=True,
+        auto_install=True,
     )
 
     try:

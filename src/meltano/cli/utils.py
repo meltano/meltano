@@ -436,7 +436,7 @@ async def install_plugins(
     parallelism=None,
     clean=False,
     force=False,
-    skip_installed=False,
+    auto_install=False,
 ) -> bool:
     """Install the provided plugins and report results to the console."""
     install_service = PluginInstallService(
@@ -449,7 +449,7 @@ async def install_plugins(
     install_results = await install_service.install_plugins(
         plugins,
         reason=reason,
-        skip_installed=skip_installed,
+        auto_install=auto_install,
     )
     num_successful = len([status for status in install_results if status.successful])
     num_skipped = len([status for status in install_results if status.skipped])
