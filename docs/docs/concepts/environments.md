@@ -60,7 +60,7 @@ plugins:
     variant: meltanolabs
     pip_url: git+https://github.com/MeltanoLabs/tap-github.git
     config:
-      start_date: '2022-01-01'
+      start_date: '2024-01-01'
   loaders:
   - name: target-snowflake
     variant: meltanolabs
