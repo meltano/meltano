@@ -407,7 +407,15 @@ class PluginInstallService:  # noqa: WPS214
                 env,
                 if_missing=EnvVarMissingBehavior.raise_exception,
             )
-        except EnvironmentVariableNotSetError:
+        except EnvironmentVariableNotSetError as e:
+            logger.warning(
+                (
+                    "Environment variable '%s' not set for '%s' `pip_url`, will not"
+                    " attempt install"
+                ),
+                e.env_var,
+                plugin.name,
+            )
             return False
 
         venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
