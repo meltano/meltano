@@ -178,7 +178,6 @@ async def run(
         project,
         parser.plugins,
         reason=PluginInstallReason.AUTO,
-        auto_install=True,
     )
 
     try:

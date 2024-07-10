@@ -141,7 +141,6 @@ async def show(
         project,
         [select_service.extractor],
         reason=PluginInstallReason.AUTO,
-        auto_install=True,
     )
 
     with closing(Session()) as session:

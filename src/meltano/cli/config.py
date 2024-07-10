@@ -426,7 +426,6 @@ async def test(
         project,
         [plugin_test_service.plugin_invoker.plugin],
         reason=PluginInstallReason.AUTO,
-        auto_install=True,
     )
 
     try:

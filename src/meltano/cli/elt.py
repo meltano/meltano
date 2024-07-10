@@ -456,7 +456,6 @@ async def _run_elt(
         elt_context.project,
         plugins,
         reason=PluginInstallReason.AUTO,
-        auto_install=True,
     )
 
     async with _redirect_output(log, output_logger):

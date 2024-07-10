@@ -248,15 +248,12 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
-        auto_install=False,
     ) -> tuple[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
             plugins: ProjectPlugin instances to install.
             reason: Plugin install reason.
-            auto_install: Whether this is an auto-install operation and plugins should
-                be evaluated for required install.
 
         Returns:
             Install state of installed plugins.
@@ -266,8 +263,7 @@ class PluginInstallService:  # noqa: WPS214
             self.status_cb(state)
 
         installing = [
-            self.install_plugin_async(plugin, reason, auto_install)
-            for plugin in new_plugins
+            self.install_plugin_async(plugin, reason) for plugin in new_plugins
         ]
 
         states.extend(await asyncio.gather(*installing))
@@ -302,15 +298,12 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,
-        auto_install=False,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
         Args:
             plugin: ProjectPlugin to install.
             reason: Install reason.
-            auto_install: Whether this is an auto-install operation and the plugin
-                    should be evaluated for required install.
 
         Returns:
             PluginInstallState state instance.
@@ -326,7 +319,10 @@ class PluginInstallService:  # noqa: WPS214
         env = self.plugin_installation_env(plugin)
 
         if (
-            (auto_install and not self._requires_install(plugin, env=env))
+            (
+                reason == PluginInstallReason.AUTO
+                and not self._requires_install(plugin, env=env)
+            )
             or not plugin.is_installable()
             or self._is_mapping(plugin)
         ):

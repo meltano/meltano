@@ -123,25 +123,37 @@ class TestPluginInstallService:
         subject: PluginInstallService,
     ):
         plugin = next(project.plugins.plugins())
-        state = await subject.install_plugin_async(plugin, auto_install=True)
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
 
         assert not state.skipped, "Expected plugin with no venv to be installed"
 
-        state = await subject.install_plugin_async(plugin, auto_install=True)
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
 
         assert (
             state.skipped
         ), "Expected plugin with venv and matching fingerprint to not be installed"
 
         plugin.pip_url = "changed"
-        state = await subject.install_plugin_async(plugin, auto_install=True)
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
 
         assert (
             not state.skipped
         ), "Expected plugin with venv and non-matching fingerprint to be installed"
 
         plugin.pip_url = "$MISSING_ENV_VAR"
-        state = await subject.install_plugin_async(plugin, auto_install=True)
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
 
         assert (
             state.skipped
