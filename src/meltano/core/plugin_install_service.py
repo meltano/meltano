@@ -308,14 +308,6 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             PluginInstallState state instance.
         """
-        self.status_cb(
-            PluginInstallState(
-                plugin=plugin,
-                reason=reason,
-                status=PluginInstallStatus.RUNNING,
-            ),
-        )
-
         env = self.plugin_installation_env(plugin)
 
         if (
@@ -334,6 +326,14 @@ class PluginInstallService:  # noqa: WPS214
             )
             self.status_cb(state)
             return state
+
+        self.status_cb(
+            PluginInstallState(
+                plugin=plugin,
+                reason=reason,
+                status=PluginInstallStatus.RUNNING,
+            ),
+        )
 
         try:
             async with plugin.trigger_hooks("install", self, plugin, reason):
