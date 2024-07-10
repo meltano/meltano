@@ -13,6 +13,9 @@ from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
 
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
 InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
 
 
@@ -37,11 +40,17 @@ def database_uri_option(func):
     return functools.update_wrapper(decorate, func)
 
 
+def _get_project_auto_install():
+    ctx = click.get_current_context()
+    project: Project = ctx.obj["project"]
+
+    return project.settings.get("auto_install")
+
+
 install_option = click.option(
     "--install/--no-install",
     "install_plugins",
-    default=True,
-    show_default=True,
+    default=_get_project_auto_install,
     callback=_install_plugins_fn,
     help="Whether or not to install the subject plugin(s) automatically.",
 )

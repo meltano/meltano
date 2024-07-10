@@ -479,6 +479,43 @@ export MELTANO_HUB_URL_AUTH=false
   </TabItem>
 </Tabs>
 
+### <a name="hub-url-auth"></a>`auto_install`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_AUTO_INSTALL`
+- Default: `true`
+
+Whether to automatically install any required plugins on command invocation. A plugin will be auto-installed when its virtual environment does not already exist or `pip_url` is changed.
+
+Auto-install pertains to the following commands:
+- [`meltano add`](command-line-interface#add)
+- [`meltano config <plugin> test`](command-line-interface#config)
+- [`meltano select --list`](command-line-interface#select)
+- [`meltano test`](command-line-interface#test)
+- [`meltano invoke`](command-line-interface#invoke)
+- [`meltano el`](command-line-interface#el) / [`meltano elt`](command-line-interface#elt)
+- [`meltano run`](command-line-interface#run)
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set auto_install true
+meltano config meltano set auto_install false
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_AUTO_INSTALL=true
+export MELTANO_AUTO_INSTALL=false
+```
+
+  </TabItem>
+</Tabs>
+
 ## `meltano` CLI
 
 These settings can be used to modify the behavior of the [`meltano` CLI](/reference/command-line-interface).

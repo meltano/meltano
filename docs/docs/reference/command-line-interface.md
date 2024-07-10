@@ -184,7 +184,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--[no-]install`: Whether or not to install the plugin after adding it to the project (default: `--install`).
+- `--[no-]install`: Whether or not to install the plugin after adding it to the project (defaults to the [project `auto_install` configuration](settings#auto_install)).
 - `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
@@ -543,7 +543,7 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
   Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano el ... --dump=state > state.json`.
 
-- A `--[no-]install` option can be passed to control whether or not to install the plugins to the project before running, if required (default: `--install`).
+- A `--[no-]install` option can be passed to control whether or not to install the plugins to the project before running, if required (defaults to the [project `auto_install` configuration](settings#auto_install)).
 
 #### Examples
 
@@ -998,7 +998,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
-- `--[no-]install`: Whether or not to install the plugins to the project before running, if required (default: `--install`).
+- `--[no-]install`: Whether or not to install the plugins to the project before running, if required (defaults to the [project `auto_install` configuration](settings#auto_install)).
 
 Examples:
 
