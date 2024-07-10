@@ -42,9 +42,9 @@ def database_uri_option(func):
 
 def _get_project_auto_install():
     ctx = click.get_current_context()
-    project: Project = ctx.obj["project"]
+    project: Project | None = ctx.obj["project"]
 
-    return project.settings.get("auto_install")
+    return project and project.settings.get("auto_install")
 
 
 install_option = click.option(
