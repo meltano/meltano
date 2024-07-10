@@ -414,9 +414,17 @@ def install_status_update(install_state: PluginInstallState):
     """
     plugin = install_state.plugin
     desc = plugin.type.descriptor
-    if install_state.status in {
+
+    if install_state.status is PluginInstallStatus.SKIPPED:
+        level = (
+            logging.DEBUG
+            if install_state.reason == PluginInstallReason.AUTO
+            else logging.INFO
+        )
+        logger.log(level, "%s %s '%s'", install_state.verb, desc, plugin.name)
+    elif install_state.status in {
         PluginInstallStatus.RUNNING,
-        PluginInstallStatus.SKIPPED,
+        PluginInstallStatus.SUCCESS,
     }:
         logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
     elif install_state.status is PluginInstallStatus.ERROR:
@@ -424,8 +432,6 @@ def install_status_update(install_state: PluginInstallState):
         logger.info(install_state.details)
     elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
         logger.warning(install_state.message)
-    elif install_state.status is PluginInstallStatus.SUCCESS:
-        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
 
 
 async def install_plugins(
@@ -455,6 +461,8 @@ async def install_plugins(
         level = logging.ERROR
     elif num_failed > 0 and num_successful > 0:
         level = logging.WARNING
+    elif reason == PluginInstallReason.AUTO and num_skipped == len(plugins):
+        level = logging.DEBUG
 
     if len(plugins) > 1:
         logger.log(
