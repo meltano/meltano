@@ -177,7 +177,7 @@ async def run(
     await install_plugins(
         project,
         parser.plugins,
-        reason=PluginInstallReason.JIT,
+        reason=PluginInstallReason.AUTO,
         auto_install=True,
     )
 

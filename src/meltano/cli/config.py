@@ -425,7 +425,7 @@ async def test(
     await install_plugins(
         project,
         [plugin_test_service.plugin_invoker.plugin],
-        reason=PluginInstallReason.JIT,
+        reason=PluginInstallReason.AUTO,
         auto_install=True,
     )
 

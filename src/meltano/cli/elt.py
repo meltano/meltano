@@ -455,7 +455,7 @@ async def _run_elt(
     await install_plugins(
         elt_context.project,
         plugins,
-        reason=PluginInstallReason.JIT,
+        reason=PluginInstallReason.AUTO,
         auto_install=True,
     )
 

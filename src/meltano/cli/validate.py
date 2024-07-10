@@ -117,7 +117,7 @@ async def test(
     await install_plugins(
         project,
         [c.invoker.plugin for c in collected.values() if c.tests_selection],
-        reason=PluginInstallReason.JIT,
+        reason=PluginInstallReason.AUTO,
         auto_install=True,
     )
 
