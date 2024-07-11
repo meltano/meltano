@@ -11,7 +11,12 @@ from datetime import datetime, timezone
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    InstallPlugins,
+    UUIDParamType,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
@@ -28,6 +33,8 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    import uuid
+
     import structlog
 
     from meltano.core.project import Project
@@ -105,6 +112,11 @@ class ELOptions:
         is_flag=True,
         help="Merges state with that of previous runs.",
     )
+    run_id = click.option(
+        "--run-id",
+        type=UUIDParamType(),
+        help="Use a custom run ID.",
+    )
 
 
 @click.command(
@@ -128,6 +140,7 @@ class ELOptions:
 @install
 @no_install
 @only_install
+@ELOptions.run_id
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -147,6 +160,7 @@ async def el(  # WPS408
     state_id: str,
     force: bool,
     merge_state: bool,
+    run_id: uuid.UUID | None,
     install_plugins: InstallPlugins,
 ):
     """
@@ -177,6 +191,7 @@ async def el(  # WPS408
         force,
         merge_state,
         install_plugins,
+        run_id=run_id,
     )
 
 
@@ -202,6 +217,7 @@ async def el(  # WPS408
 @install
 @no_install
 @only_install
+@ELOptions.run_id
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -223,6 +239,7 @@ async def elt(  # WPS408
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
+    run_id: uuid.UUID | None,
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -253,6 +270,7 @@ async def elt(  # WPS408
         force,
         merge_state,
         install_plugins,
+        run_id=run_id,
     )
 
 
@@ -274,6 +292,8 @@ async def _run_el_command(
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
+    *,
+    run_id: uuid.UUID | None,
 ):
     if platform.system() == "Windows":
         raise CliError(
@@ -298,6 +318,7 @@ async def _run_el_command(
             f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
             f"--{extractor}--{loader}"
         ),
+        run_id=run_id,
     )
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -316,6 +337,7 @@ async def _run_el_command(
             catalog=catalog,
             state=state,
             merge_state=merge_state,
+            run_id=run_id,
         )
 
         if dump:
@@ -353,6 +375,8 @@ def _elt_context_builder(
     catalog=None,
     state=None,
     merge_state=False,
+    *,
+    run_id: uuid.UUID | None = None,
 ):
     select_filter = select_filter or []
     transform_name = None
@@ -374,6 +398,7 @@ def _elt_context_builder(
         .with_catalog(catalog)
         .with_state(state)
         .with_merge_state(merge_state)
+        .with_run_id(run_id)
     )
 
 

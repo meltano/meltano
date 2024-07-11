@@ -131,7 +131,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
+        kwargs["run_id"] = kwargs.get("run_id") or uuid.uuid4()
         super().__init__(**kwargs)
 
     @hybrid_property

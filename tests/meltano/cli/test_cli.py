@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import typing as t
+import uuid
 from pathlib import Path
 from time import perf_counter_ns
 
@@ -19,6 +20,7 @@ import meltano
 from asserts import assert_cli_runner
 from fixtures.utils import cd
 from meltano.cli import cli, handle_meltano_error
+from meltano.cli.params import UUIDParamType
 from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
@@ -490,3 +492,22 @@ class TestLargeConfigProject:
         duration_ns = perf_counter_ns() - start
         # Ensure the large config can be processed in less than 25 seconds
         assert duration_ns < 25000000000
+
+
+class TestUUIDParamType:
+    @pytest.mark.parametrize(
+        "value",
+        (
+            pytest.param("123e4567-e89b-12d3-a456-426614174000", id="with hyphens"),
+            pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
+        ),
+    )
+    def test_valid_uuid(self, value: str):
+        param = UUIDParamType()
+        assert param.convert(value, None, None) == uuid.UUID(value)
+
+    def test_invalid_uuid(self):
+        param = UUIDParamType()
+        value = "zzz"
+        with pytest.raises(click.BadParameter, match="is not a valid UUID"):
+            param.convert(value, None, None)

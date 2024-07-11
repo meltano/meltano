@@ -506,12 +506,10 @@ module = [
   "meltano.cli.state",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
-  "meltano.core.elt_context",
   "meltano.core.meltano_invoker",
   "meltano.core.migration_service",
   "meltano.core.models",
   "meltano.core.plugin_install_service",
-  "meltano.core.plugin_invoker",
   "meltano.core.plugin_test_service",
   "meltano.core.project_add_service",
   "meltano.core.project_files",
@@ -561,6 +559,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.ruff]
 line-length = 88
 target-version = "py38"
+
+[tool.ruff.format]
+exclude = [
+  "src/meltano/migrations/*",
+]
 
 [tool.ruff.lint]
 exclude = [

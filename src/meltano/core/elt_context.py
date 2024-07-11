@@ -10,6 +10,9 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 
 if t.TYPE_CHECKING:
+    import uuid
+    from pathlib import Path
+
     from sqlalchemy.orm import Session
 
     from meltano.core.job import Job
@@ -101,6 +104,7 @@ class ELTContext:  # noqa: WPS230
         state: str | None = None,
         base_output_logger: OutputLogger | None = None,
         merge_state: bool | None = False,
+        run_id: uuid.UUID | None = None,
     ):
         """Initialise ELT Context instance.
 
@@ -121,6 +125,7 @@ class ELTContext:  # noqa: WPS230
             state: State to pass to extractor.
             base_output_logger: OutputLogger to use.
             merge_state: Flag. Merges State at the end of run
+            run_id: Run ID.
         """
         self.project = project
         self.job = job
@@ -141,16 +146,24 @@ class ELTContext:  # noqa: WPS230
 
         self.base_output_logger = base_output_logger
         self.merge_state = merge_state
+        self.run_id = run_id
 
     @property
-    def elt_run_dir(self):
+    def elt_run_dir(self) -> Path | None:
         """Get the ELT run directory.
 
         Returns:
             The job dir, if a Job is provided, else None.
         """
-        if self.job:  # noqa: RET503
+        # In an EL/ELT run, there is always a job. This means the run directory
+        # is always ".meltano/run/<state-id>/<run-id>".
+        # This means the catalog can only be cached for executions that use the
+        # same state and run ID.
+        # See https://github.com/meltano/meltano/issues/2415.
+        if self.job:
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
+
+        return None  # pragma: no cover
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.
@@ -160,6 +173,10 @@ class ELTContext:  # noqa: WPS230
 
         Returns:
             A PluginInvoker.
+
+        Raises:
+            RuntimeError: If plugin context could not be found for the given plugin
+                type.
         """
         plugin_contexts = {
             PluginType.EXTRACTORS: self.extractor,
@@ -167,14 +184,17 @@ class ELTContext:  # noqa: WPS230
             PluginType.TRANSFORMERS: self.transformer,
         }
 
-        plugin_context = plugin_contexts[plugin_type]
-        return invoker_factory(
-            self.project,
-            plugin_context.plugin,
-            context=self,
-            run_dir=self.elt_run_dir,
-            plugin_settings_service=plugin_context.settings_service,
-        )
+        if plugin_context := plugin_contexts[plugin_type]:
+            return invoker_factory(
+                self.project,
+                plugin_context.plugin,
+                context=self,
+                run_dir=self.elt_run_dir,
+                plugin_settings_service=plugin_context.settings_service,
+            )
+
+        errmsg = f"Plugin context could not be found for {plugin_type.value}"  # pragma: no cover  # noqa: E501
+        raise RuntimeError(errmsg)  # pragma: no cover
 
     def extractor_invoker(self) -> PluginInvoker:
         """Get the extractors' invoker.
@@ -212,23 +232,23 @@ class ELTContextBuilder:  # noqa: WPS214
         """
         self.project = project
 
-        self._session = None
-        self._job = None
+        self._session: Session | None = None
+        self._job: Job | None = None
 
-        self._extractor = None
-        self._loader = None
-        self._transform = None
-        self._transformer = None
+        self._extractor: PluginRef | None = None
+        self._loader: PluginRef | None = None
+        self._transform: PluginRef | None = None
+        self._transformer: PluginRef | None = None
 
         self._only_transform = False
         self._dry_run = False
         self._full_refresh = False
         self._refresh_catalog = False
-        self._select_filter = None
-        self._catalog = None
-        self._state = None
-        self._base_output_logger = None
-        self._merge_state = False
+        self._select_filter: list[str] | None = None
+        self._catalog: str | None = None
+        self._state: str | None = None
+        self._base_output_logger: OutputLogger | None = None
+        self._merge_state: bool = False
 
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.
@@ -404,6 +424,18 @@ class ELTContextBuilder:  # noqa: WPS214
         self._state = state
         return self
 
+    def with_run_id(self, run_id: uuid.UUID | None):
+        """Set a run ID for this run.
+
+        Args:
+            run_id: The run ID value.
+
+        Returns:
+            self
+        """
+        self._run_id = run_id
+        return self
+
     def set_base_output_logger(self, base_output_logger: OutputLogger):  # noqa: WPS615
         """Set the base output logger for use in this ELTContext.
 
@@ -454,7 +486,7 @@ class ELTContextBuilder:  # noqa: WPS214
                 env_override=env,
                 config_override=config,
             ),
-            session=self._session,
+            session=self._session,  # type: ignore[arg-type]
         )
 
     def context(self) -> ELTContext:
@@ -467,7 +499,7 @@ class ELTContextBuilder:  # noqa: WPS214
 
         extractor = None
         if self._extractor:
-            config = {}
+            config: dict[str, t.Any] = {}
             if self._select_filter:
                 config["_select_filter"] = self._select_filter
             if self._catalog:
