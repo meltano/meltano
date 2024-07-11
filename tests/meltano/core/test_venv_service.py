@@ -7,6 +7,7 @@ import subprocess
 import sys
 import typing as t
 from asyncio.subprocess import Process
+from pathlib import Path
 
 import mock
 import pytest
@@ -22,9 +23,7 @@ if t.TYPE_CHECKING:
 
 
 def _check_venv_created_with_python(project: Project, python: str | None):
-    with mock.patch(
-        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
-    ) as venv_mock:
+    with mock.patch("meltano.core.venv_service._resolve_python_path") as venv_mock:
         VenvService(project=project)
         venv_mock.assert_called_once_with(python)
 
@@ -35,7 +34,7 @@ async def _check_venv_created_with_python_for_plugin(
     python: str | None,
 ):
     with mock.patch(
-        "meltano.core.venv_service.VirtualEnv._resolve_python_path",
+        "meltano.core.venv_service._resolve_python_path"
     ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
         await install_pip_plugin(project=project, plugin=plugin)
         venv_mock.assert_called_once_with(python)
@@ -47,13 +46,27 @@ class TestVenvService:
         return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService):
-        file = project.run_dir("name", "test.file.txt")
+        run_dir = project.run_dir("name")
+
+        file = run_dir / "test.file.txt"
         file.touch()
+
         assert file.exists()
         assert file.is_file()
 
+        sub_dir = run_dir / "test_dir"
+        sub_dir.mkdir()
+
+        assert sub_dir.exists()
+        assert sub_dir.is_dir()
+
         subject.clean_run_files()
+
         assert not file.exists()
+        assert not sub_dir.exists()
+        assert (
+            run_dir.exists()
+        ), "Expected all files in the run dir to be removed, but not the dir itself"
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("project")
@@ -102,12 +115,12 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        with open(venv_dir / ".meltano_plugin_fingerprint") as fingerprint_file:
-            assert (
-                fingerprint_file.read()
-                # sha256 of "example"
-                == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
-            )
+        fingerprint = (venv_dir / ".meltano_plugin_fingerprint").read_text()
+        assert (
+            fingerprint
+            # sha256 of "example"
+            == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+        )
 
         # ensure that log file was created and is not empty
         assert subject.pip_log_path.exists()
@@ -251,13 +264,12 @@ class TestVirtualEnv:
             "os.access",
             return_value=True,
         ):
-            assert (
-                VirtualEnv(
-                    root,
-                    python="/usr/bin/test-python-executable",
-                ).python_path
-                == "/usr/bin/test-python-executable"
-            )
+            path_str = "/usr/bin/test-python-executable"
+            venv = VirtualEnv(root, python=path_str)
+            assert venv.python_path == path_str
+
+            venv = VirtualEnv(root, python=Path(path_str))
+            assert venv.python_path == str(Path(path_str).resolve())
 
         with mock.patch(
             "shutil.which",
@@ -276,6 +288,12 @@ class TestVirtualEnv:
             match="Python executable 'test-python-executable' was not found",
         ):
             VirtualEnv(root, python="test-python-executable")
+
+        with pytest.raises(
+            MeltanoError,
+            match="not the number 3.11",
+        ):
+            VirtualEnv(root, python=3.11)
 
 
 class TestUvVenvService:

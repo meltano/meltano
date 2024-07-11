@@ -8,12 +8,13 @@ import uuid
 import click
 import structlog
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.logging.utils import change_console_log_level
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
@@ -98,6 +99,7 @@ class UUIDParamType(click.ParamType):
     "blocks",
     nargs=-1,
 )
+@install_option
 @pass_project(migrate=True)
 @click.pass_context
 @run_async
@@ -113,6 +115,7 @@ async def run(
     merge_state: bool,
     run_id: uuid.UUID | None,
     blocks: list[str],
+    install_plugins: InstallPlugins,
 ):
     """
     Run a set of command blocks in series.
@@ -170,6 +173,13 @@ async def run(
     else:
         tracker.track_command_event(CliEvent.aborted)
         raise CliError("Some ExtractLoadBlocks set failed validation.")  # noqa: EM101
+
+    await install_plugins(
+        project,
+        parser.plugins,
+        reason=PluginInstallReason.AUTO,
+    )
+
     try:
         await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
     except Exception as err:

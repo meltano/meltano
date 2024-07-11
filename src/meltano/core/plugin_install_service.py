@@ -23,8 +23,18 @@ from meltano.core.error import (
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
-from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars, noop
-from meltano.core.venv_service import UvVenvService, VenvService
+from meltano.core.utils import (
+    EnvironmentVariableNotSetError,
+    EnvVarMissingBehavior,
+    expand_env_vars,
+    noop,
+)
+from meltano.core.venv_service import (
+    UvVenvService,
+    VenvService,
+    VirtualEnv,
+    fingerprint,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -37,6 +47,7 @@ class PluginInstallReason(str, Enum):
     """Plugin install reason enum."""
 
     ADD = "add"
+    AUTO = "auto"
     INSTALL = "install"
     UPGRADE = "upgrade"
 
@@ -216,7 +227,7 @@ class PluginInstallService:  # noqa: WPS214
                 )
         return states, deduped_plugins
 
-    def install_all_plugins(
+    async def install_all_plugins(
         self,
         reason=PluginInstallReason.INSTALL,
     ) -> tuple[PluginInstallState]:
@@ -231,34 +242,9 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return self.install_plugins(self.project.plugins.plugins(), reason=reason)
+        return await self.install_plugins(self.project.plugins.plugins(), reason=reason)
 
-    def install_plugins(
-        self,
-        plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
-        """
-        Install all the provided plugins.
-
-        Blocks until all plugins are installed.
-
-        Args:
-            plugins: ProjectPlugin instances to install.
-            reason: Plugin install reason.
-
-        Returns:
-            Install state of installed plugins.
-        """
-        states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
-        for state in states:
-            self.status_cb(state)
-        states.extend(
-            asyncio.run(self.install_plugins_async(new_plugins, reason=reason)),
-        )
-        return states
-
-    async def install_plugins_async(
+    async def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
         reason=PluginInstallReason.INSTALL,
@@ -272,9 +258,16 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             Install state of installed plugins.
         """
-        return await asyncio.gather(
-            *[self.install_plugin_async(plugin, reason) for plugin in plugins],
-        )
+        states, new_plugins = self.remove_duplicates(plugins=plugins, reason=reason)
+        for state in states:
+            self.status_cb(state)
+
+        installing = [
+            self.install_plugin_async(plugin, reason) for plugin in new_plugins
+        ]
+
+        states.extend(await asyncio.gather(*installing))
+        return states
 
     def install_plugin(
         self,
@@ -315,15 +308,16 @@ class PluginInstallService:  # noqa: WPS214
         Returns:
             PluginInstallState state instance.
         """
-        self.status_cb(
-            PluginInstallState(
-                plugin=plugin,
-                reason=reason,
-                status=PluginInstallStatus.RUNNING,
-            ),
-        )
+        env = self.plugin_installation_env(plugin)
 
-        if not plugin.is_installable() or self._is_mapping(plugin):
+        if (
+            (
+                reason == PluginInstallReason.AUTO
+                and not self._requires_install(plugin, env=env)
+            )
+            or not plugin.is_installable()
+            or self._is_mapping(plugin)
+        ):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -332,6 +326,14 @@ class PluginInstallService:  # noqa: WPS214
             )
             self.status_cb(state)
             return state
+
+        self.status_cb(
+            PluginInstallState(
+                plugin=plugin,
+                reason=reason,
+                status=PluginInstallStatus.RUNNING,
+            ),
+        )
 
         try:
             async with plugin.trigger_hooks("install", self, plugin, reason):
@@ -346,7 +348,7 @@ class PluginInstallService:  # noqa: WPS214
                     reason=reason,
                     clean=self.clean,
                     force=self.force,
-                    env=self.plugin_installation_env(plugin),
+                    env=env,
                 )
                 state = PluginInstallState(
                     plugin=plugin,
@@ -389,6 +391,33 @@ class PluginInstallService:  # noqa: WPS214
             )
             self.status_cb(state)
             return state
+
+    def _requires_install(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        env: t.Mapping[str, str] = None,
+    ) -> bool:
+        try:
+            pip_install_args = get_pip_install_args(
+                self.project,
+                plugin,
+                env,
+                if_missing=EnvVarMissingBehavior.raise_exception,
+            )
+        except EnvironmentVariableNotSetError as e:
+            logger.warning(
+                (
+                    "Environment variable '%s' not set for '%s' `pip_url`, will not"
+                    " attempt install"
+                ),
+                e.env_var,
+                plugin.name,
+            )
+            return False
+
+        venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
+        return fingerprint(pip_install_args) != venv.read_fingerprint()
 
     @staticmethod
     def _is_mapping(plugin: ProjectPlugin) -> bool:
@@ -479,6 +508,7 @@ def get_pip_install_args(
     project: Project,
     plugin: ProjectPlugin,
     env: t.Mapping[str, str] | None = None,
+    if_missing: EnvVarMissingBehavior | None = None,
 ) -> list[str]:
     """Get the pip install arguments for the given plugin.
 
@@ -486,6 +516,8 @@ def get_pip_install_args(
         project: Meltano Project.
         plugin: `ProjectPlugin` to get pip install arguments for.
         env: Optional environment variables to use when expanding the pip install args.
+        if_missing: The behaviour flow to follow when a environment variable is not
+            present when expanding the pip URL
 
     Returns:
         The list of pip install arguments for the given plugin.
@@ -498,7 +530,7 @@ def get_pip_install_args(
             expand_env_vars(
                 plugin.pip_url,
                 env,
-                if_missing=EnvVarMissingBehavior(strict_env_var_mode),
+                if_missing=if_missing or EnvVarMissingBehavior(strict_env_var_mode),
             )
             or "",
         )

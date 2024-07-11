@@ -295,6 +295,11 @@
           ]
         }
       }
+    },
+    "auto_install": {
+      "type": "boolean",
+      "description": "Whether to automatically install any required plugins on command invocation. A plugin will be auto-installed when its virtual environment does not already exist or `pip_url` is changed.",
+      "default": true
     }
   },
   "$defs": {

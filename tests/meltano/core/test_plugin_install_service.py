@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing as t
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import yaml
@@ -71,8 +72,8 @@ class TestPluginInstallService:
         ]
 
     @pytest.mark.slow()
-    def test_install_all(self, subject):
-        all_plugins = subject.install_all_plugins()
+    async def test_install_all(self, subject):
+        all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
 
         assert all_plugins[2].plugin.name == "target-csv"
@@ -113,3 +114,47 @@ class TestPluginInstallService:
             "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
             "python-json-logger",
         ]
+
+    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @pytest.mark.usefixtures("reset_project_context")
+    async def test_auto_install(
+        self,
+        project: Project,
+        subject: PluginInstallService,
+    ):
+        plugin = next(project.plugins.plugins())
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert not state.skipped, "Expected plugin with no venv to be installed"
+
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert (
+            state.skipped
+        ), "Expected plugin with venv and matching fingerprint to not be installed"
+
+        plugin.pip_url = "changed"
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert (
+            not state.skipped
+        ), "Expected plugin with venv and non-matching fingerprint to be installed"
+
+        plugin.pip_url = "$MISSING_ENV_VAR"
+        state = await subject.install_plugin_async(
+            plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert (
+            state.skipped
+        ), "Expected plugin with missing env var in pip URL to not be installed"

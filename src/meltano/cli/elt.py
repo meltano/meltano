@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
@@ -20,6 +20,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
@@ -122,6 +123,7 @@ class ELOptions:
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@install_option
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -141,6 +143,7 @@ async def el(  # WPS408
     state_id: str,
     force: bool,
     merge_state: bool,
+    install_plugins: InstallPlugins,
 ):
     """
     Run an EL pipeline to Extract and Load data.
@@ -169,6 +172,7 @@ async def el(  # WPS408
         state_id,
         force,
         merge_state,
+        install_plugins,
     )
 
 
@@ -191,6 +195,7 @@ async def el(  # WPS408
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@install_option
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -211,6 +216,7 @@ async def elt(  # WPS408
     state_id: str,
     force: bool,
     merge_state: bool,
+    install_plugins: InstallPlugins,
 ):
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
@@ -240,6 +246,7 @@ async def elt(  # WPS408
         state_id,
         force,
         merge_state,
+        install_plugins,
     )
 
 
@@ -260,6 +267,7 @@ async def _run_el_command(
     state_id: str,
     force: bool,
     merge_state: bool,
+    install_plugins: InstallPlugins,
 ):
     if platform.system() == "Windows":
         raise CliError(
@@ -307,7 +315,15 @@ async def _run_el_command(
         if dump:
             await dump_file(context_builder, dump)
         else:
-            await _run_job(tracker, project, job, session, context_builder, force=force)
+            await _run_job(
+                tracker,
+                project,
+                job,
+                session,
+                context_builder,
+                install_plugins,
+                force=force,
+            )
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
@@ -373,7 +389,15 @@ async def dump_file(context_builder, dumpable):
         raise CliError(f"Could not dump {dumpable}: {err}") from err  # noqa: EM102
 
 
-async def _run_job(tracker, project, job, session, context_builder, force=False):
+async def _run_job(
+    tracker,
+    project,
+    job,
+    session,
+    context_builder,
+    install_plugins: InstallPlugins,
+    force=False,
+):
     fail_stale_jobs(session, job.job_name)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
@@ -392,7 +416,7 @@ async def _run_job(tracker, project, job, session, context_builder, force=False)
 
         log = logger.bind(name="meltano", run_id=str(job.run_id), state_id=job.job_name)
 
-        await _run_elt(tracker, log, context_builder, output_logger)
+        await _run_elt(tracker, log, context_builder, output_logger, install_plugins)
 
 
 @asynccontextmanager
@@ -417,13 +441,25 @@ async def _redirect_output(log, output_logger):
 
 async def _run_elt(
     tracker: Tracker,
-    log: structlog.BoundLogger,
+    log: structlog.stdlib.BoundLogger,
     context_builder: ELTContextBuilder,
     output_logger: OutputLogger,
+    install_plugins: InstallPlugins,
 ):
+    elt_context = context_builder.context()
+    plugins = [elt_context.extractor, elt_context.loader]
+
+    if elt_context.only_transform:
+        plugins.append(elt_context.transformer)
+
+    await install_plugins(
+        elt_context.project,
+        plugins,
+        reason=PluginInstallReason.AUTO,
+    )
+
     async with _redirect_output(log, output_logger):
         try:
-            elt_context = context_builder.context()
             tracker.add_contexts(PluginsTrackingContext.from_elt_context(elt_context))
             tracker.track_command_event(CliEvent.inflight)
 

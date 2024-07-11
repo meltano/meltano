@@ -3,13 +3,24 @@
 from __future__ import annotations
 
 import functools
+import typing as t
 
 import click
 
-from meltano.cli.utils import CliError
+from meltano.cli.utils import CliError, install_plugins
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationError
 from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.utils import async_noop
+
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
+InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
+
+
+def _install_plugins_fn(_ctx, _param, value: bool) -> InstallPlugins:
+    return install_plugins if value else async_noop  # type: ignore[return-value]
 
 
 def database_uri_option(func):
@@ -27,6 +38,22 @@ def database_uri_option(func):
         return func(*args, **kwargs)
 
     return functools.update_wrapper(decorate, func)
+
+
+def _get_project_auto_install():
+    ctx = click.get_current_context()
+    project: Project | None = ctx.obj["project"]
+
+    return project and project.settings.get("auto_install")
+
+
+install_option = click.option(
+    "--install/--no-install",
+    "install_plugins",
+    default=_get_project_auto_install,
+    callback=_install_plugins_fn,
+    help="Whether or not to install the subject plugin(s) automatically.",
+)
 
 
 class pass_project:  # noqa: N801

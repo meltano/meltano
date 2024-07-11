@@ -31,6 +31,7 @@
     "KMS_DOTENV_PATH": ".env",
     "KMS_PUBLIC_KEY_PATH": "utilities/kms/Publickey.pem",
     "KMS_SECTRETS_PATH": "secrets.yml",
+    "MELTANO_AUTO_INSTALL": "true",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
     "MELTANO_CLI_LOG_LEVEL": "info",
     "MELTANO_DATABASE_MAX_RETRIES": "3",

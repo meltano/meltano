@@ -4,6 +4,7 @@ import datetime
 import itertools
 import logging
 import os
+import shutil
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from pathlib import Path
@@ -2425,3 +2426,22 @@ def use_test_log_config():
         return_value=test_log_config,
     ) as patched_default_config:
         yield patched_default_config
+
+
+@pytest.fixture()
+def reset_project_context(
+    project: Project,
+    project_init_service: ProjectInitService,
+):
+    for path in project.root.iterdir():
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink()
+
+    project_init_service.create_files(project)
+
+    project.refresh()
+
+    for plugin_type in PluginType:
+        project.meltano.plugins[plugin_type].clear()

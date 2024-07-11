@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import shutil
 import sys
 import typing as t
@@ -10,13 +9,15 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import pass_project
+from meltano.cli.params import InstallPlugins, install_option, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     InstrumentedCmd,
     propagate_stop_signals,
 )
 from meltano.core.db import project_engine
+from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
 if t.TYPE_CHECKING:
@@ -83,10 +84,13 @@ class CommandLineRunner(ValidationsRunner):
     required=False,
     nargs=-1,
 )
+@install_option
 @pass_project(migrate=True)
-def test(
+@run_async
+async def test(
     project: Project,
     all_tests: bool,
+    install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...] = (),
 ):
     """
@@ -110,7 +114,13 @@ def test(
         else:
             collected[plugin_name].select_all()
 
-    exit_codes = asyncio.run(_run_plugin_tests(session, collected.values()))
+    await install_plugins(
+        project,
+        [c.invoker.plugin for c in collected.values() if c.tests_selection],
+        reason=PluginInstallReason.AUTO,
+    )
+
+    exit_codes = await _run_plugin_tests(session, collected.values())
     click.echo()
     _report_and_exit(exit_codes)
 
