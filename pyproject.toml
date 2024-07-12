@@ -603,11 +603,11 @@ select = [
   "SIM", # flake8-simplify
   "T10", # flake8-debugger
   "T20", # flake8-print
+  "TCH", # flake8-type-checking
   "TID", # flake8-tidy-imports
   "UP",  # pyupgrade
   "W",   # pycodestyle (warning)
-  "TID", # flake8-tidy-imports
-  "TCH", # flake8-type-checking
+  "YTT", # flake8-2020
 ]
 unfixable = [
   "ERA001", # Don't remove commented-out code
