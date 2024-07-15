@@ -56,7 +56,7 @@ async def _install_plugins_and_exit(*args, **kwargs) -> bool:
     await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
     context = click.get_current_context()
     context.exit(code=0)
-    return True
+    return True  # pragma: no cover
 
 
 def database_uri_option(func):
