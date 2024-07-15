@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import click
 import requests
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
@@ -28,6 +28,8 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
+
+install, no_install = get_install_options(include_only_install=False)
 
 
 def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
@@ -102,7 +104,8 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     is_flag=True,
     help="Update an existing plugin.",
 )
-@install_option
+@install
+@no_install
 @click.option(
     "--force-install",
     is_flag=True,

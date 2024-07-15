@@ -302,8 +302,8 @@ def noop(*_args, **_kwargs):
     pass
 
 
-async def async_noop(*_args, **_kwargs):
-    pass
+async def async_noop(*_args, **_kwargs) -> bool:
+    return True
 
 
 def truthy(val: str) -> bool:

@@ -7,20 +7,55 @@ import typing as t
 
 import click
 
-from meltano.cli.utils import CliError, install_plugins
+from meltano.cli.utils import AutoInstallBehavior, CliError, install_plugins
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationError
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
+_AnyCallable = t.Callable[..., t.Any]
+FC = t.TypeVar("FC", bound=_AnyCallable)
+
 InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
 
 
-def _install_plugins_fn(_ctx, _param, value: bool) -> InstallPlugins:
-    return install_plugins if value else async_noop  # type: ignore[return-value]
+def _install_plugins_fn(
+    ctx: click.Context,
+    _param,
+    value: AutoInstallBehavior | None,
+) -> InstallPlugins:
+    if value is None:
+        project: Project | None = ctx.obj["project"]
+        auto_install = project and project.settings.get("auto_install")
+        behavior = (
+            AutoInstallBehavior.install
+            if auto_install
+            else AutoInstallBehavior.no_install
+        )
+    else:
+        behavior = value
+
+    behavior = value or ctx.obj.get(
+        "auto_install_behaviour",
+        AutoInstallBehavior.install,
+    )
+    if behavior == AutoInstallBehavior.no_install:
+        return async_noop
+    if behavior == AutoInstallBehavior.only_install:
+        return _install_plugins_and_exit
+
+    return install_plugins
+
+
+async def _install_plugins_and_exit(*args, **kwargs) -> bool:
+    kwargs.pop("reason", None)
+    await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
+    context = click.get_current_context()
+    context.exit(code=0)
 
 
 def database_uri_option(func):
@@ -40,20 +75,46 @@ def database_uri_option(func):
     return functools.update_wrapper(decorate, func)
 
 
-def _get_project_auto_install():
-    ctx = click.get_current_context()
-    project: Project | None = ctx.obj["project"]
+def get_install_options(
+    *,
+    include_only_install: bool,
+) -> tuple[t.Callable[[FC], FC], ...]:
+    """Return install options for CLI commands.
 
-    return project and project.settings.get("auto_install")
+    Args:
+        include_only_install: Flag to include the `--only-install` option.
 
+    Returns:
+        Tuple of install option decorators.
+    """
+    install_option = click.option(
+        "--install",
+        "install_plugins",
+        flag_value=AutoInstallBehavior.install,
+        callback=_install_plugins_fn,
+        help="Install the subject plugin(s) automatically.",
+    )
 
-install_option = click.option(
-    "--install/--no-install",
-    "install_plugins",
-    default=_get_project_auto_install,
-    callback=_install_plugins_fn,
-    help="Whether or not to install the subject plugin(s) automatically.",
-)
+    no_install_option = click.option(
+        "--no-install",
+        "install_plugins",
+        flag_value=AutoInstallBehavior.no_install,
+        callback=_install_plugins_fn,
+        help="Do not install the subject plugin(s) automatically.",
+    )
+
+    only_install_option = click.option(
+        "--only-install",
+        "install_plugins",
+        flag_value=AutoInstallBehavior.only_install,
+        callback=_install_plugins_fn,
+        help="Only install the subject plugin(s).",
+    )
+
+    if include_only_install:
+        return install_option, no_install_option, only_install_option
+
+    return install_option, no_install_option
 
 
 class pass_project:  # noqa: N801

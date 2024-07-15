@@ -7,7 +7,7 @@ from contextlib import closing
 
 import click
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
@@ -18,6 +18,9 @@ from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 def selection_color(selection):
@@ -75,7 +78,9 @@ def selection_mark(selection):
     is_flag=True,
     help="Exclude all attributes that match specified pattern.",
 )
-@install_option
+@install
+@no_install
+@only_install
 @pass_project(migrate=True)
 @run_async
 async def select(

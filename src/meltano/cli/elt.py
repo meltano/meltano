@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
@@ -41,6 +41,8 @@ DUMPABLES = {
 }
 
 logger = structlog_stdlib.get_logger(__name__)
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 class ELOptions:
@@ -123,7 +125,9 @@ class ELOptions:
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
-@install_option
+@install
+@no_install
+@only_install
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -195,7 +199,9 @@ async def el(  # WPS408
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
-@install_option
+@install
+@no_install
+@only_install
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
