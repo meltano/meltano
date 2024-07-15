@@ -28,6 +28,16 @@ The no color configuration is available for all meltano subcommands via an envir
 
 - `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
+##### <a name="auto-install-behavior"></a>Auto-install behavior
+
+There's three possible auto-install behaviors for commands that support the `--install/--no-install/--only-install` switch:
+
+- `--install`: Install the subject plugins if they are not already installed.
+- `--no-install`: Do not install the subject plugins, even if they are not already installed.
+- `--only-install`: Only install the subject plugins, without running the command.
+
+If the flag is not provided, the behavior is determined by the boolean [`auto_install` setting](/reference/settings#auto-install), falling back to either `--install` or `--no-install` accordingly.
+
 ## `add`
 
 `meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
@@ -543,7 +553,7 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
   Like any standard output, the dumped content can be [redirected](<https://en.wikipedia.org/wiki/Redirection_(computing)>) to a file using `>`, e.g. `meltano el ... --dump=state > state.json`.
 
-- A `--[no-]install` option can be passed to control whether or not to install the plugins to the project before running, if required (defaults to the [project `auto_install` configuration](settings#auto_install)).
+- The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 #### Examples
 
@@ -998,7 +1008,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
-- `--[no-]install`: Whether or not to install the plugins to the project before running, if required (defaults to the [project `auto_install` configuration](settings#auto_install)).
+- The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
 Examples:
 
