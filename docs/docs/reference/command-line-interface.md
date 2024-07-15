@@ -194,7 +194,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
-- `--[no-]install`: Whether or not to install the plugin after adding it to the project (defaults to the [project `auto_install` configuration](settings#auto_install)).
+- `--install/--no-install`: Whether or not to install the plugin after adding it to the project. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 - `--update`: Update a plugin in the project.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
