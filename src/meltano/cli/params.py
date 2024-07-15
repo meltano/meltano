@@ -56,6 +56,7 @@ async def _install_plugins_and_exit(*args, **kwargs) -> bool:
     await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
     context = click.get_current_context()
     context.exit(code=0)
+    return True
 
 
 def database_uri_option(func):
@@ -90,7 +91,7 @@ def get_install_options(
     install_option = click.option(
         "--install",
         "install_plugins",
-        flag_value=AutoInstallBehavior.install,
+        flag_value=AutoInstallBehavior.install.value,
         callback=_install_plugins_fn,
         help="Install the subject plugin(s) automatically.",
     )
@@ -98,7 +99,7 @@ def get_install_options(
     no_install_option = click.option(
         "--no-install",
         "install_plugins",
-        flag_value=AutoInstallBehavior.no_install,
+        flag_value=AutoInstallBehavior.no_install.value,
         callback=_install_plugins_fn,
         help="Do not install the subject plugin(s) automatically.",
     )
@@ -106,7 +107,7 @@ def get_install_options(
     only_install_option = click.option(
         "--only-install",
         "install_plugins",
-        flag_value=AutoInstallBehavior.only_install,
+        flag_value=AutoInstallBehavior.only_install.value,
         callback=_install_plugins_fn,
         help="Only install the subject plugin(s).",
     )
