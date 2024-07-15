@@ -11,6 +11,7 @@ from mock import AsyncMock, Mock, patch
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
+from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.project_plugins_service import ProjectPluginsService
 
 if t.TYPE_CHECKING:
@@ -239,3 +240,23 @@ class TestCliInvoke:
         mock_invoke.assert_not_called()
         assert "utility-mock:cmd" in res.output
         assert "description of utility command" in res.output
+
+    def test_invoke_only_install(self, cli_runner, project: Project, utility):
+        with patch.object(
+            ProjectPluginsService,
+            "find_plugin",
+            return_value=utility,
+        ), patch(
+            "meltano.cli.params.install_plugins",
+        ) as mock_install, patch(
+            "meltano.cli.invoke._invoke",
+        ) as mock_invoke:
+            res = cli_runner.invoke(cli, ["invoke", "--only-install", "utility-mock"])
+
+        assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
+        mock_install.assert_called_once_with(
+            project,
+            [utility],
+            reason=PluginInstallReason.INSTALL,
+        )
+        mock_invoke.assert_not_called()

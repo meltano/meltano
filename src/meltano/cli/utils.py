@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import signal
+import sys
 import typing as t
 from contextlib import contextmanager
 from enum import Enum, auto
@@ -32,6 +33,11 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
+
+if sys.version_info < (3, 11):
+    ReprEnum = Enum
+else:
+    from enum import ReprEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
@@ -703,3 +709,12 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
+
+
+# TODO: Use StrEnum (and its backport) when we can drop Python 3.8 support
+class AutoInstallBehavior(str, ReprEnum):
+    """Enum of the different behaviors for automatic plugin installation."""
+
+    install = "install"
+    no_install = "no_install"
+    only_install = "only_install"
