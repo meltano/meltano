@@ -138,9 +138,15 @@ class TestProject:
 
 
 class TestIncompatibleProject:
-    def test_incompatible(self, project):
+    @pytest.fixture()
+    def increase_version(self, project):
         with project.meltano_update() as meltano:
             meltano["version"] += 1
+        yield
+        with project.meltano_update() as meltano:
+            meltano["version"] -= 1
 
+    @pytest.mark.usefixtures("increase_version")
+    def test_incompatible(self, project):
         with pytest.raises(IncompatibleVersionError):
             Project.activate(project)

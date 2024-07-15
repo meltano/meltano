@@ -8,7 +8,7 @@ import uuid
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
@@ -26,6 +26,8 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 class UUIDParamType(click.ParamType):
@@ -99,7 +101,9 @@ class UUIDParamType(click.ParamType):
     "blocks",
     nargs=-1,
 )
-@install_option
+@install
+@no_install
+@only_install
 @pass_project(migrate=True)
 @click.pass_context
 @run_async

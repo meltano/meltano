@@ -9,7 +9,7 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     InstrumentedCmd,
@@ -30,6 +30,8 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 TEST_LINE_LENGTH = 60
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 def write_sep_line(title: str, sepchar: str, **kwargs):
@@ -84,7 +86,9 @@ class CommandLineRunner(ValidationsRunner):
     required=False,
     nargs=-1,
 )
-@install_option
+@install
+@no_install
+@only_install
 @pass_project(migrate=True)
 @run_async
 async def test(

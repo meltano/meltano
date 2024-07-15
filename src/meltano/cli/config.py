@@ -14,7 +14,7 @@ import dotenv
 import structlog
 
 from meltano.cli.interactive import InteractiveConfig
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
@@ -38,6 +38,8 @@ if t.TYPE_CHECKING:
     from meltano.core.project_settings_service import ProjectSettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 def _get_ctx_arg(*args: t.Any) -> click.core.Context:
@@ -405,7 +407,9 @@ def set_(
 @config.command(cls=PartialInstrumentedCmd, name="test")
 @pass_project(migrate=True)
 @click.pass_context
-@install_option
+@install
+@no_install
+@only_install
 @run_async
 async def test(
     ctx,

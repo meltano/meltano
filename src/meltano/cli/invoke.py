@@ -8,7 +8,7 @@ import typing as t
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, install_option, pass_project
+from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     CliError,
@@ -35,6 +35,8 @@ if t.TYPE_CHECKING:
     from meltano.core.tracking import Tracker
 
 logger = structlog.stdlib.get_logger(__name__)
+
+install, no_install, only_install = get_install_options(include_only_install=True)
 
 
 @click.command(
@@ -73,7 +75,9 @@ logger = structlog.stdlib.get_logger(__name__)
     is_flag=True,
     help="Execute plugins using containers where possible.",
 )
-@install_option
+@install
+@no_install
+@only_install
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
