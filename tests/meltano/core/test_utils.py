@@ -108,33 +108,83 @@ def test_flatten():
     assert result == expected_flat
 
 
-def test_expand_env_vars():
-    env = {"ENV_VAR": "substituted"}
-    assert expand_env_vars("${ENV_VAR}_suffix", env) == "substituted_suffix"
-    assert expand_env_vars("prefix_${ENV_VAR}", env) == "prefix_substituted"
-    assert (
-        expand_env_vars("prefix_${ENV_VAR}_suffix", env) == "prefix_substituted_suffix"
-    )
-    assert expand_env_vars("${ENV_VAR}", env) == "substituted"
-    assert expand_env_vars("$ENV_VAR", env) == "substituted"
-
-    assert expand_env_vars("$ENV_VAR", {}) == ""
-    assert (
-        expand_env_vars("$ENV_VAR", {}, if_missing=EnvVarMissingBehavior.ignore)
-        == "${ENV_VAR}"
-    )
-    assert (
-        expand_env_vars("${ENV_VAR}", {}, if_missing=EnvVarMissingBehavior.ignore)
-        == "${ENV_VAR}"
-    )
-    assert (
-        expand_env_vars(
+@pytest.mark.parametrize(
+    ("input_value", "env", "kwargs", "expected_output"),
+    (
+        pytest.param(
+            "${ENV_VAR}_suffix",
+            {"ENV_VAR": "substituted"},
+            {},
+            "substituted_suffix",
+            id="suffix",
+        ),
+        pytest.param(
+            "prefix_${ENV_VAR}",
+            {"ENV_VAR": "substituted"},
+            {},
+            "prefix_substituted",
+            id="prefix",
+        ),
+        pytest.param(
+            "prefix_${ENV_VAR}_suffix",
+            {"ENV_VAR": "substituted"},
+            {},
+            "prefix_substituted_suffix",
+            id="prefix-and-suffix",
+        ),
+        pytest.param(
+            "${ENV_VAR}",
+            {"ENV_VAR": "substituted"},
+            {},
+            "substituted",
+            id="curly-braces",
+        ),
+        pytest.param(
+            "$ENV_VAR",
+            {"ENV_VAR": "substituted"},
+            {},
+            "substituted",
+            id="no-curly-braces",
+        ),
+        pytest.param(
+            "$ENV_VAR",
+            {},
+            {},
+            "",
+            id="no-match-use-empty-string",
+        ),
+        pytest.param(
+            "$ENV_VAR",
+            {},
+            {"if_missing": EnvVarMissingBehavior.ignore},
+            "$ENV_VAR",
+            id="no-match-ignore",
+        ),
+        pytest.param(
+            "${ENV_VAR}",
+            {},
+            {"if_missing": EnvVarMissingBehavior.ignore},
+            "${ENV_VAR}",
+            id="no-match-ignore-curly-braces",
+        ),
+        pytest.param(
             "prefix-${ENV_VAR}-suffix",
             {},
-            if_missing=EnvVarMissingBehavior.ignore,
-        )
-        == "prefix-${ENV_VAR}-suffix"
-    )
+            {"if_missing": EnvVarMissingBehavior.ignore},
+            "prefix-${ENV_VAR}-suffix",
+            id="no-match-prefix-and-suffix-ignore",
+        ),
+        pytest.param(
+            "MY_DB\\$TableName",
+            {},
+            {},
+            "MY_DB$TableName",
+            id="escape",
+        ),
+    ),
+)
+def test_expand_env_vars(input_value, env, kwargs, expected_output):
+    assert expand_env_vars(input_value, env, **kwargs) == expected_output
 
 
 def test_expand_env_vars_nested():
