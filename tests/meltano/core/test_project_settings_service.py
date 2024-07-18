@@ -28,12 +28,11 @@ def config_override():
         ProjectSettingsService.config_override.pop("project_id")
 
 
-@pytest.fixture()
-def subject(project):
-    return ProjectSettingsService(project)
-
-
 class TestProjectSettingsService:
+    @pytest.fixture()
+    def subject(self, project):
+        return ProjectSettingsService(project)
+
     @pytest.fixture()
     def environment(self):
         return Environment("testing", {})
