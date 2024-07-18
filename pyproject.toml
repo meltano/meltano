@@ -479,6 +479,7 @@ version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
   'docs/package.json:^  "version":',
+  ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
 ]
 
 [tool.mypy]
