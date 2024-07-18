@@ -2097,8 +2097,12 @@ def project_directory(project_init_service):
 
 
 @pytest.fixture(scope="class")
-def project(project_init_service, tmp_path_factory: pytest.TempPathFactory):
-    with cd(tmp_path_factory.mktemp("meltano-project-dir")), project_directory(
+def project(
+    project_init_service,
+    tmp_path_factory: pytest.TempPathFactory,
+    worker_id,
+):
+    with cd(tmp_path_factory.mktemp(worker_id)), project_directory(
         project_init_service,
     ) as project:
         yield project
