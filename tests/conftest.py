@@ -198,12 +198,12 @@ class MockAdapter(BaseAdapter):
         return response
 
 
-@pytest.fixture(scope="class", autouse=True)
-def mount_meltano_hub_mock_adapter(project: Project, discovery) -> None:
-    project.hub_service.session.mount(
-        project.hub_service.hub_api_url,
-        MockAdapter(project.hub_service.hub_api_url, discovery),
-    )
+@pytest.fixture(scope="class")
+def hub_mock_adapter(discovery) -> t.Callable[[str], MockAdapter]:
+    def _get_adapter(api_url: str) -> MockAdapter:
+        return MockAdapter(api_url, discovery)
+
+    return _get_adapter
 
 
 @pytest.fixture(scope="class")
