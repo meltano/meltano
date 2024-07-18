@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
 
 class TestLock:
     @pytest.mark.order(0)
+    @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize(
         "args",
         (
