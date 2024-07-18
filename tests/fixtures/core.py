@@ -5,6 +5,7 @@ import itertools
 import logging
 import os
 import shutil
+import typing as t
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from pathlib import Path
@@ -36,6 +37,9 @@ from meltano.core.schedule_service import ScheduleAlreadyExistsError, ScheduleSe
 from meltano.core.state_service import StateService
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
+
+if t.TYPE_CHECKING:
+    from requests.adapters import BaseAdapter
 
 current_dir = Path(__file__).parent
 
@@ -2097,10 +2101,18 @@ def project_directory(project_init_service):
 
 
 @pytest.fixture(scope="class")
-def project(project_init_service, tmp_path_factory: pytest.TempPathFactory):
+def project(
+    project_init_service,
+    tmp_path_factory: pytest.TempPathFactory,
+    hub_mock_adapter: t.Callable[[str], BaseAdapter],
+):
     with cd(tmp_path_factory.mktemp("meltano-project-dir")), project_directory(
         project_init_service,
     ) as project:
+        project.hub_service.session.mount(
+            project.hub_service.hub_api_url,
+            hub_mock_adapter(project.hub_service.hub_api_url),
+        )
         yield project
 
 
