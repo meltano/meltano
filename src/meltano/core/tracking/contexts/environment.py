@@ -14,10 +14,10 @@ from pathlib import Path
 from warnings import warn
 
 import psutil
-from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 import meltano
+from meltano._vendor.snowplow_tracker import SelfDescribingJson  # noqa: WPS436
 from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
 

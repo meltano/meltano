@@ -11,8 +11,8 @@ from time import sleep
 
 import mock
 import pytest
-from snowplow_tracker import Emitter, SelfDescribing
 
+from meltano._vendor.snowplow_tracker import Emitter, SelfDescribing  # noqa: WPS436
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext

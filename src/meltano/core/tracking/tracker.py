@@ -20,10 +20,14 @@ import structlog
 import tzlocal
 from psutil import Process
 from requests.adapters import HTTPAdapter
-from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
-from snowplow_tracker import Tracker as SnowplowTracker
 from urllib3 import Retry
 
+from meltano._vendor.snowplow_tracker import (  # noqa: WPS436
+    Emitter,
+    SelfDescribing,
+    SelfDescribingJson,
+)
+from meltano._vendor.snowplow_tracker import Tracker as SnowplowTracker  # noqa: WPS436
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
     CliEventSchema,

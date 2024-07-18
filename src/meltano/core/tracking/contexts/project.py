@@ -7,9 +7,9 @@ import uuid
 from enum import Enum, auto
 from functools import cached_property
 
-from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
+from meltano._vendor.snowplow_tracker import SelfDescribingJson  # noqa: WPS436
 from meltano.core.tracking.schemas import ProjectContextSchema
 from meltano.core.utils import hash_sha256
 

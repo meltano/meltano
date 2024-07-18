@@ -7,6 +7,8 @@ ci:
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: weekly
 
+exclude: ^src/meltano/_vendor/.*$
+
 repos:
   - repo: local
     hooks:

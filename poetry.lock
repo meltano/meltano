@@ -3625,21 +3625,6 @@ webhdfs = ["requests"]
 zst = ["zstandard"]
 
 [[package]]
-name = "snowplow-tracker"
-version = "1.0.2"
-description = "Snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
-optional = false
-python-versions = "*"
-files = [
-    {file = "snowplow-tracker-1.0.2.tar.gz", hash = "sha256:40093edf4ce72c85e180abc6cba04aea3dcb22325710c4284e8a2655394d87e3"},
-    {file = "snowplow_tracker-1.0.2-py3-none-any.whl", hash = "sha256:8b323c3d0d02e3ffa8b2ea4e6e4190c105bfb879b3ba71957b3987d3a8a9e557"},
-]
-
-[package.dependencies]
-requests = ">=2.25.1,<3.0"
-typing-extensions = ">=3.7.4"
-
-[[package]]
 name = "sqlalchemy"
 version = "2.0.31"
 description = "Database Abstraction Library"
@@ -4256,4 +4241,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "4c8b4b08370e7b47a20c9cff7b02c81637542f2b57768ce5f8450695c52e6234"
+content-hash = "a3a5dfd04788220ef379fc4c99028980377af70866773c7341d8904f16ebadcb"

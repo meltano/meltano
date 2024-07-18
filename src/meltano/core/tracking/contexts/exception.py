@@ -8,8 +8,7 @@ import uuid
 from contextlib import suppress
 from pathlib import Path
 
-from snowplow_tracker import SelfDescribingJson
-
+from meltano._vendor.snowplow_tracker import SelfDescribingJson  # noqa: WPS436
 from meltano.core.tracking.schemas import ExceptionContextSchema
 from meltano.core.utils import hash_sha256
 

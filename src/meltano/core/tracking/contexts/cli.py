@@ -5,8 +5,7 @@ from __future__ import annotations
 import typing as t
 from enum import Enum, auto
 
-from snowplow_tracker import SelfDescribingJson
-
+from meltano._vendor.snowplow_tracker import SelfDescribingJson  # noqa: WPS436
 from meltano.core.tracking.schemas import CliContextSchema
 from meltano.core.utils import hash_sha256
 

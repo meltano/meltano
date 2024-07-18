@@ -6,8 +6,8 @@ import typing as t
 import uuid
 
 import structlog
-from snowplow_tracker import SelfDescribingJson
 
+from meltano._vendor.snowplow_tracker import SelfDescribingJson  # noqa: WPS436
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.tracking.schemas import PluginsContextSchema
