@@ -364,13 +364,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.144"
-description = "Type annotations for boto3 1.34.144 generated with mypy-boto3-builder 7.25.0"
+version = "1.34.145"
+description = "Type annotations for boto3 1.34.145 generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.34.144-py3-none-any.whl", hash = "sha256:4fc2f8d41ee7fb4952dc8d6a27bb616e7c0c5f9b71f3ad6d179f27df1bb69b0c"},
-    {file = "boto3_stubs-1.34.144.tar.gz", hash = "sha256:c19d0c4386ec160e6c06567b960b6f7c765acc4ed40f01f371c8e7a0b514520b"},
+    {file = "boto3_stubs-1.34.145-py3-none-any.whl", hash = "sha256:1303deb7d749a2c9bd5a30830e1d537c1474b70c5f429e3db9af5d3eaa7b9696"},
+    {file = "boto3_stubs-1.34.145.tar.gz", hash = "sha256:2d15ccfc44407baae897d3a531f9eb0826e207d70e92f5268e8703139bec2dba"},
 ]
 
 [package.dependencies]
@@ -428,7 +428,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.144)", "botocore (==1.34.144)"]
+boto3 = ["boto3 (==1.34.145)", "botocore (==1.34.145)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -2908,13 +2908,13 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.23.7"
+version = "0.23.8"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest_asyncio-0.23.7-py3-none-any.whl", hash = "sha256:009b48127fbe44518a547bddd25611551b0e43ccdbf1e67d12479f569832c20b"},
-    {file = "pytest_asyncio-0.23.7.tar.gz", hash = "sha256:5f5c72948f4c49e7db4f29f2521d4031f1c27f86e57b046126654083d4770268"},
+    {file = "pytest_asyncio-0.23.8-py3-none-any.whl", hash = "sha256:50265d892689a5faefb84df80819d1ecef566eb3549cf915dfb33569359d1ce2"},
+    {file = "pytest_asyncio-0.23.8.tar.gz", hash = "sha256:759b10b33a6dc61cce40a8bd5205e302978bbbcc00e279a8b61d9a6a3c82e4d3"},
 ]
 
 [package.dependencies]
@@ -4049,13 +4049,13 @@ files = [
 
 [[package]]
 name = "types-croniter"
-version = "2.0.0.20240423"
+version = "2.0.5.20240717"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.0.20240423.tar.gz", hash = "sha256:73c0e068c6ac5abc8ffed2d9828c8a38ebae9a2d32af8fcd6bc5c680c79b64b6"},
-    {file = "types_croniter-2.0.0.20240423-py3-none-any.whl", hash = "sha256:30f8e4d7ff39c39a3cabc17bfc5186a49f6d4807d9c7177e5fa9b0c2cfe3b073"},
+    {file = "types-croniter-2.0.5.20240717.tar.gz", hash = "sha256:307eda59874c0369a12623922f9f7558406b6d5b469b9a9eeec5d476bfa46c7e"},
+    {file = "types_croniter-2.0.5.20240717-py3-none-any.whl", hash = "sha256:60296031ca7034f2e9a9987ace2bf8f7cf121d4e69b5e9ac1c8c879f84bce062"},
 ]
 
 [[package]]
@@ -4528,4 +4528,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "a274c6ab92c0b8b96a16cd3dd754ea3bc3861761818557f093d67d4698a55c6f"
+content-hash = "92040ffa846eca5f8709867fb7fa1f21d9517777de331ff527a68dbcd55335e6"
