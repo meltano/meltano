@@ -364,13 +364,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.144"
-description = "Type annotations for boto3 1.34.144 generated with mypy-boto3-builder 7.25.0"
+version = "1.34.145"
+description = "Type annotations for boto3 1.34.145 generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.34.144-py3-none-any.whl", hash = "sha256:4fc2f8d41ee7fb4952dc8d6a27bb616e7c0c5f9b71f3ad6d179f27df1bb69b0c"},
-    {file = "boto3_stubs-1.34.144.tar.gz", hash = "sha256:c19d0c4386ec160e6c06567b960b6f7c765acc4ed40f01f371c8e7a0b514520b"},
+    {file = "boto3_stubs-1.34.145-py3-none-any.whl", hash = "sha256:1303deb7d749a2c9bd5a30830e1d537c1474b70c5f429e3db9af5d3eaa7b9696"},
+    {file = "boto3_stubs-1.34.145.tar.gz", hash = "sha256:2d15ccfc44407baae897d3a531f9eb0826e207d70e92f5268e8703139bec2dba"},
 ]
 
 [package.dependencies]
@@ -428,7 +428,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.144)", "botocore (==1.34.144)"]
+boto3 = ["boto3 (==1.34.145)", "botocore (==1.34.145)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -800,13 +800,13 @@ crt = ["awscrt (==0.20.11)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.34.140"
+version = "1.34.145"
 description = "Type annotations and code completion for botocore"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "botocore_stubs-1.34.140-py3-none-any.whl", hash = "sha256:3048f14af9cc52e28310c46c3e2651ee7497c94bffb702289cb3af6a4f13ae0c"},
-    {file = "botocore_stubs-1.34.140.tar.gz", hash = "sha256:f8942d5011deee1fbb20b755a14ce2f0ef3ca99ce5712e4c8b75685008dbfe63"},
+    {file = "botocore_stubs-1.34.145-py3-none-any.whl", hash = "sha256:4c579734492713c142773c7405cf62b466dfaf5f05371b7510d3cd308b0ba6a5"},
+    {file = "botocore_stubs-1.34.145.tar.gz", hash = "sha256:69bcfc0c81eee294e681dc8049b7ca2a47a8f0510b88c05710f07dba6d0785c7"},
 ]
 
 [package.dependencies]
@@ -843,13 +843,13 @@ bump2version = "*"
 
 [[package]]
 name = "cachetools"
-version = "5.3.3"
+version = "5.4.0"
 description = "Extensible memoizing collections and decorators"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "cachetools-5.3.3-py3-none-any.whl", hash = "sha256:0abad1021d3f8325b2fc1d2e9c8b9c9d57b04c3932657a72465447332c24d945"},
-    {file = "cachetools-5.3.3.tar.gz", hash = "sha256:ba29e2dfa0b8b556606f097407ed1aa62080ee108ab0dc5ec9d6a723a007d105"},
+    {file = "cachetools-5.4.0-py3-none-any.whl", hash = "sha256:3ae3b49a3d5e28a77a0be2b37dbcb89005058959cb2323858c2657c4a8cab474"},
+    {file = "cachetools-5.4.0.tar.gz", hash = "sha256:b8adc2e7c07f105ced7bc56dbb6dfbe7c4a00acce20e2227b3f355be89bc6827"},
 ]
 
 [[package]]
@@ -1266,13 +1266,13 @@ files = [
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.1"
+version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
-    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
+    {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
+    {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
 ]
 
 [package.extras]
@@ -1444,13 +1444,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-auth"
-version = "2.31.0"
+version = "2.32.0"
 description = "Google Authentication Library"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google-auth-2.31.0.tar.gz", hash = "sha256:87805c36970047247c8afe614d4e3af8eceafc1ebba0c679fe75ddd1d575e871"},
-    {file = "google_auth-2.31.0-py2.py3-none-any.whl", hash = "sha256:042c4702efa9f7d3c48d3a69341c209381b125faa6dbf3ebe56bc7e40ae05c23"},
+    {file = "google_auth-2.32.0-py2.py3-none-any.whl", hash = "sha256:53326ea2ebec768070a94bee4e1b9194c9646ea0c2bd72422785bd0f9abfad7b"},
+    {file = "google_auth-2.32.0.tar.gz", hash = "sha256:49315be72c55a6a37d62819e3573f6b416aca00721f7e3e31a008d928bf64022"},
 ]
 
 [package.dependencies]
@@ -2062,13 +2062,13 @@ xray = ["aws-xray-sdk (>=0.93,!=0.96)", "setuptools"]
 
 [[package]]
 name = "msal"
-version = "1.29.0"
+version = "1.30.0"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "msal-1.29.0-py3-none-any.whl", hash = "sha256:6b301e63f967481f0cc1a3a3bac0cf322b276855bc1b0955468d9deb3f33d511"},
-    {file = "msal-1.29.0.tar.gz", hash = "sha256:8f6725f099752553f9b2fe84125e2a5ebe47b49f92eacca33ebedd3a9ebaae25"},
+    {file = "msal-1.30.0-py3-none-any.whl", hash = "sha256:423872177410cb61683566dc3932db7a76f661a5d2f6f52f02a047f101e1c1de"},
+    {file = "msal-1.30.0.tar.gz", hash = "sha256:b4bf00850092e465157d814efa24a18f788284c9a479491024d62903085ea2fb"},
 ]
 
 [package.dependencies]
@@ -2270,13 +2270,13 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-ec2"
-version = "1.34.138"
-description = "Type annotations for boto3.EC2 1.34.138 service generated with mypy-boto3-builder 7.25.0"
+version = "1.34.145"
+description = "Type annotations for boto3.EC2 1.34.145 service generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mypy_boto3_ec2-1.34.138-py3-none-any.whl", hash = "sha256:c642a7a51a65823d2a78fcd76ff588f336b0df39c62b9372d7031252b63e0c00"},
-    {file = "mypy_boto3_ec2-1.34.138.tar.gz", hash = "sha256:00f5859318e2a8890371c7b9b37fddc2adb80a10536382e6dd066c679608ab8e"},
+    {file = "mypy_boto3_ec2-1.34.145-py3-none-any.whl", hash = "sha256:d6a200a341e65b584cc9af9861e8a331dc85d19a5316d9d0637d192824ec9375"},
+    {file = "mypy_boto3_ec2-1.34.145.tar.gz", hash = "sha256:f676e9382ca2ad1e419804a2759779018d7f0006ac86bd602479855073fafc79"},
 ]
 
 [package.dependencies]
@@ -2298,13 +2298,13 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-rds"
-version = "1.34.135"
-description = "Type annotations for boto3.RDS 1.34.135 service generated with mypy-boto3-builder 7.24.0"
+version = "1.34.145"
+description = "Type annotations for boto3.RDS 1.34.145 service generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mypy_boto3_rds-1.34.135-py3-none-any.whl", hash = "sha256:ce4872ee69cd10b895e11945b6c3255493b642e0410e48a2cfc6afe689cf6209"},
-    {file = "mypy_boto3_rds-1.34.135.tar.gz", hash = "sha256:66b50037073434eb894b00f1597ba39f1e86789717ff9676c5a099f31bc39c9a"},
+    {file = "mypy_boto3_rds-1.34.145-py3-none-any.whl", hash = "sha256:2c28c05b4269c7dcd2ee0c3350784ad02a4c1764728b3335dd56bdbdd6ebd2f6"},
+    {file = "mypy_boto3_rds-1.34.145.tar.gz", hash = "sha256:091a3605d4c2b010be2e61b306f7c877019344b3949b0bfceaee2db2a57bcc8c"},
 ]
 
 [package.dependencies]
@@ -2426,13 +2426,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "portalocker"
-version = "2.10.0"
+version = "2.10.1"
 description = "Wraps the portalocker recipe for easy usage"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "portalocker-2.10.0-py3-none-any.whl", hash = "sha256:48944147b2cd42520549bc1bb8fe44e220296e56f7c3d551bc6ecce69d9b0de1"},
-    {file = "portalocker-2.10.0.tar.gz", hash = "sha256:49de8bc0a2f68ca98bf9e219c81a3e6b27097c7bf505a87c5a112ce1aaeb9b81"},
+    {file = "portalocker-2.10.1-py3-none-any.whl", hash = "sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf"},
+    {file = "portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f"},
 ]
 
 [package.dependencies]
@@ -2908,13 +2908,13 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.23.7"
+version = "0.23.8"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest_asyncio-0.23.7-py3-none-any.whl", hash = "sha256:009b48127fbe44518a547bddd25611551b0e43ccdbf1e67d12479f569832c20b"},
-    {file = "pytest_asyncio-0.23.7.tar.gz", hash = "sha256:5f5c72948f4c49e7db4f29f2521d4031f1c27f86e57b046126654083d4770268"},
+    {file = "pytest_asyncio-0.23.8-py3-none-any.whl", hash = "sha256:50265d892689a5faefb84df80819d1ecef566eb3549cf915dfb33569359d1ce2"},
+    {file = "pytest_asyncio-0.23.8.tar.gz", hash = "sha256:759b10b33a6dc61cce40a8bd5205e302978bbbcc00e279a8b61d9a6a3c82e4d3"},
 ]
 
 [package.dependencies]
@@ -4038,24 +4038,24 @@ files = [
 
 [[package]]
 name = "types-awscrt"
-version = "0.21.0"
+version = "0.21.2"
 description = "Type annotations and code completion for awscrt"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "types_awscrt-0.21.0-py3-none-any.whl", hash = "sha256:026f882d4d23f04c5b2ab08d6fefd627842537009cd00e9f78dd4960314d51aa"},
-    {file = "types_awscrt-0.21.0.tar.gz", hash = "sha256:06aa247fe5ccf0b86428e5289aeabf67f967e10861f211c16c19e7d2542a70a9"},
+    {file = "types_awscrt-0.21.2-py3-none-any.whl", hash = "sha256:0839fe12f0f914d8f7d63ed777c728cb4eccc2d5d79a26e377d12b0604e7bf0e"},
+    {file = "types_awscrt-0.21.2.tar.gz", hash = "sha256:84a9f4f422ec525c314fdf54c23a1e73edfbcec968560943ca2d41cfae623b38"},
 ]
 
 [[package]]
 name = "types-croniter"
-version = "2.0.0.20240423"
+version = "2.0.5.20240717"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.0.20240423.tar.gz", hash = "sha256:73c0e068c6ac5abc8ffed2d9828c8a38ebae9a2d32af8fcd6bc5c680c79b64b6"},
-    {file = "types_croniter-2.0.0.20240423-py3-none-any.whl", hash = "sha256:30f8e4d7ff39c39a3cabc17bfc5186a49f6d4807d9c7177e5fa9b0c2cfe3b073"},
+    {file = "types-croniter-2.0.5.20240717.tar.gz", hash = "sha256:307eda59874c0369a12623922f9f7558406b6d5b469b9a9eeec5d476bfa46c7e"},
+    {file = "types_croniter-2.0.5.20240717-py3-none-any.whl", hash = "sha256:60296031ca7034f2e9a9987ace2bf8f7cf121d4e69b5e9ac1c8c879f84bce062"},
 ]
 
 [[package]]
@@ -4528,4 +4528,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "a274c6ab92c0b8b96a16cd3dd754ea3bc3861761818557f093d67d4698a55c6f"
+content-hash = "92040ffa846eca5f8709867fb7fa1f21d9517777de331ff527a68dbcd55335e6"
