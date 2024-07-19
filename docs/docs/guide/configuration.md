@@ -359,7 +359,7 @@ extractors:
 ```
 
 :::tip
-<p>Values with a <code>$</code> character that are not intended to be expanded should be escaped with a backslash (<code>\</code>), e.g. <code>\$VAR</code></p>:
+<p>Values with a <code>$</code> character that are not intended to be expanded should be escaped with a backslash (<code>\</code>), e.g. <code>\$VAR</code>:</p>
 
 ```yaml
 extractors:
