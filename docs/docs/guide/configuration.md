@@ -358,6 +358,17 @@ extractors:
     inside_a_word: ${MELTANO_EXTRACTOR_NAMESPACE}_foo
 ```
 
+:::tip
+<p>Values with a <code>$</code> character that are not intended to be expanded should be escaped with a backslash (<code>\</code>), e.g. <code>\$VAR</code>:</p>
+
+```yaml
+extractors:
+- name: tap-example
+  config:
+    special_character_setting: MY_$VAR
+```
+:::
+
 ### Accessing from plugins
 
 When Meltano invokes a plugin's executable as part of [`meltano run`](/reference/command-line-interface#run) or [`meltano invoke`](/reference/command-line-interface#invoke), it populates the environment with the same [variables that can be referenced from settings](#available-environment-variables), as well as those describing the plugin's current configuration (including [extras](#plugin-extras)), as discoverable using [`meltano config --format=env <plugin>`](/reference/command-line-interface#config).

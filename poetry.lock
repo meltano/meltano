@@ -2,13 +2,13 @@
 
 [[package]]
 name = "aiodocker"
-version = "0.22.1"
+version = "0.22.2"
 description = "A simple Docker HTTP API wrapper written with asyncio and aiohttp."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "aiodocker-0.22.1-py3-none-any.whl", hash = "sha256:4e42d6e6cbf8f2afb431b77208be0f7e81d07eb38c8176f18d58761115b2acf5"},
-    {file = "aiodocker-0.22.1.tar.gz", hash = "sha256:fb969fdf2ac574d800ddf132940e0337fe459e191b8024ef66ec8328effa63ce"},
+    {file = "aiodocker-0.22.2-py3-none-any.whl", hash = "sha256:ac16c9e13c01446a57b32481edca3557cdb8678fe19bb1d2debfe0cb7dc2ab29"},
+    {file = "aiodocker-0.22.2.tar.gz", hash = "sha256:8730795a817836d22df36efb04dc0f07c09f5f66b61dac539a7e436d6f4e1af0"},
 ]
 
 [package.dependencies]
@@ -16,7 +16,7 @@ aiohttp = ">=3.8"
 
 [package.extras]
 ci = ["aiohttp (==3.9.5)", "async-timeout (==4.0.3)", "multidict (==6.0.5)", "yarl (==1.9.4)"]
-dev = ["codecov (==2.1.13)", "mypy (==1.10.1)", "packaging (==24.1)", "pre-commit (>=3.5.0)", "pytest (==8.2.2)", "pytest-asyncio (==0.23.7)", "pytest-cov (==5.0.0)", "pytest-sugar (==1.0.0)", "ruff (==0.5.0)", "ruff-lsp (==0.0.54)", "towncrier (==23.11.0)"]
+dev = ["async-timeout (==4.0.3)", "codecov (==2.1.13)", "mypy (==1.10.1)", "packaging (==24.1)", "pre-commit (>=3.5.0)", "pytest (==8.2.2)", "pytest-asyncio (==0.23.7)", "pytest-cov (==5.0.0)", "pytest-sugar (==1.0.0)", "ruff (==0.5.0)", "ruff-lsp (==0.0.54)", "towncrier (==23.11.0)"]
 doc = ["alabaster (==0.7.16)", "sphinx (==7.3.7)", "sphinx-autodoc-typehints (==2.2.2)", "sphinxcontrib-asyncio (==0.3.0)"]
 
 [[package]]
@@ -240,13 +240,13 @@ typing-extensions = ">=4.0.0"
 
 [[package]]
 name = "azure-storage-blob"
-version = "12.20.0"
+version = "12.21.0"
 description = "Microsoft Azure Blob Storage Client Library for Python"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "azure-storage-blob-12.20.0.tar.gz", hash = "sha256:eeb91256e41d4b5b9bad6a87fd0a8ade07dd58aa52344e2c8d2746e27a017d3b"},
-    {file = "azure_storage_blob-12.20.0-py3-none-any.whl", hash = "sha256:de6b3bf3a90e9341a6bcb96a2ebe981dffff993e9045818f6549afea827a52a9"},
+    {file = "azure-storage-blob-12.21.0.tar.gz", hash = "sha256:b9722725072f5b7373c0f4dd6d78fbae2bb37bffc5c3e01731ab8c750ee8dd7e"},
+    {file = "azure_storage_blob-12.21.0-py3-none-any.whl", hash = "sha256:f9ede187dd5a0ef296b583a7c1861c6938ddd6708d6e70f4203a163c2ab42d43"},
 ]
 
 [package.dependencies]
@@ -345,17 +345,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.34.144"
+version = "1.34.145"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.144-py3-none-any.whl", hash = "sha256:b8433d481d50b68a0162c0379c0dd4aabfc3d1ad901800beb5b87815997511c1"},
-    {file = "boto3-1.34.144.tar.gz", hash = "sha256:2f3e88b10b8fcc5f6100a9d74cd28230edc9d4fa226d99dd40a3ab38ac213673"},
+    {file = "boto3-1.34.145-py3-none-any.whl", hash = "sha256:69d5afb7a017d07dd6bdfb680d2912d5d369b3fafa0a45161207d9f393b14d7e"},
+    {file = "boto3-1.34.145.tar.gz", hash = "sha256:ac770fb53dde1743aec56bd8e56b7ee2e2f5ad42a37825968ec4ff8428822640"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.144,<1.35.0"
+botocore = ">=1.34.145,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -364,13 +364,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.144"
-description = "Type annotations for boto3 1.34.144 generated with mypy-boto3-builder 7.25.0"
+version = "1.34.145"
+description = "Type annotations for boto3 1.34.145 generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.34.144-py3-none-any.whl", hash = "sha256:4fc2f8d41ee7fb4952dc8d6a27bb616e7c0c5f9b71f3ad6d179f27df1bb69b0c"},
-    {file = "boto3_stubs-1.34.144.tar.gz", hash = "sha256:c19d0c4386ec160e6c06567b960b6f7c765acc4ed40f01f371c8e7a0b514520b"},
+    {file = "boto3_stubs-1.34.145-py3-none-any.whl", hash = "sha256:1303deb7d749a2c9bd5a30830e1d537c1474b70c5f429e3db9af5d3eaa7b9696"},
+    {file = "boto3_stubs-1.34.145.tar.gz", hash = "sha256:2d15ccfc44407baae897d3a531f9eb0826e207d70e92f5268e8703139bec2dba"},
 ]
 
 [package.dependencies]
@@ -428,7 +428,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.144)", "botocore (==1.34.144)"]
+boto3 = ["boto3 (==1.34.145)", "botocore (==1.34.145)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -778,13 +778,13 @@ xray = ["mypy-boto3-xray (>=1.34.0,<1.35.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.144"
+version = "1.34.145"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.144-py3-none-any.whl", hash = "sha256:a2cf26e1bf10d5917a2285e50257bc44e94a1d16574f282f3274f7a5d8d1f08b"},
-    {file = "botocore-1.34.144.tar.gz", hash = "sha256:4215db28d25309d59c99507f1f77df9089e5bebbad35f6e19c7c44ec5383a3e8"},
+    {file = "botocore-1.34.145-py3-none-any.whl", hash = "sha256:2e72e262de02adcb0264ac2bac159a28f55dbba8d9e52aa0308773a42950dff5"},
+    {file = "botocore-1.34.145.tar.gz", hash = "sha256:edf0fb4c02186ae29b76263ac5fda18b0a085d334a310551c9984407cf1079e6"},
 ]
 
 [package.dependencies]
@@ -800,13 +800,13 @@ crt = ["awscrt (==0.20.11)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.34.140"
+version = "1.34.145"
 description = "Type annotations and code completion for botocore"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "botocore_stubs-1.34.140-py3-none-any.whl", hash = "sha256:3048f14af9cc52e28310c46c3e2651ee7497c94bffb702289cb3af6a4f13ae0c"},
-    {file = "botocore_stubs-1.34.140.tar.gz", hash = "sha256:f8942d5011deee1fbb20b755a14ce2f0ef3ca99ce5712e4c8b75685008dbfe63"},
+    {file = "botocore_stubs-1.34.145-py3-none-any.whl", hash = "sha256:4c579734492713c142773c7405cf62b466dfaf5f05371b7510d3cd308b0ba6a5"},
+    {file = "botocore_stubs-1.34.145.tar.gz", hash = "sha256:69bcfc0c81eee294e681dc8049b7ca2a47a8f0510b88c05710f07dba6d0785c7"},
 ]
 
 [package.dependencies]
@@ -843,13 +843,13 @@ bump2version = "*"
 
 [[package]]
 name = "cachetools"
-version = "5.3.3"
+version = "5.4.0"
 description = "Extensible memoizing collections and decorators"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "cachetools-5.3.3-py3-none-any.whl", hash = "sha256:0abad1021d3f8325b2fc1d2e9c8b9c9d57b04c3932657a72465447332c24d945"},
-    {file = "cachetools-5.3.3.tar.gz", hash = "sha256:ba29e2dfa0b8b556606f097407ed1aa62080ee108ab0dc5ec9d6a723a007d105"},
+    {file = "cachetools-5.4.0-py3-none-any.whl", hash = "sha256:3ae3b49a3d5e28a77a0be2b37dbcb89005058959cb2323858c2657c4a8cab474"},
+    {file = "cachetools-5.4.0.tar.gz", hash = "sha256:b8adc2e7c07f105ced7bc56dbb6dfbe7c4a00acce20e2227b3f355be89bc6827"},
 ]
 
 [[package]]
@@ -1186,13 +1186,13 @@ toml = ["tomli"]
 
 [[package]]
 name = "croniter"
-version = "2.0.5"
+version = "2.0.7"
 description = "croniter provides iteration for datetime object with cron like format"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.6"
 files = [
-    {file = "croniter-2.0.5-py2.py3-none-any.whl", hash = "sha256:fdbb44920944045cc323db54599b321325141d82d14fa7453bc0699826bbe9ed"},
-    {file = "croniter-2.0.5.tar.gz", hash = "sha256:f1f8ca0af64212fbe99b1bee125ee5a1b53a9c1b433968d8bca8817b79d237f3"},
+    {file = "croniter-2.0.7-py2.py3-none-any.whl", hash = "sha256:f15e80828d23920c4bb7f4d9340b932c9dcabecafc7775703c8b36d1253ed526"},
+    {file = "croniter-2.0.7.tar.gz", hash = "sha256:1041b912b4b1e03751a0993531becf77851ae6e8b334c9c76ffeffb8f055f53f"},
 ]
 
 [package.dependencies]
@@ -1266,13 +1266,13 @@ files = [
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.1"
+version = "1.2.2"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
-    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
+    {file = "exceptiongroup-1.2.2-py3-none-any.whl", hash = "sha256:3111b9d131c238bec2f8f516e123e14ba243563fb135d3fe885990585aa7795b"},
+    {file = "exceptiongroup-1.2.2.tar.gz", hash = "sha256:47c2edf7c6738fafb49fd34290706d1a1a2f4d1c6df275526b62cbb4aa5393cc"},
 ]
 
 [package.extras]
@@ -1444,13 +1444,13 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-auth"
-version = "2.31.0"
+version = "2.32.0"
 description = "Google Authentication Library"
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "google-auth-2.31.0.tar.gz", hash = "sha256:87805c36970047247c8afe614d4e3af8eceafc1ebba0c679fe75ddd1d575e871"},
-    {file = "google_auth-2.31.0-py2.py3-none-any.whl", hash = "sha256:042c4702efa9f7d3c48d3a69341c209381b125faa6dbf3ebe56bc7e40ae05c23"},
+    {file = "google_auth-2.32.0-py2.py3-none-any.whl", hash = "sha256:53326ea2ebec768070a94bee4e1b9194c9646ea0c2bd72422785bd0f9abfad7b"},
+    {file = "google_auth-2.32.0.tar.gz", hash = "sha256:49315be72c55a6a37d62819e3573f6b416aca00721f7e3e31a008d928bf64022"},
 ]
 
 [package.dependencies]
@@ -2062,13 +2062,13 @@ xray = ["aws-xray-sdk (>=0.93,!=0.96)", "setuptools"]
 
 [[package]]
 name = "msal"
-version = "1.29.0"
+version = "1.30.0"
 description = "The Microsoft Authentication Library (MSAL) for Python library enables your app to access the Microsoft Cloud by supporting authentication of users with Microsoft Azure Active Directory accounts (AAD) and Microsoft Accounts (MSA) using industry standard OAuth2 and OpenID Connect."
 optional = true
 python-versions = ">=3.7"
 files = [
-    {file = "msal-1.29.0-py3-none-any.whl", hash = "sha256:6b301e63f967481f0cc1a3a3bac0cf322b276855bc1b0955468d9deb3f33d511"},
-    {file = "msal-1.29.0.tar.gz", hash = "sha256:8f6725f099752553f9b2fe84125e2a5ebe47b49f92eacca33ebedd3a9ebaae25"},
+    {file = "msal-1.30.0-py3-none-any.whl", hash = "sha256:423872177410cb61683566dc3932db7a76f661a5d2f6f52f02a047f101e1c1de"},
+    {file = "msal-1.30.0.tar.gz", hash = "sha256:b4bf00850092e465157d814efa24a18f788284c9a479491024d62903085ea2fb"},
 ]
 
 [package.dependencies]
@@ -2270,13 +2270,13 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-ec2"
-version = "1.34.138"
-description = "Type annotations for boto3.EC2 1.34.138 service generated with mypy-boto3-builder 7.25.0"
+version = "1.34.145"
+description = "Type annotations for boto3.EC2 1.34.145 service generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mypy_boto3_ec2-1.34.138-py3-none-any.whl", hash = "sha256:c642a7a51a65823d2a78fcd76ff588f336b0df39c62b9372d7031252b63e0c00"},
-    {file = "mypy_boto3_ec2-1.34.138.tar.gz", hash = "sha256:00f5859318e2a8890371c7b9b37fddc2adb80a10536382e6dd066c679608ab8e"},
+    {file = "mypy_boto3_ec2-1.34.145-py3-none-any.whl", hash = "sha256:d6a200a341e65b584cc9af9861e8a331dc85d19a5316d9d0637d192824ec9375"},
+    {file = "mypy_boto3_ec2-1.34.145.tar.gz", hash = "sha256:f676e9382ca2ad1e419804a2759779018d7f0006ac86bd602479855073fafc79"},
 ]
 
 [package.dependencies]
@@ -2298,13 +2298,13 @@ typing-extensions = {version = ">=4.1.0", markers = "python_version < \"3.12\""}
 
 [[package]]
 name = "mypy-boto3-rds"
-version = "1.34.135"
-description = "Type annotations for boto3.RDS 1.34.135 service generated with mypy-boto3-builder 7.24.0"
+version = "1.34.145"
+description = "Type annotations for boto3.RDS 1.34.145 service generated with mypy-boto3-builder 7.25.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "mypy_boto3_rds-1.34.135-py3-none-any.whl", hash = "sha256:ce4872ee69cd10b895e11945b6c3255493b642e0410e48a2cfc6afe689cf6209"},
-    {file = "mypy_boto3_rds-1.34.135.tar.gz", hash = "sha256:66b50037073434eb894b00f1597ba39f1e86789717ff9676c5a099f31bc39c9a"},
+    {file = "mypy_boto3_rds-1.34.145-py3-none-any.whl", hash = "sha256:2c28c05b4269c7dcd2ee0c3350784ad02a4c1764728b3335dd56bdbdd6ebd2f6"},
+    {file = "mypy_boto3_rds-1.34.145.tar.gz", hash = "sha256:091a3605d4c2b010be2e61b306f7c877019344b3949b0bfceaee2db2a57bcc8c"},
 ]
 
 [package.dependencies]
@@ -2426,13 +2426,13 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "portalocker"
-version = "2.10.0"
+version = "2.10.1"
 description = "Wraps the portalocker recipe for easy usage"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "portalocker-2.10.0-py3-none-any.whl", hash = "sha256:48944147b2cd42520549bc1bb8fe44e220296e56f7c3d551bc6ecce69d9b0de1"},
-    {file = "portalocker-2.10.0.tar.gz", hash = "sha256:49de8bc0a2f68ca98bf9e219c81a3e6b27097c7bf505a87c5a112ce1aaeb9b81"},
+    {file = "portalocker-2.10.1-py3-none-any.whl", hash = "sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf"},
+    {file = "portalocker-2.10.1.tar.gz", hash = "sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f"},
 ]
 
 [package.dependencies]
@@ -2908,13 +2908,13 @@ dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments
 
 [[package]]
 name = "pytest-asyncio"
-version = "0.23.7"
+version = "0.23.8"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest_asyncio-0.23.7-py3-none-any.whl", hash = "sha256:009b48127fbe44518a547bddd25611551b0e43ccdbf1e67d12479f569832c20b"},
-    {file = "pytest_asyncio-0.23.7.tar.gz", hash = "sha256:5f5c72948f4c49e7db4f29f2521d4031f1c27f86e57b046126654083d4770268"},
+    {file = "pytest_asyncio-0.23.8-py3-none-any.whl", hash = "sha256:50265d892689a5faefb84df80819d1ecef566eb3549cf915dfb33569359d1ce2"},
+    {file = "pytest_asyncio-0.23.8.tar.gz", hash = "sha256:759b10b33a6dc61cce40a8bd5205e302978bbbcc00e279a8b61d9a6a3c82e4d3"},
 ]
 
 [package.dependencies]
@@ -3738,18 +3738,19 @@ test = ["pytest"]
 
 [[package]]
 name = "setuptools"
-version = "70.3.0"
+version = "71.0.3"
 description = "Easily download, build, install, upgrade, and uninstall Python packages"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "setuptools-70.3.0-py3-none-any.whl", hash = "sha256:fe384da74336c398e0d956d1cae0669bc02eed936cdb1d49b57de1990dc11ffc"},
-    {file = "setuptools-70.3.0.tar.gz", hash = "sha256:f171bab1dfbc86b132997f26a119f6056a57950d058587841a0082e8830f9dc5"},
+    {file = "setuptools-71.0.3-py3-none-any.whl", hash = "sha256:f501b6e6db709818dc76882582d9c516bf3b67b948864c5fa1d1624c09a49207"},
+    {file = "setuptools-71.0.3.tar.gz", hash = "sha256:3d8531791a27056f4a38cd3e54084d8b1c4228ff9cf3f2d7dd075ec99f9fd70d"},
 ]
 
 [package.extras]
-doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
-test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "jaraco.test", "mypy (==1.10.0)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (>=0.3.2)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
+core = ["importlib-metadata (>=6)", "importlib-resources (>=5.10.2)", "jaraco.text (>=3.7)", "more-itertools (>=8.8)", "ordered-set (>=3.1.1)", "packaging (>=24)", "platformdirs (>=2.6.2)", "tomli (>=2.0.1)", "wheel (>=0.43.0)"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (<7.4)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
+test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "jaraco.test", "mypy (==1.10.0)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (<0.4)", "pytest-ruff (>=0.2.1)", "pytest-ruff (>=0.3.2)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
 name = "six"
@@ -3902,18 +3903,18 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "structlog"
-version = "24.2.0"
+version = "24.4.0"
 description = "Structured Logging for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "structlog-24.2.0-py3-none-any.whl", hash = "sha256:983bd49f70725c5e1e3867096c0c09665918936b3db27341b41d294283d7a48a"},
-    {file = "structlog-24.2.0.tar.gz", hash = "sha256:0e3fe74924a6d8857d3f612739efb94c72a7417d7c7c008d12276bca3b5bf13b"},
+    {file = "structlog-24.4.0-py3-none-any.whl", hash = "sha256:597f61e80a91cc0749a9fd2a098ed76715a1c8a01f73e336b746504d1aad7610"},
+    {file = "structlog-24.4.0.tar.gz", hash = "sha256:b27bfecede327a6d2da5fbc96bd859f114ecc398a6389d664f62085ee7ae6fc4"},
 ]
 
 [package.extras]
 dev = ["freezegun (>=0.2.8)", "mypy (>=1.4)", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=0.17)", "rich", "simplejson", "twisted"]
-docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-mermaid", "sphinxext-opengraph", "twisted"]
+docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-mermaid", "sphinxext-opengraph", "twisted"]
 tests = ["freezegun (>=0.2.8)", "pretend", "pytest (>=6.0)", "pytest-asyncio (>=0.17)", "simplejson"]
 typing = ["mypy (>=1.4)", "rich", "twisted"]
 
@@ -4037,24 +4038,24 @@ files = [
 
 [[package]]
 name = "types-awscrt"
-version = "0.21.0"
+version = "0.21.2"
 description = "Type annotations and code completion for awscrt"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "types_awscrt-0.21.0-py3-none-any.whl", hash = "sha256:026f882d4d23f04c5b2ab08d6fefd627842537009cd00e9f78dd4960314d51aa"},
-    {file = "types_awscrt-0.21.0.tar.gz", hash = "sha256:06aa247fe5ccf0b86428e5289aeabf67f967e10861f211c16c19e7d2542a70a9"},
+    {file = "types_awscrt-0.21.2-py3-none-any.whl", hash = "sha256:0839fe12f0f914d8f7d63ed777c728cb4eccc2d5d79a26e377d12b0604e7bf0e"},
+    {file = "types_awscrt-0.21.2.tar.gz", hash = "sha256:84a9f4f422ec525c314fdf54c23a1e73edfbcec968560943ca2d41cfae623b38"},
 ]
 
 [[package]]
 name = "types-croniter"
-version = "2.0.0.20240423"
+version = "2.0.5.20240717"
 description = "Typing stubs for croniter"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-croniter-2.0.0.20240423.tar.gz", hash = "sha256:73c0e068c6ac5abc8ffed2d9828c8a38ebae9a2d32af8fcd6bc5c680c79b64b6"},
-    {file = "types_croniter-2.0.0.20240423-py3-none-any.whl", hash = "sha256:30f8e4d7ff39c39a3cabc17bfc5186a49f6d4807d9c7177e5fa9b0c2cfe3b073"},
+    {file = "types-croniter-2.0.5.20240717.tar.gz", hash = "sha256:307eda59874c0369a12623922f9f7558406b6d5b469b9a9eeec5d476bfa46c7e"},
+    {file = "types_croniter-2.0.5.20240717-py3-none-any.whl", hash = "sha256:60296031ca7034f2e9a9987ace2bf8f7cf121d4e69b5e9ac1c8c879f84bce062"},
 ]
 
 [[package]]
@@ -4220,29 +4221,29 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uv"
-version = "0.2.24"
+version = "0.2.26"
 description = "An extremely fast Python package installer and resolver, written in Rust."
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "uv-0.2.24-py3-none-linux_armv6l.whl", hash = "sha256:6176236d10b08d0e837d4a151e956a6af0e96626f0eda309888aa7809dc3c0d7"},
-    {file = "uv-0.2.24-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:e8c89ee50def595bd0461d009b91fc897b6ea94f1db3d67fa223154784b11a02"},
-    {file = "uv-0.2.24-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5ef97f91bc8f51d62693ec863f923ffa3b7c9f2b0d8e365751e51a8eb7d9c8c1"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:8e1858e540ceb1615b35e6b85bbf429a3875d17d240bcd3bb5305406063a641d"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:f9de35cfa2c2c4e7e041442173fbf660a15e2ede10c7f8f038b8cd9b389d2010"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:157b5cbda857d0d88469ab86c0d4a809826b6730fce14a53b2641f75ab92768f"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:2c9bc248d3e92d6dad77c19c9aa8fa6e83d7e3b43c4fb321e28f19dba8d82c3a"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:1569430e2051bb2ed80567718e81a6660407eb02a07157d648ee570fe67625e3"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e27d3dde20bd74fc2feaa57f728b3d6c6918fd109761de88f1ffe95ed340b985"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:32abd6dd5764e27402a4444dac06ee84593bf72ea1986cdd869a57283655dfcd"},
-    {file = "uv-0.2.24-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:06b95969d73c804bbee63fb1bde54d1a7570826b446a2b5b9136534ebf55a168"},
-    {file = "uv-0.2.24-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:0ea783d55d10bd3cf619fc1a7cb3f14e3157ffaa578a6afa068d0257923a31a4"},
-    {file = "uv-0.2.24-py3-none-musllinux_1_1_i686.whl", hash = "sha256:38c7614dc957b31c2064f0cd0d966805ad4af12a181dd67ebafb7c523101cf40"},
-    {file = "uv-0.2.24-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:f6cc8ed15d8399cfdb83a723a7971ce60ef18497198df54d104ae263a98940a4"},
-    {file = "uv-0.2.24-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:7a98635a4a40eadef0fe8eb649f1451f65b77b7649503034ca4af669eda43b75"},
-    {file = "uv-0.2.24-py3-none-win32.whl", hash = "sha256:1d35459408a9d4d251b03eacc7e17a6398953cae20d6275b1dca9cdb470ee992"},
-    {file = "uv-0.2.24-py3-none-win_amd64.whl", hash = "sha256:1cdde9c56ec74cf7446b1ee9668062c11755b5098dc41c5650bf50ef4fe90407"},
-    {file = "uv-0.2.24.tar.gz", hash = "sha256:c95116f2761488e4a270ab196978440319c673ecefa0db13019612861e28f395"},
+    {file = "uv-0.2.26-py3-none-linux_armv6l.whl", hash = "sha256:98e6b8940edd7f4822dca3093f55491b75841524639d91ab6629aea0bcb3a0cf"},
+    {file = "uv-0.2.26-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:fd3e850921f0d51d093aaeb76d190829eefdc0345439b8f6c06103a0463cc451"},
+    {file = "uv-0.2.26-py3-none-macosx_11_0_arm64.whl", hash = "sha256:3117aabd606cbe70a3a1589301ce14d578f3f62a46025b26e251b664b01b3728"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:ad76f6143549ed02a255a877c9e01491cc5d6af5aa4b6ad676d2d8e5a46efa33"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:b2d927097f200b7853f3d0ae3d701d130c5944d99e15ff9ddefc57533268f526"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ffb9ce3b96b31219c922395adce4c48a898f51b5574198e24d64c4f8185ad320"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:33d844ef545e519079954a4f3508c7e33106aa59f980ec30e481b5bafc558d71"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:04c0ad71a802562b9523265816f21851698709088ffea9662b00d66255aabc88"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:86d9d60b5d6e7713dfc8c7058242417e226129fc7a92b98c9ce0afc0ea22a74d"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:65120080bbd2f2ce47e92f6065e223f2f416feb3a323ea9574d3e993b7ebde9f"},
+    {file = "uv-0.2.26-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:c1ba6064f8bff59e3e6a7c59cf27ce4cffc6bf2eed1777134522b65c562f9206"},
+    {file = "uv-0.2.26-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:cb5dee6c397e6d2a9190362610ba80421a5a8ee17ba4c9548dbb2b19bcca46fd"},
+    {file = "uv-0.2.26-py3-none-musllinux_1_1_i686.whl", hash = "sha256:df3093d85c83a537245b7e3d9faab5010ddba6258d87b98bd4a357e21ee0e6d8"},
+    {file = "uv-0.2.26-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:4c995d120cb71aa7a44506a49133924f22396b26170fe6c43725801c82f30134"},
+    {file = "uv-0.2.26-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:c274408c7ee8a828bb65688baa2ca0555f7dcb211f648280d0dfe507e9b77bff"},
+    {file = "uv-0.2.26-py3-none-win32.whl", hash = "sha256:5accd1a614e437b3a0a5781282bc25ef727192d786ff35b917f30921f1b4eee0"},
+    {file = "uv-0.2.26-py3-none-win_amd64.whl", hash = "sha256:05949e0135d5093d555f17ca6701e5939547d8a656bec003b7986e3540533348"},
+    {file = "uv-0.2.26.tar.gz", hash = "sha256:692d31a61460e7cc176ca4c67152fe2fa0591b1c62f00db12002090b117c465d"},
 ]
 
 [[package]]
@@ -4527,4 +4528,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "aa902e2875780720573654ed1d67bbddf1064544d0a068eec663fb8d06d00d5c"
+content-hash = "92040ffa846eca5f8709867fb7fa1f21d9517777de331ff527a68dbcd55335e6"
