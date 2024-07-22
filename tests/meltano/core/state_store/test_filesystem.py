@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import itertools
 import json
 import os
 import platform
@@ -520,6 +521,26 @@ class TestS3StateStoreManager:
                         "ID": "test_get_state_ids",
                     },
                 },
+                {
+                    "Key": "state.json",
+                    "LastModified": datetime.datetime(
+                        2022,
+                        10,
+                        24,
+                        1,
+                        15,
+                        12,
+                        450000,
+                        tzinfo=datetime.timezone.utc,
+                    ),
+                    "ETag": '"test_get_state_ids"',
+                    "Size": 60,
+                    "StorageClass": "STANDARD",
+                    "Owner": {
+                        "DisplayName": "test_get_state_ids",
+                        "ID": "test_get_state_ids",
+                    },
+                },
             ],
             "Name": subject.bucket,
             "Delimiter": "",
@@ -616,4 +637,13 @@ class TestGCSStateStoreManager:
             for i in range(10)
         )
         assert set(subject.get_state_ids()) == {f"state_id_{i}" for i in range(10)}
-        subject.client.list_blobs.assert_called_once_with(bucket_or_name="meltano")
+        subject.client.list_blobs.assert_called_once_with(bucket_or_name="meltano", prefix="state")
+
+    @pytest.mark.usefixtures("mock_client")
+    def test_get_state_ids_when_any_files_was_located__in_root(self, subject: GCSStateStoreManager):
+        subject.client.list_blobs.return_value = itertools.chain(
+            (Blob(bucket=Bucket("meltano"), name=f"my-file.txt") for _ in range(2)),
+            (Blob(bucket=Bucket("meltano"), name=f"state/state_id_{i}/state.json") for i in range(10))
+        )
+        assert len(set(subject.get_state_ids())) == 10
+        subject.client.list_blobs.assert_called_once_with(bucket_or_name="meltano", prefix="state")
