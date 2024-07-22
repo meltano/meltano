@@ -642,7 +642,7 @@ class TestGCSStateStoreManager:
         )
 
     @pytest.mark.usefixtures("mock_client")
-    def test_get_state_ids_when_any_files_was_located__in_root(
+    def test_get_state_ids_when_any_files_was_located_in_root(
         self, subject: GCSStateStoreManager
     ):
         subject.client.list_blobs.return_value = itertools.chain(
