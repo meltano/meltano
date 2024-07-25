@@ -558,8 +558,11 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         return self.join_path(remove_suffix(self.uri, self.prefix), path)
 
     @abstractmethod
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The next file in the backend.

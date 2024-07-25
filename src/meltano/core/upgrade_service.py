@@ -171,7 +171,7 @@ class UpgradeService:  # noqa: WPS214
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
             click.secho("Applying migrations to project state...", fg="blue")
-            for filepath in state_service.state_store_manager.list_all_files():
+            for filepath in manager.list_all_files(with_prefix=False):
                 parts = filepath.split(manager.delimiter)
                 if (
                     parts[-1] == "state.json"
