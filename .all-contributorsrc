@@ -4,7 +4,7 @@
   ],
   "imageSize": 100,
   "commit": false,
-  "commitType": "docs",
+  "commitType": "chore",
   "commitConvention": "angular",
   "contributors": [
     {
