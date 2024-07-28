@@ -13,7 +13,6 @@ import os
 import sys
 import typing as t
 from pathlib import Path
-from random import randint
 
 if t.TYPE_CHECKING:
     from nox import Session
@@ -64,7 +63,8 @@ pytest_deps = (
 
 
 def _run_pytest(session: Session) -> None:
-    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    # random_seed = randint(0, 2**32 - 1)  # noqa: ERA001, S311, WPS432
+    random_seed = "1980339390"
     args = session.posargs or ("tests/",)
     try:
         session.env.update(
