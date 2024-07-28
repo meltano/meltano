@@ -55,7 +55,6 @@ pytest_deps = (
     "pytest-httpserver",
     "pytest-order",
     "pytest-randomly",
-    "pytest-rerunfailures",
     "pytest-structlog",
     "pytest-xdist",
     "requests-mock",
@@ -64,7 +63,7 @@ pytest_deps = (
 
 
 def _run_pytest(session: Session) -> None:
-    random_seed = randint(0, 2**32 - 1)  # noqa: ERA001, S311, WPS432
+    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
     args = session.posargs or ("tests/",)
     try:
         session.env.update(
@@ -80,7 +79,7 @@ def _run_pytest(session: Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
-            f"--randomly-seed={random_seed}",  # noqa: ERA001
+            f"--randomly-seed={random_seed}",
             *args,
         )
     finally:
