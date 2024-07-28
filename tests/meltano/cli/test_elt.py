@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+import typing as t
 from dataclasses import dataclass
 
 import pytest
@@ -19,6 +20,11 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
+
+if t.TYPE_CHECKING:
+    from click.testing import CliRunner
+
+    from meltano.core.logging.job_logging_service import JobLoggingService
 
 
 @dataclass
@@ -312,12 +318,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_debug_logging(
         self,
-        cli_runner,
+        cli_runner: CliRunner,
         tap,
         target,
         tap_process,
         target_process,
-        job_logging_service,
+        job_logging_service: JobLoggingService,
         monkeypatch,
         command: str,
     ):
@@ -430,18 +436,18 @@ class TestCliEltScratchpadOne:
 
             full_result = result.stdout + result.stderr
 
-            # We expect a difference of 2 lines because the cli emits two log
-            # lines not found in the log.
-            # we already test the redirect handler in test_output_logger,
-            # so we'll just verify that the # of lines matches.
-            log_diff = 2 if command == "el" else 3
+            # Skip all output lines before 'Running extract & load...' appears.
+            # This removes lines emitted by the CLI but not found in the log.
+            preserve = False
+            cleaned_up_result = []
+            for line in full_result.splitlines():
+                if "Running extract & load..." in line:
+                    preserve = True
+                if preserve:
+                    cleaned_up_result.append(line)
 
-            message = (
-                "Log contents:\n" f"{full_result}\n" "Command output:\n" f"{log}\n"
-            )
-            assert (
-                len(log.splitlines()) == len(full_result.splitlines()) - log_diff
-            ), message
+            message = f"Log contents:\n{full_result}\nCommand output:\n{log}\n"
+            assert len(log.splitlines()) == len(cleaned_up_result), message
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log
