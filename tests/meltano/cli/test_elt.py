@@ -435,7 +435,13 @@ class TestCliEltScratchpadOne:
             # we already test the redirect handler in test_output_logger,
             # so we'll just verify that the # of lines matches.
             log_diff = 2 if command == "el" else 3
-            assert len(log.splitlines()) == len(full_result.splitlines()) - log_diff
+
+            message = (
+                "Log contents:\n" f"{full_result}\n" "Command output:\n" f"{log}\n"
+            )
+            assert (
+                len(log.splitlines()) == len(full_result.splitlines()) - log_diff
+            ), message
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log
