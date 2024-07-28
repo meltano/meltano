@@ -80,10 +80,7 @@ def _run_pytest(session: Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
-            # f"--randomly-seed={random_seed}",  # noqa: ERA001
-            "-p no:randomly",
-            "--maxfail=1",
-            "@flaky.txt",
+            f"--randomly-seed={random_seed}",  # noqa: ERA001
             *args,
         )
     finally:
