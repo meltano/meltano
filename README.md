@@ -1,7 +1,4 @@
 <div align="center">
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
   <picture align="center" with="600">
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/meltano/meltano/assets/5394188/59d36ec9-2e02-45ff-98ea-8b5b1f0fb34f">
     <source media="(prefers-color-scheme: light)" srcset="https://github.com/meltano/meltano/assets/5394188/be586327-53b0-43e6-a93e-c7cc2577d9be">
@@ -35,6 +32,9 @@
 </a>
 <a href="https://libraries.io/pypi/meltano">
 <img alt="Libraries.io dependency status for latest release" src="https://img.shields.io/librariesio/release/pypi/meltano?label=Dependencies"/>
+</a>
+<a href="#contributors">
+<img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square"/>
 </a>
 </div>
 
@@ -100,7 +100,8 @@ License
 
 This code is distributed under the MIT license, see the [LICENSE](https://github.com/meltano/meltano/blob/main/LICENSE) file.
 
-## Contributors ✨
+Contributors
+------------
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
