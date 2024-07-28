@@ -41,7 +41,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = structlog.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 async def _stream_redirect(
