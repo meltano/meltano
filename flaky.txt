@@ -1,6 +1,4 @@
 tests/meltano/cli/test_elt.py::TestWindowsELT::test_elt_windows
-tests/meltano/cli/test_elt.py::TestCliEltScratchpadTwo::test_elt_transform_run
-tests/meltano/cli/test_elt.py::TestCliEltScratchpadTwo::test_elt_transform_run_dbt_failure
 tests/meltano/cli/test_elt.py::TestCliEltScratchpadThree::test_elt_transform_only
 tests/meltano/cli/test_elt.py::TestCliEltScratchpadThree::test_elt_transform_only_with_transform
 tests/meltano/cli/test_elt.py::TestCliEltScratchpadOne::test_elt_debug_logging[el]
