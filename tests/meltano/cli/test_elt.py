@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+from dataclasses import dataclass
 
 import pytest
 from mock import AsyncMock, mock
@@ -20,29 +21,23 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 
 
+@dataclass
 class LogEntry:
-    def __init__(
-        self,
-        name: str | None = None,
-        cmd_type: str | None = None,
-        event: str | None = None,
-        level: str | None = None,
-        stdio: str | None = None,
-    ):
-        """Check whether a log entry is in a list of dicts.
+    """Check whether a log entry is in a list of dicts.
 
-        Args:
-            name: The name to search for.
-            cmd_type: The `cmd_type` to search for.
-            event: Prefix of the event to search for.
-            level: The level to search for.
-            stdio: If not `None`, verify the stdio matches.
-        """
-        self.name = name
-        self.cmd_type = cmd_type
-        self.event = event
-        self.level = level
-        self.stdio = stdio
+    Attributes:
+        name: The name to search for.
+        cmd_type: The `cmd_type` to search for.
+        event: Prefix of the event to search for.
+        level: The level to search for.
+        stdio: If not `None`, verify the stdio matches.
+    """
+
+    name: str | None = None
+    cmd_type: str | None = None
+    event: str | None = None
+    level: str | None = None
+    stdio: str | None = None
 
     def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
@@ -67,6 +62,8 @@ class LogEntry:
 
             if matches:
                 return line.get("stdio") == self.stdio if self.stdio else True
+
+        return False
 
 
 def assert_lines(output, *lines):
@@ -102,7 +99,7 @@ def assert_log_lines(result_output: str, expected: list[LogEntry]):
         seen_lines.append(parsed_line)
 
     for entry in expected:
-        assert entry.matches(seen_lines)
+        assert entry.matches(seen_lines), f"Expected log entry not found: {entry}"
 
 
 def failure_help_log_suffix(job_logs_file):
