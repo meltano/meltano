@@ -69,12 +69,7 @@ class LogEntry:
             if matches:
                 return line.get("stdio") == self.stdio if self.stdio else True
 
-        return False
-
-
-def assert_lines(output, *lines):
-    for line in lines:
-        assert line in output
+        return False  # pragma: no cover
 
 
 def exception_logged(result_output: str, exc: Exception) -> bool:
