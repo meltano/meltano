@@ -307,7 +307,6 @@ class TestCliEltScratchpadOne:
             assert "Traceback (most recent call last):" in log
             assert "Exception: This is a grave danger." in log
 
-    # @pytest.mark.flaky(reruns=3, reruns_delay=2)
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
