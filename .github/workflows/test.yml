@@ -87,8 +87,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: not concurrent
-      # FORCE_COLOR: 1
-      NO_COLOR: 1
+      FORCE_COLOR: 1
       NOXPYTHON: ${{ matrix.python-version }}
 
     steps:
