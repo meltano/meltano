@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
-import typing as t
 from dataclasses import dataclass
 
 import pytest
@@ -20,11 +19,6 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_add_service import PluginAlreadyAddedException
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
-
-if t.TYPE_CHECKING:
-    from click.testing import CliRunner
-
-    from meltano.core.logging.job_logging_service import JobLoggingService
 
 
 @dataclass
@@ -313,12 +307,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_debug_logging(
         self,
-        cli_runner: CliRunner,
+        cli_runner,
         tap,
         target,
         tap_process,
         target_process,
-        job_logging_service: JobLoggingService,
+        job_logging_service,
         monkeypatch,
         command: str,
     ):
