@@ -446,7 +446,9 @@ class TestCliColors:
         cli_colors_expected,
         log_colors_expected,
         tmp_path,
+        monkeypatch,
     ):
+        monkeypatch.delenv("NO_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
 
         if log_config:
