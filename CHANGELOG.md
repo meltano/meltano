@@ -48,8 +48,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## v3.4.1 (2024-05-06)
 
-## v3.4.1b1 (2024-05-06)
-
 ### 🐛 Fixes
 
 - [#8509](https://github.com/meltano/meltano/issues/8509) Mapper configuration is no longer ignored and is passed to direct mapper invocations as well as mappings in pipelines
