@@ -1271,6 +1271,15 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "hudovisk",
+      "name": "Hudo Assenco",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5161722?v=4",
+      "profile": "https://github.com/hudovisk",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
