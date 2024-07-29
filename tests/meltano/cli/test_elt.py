@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import platform
+from dataclasses import dataclass
 
 import pytest
 from mock import AsyncMock, mock
@@ -20,29 +21,23 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 
 
+@dataclass
 class LogEntry:
-    def __init__(
-        self,
-        name: str | None = None,
-        cmd_type: str | None = None,
-        event: str | None = None,
-        level: str | None = None,
-        stdio: str | None = None,
-    ):
-        """Check whether a log entry is in a list of dicts.
+    """Check whether a log entry is in a list of dicts.
 
-        Args:
-            name: The name to search for.
-            cmd_type: The `cmd_type` to search for.
-            event: Prefix of the event to search for.
-            level: The level to search for.
-            stdio: If not `None`, verify the stdio matches.
-        """
-        self.name = name
-        self.cmd_type = cmd_type
-        self.event = event
-        self.level = level
-        self.stdio = stdio
+    Attributes:
+        name: The name to search for.
+        cmd_type: The `cmd_type` to search for.
+        event: Prefix of the event to search for.
+        level: The level to search for.
+        stdio: If not `None`, verify the stdio matches.
+    """
+
+    name: str | None = None
+    cmd_type: str | None = None
+    event: str | None = None
+    level: str | None = None
+    stdio: str | None = None
 
     def matches(self, lines: list[dict]) -> bool:
         """Find a matching log line in the provided list of log lines.
@@ -68,10 +63,7 @@ class LogEntry:
             if matches:
                 return line.get("stdio") == self.stdio if self.stdio else True
 
-
-def assert_lines(output, *lines):
-    for line in lines:
-        assert line in output
+        return False  # pragma: no cover
 
 
 def exception_logged(result_output: str, exc: Exception) -> bool:
@@ -102,7 +94,7 @@ def assert_log_lines(result_output: str, expected: list[LogEntry]):
         seen_lines.append(parsed_line)
 
     for entry in expected:
-        assert entry.matches(seen_lines)
+        assert entry.matches(seen_lines), f"Expected log entry not found: {entry}"
 
 
 def failure_help_log_suffix(job_logs_file):
@@ -310,7 +302,6 @@ class TestCliEltScratchpadOne:
             assert "Traceback (most recent call last):" in log
             assert "Exception: This is a grave danger." in log
 
-    @pytest.mark.flaky(reruns=3, reruns_delay=2)
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
@@ -434,12 +425,18 @@ class TestCliEltScratchpadOne:
 
             full_result = result.stdout + result.stderr
 
-            # We expect a difference of 2 lines because the cli emits two log
-            # lines not found in the log.
-            # we already test the redirect handler in test_output_logger,
-            # so we'll just verify that the # of lines matches.
-            log_diff = 2 if command == "el" else 3
-            assert len(log.splitlines()) == len(full_result.splitlines()) - log_diff
+            # Skip all output lines before 'Running extract & load...' appears.
+            # This removes lines emitted by the CLI but not found in the log.
+            preserve = False
+            cleaned_up_result = []
+            for line in full_result.splitlines():
+                if "Running extract & load..." in line:
+                    preserve = True
+                if preserve:
+                    cleaned_up_result.append(line)
+
+            message = f"Log contents:\n{full_result}\nCommand output:\n{log}\n"
+            assert len(log.splitlines()) == len(cleaned_up_result), message
             # and just to be safe - check if these debug mode only strings show up
             assert "target-mock (out)" in log
             assert "tap-mock (out)" in log

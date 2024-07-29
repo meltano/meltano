@@ -1,0 +1,37 @@
+{
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "chore",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "HaydenNess",
+      "name": "Hayden Ness",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11919358?v=4",
+      "profile": "https://github.com/HaydenNess",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "jx2lee",
+      "name": "Jaejun",
+      "avatar_url": "https://avatars.githubusercontent.com/u/63435794?v=4",
+      "profile": "https://github.com/jx2lee",
+      "contributions": [
+        "bug",
+        "code",
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "meltano",
+  "projectOwner": "meltano"
+}

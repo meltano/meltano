@@ -33,6 +33,9 @@
 <a href="https://libraries.io/pypi/meltano">
 <img alt="Libraries.io dependency status for latest release" src="https://img.shields.io/librariesio/release/pypi/meltano?label=Dependencies"/>
 </a>
+<a href="./CONTRIBUTORS.md">
+<img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square"/>
+</a>
 </div>
 
 <div align="center">
