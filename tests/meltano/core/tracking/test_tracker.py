@@ -423,8 +423,8 @@ class TestTracker:
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
-        caplog,
-        monkeypatch,
+        caplog: pytest.LogCaptureFixture,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         endpoints = """
             [
@@ -435,9 +435,8 @@ class TestTracker:
             ]
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
-        logging.getLogger().setLevel(logging.DEBUG)  # noqa: TID251
 
-        with caplog.at_level(logging.WARNING, logger="snowplow_tracker.emitters"):
+        with caplog.at_level(logging.WARNING, logger="meltano.core.tracking.tracker"):
             tracker = Tracker(project)
 
         try:
