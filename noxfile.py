@@ -45,7 +45,6 @@ main_python_version = "3.12"
 pytest_deps = (
     "backoff",
     "colorama",  # colored output in Windows
-    "hypothesis",
     "mock",
     "moto",
     "pytest",
@@ -166,9 +165,7 @@ def mypy(session: Session) -> None:
         "types-python-dateutil",
         "types-jsonschema",
         "types-psutil",
-        "types-python-slugify",
         "types-PyYAML",
         "types-requests",
-        "types-tabulate",
     )
     session.run("mypy", *session.posargs)
