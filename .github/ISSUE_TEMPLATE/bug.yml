@@ -1,9 +1,12 @@
 name: Bug Report
 description: File a bug report
 title: "bug: <title>"
-labels: ["kind/Bug", "valuestream/Meltano"]
+labels:
+  - kind/Bug
+  - flow::triage
+  - valuestream/Meltano
 assignees:
-  - meltano/engineering
+  - edgarrmondragon
 
 body:
   - type: markdown
@@ -15,7 +18,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.0.0"
+      placeholder: "3.5.0"
     validations:
       required: true
   - type: dropdown
@@ -24,13 +27,12 @@ body:
       label: Python Version
       description: Version of Python you are using
       options:
-        - "3.6 (deprecated)"
-        - "3.7 (deprecated)"
-        - "3.8"
-        - "3.9"
-        - "3.10"
-        - "3.11"
         - "3.12"
+        - "3.11"
+        - "3.10"
+        - "3.9"
+        - "3.8"
+        - "3.7 (deprecated)"
         - "NA"
     validations:
       required: true
@@ -69,3 +71,9 @@ body:
       render: python
     validations:
       required: false
+  - type: input
+    id: slack_or_linen
+    attributes:
+      label: Link to Slack/Linen
+      description: Provide a link to the Slack or Linen conversation, if applicable
+      placeholder: "https://..."

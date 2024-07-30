@@ -15,11 +15,14 @@ from enum import Enum, auto
 from urllib.parse import urlparse
 from warnings import warn
 
+import requests
 import structlog
 import tzlocal
 from psutil import Process
+from requests.adapters import HTTPAdapter
 from snowplow_tracker import Emitter, SelfDescribing, SelfDescribingJson
 from snowplow_tracker import Tracker as SnowplowTracker
+from urllib3 import Retry
 
 from meltano.core.tracking.schemas import (
     BlockEventSchema,
@@ -86,7 +89,7 @@ class TelemetrySettings(t.NamedTuple):
 class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
-    def __init__(  # noqa: WPS210 - too many local variables
+    def __init__(  # noqa: WPS210, WPS213 - too many local variables, too many expressions
         self,
         project: Project,
         request_timeout: float | tuple[float, float] | None = 3.5,
@@ -113,6 +116,12 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
 
+        session = requests.Session()
+
+        # Retry failed requests up to 3 times, but don't retry on error status codes
+        adapter = HTTPAdapter(max_retries=Retry(total=3, status=0))
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
         emitters: list[Emitter] = []
         for endpoint in endpoints:
             if not check_url(endpoint):
@@ -125,6 +134,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                     protocol=parsed_url.scheme or "http",
                     port=parsed_url.port,
                     request_timeout=request_timeout,
+                    session=session,
                 ),
             )
 

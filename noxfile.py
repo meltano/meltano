@@ -55,7 +55,6 @@ pytest_deps = (
     "pytest-httpserver",
     "pytest-order",
     "pytest-randomly",
-    "pytest-rerunfailures",
     "pytest-structlog",
     "pytest-xdist",
     "requests-mock",

@@ -467,11 +467,12 @@ class EnvironmentVariableNotSetError(MeltanoError):
 
 ENV_VAR_PATTERN = re.compile(
     r"""
+    (?P<escape>\\)?  # escape
     \$  # starts with a '$'
     (?:
-        {(\w+)} # ${VAR}
+        {(?P<curly>\w+)} # ${VAR}
         |
-        ([A-Z][A-Z0-9_]*) # $VAR
+        (?P<normal>[A-Z][A-Z0-9_]*) # $VAR
     )
     """,
     re.VERBOSE,
@@ -533,7 +534,10 @@ def expand_env_vars(
 
     def replacer(match: re.Match) -> str:
         # The variable can be in either group
-        var = next(var for var in match.groups() if var)
+        var = match["curly"] or match["normal"]
+        restored = f"${{{var}}}" if match["curly"] else f"${var}"
+        if match["escape"]:
+            return restored
         try:
             val = str(env[var])
         except KeyError as ex:
@@ -543,7 +547,7 @@ def expand_env_vars(
             if if_missing == EnvVarMissingBehavior.raise_exception:
                 raise EnvironmentVariableNotSetError(var) from ex
             if if_missing == EnvVarMissingBehavior.ignore:
-                return f"${{{var}}}"
+                return restored
             return ""
         if not val:
             logger.debug(f"Variable '${var}' is empty.")  # noqa: G004

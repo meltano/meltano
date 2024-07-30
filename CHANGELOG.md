@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.5.0 (2024-07-23)
+
+### ✨ New
+
+- [#8633](https://github.com/meltano/meltano/issues/8633) Added a `--only-install` option to commands that can auto-install plugins
+- [#8482](https://github.com/meltano/meltano/issues/8482) Plugins are now auto-installed when commands require them -- _**Thanks @ReubenFrankel!**_
+- [#8620](https://github.com/meltano/meltano/issues/8620) Sensitive values in `meltano config <plugin>` are now hidden by default
+- [#8580](https://github.com/meltano/meltano/issues/8580) Added CLI `--refresh-catalog` option and extractor extra `use_cached_catalog` to ignore the cached source catalog
+
+### 🐛 Fixes
+
+- [#8648](https://github.com/meltano/meltano/issues/8648) Listing Cloud (S3, GCS, etc.) state IDs no longer crashes if there is a file at the root of the bucket, and files in GCS buckets are only listed within the prefix specified in the `state_backend_uri` -- _**Thanks @jx2lee!**_
+- [#8636](https://github.com/meltano/meltano/issues/8636) Values with `$` can now be escaped instead of trying to expand them from environment variables
+- [#8590](https://github.com/meltano/meltano/issues/8590) `meltano config ... test` now also checks for `BATCH` messages
+
+### ⚙️ Under the Hood
+
+- [#8265](https://github.com/meltano/meltano/issues/8265) Use timezone-aware datetime objects
+
+### 📚 Documentation Improvements
+
+- [#8646](https://github.com/meltano/meltano/issues/8646) Documented hot to escape setting values with `$`
+- [#8627](https://github.com/meltano/meltano/issues/8627) Fixed a broken link in the plugin concept page
+- [#8621](https://github.com/meltano/meltano/issues/8621) Update to current year and recommendations
+- [#8610](https://github.com/meltano/meltano/issues/8610) Remove Meltano Cloud docs
+- [#8609](https://github.com/meltano/meltano/issues/8609) Redirect Meltano Cloud docs to Arch docs
+- [#8608](https://github.com/meltano/meltano/issues/8608) Meltano Cloud has been shut down in favor of Arch -- _**Thanks @hulet!**_
+- [#8505](https://github.com/meltano/meltano/issues/8505) Added 2024-Q2 changelog
+- [#8589](https://github.com/meltano/meltano/issues/8589) Recommend adding `namespace` key to custom plugins when migrating to Meltano 3
+- [#8578](https://github.com/meltano/meltano/issues/8578) Update `environments.md` to fix link
+- [#8570](https://github.com/meltano/meltano/issues/8570) Added a few dbt-postgres troubleshooting notes to the Getting Started guide
+- [#8566](https://github.com/meltano/meltano/issues/8566) Added a note about state IDs when using `meltano schedule run`
+
 ## v3.4.2 (2024-05-15)
 
 ### 🐛 Fixes
@@ -14,8 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#8544](https://github.com/meltano/meltano/issues/8544) Added YAML docs examples of global and per-plugin `python` executable option
 
 ## v3.4.1 (2024-05-06)
-
-## v3.4.1b1 (2024-05-06)
 
 ### 🐛 Fixes
 

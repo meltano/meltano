@@ -589,6 +589,9 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
             pattern_re = re.compile(pattern.replace("*", ".*"))
         state_ids = set()
         for filepath in self.list_all_files():
+            if "/" not in filepath:
+                continue
+
             (state_id, filename) = filepath.split("/")[-2:]
             if filename == "state.json" and (
                 (not pattern) or pattern_re.match(state_id)

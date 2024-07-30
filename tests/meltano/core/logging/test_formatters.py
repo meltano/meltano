@@ -97,7 +97,8 @@ class TestLogFormatters:
             ),
         )
 
-    def test_console_log_formatter_colors(self, record):
+    def test_console_log_formatter_colors(self, record, monkeypatch):
+        monkeypatch.delenv("NO_COLOR", raising=False)
         formatter = console_log_formatter(colors=True)
         assert ANSI_RE.match(formatter.format(record))
 

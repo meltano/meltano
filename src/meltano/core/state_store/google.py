@@ -127,7 +127,9 @@ class GCSStateStoreManager(CloudStateStoreManager):
         Yields:
             The next file in the backend.
         """
-        for blob in self.client.list_blobs(bucket_or_name=self.bucket):  # noqa: WPS526
+        for blob in self.client.list_blobs(  # noqa: WPS526
+            bucket_or_name=self.bucket, prefix=self.state_dir
+        ):
             yield blob.name
 
     def copy_file(self, src: str, dst: str) -> None:

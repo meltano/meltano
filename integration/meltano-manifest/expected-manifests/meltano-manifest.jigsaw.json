@@ -25,7 +25,7 @@
   "env": {
     "AIRFLOW_VAR_MELTANO_ENVIRONMENT": "userdev",
     "AIRFLOW_VAR_OPERATOR_TYPE": "bash",
-    "AIRFLOW__CORE__PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/plugins_local",
+    "AIRFLOW__CORE__PLUGINS_FOLDER": "$MELTANO_PROJECT_ROOT/orchestrate/plugins_local",
     "AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL": "30",
     "HUB_METRICS_S3_PATH": "s3://devtest-meltano-bucket-01/hub_metrics/",
     "MELTANO_AUTO_INSTALL": "true",
