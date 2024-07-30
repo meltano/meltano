@@ -14,15 +14,10 @@ Meltano uses the below tools to enforce consistent code style. Explore the [repo
 
 Python:
 
-- [isort](https://pycqa.github.io/isort/)
-- [Black](https://github.com/ambv/black)
-- [Flake8](https://flake8.pycqa.org/en/latest/)
-- [wemake-python-styleguide](https://wemake-python-stylegui.de/en/latest/)
+- [Ruff](https://docs.astral.sh/ruff/)
 - [MyPy](https://mypy.readthedocs.io/en/stable/)
 
-Flake8 is a python tool that glues together `pycodestyle`, `pyflakes`, `mccabe`, and third-party plugins to check the style and quality of python code. Notable among these is `wemake-python-styleguide`, which offers an extensive set of opinionated rules that encourage clean and correct code.
-
-To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files flakeheaven` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
+To lint your Python code, install the project using `poetry install`, then run `poetry run pre-commit --all-files ruff` from the root of the project. The `pre-commit` check will be run in CI on all PRs.
 
 Javascript:
 
@@ -103,7 +98,7 @@ import { bar, thing } from '@/utils/utils'   // 1: local, 2: partial, 3: @/[u]ti
 ¶  // 2 blank lines to split the imports from the code
 ```
 
-Python imports are sorted automatically using [`isort`](https://pycqa.github.io/isort/). This is executed as part of the `make lint` command, as well as during execution of the pre-commit hook.
+Python imports are sorted automatically using [Ruff](https://docs.astral.sh/ruff/). This is executed as part of the `pre-commit` hooks.
 
 #### Definitions
 
