@@ -30,7 +30,7 @@ class TestMeltanoInvoker:
             )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
-        assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
+        assert meltano.__version__ in str(process.stdout)
 
     def test_env(self, subject: MeltanoInvoker, monkeypatch: pytest.MonkeyPatch):
         # Process env vars are injected

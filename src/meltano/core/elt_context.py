@@ -80,7 +80,7 @@ class PluginContext(t.NamedTuple):
         return {**self.plugin.info_env, **self.config_env()}
 
 
-class ELTContext:  # noqa: WPS230
+class ELTContext:
     """ELT Context."""
 
     def __init__(
@@ -201,7 +201,7 @@ class ELTContext:  # noqa: WPS230
         return self.invoker_for(PluginType.TRANSFORMERS)
 
 
-class ELTContextBuilder:  # noqa: WPS214
+class ELTContextBuilder:
     """ELT Context Builder."""
 
     def __init__(self, project: Project):
@@ -404,7 +404,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._state = state
         return self
 
-    def set_base_output_logger(self, base_output_logger: OutputLogger):  # noqa: WPS615
+    def set_base_output_logger(self, base_output_logger: OutputLogger):
         """Set the base output logger for use in this ELTContext.
 
         Args:

@@ -65,7 +65,7 @@ class PluginTestService(ABC):
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> tuple[bool, str | None]:  # noqa: C901
+    async def validate(self) -> tuple[bool, str | None]:
         """Validate extractor configuration.
 
         Returns:

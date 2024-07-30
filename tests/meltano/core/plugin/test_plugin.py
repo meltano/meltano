@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 
 @pytest.mark.order(0)
 class TestPluginDefinition:
-    ATTRS = {
+    ATTRS: t.ClassVar[dict[str, t.Any]] = {
         "minimal": {"name": "tap-example", "namespace": "tap_example"},
         "basic": {
             "name": "tap-example",
@@ -262,7 +262,7 @@ class TestBasePlugin:
 
 
 class TestProjectPlugin:
-    ATTRS = {
+    ATTRS: t.ClassVar[dict[str, t.Any]] = {
         "minimal": {"name": "tap-example"},
         "basic": {
             "name": "tap-example",

@@ -45,10 +45,10 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     Returns:
         A plugin invoker.
     """
-    cls = PluginInvoker  # noqa: WPS117
+    cls = PluginInvoker
 
-    if hasattr(plugin, "invoker_class"):  # noqa: WPS421
-        cls = plugin.invoker_class  # noqa: WPS117
+    if hasattr(plugin, "invoker_class"):
+        cls = plugin.invoker_class
 
     return cls(project, plugin, *args, **kwargs)
 
@@ -117,7 +117,7 @@ class UnknownCommandError(InvokerError):
         )
 
 
-class PluginInvoker:  # noqa: WPS214, WPS230
+class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
     class StdioSource(str, enum.Enum):
@@ -320,7 +320,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):  # noqa: WPS210
+    def env(self):
         """Environment variable mapping.
 
         Returns:
@@ -335,7 +335,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 **expand_env_vars(
                     self.project.settings.env,
                     os.environ,
-                    if_missing=EnvVarMissingBehavior(  # noqa: WPS204
+                    if_missing=EnvVarMissingBehavior(
                         strict_env_var_mode,
                     ),
                 ),
@@ -419,7 +419,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs,
-    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:  # noqa: WPS221
+    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -460,7 +460,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 env=popen_env,
             )
 
-    async def invoke_docker(  # noqa: WPS210
+    async def invoke_docker(
         self,
         plugin_command: str,
         *args,
@@ -515,9 +515,9 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     return self.files[file_id].read_text()
 
             return self.files[file_id].read_text()
-        except ExecutableNotFoundError as err:  # noqa: WPS329. Allow "useless" except.
+        except ExecutableNotFoundError as err:  # . Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__ from None  # noqa: WPS469, WPS609
+            raise err.__cause__ from None
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
         """Append an output handler for a given stdio stream.

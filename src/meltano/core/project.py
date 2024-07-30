@@ -67,7 +67,7 @@ def walk_parent_directories():
         directory = parent_directory
 
 
-class Project(Versioned):  # noqa: WPS214
+class Project(Versioned):
     """Represents a Meltano project."""
 
     __version__ = 1
@@ -115,7 +115,7 @@ class Project(Versioned):  # noqa: WPS214
             "readonly": self.readonly,
             **kwargs,
         }
-        cls = type(self)  # noqa: WPS117
+        cls = type(self)
         # Clear the dictionary backing `self` to invalidate outdated info,
         # cached properties, etc., then instantiate an up-to-date instance,
         # then steal its attributes to update the dictionary backing `self`.
@@ -214,7 +214,7 @@ class Project(Versioned):  # noqa: WPS214
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "  # noqa: G004
-                            f"present in {str(Path(sys.executable).parent)}",
+                            f"present in {Path(sys.executable).parent!s}",
                         )
                 else:
                     logger.warning(
@@ -344,12 +344,12 @@ class Project(Versioned):  # noqa: WPS214
             try:
                 self.project_files.update(meltano_config.canonical())
             except Exception as err:
-                logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
+                logger.critical("Could not update meltano.yml: %s", err)
                 raise
 
         self.refresh()
 
-    def root_dir(self, *joinpaths: StrPath) -> Path:  # noqa: ARG002
+    def root_dir(self, *joinpaths: StrPath) -> Path:
         """Return the root directory of this project, optionally joined with path.
 
         Args:
@@ -587,7 +587,7 @@ class Project(Versioned):  # noqa: WPS214
         plugin_name: str,
         *,
         variant_name: str | None = None,
-        make_dirs: bool = True,  # noqa: ARG002
+        make_dirs: bool = True,
     ):
         """Path to the project lock file.
 
@@ -628,4 +628,4 @@ class Project(Versioned):  # noqa: WPS214
         Returns:
             Project hash.
         """
-        return self.root.__hash__()  # noqa: WPS609
+        return self.root.__hash__()

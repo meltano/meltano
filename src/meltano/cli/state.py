@@ -117,13 +117,13 @@ def meltano_state(project: Project, ctx: click.Context):
     """
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
-    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)  # noqa: WPS204
+    ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-def list_state(ctx: click.Context, pattern: str | None):  # noqa: WPS125
+def list_state(ctx: click.Context, pattern: str | None):
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.
@@ -168,7 +168,7 @@ def copy_state(
 
     logger.info(
         f"State for {dst_state_id} was successfully copied from "  # noqa: G004
-        f"{src_state_id} at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"{src_state_id} at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -198,7 +198,7 @@ def move_state(
 
     logger.info(
         f"State for {src_state_id} was successfully moved to {dst_state_id} "  # noqa: G004
-        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -249,7 +249,7 @@ def merge_state(
         state_service.merge_state(from_state_id, state_id)
     logger.info(
         f"State for {state_id} was successfully "  # noqa: G004
-        f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"merged at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
@@ -290,15 +290,15 @@ def set_state(
         state_service.set_state(state_id, state)
     logger.info(
         f"State for {state_id} was successfully set "  # noqa: G004
-        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",  # noqa: WPS323
+        f"at {dt.now(tz=tz.utc):%Y-%m-%d %H:%M:%S%z}.",
     )
 
 
-@meltano_state.command(cls=InstrumentedCmd, name="get")  # noqa: WPS46
+@meltano_state.command(cls=InstrumentedCmd, name="get")
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def get_state(ctx: click.Context, project: Project, state_id: str):  # noqa: WPS463
+def get_state(ctx: click.Context, project: Project, state_id: str):
     """Get state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]

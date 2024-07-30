@@ -678,7 +678,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_before_tap_finished(
         self,
         cli_runner,
         tap,
@@ -774,7 +774,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_after_tap_finished(
         self,
         cli_runner,
         tap,
@@ -937,13 +937,13 @@ class TestCliRunScratchpadOne:
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
-        try:  # noqa: WPS328
+        try:
             raise asyncio.LimitOverrunError(
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:
-            try:  # noqa: WPS328, WPS505
+            try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
                 raise ValueError(str(err))

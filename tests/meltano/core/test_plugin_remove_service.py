@@ -26,13 +26,13 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                             ],
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 },
                             ],
                         },
@@ -84,7 +84,7 @@ class TestPluginRemoveService:
                 meltano_yml = yaml.safe_load(meltanofile)
 
                 with pytest.raises(KeyError):
-                    meltano_yml[plugin.type, plugin.name]  # noqa: WPS428
+                    meltano_yml[plugin.type, plugin.name]
 
             # check removed installation
             assert not os.path.exists(

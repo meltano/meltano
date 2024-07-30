@@ -36,7 +36,7 @@ def _manifest_context(manifest: Manifest) -> t.Iterator[None]:
         _active_manifest.pop()
 
 
-@contextmanager  # noqa: WPS210
+@contextmanager
 def _env_context(env: Mapping[str, str]) -> t.Iterator[None]:
     unique_keys = env.keys() - os.environ.keys()
     shared_keys = env.keys() & os.environ.keys()

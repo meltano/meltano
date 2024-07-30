@@ -22,7 +22,7 @@ class JSONEncodedDict(TypeDecorator):
     impl = VARCHAR
     cache_ok = True
 
-    def process_bind_param(  # noqa: D102
+    def process_bind_param(
         self,
         value,
         dialect,  # noqa: ARG002
@@ -32,7 +32,7 @@ class JSONEncodedDict(TypeDecorator):
 
         return value
 
-    def process_result_value(  # noqa: D102
+    def process_result_value(
         self,
         value,
         dialect,  # noqa: ARG002
@@ -47,7 +47,7 @@ class IntFlag(TypeDecorator):
     cache_ok = True
 
     # force the cast to INTEGER
-    def process_bind_param(  # noqa: D102
+    def process_bind_param(
         self,
         value,
         dialect,  # noqa: ARG002
@@ -83,7 +83,7 @@ class GUID(TypeDecorator):
             value = uuid.UUID(value)
         return value.hex
 
-    def process_result_value(  # noqa: D102
+    def process_result_value(
         self,
         value,
         dialect,  # noqa: ARG002

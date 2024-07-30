@@ -33,12 +33,12 @@ def upgrade(ctx, project):
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """
-    engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
-    upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
-    ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
+    engine, _ = project_engine(project)  # (unreachable code)
+    upgrade_service = UpgradeService(engine, project)  # (unreachable code)
+    ctx.obj["upgrade_service"] = upgrade_service  # (unreachable code)
 
 
-@upgrade.command(  # noqa: WPS125
+@upgrade.command(
     cls=InstrumentedCmd,
     name="all",
     short_help="Upgrade Meltano and your entire project to the latest version.",

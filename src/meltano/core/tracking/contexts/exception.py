@@ -50,7 +50,7 @@ def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
         A JSON-compatible dictionary of anonymized telemetry data compliant
         with the exception context schema for an exception.
     """
-    cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__  # noqa: WPS609
+    cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__
     return {
         "type": str(type(ex).__qualname__),
         "str_hash": hash_sha256(str(ex)),

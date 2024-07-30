@@ -27,12 +27,12 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-class FilePlugin(BasePlugin):  # noqa: WPS214
+class FilePlugin(BasePlugin):
     """Meltano file plugin type."""
 
     __plugin_type__ = PluginType.FILES
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(
             name="_update",
             kind=SettingKind.OBJECT,

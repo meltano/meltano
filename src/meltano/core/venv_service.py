@@ -117,7 +117,7 @@ def _resolve_python_path(python: Path | str | None) -> str:
 class VirtualEnv:
     """Info about a single virtual environment."""
 
-    _SUPPORTED_PLATFORMS = {
+    _SUPPORTED_PLATFORMS: t.ClassVar[set[str]] = {
         "Linux",
         "Darwin",
         "Windows",
@@ -292,7 +292,7 @@ def fingerprint(pip_install_args: Iterable[str]) -> str:
     return hashlib.sha256(" ".join(sorted(set(pip_install_args))).encode()).hexdigest()
 
 
-class VenvService:  # noqa: WPS214
+class VenvService:
     """Manages virtual environments.
 
     The methods in this class are not thread-safe.
@@ -394,7 +394,7 @@ class VenvService:  # noqa: WPS214
         try:
             shutil.rmtree(self.venv.root)
             logger.debug(
-                "Removed old virtual environment for '%s/%s'",  # noqa: WPS323
+                "Removed old virtual environment for '%s/%s'",
                 self.namespace,
                 self.name,
             )
@@ -561,7 +561,7 @@ class VenvService:  # noqa: WPS214
             The error that occurred during installation with additional context.
         """
         logger.info(
-            "Logged pip install output to %s",  # noqa: WPS323
+            "Logged pip install output to %s",
             self.pip_log_path,
         )
         return AsyncSubprocessError(
@@ -617,7 +617,7 @@ class VenvService:  # noqa: WPS214
                 extract_stderr=extract_stderr,
                 env=env,
             )
-        except AsyncSubprocessError as err:  # noqa: WPS329
+        except AsyncSubprocessError as err:
             raise await self.handle_installation_error(err) from err
 
 

@@ -61,7 +61,7 @@ logger = structlog.getLogger(__name__)
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def install(  # noqa: C901
+async def install(
     project: Project,
     ctx: click.Context,
     plugin_type: str,

@@ -98,7 +98,7 @@ class ProjectAddService:
 
             return plugin
 
-    def add_required(  # noqa: WPS210
+    def add_required(
         self,
         plugin: ProjectPlugin,
         *,

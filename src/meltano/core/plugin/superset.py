@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import typing as t
 from contextlib import suppress
 
 import structlog
@@ -43,7 +44,9 @@ class Superset(BasePlugin):
 
     invoker_class = SupersetInvoker
 
-    EXTRA_SETTINGS = [SettingDefinition(name="_config_path")]
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
+        SettingDefinition(name="_config_path"),
+    ]
 
     @property
     def config_files(self):
@@ -59,7 +62,7 @@ class Superset(BasePlugin):
         self,
         invoker: SupersetInvoker,
         session,  # noqa: ARG002
-    ):  # noqa: WPS217
+    ):
         """Write plugin configuration to superset_config.py.
 
         Args:

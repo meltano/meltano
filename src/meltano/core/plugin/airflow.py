@@ -74,7 +74,7 @@ class Airflow(BasePlugin):
             invoker: the active PluginInvoker
         """
         airflow_cfg_path = invoker.files["config"]
-        logger.debug(f"Generated default '{str(airflow_cfg_path)}'")  # noqa: G004
+        logger.debug(f"Generated default '{airflow_cfg_path!s}'")  # noqa: G004
 
         # open the configuration and update it
         # now we let's update the config to use our stubs
@@ -82,7 +82,7 @@ class Airflow(BasePlugin):
 
         with airflow_cfg_path.open() as airflow_cfg_file_to_read:
             airflow_cfg.read_file(airflow_cfg_file_to_read)
-            logger.debug(f"Loaded '{str(airflow_cfg_path)}'")  # noqa: G004
+            logger.debug(f"Loaded '{airflow_cfg_path!s}'")  # noqa: G004
 
         config = invoker.plugin_config_processed
         for section, section_config in config.items():
@@ -91,7 +91,7 @@ class Airflow(BasePlugin):
 
         with airflow_cfg_path.open("w") as airflow_cfg_file_to_write:
             airflow_cfg.write(airflow_cfg_file_to_write)
-            logger.debug(f"Saved '{str(airflow_cfg_path)}'")  # noqa: G004
+            logger.debug(f"Saved '{airflow_cfg_path!s}'")  # noqa: G004
 
     @hook("before_install")
     async def setup_env(self, *args, **kwargs):  # noqa: ARG002
@@ -103,7 +103,7 @@ class Airflow(BasePlugin):
         """
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
-    @hook("before_configure")  # noqa: WPS217
+    @hook("before_configure")
     async def before_configure(self, invoker: AirflowInvoker, session):
         """Generate config file and keep metadata database up-to-date.
 

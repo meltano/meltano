@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 
 EXIT_CODE_OK = 0
 
-T = t.TypeVar("T", bound="ValidationsRunner")  # noqa: WPS111
+T = t.TypeVar("T", bound="ValidationsRunner")
 
 
 class ValidationOutcome(str, Enum):

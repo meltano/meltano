@@ -71,7 +71,7 @@ class InvalidPluginDefinitionError(Exception):
         Args:
             definition: Plugin definition.
         """
-        fullargspec = inspect.getfullargspec(PluginDefinition.__init__)  # noqa: WPS609
+        fullargspec = inspect.getfullargspec(PluginDefinition.__init__)
         _, _plugin_type, *required_properties = fullargspec.args
 
         if isinstance(definition, dict):

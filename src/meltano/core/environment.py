@@ -16,7 +16,7 @@ from meltano.core.utils import NotFound
 TEnv = t.TypeVar("TEnv", bound="Environment")
 
 
-class NoActiveEnvironment(Exception):  # noqa: N818
+class NoActiveEnvironment(Exception):
     """Exception raised when invocation has no active environment."""
 
 

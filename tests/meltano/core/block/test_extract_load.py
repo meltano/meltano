@@ -222,27 +222,27 @@ class TestExtractLoadBlocks:
     @pytest.fixture()
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        tap.stdout.readline = AsyncMock(return_value="{}")
         tap.wait = AsyncMock(return_value=0)
         return tap
 
     @pytest.fixture()
     def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
-        mapper.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        mapper.stdout.readline = AsyncMock(return_value="{}")
         mapper.wait = AsyncMock(return_value=0)
         return mapper
 
     @pytest.fixture()
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
-        target.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        target.stdout.readline = AsyncMock(return_value="{}")
         target.wait = AsyncMock(return_value=0)
         return target
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
-    async def test_link_io(  # noqa: WPS210
+    async def test_link_io(
         self,
         tap_config_dir,
         target_config_dir,

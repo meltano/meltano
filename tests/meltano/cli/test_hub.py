@@ -47,7 +47,7 @@ class TestCliHub:
         requests_mock: RequestsMocker,
     ):
         hub_api = project.hub_service.hub_api_url
-        requests_mock.get(  # noqa: S113
+        requests_mock.get(
             hub_api,
             exc=ConnectionError("Connection refused"),
         )

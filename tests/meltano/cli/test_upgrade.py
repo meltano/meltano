@@ -220,7 +220,7 @@ class TestCliUpgrade:
         bucket = conn.create_bucket(Bucket="test-state-bucket")
         for state_id in state_ids:
             bucket.put_object(
-                Key=f"some/trailing/delim/path/some/trailing/delim/path/{state_id}/state.json",  # noqa: E501
+                Key=f"some/trailing/delim/path/some/trailing/delim/path/{state_id}/state.json",
             )
         monkeypatch.setenv(
             "MELTANO_STATE_BACKEND_URI",

@@ -42,7 +42,7 @@ HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plu
 
 Following the prompts below, you will be guided through configuration of this plugin.
 
-Meltano is responsible for managing the configuration of all of a project’s plugins.
+Meltano is responsible for managing the configuration of all of a project's plugins.
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
 To determine the values of settings, Meltano will look in 4 main places, with each taking precedence over the next:
@@ -65,7 +65,7 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 """  # noqa: E501
 
 
-class InteractiveConfig:  # noqa: WPS230, WPS214
+class InteractiveConfig:
     """Manage Config interactively."""
 
     def __init__(self, ctx, store, extras=False, max_width=None):
@@ -78,7 +78,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.session = self.ctx.obj["session"]
         self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
-        self.max_width = max_width or 75  # noqa: WPS432
+        self.max_width = max_width or 75
         self.console = Console()
         self.safe: bool = ctx.obj["safe"]
 

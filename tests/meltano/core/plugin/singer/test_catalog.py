@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from meltano.core.plugin.singer.catalog import (  # noqa: WPS235
+from meltano.core.plugin.singer.catalog import (
     CatalogRule,
     ListExecutor,
     ListSelectedExecutor,
@@ -880,7 +880,7 @@ class TestLegacyCatalogSelectVisitor:
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture()
     def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+        return json.loads(globals()[request.param])
 
     @classmethod
     def stream_is_selected(cls, stream):
@@ -1111,7 +1111,7 @@ class TestSelectionType:
 class TestMetadataExecutor:
     @pytest.fixture()
     def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+        return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
         "catalog",
@@ -1168,7 +1168,7 @@ class TestMetadataExecutor:
 class TestSchemaExecutor:
     @pytest.fixture()
     def catalog(self, request):
-        return json.loads(globals()[request.param])  # noqa: WPS421
+        return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
         "catalog",
@@ -1218,7 +1218,7 @@ class TestSchemaExecutor:
         }
 
         if "created_at" in properties_node:
-            assert properties_node["created_at"] == {  # noqa: WPS52
+            assert properties_node["created_at"] == {
                 "type": "string",
                 "format": "date",
             }

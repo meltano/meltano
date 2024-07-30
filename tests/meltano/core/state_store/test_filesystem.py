@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import pytest
 import time_machine
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob._models import BlobProperties  # noqa: WPS436
+from azure.storage.blob._models import BlobProperties
 from boto3 import client
 from botocore.stub import Stubber
 from google.cloud.storage import Blob, Bucket
@@ -95,7 +95,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_reader(self, subject: LocalFilesystemStateStoreManager, state_path):
         filepath = os.path.join(state_path, "get_reader")
-        open(filepath, "a").close()  # noqa: WPS515, SIM115
+        open(filepath, "a").close()
         with subject.get_reader(path=filepath) as reader:
             assert reader.name == filepath
 
@@ -148,7 +148,7 @@ class TestLocalFilesystemStateStoreManager:
         prod_ids = [f"prod:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         for state_id in dev_ids + prod_ids:
             Path(subject.get_path(state_id)).mkdir(parents=True)
-            open(  # noqa: WPS515, SIM115
+            open(
                 subject.get_path(state_id, filename="state.json"),
                 "w+",
             ).close()
@@ -164,7 +164,7 @@ class TestLocalFilesystemStateStoreManager:
         for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             Path(state_dir).mkdir(parents=True)
-            with open(  # noqa: WPS515
+            with open(
                 os.path.join(state_dir, "state.json"),
                 "w+",
             ) as state_file:
@@ -291,8 +291,8 @@ class TestAZStorageStateStoreManager:
 
     def test_client(self, subject: AZStorageStateStoreManager, mock_client):
         # Call twice to assure memoization
-        _ = subject.client  # noqa: F541 WPS122
-        _ = subject.client  # noqa: F541 WPS122
+        _ = subject.client
+        _ = subject.client
         mock_client.from_connection_string.assert_called_once_with(
             "UseDevelopmentStorage=true",
         )
@@ -406,8 +406,8 @@ class TestS3StateStoreManager:
 
     def test_client_session(self, subject: S3StateStoreManager):
         with patch("boto3.Session") as mock_session:
-            _ = subject.client  # noqa: F541 WPS122
-            _ = subject.client  # noqa: F541 WPS122
+            _ = subject.client
+            _ = subject.client
             mock_session.assert_called_once_with(
                 aws_access_key_id=subject.aws_access_key_id,
                 aws_secret_access_key=subject.aws_secret_access_key,
@@ -415,8 +415,8 @@ class TestS3StateStoreManager:
 
     def test_client_client(self, subject: S3StateStoreManager):
         with patch("boto3.Session.client") as mock_client:
-            _ = subject.client  # noqa: F541 WPS122
-            _ = subject.client  # noqa: F541 WPS122
+            _ = subject.client
+            _ = subject.client
             mock_client.assert_called_once_with("s3", endpoint_url=subject.endpoint_url)
 
     def test_state_path(self, subject: S3StateStoreManager):
@@ -578,8 +578,8 @@ class TestGCSStateStoreManager:
 
     def test_client(self, subject: GCSStateStoreManager, mock_client):
         # Call twice to assure memoization
-        _ = subject.client  # noqa: F541 WPS122
-        _ = subject.client  # noqa: F541 WPS122
+        _ = subject.client
+        _ = subject.client
         mock_client.from_service_account_json.assert_called_once_with(
             subject.application_credentials,
         )

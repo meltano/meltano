@@ -14,7 +14,7 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
     for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
         monkeypatch.delenv(notable_flag_env_var, raising=False)
 
-    assert EnvironmentContext().data["notable_flag_env_vars"] == {}  # noqa: WPS520
+    assert EnvironmentContext().data["notable_flag_env_vars"] == {}
 
     def check(env_var_values: tuple[str, ...], expected: bool | None) -> None:
         for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
@@ -36,7 +36,7 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
 def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch):
     for notable_hashed_env_var in EnvironmentContext.notable_hashed_env_vars:
         monkeypatch.delenv(notable_hashed_env_var, raising=False)
-    assert EnvironmentContext().data["notable_hashed_env_vars"] == {}  # noqa: WPS520
+    assert EnvironmentContext().data["notable_hashed_env_vars"] == {}
 
     github_username = "test_user"
     monkeypatch.setenv("GITHUB_USER", github_username)

@@ -437,7 +437,7 @@ async def _redirect_output(log, output_logger):
     )
 
     with meltano_stdout.redirect_logging(ignore_errors=(CliError,)):
-        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():  # noqa: WPS316, E501
+        async with meltano_stdout.redirect_stdout(), meltano_stderr.redirect_stderr():
             try:
                 yield
             except CliError as err:
@@ -493,7 +493,7 @@ async def _run_elt(
             ) from err
 
 
-async def _run_extract_load(  # noqa: WPS210, WPS231
+async def _run_extract_load(
     log,
     elt_context,
     output_logger,

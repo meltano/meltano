@@ -90,7 +90,7 @@ def _debug_logging_handler(
                 stderr,
                 sys.stderr,
                 *other_dsts,
-                write_str=True,  # noqa: WPS517
+                write_str=True,
             ),
         )
 
@@ -104,12 +104,12 @@ def _debug_logging_handler(
                 stderr,
                 outerr,
                 *other_dsts,
-                write_str=True,  # noqa: WPS517
+                write_str=True,
             ),
         )
 
 
-def config_metadata_rules(config):  # noqa: WPS210
+def config_metadata_rules(config):
     """Get metadata rules from config.
 
     Args:
@@ -161,12 +161,12 @@ def config_schema_rules(config):
     ]
 
 
-class SingerTap(SingerPlugin):  # noqa: WPS214
+class SingerTap(SingerPlugin):
     """A Plugin for Singer Taps."""
 
     __plugin_type__ = PluginType.EXTRACTORS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(name="_catalog"),
         SettingDefinition(name="_state"),
         SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
@@ -231,7 +231,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
     @property
     def config_files(self):
         """Get the configuration files for this tap."""
-        return {  # noqa: DAR201
+        return {
             "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
@@ -241,7 +241,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
     @property
     def output_files(self):
         """Get the output files for this tap."""
-        return {"output": "tap.out"}  # noqa: DAR201
+        return {"output": "tap.out"}
 
     @hook("before_invoke")
     async def look_up_state_hook(
@@ -265,7 +265,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             await self.look_up_state(plugin_invoker)
 
-    async def look_up_state(  # noqa: WPS231, WPS213, WPS210
+    async def look_up_state(
         self,
         plugin_invoker: PluginInvoker,
     ):
@@ -363,7 +363,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(  # noqa: WPS231, WPS210,
+    async def discover_catalog(  # ,
         self,
         plugin_invoker: PluginInvoker,
     ):
@@ -430,11 +430,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
             ) from err
 
-    async def run_discovery(  # noqa: WPS238, WPS210
+    async def run_discovery(
         self,
         plugin_invoker: PluginInvoker,
         catalog_path: Path,
-    ):  # noqa: DAR401
+    ):
         """Run tap in discovery mode and store the result.
 
         Args:
@@ -493,7 +493,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # type: ignore[misc] # noqa: RSE102
+                        raise failed_future.exception()  # type: ignore[misc]
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
@@ -530,7 +530,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             self.apply_catalog_rules(plugin_invoker, exec_args)
 
-    def apply_catalog_rules(  # noqa: WPS213, WPS231, WPS210
+    def apply_catalog_rules(
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),  # noqa: ARG002
@@ -645,13 +645,13 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324
+        return sha1(key_json.encode()).hexdigest()  # noqa: S324
 
     @staticmethod
     @lru_cache
     def _warn_missing_stream(stream_id: str):
         logger.warning(
-            "Stream `%s` was not found in the catalog",  # noqa: WPS323
+            "Stream `%s` was not found in the catalog",
             stream_id,
         )
 
@@ -659,12 +659,12 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
     @lru_cache
     def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]):
         logger.warning(
-            "Property `%s` was not found in the schema of stream `%s`",  # noqa: E501, WPS323
+            "Property `%s` was not found in the schema of stream `%s`",
             ".".join(breadcrumb[1:]),
             stream_id,
         )
 
-    def warn_property_not_found(  # noqa: C901
+    def warn_property_not_found(
         self,
         rules: list[MetadataRule],
         catalog: CatalogDict,

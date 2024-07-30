@@ -27,7 +27,7 @@ class hook:  # noqa: N801
         self.can_fail = can_fail
 
     def __call__(self, func):
-        func.__hook__ = self  # noqa: WPS609
+        func.__hook__ = self
         return func
 
 
@@ -38,19 +38,19 @@ class Hookable(type):
     """
 
     def __new__(cls, name, bases, dct):
-        new_type = type.__new__(cls, name, bases, dct)  # noqa: WPS609
-        new_type.__hooks__ = {}  # noqa: WPS609
+        new_type = type.__new__(cls, name, bases, dct)
+        new_type.__hooks__ = {}
 
-        for hook_name, hook in (  # noqa: WPS442
-            (func.__hook__.name, func)  # noqa: WPS609, WPS335
+        for hook_name, hook in (
+            (func.__hook__.name, func)
             for func in dct.values()
-            if hasattr(func, "__hook__")  # noqa: WPS421
+            if hasattr(func, "__hook__")
         ):
-            new_type.__hooks__[hook_name] = new_type.__hooks__.get(  # noqa: WPS609
+            new_type.__hooks__[hook_name] = new_type.__hooks__.get(
                 hook_name,
                 [],
-            )  # noqa: WPS609
-            new_type.__hooks__[hook_name].append(hook)  # noqa: WPS609
+            )
+            new_type.__hooks__[hook_name].append(hook)
 
         return new_type
 
@@ -105,15 +105,15 @@ class HookObject(metaclass=Hookable):
         hooks = [
             hook
             for hook_cls in reversed(cls.__mro__)
-            if hasattr(hook_cls, "__hooks__")  # noqa: WPS421
-            for hook in hook_cls.__hooks__.get(hook_name, [])  # noqa: WPS361, WPS609
+            if hasattr(hook_cls, "__hooks__")
+            for hook in hook_cls.__hooks__.get(hook_name, [])
         ]
 
         for hook_func in hooks:
             try:
                 await hook_func(target, *args, **kwargs)
             except Exception as err:
-                if hook_func.__hook__.can_fail:  # noqa: WPS609
+                if hook_func.__hook__.can_fail:
                     logger.debug(str(err), exc_info=True)
                     logger.warning(
                         f"{hook_name} hook '{hook_func.__name__}' has failed: {err}",  # noqa: G004

@@ -4,7 +4,7 @@ import typing as t
 
 
 class visit_with:  # noqa: N801
-    def __init__(self, visit: t.Callable):  # noqa: D107
+    def __init__(self, visit: t.Callable):
         self.visit = visit
 
     def __call__(self, base_cls):

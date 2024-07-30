@@ -80,7 +80,7 @@ def project_engine(
 
     database_uri = project.settings.get("database_uri")
     parsed_db_uri = urlparse(database_uri)
-    sanitized_db_uri = parsed_db_uri._replace(  # noqa: WPS437
+    sanitized_db_uri = parsed_db_uri._replace(
         netloc=(
             f"{parsed_db_uri.username}:********@"  # user:pass auth case
             if parsed_db_uri.password

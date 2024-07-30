@@ -52,7 +52,7 @@ class LogEntry:
         Returns:
             True if a matching log line is found, else False
         """
-        for line in lines:  # noqa: RET503
+        for line in lines:
             matches = (
                 line.get("name") == self.name
                 and line.get("cmd_type") == self.cmd_type
@@ -733,13 +733,13 @@ class TestCliEltScratchpadOne:
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
-        try:  # noqa: WPS328
+        try:
             raise asyncio.LimitOverrunError(
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:
-            try:  # noqa: WPS328, WPS505
+            try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
                 raise ValueError(str(err))

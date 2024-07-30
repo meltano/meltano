@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
 
 
 class MeltanoFilePlugin(FilePlugin):
-    overwrite = {"meltano.yml"}
+    overwrite: t.ClassVar[set[str]] = {"meltano.yml"}
 
     def __init__(self):
         """Initialize the MeltanoFilePlugin."""
@@ -39,7 +39,7 @@ class MeltanoFilePlugin(FilePlugin):
                 for relative_path, content in yaml.safe_load(f).items()
             }
 
-    def update_config(self, project):  # noqa: ARG002, D102
+    def update_config(self, project):  # noqa: ARG002
         return {}
 
     def files_to_create(

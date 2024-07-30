@@ -44,8 +44,8 @@ class JobFinder:
             All successful jobs for this instance's state ID
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.SUCCESS)  # noqa: WPS465
+            (Job.job_name == self.state_id)
+            & (Job.state == State.SUCCESS)
             & Job.ended_at.isnot(None),
         )
 
@@ -59,8 +59,7 @@ class JobFinder:
             All runnings states for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.RUNNING),
+            (Job.job_name == self.state_id) & (Job.state == State.RUNNING),
         )
 
     def latest_success(self, session):
@@ -100,9 +99,9 @@ class JobFinder:
         query = (
             session.query(Job)
             .filter(
-                (Job.job_name == self.state_id)  # noqa: WPS465
-                & (Job.payload_flags != 0)  # noqa: WPS465
-                & (Job.payload_flags.op("&")(flags) == flags)  # noqa: WPS465
+                (Job.job_name == self.state_id)
+                & (Job.payload_flags != 0)
+                & (Job.payload_flags.op("&")(flags) == flags)
                 & Job.ended_at.isnot(None),
             )
             .order_by(Job.ended_at.asc())
@@ -146,14 +145,14 @@ class JobFinder:
         last_valid_started_at = now - timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
 
         return session.query(Job).filter(
-            (Job.state == State.RUNNING)  # noqa: WPS465
+            (Job.state == State.RUNNING)
             & (
                 (
-                    Job.last_heartbeat_at.isnot(None)  # noqa: WPS465
+                    Job.last_heartbeat_at.isnot(None)
                     & (Job.last_heartbeat_at < last_valid_heartbeat_at)
                 )
                 | (
-                    Job.last_heartbeat_at.is_(None)  # noqa: WPS465
+                    Job.last_heartbeat_at.is_(None)
                     & (Job.started_at < last_valid_started_at)
                 )
             ),

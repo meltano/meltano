@@ -34,7 +34,7 @@ class InvalidStateBackendConfigurationException(Exception):
     """State backend configuration is invalid."""
 
 
-class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
+class BaseFilesystemStateStoreManager(StateStoreManager):
     """Base class for filesystem state backends."""
 
     delimiter = "/"
@@ -72,7 +72,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
 
     @staticmethod
     @abstractmethod
-    def is_file_not_found_error(err: Exception) -> bool:  # noqa: N805
+    def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
         Args:
@@ -350,7 +350,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             self.delete(self.get_state_path(state_id))
 
 
-class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa: WPS214
+class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     label: str = "Local Filesystem"
@@ -384,7 +384,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         Returns:
             None
         """
-        return None  # noqa: RET501
+        return None
 
     @property
     def state_dir(self) -> str:
@@ -431,7 +431,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
             for state_file in glob.glob(
                 os.path.join(
                     self.state_dir,
-                    os.path.join(pattern, "state.json")  # noqa: WPS509
+                    os.path.join(pattern, "state.json")
                     if pattern
                     else os.path.join("*", "state.json"),
                 ),
@@ -576,7 +576,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         ...
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
+    def get_state_ids(self, pattern: str | None = None):
         """Get list of state_ids stored in the backend.
 
         Args:

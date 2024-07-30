@@ -29,7 +29,7 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class ConflictingSettingValueException(Exception):  # noqa: N818
+class ConflictingSettingValueException(Exception):
     """A setting has multiple conflicting values via aliases."""
 
     def __init__(self, setting_names):
@@ -51,7 +51,7 @@ class ConflictingSettingValueException(Exception):  # noqa: N818
         return f"Conflicting values for setting found in: {self.setting_names}"
 
 
-class MultipleEnvVarsSetException(Exception):  # noqa: N818
+class MultipleEnvVarsSetException(Exception):
     """A setting value is set via multiple environment variable names."""
 
     def __init__(self, names):
@@ -800,7 +800,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
 
         # This is not quite the right place for this, but we need to create
         # setting defs for missing keys again when `meltano.yml` changes
-        self.settings_service._setting_defs = None  # noqa: WPS437
+        self.settings_service._setting_defs = None
 
 
 class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
@@ -869,7 +869,7 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
 
         # This is not quite the right place for this, but we need to create
         # setting defs for missing keys again when `meltano.yml` changes
-        self.settings_service._setting_defs = None  # noqa: WPS437
+        self.settings_service._setting_defs = None
 
 
 class DbStoreManager(SettingsStoreManager):
@@ -1247,7 +1247,7 @@ class AutoStoreManager(SettingsStoreManager):
         except StoreNotSupportedError:
             return False
 
-    def auto_store(  # noqa: WPS231 # Too complex
+    def auto_store(  # Too complex
         self,
         name: str,
         setting_def: SettingDefinition | None = None,

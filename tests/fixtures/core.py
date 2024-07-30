@@ -45,7 +45,7 @@ current_dir = Path(__file__).parent
 
 
 @pytest.fixture(scope="class")
-def discovery():  # noqa: WPS213
+def discovery():
     return {
         PluginType.EXTRACTORS: [
             {
@@ -67,9 +67,9 @@ def discovery():  # noqa: WPS213
                 "variants": [
                     {
                         "name": "meltanolabs",
-                        "docs": "https://hub.meltano.com/extractors/google-analytics.html",  # noqa: E501
+                        "docs": "https://hub.meltano.com/extractors/google-analytics.html",
                         "repo": "https://github.com/MeltanoLabs/tap-google-analytics",
-                        "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git",  # noqa: E501
+                        "pip_url": "git+https://github.com/MeltanoLabs/tap-google-analytics.git",
                         "capabilities": ["catalog", "discover", "state"],
                         "settings_group_validation": [
                             ["key_file_location", "view_id", "start_date"],
@@ -152,9 +152,9 @@ def discovery():  # noqa: WPS213
                     {
                         "name": "meltano",
                         "hidden": True,
-                        "docs": "https://hub.meltano.com/extractors/google-analytics.html",  # noqa: E501
+                        "docs": "https://hub.meltano.com/extractors/google-analytics.html",
                         "repo": "https://gitlab.com/meltano/tap-google-analytics",
-                        "pip_url": "git+https://gitlab.com/meltano/tap-google-analytics.git",  # noqa: E501
+                        "pip_url": "git+https://gitlab.com/meltano/tap-google-analytics.git",
                         "capabilities": ["catalog", "discover"],
                         "settings_group_validation": [
                             ["key_file_location", "view_id", "start_date"],
@@ -375,8 +375,8 @@ def discovery():  # noqa: WPS213
                             "KEYWORDS_PERFORMANCE_REPORT.imprAbsTop",
                             "KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM",
                             "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR",
-                            "KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr",  # noqa: E501
-                            "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",  # noqa: E501
+                            "KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr",
+                            "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",
                             "KEYWORDS_PERFORMANCE_REPORT.allConvRate",
                             "KEYWORDS_PERFORMANCE_REPORT.allConvValue",
                             "KEYWORDS_PERFORMANCE_REPORT.avgCost",
@@ -471,16 +471,16 @@ def discovery():  # noqa: WPS213
                             "AD_PERFORMANCE_REPORT.gmailAdHeadline",
                             "AD_PERFORMANCE_REPORT.gmailAdDescription",
                             "AD_PERFORMANCE_REPORT.imageAdName",
-                            "AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay",  # noqa: E501
+                            "AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay",
                             "AD_PERFORMANCE_REPORT.imprAbsTop",
                             "AD_PERFORMANCE_REPORT.activeViewAvgCPM",
                             "AD_PERFORMANCE_REPORT.activeViewViewableCTR",
                             "AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr",
-                            "AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",  # noqa: E501
+                            "AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",
                             "AD_PERFORMANCE_REPORT.allConvRate",
                             "AD_PERFORMANCE_REPORT.allConvValue",
                             "AD_PERFORMANCE_REPORT.avgCost",
@@ -662,7 +662,7 @@ def discovery():  # noqa: WPS213
                             "KEYWORDS_PERFORMANCE_REPORT.activeViewAvgCPM",
                             "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableCTR",
                             "KEYWORDS_PERFORMANCE_REPORT.activeViewMeasurableImprImpr",
-                            "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",  # noqa: E501
+                            "KEYWORDS_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",
                             "KEYWORDS_PERFORMANCE_REPORT.allConvRate",
                             "KEYWORDS_PERFORMANCE_REPORT.allConvValue",
                             "KEYWORDS_PERFORMANCE_REPORT.avgCost",
@@ -757,16 +757,16 @@ def discovery():  # noqa: WPS213
                             "AD_PERFORMANCE_REPORT.gmailAdHeadline",
                             "AD_PERFORMANCE_REPORT.gmailAdDescription",
                             "AD_PERFORMANCE_REPORT.imageAdName",
-                            "AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay",  # noqa: E501
-                            "AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay",  # noqa: E501
+                            "AD_PERFORMANCE_REPORT.businessNameMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.longHeadlineMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.headlinesMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.callToActionTextMultiAssetResponsiveDisplay",
+                            "AD_PERFORMANCE_REPORT.promotionTextMultiAssetResponsiveDisplay",
                             "AD_PERFORMANCE_REPORT.imprAbsTop",
                             "AD_PERFORMANCE_REPORT.activeViewAvgCPM",
                             "AD_PERFORMANCE_REPORT.activeViewViewableCTR",
                             "AD_PERFORMANCE_REPORT.activeViewMeasurableImprImpr",
-                            "AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",  # noqa: E501
+                            "AD_PERFORMANCE_REPORT.activeViewViewableImprMeasurableImpr",
                             "AD_PERFORMANCE_REPORT.allConvRate",
                             "AD_PERFORMANCE_REPORT.allConvValue",
                             "AD_PERFORMANCE_REPORT.avgCost",
@@ -909,7 +909,7 @@ def discovery():  # noqa: WPS213
                         "name": "meltano",
                         "hidden": True,
                         "repo": "https://gitlab.com/meltano/tap-carbon-intensity",
-                        "pip_url": "git+https://gitlab.com/meltano/tap-carbon-intensity.git",  # noqa: E501
+                        "pip_url": "git+https://gitlab.com/meltano/tap-carbon-intensity.git",
                         "capabilities": ["discover"],
                     },
                 ],
@@ -1141,7 +1141,7 @@ def discovery():  # noqa: WPS213
                         "name": "meltanolabs",
                         "docs": "https://hub.meltano.com/loaders/sqlite.html",
                         "repo": "https://github.com/MeltanoLabs/target-sqlite",
-                        "pip_url": "git+https://github.com/MeltanoLabs/target-sqlite.git",  # noqa: E501
+                        "pip_url": "git+https://github.com/MeltanoLabs/target-sqlite.git",
                         "dialect": "sqlite",
                         "settings_group_validation": [["batch_size"]],
                         "settings": [
@@ -1205,7 +1205,7 @@ def discovery():  # noqa: WPS213
                         "name": "hotgluexyz",
                         "docs": "https://hub.meltano.com/loaders/csv.html",
                         "repo": "https://github.com/hotgluexyz/target-csv",
-                        "pip_url": "git+https://github.com/hotgluexyz/target-csv.git@0.3.3",  # noqa: E501
+                        "pip_url": "git+https://github.com/hotgluexyz/target-csv.git@0.3.3",
                         "settings": [
                             {
                                 "name": "destination_path",
@@ -1283,7 +1283,7 @@ def discovery():  # noqa: WPS213
                     {
                         "name": "transferwise",
                         "docs": "https://hub.meltano.com/loaders/postgres.html",
-                        "repo": "https://github.com/transferwise/pipelinewise-target-postgres",  # noqa: E501
+                        "repo": "https://github.com/transferwise/pipelinewise-target-postgres",
                         "pip_url": "pipelinewise-target-postgres",
                         "settings_group_validation": [
                             [
@@ -1423,7 +1423,7 @@ def discovery():  # noqa: WPS213
                     },
                     {
                         "name": "datamill-co",
-                        "docs": "https://hub.meltano.com/loaders/postgres--datamill-co.html",  # noqa: E501
+                        "docs": "https://hub.meltano.com/loaders/postgres--datamill-co.html",
                         "repo": "https://github.com/datamill-co/target-postgres",
                         "pip_url": "singer-target-postgres",
                         "settings_group_validation": [
@@ -1551,7 +1551,7 @@ def discovery():  # noqa: WPS213
                     {
                         "name": "meltano",
                         "original": True,
-                        "docs": "https://hub.meltano.com/loaders/postgres--meltano.html",  # noqa: E501
+                        "docs": "https://hub.meltano.com/loaders/postgres--meltano.html",
                         "repo": "https://github.com/meltano/target-postgres",
                         "pip_url": "git+https://github.com/meltano/target-postgres.git",
                         "settings_group_validation": [
@@ -1618,7 +1618,7 @@ def discovery():  # noqa: WPS213
                 "namespace": "tap_google_analytics",
                 "variant": "meltano",
                 "repo": "https://gitlab.com/meltano/dbt-tap-google-analytics",
-                "pip_url": "https://gitlab.com/meltano/dbt-tap-google-analytics.git@config-version-2",  # noqa: E501
+                "pip_url": "https://gitlab.com/meltano/dbt-tap-google-analytics.git@config-version-2",
                 "vars": {
                     "schema": "{{ env_var('DBT_SOURCE_SCHEMA', 'tap_google_analytics') }}",  # noqa: E501
                 },
@@ -1630,7 +1630,7 @@ def discovery():  # noqa: WPS213
                 "namespace": "airflow",
                 "docs": "https://docs.meltano.com/guide/orchestration",
                 "repo": "https://github.com/apache/airflow",
-                "pip_url": "apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt",  # noqa: E501
+                "pip_url": "apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt",
                 "settings": [
                     {
                         "name": "core.dags_folder",
@@ -1644,7 +1644,7 @@ def discovery():  # noqa: WPS213
                     },
                     {
                         "name": "core.sql_alchemy_conn",
-                        "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/orchestrators/airflow/airflow.db",  # noqa: E501
+                        "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/orchestrators/airflow/airflow.db",
                         "env": "AIRFLOW__CORE__SQL_ALCHEMY_CONN",
                     },
                     {
@@ -1771,7 +1771,7 @@ def discovery():  # noqa: WPS213
                     {"name": "ui.workers", "value": 4},
                     {
                         "name": "SQLALCHEMY_DATABASE_URI",
-                        "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db",  # noqa: E501
+                        "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db",
                     },
                     {
                         "name": "SECRET_KEY",
@@ -1822,7 +1822,7 @@ def discovery():  # noqa: WPS213
                     },
                 },
             },
-        ],  # noqa: S104
+        ],
         PluginType.MAPPERS: [
             {
                 "name": "mapper-mock",
@@ -1849,7 +1849,7 @@ def discovery():  # noqa: WPS213
                 "variant": "meltano",
                 "namespace": "dbt",
                 "repo": "https://gitlab.com/meltano/files-dbt",
-                "pip_url": "git+https://gitlab.com/meltano/files-dbt.git@3120-deprecate-env-aliases-config-v2",  # noqa: E501
+                "pip_url": "git+https://gitlab.com/meltano/files-dbt.git@3120-deprecate-env-aliases-config-v2",
             },
             {
                 "name": "docker-compose",
@@ -2220,7 +2220,7 @@ def state_ids(
 @pytest.fixture()
 def mock_time():
     def _mock_time():
-        for idx in itertools.count():  # noqa: WPS526
+        for idx in itertools.count():
             yield datetime.datetime(
                 1,
                 1,
@@ -2321,7 +2321,7 @@ def jobs(state_ids_with_jobs):
 
 
 @pytest.fixture()
-def state_ids_with_expected_states(  # noqa: WPS210
+def state_ids_with_expected_states(
     state_ids,
     payloads,
     state_ids_with_jobs,

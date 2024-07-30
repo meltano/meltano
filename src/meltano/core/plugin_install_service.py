@@ -130,15 +130,15 @@ def with_semaphore(func):
         Wrapped function.
     """
 
-    @functools.wraps(func)  # noqa: WPS430
-    async def wrapper(self, *args, **kwargs):  # noqa: WPS430
+    @functools.wraps(func)
+    async def wrapper(self, *args, **kwargs):
         async with self.semaphore:
             return await func(self, *args, **kwargs)
 
     return wrapper
 
 
-class PluginInstallService:  # noqa: WPS214
+class PluginInstallService:
     """Plugin install service."""
 
     def __init__(
@@ -183,7 +183,7 @@ class PluginInstallService:  # noqa: WPS214
 
         Returns:
             An asyncio semaphore with a counter starting at `self.parallelism`.
-        """  # noqa: D401
+        """
         return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
@@ -396,7 +396,7 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         *,
-        env: t.Mapping[str, str] = None,
+        env: t.Mapping[str, str] | None = None,
     ) -> bool:
         try:
             pip_install_args = get_pip_install_args(
@@ -450,7 +450,7 @@ class PluginInstallService:  # noqa: WPS214
             A special env var (with lowest precedence) `$MELTANO__PYTHON_VERSION`
             is included, and has the value
             `<major Python version>.<minor Python version>`.
-        """  # noqa: E501
+        """
         plugin_settings_service = PluginSettingsService(self.project, plugin)
         with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE,

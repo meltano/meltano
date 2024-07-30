@@ -45,7 +45,7 @@ class CyclicInheritanceError(Exception):
         )
 
 
-class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and methods
+class ProjectPlugin(PluginRef):  # too many attrs and methods
     """ProjectPlugin class."""
 
     VARIANT_ATTR = "variant"

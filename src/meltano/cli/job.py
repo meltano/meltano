@@ -267,7 +267,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 @job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
-def remove(ctx, job_name: str):  # noqa: WPS442
+def remove(ctx, job_name: str):
     """Remove a job.
 
     Usage:

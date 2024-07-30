@@ -89,7 +89,7 @@ class BadCronError(MeltanoError):
         super().__init__(reason, instruction)
 
 
-class ScheduleService:  # noqa: WPS214
+class ScheduleService:
     """Service for managing schedules."""
 
     def __init__(self, project: Project):

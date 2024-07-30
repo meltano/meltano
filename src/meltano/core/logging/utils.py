@@ -21,7 +21,7 @@ from meltano.core.utils import get_no_color_flag
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-LEVELS: dict[str, int] = {  # noqa: WPS407
+LEVELS: dict[str, int] = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
     "warning": logging.WARNING,
@@ -30,7 +30,7 @@ LEVELS: dict[str, int] = {  # noqa: WPS407
 }
 DEFAULT_LEVEL = "info"
 FORMAT = (
-    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
 
 
@@ -123,7 +123,7 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(  # noqa: WPS210
+def setup_logging(
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: os.PathLike | None = None,

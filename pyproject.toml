@@ -311,6 +311,7 @@ select = [
   "Q",   # flake8-quotes
   "RET", # flake8-return
   "RSE", # flake8-raise
+  "RUF", # Ruff specific rules
   "S",   # flake8-bandit
   "SIM", # flake8-simplify
   "T10", # flake8-debugger

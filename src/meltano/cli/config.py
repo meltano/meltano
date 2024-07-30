@@ -144,7 +144,7 @@ def get_label(metadata) -> str:
 )
 @pass_project(migrate=True)
 @click.pass_context
-def config(  # noqa: WPS231
+def config(
     ctx,
     project: Project,
     plugin_type: str,
@@ -242,7 +242,7 @@ def config(  # noqa: WPS231
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
-def list_settings(ctx: click.Context, extras: bool):  # noqa: C901
+def list_settings(ctx: click.Context, extras: bool):
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings: ProjectSettingsService | PluginSettingsService = ctx.obj["settings"]
     session = ctx.obj["session"]

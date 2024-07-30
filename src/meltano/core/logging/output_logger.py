@@ -132,7 +132,7 @@ class FileDescriptorWriter:
         return self.__out.isatty()
 
 
-class Out:  # noqa: WPS230
+class Out:
     """Simple Out class to log anything written in a stream."""
 
     def __init__(
@@ -196,7 +196,7 @@ class Out:  # noqa: WPS230
 
         Yields:
             With the side-effect of redirecting logging.
-        """  # noqa: DAR401
+        """
         logger = logging.getLogger()  # noqa: TID251
         logger.addHandler(self.redirect_log_handler)
         ignored_errors = (
@@ -206,7 +206,7 @@ class Out:  # noqa: WPS230
         )
         try:
             yield
-        except ignored_errors:  # noqa: WPS329
+        except ignored_errors:
             raise
         except RunnerError as err:
             logger.error(str(err))

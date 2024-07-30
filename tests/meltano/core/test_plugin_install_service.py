@@ -31,7 +31,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -42,7 +42,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "namespace": "target_csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 },
                             ],
                         },
