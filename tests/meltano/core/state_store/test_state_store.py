@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import shutil
+import sys
 import typing as t
 
 import pytest
@@ -10,9 +11,11 @@ from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
 
+from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
+    BuiltinStateBackendEnum,
     DBStateStoreManager,
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
@@ -26,10 +29,42 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
+if sys.version_info >= (3, 12):
+    from importlib.metadata import EntryPoint, EntryPoints
+else:
+    from importlib_metadata import EntryPoint, EntryPoints
+
+
+def test_unknown_state_backend_scheme(project: Project):
+    project.settings.set(["state_backend", "uri"], "unknown://")
+    with pytest.raises(ValueError, match="No state backend found for scheme"):
+        state_store_manager_from_project_settings(project.settings)
+
+
+def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPatch):
+    project.settings.set(["state_backend", "uri"], "custom://")
+
+    entry_points = EntryPoints(
+        (
+            EntryPoint(
+                value="fixtures.state_backends:DummyStateStoreManager",
+                name="custom",
+                group="meltano.state_backends",
+            ),
+        ),
+    )
+
+    with monkeypatch.context() as m:
+        m.setattr(StateBackend.addon, "installed", entry_points)
+        assert "custom" in StateBackend.backends()
+
+        state_store = state_store_manager_from_project_settings(project.settings)
+        assert isinstance(state_store, DummyStateStoreManager)
+
 
 class TestSystemDBStateBackend:
     def test_manager_from_settings(self, project: Project) -> None:
-        project.settings.set(["state_backend", "uri"], StateBackend.SYSTEMDB)
+        project.settings.set(["state_backend", "uri"], BuiltinStateBackendEnum.SYSTEMDB)
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(db_state_store, DBStateStoreManager)
