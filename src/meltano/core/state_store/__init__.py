@@ -8,9 +8,12 @@ import sys
 import typing as t
 from urllib.parse import urlparse
 
+from structlog.stdlib import get_logger
+
+from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.db import project_engine
 from meltano.core.state_store.azure import AZStorageStateStoreManager
-from meltano.core.state_store.base import MeltanoState
+from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.state_store.db import DBStateStoreManager
 from meltano.core.state_store.filesystem import (
     LocalFilesystemStateStoreManager,
@@ -30,13 +33,29 @@ if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
     from meltano.core.project_settings_service import ProjectSettingsService
-    from meltano.core.state_store.base import StateStoreManager
+
+if sys.version_info >= (3, 12):
+    from importlib.metadata import EntryPoints, entry_points
+else:
+    from importlib_metadata import EntryPoints, entry_points
+
+__all__ = [
+    "AZStorageStateStoreManager",
+    "BuiltinStateBackendEnum",
+    "DBStateStoreManager",
+    "GCSStateStoreManager",
+    "LocalFilesystemStateStoreManager",
+    "MeltanoState",
+    "S3StateStoreManager",
+    "StateBackend",
+    "StateStoreManager",
+    "state_store_manager_from_project_settings",
+]
+
+logger = get_logger(__name__)
 
 
-__all__ = ["MeltanoState", "state_store_manager_from_project_settings"]
-
-
-class StateBackend(StrEnum):
+class BuiltinStateBackendEnum(StrEnum):
     """State backend."""
 
     SYSTEMDB = "systemdb"
@@ -48,17 +67,33 @@ class StateBackend(StrEnum):
     S3 = "s3"
     GCS = "gs"
 
+
+class StateBackend:
+    """State backend."""
+
+    addon: MeltanoAddon[type[StateStoreManager]] = MeltanoAddon(
+        "meltano.state_backends",
+    )
+
+    def __init__(self, scheme: str) -> None:
+        """Create a new StateBackend.
+
+        Args:
+            scheme: The scheme of the StateBackend.
+        """
+        self.scheme = scheme
+
     @classmethod
-    def backends(cls) -> list[StateBackend]:
+    def backends(cls) -> list[str]:
         """List available state backends.
 
         Returns:
             List of available state backends.
         """
-        return list(cls)
+        return list(BuiltinStateBackendEnum) + [ep.name for ep in cls.addon.installed]
 
     @property
-    def _managers(
+    def _builtin_managers(
         self,
     ) -> Mapping[str, type[StateStoreManager]]:
         """Get mapping of StateBackend to associated StateStoreManager.
@@ -67,11 +102,11 @@ class StateBackend(StrEnum):
             Mapping of StateBackend to associated StateStoreManager.
         """
         return {
-            self.SYSTEMDB: DBStateStoreManager,
-            self.LOCAL_FILESYSTEM: LocalFilesystemStateStoreManager,
-            self.S3: S3StateStoreManager,
-            self.AZURE: AZStorageStateStoreManager,
-            self.GCS: GCSStateStoreManager,
+            BuiltinStateBackendEnum.SYSTEMDB: DBStateStoreManager,
+            BuiltinStateBackendEnum.LOCAL_FILESYSTEM: LocalFilesystemStateStoreManager,
+            BuiltinStateBackendEnum.S3: S3StateStoreManager,
+            BuiltinStateBackendEnum.AZURE: AZStorageStateStoreManager,
+            BuiltinStateBackendEnum.GCS: GCSStateStoreManager,
         }
 
     @property
@@ -82,8 +117,29 @@ class StateBackend(StrEnum):
 
         Returns:
             The StateStoreManager associated with this StateBackend.
+
+        Raises:
+            ValueError: If no state backend is found for the scheme.
         """
-        return self._managers[self]
+        try:
+            return self._builtin_managers[self.scheme]
+        except KeyError:
+            logger.info(
+                "No builtin state backend found for scheme '%s'",
+                self.scheme,
+            )
+
+        try:
+            return self.addon.get(self.scheme)
+        except KeyError:
+            logger.info(
+                "No state backend plugin found for scheme '%s'",
+                self.scheme,
+            )
+
+        # TODO: This should be a Meltano exception
+        msg = f"No state backend found for scheme '{self.scheme}'"
+        raise ValueError(msg)
 
 
 def state_store_manager_from_project_settings(
@@ -100,11 +156,12 @@ def state_store_manager_from_project_settings(
         The relevant StateStoreManager instance.
     """
     state_backend_uri: str = settings_service.get("state_backend.uri")
-    parsed = urlparse(state_backend_uri)
-    if state_backend_uri == StateBackend.SYSTEMDB:
+    if state_backend_uri == BuiltinStateBackendEnum.SYSTEMDB:
         return DBStateStoreManager(
             session=session or project_engine(settings_service.project)[1](),
         )
+
+    parsed = urlparse(state_backend_uri)
     scheme = parsed.scheme
     # Get backend-specific settings
     # AND top-level state_backend settings
@@ -120,7 +177,10 @@ def state_store_manager_from_project_settings(
     )
     settings = (setting_def.name for setting_def in setting_defs)
     backend = StateBackend(scheme).manager
-    if scheme == StateBackend.LOCAL_FILESYSTEM and "Windows" in platform.system():
+    if (
+        scheme == BuiltinStateBackendEnum.LOCAL_FILESYSTEM
+        and "Windows" in platform.system()
+    ):
         backend = WindowsFilesystemStateStoreManager
     kwargs = {name.split(".")[-1]: settings_service.get(name) for name in settings}
     return backend(**kwargs)
