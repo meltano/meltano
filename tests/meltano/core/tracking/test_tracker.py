@@ -438,14 +438,18 @@ class TestTracker:
         with caplog.at_level(logging.WARNING, logger="meltano.core.tracking.tracker"):
             tracker = Tracker(project)
 
-        try:
-            assert caplog.records[0].levelname == "WARNING"
-            assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+        recs = caplog.records
 
-            assert caplog.records[1].levelname == "WARNING"
-            assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+        try:
+            assert recs[0].levelname == "WARNING", recs[1].levelname
+            assert isinstance(recs[0].msg, dict), recs[0].msg
+            assert recs[0].msg["event"] == "invalid_snowplow_endpoint", recs[0].msg
+            assert recs[0].msg["endpoint"] == "notvalid:8080", recs[0].msg
+
+            assert recs[1].levelname == "WARNING", recs[1].levelname
+            assert isinstance(recs[1].msg, dict), recs[1].msg
+            assert recs[1].msg["event"] == "invalid_snowplow_endpoint", recs[1].msg
+            assert recs[1].msg["endpoint"] == "file://bad.scheme", recs[1].msg
 
             assert len(tracker.snowplow_tracker.emitters) == 2
 
