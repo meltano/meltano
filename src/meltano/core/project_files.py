@@ -236,7 +236,7 @@ class ProjectFiles:
         for path in self.include_paths:
             try:
                 contents: CommentedMap = yaml.load(path)
-            except YAMLError as exc:
+            except YAMLError as exc:  # noqa: PERF203
                 logger.critical(f"Error while parsing YAML file: {path} \n {exc}")  # noqa: G004
                 raise exc
             else:

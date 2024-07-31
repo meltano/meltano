@@ -283,7 +283,7 @@ class SettingsService(metaclass=ABCMeta):
             settings as environment variables
         """
         env = {}
-        for _, config in self.config_with_metadata(*args, **kwargs).items():
+        for config in self.config_with_metadata(*args, **kwargs).values():
             value = config["value"]
             if value is None:
                 continue

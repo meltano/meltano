@@ -30,7 +30,7 @@ class SingerRunner(Runner):  # noqa: D101
                 code = process.wait(**wait_args)
                 logger.debug(f"{process} exited with {code}")  # noqa: G004
                 return code
-            except subprocess.TimeoutExpired:
+            except subprocess.TimeoutExpired:  # noqa: PERF203
                 process.kill()
                 logger.error(f"{process} was killed.")  # noqa: G004
 

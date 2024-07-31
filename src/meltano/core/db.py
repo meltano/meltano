@@ -142,7 +142,7 @@ def connect(
     while True:
         try:
             return engine.connect()
-        except OperationalError:
+        except OperationalError:  # noqa: PERF203
             if attempt >= max_retries:
                 logger.error(
                     f"Could not connect to the database after {attempt} "  # noqa: G004

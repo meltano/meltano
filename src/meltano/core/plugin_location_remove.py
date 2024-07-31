@@ -164,13 +164,13 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
             self.remove_status = PluginLocationRemoveStatus.NOT_FOUND
             return
 
-        for path in self.paths:
-            try:
+        try:
+            for path in self.paths:
                 path.unlink()
-            except OSError as err:
-                self.remove_status = PluginLocationRemoveStatus.ERROR
-                self.message = err.strerror
-                return
+        except OSError as err:
+            self.remove_status = PluginLocationRemoveStatus.ERROR
+            self.message = err.strerror
+            return
 
         self.remove_status = PluginLocationRemoveStatus.REMOVED
 

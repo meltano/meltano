@@ -112,7 +112,7 @@ class HookObject(metaclass=Hookable):
         for hook_func in hooks:
             try:
                 await hook_func(target, *args, **kwargs)
-            except Exception as err:
+            except Exception as err:  # noqa: PERF203
                 if hook_func.__hook__.can_fail:
                     logger.debug(str(err), exc_info=True)
                     logger.warning(
