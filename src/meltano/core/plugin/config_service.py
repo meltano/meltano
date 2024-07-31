@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import shutil
 import typing as t
 from pathlib import Path
@@ -31,7 +30,7 @@ class PluginConfigService:
         self.run_dir = Path(run_dir)
 
     def configure(self):
-        os.makedirs(self.run_dir, exist_ok=True)
+        self.run_dir.mkdir(parents=True, exist_ok=True)
 
         config_file = self.config_dir.joinpath
         run_file = self.run_dir.joinpath

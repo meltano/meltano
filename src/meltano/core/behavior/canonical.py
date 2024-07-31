@@ -430,7 +430,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         Returns:
             A standalone plugin definition.
         """
-        with open(path) as file:
+        with open(path) as file:  # noqa: PTH123
             return cls.parse(json.load(file))
 
 

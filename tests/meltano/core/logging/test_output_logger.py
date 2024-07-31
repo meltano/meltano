@@ -210,7 +210,7 @@ class TestOutputLogger:
             logging.warning("warning")  # noqa: TID251
             logging.error("error")  # noqa: TID251
 
-        with open(subject.file) as logf:
+        with open(subject.file) as logf:  # noqa: PTH123
             log_file_contents = [json.loads(line) for line in logf.readlines()]
 
         assert_lines(

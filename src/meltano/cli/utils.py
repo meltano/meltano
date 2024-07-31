@@ -180,8 +180,8 @@ def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
         f"\nSpecify the plugin's {click.style(prompt_request, fg='blue')}\n"
         f"\nDefault: name derived from {derived_from}\n",
     )
-    plugin_basename = os.path.basename(pip_url or plugin_name)
-    package_name, _ = os.path.splitext(plugin_basename)
+    plugin_basename = os.path.basename(pip_url or plugin_name)  # noqa: PTH119
+    package_name, _ = os.path.splitext(plugin_basename)  # noqa: PTH122
     return click.prompt(click.style("(executable)", fg="blue"), default=package_name)
 
 

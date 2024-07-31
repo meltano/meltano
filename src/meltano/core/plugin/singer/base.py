@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from uuid import uuid4
 
 import structlog
@@ -8,6 +9,9 @@ import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin
 from meltano.core.utils import nest_object
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -26,7 +30,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config):
+    def process_config(self, flat_config) -> dict:
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
@@ -46,26 +50,26 @@ class SingerPlugin(BasePlugin):
     @hook("before_configure")
     async def before_configure(
         self,
-        invoker,
+        invoker: PluginInvoker,
         session,  # noqa: ARG002
-    ):
+    ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
+        with config_path.open("w") as config_file:
             config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker) -> None:
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
         logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
-    def instance_uuid(self):
+    def instance_uuid(self) -> str:
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
             self._instance_uuid = str(uuid4())

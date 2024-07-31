@@ -1,3 +1,5 @@
+# ruff: noqa: PTH110, PTH118, PTH120, PTH123
+
 from __future__ import annotations
 
 import contextlib

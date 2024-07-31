@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import os
 import typing as t
-from pathlib import Path
 
 import mock
 import pytest
@@ -14,6 +12,8 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
 TEST_STATE_ID = "test_job"
@@ -32,7 +32,7 @@ class AnyInstanceOf:
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
-        Path(os.path.join(config_dir, file)).touch()
+        config_dir.joinpath(file).touch()
 
     return config_dir
 

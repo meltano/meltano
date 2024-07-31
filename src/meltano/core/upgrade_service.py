@@ -65,7 +65,7 @@ class UpgradeService:
             fail_reason = "it is installed from source"
             instructions = f"navigate to `{meltano_dir}` and run `git pull`"
 
-        elif os.path.exists("/.dockerenv"):
+        elif os.path.exists("/.dockerenv"):  # noqa: PTH110
             fail_reason = "it is installed inside Docker"
             instructions = (
                 "pull the latest Docker image using "

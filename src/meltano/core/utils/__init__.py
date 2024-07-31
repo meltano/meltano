@@ -390,7 +390,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func):
+def makedirs(func: t.Callable[..., Path]):
     @functools.wraps(func)
     def decorate(*args, **kwargs):
         enabled = kwargs.pop("make_dirs", True)
@@ -401,8 +401,8 @@ def makedirs(func):
             return path
 
         # if there is an extension, only create the base dir
-        _, ext = os.path.splitext(path)
-        os.makedirs(os.path.dirname(path) if ext else path, exist_ok=True)
+        dir_path = path.parent if path.suffix else path
+        dir_path.mkdir(parents=True, exist_ok=True)
         return path
 
     return decorate

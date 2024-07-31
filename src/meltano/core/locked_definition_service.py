@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from glob import iglob
 
 from meltano.core.plugin import BasePlugin, PluginDefinition, PluginRef, PluginType
 from meltano.core.plugin.base import StandalonePlugin
@@ -92,12 +91,8 @@ class LockedDefinitionService(PluginRepository):
         Yields:
             Locked plugin definitions for the given type.
         """
+        plugin_type_dir = self.project.root_plugins_dir(plugin_type.value)
         yield from (
-            PluginDefinition.from_standalone(
-                StandalonePlugin.parse_json_file(lockfile),  # type: ignore[arg-type]
-            )
-            for lockfile in iglob(
-                "*.lock",
-                root_dir=self.project.root_plugins_dir(plugin_type.value),
-            )
+            PluginDefinition.from_standalone(StandalonePlugin.parse_json_file(lockfile))
+            for lockfile in plugin_type_dir.glob("*.lock")
         )

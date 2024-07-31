@@ -82,7 +82,7 @@ class PluginLock:
         """
 
         def _load():
-            with open(self.path) as lockfile:
+            with self.path.open() as lockfile:
                 return loader(lockfile)
 
         try:

@@ -83,7 +83,7 @@ class TestSingerMapper:
         async with invoker.prepared(session):
             config_path = invoker.files["config"]
 
-            with open(config_path) as config_file:
+            with config_path.open() as config_file:
                 config = json.load(config_file)
 
             assert config == {

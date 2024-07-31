@@ -55,8 +55,8 @@ def read_config(config_file: os.PathLike | None = None) -> dict | None:
     Returns:
         dict: parsed yaml config
     """
-    if config_file and os.path.exists(config_file):
-        with open(config_file) as cf:
+    if config_file and os.path.exists(config_file):  # noqa: PTH110
+        with open(config_file) as cf:  # noqa: PTH123
             return yaml.safe_load(cf.read())
     else:
         return None

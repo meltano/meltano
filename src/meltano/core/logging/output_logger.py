@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import sys
+import typing as t
 from contextlib import (
     asynccontextmanager,
     contextmanager,
@@ -21,11 +22,19 @@ from meltano.core.runner import RunnerError
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
 
+if t.TYPE_CHECKING:
+    if sys.version_info < (3, 10):
+        from typing import TypeAlias  # noqa: ICN003
+    else:
+        from typing_extensions import TypeAlias
+
+StrPath: TypeAlias = t.Union[str, os.PathLike]
+
 
 class OutputLogger:
     """Output Logger."""
 
-    def __init__(self, file):
+    def __init__(self, file: StrPath):
         """Instantiate an Output Logger.
 
         Args:
@@ -35,7 +44,7 @@ class OutputLogger:
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
-        self.outs = {}
+        self.outs: dict[str, Out] = {}
 
     def out(
         self,
@@ -141,7 +150,7 @@ class Out:
         name: str,
         logger: structlog.stdlib.BoundLogger,
         write_level: int,
-        file: str,
+        file: StrPath,
     ):
         """Log anything written in a stream.
 

@@ -18,7 +18,7 @@ class TestPluginRemoveService:
 
     @pytest.fixture()
     def add(self, subject: PluginRemoveService):
-        with open(subject.project.meltanofile, "w") as meltano_yml:
+        with subject.project.meltanofile.open("w") as meltano_yml:
             meltano_yml.write(
                 yaml.dump(
                     {
@@ -50,8 +50,8 @@ class TestPluginRemoveService:
             "loaders",
             "target-csv",
         )
-        os.makedirs(tap_gitlab_installation, exist_ok=True)
-        os.makedirs(target_csv_installation, exist_ok=True)
+        tap_gitlab_installation.mkdir(parents=True, exist_ok=True)
+        target_csv_installation.mkdir(parents=True, exist_ok=True)
 
     @pytest.fixture()
     def lock(self, subject: PluginRemoveService):
@@ -80,16 +80,15 @@ class TestPluginRemoveService:
 
         for plugin in plugins:
             # check removed from meltano.yml
-            with open(subject.project.meltanofile) as meltanofile:
+            with subject.project.meltanofile.open() as meltanofile:
                 meltano_yml = yaml.safe_load(meltanofile)
 
                 with pytest.raises(KeyError):
                     meltano_yml[plugin.type, plugin.name]
 
             # check removed installation
-            assert not os.path.exists(
-                subject.project.meltano_dir().joinpath(plugin.type, plugin.name),
-            )
+            path = subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
+            assert not path.exists()
 
             # check removed lock files
             lock_file_paths = list(

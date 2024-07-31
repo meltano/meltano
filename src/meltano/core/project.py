@@ -51,17 +51,17 @@ PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
 
 
-def walk_parent_directories():
+def walk_parent_directories() -> t.Generator[Path, None, None]:
     """Yield each directory starting with the current up to the root.
 
     Yields:
         parent directories
     """
-    directory = os.getcwd()
+    directory = Path.cwd()
     while True:
         yield directory
 
-        parent_directory = os.path.dirname(directory)
+        parent_directory = directory.parent
         if parent_directory == directory:
             return
         directory = parent_directory
@@ -290,7 +290,7 @@ class Project(Versioned):
                 if project.meltanofile.exists():
                     break
             if not project.meltanofile.exists():
-                raise ProjectNotFound(Project(os.getcwd()))
+                raise ProjectNotFound(Project(Path.cwd()))
 
         readonly = project.settings.get("project_readonly")
         if readonly != project.readonly:

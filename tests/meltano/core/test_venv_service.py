@@ -83,10 +83,7 @@ class TestVenvService:
         assert venv_dir.exists()
 
         # ensure that the binary is python3
-        assert os.path.samefile(
-            venv_dir.joinpath("bin/python"),
-            venv_dir.joinpath("bin/python3"),
-        )
+        assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
 
         # ensure that the package is installed
         run = subprocess.run(

@@ -65,7 +65,7 @@ class TestMeltanoInvoker:
 
             # ...the symlink is not relevant and we find the executable next
             # to the `python` executable
-            pip_path = Path(os.path.dirname(sys.executable), "pip")
+            pip_path = Path(os.path.dirname(sys.executable), "pip")  # noqa: PTH120
             assert run_mock.call_args[0][0][0] == str(pip_path)
 
             # If the `meltano` symlink does not exist...
@@ -73,7 +73,7 @@ class TestMeltanoInvoker:
             subject.invoke(["--version"])
 
             # we find the executable next to the `python` executable
-            meltano_path = Path(os.path.dirname(sys.executable), MELTANO_COMMAND)
+            meltano_path = Path(os.path.dirname(sys.executable), MELTANO_COMMAND)  # noqa: PTH120
             assert run_mock.call_args[0][0][0] == str(meltano_path)
 
             # If the executable doesn't exist in either place...
