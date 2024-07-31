@@ -302,6 +302,7 @@ select = [
   "F",   # pyflakes
   "G",   # flake8-logging-format
   "I",   # isort
+  "ICN", # flake8-import-conventions
   "INP", # flake8-no-pep420
   "ISC", # flake8-implicit-str-concat
   "N",   # pep8-naming
@@ -339,6 +340,14 @@ unfixable = [
 allow-star-arg-any = true
 mypy-init-return = true
 suppress-dummy-args = true
+
+[tool.ruff.lint.flake8-import-conventions]
+banned-from = [
+  "typing",
+]
+
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+typing = "t"
 
 [tool.ruff.lint.flake8-pytest-style]
 parametrize-values-type = "tuple"
