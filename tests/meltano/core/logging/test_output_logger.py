@@ -76,7 +76,7 @@ class TestOutputLogger:
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
             sys.stdout.write("OUT\n")
-            print("STDOUT 2")  # noqa: T201, WPS421
+            print("STDOUT 2")  # noqa: T201
 
         assert_lines(
             log_output.entries,
@@ -95,7 +95,7 @@ class TestOutputLogger:
         async with stderr_out.redirect_stderr():
             sys.stderr.write("STD")
             sys.stderr.write("ERR\n")
-            print("STDERR 2", file=sys.stderr)  # noqa: T201, WPS421
+            print("STDERR 2", file=sys.stderr)  # noqa: T201
 
         assert_lines(
             log_output.entries,

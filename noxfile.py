@@ -62,7 +62,7 @@ pytest_deps = (
 
 
 def _run_pytest(session: Session) -> None:
-    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    random_seed = randint(0, 2**32 - 1)  # noqa: S311
     args = session.posargs or ("tests/",)
     try:
         session.env.update(

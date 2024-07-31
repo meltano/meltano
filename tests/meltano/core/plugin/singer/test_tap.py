@@ -5,6 +5,7 @@ import json
 import logging
 import subprocess
 import sys
+import typing as t
 from contextlib import contextmanager, suppress
 
 import pytest
@@ -23,9 +24,9 @@ from meltano.core.state_service import InvalidJobStateError, StateService
 
 
 class CatalogFixture:
-    empty_stream: CatalogDict = {"streams": []}
-    empty_properties: CatalogDict = {"streams": [{"tap_stream_id": "foo"}]}
-    regular_stream: CatalogDict = {
+    empty_stream: t.ClassVar[CatalogDict] = {"streams": []}
+    empty_properties: t.ClassVar[CatalogDict] = {"streams": [{"tap_stream_id": "foo"}]}
+    regular_stream: t.ClassVar[CatalogDict] = {
         "streams": [
             {
                 "tap_stream_id": "foo",
@@ -86,7 +87,7 @@ class TestSingerTap:
         assert not invoker.files["config"].exists()
 
     @pytest.mark.asyncio()
-    async def test_look_up_state(  # noqa: WPS213, WPS217
+    async def test_look_up_state(
         self,
         subject,
         project,
@@ -211,7 +212,7 @@ class TestSingerTap:
 
     @pytest.mark.order(1)
     @pytest.mark.asyncio()
-    async def test_discover_catalog(  # noqa: WPS213
+    async def test_discover_catalog(
         self,
         session,
         plugin_invoker_factory,
@@ -322,7 +323,7 @@ class TestSingerTap:
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
     @pytest.mark.asyncio()
-    async def test_apply_select(  # noqa: WPS213
+    async def test_apply_select(
         self,
         session,
         plugin_invoker_factory,
@@ -409,7 +410,7 @@ class TestSingerTap:
             )
 
     @pytest.mark.asyncio()
-    async def test_apply_catalog_rules(  # noqa: WPS213
+    async def test_apply_catalog_rules(
         self,
         session,
         plugin_invoker_factory,
@@ -576,7 +577,7 @@ class TestSingerTap:
             assert cache_key is None
 
     @pytest.mark.asyncio()
-    async def test_apply_catalog_rules_select_filter(  # noqa: WPS217, WPS213
+    async def test_apply_catalog_rules_select_filter(
         self,
         session,
         plugin_invoker_factory,
@@ -715,11 +716,11 @@ class TestSingerTap:
         async with invoker.prepared(session):
             invoker.files["catalog"].open("w").write("this is invalid json")
 
-            with pytest.raises(PluginExecutionError, match=r"invalid"):  # noqa: WPS360
+            with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
 
     @pytest.mark.asyncio()
-    async def test_catalog_cache_key(  # noqa: WPS217
+    async def test_catalog_cache_key(
         self,
         session,
         plugin_invoker_factory,

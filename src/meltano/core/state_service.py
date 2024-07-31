@@ -28,7 +28,7 @@ class InvalidJobStateError(Exception):
     """Invalid job state is parsed."""
 
 
-class StateService:  # noqa: WPS214
+class StateService:
     """Meltano Service used to manage job state.
 
     Currently only manages Singer state for Extract and Load jobs.

@@ -358,7 +358,7 @@ class SettingDefinition(NameEq, Canonical):
 
         Returns:
             True if setting is a config extra.
-        """  # noqa: E501
+        """
         return self.name.startswith("_")
 
     @property
@@ -447,7 +447,7 @@ class SettingDefinition(NameEq, Canonical):
         try:
             parsed = json.loads(unparsed)
         except json.JSONDecodeError:
-            try:  # noqa: WPS505
+            try:
                 parsed = ast.literal_eval(unparsed)
             except (
                 ValueError,
@@ -461,7 +461,7 @@ class SettingDefinition(NameEq, Canonical):
             raise parse_error
         return parsed
 
-    def cast_value(self, value: t.Any) -> t.Any:  # noqa: C901
+    def cast_value(self, value: t.Any) -> t.Any:
         """Cast given value.
 
         Args:

@@ -321,12 +321,12 @@ class SelectionType(str, ReprEnum):
 
 
 @singledispatch
-def visit(  # noqa: D103
+def visit(
     node,  # noqa: ARG001
     executor,  # noqa: ARG001
     path: str = "",
 ):
-    logger.debug("Skipping node at '%s'", path)  # noqa: WPS323
+    logger.debug("Skipping node at '%s'", path)
 
 
 @visit.register(dict)
@@ -343,7 +343,7 @@ def _(node: dict, executor, path=""):
         node_type = CatalogNode.METADATA
 
     if node_type:
-        logger.debug("Visiting %s at '%s'.", node_type, path)  # noqa: WPS323
+        logger.debug("Visiting %s at '%s'.", node_type, path)
         executor(node_type, node, path)
 
     for child_path, child_node in node.items():
@@ -373,7 +373,7 @@ class CatalogExecutor:
         try:
             dispatch[node_type](node, path)
         except KeyError:  # pragma: no cover
-            logger.debug("Unknown node type '%s'.", node_type)  # noqa: WPS323
+            logger.debug("Unknown node type '%s'.", node_type)
 
     def stream_node(self, node: Node, path: str):
         """Process stream node."""
@@ -464,7 +464,7 @@ class MetadataExecutor(CatalogExecutor):
         breadcrumb = node["breadcrumb"]
 
         logger.debug(
-            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",  # noqa: WPS323, E501
+            "Visiting metadata node for tap_stream_id '%s', breadcrumb '%s'",
             tap_stream_id,
             breadcrumb,
         )
@@ -488,7 +488,7 @@ class MetadataExecutor(CatalogExecutor):
             return
 
         node[key] = value
-        logger.debug("Setting '%s.%s' to '%s'", path, key, value)  # noqa: WPS323
+        logger.debug("Setting '%s.%s' to '%s'", path, key, value)
 
 
 class SelectExecutor(MetadataExecutor):
@@ -501,7 +501,7 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = None
         self._rules = rules
 
-    def ensure_property(self, breadcrumb: list[str]):  # noqa: WPS231
+    def ensure_property(self, breadcrumb: list[str]):
         """Create nodes for the breadcrumb and schema extra that matches."""
         next_node: dict[str, t.Any] = self._stream["schema"]
 
@@ -553,7 +553,7 @@ class SchemaExecutor(CatalogExecutor):
         """Set node payload from a clean mapping."""
         node.clear()
         node.update(payload)
-        logger.debug("Setting '%s' to %r", path, payload)  # noqa: WPS323
+        logger.debug("Setting '%s' to %r", path, payload)
 
 
 class ListExecutor(CatalogExecutor):

@@ -118,7 +118,7 @@ class TaskSets(NameEq, Canonical):
 
         Returns:
             The per-task run arguments.
-        """  # noqa: F721
+        """
         return self._as_args(preserve_top_level=True)
 
 

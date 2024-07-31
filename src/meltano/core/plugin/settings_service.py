@@ -14,10 +14,10 @@ if t.TYPE_CHECKING:
     from meltano.core.setting_definition import SettingDefinition
 
 
-class PluginSettingsService(SettingsService):  # noqa: WPS214
+class PluginSettingsService(SettingsService):
     """Settings manager for Meltano plugins."""
 
-    def __init__(  # noqa: WPS210
+    def __init__(
         self,
         project: Project,
         plugin: ProjectPlugin,
@@ -109,7 +109,7 @@ class PluginSettingsService(SettingsService):  # noqa: WPS214
         Returns:
             The label for this plugin.
         """
-        return f"{self.plugin.type.descriptor} '{self.plugin.name}'"  # noqa: WPS237
+        return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
 
     @property
     def docs_url(self):

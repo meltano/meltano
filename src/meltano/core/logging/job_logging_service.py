@@ -30,7 +30,7 @@ class JobLoggingService:
         self.project = project
 
     @makedirs
-    def logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):  # noqa: ARG002
+    def logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):
         """Return the logs directory for a given state_id.
 
         Args:
@@ -67,7 +67,7 @@ class JobLoggingService:
 
         Log will be created inside the logs_dir, which is
         `.meltano/logs/elt/:state_id/:run_id`
-        """  # noqa: DAR101, DAR301
+        """
         log_file_name = self.generate_log_name(state_id, run_id, file_name)
 
         try:
@@ -92,7 +92,7 @@ class JobLoggingService:
         Returns:
             The contents of the most recent log for any ELT job that ran with
             the provided `state_id`.
-        """  # noqa: DAR301, DAR401
+        """
         try:
             latest_log = next(iter(self.get_all_logs(state_id)))
 
@@ -113,7 +113,7 @@ class JobLoggingService:
             ) from ex
 
     def get_downloadable_log(self, state_id):
-        """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501, DAR101, DAR201, DAR401
+        """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501
         try:
             latest_log = next(iter(self.get_all_logs(state_id)))
             return str(latest_log.resolve())

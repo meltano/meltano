@@ -175,7 +175,7 @@ def are_similar_types(left, right):
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
+def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -202,7 +202,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         >>> alist.append("works")
         >>> d
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
-    """  # noqa: P102
+    """
     if value is None:
         value = {}
 
@@ -219,9 +219,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
 
         cursor = cursor[key]
 
-    if tail not in cursor or (
-        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
-    ):
+    if tail not in cursor or ((not are_similar_types(cursor[tail], value)) and force):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
         cursor[tail] = deepcopy(value)
@@ -311,15 +309,15 @@ def truthy(val: str) -> bool:
 
 
 @t.overload
-def coerce_datetime(d: None) -> None: ...  # noqa: WPS428
+def coerce_datetime(d: None) -> None: ...
 
 
 @t.overload
-def coerce_datetime(d: datetime) -> datetime: ...  # noqa: WPS428
+def coerce_datetime(d: datetime) -> datetime: ...
 
 
 @t.overload
-def coerce_datetime(d: date) -> datetime: ...  # noqa: WPS428
+def coerce_datetime(d: date) -> datetime: ...
 
 
 def coerce_datetime(d):
@@ -338,11 +336,11 @@ def coerce_datetime(d):
 
 
 @t.overload
-def iso8601_datetime(d: None) -> None: ...  # noqa: WPS428
+def iso8601_datetime(d: None) -> None: ...
 
 
 @t.overload
-def iso8601_datetime(d: str) -> datetime: ...  # noqa: WPS428
+def iso8601_datetime(d: str) -> datetime: ...
 
 
 def iso8601_datetime(d: str | None):
@@ -350,11 +348,11 @@ def iso8601_datetime(d: str | None):
         return None
 
     isoformats = [
-        "%Y-%m-%dT%H:%M:%SZ",  # noqa: WPS323
-        "%Y-%m-%dT%H:%M:%S+00:00",  # noqa: WPS323
-        "%Y-%m-%dT%H:%M:%S",  # noqa: WPS323
-        "%Y-%m-%d %H:%M:%S",  # noqa: WPS323
-        "%Y-%m-%d",  # noqa: WPS323
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S+00:00",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
     ]
 
     for format_string in isoformats:
@@ -366,7 +364,7 @@ def iso8601_datetime(d: str | None):
 
 
 class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str: ...  # noqa: WPS428
+    def __getitem__(self, key: str) -> str: ...
 
 
 _G = t.TypeVar("_G", bound=_GetItemProtocol)
@@ -414,7 +412,7 @@ def is_email_valid(value: str):
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):  # noqa: WPS210
+def pop_at_path(d, path, default=None):
     if isinstance(path, str):
         path = path.split(".")
 
@@ -526,7 +524,7 @@ def expand_env_vars(
         The string or env dict with env vars expanded. For backwards
         compatibility, if anything other than an `str` or mapping is provided
         as the `raw_value`, it is returned unchanged.
-    """  # noqa: DAR402
+    """
     if_missing = EnvVarMissingBehavior(if_missing)
 
     if not isinstance(raw_value, (str, t.Mapping, list)):
@@ -895,7 +893,7 @@ def sanitize_filename(filename: str) -> str:
         Windows file names.
     """
     return functools.reduce(
-        lambda x, y: y(x),  # noqa: WPS442
+        lambda x, y: y(x),
         _sanitize_filename_transformations,
         filename,
     )

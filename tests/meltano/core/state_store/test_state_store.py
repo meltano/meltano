@@ -6,7 +6,7 @@ import typing as t
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-from azure.storage.blob._shared.authentication import (  # noqa: WPS436
+from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
 
@@ -115,7 +115,7 @@ class TestAzureStateBackend:
         assert isinstance(az_state_store, AZStorageStateStoreManager)
         # Should raise error
         with pytest.raises(MeltanoError):
-            _ = az_state_store.client  # noqa: WPS122
+            _ = az_state_store.client
 
 
 class TestGCSStateBackend:
@@ -139,7 +139,7 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store, S3StateStoreManager)
         assert s3_state_store.bucket == "some_bucket"
         assert s3_state_store.prefix == "/some/path"
-        assert s3_state_store.aws_access_key_id == "aws_access_key_id"  # noqa: S105
+        assert s3_state_store.aws_access_key_id == "aws_access_key_id"
         assert (
             s3_state_store.aws_secret_access_key == "aws_secret_access_key"  # noqa: S105
         )

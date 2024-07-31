@@ -99,7 +99,7 @@ class HubPluginVariantNotFoundError(Exception):
         )
 
 
-class MeltanoHubService(PluginRepository):  # noqa: WPS214
+class MeltanoHubService(PluginRepository):
     """PluginRepository implementation for the Meltano Hub."""
 
     session = requests.Session()

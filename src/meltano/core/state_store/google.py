@@ -15,8 +15,8 @@ GOOGLE_INSTALLED = True
 
 try:
     import google
-    import google.api_core.exceptions  # noqa: WPS301
-    import google.cloud.storage  # type: ignore[import-untyped]  # noqa: WPS301
+    import google.api_core.exceptions
+    import google.cloud.storage  # type: ignore[import-untyped]
 except ImportError:
     GOOGLE_INSTALLED = False
 
@@ -127,7 +127,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         Yields:
             The next file in the backend.
         """
-        for blob in self.client.list_blobs(  # noqa: WPS526
+        for blob in self.client.list_blobs(
             bucket_or_name=self.bucket, prefix=self.state_dir
         ):
             yield blob.name

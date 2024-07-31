@@ -72,7 +72,7 @@ async def test_select_service_list_all(
     )
 
     # Update the catalog to include a new property
-    catalog["streams"][0]["schema"]["properties"]["name"] = {"type": "string"}  # noqa: WPS219
+    catalog["streams"][0]["schema"]["properties"]["name"] = {"type": "string"}
 
     # Without refreshing the catalog, the new property should not be included
     list_all = await service.list_all(session, refresh=False)

@@ -31,7 +31,7 @@ class ProcessWaitError(Exception):
     """Raised when a process can be waited on."""
 
 
-class InvokerBase:  # noqa: WPS230, WPS214
+class InvokerBase:
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
     def __init__(

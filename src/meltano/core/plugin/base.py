@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import typing as t
 from collections import defaultdict
 
 import yaml
@@ -64,7 +65,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class PluginType(YAMLEnum):  # noqa: WPS214
+class PluginType(YAMLEnum):
     """The type of a plugin."""
 
     EXTRACTORS = "extractors"
@@ -350,7 +351,7 @@ class PluginDefinition(PluginRef):
 
         def default_logo_url(plugin_def):
             short_name = re.sub(
-                r"^(tap|target)-",  # noqa: WPS360
+                r"^(tap|target)-",
                 "",
                 plugin_def.name,
             )
@@ -501,10 +502,10 @@ class PluginDefinition(PluginRef):
         )
 
 
-class BasePlugin(HookObject):  # noqa: WPS214
+class BasePlugin(HookObject):
     """A base plugin."""
 
-    EXTRA_SETTINGS = []
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = []
 
     def __init__(self, plugin_def: PluginDefinition, variant: Variant):
         """Create a new BasePlugin.
@@ -527,10 +528,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         Returns:
             True if the plugins are equal, False otherwise.
         """
-        return (
-            self._plugin_def == other._plugin_def  # noqa: WPS437
-            and self._variant == other._variant  # noqa: WPS437
-        )
+        return self._plugin_def == other._plugin_def and self._variant == other._variant
 
     def __hash__(self) -> int:
         """Return the hash of the plugin.
@@ -620,8 +618,8 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.settings
 
-    @property  # noqa: WPS210
-    def extra_settings(self):  # noqa: WPS210
+    @property
+    def extra_settings(self):
         """Return the extra settings for this plugin.
 
         Returns:
@@ -855,7 +853,7 @@ class StandalonePlugin(Canonical):
                     + ". "
                     + "Please open an issue or pull request to update the plugin "
                     + "definition on Meltano Hub at "
-                    + f"https://github.com/meltano/hub/blob/main/_data/meltano/{self.plugin_type}/{self.name}/{self.variant}.yml.",  # noqa: E501
+                    + f"https://github.com/meltano/hub/blob/main/_data/meltano/{self.plugin_type}/{self.name}/{self.variant}.yml.",
                 )
 
     @classmethod

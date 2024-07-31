@@ -8,7 +8,7 @@ import typing as t
 
 import structlog
 
-from meltano.cli import (  # noqa: WPS235
+from meltano.cli import (
     add,
     config,
     docs,
@@ -99,13 +99,13 @@ def _run_cli():
         KeyboardInterrupt: if caught.
     """
     try:
-        try:  # noqa: WPS225, WPS505
+        try:
             cli(obj={"project": None})
         except ProjectReadonly as err:
             raise CliError(
                 f"The requested action could not be completed: {err}",  # noqa: EM102
             ) from err
-        except KeyboardInterrupt:  # noqa: WPS329
+        except KeyboardInterrupt:
             raise
         except MeltanoError as err:
             handle_meltano_error(err)
@@ -126,11 +126,11 @@ def main():
         global exit_code
         ex = sys.exc_info()[1]
         if ex is None:
-            exit_code = 0  # noqa: WPS442
+            exit_code = 0
         elif isinstance(ex, SystemExit):
-            exit_code = 0 if ex.code is None else ex.code  # noqa: WPS442
+            exit_code = 0 if ex.code is None else ex.code
         else:
-            exit_code = 1  # noqa: WPS442
+            exit_code = 1
         # Track the exit event now to provide more details via the exception context.
         # We assume the process will exit practically immediately after `main` returns.
         if exit_event_tracker is not None:

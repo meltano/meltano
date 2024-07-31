@@ -32,12 +32,12 @@ class SingerPlugin(BasePlugin):
         # Result at this point will contain duplicate entries for nested config
         # options. We need to pop those redundant entries recursively.
 
-        def _pop_non_leaf_keys(nested_config: dict) -> None:  # noqa: WPS430
+        def _pop_non_leaf_keys(nested_config: dict) -> None:
             """Recursively pop dictionary entries with '.' in their keys."""
             for key, val in list(nested_config.items()):
                 if "." in key:
                     nested_config.pop(key)
-                elif isinstance(val, dict):  # noqa: WPS220
+                elif isinstance(val, dict):
                     _pop_non_leaf_keys(val)
 
         _pop_non_leaf_keys(processed_config)
@@ -49,7 +49,7 @@ class SingerPlugin(BasePlugin):
         invoker,
         session,  # noqa: ARG002
     ):
-        """Create configuration file."""  # noqa: DAR101
+        """Create configuration file."""
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
             config = invoker.plugin_config_processed

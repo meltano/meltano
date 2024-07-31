@@ -102,7 +102,7 @@ class AmbiguousMappingName(MeltanoError):
         )
 
 
-class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
+class ProjectPluginsService:  # (too many methods, attributes)
     """Project Plugins Service."""
 
     def __init__(self, project: Project):
@@ -230,7 +230,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         for plugin in self.plugins(ensure_parent=False):
             if (
-                plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
+                plugin.name == plugin_name  # (with too much logic)
                 and (plugin_type is None or plugin.type == plugin_type)
                 and (
                     invokable is None

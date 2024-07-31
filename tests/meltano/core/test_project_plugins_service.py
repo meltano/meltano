@@ -190,13 +190,13 @@ class TestProjectPluginsService:
         tap.config["test"] = 42
         tap, outdated = project.plugins.update_plugin(tap)
         assert (
-            project.plugins.get_plugin(tap).config["test"] == 42  # noqa: WPS432 (OK magic number)
+            project.plugins.get_plugin(tap).config["test"] == 42  # (OK magic number)
         )
 
         # revert back
         project.plugins.update_plugin(outdated)
         assert (
-            project.plugins.get_plugin(tap).config == {}  # noqa: WPS520 (OK compare with falsy)
+            project.plugins.get_plugin(tap).config == {}  # (OK compare with falsy)
         )
 
     def test_update_plugin_not_found(self, project: Project):

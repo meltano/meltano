@@ -37,7 +37,7 @@ class Hooked(HookObject):
 class DerivedHooked(Hooked):
     @hook("before_test")
     async def derived_before_test(self):
-        super().call("derived_before_test")  # noqa: WPS613
+        super().call("derived_before_test")
 
 
 class Hooked2(HookObject):
@@ -65,7 +65,7 @@ class TestHookable:
     @pytest.mark.asyncio()
     async def test_trigger_hook_raise(self):
         subject = Hooked()
-        with pytest.raises(Exception):  # noqa: B017, PT012, PT011
+        with pytest.raises(Exception):  # noqa: B017, PT011
             async with subject.trigger_hooks("test"):
                 raise Exception
 

@@ -115,7 +115,6 @@ class DBStateStoreManager(StateStoreManager):
         Args:
             state_id: the state_id to lock
         """
-        # noqa: WPS428
 
     def release_lock(self, state_id):
         """Release the lock for the given job's state.
@@ -126,4 +125,3 @@ class DBStateStoreManager(StateStoreManager):
         Args:
             state_id: the state_id to unlock
         """
-        # noqa: WPS428

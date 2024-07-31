@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
-import pytest  # noqa: F401
+import pytest
 
 from meltano.core.utils import (
     EnvVarMissingBehavior,
@@ -44,7 +44,7 @@ def test_nest():
     assert subject == {"a": {"b": "not_a_dict", "list": [], "value": {"value": 1}}}
 
     # make sure existing values aren't cleared when `value=None` and `force=True`
-    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)  # noqa: WPS122
+    _ = nest(subject, "a.b", OrderedDict({"d": "d_value"}), force=True)
     assert subject == {
         "a": {"b": OrderedDict({"d": "d_value"}), "list": [], "value": {"value": 1}},
     }
@@ -284,7 +284,7 @@ def test_makedirs_decorator(tmp_path):
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, make_dirs: bool = True):  # noqa: ARG001
+    def species(genus_name, species_name, make_dirs: bool = True):
         return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")

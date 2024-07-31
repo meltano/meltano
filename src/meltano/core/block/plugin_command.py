@@ -123,7 +123,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         Raises:
             RunnerError: if the command fails.
         """
-        try:  # noqa: WPS501
+        try:
             async with self.invoker.prepared(self.context.session):
                 await self._start()
 

@@ -233,7 +233,7 @@ class TestCli:
         assert Project._default.environment is None
 
     @pytest.mark.usefixtures("deactivate_project")
-    def test_no_environment_and_null_environment_overrides_default(  # noqa: WPS118
+    def test_no_environment_and_null_environment_overrides_default(
         self,
         project_files_cli,
         cli_runner,

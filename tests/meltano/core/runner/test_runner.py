@@ -139,7 +139,7 @@ class TestSingerRunner:
     ):
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        async with tap_invoker.prepared(  # noqa: WPS316
+        async with tap_invoker.prepared(
             session,
         ), target_invoker.prepared(session):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))

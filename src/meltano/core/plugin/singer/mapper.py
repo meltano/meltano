@@ -23,7 +23,7 @@ class SingerMapper(SingerPlugin):
 
     __plugin_type__ = PluginType.MAPPERS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(
             name="_mappings",
             kind=SettingKind.ARRAY,
@@ -53,7 +53,7 @@ class SingerMapper(SingerPlugin):
         invoker: PluginInvoker,
         session,  # noqa: ARG002
     ):
-        """Create configuration file."""  # noqa: DAR101
+        """Create configuration file."""
         config_path = invoker.files["config"]
 
         config_payload: dict = {}

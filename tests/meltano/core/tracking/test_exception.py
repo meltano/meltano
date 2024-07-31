@@ -61,7 +61,7 @@ def test_simple_exception_context():
     msg = "The error message"
 
     ex = ValueError(msg)
-    try:  # noqa: WPS328
+    try:
         raise ex
     except Exception:
         ctx = ExceptionContext()
@@ -111,7 +111,7 @@ def test_complex_exception_context():
             raise ValueError("that path was a bad value") from ex  # noqa: EM101
 
     try:
-        try:  # noqa: WPS505
+        try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             _function_to_deepen_traceback()
         except Exception:

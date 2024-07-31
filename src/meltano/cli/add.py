@@ -51,7 +51,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     return yaml.load(content) or {}
 
 
-@click.command(  # noqa: WPS238
+@click.command(
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )
@@ -114,7 +114,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
 @pass_project()
 @click.pass_context
 @run_async
-async def add(  # noqa: C901 WPS238
+async def add(
     ctx,
     project: Project,
     plugin_type: str,

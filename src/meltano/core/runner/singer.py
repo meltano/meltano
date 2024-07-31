@@ -34,7 +34,7 @@ class SingerRunner(Runner):
                 process.kill()
                 logger.error(f"{process} was killed.")  # noqa: G004
 
-    async def invoke(  # noqa: WPS210, WPS213, WPS217, WPS231, WPS238
+    async def invoke(
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
@@ -145,7 +145,7 @@ class SingerRunner(Runner):
                     )
 
                 failed_future = output_futures_failed.pop()
-                raise failed_future.exception()  # noqa: RSE102
+                raise failed_future.exception()
 
             # If all of the output handlers completed without raising an
             # exception, we still need to wait for the tap or target to
@@ -245,7 +245,7 @@ class SingerRunner(Runner):
         if not isinstance(exception, ValueError):
             return
 
-        exception = exception.__context__  # noqa: WPS609
+        exception = exception.__context__
         if not isinstance(exception, asyncio.LimitOverrunError):  # pragma: no cover
             return
 

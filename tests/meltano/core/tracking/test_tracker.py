@@ -68,7 +68,7 @@ class TestTracker:
             project.refresh()
             yield
         finally:
-            (  # noqa: WPS414
+            (
                 type(project.settings).config_override,
                 project.settings.config_override,
             ) = original_config_override
@@ -172,11 +172,11 @@ class TestTracker:
     @pytest.mark.parametrize(
         "analytics_json_content",
         (
-            f'{{"clientId":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-            f'{{"client_id":"{str(uuid.uuid4())}","projectId":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
-            f'{{"client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anon_usage_stats":true}}',  # noqa: E501
-            f'["{str(uuid.uuid4())}","{str(uuid.uuid4())}", true]',
-            f'client_id":"{str(uuid.uuid4())}","project_id":"{str(uuid.uuid4())}","send_anonymous_usage_stats":true}}',  # noqa: E501
+            f'{{"clientId":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{uuid.uuid4()!s}","projectId":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anon_usage_stats":true}}',
+            f'["{uuid.uuid4()!s}","{uuid.uuid4()!s}", true]',
+            f'client_id":"{uuid.uuid4()!s}","project_id":"{uuid.uuid4()!s}","send_anonymous_usage_stats":true}}',
         ),
         ids=(0, 1, 2, 3, 4),
     )
@@ -202,7 +202,7 @@ class TestTracker:
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
         change event is fired because `send_anonymous_usage_stats` is negated.
-        """  # noqa: D205, D400
+        """
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
         original_project_id = project.settings.get("project_id")
@@ -393,8 +393,7 @@ class TestTracker:
         server_thread.join()
 
         timeout_occurred = (
-            tracker.snowplow_tracker.emitters[0].on_failure.call_count  # noqa: WPS219
-            == 1
+            tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
         )
         assert timeout_occurred is timeout_should_occur
 

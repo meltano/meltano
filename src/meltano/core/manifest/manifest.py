@@ -116,7 +116,7 @@ class YamlNoTimestampSafeLoader(
     """A safe YAML loader that leaves timestamps as strings."""
 
 
-class Manifest:  # noqa: WPS214
+class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
     def __init__(self, project: Project, path: Path, check_schema: bool) -> None:
@@ -226,7 +226,7 @@ class Manifest:  # noqa: WPS214
         )
 
         # Merge the locked plugins with the root-level plugins from `meltano.yml`:
-        manifest["plugins"] = deep_merge(  # noqa: WPS204
+        manifest["plugins"] = deep_merge(
             _plugins_by_name_by_type(manifest["plugins"]),
             _plugins_by_name_by_type(locked_plugins),
         )
@@ -363,7 +363,7 @@ class Manifest:  # noqa: WPS214
             # expects there to be exactly one environment. It is omitted from
             # the final output, and during processing it only affects things if
             # it has content, which this mock does not.
-            manifest["environments"] = [{"name": "mock"}]  # noqa: WPS204
+            manifest["environments"] = [{"name": "mock"}]
         else:
             manifest["environments"] = [
                 x

@@ -31,7 +31,7 @@ conventional_state_ids = [
 
 class TestCliState:
     @pytest.mark.parametrize("state_id", unconventional_state_ids)
-    def test_state_service_from_state_id_returns_none_non_convention(  # noqa: WPS118
+    def test_state_service_from_state_id_returns_none_non_convention(
         self,
         project,
         state_id,
@@ -39,7 +39,7 @@ class TestCliState:
         assert state.state_service_from_state_id(project, state_id) is None
 
     @pytest.mark.parametrize("state_id", conventional_state_ids)
-    def test_state_service_from_state_id_returns_state_service_convention(  # noqa: WPS118, E501
+    def test_state_service_from_state_id_returns_state_service_convention(
         self,
         project,
         state_id,

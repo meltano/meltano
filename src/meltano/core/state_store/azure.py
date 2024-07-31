@@ -77,7 +77,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         if not self.parsed.hostname:
             raise MeltanoError(
                 f"Azure state backend URI must include a container name: {self.uri}",  # noqa: EM102
-                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",  # noqa: E501
+                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",
             )
 
         self.container_name = self.parsed.hostname
@@ -155,7 +155,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             The next file in the backend.
         """
         container_client = self.client.get_container_client(self.container_name)
-        for blob in container_client.list_blobs(  # noqa: WPS526
+        for blob in container_client.list_blobs(
             name_starts_with=self.prefix.lstrip("/"),
         ):
             yield blob.name

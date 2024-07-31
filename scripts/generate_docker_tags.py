@@ -19,7 +19,7 @@ import argparse
 from packaging.version import Version
 
 
-def main():  # noqa: WPS213
+def main():
     """Generate docker tags for the given package version."""
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--registry", default="docker.io")

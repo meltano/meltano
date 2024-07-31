@@ -36,7 +36,7 @@ class ProjectInitService:
         with contextlib.suppress(ValueError):
             self.project_directory = self.project_directory.relative_to(Path.cwd())
 
-    def init(  # noqa: C901
+    def init(
         self,
         *,
         activate: bool = True,

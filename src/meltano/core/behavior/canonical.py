@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
 
     from ruamel.yaml import Representer
 
-T = t.TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
+T = t.TypeVar("T", bound="Canonical")  # (name too short)
 
 
 class IdHashBox:
@@ -84,11 +84,11 @@ class AnnotationsMeta(type):
         )
         instance = super().__call__(*args, **kwargs)
         # Store the annotations for later re-insertion during serialization
-        instance._annotations = extracted_annotations  # noqa: WPS437
+        instance._annotations = extracted_annotations
         return instance
 
 
-class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
+class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
     """Defines an object that can be represented as a subset of its attributes.
 
     Its purpose is to be serializable as the smallest possible form.
@@ -150,11 +150,11 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         if isinstance(target, Canonical):
             result = CommentedMap((key, cls._canonize(val)) for key, val in target)
-            if target._annotations is not None:  # noqa: WPS437
+            if target._annotations is not None:
                 result.insert(
-                    target._annotations.index,  # noqa: WPS437
+                    target._annotations.index,
                     "annotations",
-                    target._annotations.data,  # noqa: WPS437
+                    target._annotations.data,
                 )
             target.attrs.copy_attributes(result)
             return result
@@ -255,7 +255,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return self._dict.get(attr) is not None
 
-    def __getattr__(self, attr: str) -> t.Any:  # noqa: C901
+    def __getattr__(self, attr: str) -> t.Any:
         """Return the value of the given attribute.
 
         Args:
@@ -296,7 +296,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
             attr: Attribute to set.
             value: Value to set.
         """
-        if attr.startswith("_") or hasattr(type(self), attr):  # noqa: WPS421
+        if attr.startswith("_") or hasattr(type(self), attr):
             super().__setattr__(attr, value)
         else:
             self._dict[attr] = value

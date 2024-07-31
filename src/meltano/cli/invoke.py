@@ -81,7 +81,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def invoke(  # noqa: C901
+async def invoke(
     project: Project,
     ctx: click.Context,
     plugin_type: str,
@@ -176,7 +176,7 @@ async def _invoke(
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
-            elif (  # noqa: WPS337
+            elif (
                 containers
                 and command_name is not None
                 and command.container_spec is not None
@@ -228,4 +228,4 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
         raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
     except Exception as err:
         raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
-    print(content)  # noqa: T201, WPS421
+    print(content)  # noqa: T201

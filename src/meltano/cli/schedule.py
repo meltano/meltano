@@ -203,7 +203,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(  # noqa: WPS125
+@schedule.command(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help="List available schedules.",
@@ -215,7 +215,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     default="text",
 )
 @click.pass_context
-def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
+def list_schedules(ctx: click.Context, list_format: str) -> None:
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -229,7 +229,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
         if list_format == "text":
             transform_elt_markers = {
                 "run": ("→", "→"),
-                "only": ("×", "→"),
+                "only": ("×", "→"),  # noqa: RUF001
                 "skip": ("→", "x"),
             }
 

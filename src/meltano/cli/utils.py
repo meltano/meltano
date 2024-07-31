@@ -59,7 +59,7 @@ class CliError(Exception):
 
         self.printed = False
 
-    def print(self):  # noqa: T202
+    def print(self):
         """Print CLI error."""
         if self.printed:
             return
@@ -246,7 +246,7 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
     )
 
     settings = None
-    while settings is None:  # noqa:  WPS426  # allows lambda in loop
+    while settings is None:  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),
             type=list,
@@ -268,7 +268,7 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
     return settings
 
 
-def add_plugin(  # noqa: C901
+def add_plugin(
     plugin_type: PluginType,
     plugin_name: str,
     *,
@@ -355,7 +355,7 @@ def add_plugin(  # noqa: C901
                 "changes until it is):\n"
                 f"\tmeltano config {plugin.name} list\n\n"
                 "To learn more, visit "
-                "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"  # noqa: E501
+                "https://docs.meltano.com/guide/plugin-management#switching-from-one-variant-to-another\n\n"
                 f"Alternatively, to keep the existing '{plugin.name}' with "
                 f"variant '{new_plugin.variant}', add variant '{new_plugin.variant}' "
                 "as a separate plugin with its own unique name:\n"
@@ -493,7 +493,7 @@ async def install_plugins(
 def propagate_stop_signals(proc):
     """Propagate stop signals to `proc`, then wait for it to terminate."""
 
-    def _handler(sig, _):  # noqa: WPS430
+    def _handler(sig, _):
         proc.send_signal(sig)
         logger.debug("stopping child process...")
         # unset signal handler, so that even if the child never stops,

@@ -100,7 +100,7 @@ class TestJob:
                 "Fails on Windows: https://github.com/meltano/meltano/issues/2842",
             )
         subject = self.sample_job({"original_state": 1}).save(session)
-        with pytest.raises(KeyboardInterrupt):  # noqa: PT012
+        with pytest.raises(KeyboardInterrupt):
             async with subject.run(session):
                 signal.raise_signal(signal.SIGINT)
 
@@ -117,7 +117,7 @@ class TestJob:
             )
         subject = self.sample_job({"original_state": 1}).save(session)
 
-        with pytest.raises(SystemExit):  # noqa: PT012
+        with pytest.raises(SystemExit):
             async with subject.run(session):
                 signal.raise_signal(signal.SIGTERM)
 

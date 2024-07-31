@@ -215,7 +215,7 @@ class TestAutoStoreManager:
         assert subject.auto_store(setting_name) == Store.DB
 
     @pytest.mark.usefixtures("assert_value_source")
-    def test_get(  # noqa: WPS213
+    def test_get(
         self,
         subject,
         project,
@@ -377,7 +377,7 @@ class TestAutoStoreManager:
         # Even though `.env` can't be overwritten
         assert_value_source("from_dotenv", Store.DOTENV)
 
-    def test_unset(  # noqa: WPS213
+    def test_unset(
         self,
         subject,
         project,
@@ -439,7 +439,7 @@ class TestAutoStoreManager:
         subject.unset("custom_in_env", ["custom_in_env"])
         assert_value_source(None, Store.DEFAULT, name="custom_in_env")
 
-    def test_reset(  # noqa: WPS213
+    def test_reset(
         self,
         subject,
         unsupported,

@@ -80,7 +80,7 @@ class TestCanonical:
 
     def test_defaults(self, subject):
         with pytest.raises(AttributeError):
-            subject.test  # noqa: B018, WPS428
+            subject.test  # noqa: B018
 
         subject.test = None
 
@@ -102,7 +102,7 @@ class TestCanonical:
     def test_fallbacks(self, subject):
         # Calling an unknown attribute is not supported
         with pytest.raises(AttributeError):
-            subject.unknown  # noqa: B018, WPS428
+            subject.unknown  # noqa: B018
 
         fallback = Canonical(unknown="value", known="value")
         # This would typically be set from a Canonical subclass

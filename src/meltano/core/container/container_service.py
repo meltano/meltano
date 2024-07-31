@@ -24,7 +24,7 @@ def stop_container(container: DockerContainer):
         container: Running container.
     """
     logger.info("Stopping container", container_id=container.id)
-    asyncio.ensure_future(container.stop())
+    asyncio.ensure_future(container.stop())  # noqa: RUF006
 
 
 class ContainerService:

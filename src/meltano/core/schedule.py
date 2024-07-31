@@ -24,7 +24,7 @@ CRON_INTERVALS: dict[str, str | None] = {
 }
 
 
-class Schedule(NameEq, Canonical):  # noqa: WPS230
+class Schedule(NameEq, Canonical):
     """A schedule is an elt command or a job configured to run at a certain interval."""
 
     name: str

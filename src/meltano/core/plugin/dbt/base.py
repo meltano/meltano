@@ -99,7 +99,7 @@ class DbtTransformPlugin(BasePlugin):
 
     __plugin_type__ = PluginType.TRANSFORMS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"),
         SettingDefinition(name="_vars", kind=SettingKind.OBJECT, value={}),
     ]

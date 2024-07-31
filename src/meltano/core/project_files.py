@@ -39,7 +39,7 @@ class InvalidIncludePathError(Exception):
     """Included file path matches a provided pattern but is not a valid config file."""
 
 
-class ProjectFiles:  # noqa: WPS214
+class ProjectFiles:
     """Interface for working with multiple project yaml files."""
 
     def __init__(self, root: Path, meltano_file_path: Path) -> None:
@@ -186,7 +186,7 @@ class ProjectFiles:  # noqa: WPS214
 
         self._plugin_file_map.update({key: str(include_path)})
 
-    def _index_file(  # noqa: WPS210
+    def _index_file(
         self,
         include_file_path: Path,
         include_file_contents: CommentedMap,
@@ -325,7 +325,7 @@ class ProjectFiles:  # noqa: WPS214
 
         return sorted_file_dicts
 
-    def _copy_yaml_attributes(  # noqa: WPS210
+    def _copy_yaml_attributes(
         self,
         file_dicts: dict[str, CommentedMap],
     ):

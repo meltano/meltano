@@ -18,10 +18,10 @@ if t.TYPE_CHECKING:
 logger = structlog.get_logger(__name__)
 
 
-class ProjectSettingsService(SettingsService):  # noqa: WPS214
+class ProjectSettingsService(SettingsService):
     """Project Settings Service."""
 
-    config_override = {}
+    config_override: t.ClassVar[dict[str, t.Any]] = {}
     supports_environments = False
 
     def __init__(
@@ -56,7 +56,7 @@ class ProjectSettingsService(SettingsService):  # noqa: WPS214
             **self.env_override,
         }
 
-        self.config_override = {  # noqa: WPS601
+        self.config_override = {
             **self.__class__.config_override,
             **self.config_override,
         }

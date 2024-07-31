@@ -209,7 +209,7 @@ class TestProjectAddService:
             ],
         }
 
-        assert not target.canonical().items() >= updated_attrs.items()  # noqa: WPS508
+        assert not target.canonical().items() >= updated_attrs.items()
 
         updated = subject.add(
             target.type,

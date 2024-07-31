@@ -80,7 +80,7 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
-class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
+class SettingsService(metaclass=ABCMeta):
     """Abstract base class for managing settings."""
 
     LOGGING = False
@@ -156,7 +156,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
     @property
     def inherited_settings_service(self):
         """Return settings service to inherit configuration from."""
-        return None  # noqa: DAR201, RET501
+        return None
 
     @property
     @abstractmethod
@@ -298,7 +298,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
 
         return env
 
-    def get_with_metadata(  # noqa: WPS210, WPS615
+    def get_with_metadata(
         self,
         name: str,
         redacted: bool = False,
@@ -457,7 +457,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(  # noqa: WPS615, WPS210
+    def set_with_metadata(
         self,
         path: str | list[str],
         value,
@@ -599,7 +599,7 @@ class SettingsService(metaclass=ABCMeta):  # noqa: WPS214
             return [
                 setting
                 for setting in self._setting_defs
-                if (extras is True and setting.is_extra)  # noqa: WPS408
+                if (extras is True and setting.is_extra)
                 or (extras is False and not setting.is_extra)
             ]
 

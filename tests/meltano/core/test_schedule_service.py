@@ -170,7 +170,7 @@ class TestScheduleService:
     ):
         # curry the `add_elt` method to remove some arguments
         def add_elt(name, start_date):
-            return subject.add_elt(  # noqa: E731
+            return subject.add_elt(
                 session,
                 name,
                 tap.name,
@@ -180,7 +180,7 @@ class TestScheduleService:
                 start_date=start_date,
             )
 
-        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)  # noqa: WPS432
+        mock_date = datetime(2002, 1, 1, tzinfo=timezone.utc)
 
         # when a start_date is set, the schedule should use it
         schedule = add_elt("with_start_date", mock_date)

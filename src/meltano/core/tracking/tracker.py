@@ -86,10 +86,10 @@ class TelemetrySettings(t.NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
+class Tracker:  # - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
-    def __init__(  # noqa: WPS210, WPS213 - too many local variables, too many expressions
+    def __init__(  # - too many local variables, too many expressions
         self,
         project: Project,
         request_timeout: float | tuple[float, float] | None = 3.5,
@@ -103,7 +103,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 `read` timeout, or as tuple with two float values which specify
                 the `connect` and `read` timeouts separately.
         """
-        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+        from meltano.core.tracking.contexts import (
             ProjectContext,
             environment_context,
         )
@@ -270,7 +270,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         Returns:
             The local timezone as an IANA TZ database name if possible, or
             abbreviation otherwise.
-        """  # noqa: F821
+        """
         try:
             return tzlocal.get_localzone_name()
         except Exception:
@@ -354,7 +354,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             from_value: the old value
             to_value: the new value
         """
-        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+        from meltano.core.tracking.contexts import (
             EnvironmentContext,
             ProjectContext,
         )
@@ -469,7 +469,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     def _uuid_from_str(
         self,
         from_val: t.Any | None,
-        warn: bool,  # noqa: WPS442
+        warn: bool,
     ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 

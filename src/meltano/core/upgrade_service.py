@@ -41,7 +41,7 @@ class AutomaticPackageUpgradeError(Exception):
         self.instructions = instructions
 
 
-class UpgradeService:  # noqa: WPS214
+class UpgradeService:
     """Meltano upgrade service."""
 
     def __init__(self, engine: Engine, project: Project):
@@ -191,7 +191,7 @@ class UpgradeService:  # noqa: WPS214
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
+    def upgrade(self, skip_package: bool = False, **kwargs):
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command

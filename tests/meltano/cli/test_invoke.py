@@ -93,7 +93,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_command_containerized(  # noqa: WPS210
+    def test_invoke_command_containerized(
         self,
         project,
         cli_runner,
@@ -106,11 +106,11 @@ class TestCliInvoke:
 
         async def async_generator(*args, **kwargs):  # noqa: ARG001
             yield "Line 1"
-            yield "Line 2"  # noqa: WPS354
+            yield "Line 2"
 
         docker = mock_invoke_containers.return_value
         docker_context = mock.AsyncMock()
-        docker.__aenter__.return_value = docker_context  # noqa: WPS609
+        docker.__aenter__.return_value = docker_context
 
         container = mock.AsyncMock()
         docker_context.containers.run.return_value = container

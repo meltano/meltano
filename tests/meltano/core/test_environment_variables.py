@@ -14,8 +14,8 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 
 class EnvVarResolutionExpectation(t.NamedTuple):
     expected_env_values: dict
-    meltanofile_updates: dict = {}
-    terminal_env: dict = {}
+    meltanofile_updates: t.ClassVar[dict] = {}
+    terminal_env: t.ClassVar[dict] = {}
 
 
 def _meltanofile_update_dict(
