@@ -48,7 +48,7 @@ class PluginConfigService:
             try:
                 shutil.copy(src, dst)
                 stubbed.append(dst)
-            except FileNotFoundError:
+            except FileNotFoundError:  # noqa: PERF203
                 logger.debug(
                     f"Could not find {src.name} in {src.resolve()}, skipping.",  # noqa: G004
                 )
