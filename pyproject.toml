@@ -347,8 +347,6 @@ banned-from = [
 typing = "t"
 
 [tool.ruff.lint.flake8-pytest-style]
-parametrize-names-type = "tuple"
-parametrize-values-row-type = "tuple"
 parametrize-values-type = "tuple"
 
 [tool.ruff.lint.isort]
