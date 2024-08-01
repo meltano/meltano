@@ -35,11 +35,11 @@ class SelectService:
         return self._extractor
 
     @property
-    def current_select(self):
+    def current_select(self):  # noqa: ANN201
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
-    async def load_catalog(self, session, *, refresh=False):
+    async def load_catalog(self, session, *, refresh=False):  # noqa: ANN001, ANN201
         """Load the catalog."""
         invoker = invoker_factory(self.project, self.extractor)
 
@@ -51,7 +51,7 @@ class SelectService:
 
         return json.loads(catalog_json)
 
-    async def list_all(self, session, *, refresh=False) -> ListSelectedExecutor:
+    async def list_all(self, session, *, refresh=False) -> ListSelectedExecutor:  # noqa: ANN001
         """List all select."""
         try:
             catalog = await self.load_catalog(session, refresh=refresh)
@@ -67,7 +67,14 @@ class SelectService:
 
         return list_all
 
-    def update(self, entities_filter, attributes_filter, exclude, *, remove=False):
+    def update(
+        self,
+        entities_filter,  # noqa: ANN001
+        attributes_filter,  # noqa: ANN001
+        exclude,  # noqa: ANN001
+        *,
+        remove=False,  # noqa: ANN001
+    ) -> None:
         """Update plugins' select patterns."""
         plugin: PluginRef
 
@@ -97,7 +104,7 @@ class SelectService:
             self.project.plugins.update_environment_plugin(plugin)
 
     @staticmethod
-    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:  # noqa: ANN001
         """Return a select pattern in string form."""
         exclude = "!" if exclude else ""
         return f"{exclude}{entities_filter}.{attributes_filter}"

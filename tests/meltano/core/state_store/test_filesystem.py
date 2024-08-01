@@ -47,7 +47,7 @@ def encode_if_on_windows(string: str) -> str:
 
 class TestLocalFilesystemStateStoreManager:
     @pytest.fixture()
-    def subject(self, function_scoped_test_dir):
+    def subject(self, function_scoped_test_dir):  # noqa: ANN001, ANN201
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
                 uri=f"file://{function_scoped_test_dir}\\.meltano\\state\\",
@@ -60,9 +60,9 @@ class TestLocalFilesystemStateStoreManager:
             )
 
     @pytest.fixture()
-    def state_path(
+    def state_path(  # noqa: ANN201
         self,
-        function_scoped_test_dir,
+        function_scoped_test_dir,  # noqa: ANN001
         subject: LocalFilesystemStateStoreManager,
     ):
         Path(subject.state_dir).mkdir(parents=True, exist_ok=True)
@@ -72,7 +72,7 @@ class TestLocalFilesystemStateStoreManager:
             ignore_errors=True,
         )
 
-    def test_join_path(self, subject: LocalFilesystemStateStoreManager):
+    def test_join_path(self, subject: LocalFilesystemStateStoreManager) -> None:
         if on_windows():
             assert subject.join_path("a", "b") == "a\\b"
             assert subject.join_path("a", "b", "c", "d", "e") == "a\\b\\c\\d\\e"
@@ -83,8 +83,8 @@ class TestLocalFilesystemStateStoreManager:
     def test_create_state_id_dir_if_not_exists(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-    ):
+        state_path,  # noqa: ANN001
+    ) -> None:
         state_id_path = os.path.join(
             state_path,
             encode_if_on_windows("create_state_id_dir"),
@@ -93,13 +93,21 @@ class TestLocalFilesystemStateStoreManager:
         subject.create_state_id_dir_if_not_exists("create_state_id_dir")
         assert os.path.exists(state_id_path)
 
-    def test_get_reader(self, subject: LocalFilesystemStateStoreManager, state_path):
+    def test_get_reader(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path,  # noqa: ANN001
+    ) -> None:
         filepath = os.path.join(state_path, "get_reader")
         open(filepath, "a").close()
         with subject.get_reader(path=filepath) as reader:
             assert reader.name == filepath
 
-    def test_get_writer(self, subject: LocalFilesystemStateStoreManager, state_path):
+    def test_get_writer(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path,  # noqa: ANN001
+    ) -> None:
         filepath = os.path.join(state_path, "get_writer")
         with subject.get_writer(path=filepath) as writer:
             assert writer.name == filepath
@@ -107,33 +115,41 @@ class TestLocalFilesystemStateStoreManager:
     def test_get_state_path(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-    ):
+        state_path,  # noqa: ANN001
+    ) -> None:
         assert subject.get_state_path("get_state_path") == os.path.join(
             state_path,
             encode_if_on_windows("get_state_path"),
             "state.json",
         )
 
-    def test_get_lock_path(self, subject: LocalFilesystemStateStoreManager, state_path):
+    def test_get_lock_path(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path,  # noqa: ANN001
+    ) -> None:
         assert subject.get_lock_path("some_state_id") == os.path.join(
             state_path,
             encode_if_on_windows("some_state_id"),
             "lock",
         )
 
-    def test_acquire_lock(self, subject: LocalFilesystemStateStoreManager, state_path):
+    def test_acquire_lock(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path,  # noqa: ANN001
+    ) -> None:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
         with subject.acquire_lock("acquire_lock"):
             assert os.path.exists(os.path.join(dir_path, "lock"))
 
-    def test_lock_timeout(self, subject: LocalFilesystemStateStoreManager):
+    def test_lock_timeout(self, subject: LocalFilesystemStateStoreManager) -> None:
         state_id = "is_locked"
         timeout = subject.lock_timeout_seconds
 
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
         with time_machine.travel(initial_dt) as frozen_datetime, subject.acquire_lock(
-            state_id
+            state_id,
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
@@ -143,7 +159,7 @@ class TestLocalFilesystemStateStoreManager:
                 assert not subject.is_locked(state_id)
 
     @pytest.mark.usefixtures("state_path")
-    def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager):
+    def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager) -> None:
         dev_ids = [f"dev:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         prod_ids = [f"prod:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         for state_id in dev_ids + prod_ids:
@@ -158,9 +174,9 @@ class TestLocalFilesystemStateStoreManager:
     def test_get(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-        state_ids_with_expected_states,
-    ):
+        state_path,  # noqa: ANN001
+        state_ids_with_expected_states,  # noqa: ANN001
+    ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             Path(state_dir).mkdir(parents=True)
@@ -179,9 +195,9 @@ class TestLocalFilesystemStateStoreManager:
     def test_set(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-        state_ids_with_expected_states,
-    ):
+        state_path,  # noqa: ANN001
+        state_ids_with_expected_states,  # noqa: ANN001
+    ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             subject.set(
                 JobState.from_json(state_id, json.dumps({"completed": expected_state})),
@@ -199,8 +215,8 @@ class TestLocalFilesystemStateStoreManager:
         self,
         subject: LocalFilesystemStateStoreManager,
         state_path: str,
-        state_ids_with_expected_states,
-    ):
+        state_ids_with_expected_states,  # noqa: ANN001
+    ) -> None:
         def _get_state_path(state_id: str) -> str:
             return os.path.join(
                 state_path,
@@ -228,9 +244,9 @@ class TestLocalFilesystemStateStoreManager:
     def test_delete(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-        state_ids_with_expected_states,
-    ):
+        state_path,  # noqa: ANN001
+        state_ids_with_expected_states,  # noqa: ANN001
+    ) -> None:
         # Delete files
         state_id, expected_state = state_ids_with_expected_states[0]
         state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
@@ -254,9 +270,9 @@ class TestLocalFilesystemStateStoreManager:
     def test_clear(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,
-        state_ids_with_expected_states,
-    ):
+        state_path,  # noqa: ANN001
+        state_ids_with_expected_states,  # noqa: ANN001
+    ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
             Path(state_dir).mkdir(parents=True)
@@ -272,9 +288,9 @@ class TestLocalFilesystemStateStoreManager:
 
 class TestAZStorageStateStoreManager:
     @pytest.fixture()
-    def subject(
+    def subject(  # noqa: ANN201
         self,
-        function_scoped_test_dir,  # noqa: ARG002
+        function_scoped_test_dir,  # noqa: ANN001, ARG002
     ):
         return AZStorageStateStoreManager(
             uri="azure://meltano/state/",
@@ -283,13 +299,13 @@ class TestAZStorageStateStoreManager:
         )
 
     @pytest.fixture()
-    def mock_client(self):
+    def mock_client(self):  # noqa: ANN201
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
         ) as mock_client:
             yield mock_client
 
-    def test_client(self, subject: AZStorageStateStoreManager, mock_client):
+    def test_client(self, subject: AZStorageStateStoreManager, mock_client) -> None:  # noqa: ANN001
         # Call twice to assure memoization
         _ = subject.client
         _ = subject.client
@@ -301,7 +317,7 @@ class TestAZStorageStateStoreManager:
     def test_is_file_not_found_error_true(
         self,
         subject: AZStorageStateStoreManager,
-    ):
+    ) -> None:
         got_reader = False
         mock_container_client = MagicMock()
         mock_container_client.container_name = subject.container_name
@@ -321,7 +337,7 @@ class TestAZStorageStateStoreManager:
     def test_is_file_not_found_error_false(
         self,
         subject: AZStorageStateStoreManager,
-    ):
+    ) -> None:
         got_reader = False
         mock_container_client = MagicMock()
         mock_container_client.container_name = subject.container_name
@@ -337,18 +353,18 @@ class TestAZStorageStateStoreManager:
             assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
-    def test_state_path(self, subject: AZStorageStateStoreManager):
+    def test_state_path(self, subject: AZStorageStateStoreManager) -> None:
         assert subject.state_dir == "state"
 
     @pytest.mark.usefixtures("mock_client")
-    def test_delete(self, subject):
+    def test_delete(self, subject) -> None:  # noqa: ANN001
         mock_blob_client = MagicMock()
         subject.client.get_blob_client.return_value = mock_blob_client
         subject.delete("some_path")
         mock_blob_client.delete_blob.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
-    def test_get_state_ids(self, subject):
+    def test_get_state_ids(self, subject) -> None:  # noqa: ANN001
         mock_container_client = MagicMock()
         mock_container_client.list_blobs.return_value = (
             BlobProperties(name=f"state/state_id_{i}/state.json") for i in range(10)
@@ -372,9 +388,9 @@ class TestS3StateStoreManager:
                 yield stubber
 
     @pytest.fixture()
-    def subject(
+    def subject(  # noqa: ANN201
         self,
-        function_scoped_test_dir,  # noqa: ARG002
+        function_scoped_test_dir,  # noqa: ANN001, ARG002
     ):
         return S3StateStoreManager(
             uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -382,7 +398,7 @@ class TestS3StateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    def test_is_file_not_found_error_true(self, subject: S3StateStoreManager):
+    def test_is_file_not_found_error_true(self, subject: S3StateStoreManager) -> None:
         got_reader = False
         with self.stubber() as stubber:
             stubber.add_client_error("get_object", service_error_code="NoSuchKey")
@@ -393,7 +409,7 @@ class TestS3StateStoreManager:
                 assert subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
-    def test_is_file_not_found_error_false(self, subject: S3StateStoreManager):
+    def test_is_file_not_found_error_false(self, subject: S3StateStoreManager) -> None:
         got_reader = False
         with self.stubber() as stubber:
             stubber.add_client_error("get_object", service_error_code="NoSuchBucket")
@@ -404,7 +420,7 @@ class TestS3StateStoreManager:
                 assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
-    def test_client_session(self, subject: S3StateStoreManager):
+    def test_client_session(self, subject: S3StateStoreManager) -> None:
         with patch("boto3.Session") as mock_session:
             _ = subject.client
             _ = subject.client
@@ -413,16 +429,16 @@ class TestS3StateStoreManager:
                 aws_secret_access_key=subject.aws_secret_access_key,
             )
 
-    def test_client_client(self, subject: S3StateStoreManager):
+    def test_client_client(self, subject: S3StateStoreManager) -> None:
         with patch("boto3.Session.client") as mock_client:
             _ = subject.client
             _ = subject.client
             mock_client.assert_called_once_with("s3", endpoint_url=subject.endpoint_url)
 
-    def test_state_path(self, subject: S3StateStoreManager):
+    def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
 
-    def test_delete(self, subject: S3StateStoreManager):
+    def test_delete(self, subject: S3StateStoreManager) -> None:
         response = {
             "ResponseMetadata": {
                 "RequestId": "test_delete",
@@ -458,7 +474,7 @@ class TestS3StateStoreManager:
             )
             subject.delete("/state/test_delete")
 
-    def test_get_state_ids(self, subject: S3StateStoreManager):
+    def test_get_state_ids(self, subject: S3StateStoreManager) -> None:
         response = {
             "ResponseMetadata": {
                 "RequestId": "test_get_state_ids",
@@ -559,9 +575,9 @@ class TestS3StateStoreManager:
 
 class TestGCSStateStoreManager:
     @pytest.fixture()
-    def subject(
+    def subject(  # noqa: ANN201
         self,
-        function_scoped_test_dir,  # noqa: ARG002
+        function_scoped_test_dir,  # noqa: ANN001, ARG002
     ):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
@@ -570,13 +586,13 @@ class TestGCSStateStoreManager:
         )
 
     @pytest.fixture()
-    def mock_client(self):
+    def mock_client(self):  # noqa: ANN201
         with patch(
             "google.cloud.storage.Client",
         ) as mock_client:
             yield mock_client
 
-    def test_client(self, subject: GCSStateStoreManager, mock_client):
+    def test_client(self, subject: GCSStateStoreManager, mock_client) -> None:  # noqa: ANN001
         # Call twice to assure memoization
         _ = subject.client
         _ = subject.client
@@ -588,7 +604,7 @@ class TestGCSStateStoreManager:
     def test_is_file_not_found_error_true(
         self,
         subject: GCSStateStoreManager,
-    ):
+    ) -> None:
         got_reader = False
         mock_bucket = MagicMock()
         mock_bucket.get_blob.return_value = None
@@ -604,7 +620,7 @@ class TestGCSStateStoreManager:
     def test_is_file_not_found_error_false(
         self,
         subject: GCSStateStoreManager,
-    ):
+    ) -> None:
         got_reader = False
         mock_blob = MagicMock()
         mock_blob.open.side_effect = ValueError("Some other error")
@@ -618,11 +634,11 @@ class TestGCSStateStoreManager:
             assert not subject.is_file_not_found_error(e)  # noqa: PT017
         assert not got_reader
 
-    def test_state_path(self, subject: GCSStateStoreManager):
+    def test_state_path(self, subject: GCSStateStoreManager) -> None:
         assert subject.state_dir == "state"
 
     @pytest.mark.usefixtures("mock_client")
-    def test_delete(self, subject: GCSStateStoreManager):
+    def test_delete(self, subject: GCSStateStoreManager) -> None:
         mock_blob = MagicMock()
         mock_bucket = MagicMock()
         mock_bucket.blob.return_value = mock_blob
@@ -631,20 +647,22 @@ class TestGCSStateStoreManager:
         mock_blob.delete.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
-    def test_get_state_ids(self, subject: GCSStateStoreManager):
+    def test_get_state_ids(self, subject: GCSStateStoreManager) -> None:
         subject.client.list_blobs.return_value = (
             Blob(bucket=Bucket("meltano"), name=f"state/state_id_{i}/state.json")
             for i in range(10)
         )
         assert set(subject.get_state_ids()) == {f"state_id_{i}" for i in range(10)}
         subject.client.list_blobs.assert_called_once_with(
-            bucket_or_name="meltano", prefix="state"
+            bucket_or_name="meltano",
+            prefix="state",
         )
 
     @pytest.mark.usefixtures("mock_client")
     def test_get_state_ids_when_any_files_was_located_in_root(
-        self, subject: GCSStateStoreManager
-    ):
+        self,
+        subject: GCSStateStoreManager,
+    ) -> None:
         subject.client.list_blobs.return_value = itertools.chain(
             (Blob(bucket=Bucket("meltano"), name="my-file.txt") for _ in range(2)),
             (
@@ -654,5 +672,6 @@ class TestGCSStateStoreManager:
         )
         assert len(set(subject.get_state_ids())) == 10
         subject.client.list_blobs.assert_called_once_with(
-            bucket_or_name="meltano", prefix="state"
+            bucket_or_name="meltano",
+            prefix="state",
         )

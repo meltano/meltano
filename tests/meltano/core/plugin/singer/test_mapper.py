@@ -66,7 +66,7 @@ class TestSingerMapper:
         subject: ProjectPlugin,
         session: Session,
         plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
-    ):
+    ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
@@ -77,7 +77,7 @@ class TestSingerMapper:
         subject: ProjectPlugin,
         session: Session,
         plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
-    ):
+    ) -> None:
         invoker = plugin_invoker_factory(subject)
 
         async with invoker.prepared(session):
@@ -92,7 +92,7 @@ class TestSingerMapper:
                         "field_id": "author_email",
                         "tap_stream_name": "commits",
                         "type": "MASK-HIDDEN",
-                    }
+                    },
                 ],
                 "parent_mapper_setting": "parent_mapper_setting_value",
             }

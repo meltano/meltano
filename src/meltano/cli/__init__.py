@@ -92,7 +92,7 @@ def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     raise CliError(str(error)) from error
 
 
-def _run_cli():
+def _run_cli() -> None:
     """Run the Meltano CLI.
 
     Raises:
@@ -116,7 +116,7 @@ def _run_cli():
         sys.exit(1)
 
 
-def main():
+def main() -> None:
     """Entry point for the meltano CLI."""
     # Mark the current process as executed via the CLI
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")

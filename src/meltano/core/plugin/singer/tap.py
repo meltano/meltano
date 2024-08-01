@@ -46,9 +46,9 @@ logger = structlog.getLogger(__name__)
 
 async def _stream_redirect(
     stream: asyncio.StreamReader | None,
-    *file_like_objs,
-    write_str=False,
-):
+    *file_like_objs,  # noqa: ANN002
+    write_str=False,  # noqa: ANN001
+) -> None:
     """Redirect stream to a file like obj.
 
     Args:
@@ -67,7 +67,7 @@ def _debug_logging_handler(
     name: str,
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
-    *other_dsts,
+    *other_dsts,  # noqa: ANN002
 ) -> asyncio.Task:
     """Route debug log lines.
 
@@ -109,7 +109,7 @@ def _debug_logging_handler(
         )
 
 
-def config_metadata_rules(config):
+def config_metadata_rules(config):  # noqa: ANN001, ANN201
     """Get metadata rules from config.
 
     Args:
@@ -141,7 +141,7 @@ def config_metadata_rules(config):
     return rules
 
 
-def config_schema_rules(config):
+def config_schema_rules(config):  # noqa: ANN001, ANN201
     """Get schema rules from config.
 
     Args:
@@ -192,7 +192,7 @@ class SingerTap(SingerPlugin):
         ),
     ]
 
-    def exec_args(self, plugin_invoker):
+    def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Return the arguments list with the complete runtime paths.
 
         Args:
@@ -229,7 +229,7 @@ class SingerTap(SingerPlugin):
         return args
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Get the configuration files for this tap."""
         return {
             "config": f"tap.{self.instance_uuid}.config.json",
@@ -239,7 +239,7 @@ class SingerTap(SingerPlugin):
         }
 
     @property
-    def output_files(self):
+    def output_files(self):  # noqa: ANN201
         """Get the output files for this tap."""
         return {"output": "tap.out"}
 
@@ -248,7 +248,7 @@ class SingerTap(SingerPlugin):
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Look up state before being invoked if in sync mode.
 
         Args:
@@ -268,7 +268,7 @@ class SingerTap(SingerPlugin):
     async def look_up_state(
         self,
         plugin_invoker: PluginInvoker,
-    ):
+    ) -> None:
         """Look up state, cleaning up and refreshing as needed.
 
         Args:
@@ -346,7 +346,7 @@ class SingerTap(SingerPlugin):
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Discover Singer catalog before invoking tap if in sync mode.
 
         Args:
@@ -366,7 +366,7 @@ class SingerTap(SingerPlugin):
     async def discover_catalog(  # ,
         self,
         plugin_invoker: PluginInvoker,
-    ):
+    ) -> None:
         """Perform catalog discovery.
 
         Args:
@@ -434,7 +434,7 @@ class SingerTap(SingerPlugin):
         self,
         plugin_invoker: PluginInvoker,
         catalog_path: Path,
-    ):
+    ) -> None:
         """Run tap in discovery mode and store the result.
 
         Args:
@@ -513,7 +513,7 @@ class SingerTap(SingerPlugin):
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Apply catalog rules before invoke if in sync mode.
 
         Args:
@@ -534,7 +534,7 @@ class SingerTap(SingerPlugin):
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),  # noqa: ARG002
-    ):
+    ) -> None:
         """Apply Singer catalog and schema rules to discovered catalog.
 
         Args:
@@ -608,7 +608,7 @@ class SingerTap(SingerPlugin):
                 f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
             ) from err
 
-    def catalog_cache_key(self, plugin_invoker):
+    def catalog_cache_key(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get a cache key for the catalog.
 
         Args:
@@ -649,7 +649,7 @@ class SingerTap(SingerPlugin):
 
     @staticmethod
     @lru_cache
-    def _warn_missing_stream(stream_id: str):
+    def _warn_missing_stream(stream_id: str) -> None:
         logger.warning(
             "Stream `%s` was not found in the catalog",
             stream_id,
@@ -657,7 +657,7 @@ class SingerTap(SingerPlugin):
 
     @staticmethod
     @lru_cache
-    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]):
+    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]) -> None:
         logger.warning(
             "Property `%s` was not found in the schema of stream `%s`",
             ".".join(breadcrumb[1:]),
@@ -668,7 +668,7 @@ class SingerTap(SingerPlugin):
         self,
         rules: list[MetadataRule],
         catalog: CatalogDict,
-    ):
+    ) -> None:
         """Validate MetadataRules conforms to discovered Catalog.
 
         Validate MetadataRules against the tap's discovered Catalog & emit
@@ -690,10 +690,10 @@ class SingerTap(SingerPlugin):
             if isinstance(stream, dict)
         }
 
-        def is_not_star(x):
+        def is_not_star(x):  # noqa: ANN001, ANN202
             return "*" not in x
 
-        def dict_get(dictionary, key):
+        def dict_get(dictionary, key):  # noqa: ANN001, ANN202
             return dictionary.get(key, {})
 
         for rule in rules:

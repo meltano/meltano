@@ -6,7 +6,7 @@ from sqlalchemy import engine_from_config, pool
 config = context.config
 
 
-def run_migrations_offline():
+def run_migrations_offline():  # noqa: ANN201
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -25,7 +25,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online():  # noqa: ANN201
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -46,7 +46,7 @@ def run_migrations_online():
         _run_migrations_online(new_connection)
 
 
-def _run_migrations_online(connection):
+def _run_migrations_online(connection):  # noqa: ANN001, ANN202
     context.configure(connection=connection)
 
     with context.begin_transaction():

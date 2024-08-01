@@ -23,16 +23,16 @@ MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 class TestPluginTestServiceFactory:
     @pytest.fixture(autouse=True)
     @patch("meltano.core.plugin_invoker.PluginInvoker")
-    def setup(self, mock_invoker):
+    def setup(self, mock_invoker) -> None:  # noqa: ANN001
         self.mock_invoker = mock_invoker
 
-    def test_extractor_plugin(self, tap: ProjectPlugin):
+    def test_extractor_plugin(self, tap: ProjectPlugin) -> None:
         self.mock_invoker.plugin = tap
 
         test_service = PluginTestServiceFactory(self.mock_invoker).get_test_service()
         assert isinstance(test_service, ExtractorTestService)
 
-    def test_loader_plugin(self, target: ProjectPlugin):
+    def test_loader_plugin(self, target: ProjectPlugin) -> None:
         self.mock_invoker.plugin = target
 
         with pytest.raises(
@@ -47,7 +47,7 @@ class TestPluginTestServiceFactory:
 class TestExtractorTestService:
     @pytest.fixture(autouse=True)
     @patch("meltano.core.plugin_invoker.PluginInvoker")
-    def setup(self, mock_invoker):
+    def setup(self, mock_invoker) -> None:  # noqa: ANN001
         self.mock_invoke = Mock()
         self.mock_invoke.name = "utility-mock"
         self.mock_invoke.wait = AsyncMock(return_value=-SIGTERM)
@@ -56,7 +56,7 @@ class TestExtractorTestService:
         self.mock_invoker.invoke_async = AsyncMock(return_value=self.mock_invoke)
 
     @pytest.mark.asyncio()
-    async def test_validate_success(self):
+    async def test_validate_success(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -69,7 +69,7 @@ class TestExtractorTestService:
         assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio()
-    async def test_validate_success_ignore_non_json(self):
+    async def test_validate_success_ignore_non_json(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -82,7 +82,7 @@ class TestExtractorTestService:
         assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio()
-    async def test_validate_success_ignore_non_record_msg(self):
+    async def test_validate_success_ignore_non_record_msg(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -98,7 +98,7 @@ class TestExtractorTestService:
         assert detail == MOCK_RECORD_MESSAGE
 
     @pytest.mark.asyncio()
-    async def test_validate_success_stop_after_record_msg(self):
+    async def test_validate_success_stop_after_record_msg(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -117,7 +117,7 @@ class TestExtractorTestService:
         assert self.mock_invoke.stdout.readline.call_count == 2
 
     @pytest.mark.asyncio()
-    async def test_validate_failure_no_record_msg(self):
+    async def test_validate_failure_no_record_msg(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -134,7 +134,7 @@ class TestExtractorTestService:
         assert "No RECORD or BATCH message received" in detail
 
     @pytest.mark.asyncio()
-    async def test_validate_failure_subprocess_err(self):
+    async def test_validate_failure_subprocess_err(self) -> None:
         self.mock_invoke.stderr.at_eof.side_effect = True
         self.mock_invoke.stdout.at_eof.side_effect = (False, False, True)
         self.mock_invoke.stdout.readline = AsyncMock(
@@ -153,7 +153,7 @@ class TestExtractorTestService:
         assert "A subprocess error occurred" in detail
 
     @pytest.mark.asyncio()
-    async def test_validate_failure_plugin_invoke_exception(self):
+    async def test_validate_failure_plugin_invoke_exception(self) -> None:
         mock_exception = Exception("An exception occurred on plugin invocation")
         self.mock_invoker.invoke_async.side_effect = mock_exception
 

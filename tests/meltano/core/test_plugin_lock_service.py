@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
 
 
 @pytest.fixture()
-def plugin():
+def plugin():  # noqa: ANN201
     plugin_definition = PluginDefinition(
         PluginType.EXTRACTORS,
         name="tap-locked",
@@ -61,10 +61,10 @@ def plugin():
 
 class TestPluginLock:
     @pytest.fixture()
-    def subject(self, project: Project, plugin: ProjectPlugin):
+    def subject(self, project: Project, plugin: ProjectPlugin):  # noqa: ANN201
         return PluginLock(project, plugin)
 
-    def test_path(self, subject: PluginLock):
+    def test_path(self, subject: PluginLock) -> None:
         assert subject.path.parts[-3:] == (
             "plugins",
             "extractors",
@@ -72,12 +72,12 @@ class TestPluginLock:
         )
 
     @pytest.mark.order(before="test_load")
-    def test_save(self, subject: PluginLock):
+    def test_save(self, subject: PluginLock) -> None:
         assert not subject.path.exists()
         subject.save()
         assert subject.path.exists()
 
-    def test_load(self, subject: PluginLock, plugin: ProjectPlugin):
+    def test_load(self, subject: PluginLock, plugin: ProjectPlugin) -> None:
         subject.save()
         loaded = subject.load()
         assert loaded.name == plugin.inherit_from
@@ -87,7 +87,7 @@ class TestPluginLock:
 
 class TestPluginLockService:
     @pytest.fixture()
-    def subject(self, project: Project):
+    def subject(self, project: Project):  # noqa: ANN201
         return PluginLockService(project)
 
     def test_save(
@@ -95,7 +95,7 @@ class TestPluginLockService:
         subject: PluginLockService,
         project: Project,
         plugin: ProjectPlugin,
-    ):
+    ) -> None:
         plugin_lock = PluginLock(project, plugin)
         assert not plugin_lock.path.exists()
 

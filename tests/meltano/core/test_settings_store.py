@@ -26,7 +26,7 @@ Store = SettingValueStore
 class DummySettingsService(SettingsService):
     """Dummy SettingsService for testing."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Instantiate new DummySettingsService instance.
 
         Args:
@@ -45,44 +45,44 @@ class DummySettingsService(SettingsService):
         self._inherited_settings = None
 
     @property
-    def label(self):
+    def label(self) -> str:
         return "Dummy"
 
     @property
-    def project_settings_service(self):
+    def project_settings_service(self):  # noqa: ANN201
         return ProjectSettingsService(Project.find())
 
     @property
-    def docs_url(self):
+    def docs_url(self) -> str:
         return "https://docs.meltano.com/"
 
     @property
-    def env_prefixes(self):
+    def env_prefixes(self):  # noqa: ANN201
         return ["dummy"]
 
     @property
-    def db_namespace(self):
+    def db_namespace(self) -> str:
         return "dummy"
 
     @property
-    def setting_definitions(self):
+    def setting_definitions(self):  # noqa: ANN201
         return self.__definitions
 
     @property
-    def meltano_yml_config(self):
+    def meltano_yml_config(self):  # noqa: ANN201
         return self.__meltano_yml_config
 
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config) -> None:  # noqa: ANN001
         self.__meltano_yml_config = config
 
-    def update_meltano_environment_config(self, config):
+    def update_meltano_environment_config(self, config) -> None:  # noqa: ANN001
         self._meltano_environment_config = config
 
     @property
-    def inherited_settings_service(self):
+    def inherited_settings_service(self):  # noqa: ANN201
         return self._inherited_settings
 
-    def process_config(self, config):
+    def process_config(self, config):  # noqa: ANN001, ANN201
         return config
 
     @property
@@ -91,14 +91,14 @@ class DummySettingsService(SettingsService):
 
 
 @pytest.fixture()
-def dummy_settings_service(project):
+def dummy_settings_service(project):  # noqa: ANN001, ANN201
     return DummySettingsService(project)
 
 
 @pytest.fixture()
-def unsupported():
+def unsupported():  # noqa: ANN201
     @contextmanager
-    def _unsupported(store):
+    def _unsupported(store):  # noqa: ANN001, ANN202
         with mock.patch.object(
             store.manager,
             "ensure_supported",
@@ -123,14 +123,14 @@ def unsupported():
 
 class TestAutoStoreManager:
     @pytest.fixture()
-    def subject(self, dummy_settings_service, session):
+    def subject(self, dummy_settings_service, session):  # noqa: ANN001, ANN201
         manager = AutoStoreManager(dummy_settings_service, session=session, cache=False)
         yield manager
         manager.reset()
 
     @pytest.fixture()
-    def set_value_store(self, subject):
-        def _set_value_store(value, store, name="regular"):
+    def set_value_store(self, subject):  # noqa: ANN001, ANN201
+        def _set_value_store(value, store, name="regular") -> None:  # noqa: ANN001
             subject.manager_for(store).set(
                 name,
                 [name],
@@ -141,12 +141,12 @@ class TestAutoStoreManager:
         return _set_value_store
 
     @pytest.fixture()
-    def environment(self):
+    def environment(self):  # noqa: ANN201
         return Environment("testing", {})
 
     @pytest.fixture()
-    def assert_value_source(self, subject):
-        def _assert_value_source(value, source, name="regular"):
+    def assert_value_source(self, subject):  # noqa: ANN001, ANN201
+        def _assert_value_source(value, source, name="regular") -> None:  # noqa: ANN001
             new_value, metadata = subject.get(
                 name,
                 setting_def=subject.find_setting(name),
@@ -167,14 +167,14 @@ class TestAutoStoreManager:
     )
     def test_auto_store(
         self,
-        setting_name,
-        preferred_store,
-        subject,
-        project,
-        unsupported,
-        environment,
-        monkeypatch,
-    ):
+        setting_name,  # noqa: ANN001
+        preferred_store,  # noqa: ANN001
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        unsupported,  # noqa: ANN001
+        environment,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+    ) -> None:
         assert subject.auto_store(setting_name) == preferred_store
 
         # Meltano environment is selected only when there's an active environment
@@ -217,13 +217,13 @@ class TestAutoStoreManager:
     @pytest.mark.usefixtures("assert_value_source")
     def test_get(
         self,
-        subject,
-        project,
-        dummy_settings_service,
-        set_value_store,
-        monkeypatch,
-        environment,
-    ):
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        dummy_settings_service,  # noqa: ANN001
+        set_value_store,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        environment,  # noqa: ANN001
+    ) -> None:
         value, metadata = subject.get("regular")
         assert value == "from_default"
         assert metadata["source"] == Store.DEFAULT
@@ -306,13 +306,13 @@ class TestAutoStoreManager:
     def test_set(
         self,
         subject: SettingsStoreManager,
-        project,
-        unsupported,
-        assert_value_source,
-        monkeypatch,
-        environment,
-    ):
-        def set_value(value):
+        project,  # noqa: ANN001
+        unsupported,  # noqa: ANN001
+        assert_value_source,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        environment,  # noqa: ANN001
+    ) -> None:
+        def set_value(value):  # noqa: ANN001, ANN202
             return subject.set("regular", ["regular"], value)
 
         # Allow setting to a default value
@@ -379,14 +379,14 @@ class TestAutoStoreManager:
 
     def test_unset(
         self,
-        subject,
-        project,
-        unsupported,
-        set_value_store,
-        assert_value_source,
-        monkeypatch,
-        environment,
-    ):
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        unsupported,  # noqa: ANN001
+        set_value_store,  # noqa: ANN001
+        assert_value_source,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+        environment,  # noqa: ANN001
+    ) -> None:
         set_value_store("from_dotenv", Store.DOTENV, name="password")
 
         set_value_store("from_dotenv", Store.DOTENV)
@@ -441,14 +441,14 @@ class TestAutoStoreManager:
 
     def test_reset(
         self,
-        subject,
-        unsupported,
-        set_value_store,
-        assert_value_source,
-        project,
-        environment,
-        monkeypatch,
-    ):
+        subject,  # noqa: ANN001
+        unsupported,  # noqa: ANN001
+        set_value_store,  # noqa: ANN001
+        assert_value_source,  # noqa: ANN001
+        project,  # noqa: ANN001
+        environment,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+    ) -> None:
         set_value_store("from_db", Store.DB)
         set_value_store("from_meltano_yml", Store.MELTANO_YML, name="unknown")
         set_value_store("from_dotenv", Store.DOTENV, name="password")
@@ -515,13 +515,13 @@ class TestAutoStoreManager:
 
 class TestMeltanoYmlStoreManager:
     @pytest.fixture()
-    def subject(self, dummy_settings_service):
+    def subject(self, dummy_settings_service):  # noqa: ANN001, ANN201
         manager = MeltanoYmlStoreManager(dummy_settings_service)
         yield manager
         manager.reset()
 
-    def test_get(self, subject):
-        def get():
+    def test_get(self, subject) -> None:  # noqa: ANN001
+        def get():  # noqa: ANN202
             return subject.get(
                 "regular",
                 setting_def=subject.settings_service.find_setting("regular"),
@@ -538,8 +538,8 @@ class TestMeltanoYmlStoreManager:
 
         assert get() == ("value", {"expandable": True, "key": "regular"})
 
-    def test_set(self, subject):
-        def set_value(key, value):
+    def test_set(self, subject) -> None:  # noqa: ANN001
+        def set_value(key, value):  # noqa: ANN001, ANN202
             return subject.set(
                 key,
                 [key],
@@ -559,15 +559,15 @@ class TestMeltanoYmlStoreManager:
         assert "basic" not in subject.flat_config
         assert subject.flat_config["regular"] == "new_value"
 
-    def test_unset(self, subject):
-        def unset_value(key):
+    def test_unset(self, subject) -> None:  # noqa: ANN001
+        def unset_value(key):  # noqa: ANN001, ANN202
             return subject.unset(
                 key,
                 [key],
                 setting_def=subject.settings_service.find_setting(key),
             )
 
-        def set_values():
+        def set_values() -> None:
             subject.flat_config["regular"] = "value"
             subject.flat_config["basic"] = "alias_value"
 
@@ -586,7 +586,7 @@ class TestMeltanoYmlStoreManager:
 
 class TestMeltanoEnvironmentStoreManager(TestMeltanoYmlStoreManager):
     @pytest.fixture()
-    def subject(self, dummy_settings_service, project):
+    def subject(self, dummy_settings_service, project):  # noqa: ANN001, ANN201
         project.refresh(environment=Environment("testing", {}))
         manager = MeltanoEnvStoreManager(dummy_settings_service)
         try:
@@ -598,11 +598,11 @@ class TestMeltanoEnvironmentStoreManager(TestMeltanoYmlStoreManager):
 
 class TestInheritedStoreManager:
     @pytest.fixture()
-    def subject(self, dummy_settings_service):
+    def subject(self, dummy_settings_service):  # noqa: ANN001, ANN201
         return InheritedStoreManager(dummy_settings_service)
 
-    def test_get(self, subject, project):
-        def get(key="regular"):
+    def test_get(self, subject, project) -> None:  # noqa: ANN001
+        def get(key="regular"):  # noqa: ANN001, ANN202
             return subject.get(
                 key,
                 setting_def=subject.settings_service.find_setting(key),

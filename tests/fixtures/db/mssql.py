@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.engine import URL
 
 
-def recreate_database(engine, db_name):
+def recreate_database(engine, db_name) -> None:  # noqa: ANN001
     """Drop & Create a new database.
 
     We need to use the master connection to do this.
@@ -61,7 +61,7 @@ def create_connection_url(
 
 
 @pytest.fixture(scope="session")
-def engine_uri(worker_id: str):
+def engine_uri(worker_id: str):  # noqa: ANN201
     host = os.getenv("MSSQL_ADDRESS")
     port = os.getenv("MSSQL_PORT", 1433)
     user = os.getenv("MSSQL_USER")
@@ -85,7 +85,7 @@ def engine_uri(worker_id: str):
 
 
 @pytest.fixture()
-def pg_stats(request, session):
+def pg_stats(request, session):  # noqa: ANN001, ANN201
     yield
 
     from meltano.core.job import Job

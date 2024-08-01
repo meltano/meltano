@@ -11,8 +11,8 @@ from meltano.core.task_sets_service import (
 
 
 @pytest.fixture(scope="session")
-def create_task_set():
-    def make(name):
+def create_task_set():  # noqa: ANN201
+    def make(name):  # noqa: ANN001, ANN202
         return TaskSets(name=name, tasks=["tap-mock target-mock"])
 
     return make
@@ -20,11 +20,11 @@ def create_task_set():
 
 class TestTaskSetsService:
     @pytest.fixture()
-    def subject(self, task_sets_service):
+    def subject(self, task_sets_service):  # noqa: ANN001, ANN201
         return task_sets_service
 
     @pytest.mark.order(0)
-    def test_add(self, subject: TaskSetsService, create_task_set):
+    def test_add(self, subject: TaskSetsService, create_task_set) -> None:  # noqa: ANN001
         count = 10
         jobs = [create_task_set(f"test_job_{idx}") for idx in range(count)]
 
@@ -37,7 +37,7 @@ class TestTaskSetsService:
         with pytest.raises(JobAlreadyExistsError):
             subject.add(jobs[0])
 
-    def test_update(self, subject: TaskSetsService, create_task_set):
+    def test_update(self, subject: TaskSetsService, create_task_set) -> None:  # noqa: ANN001
         job = subject.list()[0]
         job.tasks = ["tap-mock target-mock updated:addition"]
         subject.update(job)
@@ -49,7 +49,7 @@ class TestTaskSetsService:
             subject.update(nonexistent)
 
     @pytest.mark.usefixtures("create_task_set")
-    def test_remove(self, subject: TaskSetsService):
+    def test_remove(self, subject: TaskSetsService) -> None:
         jobs = subject.list()
         subject.remove(jobs[0].name)
         assert subject.list() == jobs[1:]
@@ -60,7 +60,7 @@ class TestTaskSetsService:
             subject.remove(jobs[0].name)
 
     @pytest.mark.usefixtures("create_task_set")
-    def test_get(self, subject: TaskSetsService):
+    def test_get(self, subject: TaskSetsService) -> None:
         jobs = subject.list()
 
         assert subject.get(jobs[0].name) == jobs[0]
@@ -70,12 +70,12 @@ class TestTaskSetsService:
             subject.get("non-existent")
 
     @pytest.mark.usefixtures("create_task_set")
-    def test_exists(self, subject: TaskSetsService):
+    def test_exists(self, subject: TaskSetsService) -> None:
         job = subject.list()[0]
         assert subject.exists(job.name)
         assert not subject.exists("non-existent")
 
-    def test_list(self, subject: TaskSetsService, create_task_set):
+    def test_list(self, subject: TaskSetsService, create_task_set) -> None:  # noqa: ANN001
         expected_jobs = [create_task_set(f"test_list_{idx}") for idx in range(3)]
 
         for job in expected_jobs:

@@ -24,7 +24,7 @@ except ImportError:
 class MissingGoogleError(Exception):
     """Raised when google is required but not installed."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize a MissingGoogleError."""
         super().__init__(
             "google-cloud-storage required but not installed. Install meltano[gcs] to use GCS as a state backend.",  # noqa: E501
@@ -32,7 +32,7 @@ class MissingGoogleError(Exception):
 
 
 @contextmanager
-def requires_gcs():
+def requires_gcs():  # noqa: ANN201
     """Raise MissingGoogleError if gcs is required but missing in context.
 
     Raises:
@@ -56,7 +56,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         application_credentials: str | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -88,7 +88,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
-    def client(self):
+    def client(self):  # noqa: ANN201
         """Get an authenticated google.cloud.storage.Client.
 
         Returns:
@@ -102,7 +102,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             # Use default authentication in environment
             return google.cloud.storage.Client()
 
-    def delete(self, file_path: str):
+    def delete(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -128,7 +128,8 @@ class GCSStateStoreManager(CloudStateStoreManager):
             The next file in the backend.
         """
         for blob in self.client.list_blobs(
-            bucket_or_name=self.bucket, prefix=self.state_dir
+            bucket_or_name=self.bucket,
+            prefix=self.state_dir,
         ):
             yield blob.name
 

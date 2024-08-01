@@ -29,5 +29,5 @@ versions_available = {
 }
 
 
-def test_using_latest_schemas():
+def test_using_latest_schemas() -> None:
     assert versions_in_use == versions_available

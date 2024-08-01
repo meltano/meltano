@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
 
 
-def check_indent(json_path: Path, indent: int):
+def check_indent(json_path: Path, indent: int) -> None:
     text = json_path.read_text()
     # If the indent is as-expected, then a trip through `json.loads` and
     # `json.dumps` should produce the same text, usually. This isn't true in
@@ -41,7 +41,7 @@ class TestCompile:
     def clear_default_manifest_dir(self, manifest_dir: Path) -> None:
         shutil.rmtree(manifest_dir, ignore_errors=True)
 
-    def test_compile(self, manifest_dir: Path, cli_runner: CliRunner):
+    def test_compile(self, manifest_dir: Path, cli_runner: CliRunner) -> None:
         assert cli_runner.invoke(cli, ("compile",)).exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {
             f"meltano-manifest{x}.json" for x in (".dev", ".staging", ".prod", "")
@@ -53,14 +53,18 @@ class TestCompile:
         manifest_dir: Path,
         cli_runner: CliRunner,
         environment_name: str,
-    ):
+    ) -> None:
         result = cli_runner.invoke(cli, ("--environment", environment_name, "compile"))
         assert result.exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {
             f"meltano-manifest.{environment_name}.json",
         }
 
-    def test_compile_no_environment(self, manifest_dir: Path, cli_runner: CliRunner):
+    def test_compile_no_environment(
+        self,
+        manifest_dir: Path,
+        cli_runner: CliRunner,
+    ) -> None:
         result = cli_runner.invoke(cli, ("--no-environment", "compile"))
         assert result.exit_code == 0
         assert {x.name for x in manifest_dir.iterdir()} == {"meltano-manifest.json"}
@@ -71,7 +75,7 @@ class TestCompile:
         manifest_dir: Path,
         cli_runner: CliRunner,
         indent: int,
-    ):
+    ) -> None:
         assert (
             cli_runner.invoke(
                 cli,
@@ -86,7 +90,7 @@ class TestCompile:
         manifest_dir: Path,
         cli_runner: CliRunner,
         tmp_path: Path,
-    ):
+    ) -> None:
         result = cli_runner.invoke(cli, ("compile", "--directory", tmp_path))
         assert result.exit_code == 0
         assert not manifest_dir.exists()
@@ -101,10 +105,10 @@ class TestCompile:
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
         log: StructuredLogCapture,
-    ):
+    ) -> None:
         original_yaml_load = manifest.yaml.load
 
-        def patch(*args, **kwargs):
+        def patch(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
             project_files = original_yaml_load(*args, **kwargs)
             project_files["invalid_key"] = None
             return project_files

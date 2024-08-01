@@ -17,7 +17,7 @@ class TestPluginsTrackingContext:
         self,
         project: Project,
         dbt: ProjectPlugin,
-    ):
+    ) -> None:
         plugin_ctx = PluginsTrackingContext.from_block(
             plugin_command_invoker(
                 dbt,
@@ -31,7 +31,11 @@ class TestPluginsTrackingContext:
         self.assert_plugin_attributes(plugin_dict, dbt)
         assert plugin_dict.get("command") == "test"
 
-    def test_plugins_tracking_context(self, tap: ProjectPlugin, dbt: ProjectPlugin):
+    def test_plugins_tracking_context(
+        self,
+        tap: ProjectPlugin,
+        dbt: ProjectPlugin,
+    ) -> None:
         plugin_ctx = PluginsTrackingContext([(tap, None), (dbt, "test")])
         assert plugin_ctx.schema == PluginsContextSchema.url
         assert len(plugin_ctx.data.get("plugins")) == 2
@@ -58,7 +62,10 @@ class TestPluginsTrackingContext:
         assert not plugin_with_no_parent.get("parent_name_hash")
 
     @staticmethod
-    def assert_plugin_attributes(plugin_dict: dict[str, t.Any], plugin: ProjectPlugin):
+    def assert_plugin_attributes(
+        plugin_dict: dict[str, t.Any],
+        plugin: ProjectPlugin,
+    ) -> None:
         for dict_key, plugin_key in (
             ("name_hash", "name"),
             ("namespace_hash", "namespace"),

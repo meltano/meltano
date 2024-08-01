@@ -20,18 +20,18 @@ AIRFLOW_CONFIG = """
 
 class TestAirflow:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
     @pytest.mark.asyncio()
     async def test_before_configure(
         self,
-        subject,
-        project,
-        session,
-        plugin_invoker_factory,
-    ):
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+    ) -> None:
         run_dir = project.run_dir("airflow")
 
         handle_mock = mock.Mock()
@@ -43,7 +43,7 @@ class TestAirflow:
 
         original_exec = asyncio.create_subprocess_exec
 
-        def popen_mock(cmd, *popen_args, **kwargs):
+        def popen_mock(cmd, *popen_args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
             # first time, it creates the `airflow.cfg`
             if "--help" in popen_args:
                 assert "env" in kwargs
@@ -99,7 +99,7 @@ class TestAirflow:
             assert not run_dir.joinpath("airflow.cfg").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:  # noqa: ANN001
         invoker: AirflowInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

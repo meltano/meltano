@@ -22,7 +22,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class AirflowInvoker(PluginInvoker):
     """Invoker that prepares env for Airflow."""
 
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Environment variables for Airflow.
 
         Returns:
@@ -44,7 +44,7 @@ class Airflow(BasePlugin):
     invoker_class = AirflowInvoker
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return the configuration files required by the plugin.
 
         Returns:
@@ -52,7 +52,7 @@ class Airflow(BasePlugin):
         """
         return {"config": "airflow.cfg"}
 
-    def process_config(self, flat_config):
+    def process_config(self, flat_config):  # noqa: ANN001, ANN201
         """Unflatten the config.
 
         Args:
@@ -94,7 +94,7 @@ class Airflow(BasePlugin):
             logger.debug(f"Saved '{airflow_cfg_path!s}'")  # noqa: G004
 
     @hook("before_install")
-    async def setup_env(self, *args, **kwargs):  # noqa: ARG002
+    async def setup_env(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG002
         """Configure the env to make airflow installable without GPL deps.
 
         Args:
@@ -104,7 +104,7 @@ class Airflow(BasePlugin):
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
 
     @hook("before_configure")
-    async def before_configure(self, invoker: AirflowInvoker, session):
+    async def before_configure(self, invoker: AirflowInvoker, session) -> None:  # noqa: ANN001
         """Generate config file and keep metadata database up-to-date.
 
         Args:
@@ -176,7 +176,7 @@ class Airflow(BasePlugin):
         logger.debug("Completed `airflow initdb`")
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker: PluginInvoker):
+    async def before_cleanup(self, invoker: PluginInvoker) -> None:
         """Delete the config file.
 
         Args:

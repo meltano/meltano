@@ -39,7 +39,7 @@ class BlockSet(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    async def terminate(self, *, graceful: bool = True):
+    async def terminate(self, *, graceful: bool = True) -> t.NoReturn:
         """Terminate a currently executing BlockSet.
 
         Args:

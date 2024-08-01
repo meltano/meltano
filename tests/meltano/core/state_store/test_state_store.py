@@ -28,7 +28,7 @@ if t.TYPE_CHECKING:
 
 
 class TestSystemDBStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         project.settings.set(["state_backend", "uri"], StateBackend.SYSTEMDB)
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
@@ -37,14 +37,14 @@ class TestSystemDBStateBackend:
 
 class TestLocalFilesystemStateBackend:
     @pytest.fixture()
-    def state_path(self, tmp_path: Path):
+    def state_path(self, tmp_path: Path):  # noqa: ANN201
         path = tmp_path / ".meltano" / "state"
         try:
             yield str(path)
         finally:
             shutil.rmtree(path)
 
-    def test_manager_from_settings(self, project: Project, state_path: str):
+    def test_manager_from_settings(self, project: Project, state_path: str) -> None:
         project.settings.set(["state_backend", "uri"], f"file://{state_path}")
         file_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(file_state_store, LocalFilesystemStateStoreManager)
@@ -52,7 +52,7 @@ class TestLocalFilesystemStateBackend:
 
 
 class TestAzureStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # Azure
         project.settings.set(
             ["state_backend", "uri"],
@@ -119,7 +119,7 @@ class TestAzureStateBackend:
 
 
 class TestGCSStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
         gs_state_store = state_store_manager_from_project_settings(project.settings)
@@ -129,7 +129,7 @@ class TestGCSStateBackend:
 
 
 class TestS3StateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # AWS S3 (credentials in URI)
         project.settings.set(
             ["state_backend", "uri"],

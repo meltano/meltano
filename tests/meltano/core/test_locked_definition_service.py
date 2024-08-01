@@ -13,13 +13,13 @@ HTTP_STATUS_TEAPOT = 418
 
 
 @pytest.fixture()
-def subject(project):
+def subject(project):  # noqa: ANN001, ANN201
     return LockedDefinitionService(project)
 
 
 class TestLockedDefinitionService:
     @pytest.fixture()
-    def locked_plugin(self, subject: LockedDefinitionService):
+    def locked_plugin(self, subject: LockedDefinitionService):  # noqa: ANN201
         """Locked plugin definition.
 
         Yields:
@@ -44,7 +44,7 @@ class TestLockedDefinitionService:
         path.unlink()
 
     @pytest.mark.usefixtures("locked_plugin")
-    def test_definition(self, subject: LockedDefinitionService):
+    def test_definition(self, subject: LockedDefinitionService) -> None:
         with pytest.raises(PluginNotFoundError):
             subject.find_definition(PluginType.EXTRACTORS, "unknown")
 
@@ -60,7 +60,7 @@ class TestLockedDefinitionService:
         assert len(plugin_def.variants) == 1
 
     @pytest.mark.usefixtures("locked_plugin")
-    def test_find_base_plugin(self, subject: LockedDefinitionService):
+    def test_find_base_plugin(self, subject: LockedDefinitionService) -> None:
         base_plugin = subject.find_base_plugin(
             PluginType.EXTRACTORS,
             "tap-locked",

@@ -13,7 +13,7 @@ logger = structlog.stdlib.get_logger(__name__)
 
 
 class SingerPlugin(BasePlugin):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize a `SingerPlugin`.
 
         Args:
@@ -26,7 +26,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config):
+    def process_config(self, flat_config):  # noqa: ANN001, ANN201
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
@@ -46,9 +46,9 @@ class SingerPlugin(BasePlugin):
     @hook("before_configure")
     async def before_configure(
         self,
-        invoker,
-        session,  # noqa: ARG002
-    ):
+        invoker,  # noqa: ANN001
+        session,  # noqa: ANN001, ARG002
+    ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
         with open(config_path, "w") as config_file:
@@ -58,14 +58,14 @@ class SingerPlugin(BasePlugin):
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker):
+    async def before_cleanup(self, invoker) -> None:  # noqa: ANN001
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()
         logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
-    def instance_uuid(self):
+    def instance_uuid(self):  # noqa: ANN201
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
             self._instance_uuid = str(uuid4())

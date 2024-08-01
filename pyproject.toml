@@ -284,13 +284,14 @@ ignore = [
 ]
 select = [
   "A",   # flake8-builtins
+  "ANN", # flake8-annotations
   "ARG", # flake8-unused-arguments
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
   "COM", # flake8-commas
   "DTZ", # flake8-datetimez
   "E",   # pycodestyle (error)
-  "EM",   # flake8-errmsg
+  "EM",  # flake8-errmsg
   "ERA", # flake8-eradicate
   "F",   # pyflakes
   "FBT", # flake8-boolean-trap
@@ -344,6 +345,8 @@ banned-from = [
 typing = "t"
 
 [tool.ruff.lint.flake8-pytest-style]
+parametrize-names-type = "tuple"
+parametrize-values-row-type = "tuple"
 parametrize-values-type = "tuple"
 
 [tool.ruff.lint.isort]

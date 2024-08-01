@@ -22,7 +22,7 @@ class TestCliHub:
         project: Project,
         cli_runner: CliRunner,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         with mock.patch(
             "requests.adapters.HTTPAdapter.send",
             project.hub_service.session.get_adapter(
@@ -45,7 +45,7 @@ class TestCliHub:
         cli_runner: CliRunner,
         hub_request_counter: Counter,
         requests_mock: RequestsMocker,
-    ):
+    ) -> None:
         hub_api = project.hub_service.hub_api_url
         requests_mock.get(
             hub_api,

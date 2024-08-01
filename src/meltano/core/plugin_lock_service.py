@@ -82,7 +82,7 @@ class PluginLock:
             The loaded plugin.
         """
 
-        def _load():
+        def _load():  # noqa: ANN202
             with open(self.path) as lockfile:
                 return loader(lockfile)
 
@@ -120,7 +120,7 @@ class PluginLockService:
         plugin: ProjectPlugin,
         *,
         exists_ok: bool = False,
-    ):
+    ) -> None:
         """Save the plugin lockfile.
 
         Args:

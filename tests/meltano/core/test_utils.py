@@ -16,7 +16,7 @@ from meltano.core.utils import (
 )
 
 
-def test_nest():
+def test_nest() -> None:
     subject = {}
 
     one_deep = nest(subject, "a.b")
@@ -55,7 +55,7 @@ def test_nest():
     }
 
 
-def test_pop_at_path():
+def test_pop_at_path() -> None:
     subject = {}
     pop_at_path(subject, "a.b.c")
     assert not subject
@@ -79,7 +79,7 @@ def test_pop_at_path():
     assert not subject
 
 
-def test_set_at_path():
+def test_set_at_path() -> None:
     subject = {}
 
     set_at_path(subject, "a.b.c", "value")
@@ -101,7 +101,7 @@ def test_set_at_path():
     assert subject == {"a": {"b": {"c": "value"}, "d.e": "value"}}
 
 
-def test_flatten():
+def test_flatten() -> None:
     example_config = {"_update": {"orchestrate/dags/meltano.py": False}}
     expected_flat = {"_update.orchestrate/dags/meltano.py": False}
     result = flatten(example_config, "dot")
@@ -183,11 +183,11 @@ def test_flatten():
         ),
     ),
 )
-def test_expand_env_vars(input_value, env, kwargs, expected_output):
+def test_expand_env_vars(input_value, env, kwargs, expected_output) -> None:  # noqa: ANN001
     assert expand_env_vars(input_value, env, **kwargs) == expected_output
 
 
-def test_expand_env_vars_nested():
+def test_expand_env_vars_nested() -> None:
     input_dict = {
         "some_key": 12,
         "some_var": "${ENV_VAR_1}",
@@ -265,26 +265,26 @@ def test_expand_env_vars_nested():
         ),
     ),
 )
-def test_expand_env_vars_array_nested(input_array, env, expected_output):
+def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None:  # noqa: ANN001
     assert expand_env_vars(input_array, env) == expected_output
 
 
-def test_remove_suffix():
+def test_remove_suffix() -> None:
     assert remove_suffix("a_string", "ing") == "a_str"
     assert remove_suffix("a_string", "in") == "a_string"
     assert remove_suffix("a_string", "gni") == "a_string"
 
 
-def test_makedirs_decorator(tmp_path):
-    def root(*paths):
+def test_makedirs_decorator(tmp_path) -> None:  # noqa: ANN001
+    def root(*paths):  # noqa: ANN002, ANN202
         return tmp_path.joinpath(*paths)
 
     @makedirs
-    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ARG001
+    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ANN002, ANN202, ARG001
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, *, make_dirs: bool = True):
+    def species(genus_name, species_name, *, make_dirs: bool = True):  # noqa: ANN001, ANN202
         return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")

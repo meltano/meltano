@@ -35,7 +35,7 @@ class UUIDParamType(click.ParamType):
 
     name = "uuid"
 
-    def convert(self, value, param, ctx):
+    def convert(self, value, param, ctx):  # noqa: ANN001, ANN201
         """Convert an input value to a UUID."""
         try:
             return uuid.UUID(value)
@@ -121,7 +121,7 @@ async def run(
     run_id: uuid.UUID | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
-):
+) -> None:
     """
     Run a set of command blocks in series.
 

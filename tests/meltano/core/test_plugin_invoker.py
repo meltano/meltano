@@ -13,19 +13,19 @@ from meltano.core.venv_service import VirtualEnv
 
 class TestPluginInvoker:
     @pytest.fixture()
-    async def plugin_invoker(self, utility, session, plugin_invoker_factory):
+    async def plugin_invoker(self, utility, session, plugin_invoker_factory):  # noqa: ANN001, ANN201
         subject = plugin_invoker_factory(utility)
         async with subject.prepared(session):
             yield subject
 
     @pytest.fixture()
-    async def nonpip_plugin_invoker(self, nonpip_tap, session, plugin_invoker_factory):
+    async def nonpip_plugin_invoker(self, nonpip_tap, session, plugin_invoker_factory):  # noqa: ANN001, ANN201
         subject = plugin_invoker_factory(nonpip_tap)
         async with subject.prepared(session):
             yield subject
 
     @pytest.mark.asyncio()
-    async def test_env(self, project, tap, session, plugin_invoker_factory):
+    async def test_env(self, project, tap, session, plugin_invoker_factory) -> None:  # noqa: ANN001
         project.dotenv.touch()
         dotenv.set_key(project.dotenv, "DUMMY_ENV_VAR", "from_dotenv")
         dotenv.set_key(project.dotenv, "TAP_MOCK_TEST", "from_dotenv")
@@ -66,11 +66,11 @@ class TestPluginInvoker:
     @pytest.mark.asyncio()
     async def test_environment_env(
         self,
-        project_with_environment,
-        tap,
-        session,
-        plugin_invoker_factory,
-    ):
+        project_with_environment,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+    ) -> None:
         subject = plugin_invoker_factory(tap)
         async with subject.prepared(session):
             env = subject.env()
@@ -81,11 +81,11 @@ class TestPluginInvoker:
     @pytest.mark.asyncio()
     async def test_expanded_environment_env(
         self,
-        project_with_environment,
-        tap,
-        session,
-        plugin_invoker_factory,
-    ):
+        project_with_environment,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -99,14 +99,14 @@ class TestPluginInvoker:
         )
 
     @pytest.mark.asyncio()
-    async def test_unknown_command(self, plugin_invoker):
+    async def test_unknown_command(self, plugin_invoker) -> None:  # noqa: ANN001
         with pytest.raises(UnknownCommandError) as err:
             await plugin_invoker.invoke_async(command="foo")
 
         assert err.value.command == "foo"
         assert "supports the following commands" in str(err.value)
 
-    def test_expand_exec_args(self, plugin_invoker):
+    def test_expand_exec_args(self, plugin_invoker) -> None:  # noqa: ANN001
         exec_args = plugin_invoker.exec_args(
             "extra",
             "args",
@@ -119,7 +119,7 @@ class TestPluginInvoker:
         assert exec_args[0].endswith("utility-mock")
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
-    def test_expand_command_exec_args(self, plugin_invoker):
+    def test_expand_command_exec_args(self, plugin_invoker) -> None:  # noqa: ANN001
         exec_args = plugin_invoker.exec_args(
             "extra",
             "args",
@@ -133,7 +133,7 @@ class TestPluginInvoker:
         assert exec_args[1:] == ["--option", "env-var-arg", "extra", "args"]
 
     @pytest.mark.asyncio()
-    async def test_undefined_env_var(self, plugin_invoker):
+    async def test_undefined_env_var(self, plugin_invoker) -> None:  # noqa: ANN001
         with pytest.raises(UndefinedEnvVarError) as err:
             await plugin_invoker.invoke_async(command="cmd")
 
@@ -142,7 +142,7 @@ class TestPluginInvoker:
             "variable '$ENV_VAR_ARG' in an argument"
         ) in str(err.value)
 
-    def test_alternate_command_executable(self, plugin_invoker):
+    def test_alternate_command_executable(self, plugin_invoker) -> None:  # noqa: ANN001
         exec_args = plugin_invoker.exec_args(
             "extra",
             "args",
@@ -166,11 +166,11 @@ class TestPluginInvoker:
     @pytest.mark.asyncio()
     async def test_expand_nonpip_command_exec_args(
         self,
-        nonpip_plugin_invoker,
-        session,
-        executable_str,
-        assert_fn,
-    ):
+        nonpip_plugin_invoker,  # noqa: ANN001
+        session,  # noqa: ANN001
+        executable_str,  # noqa: ANN001
+        assert_fn,  # noqa: ANN001
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",

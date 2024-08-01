@@ -14,10 +14,10 @@ if t.TYPE_CHECKING:
 
 
 @pytest.fixture(scope="class")
-def compatible_copy_tree():
+def compatible_copy_tree():  # noqa: ANN201
     """Copy files recursively from source to destination, ignoring existing dirs."""
 
-    def _compatible_copy_tree(source: Path, destination: Path):
+    def _compatible_copy_tree(source: Path, destination: Path) -> None:
         """Copy files recursively from source to destination, ignoring existing dirs."""
         shutil.copytree(source, destination, dirs_exist_ok=True)
 
@@ -25,7 +25,7 @@ def compatible_copy_tree():
 
 
 @pytest.fixture()
-def function_scoped_test_dir(tmp_path_factory) -> Path:
+def function_scoped_test_dir(tmp_path_factory) -> Path:  # noqa: ANN001
     tmp_path = tmp_path_factory.mktemp("meltano_root")
     cwd = os.getcwd()
     try:
@@ -36,15 +36,15 @@ def function_scoped_test_dir(tmp_path_factory) -> Path:
 
 
 @pytest.fixture()
-def empty_meltano_yml_dir(tmp_path):
+def empty_meltano_yml_dir(tmp_path):  # noqa: ANN001, ANN201
     with cd(tmp_path):
         (tmp_path / "meltano.yml").touch()
         return tmp_path
 
 
 @pytest.fixture()
-def pushd(request):
-    def _pushd(path):
+def pushd(request):  # noqa: ANN001, ANN201
+    def _pushd(path):  # noqa: ANN001, ANN202
         popd = partial(os.chdir, os.getcwd())
         request.addfinalizer(popd)
         os.chdir(path)
@@ -55,7 +55,7 @@ def pushd(request):
 
 
 @pytest.mark.meta()
-def test_pushd(tmp_path, pushd):
+def test_pushd(tmp_path, pushd) -> None:  # noqa: ANN001
     os.makedirs(tmp_path / "a")
     os.makedirs(tmp_path / "a" / "b")
 

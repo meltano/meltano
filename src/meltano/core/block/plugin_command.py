@@ -113,7 +113,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         return self._command_args
 
-    async def _start(self):
+    async def _start(self) -> None:
         invoke_args = (self.command_args,) if self.command_args else ()
         await self.start(*invoke_args)
 

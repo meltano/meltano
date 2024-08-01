@@ -40,19 +40,19 @@ def load_module_from_path(name: str, path: Path) -> ModuleType:
 
 class TestSuperset:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
     @pytest.mark.asyncio()
     async def test_hooks(
         self,
-        subject,
-        project,
-        session,
-        plugin_invoker_factory,
-        monkeypatch,
-    ):
+        subject,  # noqa: ANN001
+        project,  # noqa: ANN001
+        session,  # noqa: ANN001
+        plugin_invoker_factory,  # noqa: ANN001
+        monkeypatch,  # noqa: ANN001
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -67,7 +67,7 @@ class TestSuperset:
 
         original_exec = asyncio.create_subprocess_exec
 
-        def popen_mock(cmd, *popen_args, **kwargs):
+        def popen_mock(cmd, *popen_args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
             assert kwargs["env"]["SUPERSET_HOME"] == str(run_dir)
             assert kwargs["env"]["SUPERSET_CONFIG_PATH"] == str(config_path)
 
@@ -151,7 +151,7 @@ class TestSuperset:
             assert not run_dir.joinpath("superset_config.py").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:  # noqa: ANN001
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

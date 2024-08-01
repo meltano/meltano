@@ -13,13 +13,13 @@ if t.TYPE_CHECKING:
 
 
 class MockValidationsRunner(ValidationsRunner):
-    async def run_test(self, name: str):  # noqa: ARG002
+    async def run_test(self, name: str) -> int:  # noqa: ARG002
         return 1
 
 
 class TestValidationsRunner:
     @pytest.mark.asyncio()
-    async def test_run_all(self, session, dbt, plugin_invoker_factory):
+    async def test_run_all(self, session, dbt, plugin_invoker_factory) -> None:  # noqa: ANN001
         invoker = plugin_invoker_factory(dbt)
         runner = MockValidationsRunner(
             invoker,
@@ -48,7 +48,7 @@ class TestValidationsRunner:
         assert noop_runner.invoker.call_count == 0
 
     @pytest.mark.order(after="test_run_all")
-    def test_collect_tests(self, project: Project):
+    def test_collect_tests(self, project: Project) -> None:
         collected = MockValidationsRunner.collect(project, select_all=False)
 
         assert collected["dbt"].invoker.plugin.type == PluginType.TRANSFORMERS

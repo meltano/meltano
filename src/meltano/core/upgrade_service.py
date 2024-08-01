@@ -128,7 +128,7 @@ class UpgradeService:
         click.echo()
         return True
 
-    def update_files(self):
+    def update_files(self) -> None:
         """Update the files managed by Meltano inside the current project.
 
         Raises:
@@ -146,12 +146,12 @@ class UpgradeService:
                 self.project,
                 file_plugins,
                 reason=PluginInstallReason.UPGRADE,
-            )
+            ),
         )
         if not success:
             raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
 
-    def migrate_database(self):
+    def migrate_database(self) -> None:
         """Migrate the Meltano database.
 
         Raises:
@@ -167,7 +167,7 @@ class UpgradeService:
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def migrate_state(self):
+    def migrate_state(self) -> None:
         """Move cloud state files to deduplicated prefix paths.
 
         See: https://github.com/meltano/meltano/issues/7938
@@ -196,7 +196,7 @@ class UpgradeService:
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, *, skip_package: bool = False, **kwargs):
+    def upgrade(self, *, skip_package: bool = False, **kwargs) -> None:  # noqa: ANN003
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command

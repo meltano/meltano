@@ -10,7 +10,7 @@ if t.TYPE_CHECKING:
     import pytest
 
 
-def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
+def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
         monkeypatch.delenv(notable_flag_env_var, raising=False)
 
@@ -33,7 +33,7 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
     check(("trew", "Fallse", "nah", "si", "okay", "01"), expected=None)
 
 
-def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch):
+def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     for notable_hashed_env_var in EnvironmentContext.notable_hashed_env_vars:
         monkeypatch.delenv(notable_hashed_env_var, raising=False)
     assert EnvironmentContext().data["notable_hashed_env_vars"] == {}

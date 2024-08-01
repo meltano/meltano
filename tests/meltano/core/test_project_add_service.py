@@ -21,10 +21,10 @@ if t.TYPE_CHECKING:
 
 class TestProjectAddService:
     @pytest.fixture()
-    def subject(self, project_add_service):
+    def subject(self, project_add_service):  # noqa: ANN001, ANN201
         return project_add_service
 
-    def test_missing_plugin_exception(self, subject, hub_request_counter):
+    def test_missing_plugin_exception(self, subject, hub_request_counter) -> None:  # noqa: ANN001
         with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
@@ -51,7 +51,7 @@ class TestProjectAddService:
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         used_variant = variant or default_variant
         lockfile_path = project.plugin_lock_path(
             plugin_type,
@@ -83,11 +83,11 @@ class TestProjectAddService:
 
     def test_add_inherited(
         self,
-        tap,
-        subject,
+        tap,  # noqa: ANN001
+        subject,  # noqa: ANN001
         project: Project,
-        hub_request_counter,
-    ):
+        hub_request_counter,  # noqa: ANN001
+    ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
 
@@ -124,7 +124,7 @@ class TestProjectAddService:
         self,
         subject: ProjectAddService,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         child = subject.add(
             PluginType.EXTRACTORS,
             "tap-mock-inherited-new",
@@ -176,7 +176,7 @@ class TestProjectAddService:
     def test_add_name_contains_state_id_component_delimiter(
         self,
         subject: ProjectAddService,
-    ):
+    ) -> None:
         with pytest.raises(PluginRefNameContainsStateIdDelimiterError):
             subject.add(
                 PluginType.EXTRACTORS,
@@ -187,11 +187,11 @@ class TestProjectAddService:
     def test_add_update(
         self,
         lock_save: mock.MagicMock,
-        target,
+        target,  # noqa: ANN001
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         target.config = {
             "username": "meltano",
             "password": "meltano",
@@ -235,7 +235,7 @@ class TestProjectAddService:
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         custom_plugin = subject.add(
             PluginType.EXTRACTORS,
             "tap-custom",

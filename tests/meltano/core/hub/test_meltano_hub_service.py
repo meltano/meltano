@@ -25,7 +25,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         definition = project.hub_service.find_definition(
             PluginType.EXTRACTORS,
             "tap-mock",
@@ -41,7 +41,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         definition = project.hub_service.find_definition(
             PluginType.EXTRACTORS,
             "tap-mock",
@@ -56,7 +56,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         definition = project.hub_service.find_definition(
             PluginType.EXTRACTORS,
             "tap-mock",
@@ -72,7 +72,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         with pytest.raises(PluginNotFoundError):
             project.hub_service.find_definition(PluginType.EXTRACTORS, "tap-not-found")
 
@@ -83,7 +83,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         with pytest.raises(HubPluginVariantNotFoundError):
             project.hub_service.find_definition(
                 PluginType.EXTRACTORS,
@@ -98,7 +98,7 @@ class TestMeltanoHubService:
         self,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         extractors = project.hub_service.get_plugins_of_type(PluginType.EXTRACTORS)
         assert len(extractors) == 9
         assert len(extractors["tap-mock"].variants) == 2
@@ -108,11 +108,11 @@ class TestMeltanoHubService:
         ]
         assert hub_request_counter["/extractors/index"] == 1
 
-    def test_hub_auth(self, project):
+    def test_hub_auth(self, project) -> None:  # noqa: ANN001
         project.settings.set("hub_url_auth", "Bearer s3cr3t")
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
 
-    def test_server_error(self, project: Project):
+    def test_server_error(self, project: Project) -> None:
         with pytest.raises(
             HubConnectionError,
             match="Could not connect to Meltano Hub. 500 Server Error",
@@ -131,7 +131,7 @@ class TestMeltanoHubService:
             "/this-returns-500--original"
         )
 
-    def test_request_headers(self, project: Project):
+    def test_request_headers(self, project: Project) -> None:
         with mock.patch("click.get_current_context") as get_context:
             get_context.return_value = click.Context(
                 hub,
@@ -146,14 +146,14 @@ class TestMeltanoHubService:
             request = project.hub_service._build_request("GET", "https://example.com")
             assert "X-Meltano-Command" not in request.headers
 
-    def test_custom_ca(self, project, monkeypatch):
+    def test_custom_ca(self, project, monkeypatch) -> None:  # noqa: ANN001
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(
+            def send(  # noqa: ANN202
                 self,
-                request,  # noqa: ARG002
-                **kwargs,
+                request,  # noqa: ANN001, ARG002
+                **kwargs,  # noqa: ANN003
             ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
@@ -171,14 +171,14 @@ class TestMeltanoHubService:
         hub._get(mock_url)
         assert send_kwargs["verify"] == "/path/to/ca.pem"
 
-    def test_custom_proxy(self, project, monkeypatch):
+    def test_custom_proxy(self, project, monkeypatch) -> None:  # noqa: ANN001
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(
+            def send(  # noqa: ANN202
                 self,
-                request,  # noqa: ARG002
-                **kwargs,
+                request,  # noqa: ANN001, ARG002
+                **kwargs,  # noqa: ANN003
             ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs

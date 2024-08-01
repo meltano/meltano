@@ -18,7 +18,7 @@ class JobFinder:
         """
         self.state_id = state_id
 
-    def latest(self, session):
+    def latest(self, session):  # noqa: ANN001, ANN201
         """Get the latest state for this instance's state ID.
 
         Args:
@@ -34,7 +34,7 @@ class JobFinder:
             .first()
         )
 
-    def successful(self, session):
+    def successful(self, session):  # noqa: ANN001, ANN201
         """Get all successful jobs for this instance's state ID.
 
         Args:
@@ -49,7 +49,7 @@ class JobFinder:
             & Job.ended_at.isnot(None),
         )
 
-    def running(self, session):
+    def running(self, session):  # noqa: ANN001, ANN201
         """Find states in the running state.
 
         Args:
@@ -62,7 +62,7 @@ class JobFinder:
             (Job.job_name == self.state_id) & (Job.state == State.RUNNING),
         )
 
-    def latest_success(self, session):
+    def latest_success(self, session):  # noqa: ANN001, ANN201
         """Get the latest successful state for this instance's state ID.
 
         Args:
@@ -73,7 +73,7 @@ class JobFinder:
         """
         return self.successful(session).order_by(Job.ended_at.desc()).first()
 
-    def latest_running(self, session):
+    def latest_running(self, session):  # noqa: ANN001, ANN201
         """Find the most recent state in the running state, if any.
 
         Args:
@@ -84,7 +84,7 @@ class JobFinder:
         """
         return self.running(session).order_by(Job.started_at.desc()).first()
 
-    def with_payload(self, session, flags=0, since=None, state=None):
+    def with_payload(self, session, flags=0, since=None, state=None):  # noqa: ANN001, ANN201
         """Get all states for this instance's state ID matching the given args.
 
         Args:
@@ -113,7 +113,7 @@ class JobFinder:
             query = query.filter(Job.state == state)
         return query
 
-    def latest_with_payload(self, session, **kwargs):
+    def latest_with_payload(self, session, **kwargs):  # noqa: ANN001, ANN003, ANN201
         """Return the latest state matching the given kwargs.
 
         Args:
@@ -131,7 +131,7 @@ class JobFinder:
         )
 
     @classmethod
-    def all_stale(cls, session):
+    def all_stale(cls, session):  # noqa: ANN001, ANN206
         """Return all stale states.
 
         Args:
@@ -158,7 +158,7 @@ class JobFinder:
             ),
         )
 
-    def stale(self, session):
+    def stale(self, session):  # noqa: ANN001, ANN201
         """Return stale states with the instance's state ID.
 
         Args:
@@ -169,7 +169,7 @@ class JobFinder:
         """
         return self.all_stale(session).filter(Job.job_name == self.state_id)
 
-    def get_all(self, session: object, since=None):
+    def get_all(self, session: object, since=None):  # noqa: ANN001, ANN201
         """Return all state with the instance's state ID.
 
         Args:

@@ -16,17 +16,17 @@ from meltano.core.logging import OutputLogger
 
 class TestSingerBlocks:
     @pytest.fixture()
-    def log(self, tmp_path):
+    def log(self, tmp_path):  # noqa: ANN001, ANN201
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture()
-    def elt_context(
+    def elt_context(  # noqa: ANN201
         self,
-        project,  # noqa: ARG002
-        session,
-        tap,
-        target,
-        elt_context_builder,
+        project,  # noqa: ANN001, ARG002
+        session,  # noqa: ANN001
+        tap,  # noqa: ANN001
+        target,  # noqa: ANN001
+        elt_context_builder,  # noqa: ANN001
     ):
         job = Job(job_name="pytest_test_runner")
 
@@ -39,8 +39,8 @@ class TestSingerBlocks:
         )
 
     @pytest.fixture()
-    def process_mock_factory(self):
-        def _factory(name):
+    def process_mock_factory(self):  # noqa: ANN201
+        def _factory(name):  # noqa: ANN001, ANN202
             process_mock = Mock()
             process_mock.name = name
             process_mock.wait = AsyncMock(return_value=0)
@@ -49,7 +49,7 @@ class TestSingerBlocks:
         return _factory
 
     @pytest.fixture()
-    def mock_tap_plugin_invoker(self, process_mock_factory, tap):
+    def mock_tap_plugin_invoker(self, process_mock_factory, tap):  # noqa: ANN001, ANN201
         stdout_lines = (b"out1\n", b"out2\n", b"out3\n")
         stderr_lines = (b"err1\n", b"err2\n", b"err3\n")
 
@@ -73,7 +73,7 @@ class TestSingerBlocks:
         return invoker
 
     @pytest.fixture()
-    def mock_target_plugin_invoker(self, process_mock_factory, target):
+    def mock_target_plugin_invoker(self, process_mock_factory, target):  # noqa: ANN001, ANN201
         target_process = process_mock_factory(target)
         target_process.stdin = mock.MagicMock()
         target_process.stdin.wait_closed = AsyncMock(return_value=True)
@@ -87,10 +87,10 @@ class TestSingerBlocks:
     @pytest.mark.asyncio()
     async def test_singer_block_start(
         self,
-        elt_context,
-        mock_tap_plugin_invoker,
-        mock_target_plugin_invoker,
-    ):
+        elt_context,  # noqa: ANN001
+        mock_tap_plugin_invoker,  # noqa: ANN001
+        mock_target_plugin_invoker,  # noqa: ANN001
+    ) -> None:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -133,7 +133,11 @@ class TestSingerBlocks:
         )
 
     @pytest.mark.asyncio()
-    async def test_singer_block_stop(self, elt_context, mock_target_plugin_invoker):
+    async def test_singer_block_stop(
+        self,
+        elt_context,  # noqa: ANN001
+        mock_target_plugin_invoker,  # noqa: ANN001
+    ) -> None:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -159,7 +163,12 @@ class TestSingerBlocks:
         assert block.invoker.cleanup.called
 
     @pytest.mark.asyncio()
-    async def test_singer_block_io(self, elt_context, mock_tap_plugin_invoker, log):
+    async def test_singer_block_io(
+        self,
+        elt_context,  # noqa: ANN001
+        mock_tap_plugin_invoker,  # noqa: ANN001
+        log,  # noqa: ANN001
+    ) -> None:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -202,10 +211,10 @@ class TestSingerBlocks:
     @pytest.mark.asyncio()
     async def test_singer_block_close_stdin(
         self,
-        elt_context,
-        mock_tap_plugin_invoker,
-        mock_target_plugin_invoker,
-    ):
+        elt_context,  # noqa: ANN001
+        mock_tap_plugin_invoker,  # noqa: ANN001
+        mock_target_plugin_invoker,  # noqa: ANN001
+    ) -> None:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,

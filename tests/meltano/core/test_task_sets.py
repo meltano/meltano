@@ -6,7 +6,7 @@ from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_
 
 
 class TestTaskSets:
-    def test_squash(self):
+    def test_squash(self) -> None:
         tset = TaskSets(name="test", tasks=["tap target", "tap2 target2"])
         assert tset._as_args() == ["tap", "target", "tap2", "target2"]
 
@@ -25,7 +25,7 @@ class TestTaskSets:
             ["tap2", "target2"],
         ]
 
-    def test_tasks_from_yaml_str(self):
+    def test_tasks_from_yaml_str(self) -> None:
         cases = [
             ("generic", "tap target", TaskSets(name="generic", tasks=["tap target"])),
             (

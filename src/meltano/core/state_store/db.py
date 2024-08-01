@@ -19,7 +19,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
-    def __init__(self, session: Session, **kwargs):
+    def __init__(self, session: Session, **kwargs):  # noqa: ANN003
         """Initialize the DBStateStoreManager.
 
         Args:
@@ -60,7 +60,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id):
+    def get(self, state_id):  # noqa: ANN001, ANN201
         """Get the job state for the given state_id.
 
         Args:
@@ -73,7 +73,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
 
-    def clear(self, state_id):
+    def clear(self, state_id) -> None:  # noqa: ANN001
         """Clear state for the given state_id.
 
         Args:
@@ -85,7 +85,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
-    def get_state_ids(self, pattern: str | None = None):
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -106,7 +106,7 @@ class DBStateStoreManager(StateStoreManager):
             for record in self.session.execute(select(JobState.state_id)).all()
         )
 
-    def acquire_lock(self, state_id):
+    def acquire_lock(self, state_id) -> None:  # noqa: ANN001
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
@@ -116,7 +116,7 @@ class DBStateStoreManager(StateStoreManager):
             state_id: the state_id to lock
         """
 
-    def release_lock(self, state_id):
+    def release_lock(self, state_id) -> None:  # noqa: ANN001
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.

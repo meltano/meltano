@@ -20,10 +20,10 @@ if t.TYPE_CHECKING:
 
 class TestMeltanoInvoker:
     @pytest.fixture()
-    def subject(self, project):
+    def subject(self, project):  # noqa: ANN001, ANN201
         return MeltanoInvoker(project)
 
-    def test_invoke(self, subject: MeltanoInvoker):
+    def test_invoke(self, subject: MeltanoInvoker) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -32,7 +32,11 @@ class TestMeltanoInvoker:
         assert process.returncode == 0
         assert meltano.__version__ in str(process.stdout)
 
-    def test_env(self, subject: MeltanoInvoker, monkeypatch: pytest.MonkeyPatch):
+    def test_env(
+        self,
+        subject: MeltanoInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         # Process env vars are injected
         monkeypatch.setenv("ENV_VAR_KEY", "ENV_VAR_VALUE_1")
         assert subject._executable_env()["ENV_VAR_KEY"] == "ENV_VAR_VALUE_1"
@@ -47,7 +51,7 @@ class TestMeltanoInvoker:
             == environment_context.data["context_uuid"]
         )
 
-    def test_invoke_executable(self, subject: MeltanoInvoker, project: Project):
+    def test_invoke_executable(self, subject: MeltanoInvoker, project: Project) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",

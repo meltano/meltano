@@ -21,7 +21,7 @@ class TestPluginInstallService:
         params=({}, {"parallelism": -1}, {"parallelism": 2}),
         ids=("default", "-p=-1", "-p=2"),
     )
-    def subject(self, project: Project, request):
+    def subject(self, project: Project, request):  # noqa: ANN001, ANN201
         with open(project.meltanofile, "w") as file:
             file.write(
                 yaml.dump(
@@ -52,10 +52,10 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    def test_default_init_should_not_fail(self, subject):
+    def test_default_init_should_not_fail(self, subject) -> None:  # noqa: ANN001
         assert subject
 
-    def test_remove_duplicates(self, subject):
+    def test_remove_duplicates(self, subject) -> None:  # noqa: ANN001
         states, deduped_plugins = subject.remove_duplicates(
             plugins=subject.project.plugins.plugins(),
             reason=PluginInstallReason.INSTALL,
@@ -72,7 +72,7 @@ class TestPluginInstallService:
         ]
 
     @pytest.mark.slow()
-    async def test_install_all(self, subject):
+    async def test_install_all(self, subject) -> None:  # noqa: ANN001
         all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
 
@@ -91,7 +91,7 @@ class TestPluginInstallService:
         assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
-    def test_get_quoted_pip_install_args(self, project):
+    def test_get_quoted_pip_install_args(self, project) -> None:  # noqa: ANN001
         with open(project.meltanofile, "w") as file:
             file.write(
                 yaml.dump(
@@ -121,7 +121,7 @@ class TestPluginInstallService:
         self,
         project: Project,
         subject: PluginInstallService,
-    ):
+    ) -> None:
         plugin = next(project.plugins.plugins())
         state = await subject.install_plugin_async(
             plugin,

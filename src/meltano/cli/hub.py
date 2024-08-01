@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
     short_help="Interact with Meltano Hub.",
     environment_behavior=CliEnvironmentBehavior.environment_optional_use_default,
 )
-def hub():
+def hub() -> None:
     """
     Interact with Meltano Hub.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub
@@ -31,7 +31,7 @@ def hub():
     short_help="Ping Meltano Hub.",
 )
 @pass_project()
-def ping(project: Project):
+def ping(project: Project) -> None:
     """
     Ping Meltano Hub. This can be useful for checking if a custom Hub URL is reachable.
     Read more at https://docs.meltano.com/reference/command-line-interface#hub

@@ -21,7 +21,7 @@ T = t.TypeVar("T", bound="Canonical")  # (name too short)
 class IdHashBox:
     """Wrapper class that makes the hash of an object its Python ID."""
 
-    def __init__(self, content: t.Any):
+    def __init__(self, content: t.Any):  # noqa: ANN401
         """Initialize the `IdHashBox`.
 
         Parameters:
@@ -38,7 +38,7 @@ class IdHashBox:
         """
         return id(self.content)
 
-    def __eq__(self, other: t.Any) -> bool:
+    def __eq__(self, other: t.Any) -> bool:  # noqa: ANN401
         """Check equality of this instance and some other object.
 
         Parameters:
@@ -63,7 +63,7 @@ class Annotations(t.NamedTuple):
 class AnnotationsMeta(type):
     """Metaclass to intercept and store annotations before calling `__init__`."""
 
-    def __call__(cls, *args: t.Any, **kwargs: t.Any) -> t.Any:
+    def __call__(cls, *args: t.Any, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Create and return an instance of the class this metaclass is applied to.
 
         Args:
@@ -122,7 +122,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         self._defaults = {}
 
     @classmethod
-    def _canonize(cls, val: t.Any) -> t.Any:
+    def _canonize(cls, val: t.Any) -> t.Any:  # noqa: ANN401
         """Call `as_canonical` on `val`, respecting `Canonical` subclasses.
 
         Args:
@@ -138,8 +138,8 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
     @classmethod
     def as_canonical(
         cls: type[T],
-        target: t.Any,
-    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:
+        target: t.Any,  # noqa: ANN401
+    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
         """Return a canonical representation of the given instance.
 
         Args:
@@ -177,7 +177,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
         return copy.deepcopy(target)
 
-    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | t.Any:
+    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
         """Return a canonical representation of the current instance.
 
         Returns:
@@ -198,7 +198,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         return type(self)(*args, **{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: type[T], obj: t.Any) -> T:
+    def parse(cls: type[T], obj: t.Any) -> T:  # noqa: ANN401
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
         Args:
@@ -244,7 +244,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return self._dict
 
-    def is_attr_set(self, attr):
+    def is_attr_set(self, attr):  # noqa: ANN001, ANN201
         """Return whether specified attribute has a non-default/fallback value set.
 
         Args:
@@ -255,7 +255,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return self._dict.get(attr) is not None
 
-    def __getattr__(self, attr: str) -> t.Any:
+    def __getattr__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Return the value of the given attribute.
 
         Args:
@@ -289,7 +289,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
 
         return value
 
-    def __setattr__(self, attr: str, value: t.Any):
+    def __setattr__(self, attr: str, value: t.Any) -> None:  # noqa: ANN401
         """Set the given attribute to the given value.
 
         Args:
@@ -301,7 +301,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         else:
             self._dict[attr] = value
 
-    def __getitem__(self, attr: str) -> t.Any:
+    def __getitem__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Return the value of the given attribute.
 
         Args:
@@ -312,7 +312,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return getattr(self, attr)
 
-    def __setitem__(self, attr: str, value: t.Any) -> None:
+    def __setitem__(self, attr: str, value: t.Any) -> None:  # noqa: ANN401
         """Set the given attribute to the given value.
 
         Args:
@@ -324,7 +324,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return setattr(self, attr, value)
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Return an iterator over the attributes set on the current instance.
 
         Yields:
@@ -352,7 +352,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
             else:
                 yield (key, val)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of attributes set on the current instance.
 
         Returns:
@@ -360,7 +360,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         """
         return len(self._dict)
 
-    def __contains__(self, obj: t.Any):
+    def __contains__(self, obj: t.Any) -> bool:  # noqa: ANN401
         """Return whether the current instance contains the given object.
 
         Args:
@@ -388,7 +388,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
                 setattr(self, key, val)
 
     @classmethod
-    def yaml(cls, dumper: yaml.BaseDumper, obj: t.Any) -> yaml.MappingNode:
+    def yaml(cls, dumper: yaml.BaseDumper, obj: t.Any) -> yaml.MappingNode:  # noqa: ANN401
         """YAML serializer for Canonical objects.
 
         Args:
@@ -405,7 +405,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         )
 
     @classmethod
-    def to_yaml(cls, representer: Representer, obj: t.Any):
+    def to_yaml(cls, representer: Representer, obj: t.Any):  # noqa: ANN206, ANN401
         """YAML serializer for Canonical objects.
 
         Args:

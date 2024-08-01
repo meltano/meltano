@@ -11,20 +11,20 @@ from meltano.core.project_add_service import PluginAlreadyAddedException
 
 class TestCliRemove:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service):
+    def tap_gitlab(self, project_add_service):  # noqa: ANN001, ANN201
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    def test_remove(self, project, tap, cli_runner):
+    def test_remove(self, project, tap, cli_runner) -> None:  # noqa: ANN001
         with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
             result = cli_runner.invoke(cli, ["remove", tap.type, tap.name])
             assert_cli_runner(result)
 
             remove_plugins_mock.assert_called_once_with(project, [tap])
 
-    def test_remove_multiple(self, project, tap, tap_gitlab, cli_runner):
+    def test_remove_multiple(self, project, tap, tap_gitlab, cli_runner) -> None:  # noqa: ANN001
         with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
             result = cli_runner.invoke(
                 cli,
@@ -34,7 +34,7 @@ class TestCliRemove:
 
             remove_plugins_mock.assert_called_once_with(project, [tap, tap_gitlab])
 
-    def test_remove_type_name(self, project, tap, target, cli_runner):
+    def test_remove_type_name(self, project, tap, target, cli_runner) -> None:  # noqa: ANN001
         with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
             result = cli_runner.invoke(cli, ["remove", "extractor", tap.name])
             assert_cli_runner(result)

@@ -29,12 +29,12 @@ class TestJobFinder:
     )
     def test_all_stale(
         self,
-        state,
-        started_at_hours_ago,
-        last_heartbeat_at_minutes_ago,
-        is_stale,
-        session,
-    ):
+        state,  # noqa: ANN001
+        started_at_hours_ago,  # noqa: ANN001
+        last_heartbeat_at_minutes_ago,  # noqa: ANN001
+        is_stale,  # noqa: ANN001
+        session,  # noqa: ANN001
+    ) -> None:
         started_at = datetime.now(timezone.utc)
         if started_at_hours_ago:
             started_at -= timedelta(hours=started_at_hours_ago)
@@ -57,7 +57,7 @@ class TestJobFinder:
 
         assert bool(job in JobFinder.all_stale(session)) == is_stale
 
-    def test_stale(self, session):
+    def test_stale(self, session) -> None:  # noqa: ANN001
         job = Job(job_name="test")
         job.start()
         job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)

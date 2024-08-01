@@ -4,6 +4,6 @@ from meltano.core.block.parser import is_command_block
 
 
 class TestParserUtils:
-    def test_is_command_block(self, tap, dbt):
+    def test_is_command_block(self, tap, dbt) -> None:  # noqa: ANN001
         assert not is_command_block(tap)
         assert is_command_block(dbt)

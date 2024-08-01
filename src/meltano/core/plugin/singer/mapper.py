@@ -38,12 +38,12 @@ class SingerMapper(SingerPlugin):
         ),
     ]
 
-    def exec_args(self, plugin_invoker: PluginInvoker):
+    def exec_args(self, plugin_invoker: PluginInvoker):  # noqa: ANN201
         """Return the arguments to be passed to the plugin's executable."""
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return the configuration files required by the plugin."""
         return {"config": f"mapper.{self.instance_uuid}.config.json"}
 
@@ -51,8 +51,8 @@ class SingerMapper(SingerPlugin):
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ARG002
-    ):
+        session,  # noqa: ANN001, ARG002
+    ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
 

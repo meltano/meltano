@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 install, no_install, only_install = get_install_options(include_only_install=True)
 
 
-def selection_color(selection):
+def selection_color(selection) -> str | None:  # noqa: ANN001
     """Return the appropriate colour for given SelectionType."""
     if selection is SelectionType.SELECTED:
         return "bright_green"
@@ -34,7 +34,7 @@ def selection_color(selection):
     return None
 
 
-def selection_mark(selection):
+def selection_mark(selection) -> str:  # noqa: ANN001
     """
     Return the mark to indicate the selection type of an attribute.
 
@@ -90,7 +90,7 @@ async def select(
     attributes_filter: str,
     install_plugins: InstallPlugins,
     **flags: bool,
-):
+) -> None:
     """
     Manage extractor selection patterns.
 
@@ -119,14 +119,14 @@ async def select(
 
 
 def update(
-    project,
-    extractor,
-    entities_filter,
-    attributes_filter,
+    project,  # noqa: ANN001
+    extractor,  # noqa: ANN001
+    entities_filter,  # noqa: ANN001
+    attributes_filter,  # noqa: ANN001
     *,
-    exclude=False,
-    remove=False,
-):
+    exclude=False,  # noqa: ANN001
+    remove=False,  # noqa: ANN001
+) -> None:
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
     select_service.update(entities_filter, attributes_filter, exclude, remove=remove)
