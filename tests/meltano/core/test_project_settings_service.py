@@ -89,7 +89,7 @@ class TestProjectSettingsService:
 
     def test_feature_flag_allowed(self, subject):
         changed = []
-        subject.set([FEATURE_FLAG_PREFIX, "allowed"], True)
+        subject.set([FEATURE_FLAG_PREFIX, "allowed"], value=True)
 
         @subject.feature_flag("allowed")
         def should_run():
@@ -100,7 +100,7 @@ class TestProjectSettingsService:
 
     def test_feature_flag_disallowed(self, subject):
         changed = []
-        subject.set([FEATURE_FLAG_PREFIX, "disallowed"], False)
+        subject.set([FEATURE_FLAG_PREFIX, "disallowed"], value=False)
 
         @subject.feature_flag("disallowed")
         def should_not_run():
@@ -110,7 +110,9 @@ class TestProjectSettingsService:
             should_not_run()
 
     def test_strict_env_var_mode_on_raises_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], True)
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], value=True
+        )
         subject.set(
             "stacked_env_var",
             "${NONEXISTENT_ENV_VAR}@nonexistent",
@@ -119,7 +121,9 @@ class TestProjectSettingsService:
             subject.get("stacked_env_var")
 
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], value=False
+        )
         subject.set(
             "stacked_env_var",
             "${NONEXISTENT_ENV_VAR}@nonexistent_1",
@@ -180,7 +184,9 @@ class TestProjectSettingsService:
         self,
         subject: ProjectSettingsService,
     ):
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], value=False
+        )
         # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
         with pytest.warns(RuntimeWarning, match="Unknown setting 'port'"):
             subject.set("port", "${UNSET_PORT_ENV_VAR}")
@@ -203,7 +209,9 @@ class TestProjectSettingsService:
             setting_def=setting_def,
         )
 
-        subject.set([FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], False)
+        subject.set(
+            [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)], value=False
+        )
         assert subject.get(name) is None
 
         subject.env_override["DB_MAX_RETRIES_TEST"] = "7"

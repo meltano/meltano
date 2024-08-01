@@ -28,9 +28,9 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
             expected,
         )
 
-    check(("Yes", "TRUE", "1", "true", "y", "on", "t"), True)
-    check(("No", "FALSE", "0", "false", "n", "off", "f"), False)
-    check(("trew", "Fallse", "nah", "si", "okay", "01"), None)
+    check(("Yes", "TRUE", "1", "true", "y", "on", "t"), expected=True)
+    check(("No", "FALSE", "0", "false", "n", "off", "f"), expected=False)
+    check(("trew", "Fallse", "nah", "si", "okay", "01"), expected=None)
 
 
 def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch):

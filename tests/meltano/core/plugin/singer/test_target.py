@@ -91,7 +91,7 @@ class TestSingerTarget:
             .with_loader(subject.name)
             .with_job(job)
             .with_select_filter(["entity", "!other_entity"])
-            .with_full_refresh(True)
+            .with_full_refresh(full_refresh=True)
             .context()
         )
 

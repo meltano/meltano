@@ -38,9 +38,9 @@ class DummySettingsService(SettingsService):
         self.__meltano_yml_config = {}
         self._meltano_environment_config = {}
         self.__definitions = [
-            SettingDefinition("regular", aliases=["basic"], value="from_default"),
-            SettingDefinition("password", sensitive=True),
-            SettingDefinition("env_specific", env_specific=True),
+            SettingDefinition(name="regular", aliases=["basic"], value="from_default"),
+            SettingDefinition(name="password", sensitive=True),
+            SettingDefinition(name="env_specific", env_specific=True),
         ]
         self._inherited_settings = None
 

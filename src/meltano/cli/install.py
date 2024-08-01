@@ -64,6 +64,7 @@ logger = structlog.getLogger(__name__)
 async def install(
     project: Project,
     ctx: click.Context,
+    *,
     plugin_type: str,
     plugin_name: str,
     clean: bool,

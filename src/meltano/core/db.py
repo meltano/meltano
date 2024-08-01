@@ -60,6 +60,7 @@ class NullConnectionStringError(MeltanoError):
 
 def project_engine(
     project: Project,
+    *,
     default: bool = False,
 ) -> tuple[Engine, sessionmaker]:
     """Create and register a SQLAlchemy engine for a Meltano project instance.

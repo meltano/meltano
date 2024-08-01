@@ -54,7 +54,7 @@ class UpgradeService:
         self.project = project
         self.engine = engine
 
-    def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
+    def _upgrade_package(self, pip_url: str | None, *, force: bool) -> bool:
         fail_reason = None
         instructions = ""
 
@@ -95,7 +95,12 @@ class UpgradeService:
 
         return True
 
-    def upgrade_package(self, pip_url: str | None = None, force: bool = False) -> bool:
+    def upgrade_package(
+        self,
+        pip_url: str | None = None,
+        *,
+        force: bool = False,
+    ) -> bool:
         """Upgrade the Meltano package.
 
         Args:
@@ -108,7 +113,7 @@ class UpgradeService:
         click.secho("Upgrading `meltano` package...", fg="blue")
 
         try:
-            self._upgrade_package(pip_url, force)
+            self._upgrade_package(pip_url=pip_url, force=force)
         except AutomaticPackageUpgradeError as err:
             msg = click.style(
                 "The `meltano` package could not be upgraded automatically",
@@ -191,7 +196,7 @@ class UpgradeService:
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, skip_package: bool = False, **kwargs):
+    def upgrade(self, *, skip_package: bool = False, **kwargs):
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command

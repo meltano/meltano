@@ -48,7 +48,7 @@ class MutuallyExclusiveOptionsError(Exception):
 def _prompt_for_confirmation(prompt):
     """Wrap destructive CLI commands which should prompt the user for confirmation."""
 
-    def _prompt_callback(ctx: click.Context, param, value: bool):  # noqa: ARG001
+    def _prompt_callback(ctx: click.Context, param, value: bool):  # noqa: ARG001, FBT001
         if not value and not click.confirm(prompt):
             ctx.exit(1)
 

@@ -110,6 +110,7 @@ class UUIDParamType(click.ParamType):
 async def run(
     ctx: click.Context,
     project: Project,
+    *,
     dry_run: bool,
     full_refresh: bool,
     refresh_catalog: bool,
@@ -195,6 +196,7 @@ async def run(
 async def _run_blocks(
     tracker: Tracker,
     parsed_blocks: list[BlockSet | PluginCommandBlock],
+    *,
     dry_run: bool,
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):

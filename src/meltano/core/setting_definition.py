@@ -177,6 +177,7 @@ class SettingDefinition(NameEq, Canonical):
 
     def __init__(
         self,
+        *,
         name: str | None = None,
         aliases: list[str] | None = None,
         env: str | None = None,
@@ -317,6 +318,7 @@ class SettingDefinition(NameEq, Canonical):
         cls,
         key: str,
         value: t.Any,
+        *,
         custom: bool = True,
         default: t.Any | bool = False,
     ) -> SettingDefinition:
@@ -382,6 +384,7 @@ class SettingDefinition(NameEq, Canonical):
     def env_vars(
         self,
         prefixes: list[str],
+        *,
         include_custom: bool = True,
         for_writing: bool = False,
     ) -> list[EnvVar]:

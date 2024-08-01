@@ -89,6 +89,7 @@ class SettingsService(metaclass=ABCMeta):
     def __init__(
         self,
         project: Project,
+        *,
         show_hidden: bool = True,
         env_override: dict | None = None,
         config_override: dict | None = None,
@@ -301,6 +302,7 @@ class SettingsService(metaclass=ABCMeta):
     def get_with_metadata(
         self,
         name: str,
+        *,
         redacted: bool = False,
         source: SettingValueStore = SettingValueStore.AUTO,
         source_manager: SettingsStoreManager | None = None,
@@ -632,6 +634,7 @@ class SettingsService(metaclass=ABCMeta):
     def setting_env_vars(
         self,
         setting_def,
+        *,
         for_writing=False,  # noqa: ARG002
     ):
         """Get environment variables for the given setting definition.
@@ -669,6 +672,7 @@ class SettingsService(metaclass=ABCMeta):
     def feature_flag(
         self,
         feature: str,
+        *,
         raise_error: bool = True,
     ) -> t.Generator[bool, None, None]:
         """Gate code paths based on feature flags.

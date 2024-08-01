@@ -24,7 +24,7 @@ from meltano.core.project_init_service import (
         "empty directory",
     ),
 )
-def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
+def test_project_init_success(*, create_project_dir: bool, tmp_path: Path, pushd):
     projects_dir = tmp_path.joinpath("success")
     projects_dir.mkdir()
     pushd(projects_dir)

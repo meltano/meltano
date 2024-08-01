@@ -1121,18 +1121,23 @@ class TestMetadataExecutor:
     def test_visit(self, catalog):
         executor = MetadataExecutor(
             [
-                MetadataRule("UniqueEntitiesName", [], "replication-key", "created_at"),
+                MetadataRule(
+                    "UniqueEntitiesName",
+                    [],
+                    "replication-key",
+                    value="created_at",
+                ),
                 MetadataRule(
                     "UniqueEntitiesName",
                     ["properties", "created_at"],
                     "is-replication-key",
-                    True,
+                    value=True,
                 ),
                 MetadataRule(
                     "UniqueEntitiesName",
                     ["properties", "payload", "properties", "hash"],
                     "custom-metadata",
-                    "custom-value",
+                    value="custom-value",
                 ),
             ],
         )

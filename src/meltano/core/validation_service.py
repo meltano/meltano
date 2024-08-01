@@ -117,6 +117,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     def collect(
         cls: type[T],
         project: Project,
+        *,
         select_all: bool = True,
     ) -> dict[str, T]:
         """Collect all tests for CLI invocation.

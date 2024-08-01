@@ -85,6 +85,7 @@ class ELTContext:
 
     def __init__(
         self,
+        *,
         project: Project,
         job: Job | None = None,
         session=None,
@@ -307,7 +308,7 @@ class ELTContextBuilder:
         self._transformer = PluginRef(PluginType.TRANSFORMERS, transformer_name)
         return self
 
-    def with_only_transform(self, only_transform: bool) -> ELTContextBuilder:
+    def with_only_transform(self, *, only_transform: bool) -> ELTContextBuilder:
         """Include only transform flag when building context.
 
         Args:
@@ -319,7 +320,7 @@ class ELTContextBuilder:
         self._only_transform = only_transform
         return self
 
-    def with_dry_run(self, dry_run: bool) -> ELTContextBuilder:
+    def with_dry_run(self, *, dry_run: bool) -> ELTContextBuilder:
         """Include dry run flag when building context.
 
         Args:
@@ -331,7 +332,7 @@ class ELTContextBuilder:
         self._dry_run = dry_run
         return self
 
-    def with_full_refresh(self, full_refresh: bool) -> ELTContextBuilder:
+    def with_full_refresh(self, *, full_refresh: bool) -> ELTContextBuilder:
         """Include full refresh flag when building context.
 
         Args:
@@ -344,7 +345,7 @@ class ELTContextBuilder:
         self._full_refresh = full_refresh
         return self
 
-    def with_refresh_catalog(self, refresh_catalog: bool) -> ELTContextBuilder:
+    def with_refresh_catalog(self, *, refresh_catalog: bool) -> ELTContextBuilder:
         """Ignore cached catalog.
 
         Args:
@@ -356,7 +357,7 @@ class ELTContextBuilder:
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_merge_state(self, merge_state: bool):
+    def with_merge_state(self, *, merge_state: bool):
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -508,7 +509,7 @@ class ELTContextBuilder:
             )
 
         return ELTContext(
-            self.project,
+            project=self.project,
             job=self._job,
             session=self._session,
             extractor=extractor,

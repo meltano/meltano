@@ -163,6 +163,7 @@ class MockAdapter(BaseAdapter):
     def send(
         self,
         request: requests.PreparedRequest,
+        *,
         stream: bool = False,  # noqa: ARG002
         timeout: float  # noqa: ARG002
         | tuple[float, float]

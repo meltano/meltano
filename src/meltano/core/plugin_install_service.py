@@ -145,6 +145,7 @@ class PluginInstallService:
         self,
         project: Project,
         status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
+        *,
         parallelism: int | None = None,
         clean: bool = False,
         force: bool = False,
@@ -559,7 +560,7 @@ async def install_pip_plugin(
         ValueError: If the venv backend is not supported.
     """
     pip_install_args = get_pip_install_args(project, plugin, env=env)
-    backend = project.settings.get("venv.backend", "virtualenv")
+    backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":
         service = VenvService(

@@ -111,7 +111,7 @@ class Tracker:  # - too many (public) methods
         self.project = project
         self.send_anonymous_usage_stats = project.settings.get(
             "send_anonymous_usage_stats",
-            not project.settings.get("disable_tracking", False),
+            redacted=not project.settings.get("disable_tracking"),
         )
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
@@ -469,6 +469,7 @@ class Tracker:  # - too many (public) methods
     def _uuid_from_str(
         self,
         from_val: t.Any | None,
+        *,
         warn: bool,
     ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
