@@ -268,9 +268,6 @@ line-length = 88
 target-version = "py38"
 
 [tool.ruff.lint]
-exclude = [
-  "src/meltano/migrations/*",
-]
 ignore = [
   "ANN101", # Missing type annotation for `self` in method
   "ANN102", # Missing type annotation for `cls` in class method
@@ -332,6 +329,14 @@ unfixable = [
   "D1",
   "S101", # Allow 'assert' in tests
   "INP",  # Don't require __init__.py files in tests directories
+]
+"src/meltano/migrations/versions/*" = [
+    "D103",
+    "D415",
+    "INP001",
+    "TCH003",
+    "TID251",
+    "UP007",
 ]
 
 [tool.ruff.lint.flake8-annotations]
