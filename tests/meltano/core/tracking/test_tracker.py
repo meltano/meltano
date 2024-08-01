@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import subprocess
 import typing as t
 import uuid
@@ -22,6 +21,8 @@ from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
+    import pytest_structlog
+
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
 
@@ -422,8 +423,8 @@ class TestTracker:
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
-        caplog: pytest.LogCaptureFixture,
         monkeypatch: pytest.MonkeyPatch,
+        log: pytest_structlog.StructuredLogCapture,
     ):
         endpoints = """
             [
@@ -435,17 +436,16 @@ class TestTracker:
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
 
-        with caplog.at_level(logging.WARNING, logger="meltano.core.tracking.tracker"):
-            tracker = Tracker(project)
+        tracker = Tracker(project)
 
         try:
-            assert caplog.records[0].levelname == "WARNING"
-            assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+            assert log.events[0]["level"] == "warning"
+            assert log.events[0]["event"] == "invalid_snowplow_endpoint"
+            assert log.events[0]["endpoint"] == "notvalid:8080"
 
-            assert caplog.records[1].levelname == "WARNING"
-            assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+            assert log.events[1]["level"] == "warning"
+            assert log.events[1]["event"] == "invalid_snowplow_endpoint"
+            assert log.events[1]["endpoint"] == "file://bad.scheme"
 
             assert len(tracker.snowplow_tracker.emitters) == 2
 
