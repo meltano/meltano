@@ -42,7 +42,7 @@ class PluginLocationRemoveManager(ABC):
         self.plugin = plugin
         self.plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
         self.location = location
-        self.remove_status = None
+        self.remove_status: PluginLocationRemoveStatus | None = None
         self.remove_message = None
 
     @abstractmethod
