@@ -146,6 +146,7 @@ def get_label(metadata) -> str:
 def config(
     ctx,
     project: Project,
+    *,
     plugin_type: str,
     plugin_name: str,
     config_format: str,
@@ -241,7 +242,7 @@ def config(
 )
 @click.option("--extras", is_flag=True)
 @click.pass_context
-def list_settings(ctx: click.Context, extras: bool):
+def list_settings(ctx: click.Context, *, extras: bool):
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
     settings: ProjectSettingsService | PluginSettingsService = ctx.obj["settings"]
     session = ctx.obj["session"]
@@ -380,6 +381,7 @@ def reset(ctx, store):
 @_use_meltano_env
 def set_(
     ctx: click.core.Context,
+    *,
     setting_name: tuple[str, ...],
     value: t.Any,
     store: str,

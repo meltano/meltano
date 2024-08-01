@@ -36,7 +36,7 @@ path_type = click.Path(file_okay=False, path_type=Path)
     is_flag=True,
 )
 @database_uri_option
-def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
+def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool):
     """
     Create a new Meltano project.
 

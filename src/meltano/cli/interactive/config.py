@@ -68,7 +68,7 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 class InteractiveConfig:
     """Manage Config interactively."""
 
-    def __init__(self, ctx, store, extras=False, max_width=None):
+    def __init__(self, ctx, store, *, extras=False, max_width=None):
         """Initialise InteractiveConfig instance."""
         self.ctx = ctx
         self.store = store
@@ -272,7 +272,7 @@ class InteractiveConfig:
         )
         return options_index[chosen_index][1]
 
-    def configure(self, name, index=None, last_index=None, show_set_prompt=True):
+    def configure(self, name, index=None, last_index=None, *, show_set_prompt=True):
         """Configure a single setting interactively."""
         config_metadata = next(
             (
@@ -396,7 +396,7 @@ class InteractiveConfig:
                     show_set_prompt=False,
                 )
 
-    def set_value(self, setting_name, value, store, interactive=False):
+    def set_value(self, setting_name, value, store, *, interactive=False):
         """Set value helper function."""
         settings = self.settings
         path = list(setting_name)

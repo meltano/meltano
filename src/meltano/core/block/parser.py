@@ -71,6 +71,7 @@ class BlockParser:
         log: structlog.BoundLogger,
         project,
         blocks: list[str],
+        *,
         full_refresh: bool | None = False,
         refresh_catalog: bool | None = False,
         no_state_update: bool | None = False,
@@ -247,12 +248,12 @@ class BlockParser:
 
         builder = (
             ELBContextBuilder(self.project)
-            .with_force(self._force)
-            .with_full_refresh(self._full_refresh)
-            .with_refresh_catalog(self._refresh_catalog)
-            .with_no_state_update(self._no_state_update)
+            .with_force(force=self._force)
+            .with_full_refresh(full_refresh=self._full_refresh)
+            .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
+            .with_no_state_update(no_state_update=self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
-            .with_merge_state(self._merge_state)
+            .with_merge_state(merge_state=self._merge_state)
             .with_run_id(self._run_id)
         )
 

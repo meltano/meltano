@@ -80,6 +80,7 @@ class Project(Versioned):
         self,
         root: StrPath,
         environment: Environment | None = None,
+        *,
         readonly: bool = False,
     ):
         """Initialize a `Project` instance.
@@ -257,7 +258,7 @@ class Project(Versioned):
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Path | str | None = None, activate=True):
+    def find(cls, project_root: Path | str | None = None, *, activate=True):
         """Find a Project.
 
         Args:

@@ -97,7 +97,7 @@ class TestCli:
         cli_runner,
         pushd,
     ):
-        test_cli_project.settings.set("project_readonly", True)
+        test_cli_project.settings.set("project_readonly", value=True)
         assert Project._default is None
         pushd(test_cli_project.root)
         cli_runner.invoke(cli, ["hub", "ping"])
@@ -324,7 +324,7 @@ class TestCli:
         )
 
 
-def _get_dummy_logging_config(colors=True):
+def _get_dummy_logging_config(*, colors=True):
     return {
         "version": 1,
         "disable_existing_loggers": False,

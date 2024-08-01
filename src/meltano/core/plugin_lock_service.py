@@ -64,6 +64,7 @@ class PluginLock:
 
     def load(
         self,
+        *,
         create: bool = False,
         loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
     ) -> StandalonePlugin:

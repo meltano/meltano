@@ -664,6 +664,7 @@ class BasePlugin(HookObject):
 
     def env_prefixes(
         self,
+        *,
         for_writing=False,  # noqa: ARG002
     ) -> list[str]:
         """Return environment variable prefixes to use for settings.

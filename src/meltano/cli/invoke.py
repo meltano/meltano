@@ -84,6 +84,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 async def invoke(
     project: Project,
     ctx: click.Context,
+    *,
     plugin_type: str,
     dump: str,
     list_commands: bool,
@@ -135,12 +136,12 @@ async def invoke(
     invoker = invoker_factory(project, plugin)
     try:
         exit_code = await _invoke(
-            invoker,
-            plugin_args,
-            session,
-            dump,
-            command_name,
-            containers,
+            invoker=invoker,
+            plugin_args=plugin_args,
+            session=session,
+            dump=dump,
+            command_name=command_name,
+            containers=containers,
             print_var=print_var,
         )
     except Exception as invoke_err:
@@ -155,6 +156,7 @@ async def invoke(
 
 
 async def _invoke(
+    *,
     invoker: PluginInvoker,
     plugin_args: str,
     session: sessionmaker,

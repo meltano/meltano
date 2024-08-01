@@ -93,6 +93,7 @@ class CommandLineRunner(ValidationsRunner):
 @run_async
 async def test(
     project: Project,
+    *,
     all_tests: bool,
     install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...] = (),

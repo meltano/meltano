@@ -19,6 +19,7 @@ class EnvVarResolutionExpectation(t.NamedTuple):
 
 
 def _meltanofile_update_dict(
+    *,
     top_level_plugin_setting=True,
     top_level_plugin_config=False,
     top_level_env=False,
@@ -348,7 +349,7 @@ def test_environment_variable_inheritance_meltano_env_only(
 def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-        True,
+        value=True,
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())
@@ -373,7 +374,7 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project):
 def test_strict_env_var_mode_raises_partial_replace(cli_runner, project):
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-        True,
+        value=True,
     )
     with project.meltano_update() as meltanofile:
         meltanofile.update(_meltanofile_update_dict())

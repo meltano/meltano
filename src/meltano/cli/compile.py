@@ -55,6 +55,7 @@ if t.TYPE_CHECKING:
 def compile_command(
     project: Project,
     ctx: click.Context,
+    *,
     directory: Path,
     lint: bool,
     indent: int,

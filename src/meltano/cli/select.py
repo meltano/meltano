@@ -123,18 +123,20 @@ def update(
     extractor,
     entities_filter,
     attributes_filter,
+    *,
     exclude=False,
     remove=False,
 ):
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)
-    select_service.update(entities_filter, attributes_filter, exclude, remove)
+    select_service.update(entities_filter, attributes_filter, exclude, remove=remove)
 
 
 async def show(
     project: Project,
     extractor: str,
     install_plugins: InstallPlugins,
+    *,
     show_all: bool = False,
     refresh: bool = False,
 ) -> None:
@@ -149,7 +151,7 @@ async def show(
     )
 
     with closing(Session()) as session:
-        list_all = await select_service.list_all(session, refresh)
+        list_all = await select_service.list_all(session, refresh=refresh)
 
     # legend
     click.secho("Legend:")

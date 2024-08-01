@@ -134,6 +134,7 @@ class ELOptions:
 async def el(  # WPS408
     project: Project,
     ctx: click.Context,
+    *,
     extractor: str,
     loader: str,
     dry: bool,
@@ -160,23 +161,23 @@ async def el(  # WPS408
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
     """
     await _run_el_command(
-        project,
-        ctx,
-        extractor,
-        loader,
-        None,
-        dry,
-        full_refresh,
-        refresh_catalog,
-        select,
-        exclude,
-        catalog,
-        state,
-        dump,
-        state_id,
-        force,
-        merge_state,
-        install_plugins,
+        project=project,
+        ctx=ctx,
+        extractor=extractor,
+        loader=loader,
+        transform=None,
+        dry=dry,
+        full_refresh=full_refresh,
+        refresh_catalog=refresh_catalog,
+        select=select,
+        exclude=exclude,
+        catalog=catalog,
+        state=state,
+        dump=dump,
+        state_id=state_id,
+        force=force,
+        merge_state=merge_state,
+        install_plugins=install_plugins,
     )
 
 
@@ -208,6 +209,7 @@ async def el(  # WPS408
 async def elt(  # WPS408
     project: Project,
     ctx: click.Context,
+    *,
     extractor: str,
     loader: str,
     transform: str,
@@ -236,29 +238,30 @@ async def elt(  # WPS408
     """
     logger.warning("The `elt` command is deprecated in favor of `el`")
     await _run_el_command(
-        project,
-        ctx,
-        extractor,
-        loader,
-        transform,
-        dry,
-        full_refresh,
-        refresh_catalog,
-        select,
-        exclude,
-        catalog,
-        state,
-        dump,
-        state_id,
-        force,
-        merge_state,
-        install_plugins,
+        project=project,
+        ctx=ctx,
+        extractor=extractor,
+        loader=loader,
+        transform=transform,
+        dry=dry,
+        full_refresh=full_refresh,
+        refresh_catalog=refresh_catalog,
+        select=select,
+        exclude=exclude,
+        catalog=catalog,
+        state=state,
+        dump=dump,
+        state_id=state_id,
+        force=force,
+        merge_state=merge_state,
+        install_plugins=install_plugins,
     )
 
 
 async def _run_el_command(
     project: Project,
     ctx: click.Context,
+    *,
     extractor: str,
     loader: str,
     transform: str | None,
@@ -346,6 +349,7 @@ def _elt_context_builder(
     extractor,
     loader,
     transform,
+    *,
     dry_run=False,
     full_refresh=False,
     refresh_catalog=False,
@@ -366,14 +370,14 @@ def _elt_context_builder(
         .with_extractor(extractor)
         .with_loader(loader)
         .with_transform(transform_name or transform)
-        .with_dry_run(dry_run)
-        .with_only_transform(transform == "only")
-        .with_full_refresh(full_refresh)
-        .with_refresh_catalog(refresh_catalog)
+        .with_dry_run(dry_run=dry_run)
+        .with_only_transform(only_transform=(transform == "only"))
+        .with_full_refresh(full_refresh=full_refresh)
+        .with_refresh_catalog(refresh_catalog=refresh_catalog)
         .with_select_filter(select_filter)
         .with_catalog(catalog)
         .with_state(state)
-        .with_merge_state(merge_state)
+        .with_merge_state(merge_state=merge_state)
     )
 
 
@@ -402,6 +406,7 @@ async def _run_job(
     session,
     context_builder,
     install_plugins: InstallPlugins,
+    *,
     force=False,
 ):
     fail_stale_jobs(session, job.job_name)

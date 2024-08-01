@@ -78,6 +78,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 @click.pass_context
 def cli(
     ctx: click.Context,
+    *,
     log_level: str,
     log_config: str,
     environment: str,

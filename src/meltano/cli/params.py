@@ -123,7 +123,7 @@ class pass_project:  # noqa: N801
 
     __name__ = "project"
 
-    def __init__(self, migrate=False):
+    def __init__(self, *, migrate=False):
         """Instantiate decorator.
 
         args:

@@ -231,6 +231,7 @@ class SettingsStoreManager(ABC):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Abstract get method.
@@ -317,6 +318,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        *,
         cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
@@ -349,6 +351,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
         self,
         name: str,  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the .env file.
@@ -634,6 +637,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
@@ -918,6 +922,7 @@ class DbStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
+        *,
         cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get value by name from the system database.
@@ -1074,6 +1079,7 @@ class InheritedStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
@@ -1152,6 +1158,7 @@ class DefaultStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,  # noqa: ARG002
     ) -> tuple[str, dict]:
         """Get a Setting value by name and SettingDefinition.
@@ -1319,6 +1326,7 @@ class AutoStoreManager(SettingsStoreManager):
         self,
         name: str,
         setting_def: SettingDefinition | None = None,
+        *,
         cast_value: bool = False,
         **kwargs,
     ) -> tuple[str, dict]:

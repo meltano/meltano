@@ -22,7 +22,7 @@ class hook:  # noqa: N801
     accordingly.
     """
 
-    def __init__(self, hook_name, can_fail=False):
+    def __init__(self, hook_name, *, can_fail=False):
         self.name = hook_name
         self.can_fail = can_fail
 

@@ -75,7 +75,7 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture()
-def environment(project: Project) -> Environment:
+def environment(project: Project) -> t.Generator[Environment, None, None]:
     project.activate_environment("dev")
     try:
         yield project.environment
@@ -310,7 +310,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.usefixtures("tap")
     def test_as_env(self, subject, session, env_var):
-        subject.set("boolean", True, store=SettingValueStore.DOTENV)
+        subject.set("boolean", value=True, store=SettingValueStore.DOTENV)
         subject.set("list", [1, 2, 3, "4"], store=SettingValueStore.DOTENV)
         subject.set("object", {"1": {"2": 3}}, store=SettingValueStore.DOTENV)
 
@@ -515,7 +515,7 @@ class TestPluginSettingsService:
         assert subject.get_with_source("boolean") == (False, SettingValueStore.DOTENV)
         dotenv.unset_key(project.dotenv, "TAP_MOCK_BOOLEAN")
 
-        subject.set("boolean", True, store=store)
+        subject.set("boolean", value=True, store=store)
 
         dotenv_contents = dotenv.dotenv_values(project.dotenv)
         assert dotenv_contents["TAP_MOCK_BOOLEAN"] == "true"
@@ -675,7 +675,7 @@ class TestPluginSettingsService:
     @pytest.mark.usefixtures("tap")
     def test_custom_setting(self, session, subject, env_var):
         subject.set("custom_string", "from_yml", store=SettingValueStore.MELTANO_YML)
-        subject.set("custom_bool", True, store=SettingValueStore.MELTANO_YML)
+        subject.set("custom_bool", value=True, store=SettingValueStore.MELTANO_YML)
         subject.set("custom_array", [1, 2, 3, "4"], store=SettingValueStore.MELTANO_YML)
 
         assert subject.get_with_source("custom_string", session=session) == (
@@ -998,7 +998,7 @@ class TestPluginSettingsService:
     def test_strict_env_var_mode_on_raises_error(self, subject):
         subject.project_settings_service.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-            True,
+            value=True,
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         with pytest.raises(EnvironmentVariableNotSetError):
@@ -1008,7 +1008,7 @@ class TestPluginSettingsService:
     def test_strict_env_var_mode_off_no_raise_error(self, subject):
         subject.project_settings_service.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
-            False,
+            value=False,
         )
         subject.set("stacked_env_var", "${NONEXISTENT_ENV_VAR}")
         assert subject.get("stacked_env_var") is None

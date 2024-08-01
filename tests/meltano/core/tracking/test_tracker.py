@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import subprocess
 import typing as t
 import uuid
@@ -22,6 +21,8 @@ from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
+    import pytest_structlog
+
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
 
@@ -43,7 +44,7 @@ def check_analytics_json(project: Project) -> None:
 
 
 @contextmanager
-def delete_analytics_json(project: Project) -> None:
+def delete_analytics_json(project: Project) -> t.Generator[None, None, None]:
     (project.meltano_dir() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
@@ -135,11 +136,11 @@ class TestTracker:
     def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
         method_name = "track_telemetry_state_change_event"
 
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", value=True)
         project.settings.set("project_id", str(uuid.uuid4()))
         Tracker(project).save_telemetry_settings()
 
-        project.settings.set("send_anonymous_usage_stats", False)
+        project.settings.set("send_anonymous_usage_stats", value=False)
         with mock.patch.object(Tracker, method_name) as mocked:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 1
@@ -152,7 +153,7 @@ class TestTracker:
     def test_no_state_change_event_without_analytics_json(self, project: Project):
         method_name = "track_telemetry_state_change_event"
 
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", value=True)
         project.settings.set("project_id", str(uuid.uuid4()))
         Tracker(project).save_telemetry_settings()
 
@@ -248,6 +249,7 @@ class TestTracker:
     def test_can_track(
         self,
         project: Project,
+        *,
         snowplow_endpoints: list[str],
         send_stats: bool,
         expected: bool,
@@ -261,20 +263,21 @@ class TestTracker:
         assert Tracker(project).send_anonymous_usage_stats is True
 
         # Ensure the env var takes priority
-        project.settings.set("send_anonymous_usage_stats", False)
+        project.settings.set("send_anonymous_usage_stats", value=False)
         assert Tracker(project).send_anonymous_usage_stats is True
 
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "False")
         assert Tracker(project).send_anonymous_usage_stats is False
 
         # Ensure the env var takes priority
-        project.settings.set("send_anonymous_usage_stats", True)
+        project.settings.set("send_anonymous_usage_stats", value=True)
         assert Tracker(project).send_anonymous_usage_stats is False
 
     @pytest.mark.parametrize("setting_value", (False, True))
     def test_send_anonymous_usage_stats_no_env(
         self,
         project: Project,
+        *,
         setting_value: bool,
     ):
         project.settings.set("send_anonymous_usage_stats", setting_value)
@@ -302,6 +305,7 @@ class TestTracker:
     def test_context_with_telemetry_state_change_event(
         self,
         project: Project,
+        *,
         send_anonymous_usage_stats: bool,
     ):
         tracker = Tracker(project)
@@ -332,15 +336,15 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "send_anonymous_usage_stats",
-            True,
-            False,
+            from_value=True,
+            to_value=False,
         )
         assert passed
 
         tracker.track_telemetry_state_change_event(
             "send_anonymous_usage_stats",
-            False,
-            True,
+            from_value=False,
+            to_value=True,
         )
         assert passed
 
@@ -422,8 +426,8 @@ class TestTracker:
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
         project: Project,
-        caplog: pytest.LogCaptureFixture,
         monkeypatch: pytest.MonkeyPatch,
+        log: pytest_structlog.StructuredLogCapture,
     ):
         endpoints = """
             [
@@ -435,17 +439,16 @@ class TestTracker:
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
 
-        with caplog.at_level(logging.WARNING, logger="meltano.core.tracking.tracker"):
-            tracker = Tracker(project)
+        tracker = Tracker(project)
 
         try:
-            assert caplog.records[0].levelname == "WARNING"
-            assert caplog.records[0].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[0].msg["endpoint"] == "notvalid:8080"
+            assert log.events[0]["level"] == "warning"
+            assert log.events[0]["event"] == "invalid_snowplow_endpoint"
+            assert log.events[0]["endpoint"] == "notvalid:8080"
 
-            assert caplog.records[1].levelname == "WARNING"
-            assert caplog.records[1].msg["event"] == "invalid_snowplow_endpoint"
-            assert caplog.records[1].msg["endpoint"] == "file://bad.scheme"
+            assert log.events[1]["level"] == "warning"
+            assert log.events[1]["event"] == "invalid_snowplow_endpoint"
+            assert log.events[1]["endpoint"] == "file://bad.scheme"
 
             assert len(tracker.snowplow_tracker.emitters) == 2
 

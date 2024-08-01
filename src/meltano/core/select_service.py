@@ -39,7 +39,7 @@ class SelectService:
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
-    async def load_catalog(self, session, refresh=False):
+    async def load_catalog(self, session, *, refresh=False):
         """Load the catalog."""
         invoker = invoker_factory(self.project, self.extractor)
 
@@ -51,10 +51,10 @@ class SelectService:
 
         return json.loads(catalog_json)
 
-    async def list_all(self, session, refresh=False) -> ListSelectedExecutor:
+    async def list_all(self, session, *, refresh=False) -> ListSelectedExecutor:
         """List all select."""
         try:
-            catalog = await self.load_catalog(session, refresh)
+            catalog = await self.load_catalog(session, refresh=refresh)
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 "Could not find catalog. Verify that the tap supports discovery "  # noqa: EM101
@@ -67,7 +67,7 @@ class SelectService:
 
         return list_all
 
-    def update(self, entities_filter, attributes_filter, exclude, remove=False):
+    def update(self, entities_filter, attributes_filter, exclude, *, remove=False):
         """Update plugins' select patterns."""
         plugin: PluginRef
 

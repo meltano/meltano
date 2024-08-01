@@ -73,6 +73,7 @@ class CliError(Exception):
 def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
+    *,
     update: bool = False,
 ) -> None:
     """Print added plugin."""
@@ -394,6 +395,7 @@ def add_plugin(
 def add_required_plugins(
     plugins: list[ProjectPlugin],
     add_service: ProjectAddService,
+    *,
     lock: bool = True,
 ):
     """Add any Plugins required by the given Plugin."""
@@ -545,6 +547,7 @@ def check_dependencies_met(
 def activate_environment(
     ctx: click.Context,
     project: Project,
+    *,
     required: bool = False,
 ) -> None:
     """Activate the selected environment.

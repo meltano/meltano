@@ -276,7 +276,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         """
         return list(self.all_commands.keys())
 
-    def env_prefixes(self, for_writing=False) -> list[str]:
+    def env_prefixes(self, *, for_writing=False) -> list[str]:
         """Return environment variable prefixes.
 
         Args:
