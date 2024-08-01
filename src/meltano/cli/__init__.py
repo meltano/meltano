@@ -128,7 +128,13 @@ def main() -> None:
         if ex is None:
             exit_code = 0
         elif isinstance(ex, SystemExit):
-            exit_code = 0 if ex.code is None else ex.code
+            if ex.code is None:
+                exit_code = 0
+            else:
+                try:
+                    exit_code = int(ex.code)
+                except ValueError:
+                    exit_code = 1
         else:
             exit_code = 1
         # Track the exit event now to provide more details via the exception context.

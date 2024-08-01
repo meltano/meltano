@@ -35,7 +35,7 @@ class OutputLogger:
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
-        self.outs = {}
+        self.outs = {}  # type: ignore[var-annotated]
 
     def out(
         self,

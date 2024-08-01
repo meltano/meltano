@@ -106,7 +106,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         if not self.tests_selection:
             return {}
 
-        results = {}
+        results = {}  # type: ignore[var-annotated]
         async with self.invoker.prepared(session):
             for name, selected in self.tests_selection.items():
                 if selected:
