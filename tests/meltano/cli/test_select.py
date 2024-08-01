@@ -16,7 +16,7 @@ from meltano.core.select_service import SelectService
 
 class TestCliSelect:
     @pytest.mark.usefixtures("project")
-    def test_update_select_pattern(self, cli_runner, tap) -> None:  # noqa: ANN001
+    def test_update_select_pattern(self, cli_runner, tap) -> None:
         # add select pattern
         result = cli_runner.invoke(
             cli,
@@ -43,11 +43,11 @@ class TestCliSelect:
     @pytest.mark.usefixtures("project")
     def test_select_list(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
+        cli_runner,
+        tap,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
-        async def mock_list_all(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202, ARG001
+        async def mock_list_all(*args, **kwargs):  # noqa: ARG001
             result = ListSelectedExecutor()
             result.streams = {
                 SelectedNode(key="users", selection=SelectionType.SELECTED),

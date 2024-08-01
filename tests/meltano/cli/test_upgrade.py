@@ -74,7 +74,7 @@ class TestCliUpgrade:
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files(self, project, cli_runner: CliRunner) -> None:  # noqa: ANN001
+    def test_upgrade_files(self, project, cli_runner: CliRunner) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -170,7 +170,7 @@ class TestCliUpgrade:
         assert "Updated orchestrate/dags/meltano.py" in output
 
     @pytest.mark.usefixtures("session")
-    def test_upgrade_files_glob_path(self, project, cli_runner: CliRunner) -> None:  # noqa: ANN001
+    def test_upgrade_files_glob_path(self, project, cli_runner: CliRunner) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -214,7 +214,7 @@ class TestCliUpgrade:
 
     @mock_aws
     @pytest.mark.usefixtures("project")
-    def test_upgrade_state(self, cli_runner, monkeypatch) -> None:  # noqa: ANN001
+    def test_upgrade_state(self, cli_runner, monkeypatch) -> None:
         state_ids = [f"dev:tap-{i}-to-target-{i}" for i in range(10)]
         conn = boto3.resource("s3", region_name="us-east-1")
         bucket = conn.create_bucket(Bucket="test-state-bucket")

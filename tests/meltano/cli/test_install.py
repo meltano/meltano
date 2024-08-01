@@ -14,14 +14,14 @@ from meltano.core.project_add_service import PluginAlreadyAddedException
 
 class TestCliInstall:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service):  # noqa: ANN001, ANN201
+    def tap_gitlab(self, project_add_service):
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
     @pytest.mark.order(0)
-    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner) -> None:  # noqa: ANN001
+    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -53,12 +53,12 @@ class TestCliInstall:
     @pytest.mark.usefixtures("dbt")
     def test_install_type(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        tap_gitlab,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        mapper,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
@@ -108,11 +108,11 @@ class TestCliInstall:
     @pytest.mark.usefixtures("tap_gitlab", "dbt")
     def test_install_type_name(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        project,
+        tap,
+        target,
+        mapper,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
@@ -160,7 +160,7 @@ class TestCliInstall:
             assert mappings_seen == 2
 
     @pytest.mark.usefixtures("target", "dbt")
-    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner) -> None:  # noqa: ANN001
+    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -181,11 +181,11 @@ class TestCliInstall:
     @pytest.mark.usefixtures("dbt")
     def test_install_multiple_any_type(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        dbt,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        project,
+        tap,
+        target,
+        dbt,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -206,13 +206,13 @@ class TestCliInstall:
 
     def test_install_parallel(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        tap_gitlab,  # noqa: ANN001
-        target,  # noqa: ANN001
-        dbt,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -242,13 +242,13 @@ class TestCliInstall:
 
     def test_clean_install(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        tap_gitlab,  # noqa: ANN001
-        target,  # noqa: ANN001
-        dbt,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        project,
+        tap,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -279,15 +279,15 @@ class TestCliInstall:
     @pytest.mark.usefixtures("tap_gitlab", "target")
     def test_install_schedule(
         self,
-        project,  # noqa: ANN001
-        tap_gitlab,  # noqa: ANN001
-        target,  # noqa: ANN001
-        dbt,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
-        schedule_service,  # noqa: ANN001
-        job_schedule,  # noqa: ANN001
-        task_sets_service,  # noqa: ANN001
+        project,
+        tap_gitlab,
+        target,
+        dbt,
+        mapper,
+        cli_runner,
+        schedule_service,
+        job_schedule,
+        task_sets_service,
     ) -> None:
         with mock.patch(
             "meltano.cli.install.ScheduleService",
@@ -324,13 +324,13 @@ class TestCliInstall:
 
     def test_install_schedule_elt(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
-        schedule_service,  # noqa: ANN001
-        elt_schedule,  # noqa: ANN001
-        task_sets_service,  # noqa: ANN001
+        project,
+        tap,
+        target,
+        cli_runner,
+        schedule_service,
+        elt_schedule,
+        task_sets_service,
     ) -> None:
         with mock.patch(
             "meltano.cli.install.ScheduleService",
@@ -367,7 +367,7 @@ class TestCliInstall:
 # For more details
 @pytest.mark.order(-1)
 @pytest.mark.usefixtures("un_engine_uri", "project_function")
-def test_new_folder_should_autocreate_on_install(cli_runner) -> None:  # noqa: ANN001
+def test_new_folder_should_autocreate_on_install(cli_runner) -> None:
     """Be sure .meltano auto creates a db on install by default.
 
     We had a case https://github.com/meltano/meltano/issues/6383

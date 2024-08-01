@@ -14,13 +14,13 @@ from meltano.core.project import PROJECT_ROOT_ENV, Project
 
 
 @pytest.fixture()
-def deactivate_project(project):  # noqa: ANN001, ANN201
+def deactivate_project(project):
     Project.deactivate()
     yield
     Project.activate(project)
 
 
-def update(payload) -> None:  # noqa: ANN001
+def update(payload) -> None:
     project = Project.find()
 
     with project.meltano_update() as meltano:
@@ -39,7 +39,7 @@ class IndefiniteThread(threading.Thread):
     def stop(self) -> None:
         self._stop_event.set()
 
-    def run(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def run(self, *args, **kwargs) -> None:
         while not self._stop_event.is_set():
             self.do(*args, **kwargs)
 
@@ -47,7 +47,7 @@ class IndefiniteThread(threading.Thread):
 class ProjectReader(IndefiniteThread):
     """Project using a never ending thread."""
 
-    def __init__(self, project) -> None:  # noqa: ANN001
+    def __init__(self, project) -> None:
         """Set the project."""
         self.project = project
         super().__init__()
@@ -59,7 +59,7 @@ class ProjectReader(IndefiniteThread):
 
 class TestProject:
     @pytest.mark.usefixtures("deactivate_project")
-    def test_find(self, project, tmp_path, monkeypatch) -> None:  # noqa: ANN001
+    def test_find(self, project, tmp_path, monkeypatch) -> None:
         # defaults to the cwd
         found = Project.find(activate=False)
         assert found == project
@@ -86,7 +86,7 @@ class TestProject:
         with pytest.raises(ProjectNotFound):
             Project.find(tmp_path)
 
-    def test_activate(self, project) -> None:  # noqa: ANN001
+    def test_activate(self, project) -> None:
         Project.deactivate()
         assert Project._default is None
 
@@ -95,13 +95,13 @@ class TestProject:
         assert Project._default is project
         assert Project.find() is project
 
-    def test_find_threadsafe(self, project, concurrency) -> None:  # noqa: ANN001
+    def test_find_threadsafe(self, project, concurrency) -> None:
         workers = ThreadPool(concurrency["threads"])
         projects = workers.map(Project.find, range(concurrency["cases"]))
         assert all(x is project for x in projects)
 
     @pytest.mark.concurrent()
-    def test_meltano_concurrency(self, project, concurrency) -> None:  # noqa: ANN001
+    def test_meltano_concurrency(self, project, concurrency) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -139,7 +139,7 @@ class TestProject:
 
 class TestIncompatibleProject:
     @pytest.fixture()
-    def increase_version(self, project):  # noqa: ANN001, ANN201
+    def increase_version(self, project):
         with project.meltano_update() as meltano:
             meltano["version"] += 1
         yield
@@ -147,6 +147,6 @@ class TestIncompatibleProject:
             meltano["version"] -= 1
 
     @pytest.mark.usefixtures("increase_version")
-    def test_incompatible(self, project) -> None:  # noqa: ANN001
+    def test_incompatible(self, project) -> None:
         with pytest.raises(IncompatibleVersionError):
             Project.activate(project)

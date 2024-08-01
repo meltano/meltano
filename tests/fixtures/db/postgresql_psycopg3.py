@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
 
 
-def recreate_database(engine, db_name) -> None:  # noqa: ANN001
+def recreate_database(engine, db_name) -> None:
     """Drop & Create a new database, PostgreSQL only."""
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError), engine.begin() as conn:
         conn.execute(text(f"DROP DATABASE {db_name}"))

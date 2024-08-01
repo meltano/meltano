@@ -183,7 +183,7 @@ def test_flatten() -> None:
         ),
     ),
 )
-def test_expand_env_vars(input_value, env, kwargs, expected_output) -> None:  # noqa: ANN001
+def test_expand_env_vars(input_value, env, kwargs, expected_output) -> None:
     assert expand_env_vars(input_value, env, **kwargs) == expected_output
 
 
@@ -265,7 +265,7 @@ def test_expand_env_vars_nested() -> None:
         ),
     ),
 )
-def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None:  # noqa: ANN001
+def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None:
     assert expand_env_vars(input_array, env) == expected_output
 
 
@@ -275,16 +275,16 @@ def test_remove_suffix() -> None:
     assert remove_suffix("a_string", "gni") == "a_string"
 
 
-def test_makedirs_decorator(tmp_path) -> None:  # noqa: ANN001
-    def root(*paths):  # noqa: ANN002, ANN202
+def test_makedirs_decorator(tmp_path) -> None:
+    def root(*paths):
         return tmp_path.joinpath(*paths)
 
     @makedirs
-    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ANN002, ANN202, ARG001
+    def hierarchy(*ranks, make_dirs: bool = True):  # noqa: ARG001
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, *, make_dirs: bool = True):  # noqa: ANN001, ANN202
+    def species(genus_name, species_name, *, make_dirs: bool = True):
         return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")

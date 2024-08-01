@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
 
 
 @pytest.fixture()
-def plugin():  # noqa: ANN201
+def plugin():
     plugin_definition = PluginDefinition(
         PluginType.EXTRACTORS,
         name="tap-locked",
@@ -61,7 +61,7 @@ def plugin():  # noqa: ANN201
 
 class TestPluginLock:
     @pytest.fixture()
-    def subject(self, project: Project, plugin: ProjectPlugin):  # noqa: ANN201
+    def subject(self, project: Project, plugin: ProjectPlugin):
         return PluginLock(project, plugin)
 
     def test_path(self, subject: PluginLock) -> None:
@@ -87,7 +87,7 @@ class TestPluginLock:
 
 class TestPluginLockService:
     @pytest.fixture()
-    def subject(self, project: Project):  # noqa: ANN201
+    def subject(self, project: Project):
         return PluginLockService(project)
 
     def test_save(

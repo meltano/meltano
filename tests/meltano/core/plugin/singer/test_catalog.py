@@ -685,7 +685,7 @@ CATALOG_PROPERTIES = {
 
 
 @pytest.fixture()
-def select_all_executor():  # noqa: ANN201
+def select_all_executor():
     return SelectExecutor(["*.*"])
 
 
@@ -702,7 +702,7 @@ def select_all_executor():  # noqa: ANN201
         ),
     ),
 )
-def test_path_property(path, prop) -> None:  # noqa: ANN001
+def test_path_property(path, prop) -> None:
     assert path_property(path) == prop
 
 
@@ -830,15 +830,15 @@ class TestCatalogRule:
 
 class TestLegacyCatalogSelectVisitor:
     @pytest.fixture()
-    def catalog(self):  # noqa: ANN201
+    def catalog(self):
         return json.loads(LEGACY_CATALOG)
 
     @classmethod
-    def stream_is_selected(cls, stream):  # noqa: ANN001, ANN206
+    def stream_is_selected(cls, stream):
         return stream.get("selected", False)
 
     @classmethod
-    def metadata_is_selected(cls, metadata):  # noqa: ANN001, ANN206
+    def metadata_is_selected(cls, metadata):
         inclusion = metadata.get("inclusion")
         if inclusion == "automatic":
             return True
@@ -846,7 +846,7 @@ class TestLegacyCatalogSelectVisitor:
         return metadata.get("selected", False)
 
     @classmethod
-    def assert_catalog_is_selected(cls, catalog) -> None:  # noqa: ANN001
+    def assert_catalog_is_selected(cls, catalog) -> None:
         streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
 
         # all streams are selected
@@ -871,7 +871,7 @@ class TestLegacyCatalogSelectVisitor:
                     field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
-    def test_visit(self, catalog, select_all_executor) -> None:  # noqa: ANN001
+    def test_visit(self, catalog, select_all_executor) -> None:
         visit(catalog, select_all_executor)
 
         self.assert_catalog_is_selected(catalog)
@@ -879,11 +879,11 @@ class TestLegacyCatalogSelectVisitor:
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture()
-    def catalog(self, request):  # noqa: ANN001, ANN201
+    def catalog(self, request):
         return json.loads(globals()[request.param])
 
     @classmethod
-    def stream_is_selected(cls, stream):  # noqa: ANN001, ANN206
+    def stream_is_selected(cls, stream):
         try:
             stream_metadata = next(
                 metadata
@@ -900,7 +900,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog, select_all_executor) -> None:  # noqa: ANN001
+    def test_visit(self, catalog, select_all_executor) -> None:
         super().test_visit(catalog, select_all_executor)
 
     @pytest.mark.parametrize(
@@ -908,7 +908,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_select_all(self, catalog, select_all_executor) -> None:  # noqa: ANN001
+    def test_select_all(self, catalog, select_all_executor) -> None:
         visit(catalog, select_all_executor)
         self.assert_catalog_is_selected(catalog)
 
@@ -942,7 +942,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select(self, catalog, attrs) -> None:  # noqa: ANN001
+    def test_select(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "UniqueEntitiesName.code",
@@ -975,7 +975,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_escaped(self, catalog, attrs) -> None:  # noqa: ANN001
+    def test_select_escaped(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "Unique\\.Entities\\.Name.code",
@@ -1001,7 +1001,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_negated(self, catalog, attrs) -> None:  # noqa: ANN001
+    def test_select_negated(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "*.*",
@@ -1110,7 +1110,7 @@ class TestSelectionType:
 
 class TestMetadataExecutor:
     @pytest.fixture()
-    def catalog(self, request):  # noqa: ANN001, ANN201
+    def catalog(self, request):
         return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
@@ -1118,7 +1118,7 @@ class TestMetadataExecutor:
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog) -> None:  # noqa: ANN001
+    def test_visit(self, catalog) -> None:
         executor = MetadataExecutor(
             [
                 MetadataRule(
@@ -1172,7 +1172,7 @@ class TestMetadataExecutor:
 
 class TestSchemaExecutor:
     @pytest.fixture()
-    def catalog(self, request):  # noqa: ANN001, ANN201
+    def catalog(self, request):
         return json.loads(globals()[request.param])
 
     @pytest.mark.parametrize(
@@ -1180,7 +1180,7 @@ class TestSchemaExecutor:
         ("CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog) -> None:  # noqa: ANN001
+    def test_visit(self, catalog) -> None:
         executor = SchemaExecutor(
             [
                 SchemaRule(
@@ -1243,10 +1243,10 @@ class TestSchemaExecutor:
 
 class TestListExecutor:
     @pytest.fixture()
-    def catalog(self):  # noqa: ANN201
+    def catalog(self):
         return json.loads(CATALOG)
 
-    def test_visit(self, catalog) -> None:  # noqa: ANN001
+    def test_visit(self, catalog) -> None:
         executor = ListExecutor()
         visit(catalog, executor)
 

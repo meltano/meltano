@@ -25,7 +25,7 @@ def cd(path: Path) -> Path:
 
 
 @contextmanager
-def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:  # noqa: ANN001
+def tmp_project(name: str, source: Path, compatible_copy_tree) -> Project:
     project_init_service = ProjectInitService(name)
     blank_project = project_init_service.init()
     logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004, TID251

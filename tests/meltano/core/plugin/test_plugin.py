@@ -156,7 +156,7 @@ class TestPluginDefinition:
         assert not variant.extras
 
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
-    def test_canonical(self, attrs_key) -> None:  # noqa: ANN001
+    def test_canonical(self, attrs_key) -> None:
         attrs = self.ATTRS[attrs_key]
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **attrs)
         assert plugin_def.canonical() == attrs
@@ -202,37 +202,37 @@ class TestPluginDefinition:
 
 class TestBasePlugin:
     @pytest.fixture()
-    def plugin_def(self):  # noqa: ANN201
+    def plugin_def(self):
         return PluginDefinition(
             PluginType.EXTRACTORS,
             **TestPluginDefinition.ATTRS["variants"],
         )
 
     @pytest.fixture()
-    def variant(self, plugin_def):  # noqa: ANN001, ANN201
+    def variant(self, plugin_def):
         return plugin_def.find_variant()
 
     @pytest.fixture()
-    def subject(self, plugin_def, variant):  # noqa: ANN001, ANN201
+    def subject(self, plugin_def, variant):
         return BasePlugin(plugin_def, variant)
 
-    def test_getattr(self, subject, plugin_def, variant) -> None:  # noqa: ANN001
+    def test_getattr(self, subject, plugin_def, variant) -> None:
         # Falls back to the plugin def
         assert subject.name == plugin_def.name
 
         # And the variant
         assert subject.pip_url == variant.pip_url
 
-    def test_variant(self, subject, variant) -> None:  # noqa: ANN001
+    def test_variant(self, subject, variant) -> None:
         assert subject.variant == variant.name
 
         variant.name = None
         assert subject.variant is None
 
-    def test_extras(self, subject) -> None:  # noqa: ANN001
+    def test_extras(self, subject) -> None:
         assert subject.extras == {"foo": "bar", "baz": "qux"}
 
-    def test_extra_settings(self, subject) -> None:  # noqa: ANN001
+    def test_extra_settings(self, subject) -> None:
         subject.EXTRA_SETTINGS = [
             SettingDefinition(name="_foo", sensitive=True, value="default"),
             SettingDefinition(name="_bar", kind=SettingKind.INTEGER, value=0),
@@ -364,12 +364,12 @@ class TestProjectPlugin:
         assert plugin.label == plugin.name
 
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
-    def test_canonical(self, attrs_key) -> None:  # noqa: ANN001
+    def test_canonical(self, attrs_key) -> None:
         attrs = self.ATTRS[attrs_key]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
         assert plugin.canonical() == attrs
 
-    def test_parent(self, inherited_tap) -> None:  # noqa: ANN001
+    def test_parent(self, inherited_tap) -> None:
         tap = inherited_tap.parent
         assert isinstance(tap, ProjectPlugin)
 
@@ -476,7 +476,7 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_command_inheritance(self, tap, inherited_tap) -> None:  # noqa: ANN001
+    def test_command_inheritance(self, tap, inherited_tap) -> None:
         # variants
         assert tap.all_commands["cmd"].args == "cmd meltano"
         assert tap.all_commands["cmd"].description == "a description of cmd"
@@ -512,7 +512,7 @@ class TestProjectPlugin:
         assert tap.test_commands["test_extra"].description == "Run extra tests"
         assert tap.test_commands["test_extra"].executable == "test-extra"
 
-    def testenv_prefixes(self, inherited_tap, tap) -> None:  # noqa: ANN001
+    def testenv_prefixes(self, inherited_tap, tap) -> None:
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
         assert tap.env_prefixes(for_writing=True) == [
             "tap-mock",
@@ -551,7 +551,7 @@ class TestProjectPlugin:
         assert plugin.config == {"foo": "BAR", "bar": "FOO"}
         assert plugin.extras == {"baz": "QUX", "qux": "BAZ"}
 
-    def test_settings(self, tap) -> None:  # noqa: ANN001
+    def test_settings(self, tap) -> None:
         tap.config["custom"] = "from_meltano_yml"
         tap.config["nested"] = {"custom": True}
 
@@ -566,7 +566,7 @@ class TestProjectPlugin:
         assert "nested.custom" in settings_by_name
         assert settings_by_name["nested.custom"].kind == SettingKind.BOOLEAN
 
-    def test_extra_settings(self, tap) -> None:  # noqa: ANN001
+    def test_extra_settings(self, tap) -> None:
         tap.extras["custom"] = "from_meltano_yml"
         tap.extras["nested"] = {"custom": True}
 

@@ -32,7 +32,7 @@ class MockIOBlock(IOBlock):
 
 
 @pytest.fixture(scope="class")
-def tap_mock_transform(project_add_service):  # noqa: ANN001, ANN201
+def tap_mock_transform(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMS, "tap-mock-transform")
     except PluginAlreadyAddedException as err:
@@ -40,8 +40,8 @@ def tap_mock_transform(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def process_mock_factory():  # noqa: ANN201
-    def _factory(name):  # noqa: ANN001, ANN202
+def process_mock_factory():
+    def _factory(name):
         process_mock = mock.Mock()
         process_mock.name = name
         process_mock.wait = AsyncMock(return_value=0)
@@ -53,7 +53,7 @@ def process_mock_factory():  # noqa: ANN201
 
 
 @pytest.fixture()
-def tap_process(process_mock_factory, tap):  # noqa: ANN001, ANN201
+def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
     tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
@@ -65,11 +65,11 @@ def tap_process(process_mock_factory, tap):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def target_process(process_mock_factory, target):  # noqa: ANN001, ANN201
+def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
     # Have `target.wait` take 2s to make sure the tap always finishes before the target
-    async def wait_mock():  # noqa: ANN202
+    async def wait_mock():
         await asyncio.sleep(2)
         return target.wait.return_value
 
@@ -87,12 +87,12 @@ def target_process(process_mock_factory, target):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def mapper_process(process_mock_factory, mapper):  # noqa: ANN001, ANN201
+def mapper_process(process_mock_factory, mapper):
     mapper = process_mock_factory(mapper)
 
     # Have `mapper.wait` take 1s to make sure the mapper always finishes after
     # the tap but before the target
-    async def wait_mock():  # noqa: ANN202
+    async def wait_mock():
         await asyncio.sleep(1)
         return mapper.wait.return_value
 
@@ -110,10 +110,10 @@ def mapper_process(process_mock_factory, mapper):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
+def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
 
-    async def wait_mock():  # noqa: ANN202
+    async def wait_mock():
         await asyncio.sleep(1)
         return dbt.wait.return_value
 
@@ -178,11 +178,11 @@ class TestCliRunScratchpadOne:
     @pytest.mark.usefixtures("use_test_log_config", "project", "job_logging_service")
     def test_run_parsing_failures(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
     ) -> None:
         result = cli_runner.invoke(cli, ["run"])
         assert result.exit_code == 0
@@ -260,13 +260,13 @@ class TestCliRunScratchpadOne:
     )
     def test_run_basic_invocations(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
     ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -320,11 +320,11 @@ class TestCliRunScratchpadOne:
     @pytest.mark.usefixtures("use_test_log_config", "project")
     def test_run_custom_suffix_command_option(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
         job_logging_service: JobLoggingService,
     ) -> None:
         # exit cleanly when everything is fine
@@ -383,13 +383,13 @@ class TestCliRunScratchpadOne:
     )
     def test_run_custom_suffix_active_environment(
         self,
-        suffix_args,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        suffix_args,
+        cli_runner,
         project: Project,
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        tap,
+        target,
+        tap_process,
+        target_process,
         job_logging_service: JobLoggingService,
     ) -> None:
         state_id_suffix, expected_suffix, suffix_env = suffix_args
@@ -432,7 +432,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_multiple_commands(self, cli_runner, dbt_process) -> None:  # noqa: ANN001
+    def test_run_multiple_commands(self, cli_runner, dbt_process) -> None:
         # Verify that requesting the same command plugin multiple time with
         # different args works
         invoke_async = AsyncMock(
@@ -480,13 +480,13 @@ class TestCliRunScratchpadOne:
     )
     def test_run_complex_invocations(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
     ) -> None:
         invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process),
@@ -543,12 +543,12 @@ class TestCliRunScratchpadOne:
     )
     def test_run_plugin_command_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
     ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -610,12 +610,12 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_tap_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
     ) -> None:
         # In this scenario, the tap fails on the third read. Target should still
         # complete, but dbt should not.
@@ -680,18 +680,18 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_target_failure_before_tap_finished(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
     ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail
         # before tap finishes
-        async def tap_wait_mock():  # noqa: ANN202
+        async def tap_wait_mock():
             await asyncio.sleep(2)
             return tap_process.wait.return_value
 
@@ -776,12 +776,12 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_target_failure_after_tap_finished(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
     ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -846,12 +846,12 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_tap_and_target_failed(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        dbt_process,
     ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
@@ -926,11 +926,11 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_tap_line_length_limit_error(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
     ) -> None:
         args = ["run", tap.name, target.name]
 
@@ -952,7 +952,7 @@ class TestCliRunScratchpadOne:
 
         # Have `tap_process.wait` take 1s to make sure the `LimitOverrunError`
         # exception can be raised before tap finishes
-        async def wait_mock():  # noqa: ANN202
+        async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value
 
@@ -994,14 +994,14 @@ class TestCliRunScratchpadOne:
     )
     def test_run_mapper_config(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        project_add_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        project_add_service,
     ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -1140,14 +1140,14 @@ class TestCliRunScratchpadOne:
     )
     def test_run_elb_mapper_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        dbt_process,
     ) -> None:
         # In this scenario, the map fails on the second read. Target should
         # still complete, but dbt should not.
@@ -1219,12 +1219,12 @@ class TestCliRunScratchpadOne:
     )
     def test_run_dry_run(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        mapper_process,
     ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
@@ -1262,12 +1262,12 @@ class TestCliRunScratchpadOne:
     @pytest.mark.parametrize("colors", (True, False))
     def test_color_console_exception_handler(
         self,
-        colors,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        colors,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         monkeypatch.delenv("FORCE_COLOR", raising=False)

@@ -13,7 +13,7 @@ from meltano.core.utils import deep_merge
 
 
 @pytest.fixture()
-def cd_temp_subdir():  # noqa: ANN201
+def cd_temp_subdir():
     original_dir = Path.cwd()
     with tempfile.TemporaryDirectory(dir=original_dir) as name, cd(
         Path(name).resolve(),
@@ -22,7 +22,7 @@ def cd_temp_subdir():  # noqa: ANN201
 
 
 @pytest.fixture()
-def cd_temp_dir():  # noqa: ANN201
+def cd_temp_dir():
     with tempfile.TemporaryDirectory() as name, cd(Path(name).resolve()) as new_dir:
         yield new_dir
 
@@ -38,13 +38,13 @@ def cd_temp_dir():  # noqa: ANN201
         ({"a": "A", "b": "B"}, [{"a": "Z"}], {"a": "Z", "b": "B"}),
     ),
 )
-def test_deep_merge(parent, children, expected) -> None:  # noqa: ANN001
+def test_deep_merge(parent, children, expected) -> None:
     assert deep_merge(parent, *children) == expected
 
 
 class TestProjectFiles:
     @pytest.mark.order(1)
-    def test_resolve_subfiles(self, project_files) -> None:  # noqa: ANN001
+    def test_resolve_subfiles(self, project_files) -> None:
         assert project_files._meltano_file_path == (project_files.root / "meltano.yml")
         assert project_files.meltano == {
             "version": 1,
@@ -115,7 +115,7 @@ class TestProjectFiles:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    def test_resolve_from_subdir(self, project_files, cd_temp_subdir) -> None:  # noqa: ANN001
+    def test_resolve_from_subdir(self, project_files, cd_temp_subdir) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -133,7 +133,7 @@ class TestProjectFiles:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    def test_resolve_from_any_dir(self, project_files, cd_temp_dir) -> None:  # noqa: ANN001
+    def test_resolve_from_any_dir(self, project_files, cd_temp_dir) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -146,7 +146,7 @@ class TestProjectFiles:
         ]
 
     @pytest.mark.order(5)
-    def test_load(self, project_files) -> None:  # noqa: ANN001
+    def test_load(self, project_files) -> None:
         expected_result = {
             "version": 1,
             "default_environment": "test-meltano-environment",
@@ -248,7 +248,7 @@ class TestProjectFiles:
         assert read_result == expected_result
 
     @pytest.mark.order(6)
-    def test_update(self, project_files) -> None:  # noqa: ANN001
+    def test_update(self, project_files) -> None:
         meltano_config = project_files.load()
         meltano_config["version"] = 2
         meltano_config["plugins"]["extractors"][1]["name"] = (
@@ -361,7 +361,7 @@ class TestProjectFiles:
         assert read_result == expected_result
 
     @pytest.mark.order(7)
-    def test_preserve_format(self, project_files) -> None:  # noqa: ANN001
+    def test_preserve_format(self, project_files) -> None:
         meltano_config = project_files.load()
         meltano_config["version"] = 3
         meltano_config["schedules"][0]["transform"] = "only"
@@ -464,7 +464,7 @@ class TestProjectFiles:
         assert included_path.read_text() == dedent(expected_subconfig_2_contents)
 
     @pytest.mark.order(-1)
-    def test_remove_all_file_contents(self, project_files) -> None:  # noqa: ANN001
+    def test_remove_all_file_contents(self, project_files) -> None:
         meltano_config = project_files.load()
         meltano_config["plugins"]["extractors"] = [
             entry

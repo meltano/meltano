@@ -43,7 +43,7 @@ else:
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
-def pytest_runtest_setup(item) -> None:  # noqa: ANN001
+def pytest_runtest_setup(item) -> None:
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database
@@ -55,7 +55,7 @@ def pytest_runtest_setup(item) -> None:  # noqa: ANN001
 
 
 @pytest.fixture(scope="session")
-def concurrency():  # noqa: ANN201
+def concurrency():
     return {
         "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),
         "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
@@ -160,7 +160,7 @@ class MockAdapter(BaseAdapter):
             },
         }
 
-    def send(  # noqa: ANN201
+    def send(
         self,
         request: requests.PreparedRequest,
         *,
@@ -170,7 +170,7 @@ class MockAdapter(BaseAdapter):
         | tuple[float, None]
         | None = None,
         verify: bool | str = True,  # noqa: ARG002
-        cert: t.Any | None = None,  # noqa: ANN401, ARG002
+        cert: t.Any | None = None,  # noqa: ARG002
         proxies: abc.Mapping[str, str] | None = None,  # noqa: ARG002
     ):
         _, endpoint = request.path_url.split("/meltano/api/v1/plugins")
@@ -200,7 +200,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class")
-def hub_mock_adapter(discovery) -> t.Callable[[str], MockAdapter]:  # noqa: ANN001
+def hub_mock_adapter(discovery) -> t.Callable[[str], MockAdapter]:
     def _get_adapter(api_url: str) -> MockAdapter:
         return MockAdapter(api_url, discovery)
 
@@ -208,13 +208,13 @@ def hub_mock_adapter(discovery) -> t.Callable[[str], MockAdapter]:  # noqa: ANN0
 
 
 @pytest.fixture(scope="class")
-def hub_endpoints(project: Project):  # noqa: ANN201
+def hub_endpoints(project: Project):
     adapter = project.hub_service.session.adapters[project.hub_service.hub_api_url]
     return adapter._mapping
 
 
 @pytest.fixture()
-def hub_request_counter(project: Project):  # noqa: ANN201
+def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
         project.hub_service.hub_api_url,
     ).count

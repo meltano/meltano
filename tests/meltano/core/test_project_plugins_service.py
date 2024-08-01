@@ -21,7 +21,7 @@ if t.TYPE_CHECKING:
 
 
 @pytest.fixture()
-def modified_lockfile(project: Project):  # noqa: ANN201
+def modified_lockfile(project: Project):
     lockfile_path = project.plugin_lock_path(
         PluginType.EXTRACTORS,
         "tap-mock",
@@ -44,12 +44,12 @@ def modified_lockfile(project: Project):  # noqa: ANN201
 
 class TestProjectPluginsService:
     @pytest.fixture(autouse=True)
-    def setup(self, project: Project, tap) -> None:  # noqa: ANN001
+    def setup(self, project: Project, tap) -> None:
         project.plugins.lock_service.save(tap, exists_ok=True)
         project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)
-    def test_plugins(self, project) -> None:  # noqa: ANN001
+    def test_plugins(self, project) -> None:
         assert all(
             isinstance(plugin.parent, BasePlugin)
             for plugin in project.plugins.plugins()
@@ -57,11 +57,11 @@ class TestProjectPluginsService:
 
     def test_get_plugin(
         self,
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        alternative_tap,  # noqa: ANN001
-        inherited_tap,  # noqa: ANN001
-        alternative_target,  # noqa: ANN001
+        project,
+        tap,
+        alternative_tap,
+        inherited_tap,
+        alternative_target,
     ) -> None:
         # name="tap-mock", variant="meltano"
         plugin = project.plugins.get_plugin(tap)
@@ -132,10 +132,10 @@ class TestProjectPluginsService:
     def test_get_parent_no_lockfiles(
         self,
         project: Project,
-        tap,  # noqa: ANN001
-        alternative_tap,  # noqa: ANN001
-        inherited_tap,  # noqa: ANN001
-        alternative_target,  # noqa: ANN001
+        tap,
+        alternative_tap,
+        inherited_tap,
+        alternative_target,
     ) -> None:
         # The behavior being tested here assumes that no lockfiles exist.
         shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
@@ -185,7 +185,7 @@ class TestProjectPluginsService:
 
         assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
 
-    def test_update_plugin(self, project: Project, tap) -> None:  # noqa: ANN001
+    def test_update_plugin(self, project: Project, tap) -> None:
         # update a tap with a random value
         tap.config["test"] = 42
         tap, outdated = project.plugins.update_plugin(tap)
@@ -208,7 +208,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginNotFoundError):
             project.plugins.update_plugin(nonexistent_plugin)
 
-    def test_find_plugins_by_mapping_name(self, project: Project, mapper) -> None:  # noqa: ANN001
+    def test_find_plugins_by_mapping_name(self, project: Project, mapper) -> None:
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
             mapper,
         ]
@@ -218,7 +218,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")
 
-    def test_find_plugins(self, project: Project, mapper) -> None:  # noqa: ANN001
+    def test_find_plugins(self, project: Project, mapper) -> None:
         assert project.plugins.find_plugin("mock-mapping-1") == mapper
         assert project.plugins.find_plugin("mock-mapping-0") == mapper
         with pytest.raises(PluginNotFoundError):

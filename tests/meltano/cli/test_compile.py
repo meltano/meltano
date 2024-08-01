@@ -108,7 +108,7 @@ class TestCompile:
     ) -> None:
         original_yaml_load = manifest.yaml.load
 
-        def patch(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+        def patch(*args, **kwargs):
             project_files = original_yaml_load(*args, **kwargs)
             project_files["invalid_key"] = None
             return project_files

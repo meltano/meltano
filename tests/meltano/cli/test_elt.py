@@ -97,7 +97,7 @@ def assert_log_lines(result_output: str, expected: list[LogEntry]) -> None:
         assert entry.matches(seen_lines), f"Expected log entry not found: {entry}"
 
 
-def failure_help_log_suffix(job_logs_file) -> str:  # noqa: ANN001
+def failure_help_log_suffix(job_logs_file) -> str:
     return (
         "For more detailed log messages re-run the command using 'meltano "
         "--log-level=debug ...' CLI flag.\nNote that you can also check the "
@@ -108,7 +108,7 @@ def failure_help_log_suffix(job_logs_file) -> str:  # noqa: ANN001
 
 
 @pytest.fixture(scope="class")
-def tap_mock_transform(project_add_service):  # noqa: ANN001, ANN201
+def tap_mock_transform(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMS, "tap-mock-transform")
     except PluginAlreadyAddedException as err:
@@ -116,8 +116,8 @@ def tap_mock_transform(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def process_mock_factory():  # noqa: ANN201
-    def _factory(name):  # noqa: ANN001, ANN202
+def process_mock_factory():
+    def _factory(name):
         process_mock = mock.Mock()
         process_mock.name = name
         process_mock.wait = AsyncMock(return_value=0)
@@ -129,7 +129,7 @@ def process_mock_factory():  # noqa: ANN201
 
 
 @pytest.fixture()
-def tap_process(process_mock_factory, tap):  # noqa: ANN001, ANN201
+def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
     tap.stdout.readline = AsyncMock(side_effect=(b"SCHEMA\n", b"RECORD\n", b"STATE\n"))
@@ -141,11 +141,11 @@ def tap_process(process_mock_factory, tap):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def target_process(process_mock_factory, target):  # noqa: ANN001, ANN201
+def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
     # Have `target.wait` take 1s to make sure the tap always finishes before the target
-    async def wait_mock():  # noqa: ANN202
+    async def wait_mock():
         await asyncio.sleep(1)
         return target.wait.return_value
 
@@ -163,7 +163,7 @@ def target_process(process_mock_factory, target):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def silent_dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
+def silent_dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True, True)
     dbt.stderr.at_eof.side_effect = (True, True)
@@ -171,7 +171,7 @@ def silent_dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
+def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True,)
     dbt.stderr.at_eof.side_effect = (False, False, False, True)
@@ -182,7 +182,7 @@ def dbt_process(process_mock_factory, dbt):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(autouse=True)
-def mock_plugin_installation_env():  # noqa: ANN201
+def mock_plugin_installation_env():
     with mock.patch.object(
         PluginInstallService,
         "plugin_installation_env",
@@ -199,9 +199,9 @@ class TestWindowsELT:
     @pytest.mark.usefixtures("use_test_log_config")
     def test_elt_windows(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
     ) -> None:
         args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
@@ -225,12 +225,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         result = cli_runner.invoke(cli, [command])
@@ -308,13 +308,13 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_debug_logging(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
-        monkeypatch,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
+        monkeypatch,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}_debug"
@@ -447,12 +447,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -508,12 +508,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_target_failure_before_tap_finishes(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -521,7 +521,7 @@ class TestCliEltScratchpadOne:
 
         # Have `tap_process.wait` take 2s to make sure the target can fail
         # before tap finishes
-        async def tap_wait_mock():  # noqa: ANN202
+        async def tap_wait_mock():
             await asyncio.sleep(2)
             return tap_process.wait.return_value
 
@@ -589,12 +589,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_target_failure_after_tap_finishes(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -650,12 +650,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_and_target_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -720,12 +720,12 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_tap_line_length_limit_error(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -749,7 +749,7 @@ class TestCliEltScratchpadOne:
 
         # Have `tap_process.wait` take 1s to make sure the `LimitOverrunError`
         # exception can be raised before tap finishes
-        async def wait_mock():  # noqa: ANN202
+        async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value
 
@@ -796,11 +796,11 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_output_handler_error(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -811,7 +811,7 @@ class TestCliEltScratchpadOne:
 
         # Have `tap_process.wait` take 1s to make sure the exception can be
         # raised before tap finishes
-        async def wait_mock():  # noqa: ANN202
+        async def wait_mock():
             await asyncio.sleep(1)
             return tap_process.wait.return_value
 
@@ -842,10 +842,10 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_elt_already_running(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        session,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        session,
         command: str,
     ) -> None:
         state_id = "already_running"
@@ -867,10 +867,10 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_catalog(
         self,
-        cli_runner,  # noqa: ANN001
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        cli_runner,
+        project,
+        tap,
+        target,
         command: str,
     ) -> None:
         catalog = {"streams": []}
@@ -899,10 +899,10 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_state(
         self,
-        cli_runner,  # noqa: ANN001
-        project,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        cli_runner,
+        project,
+        tap,
+        target,
         command: str,
     ) -> None:
         state = {"success": True}
@@ -935,10 +935,10 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_extractor_config(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        plugin_settings_service_factory,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        plugin_settings_service_factory,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -970,10 +970,10 @@ class TestCliEltScratchpadOne:
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
     def test_dump_loader_config(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        plugin_settings_service_factory,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        plugin_settings_service_factory,
         command: str,
     ) -> None:
         state_id = f"pytest_test_{command}"
@@ -1016,13 +1016,13 @@ class TestCliEltScratchpadTwo:
     )
     def test_elt_transform_run(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        silent_dbt_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        silent_dbt_process,
+        dbt_process,
     ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
@@ -1077,14 +1077,14 @@ class TestCliEltScratchpadTwo:
     )
     def test_elt_transform_run_dbt_failure(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        silent_dbt_process,  # noqa: ANN001
-        dbt_process,  # noqa: ANN001
-        job_logging_service,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        silent_dbt_process,
+        dbt_process,
+        job_logging_service,
     ) -> None:
         state_id = "pytest_test_elt"
         args = [
@@ -1166,9 +1166,9 @@ class TestCliEltScratchpadThree:
     @pytest.mark.usefixtures("use_test_log_config", "project", "dbt")
     def test_elt_transform_only(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
     ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
@@ -1200,9 +1200,9 @@ class TestCliEltScratchpadThree:
     )
     def test_elt_transform_only_with_transform(
         self,
-        cli_runner,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        cli_runner,
+        tap,
+        target,
     ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 

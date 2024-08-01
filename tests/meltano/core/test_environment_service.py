@@ -18,7 +18,7 @@ from meltano.core.utils import NotFound
 
 class TestEnvironmentService:
     @pytest.fixture()
-    def subject(self, environment_service):  # noqa: ANN001, ANN201
+    def subject(self, environment_service):
         return environment_service
 
     @pytest.fixture()

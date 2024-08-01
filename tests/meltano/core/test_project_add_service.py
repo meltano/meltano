@@ -21,10 +21,10 @@ if t.TYPE_CHECKING:
 
 class TestProjectAddService:
     @pytest.fixture()
-    def subject(self, project_add_service):  # noqa: ANN001, ANN201
+    def subject(self, project_add_service):
         return project_add_service
 
-    def test_missing_plugin_exception(self, subject, hub_request_counter) -> None:  # noqa: ANN001
+    def test_missing_plugin_exception(self, subject, hub_request_counter) -> None:
         with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
@@ -83,10 +83,10 @@ class TestProjectAddService:
 
     def test_add_inherited(
         self,
-        tap,  # noqa: ANN001
-        subject,  # noqa: ANN001
+        tap,
+        subject,
         project: Project,
-        hub_request_counter,  # noqa: ANN001
+        hub_request_counter,
     ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
@@ -187,7 +187,7 @@ class TestProjectAddService:
     def test_add_update(
         self,
         lock_save: mock.MagicMock,
-        target,  # noqa: ANN001
+        target,
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,

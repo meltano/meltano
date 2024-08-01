@@ -18,16 +18,16 @@ class EnvVarResolutionExpectation(t.NamedTuple):
     terminal_env: t.ClassVar[dict] = {}
 
 
-def _meltanofile_update_dict(  # noqa: ANN202
+def _meltanofile_update_dict(
     *,
-    top_level_plugin_setting=True,  # noqa: ANN001
-    top_level_plugin_config=False,  # noqa: ANN001
-    top_level_env=False,  # noqa: ANN001
-    top_level_plugin_env=False,  # noqa: ANN001
-    environment_level_env=False,  # noqa: ANN001
-    environment_level_plugin_env=False,  # noqa: ANN001
-    environment_level_plugin_config=False,  # noqa: ANN001
-    environment_level_plugin_config_indirected=False,  # noqa: ANN001
+    top_level_plugin_setting=True,
+    top_level_plugin_config=False,
+    top_level_env=False,
+    top_level_plugin_env=False,
+    environment_level_env=False,
+    environment_level_plugin_env=False,
+    environment_level_plugin_config=False,
+    environment_level_plugin_config_indirected=False,
 ):
     plugin_name = "test-env-var-resolution"
     plugin_namespace = plugin_name.replace("-", "_")
@@ -227,11 +227,11 @@ class TestEnvVarResolution:
     @pytest.mark.usefixtures("cli_runner")
     def test_env_var_resolution(
         self,
-        expected_env_values,  # noqa: ANN001
-        meltanofile_updates,  # noqa: ANN001
-        terminal_env,  # noqa: ANN001
-        project,  # noqa: ANN001
-        monkeypatch,  # noqa: ANN001
+        expected_env_values,
+        meltanofile_updates,
+        terminal_env,
+        project,
+        monkeypatch,
     ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -260,7 +260,7 @@ class TestEnvVarResolution:
         ]
 
 
-def test_environment_variable_inheritance(cli_runner, project, monkeypatch) -> None:  # noqa: ANN001
+def test_environment_variable_inheritance(cli_runner, project, monkeypatch) -> None:
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
         meltanofile.update(
@@ -308,9 +308,9 @@ def test_environment_variable_inheritance(cli_runner, project, monkeypatch) -> N
 
 
 def test_environment_variable_inheritance_meltano_env_only(
-    cli_runner,  # noqa: ANN001
-    project,  # noqa: ANN001
-    monkeypatch,  # noqa: ANN001
+    cli_runner,
+    project,
+    monkeypatch,
 ) -> None:
     monkeypatch.setenv("STACKED", "1")
     with project.meltano_update() as meltanofile:
@@ -346,7 +346,7 @@ def test_environment_variable_inheritance_meltano_env_only(
     assert result.stdout.strip() == "STACKED=12"
 
 
-def test_strict_env_var_mode_raises_full_replace(cli_runner, project) -> None:  # noqa: ANN001
+def test_strict_env_var_mode_raises_full_replace(cli_runner, project) -> None:
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
         value=True,
@@ -371,7 +371,7 @@ def test_strict_env_var_mode_raises_full_replace(cli_runner, project) -> None:  
     assert result.exception.instruction == "Make sure the environment variable is set"
 
 
-def test_strict_env_var_mode_raises_partial_replace(cli_runner, project) -> None:  # noqa: ANN001
+def test_strict_env_var_mode_raises_partial_replace(cli_runner, project) -> None:
     project.settings.set(
         [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
         value=True,

@@ -23,12 +23,12 @@ plugins_dir = current_dir / "plugins"
 
 
 class MeltanoCliRunner(CliRunner):
-    def __init__(self, *args, snowplow: SnowplowMicro | None = None, **kwargs):  # noqa: ANN002, ANN003
+    def __init__(self, *args, snowplow: SnowplowMicro | None = None, **kwargs):
         """Initialize the `MeltanoCliRunner`."""
         self.snowplow = snowplow
         super().__init__(*args, **kwargs)
 
-    def invoke(self, cli: Command, *args, **kwargs) -> Result:  # noqa: ANN002, ANN003
+    def invoke(self, cli: Command, *args, **kwargs) -> Result:
         results = super().invoke(cli, *args, **kwargs)
         if self.snowplow:  # pragma: no cover
             assert self.snowplow.all()["bad"] == 0  # pragma: no cover
@@ -37,7 +37,7 @@ class MeltanoCliRunner(CliRunner):
 
 
 @pytest.fixture()
-def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):  # noqa: ANN001, ANN201
+def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
     pushd(os.getcwd())  # Ensure we return to the CWD after the test
     root_logger = logging.getLogger()  # noqa: TID251
     log_level = root_logger.level
@@ -48,8 +48,8 @@ def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):  # noqa: ANN001,
 
 
 @pytest.fixture(scope="class")
-def large_config_project(  # noqa: ANN201
-    compatible_copy_tree,  # noqa: ANN001
+def large_config_project(
+    compatible_copy_tree,
     tmp_path_factory: pytest.TempPathFactory,
 ):
     with cd(tmp_path_factory.mktemp("meltano-large-config-project")), tmp_project(
@@ -61,7 +61,7 @@ def large_config_project(  # noqa: ANN201
 
 
 @pytest.fixture(scope="class")
-def project_files_cli(compatible_copy_tree, tmp_path_factory: pytest.TempPathFactory):  # noqa: ANN001, ANN201
+def project_files_cli(compatible_copy_tree, tmp_path_factory: pytest.TempPathFactory):
     with cd(tmp_path_factory.mktemp("meltano-project-files-cli")), tmp_project(
         "a_multifile_meltano_project_cli",
         current_dir / "multifile_project",

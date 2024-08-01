@@ -13,13 +13,13 @@ HTTP_STATUS_TEAPOT = 418
 
 
 @pytest.fixture()
-def subject(project):  # noqa: ANN001, ANN201
+def subject(project):
     return LockedDefinitionService(project)
 
 
 class TestLockedDefinitionService:
     @pytest.fixture()
-    def locked_plugin(self, subject: LockedDefinitionService):  # noqa: ANN201
+    def locked_plugin(self, subject: LockedDefinitionService):
         """Locked plugin definition.
 
         Yields:

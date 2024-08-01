@@ -7,12 +7,12 @@ from meltano.core.meltano_file import MeltanoFile
 
 class TestMeltanoFile:
     @pytest.mark.usefixtures("tap", "target")
-    def test_load(self, project) -> None:  # noqa: ANN001
+    def test_load(self, project) -> None:
         meltano_file = MeltanoFile.parse(project.meltano)
         assert meltano_file
 
     @pytest.mark.usefixtures("mapper")
-    def test_get_plugins_for_mappings(self, project) -> None:  # noqa: ANN001
+    def test_get_plugins_for_mappings(self, project) -> None:
         meltano_file = MeltanoFile.parse(project.meltano)
 
         test_config = {

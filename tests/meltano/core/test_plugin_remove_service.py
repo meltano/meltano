@@ -14,7 +14,7 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 
 class TestPluginRemoveService:
     @pytest.fixture()
-    def subject(self, project):  # noqa: ANN001, ANN201
+    def subject(self, project):
         return PluginRemoveService(project)
 
     @pytest.fixture()
@@ -69,7 +69,7 @@ class TestPluginRemoveService:
         tap_gitlab_lockfile.touch()
         target_csv_lockfile.touch()
 
-    def test_default_init_should_not_fail(self, subject) -> None:  # noqa: ANN001
+    def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
 
     @pytest.mark.usefixtures("add", "install", "lock")
@@ -124,7 +124,7 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_meltano_yml_error(self, subject: PluginRemoveService) -> None:
-        def raise_permissionerror(filename) -> NoReturn:  # noqa: ANN001
+        def raise_permissionerror(filename) -> NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())
@@ -139,7 +139,7 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_installation_error(self, subject: PluginRemoveService) -> None:
-        def raise_permissionerror(filename) -> NoReturn:  # noqa: ANN001
+        def raise_permissionerror(filename) -> NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())

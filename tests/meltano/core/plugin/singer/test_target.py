@@ -14,14 +14,14 @@ if t.TYPE_CHECKING:
 
 class TestSingerTarget:
     @pytest.fixture()
-    def subject(self, project_add_service: ProjectAddService):  # noqa: ANN201
+    def subject(self, project_add_service: ProjectAddService):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-mock")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
     @pytest.mark.asyncio()
-    async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:  # noqa: ANN001
+    async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
@@ -29,10 +29,10 @@ class TestSingerTarget:
     @pytest.mark.asyncio()
     async def test_setup_bookmark_writer(
         self,
-        subject,  # noqa: ANN001
-        session,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        elt_context_builder,  # noqa: ANN001
+        subject,
+        session,
+        plugin_invoker_factory,
+        elt_context_builder,
     ) -> None:
         job = Job(job_name="pytest_test_runner")
 

@@ -20,17 +20,17 @@ TEST_STATE_ID = "test_job"
 
 
 class AnyInstanceOf:
-    def __init__(self, target_cls) -> None:  # noqa: ANN001
+    def __init__(self, target_cls) -> None:
         self.target_cls = target_cls
 
-    def __eq__(self, other):  # noqa: ANN001, ANN204
+    def __eq__(self, other):
         return isinstance(other, self.target_cls)
 
     def __repr__(self) -> str:
         return f"<Any({self.target_cls}>"
 
 
-def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):  # noqa: ANN201
+def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
         Path(os.path.join(config_dir, file)).touch()
 
@@ -39,13 +39,13 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):  # noqa: ANN20
 
 class TestSingerRunner:
     @pytest.fixture()
-    def elt_context(  # noqa: ANN201
+    def elt_context(
         self,
-        project,  # noqa: ANN001, ARG002
-        session,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        elt_context_builder,  # noqa: ANN001
+        project,  # noqa: ARG002
+        session,
+        tap,
+        target,
+        elt_context_builder,
     ):
         job = Job(job_name="pytest_test_runner")
 
@@ -58,17 +58,17 @@ class TestSingerRunner:
         )
 
     @pytest.fixture()
-    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:  # noqa: ANN001
+    def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
     @pytest.fixture()
-    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:  # noqa: ANN001
+    def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
 
     @pytest.fixture()
-    def subject(self, session, elt_context):  # noqa: ANN001, ANN201
+    def subject(self, session, elt_context):
         Job(
             job_name=TEST_STATE_ID,
             state=State.SUCCESS,
@@ -79,8 +79,8 @@ class TestSingerRunner:
         return SingerRunner(elt_context)
 
     @pytest.fixture()
-    def process_mock_factory(self):  # noqa: ANN201
-        def _factory(name):  # noqa: ANN001, ANN202
+    def process_mock_factory(self):
+        def _factory(name):
             process_mock = mock.Mock()
             process_mock.name = name
             process_mock.wait = AsyncMock(return_value=0)
@@ -89,25 +89,25 @@ class TestSingerRunner:
         return _factory
 
     @pytest.fixture()
-    def tap_process(self, process_mock_factory, tap):  # noqa: ANN001, ANN201
+    def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
     @pytest.fixture()
-    def target_process(self, process_mock_factory, target):  # noqa: ANN001, ANN201
+    def target_process(self, process_mock_factory, target):
         return process_mock_factory(target)
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("subject")
     async def test_prepare_job(
         self,
-        session,  # noqa: ANN001
-        tap_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
+        session,
+        tap_config_dir,
+        target_config_dir,
+        tap,
+        target,
+        plugin_invoker_factory,
     ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
@@ -127,15 +127,15 @@ class TestSingerRunner:
     @pytest.mark.asyncio()
     async def test_invoke(
         self,
-        session,  # noqa: ANN001
-        subject,  # noqa: ANN001
-        tap_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
+        session,
+        subject,
+        tap_config_dir,
+        target_config_dir,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        plugin_invoker_factory,
     ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
@@ -222,17 +222,17 @@ class TestSingerRunner:
     )
     async def test_bookmark(
         self,
-        subject,  # noqa: ANN001
-        session,  # noqa: ANN001
-        target,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        full_refresh,  # noqa: ANN001
-        select_filter,  # noqa: ANN001
-        payload_flag,  # noqa: ANN001
-        elt_context,  # noqa: ANN001
-        merge_state,  # noqa: ANN001
+        subject,
+        session,
+        target,
+        target_config_dir,
+        target_process,
+        plugin_invoker_factory,
+        full_refresh,
+        select_filter,
+        payload_flag,
+        elt_context,
+        merge_state,
     ) -> None:
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -277,8 +277,8 @@ class TestSingerRunner:
             assert job.payload_flags == payload_flag
 
     @pytest.mark.asyncio()
-    async def test_run(self, subject) -> None:  # noqa: ANN001
-        async def invoke_mock(*args, **kwargs) -> None:  # noqa: ANN002, ANN003, ARG001
+    async def test_run(self, subject) -> None:
+        async def invoke_mock(*args, **kwargs) -> None:  # noqa: ARG001
             pass
 
         with mock.patch.object(

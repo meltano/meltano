@@ -10,17 +10,17 @@ from meltano.core.state_store import DBStateStoreManager
 
 class TestDBStateStoreManager:
     @pytest.fixture()
-    def subject(  # noqa: ANN201
+    def subject(
         self,
-        job_history_session,  # noqa: ANN001
-        state_ids_with_jobs,  # noqa: ANN001, ARG002
+        job_history_session,
+        state_ids_with_jobs,  # noqa: ARG002
     ):
         return DBStateStoreManager(session=job_history_session)
 
     def test_get_state(
         self,
         subject: DBStateStoreManager,
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             assert json.loads(subject.get(state_id).json_merged()) == expected_state
@@ -81,6 +81,6 @@ class TestDBStateStoreManager:
     def test_get_state_ids(
         self,
         subject: DBStateStoreManager,
-        state_ids_with_jobs,  # noqa: ANN001
+        state_ids_with_jobs,
     ) -> None:
         assert set(subject.get_state_ids()) == set(state_ids_with_jobs.keys())

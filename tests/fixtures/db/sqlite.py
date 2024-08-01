@@ -4,7 +4,7 @@ import pytest
 
 
 @pytest.fixture(scope="session")
-def engine_uri(tmp_path_factory, worker_id: str) -> str:  # noqa: ANN001
+def engine_uri(tmp_path_factory, worker_id: str) -> str:
     database_path = (
         tmp_path_factory.mktemp("fixture_db_sqlite_engine_uri")
         / f"pytest_meltano_{worker_id}.db"

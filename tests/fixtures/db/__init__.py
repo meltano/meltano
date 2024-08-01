@@ -28,7 +28,7 @@ def engine_uri_env(engine_uri: str) -> t.Generator:
 
 
 @pytest.fixture()
-def un_engine_uri(monkeypatch) -> None:  # noqa: ANN001
+def un_engine_uri(monkeypatch) -> None:
     """When we want to test functionality that doesn't use the current DB URI.
 
     Note that this fixture must run before the project fixture as
@@ -38,7 +38,7 @@ def un_engine_uri(monkeypatch) -> None:  # noqa: ANN001
 
 
 @pytest.fixture(scope="class", autouse=True)
-def vacuum_db(engine_sessionmaker):  # noqa: ANN001, ANN201
+def vacuum_db(engine_sessionmaker):
     try:
         yield
     finally:
@@ -51,13 +51,13 @@ def vacuum_db(engine_sessionmaker):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def engine_sessionmaker(engine_uri):  # noqa: ANN001, ANN201
+def engine_sessionmaker(engine_uri):
     engine = create_engine(engine_uri, poolclass=NullPool, future=True)
     return (engine, sessionmaker(bind=engine, future=True))
 
 
 @pytest.fixture()
-def connection(engine_sessionmaker):  # noqa: ANN001, ANN201
+def connection(engine_sessionmaker):
     engine, _ = engine_sessionmaker
     connection = engine.connect()
     transaction = connection.begin()
@@ -77,10 +77,10 @@ def connection(engine_sessionmaker):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def session(  # noqa: ANN201
+def session(
     project: Project,  # noqa: ARG001
-    engine_sessionmaker,  # noqa: ANN001
-    connection,  # noqa: ANN001
+    engine_sessionmaker,
+    connection,
 ):
     """Create a new database session for a test.
 

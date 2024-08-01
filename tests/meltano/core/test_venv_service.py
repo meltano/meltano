@@ -42,7 +42,7 @@ async def _check_venv_created_with_python_for_plugin(
 
 class TestVenvService:
     @pytest.fixture()
-    def subject(self, project):  # noqa: ANN001, ANN201
+    def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
 
     def test_clean_run_files(self, project: Project, subject: VenvService) -> None:
@@ -298,7 +298,7 @@ class TestVirtualEnv:
 
 class TestUvVenvService:
     @pytest.fixture()
-    def subject(self, project):  # noqa: ANN001, ANN201
+    def subject(self, project):
         find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
 

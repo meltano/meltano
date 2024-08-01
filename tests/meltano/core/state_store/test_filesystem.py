@@ -47,7 +47,7 @@ def encode_if_on_windows(string: str) -> str:
 
 class TestLocalFilesystemStateStoreManager:
     @pytest.fixture()
-    def subject(self, function_scoped_test_dir):  # noqa: ANN001, ANN201
+    def subject(self, function_scoped_test_dir):
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
                 uri=f"file://{function_scoped_test_dir}\\.meltano\\state\\",
@@ -60,9 +60,9 @@ class TestLocalFilesystemStateStoreManager:
             )
 
     @pytest.fixture()
-    def state_path(  # noqa: ANN201
+    def state_path(
         self,
-        function_scoped_test_dir,  # noqa: ANN001
+        function_scoped_test_dir,
         subject: LocalFilesystemStateStoreManager,
     ):
         Path(subject.state_dir).mkdir(parents=True, exist_ok=True)
@@ -83,7 +83,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_create_state_id_dir_if_not_exists(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         state_id_path = os.path.join(
             state_path,
@@ -96,7 +96,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_get_reader(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         filepath = os.path.join(state_path, "get_reader")
         open(filepath, "a").close()
@@ -106,7 +106,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_get_writer(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         filepath = os.path.join(state_path, "get_writer")
         with subject.get_writer(path=filepath) as writer:
@@ -115,7 +115,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_get_state_path(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         assert subject.get_state_path("get_state_path") == os.path.join(
             state_path,
@@ -126,7 +126,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_get_lock_path(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         assert subject.get_lock_path("some_state_id") == os.path.join(
             state_path,
@@ -137,7 +137,7 @@ class TestLocalFilesystemStateStoreManager:
     def test_acquire_lock(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
+        state_path,
     ) -> None:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
         with subject.acquire_lock("acquire_lock"):
@@ -174,8 +174,8 @@ class TestLocalFilesystemStateStoreManager:
     def test_get(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_path,
+        state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
@@ -195,8 +195,8 @@ class TestLocalFilesystemStateStoreManager:
     def test_set(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_path,
+        state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             subject.set(
@@ -215,7 +215,7 @@ class TestLocalFilesystemStateStoreManager:
         self,
         subject: LocalFilesystemStateStoreManager,
         state_path: str,
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_ids_with_expected_states,
     ) -> None:
         def _get_state_path(state_id: str) -> str:
             return os.path.join(
@@ -244,8 +244,8 @@ class TestLocalFilesystemStateStoreManager:
     def test_delete(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_path,
+        state_ids_with_expected_states,
     ) -> None:
         # Delete files
         state_id, expected_state = state_ids_with_expected_states[0]
@@ -270,8 +270,8 @@ class TestLocalFilesystemStateStoreManager:
     def test_clear(
         self,
         subject: LocalFilesystemStateStoreManager,
-        state_path,  # noqa: ANN001
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_path,
+        state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
@@ -288,9 +288,9 @@ class TestLocalFilesystemStateStoreManager:
 
 class TestAZStorageStateStoreManager:
     @pytest.fixture()
-    def subject(  # noqa: ANN201
+    def subject(
         self,
-        function_scoped_test_dir,  # noqa: ANN001, ARG002
+        function_scoped_test_dir,  # noqa: ARG002
     ):
         return AZStorageStateStoreManager(
             uri="azure://meltano/state/",
@@ -299,13 +299,13 @@ class TestAZStorageStateStoreManager:
         )
 
     @pytest.fixture()
-    def mock_client(self):  # noqa: ANN201
+    def mock_client(self):
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
         ) as mock_client:
             yield mock_client
 
-    def test_client(self, subject: AZStorageStateStoreManager, mock_client) -> None:  # noqa: ANN001
+    def test_client(self, subject: AZStorageStateStoreManager, mock_client) -> None:
         # Call twice to assure memoization
         _ = subject.client
         _ = subject.client
@@ -357,14 +357,14 @@ class TestAZStorageStateStoreManager:
         assert subject.state_dir == "state"
 
     @pytest.mark.usefixtures("mock_client")
-    def test_delete(self, subject) -> None:  # noqa: ANN001
+    def test_delete(self, subject) -> None:
         mock_blob_client = MagicMock()
         subject.client.get_blob_client.return_value = mock_blob_client
         subject.delete("some_path")
         mock_blob_client.delete_blob.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
-    def test_get_state_ids(self, subject) -> None:  # noqa: ANN001
+    def test_get_state_ids(self, subject) -> None:
         mock_container_client = MagicMock()
         mock_container_client.list_blobs.return_value = (
             BlobProperties(name=f"state/state_id_{i}/state.json") for i in range(10)
@@ -388,9 +388,9 @@ class TestS3StateStoreManager:
                 yield stubber
 
     @pytest.fixture()
-    def subject(  # noqa: ANN201
+    def subject(
         self,
-        function_scoped_test_dir,  # noqa: ANN001, ARG002
+        function_scoped_test_dir,  # noqa: ARG002
     ):
         return S3StateStoreManager(
             uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -575,9 +575,9 @@ class TestS3StateStoreManager:
 
 class TestGCSStateStoreManager:
     @pytest.fixture()
-    def subject(  # noqa: ANN201
+    def subject(
         self,
-        function_scoped_test_dir,  # noqa: ANN001, ARG002
+        function_scoped_test_dir,  # noqa: ARG002
     ):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
@@ -586,13 +586,13 @@ class TestGCSStateStoreManager:
         )
 
     @pytest.fixture()
-    def mock_client(self):  # noqa: ANN201
+    def mock_client(self):
         with patch(
             "google.cloud.storage.Client",
         ) as mock_client:
             yield mock_client
 
-    def test_client(self, subject: GCSStateStoreManager, mock_client) -> None:  # noqa: ANN001
+    def test_client(self, subject: GCSStateStoreManager, mock_client) -> None:
         # Call twice to assure memoization
         _ = subject.client
         _ = subject.client

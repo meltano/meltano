@@ -40,7 +40,7 @@ MOCK_STATE_MESSAGE = json.dumps({"type": "STATE"})
 MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 
 
-def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):  # noqa: ANN201
+def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
         Path(os.path.join(config_dir, file)).touch()
 
@@ -48,7 +48,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):  # noqa: ANN20
 
 
 @pytest.fixture()
-def test_job(session) -> Job:  # noqa: ANN001
+def test_job(session) -> Job:
     return Job(
         job_name=TEST_STATE_ID,
         state=State.SUCCESS,
@@ -63,7 +63,7 @@ def output_logger() -> OutputLogger:
 
 
 @pytest.fixture()
-def elb_context(project, session, test_job, output_logger) -> ELBContext:  # noqa: ANN001
+def elb_context(project, session, test_job, output_logger) -> ELBContext:
     ctx = ELBContext(
         project=project,
         job=test_job,
@@ -76,8 +76,8 @@ def elb_context(project, session, test_job, output_logger) -> ELBContext:  # noq
 class TestELBContext:
     def test_elt_run_dir_is_returned(
         self,
-        project,  # noqa: ANN001
-        test_job,  # noqa: ANN001
+        project,
+        test_job,
         elb_context: ELBContext,
     ) -> None:
         expected_path = project.job_dir(test_job.job_name, str(test_job.run_id))
@@ -86,14 +86,14 @@ class TestELBContext:
 
 class TestELBContextBuilder:
     @pytest.fixture()
-    def target_postgres(self, project_add_service):  # noqa: ANN001, ANN201
+    def target_postgres(self, project_add_service):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-postgres")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
     @pytest.mark.usefixtures("target")
-    def test_builder_returns_elb_context(self, project, session, tap) -> None:  # noqa: ANN001
+    def test_builder_returns_elb_context(self, project, session, tap) -> None:
         """Ensure that builder is returning ELBContext and not itself."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -103,10 +103,10 @@ class TestELBContextBuilder:
 
     def test_make_block_returns_valid_singer_block(
         self,
-        project,  # noqa: ANN001
-        session,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        project,
+        session,
+        tap,
+        target,
     ) -> None:
         """Ensure that calling make_block returns a valid SingerBlock."""
         builder = ELBContextBuilder(project)
@@ -122,7 +122,7 @@ class TestELBContextBuilder:
         assert block.consumer
         assert not block.producer
 
-    def test_make_block_tracks_envs(self, project, session, tap, target) -> None:  # noqa: ANN001
+    def test_make_block_tracks_envs(self, project, session, tap, target) -> None:
         """Ensure that calling make_block correctly stacks env vars."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -138,7 +138,7 @@ class TestELBContextBuilder:
         assert builder._env.items() >= block2.context.env.items()
 
     @pytest.mark.asyncio()
-    async def test_validate_envs(self, project, session, tap, target_postgres) -> None:  # noqa: ANN001
+    async def test_validate_envs(self, project, session, tap, target_postgres) -> None:
         """Ensure that expected environment variables are present."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -181,7 +181,7 @@ class TestELBContextBuilder:
 
 class TestExtractLoadBlocks:
     @pytest.fixture()
-    def log_level_debug(self):  # noqa: ANN201
+    def log_level_debug(self):
         root_logger = logging.getLogger()  # noqa: TID251
         log_level = root_logger.level
         try:
@@ -191,26 +191,26 @@ class TestExtractLoadBlocks:
             root_logger.setLevel(log_level)
 
     @pytest.fixture()
-    def log(self, tmp_path: Path):  # noqa: ANN201
+    def log(self, tmp_path: Path):
         return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
 
     @pytest.fixture()
-    def tap_config_dir(self, tmp_path: Path, tap) -> Path:  # noqa: ANN001
+    def tap_config_dir(self, tmp_path: Path, tap) -> Path:
         create_plugin_files(tmp_path, tap)
         return tmp_path
 
     @pytest.fixture()
-    def mapper_config_dir(self, tmp_path: Path, tap) -> Path:  # noqa: ANN001
+    def mapper_config_dir(self, tmp_path: Path, tap) -> Path:
         create_plugin_files(tmp_path, tap)
         return tmp_path
 
     @pytest.fixture()
-    def target_config_dir(self, tmp_path: Path, target) -> Path:  # noqa: ANN001
+    def target_config_dir(self, tmp_path: Path, target) -> Path:
         create_plugin_files(tmp_path, target)
         return tmp_path
 
     @pytest.fixture()
-    def subject(self, session, elb_context):  # noqa: ANN001, ANN201
+    def subject(self, session, elb_context):
         Job(
             job_name=TEST_STATE_ID,
             state=State.SUCCESS,
@@ -221,8 +221,8 @@ class TestExtractLoadBlocks:
         return SingerRunner(elb_context)
 
     @pytest.fixture()
-    def process_mock_factory(self):  # noqa: ANN201
-        def _factory(name):  # noqa: ANN001, ANN202
+    def process_mock_factory(self):
+        def _factory(name):
             process_mock = mock.Mock()
             process_mock.name = name
             process_mock.wait = AsyncMock(return_value=0)
@@ -231,21 +231,21 @@ class TestExtractLoadBlocks:
         return _factory
 
     @pytest.fixture()
-    def tap_process(self, process_mock_factory, tap):  # noqa: ANN001, ANN201
+    def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         tap.wait = AsyncMock(return_value=0)
         return tap
 
     @pytest.fixture()
-    def mapper_process(self, process_mock_factory, mapper):  # noqa: ANN001, ANN201
+    def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
         mapper.stdout.readline = AsyncMock(return_value="{}")
         mapper.wait = AsyncMock(return_value=0)
         return mapper
 
     @pytest.fixture()
-    def target_process(self, process_mock_factory, target):  # noqa: ANN001, ANN201
+    def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
         target.stdout.readline = AsyncMock(return_value="{}")
         target.wait = AsyncMock(return_value=0)
@@ -255,17 +255,17 @@ class TestExtractLoadBlocks:
     @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
     async def test_link_io(
         self,
-        tap_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        mapper_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        elb_context,  # noqa: ANN001
+        tap_config_dir,
+        target_config_dir,
+        mapper_config_dir,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        plugin_invoker_factory,
+        elb_context,
     ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -341,17 +341,17 @@ class TestExtractLoadBlocks:
     @pytest.mark.usefixtures("session", "subject", "log")
     async def test_extract_load_block(
         self,
-        tap_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        mapper_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        elb_context,  # noqa: ANN001
+        tap_config_dir,
+        target_config_dir,
+        mapper_config_dir,
+        tap,
+        target,
+        mapper,
+        tap_process,
+        target_process,
+        mapper_process,
+        plugin_invoker_factory,
+        elb_context,
     ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -422,14 +422,14 @@ class TestExtractLoadBlocks:
     @pytest.mark.usefixtures("session", "subject")
     async def test_elb_validation(
         self,
-        tap_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        elb_context,  # noqa: ANN001
+        tap_config_dir,
+        target_config_dir,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        plugin_invoker_factory,
+        elb_context,
     ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -514,18 +514,18 @@ class TestExtractLoadBlocks:
     @pytest.mark.usefixtures("session", "subject")
     async def test_elb_with_job_context(
         self,
-        tap_config_dir,  # noqa: ANN001
-        mapper_config_dir,  # noqa: ANN001
-        target_config_dir,  # noqa: ANN001
-        tap,  # noqa: ANN001
-        mapper,  # noqa: ANN001
-        target,  # noqa: ANN001
-        tap_process,  # noqa: ANN001
-        mapper_process,  # noqa: ANN001
-        target_process,  # noqa: ANN001
-        plugin_invoker_factory,  # noqa: ANN001
-        elb_context,  # noqa: ANN001
-        project,  # noqa: ANN001
+        tap_config_dir,
+        mapper_config_dir,
+        target_config_dir,
+        tap,
+        mapper,
+        target,
+        tap_process,
+        mapper_process,
+        target_process,
+        plugin_invoker_factory,
+        elb_context,
+        project,
     ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
@@ -592,8 +592,8 @@ class TestExtractLoadBlocks:
 
     def test_custom_run_id(
         self,
-        tap,  # noqa: ANN001
-        target,  # noqa: ANN001
+        tap,
+        target,
         project_with_environment: Project,
     ) -> None:
         run_id = uuid.UUID("12345678-1234-5678-1234-567812345678")

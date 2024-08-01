@@ -8,7 +8,7 @@ from meltano.core.plugin.command import Command, UndefinedEnvVarError
 
 class TestCommand:
     @pytest.fixture()
-    def commands(self):  # noqa: ANN201
+    def commands(self):
         return {
             "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},
             "bar": {"args": "bar"},
@@ -16,7 +16,7 @@ class TestCommand:
             "test": {"args": "--test", "description": "Run tests"},
         }
 
-    def test_serialize(self, commands) -> None:  # noqa: ANN001
+    def test_serialize(self, commands) -> None:
         assert Command.parse(commands["foo"]).args == "foo"
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"
@@ -36,7 +36,7 @@ class TestCommand:
         assert serialized["test"].description == "Run tests"
         assert serialized["test"].executable is None
 
-    def test_deserialize(self, commands) -> None:  # noqa: ANN001
+    def test_deserialize(self, commands) -> None:
         serialized = Command.parse_all(commands)
 
         assert serialized["foo"].canonical() == commands["foo"]

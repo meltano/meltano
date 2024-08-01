@@ -108,7 +108,7 @@ class TestMeltanoHubService:
         ]
         assert hub_request_counter["/extractors/index"] == 1
 
-    def test_hub_auth(self, project) -> None:  # noqa: ANN001
+    def test_hub_auth(self, project) -> None:
         project.settings.set("hub_url_auth", "Bearer s3cr3t")
         assert project.hub_service.session.headers["Authorization"] == "Bearer s3cr3t"
 
@@ -146,14 +146,14 @@ class TestMeltanoHubService:
             request = project.hub_service._build_request("GET", "https://example.com")
             assert "X-Meltano-Command" not in request.headers
 
-    def test_custom_ca(self, project, monkeypatch) -> None:  # noqa: ANN001
+    def test_custom_ca(self, project, monkeypatch) -> None:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(  # noqa: ANN202
+            def send(
                 self,
-                request,  # noqa: ANN001, ARG002
-                **kwargs,  # noqa: ANN003
+                request,  # noqa: ARG002
+                **kwargs,
             ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs
@@ -171,14 +171,14 @@ class TestMeltanoHubService:
         hub._get(mock_url)
         assert send_kwargs["verify"] == "/path/to/ca.pem"
 
-    def test_custom_proxy(self, project, monkeypatch) -> None:  # noqa: ANN001
+    def test_custom_proxy(self, project, monkeypatch) -> None:
         send_kwargs = {}
 
         class _Adapter(BaseAdapter):
-            def send(  # noqa: ANN202
+            def send(
                 self,
-                request,  # noqa: ANN001, ARG002
-                **kwargs,  # noqa: ANN003
+                request,  # noqa: ARG002
+                **kwargs,
             ):
                 nonlocal send_kwargs
                 send_kwargs = kwargs

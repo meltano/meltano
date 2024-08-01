@@ -23,7 +23,7 @@ MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 class TestPluginTestServiceFactory:
     @pytest.fixture(autouse=True)
     @patch("meltano.core.plugin_invoker.PluginInvoker")
-    def setup(self, mock_invoker) -> None:  # noqa: ANN001
+    def setup(self, mock_invoker) -> None:
         self.mock_invoker = mock_invoker
 
     def test_extractor_plugin(self, tap: ProjectPlugin) -> None:
@@ -47,7 +47,7 @@ class TestPluginTestServiceFactory:
 class TestExtractorTestService:
     @pytest.fixture(autouse=True)
     @patch("meltano.core.plugin_invoker.PluginInvoker")
-    def setup(self, mock_invoker) -> None:  # noqa: ANN001
+    def setup(self, mock_invoker) -> None:
         self.mock_invoke = Mock()
         self.mock_invoke.name = "utility-mock"
         self.mock_invoke.wait = AsyncMock(return_value=-SIGTERM)

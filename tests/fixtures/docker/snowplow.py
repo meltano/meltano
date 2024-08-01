@@ -28,7 +28,7 @@ class SnowplowMicro:
         self.all()  # Wait until a connection is established
 
     @backoff.on_exception(backoff.expo, ConnectionError, max_tries=5)
-    def get(self, endpoint: str) -> t.Any:  # noqa: ANN401
+    def get(self, endpoint: str) -> t.Any:
         with urlopen(f"{self.url}/{endpoint}") as response:
             return json.load(response)
 
@@ -50,7 +50,7 @@ class SnowplowMicro:
 
 
 @pytest.fixture(scope="session")
-def snowplow_session(request) -> SnowplowMicro | None:  # noqa: ANN001
+def snowplow_session(request) -> SnowplowMicro | None:
     """Start a Snowplow Micro Docker container, then yield a `SnowplowMicro` instance.
 
     The environment variable `$MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS` is set to
@@ -78,7 +78,7 @@ def snowplow_session(request) -> SnowplowMicro | None:  # noqa: ANN001
 @pytest.fixture()
 def snowplow_optional(
     snowplow_session: SnowplowMicro | None,
-    monkeypatch,  # noqa: ANN001
+    monkeypatch,
 ) -> SnowplowMicro | None:
     """Provide a clean `SnowplowMicro` instance.
 

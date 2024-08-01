@@ -19,7 +19,7 @@ from meltano.core.utils import EnvironmentVariableNotSetError
 
 
 @pytest.fixture()
-def config_override():  # noqa: ANN201
+def config_override():
     try:
         ProjectSettingsService.config_override["project_id"] = "from_config_override"
 
@@ -29,23 +29,23 @@ def config_override():  # noqa: ANN201
 
 
 @pytest.fixture()
-def subject(project):  # noqa: ANN001, ANN201
+def subject(project):
     return ProjectSettingsService(project)
 
 
 class TestProjectSettingsService:
     @pytest.fixture()
-    def environment(self):  # noqa: ANN201
+    def environment(self):
         return Environment("testing", {})
 
-    def test_get_with_source(self, subject, monkeypatch) -> None:  # noqa: ANN001
+    def test_get_with_source(self, subject, monkeypatch) -> None:
         # A warning is raised because the setting does not exist.
         with pytest.warns(RuntimeWarning):
             assert subject.get_with_source(
                 "and_now_for_something_completely_different",
             ) == (None, SettingValueStore.DEFAULT)
 
-        def assert_value_source(value, source) -> None:  # noqa: ANN001
+        def assert_value_source(value, source) -> None:
             assert subject.get_with_source("project_id") == (value, source)
 
         subject.set(
@@ -67,27 +67,27 @@ class TestProjectSettingsService:
             assert_value_source("from_env", SettingValueStore.ENV)
 
     @pytest.mark.usefixtures("config_override")
-    def test_get_with_source_config_override(self, subject) -> None:  # noqa: ANN001
+    def test_get_with_source_config_override(self, subject) -> None:
         assert subject.get_with_source("project_id") == (
             "from_config_override",
             SettingValueStore.CONFIG_OVERRIDE,
         )
 
-    def test_experimental_on(self, subject, monkeypatch) -> None:  # noqa: ANN001
+    def test_experimental_on(self, subject, monkeypatch) -> None:
         changed = []
         monkeypatch.setenv("MELTANO_EXPERIMENTAL", "true")
         with subject.feature_flag(EXPERIMENTAL):
             changed.append(True)
         assert changed
 
-    def test_experimental_off_by_default(self, subject) -> None:  # noqa: ANN001
+    def test_experimental_off_by_default(self, subject) -> None:
         changed = []
         with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
             EXPERIMENTAL,
         ):
             changed.append(True)
 
-    def test_feature_flag_allowed(self, subject) -> None:  # noqa: ANN001
+    def test_feature_flag_allowed(self, subject) -> None:
         changed = []
         subject.set([FEATURE_FLAG_PREFIX, "allowed"], value=True)
 
@@ -98,7 +98,7 @@ class TestProjectSettingsService:
         should_run()
         assert changed
 
-    def test_feature_flag_disallowed(self, subject) -> None:  # noqa: ANN001
+    def test_feature_flag_disallowed(self, subject) -> None:
         changed = []
         subject.set([FEATURE_FLAG_PREFIX, "disallowed"], value=False)
 
@@ -109,7 +109,7 @@ class TestProjectSettingsService:
         with pytest.raises(FeatureNotAllowedException):
             should_not_run()
 
-    def test_strict_env_var_mode_on_raises_error(self, subject) -> None:  # noqa: ANN001
+    def test_strict_env_var_mode_on_raises_error(self, subject) -> None:
         subject.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
             value=True,
@@ -121,7 +121,7 @@ class TestProjectSettingsService:
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
-    def test_strict_env_var_mode_off_no_raise_error(self, subject) -> None:  # noqa: ANN001
+    def test_strict_env_var_mode_off_no_raise_error(self, subject) -> None:
         subject.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
             value=False,
@@ -132,7 +132,7 @@ class TestProjectSettingsService:
         )
         assert subject.get("stacked_env_var") == "@nonexistent_1"
 
-    def test_warn_if_default_setting_is_used(self, subject, monkeypatch) -> None:  # noqa: ANN001
+    def test_warn_if_default_setting_is_used(self, subject, monkeypatch) -> None:
         # Assert that warnings are not raised in the following cases:
         with warnings.catch_warnings():
             warnings.simplefilter("error")
@@ -169,9 +169,9 @@ class TestProjectSettingsService:
 
     def test_meltano_settings_with_active_environment(
         self,
-        subject,  # noqa: ANN001
-        monkeypatch,  # noqa: ANN001
-        environment,  # noqa: ANN001
+        subject,
+        monkeypatch,
+        environment,
     ) -> None:
         # make sure that meltano setting values are written to the root of `meltano.yml`
         # even if there is an active environment

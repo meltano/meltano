@@ -47,7 +47,7 @@ class TestSettingDefinition:
     def test_cast_value_array(
         self,
         setting_definition: SettingDefinition,
-        uncast_expected_pairs,  # noqa: ANN001
+        uncast_expected_pairs,
     ) -> None:
         for uncast, expected in uncast_expected_pairs:
             if isinstance(expected, type) and issubclass(expected, Exception):

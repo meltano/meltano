@@ -42,7 +42,7 @@ async def test_select_service_list_all(
     extractor = "tap-mock"
     service = SelectService(project, extractor)
 
-    async def mock_run_discovery(tap, plugin_invoker, catalog_path) -> None:  # noqa: ANN001, ARG001
+    async def mock_run_discovery(tap, plugin_invoker, catalog_path) -> None:  # noqa: ARG001
         with catalog_path.open("w") as catalog_file:
             json.dump(catalog, catalog_file)
 

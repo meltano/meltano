@@ -12,11 +12,11 @@ class Hooked(HookObject):
     def __init__(self) -> None:
         self._calls = []
 
-    def call(self, hook_name) -> None:  # noqa: ANN001
+    def call(self, hook_name) -> None:
         self._calls.append(hook_name)
 
     @property
-    def calls(self):  # noqa: ANN201
+    def calls(self):
         return self._calls.copy()
 
     @hook("after_test")

@@ -10,7 +10,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 
 class TestStaleJobFailer:
     @pytest.fixture()
-    def live_job(self, session):  # noqa: ANN001, ANN201
+    def live_job(self, session):
         job = Job(job_name="test")
         job.start()
         job.save(session)
@@ -18,7 +18,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def stale_job(self, session):  # noqa: ANN001, ANN201
+    def stale_job(self, session):
         job = Job(job_name="test")
         job.start()
         job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
@@ -27,7 +27,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def other_stale_job(self, session):  # noqa: ANN001, ANN201
+    def other_stale_job(self, session):
         job = Job(job_name="other")
         job.start()
         job.last_heartbeat_at = datetime.now(timezone.utc) - timedelta(minutes=10)
@@ -36,7 +36,7 @@ class TestStaleJobFailer:
         return job
 
     @pytest.fixture()
-    def complete_job(self, session):  # noqa: ANN001, ANN201
+    def complete_job(self, session):
         job = Job(job_name="other")
         job.start()
         job.success()
@@ -46,11 +46,11 @@ class TestStaleJobFailer:
 
     def test_fail_stale_jobs(
         self,
-        live_job,  # noqa: ANN001
-        stale_job,  # noqa: ANN001
-        other_stale_job,  # noqa: ANN001
-        complete_job,  # noqa: ANN001
-        session,  # noqa: ANN001
+        live_job,
+        stale_job,
+        other_stale_job,
+        complete_job,
+        session,
     ) -> None:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
@@ -75,11 +75,11 @@ class TestStaleJobFailer:
 
     def test_fail_stale_jobs_with_state_id(
         self,
-        live_job,  # noqa: ANN001
-        stale_job,  # noqa: ANN001
-        other_stale_job,  # noqa: ANN001
-        complete_job,  # noqa: ANN001
-        session,  # noqa: ANN001
+        live_job,
+        stale_job,
+        other_stale_job,
+        complete_job,
+        session,
     ) -> None:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()

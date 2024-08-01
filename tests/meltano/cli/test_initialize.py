@@ -9,7 +9,7 @@ from meltano.core.project_init_service import ProjectInitServiceError
 
 
 class TestCliInit:
-    def test_init(self, cli_runner, tmp_path_factory, pushd) -> None:  # noqa: ANN001
+    def test_init(self, cli_runner, tmp_path_factory, pushd) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
@@ -54,9 +54,9 @@ class TestCliInit:
 
     def test_init_existing_empty_directory(
         self,
-        cli_runner,  # noqa: ANN001
-        tmp_path_factory,  # noqa: ANN001
-        pushd,  # noqa: ANN001
+        cli_runner,
+        tmp_path_factory,
+        pushd,
     ) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
@@ -84,9 +84,9 @@ class TestCliInit:
 
     def test_init_existing_meltano_yml(
         self,
-        cli_runner,  # noqa: ANN001
-        tmp_path_factory,  # noqa: ANN001
-        pushd,  # noqa: ANN001
+        cli_runner,
+        tmp_path_factory,
+        pushd,
     ) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         new_project_root.joinpath("meltano.yml").touch()

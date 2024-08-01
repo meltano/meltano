@@ -327,6 +327,8 @@ unfixable = [
   "F401", # Permit unused imports in `__init__.py` files
 ]
 "tests/**" = [
+  "ANN",
+  "D1",
   "S101", # Allow 'assert' in tests
   "INP",  # Don't require __init__.py files in tests directories
 ]

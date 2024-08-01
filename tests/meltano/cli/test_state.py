@@ -33,16 +33,16 @@ class TestCliState:
     @pytest.mark.parametrize("state_id", unconventional_state_ids)
     def test_state_service_from_state_id_returns_none_non_convention(
         self,
-        project,  # noqa: ANN001
-        state_id,  # noqa: ANN001
+        project,
+        state_id,
     ) -> None:
         assert state.state_service_from_state_id(project, state_id) is None
 
     @pytest.mark.parametrize("state_id", conventional_state_ids)
     def test_state_service_from_state_id_returns_state_service_convention(
         self,
-        project,  # noqa: ANN001
-        state_id,  # noqa: ANN001
+        project,
+        state_id,
     ) -> None:
         with mock.patch(
             "meltano.cli.state.BlockParser",
@@ -53,20 +53,20 @@ class TestCliState:
             assert args in mock_block_parser.call_args.args
 
     @staticmethod
-    def get_result_set(result):  # noqa: ANN001, ANN205
+    def get_result_set(result):
         result_set = set(result.stdout.split("\n"))
         result_set.remove("")
         return result_set
 
     @pytest.mark.usefixtures("project")
-    def test_list(self, state_ids, state_service, cli_runner) -> None:  # noqa: ANN001
+    def test_list(self, state_ids, state_service, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             result = cli_runner.invoke(cli, ["state", "list"])
         assert_cli_runner(result)
         assert self.get_result_set(result) == set(state_ids)
 
     @pytest.fixture()
-    def patterns_with_expected_results(self, state_ids):  # noqa: ANN001, ANN201
+    def patterns_with_expected_results(self, state_ids):
         return [
             (
                 "test:*",
@@ -92,9 +92,9 @@ class TestCliState:
 
     def test_list_pattern(
         self,
-        state_service,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
-        patterns_with_expected_results,  # noqa: ANN001
+        state_service,
+        cli_runner,
+        patterns_with_expected_results,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for pattern, expected_result in patterns_with_expected_results:
@@ -104,10 +104,10 @@ class TestCliState:
 
     def test_set_from_string(
         self,
-        state_service,  # noqa: ANN001
-        state_ids,  # noqa: ANN001
-        payloads,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        state_service,
+        state_ids,
+        payloads,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for state_id in state_ids:
@@ -127,11 +127,11 @@ class TestCliState:
 
     def test_set_from_file(
         self,
-        tmp_path,  # noqa: ANN001
-        state_service,  # noqa: ANN001
-        state_ids,  # noqa: ANN001
-        payloads,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        tmp_path,
+        state_service,
+        state_ids,
+        payloads,
+        cli_runner,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for idx_i, state_id in enumerate(state_ids):
@@ -149,7 +149,7 @@ class TestCliState:
                     assert_cli_runner(result)
                     assert state_service.get_state(state_id) == state_payload
 
-    def test_merge_from_string(self, state_service, state_ids, cli_runner) -> None:  # noqa: ANN001
+    def test_merge_from_string(self, state_service, state_ids, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = [
                 (state_ids[idx], state_ids[idx + 1])
@@ -171,10 +171,10 @@ class TestCliState:
     @pytest.mark.usefixtures("payloads")
     def test_merge_from_file(
         self,
-        tmp_path,  # noqa: ANN001
-        state_service,  # noqa: ANN001
-        state_ids,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
+        tmp_path,
+        state_service,
+        state_ids,
+        cli_runner,
     ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -201,7 +201,7 @@ class TestCliState:
                     job_dst_state,
                 )
 
-    def test_merge_from_job(self, state_service, state_ids, cli_runner) -> None:  # noqa: ANN001
+    def test_merge_from_job(self, state_service, state_ids, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = [
                 (state_ids[idx], state_ids[idx + 1])
@@ -218,7 +218,7 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == merged_state
 
-    def test_copy_over_existing(self, state_service, state_ids, cli_runner) -> None:  # noqa: ANN001
+    def test_copy_over_existing(self, state_service, state_ids, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = [
                 (state_ids[idx], state_ids[idx + 1])
@@ -233,7 +233,7 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst) == job_src_state
 
-    def test_copy_to_new(self, state_service, state_ids, cli_runner) -> None:  # noqa: ANN001
+    def test_copy_to_new(self, state_service, state_ids, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for job_src_id in state_ids:
                 job_src_state = state_service.get_state(job_src_id)
@@ -245,7 +245,7 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert state_service.get_state(job_dst_id) == job_src_state
 
-    def test_move(self, state_service, state_ids, cli_runner) -> None:  # noqa: ANN001
+    def test_move(self, state_service, state_ids, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             job_pairs = [
                 (state_ids[idx], state_ids[idx + 1])
@@ -263,9 +263,9 @@ class TestCliState:
 
     def test_get(
         self,
-        state_service,  # noqa: ANN001
-        cli_runner,  # noqa: ANN001
-        state_ids_with_expected_states,  # noqa: ANN001
+        state_service,
+        cli_runner,
+        state_ids_with_expected_states,
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for state_id, expected_state in state_ids_with_expected_states:
@@ -273,7 +273,7 @@ class TestCliState:
                 assert_cli_runner(result)
                 assert json.loads(result.stdout) == expected_state
 
-    def test_clear(self, state_service, cli_runner, state_ids) -> None:  # noqa: ANN001
+    def test_clear(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for state_id in state_ids:
                 result = cli_runner.invoke(cli, ["state", "clear", "--force", state_id])
@@ -281,7 +281,7 @@ class TestCliState:
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
 
-    def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:  # noqa: ANN001
+    def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for state_id in state_ids:
                 result = cli_runner.invoke(cli, ["state", "clear", state_id], input="n")

@@ -45,7 +45,7 @@ current_dir = Path(__file__).parent
 
 
 @pytest.fixture(scope="class")
-def discovery():  # noqa: ANN201
+def discovery():
     return {
         PluginType.EXTRACTORS: [
             {
@@ -1871,36 +1871,36 @@ def discovery():  # noqa: ANN201
 
 
 @pytest.fixture(scope="class")
-def locked_definition_service(project):  # noqa: ANN001, ANN201
+def locked_definition_service(project):
     return LockedDefinitionService(project)
 
 
 @pytest.fixture(scope="class")
-def project_init_service(request):  # noqa: ANN001, ANN201
+def project_init_service(request):
     return ProjectInitService(f"project_{request.node.name}")
 
 
 @pytest.fixture(scope="class")
-def plugin_install_service(project):  # noqa: ANN001, ANN201
+def plugin_install_service(project):
     return PluginInstallService(project)
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project):  # noqa: ANN001, ANN201
+def project_add_service(project):
     return ProjectAddService(project)
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service_factory(project):  # noqa: ANN001, ANN201
-    def _factory(plugin, **kwargs):  # noqa: ANN001, ANN003, ANN202
+def plugin_settings_service_factory(project):
+    def _factory(plugin, **kwargs):
         return PluginSettingsService(project, plugin, **kwargs)
 
     return _factory
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(project, plugin_settings_service_factory):  # noqa: ANN001, ANN201
-    def _factory(plugin, **kwargs):  # noqa: ANN001, ANN003, ANN202
+def plugin_invoker_factory(project, plugin_settings_service_factory):
+    def _factory(plugin, **kwargs):
         return invoker_factory(
             project,
             plugin,
@@ -1912,7 +1912,7 @@ def plugin_invoker_factory(project, plugin_settings_service_factory):  # noqa: A
 
 
 @pytest.fixture(scope="class")
-def tap(project_add_service):  # noqa: ANN001, ANN201
+def tap(project_add_service):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1924,7 +1924,7 @@ def tap(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def alternative_tap(project_add_service, tap):  # noqa: ANN001, ANN201
+def alternative_tap(project_add_service, tap):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1937,7 +1937,7 @@ def alternative_tap(project_add_service, tap):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def inherited_tap(project_add_service, tap):  # noqa: ANN001, ANN201
+def inherited_tap(project_add_service, tap):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1953,7 +1953,7 @@ def inherited_tap(project_add_service, tap):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def nonpip_tap(project_add_service):  # noqa: ANN001, ANN201
+def nonpip_tap(project_add_service):
     try:
         return project_add_service.add(
             PluginType.EXTRACTORS,
@@ -1965,7 +1965,7 @@ def nonpip_tap(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def target(project_add_service):  # noqa: ANN001, ANN201
+def target(project_add_service):
     try:
         return project_add_service.add(PluginType.LOADERS, "target-mock")
     except PluginAlreadyAddedException as err:
@@ -1973,7 +1973,7 @@ def target(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def alternative_target(project_add_service):  # noqa: ANN001, ANN201
+def alternative_target(project_add_service):
     # We don't load the `target` fixture here since this ProjectPlugin should
     # have a BasePlugin parent, not the `target` ProjectPlugin
     try:
@@ -1987,7 +1987,7 @@ def alternative_target(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def dbt(project_add_service):  # noqa: ANN001, ANN201
+def dbt(project_add_service):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "dbt")
     except PluginAlreadyAddedException as err:
@@ -1995,7 +1995,7 @@ def dbt(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def transformer(project_add_service: ProjectAddService):  # noqa: ANN201
+def transformer(project_add_service: ProjectAddService):
     try:
         return project_add_service.add(PluginType.TRANSFORMERS, "transformer-mock")
     except PluginAlreadyAddedException as err:
@@ -2003,7 +2003,7 @@ def transformer(project_add_service: ProjectAddService):  # noqa: ANN201
 
 
 @pytest.fixture(scope="class")
-def utility(project_add_service):  # noqa: ANN001, ANN201
+def utility(project_add_service):
     try:
         return project_add_service.add(PluginType.UTILITIES, "utility-mock")
     except PluginAlreadyAddedException as err:
@@ -2011,21 +2011,21 @@ def utility(project_add_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def schedule_service(project):  # noqa: ANN001, ANN201
+def schedule_service(project):
     return ScheduleService(project)
 
 
 @pytest.fixture(scope="class")
-def task_sets_service(project):  # noqa: ANN001, ANN201
+def task_sets_service(project):
     return TaskSetsService(project)
 
 
 @pytest.fixture(scope="class")
-def elt_schedule(  # noqa: ANN201
-    project,  # noqa: ANN001, ARG001
-    tap,  # noqa: ANN001
-    target,  # noqa: ANN001
-    schedule_service,  # noqa: ANN001
+def elt_schedule(
+    project,  # noqa: ARG001
+    tap,
+    target,
+    schedule_service,
 ):
     try:
         return schedule_service.add_elt(
@@ -2042,11 +2042,11 @@ def elt_schedule(  # noqa: ANN201
 
 
 @pytest.fixture(scope="class")
-def job_schedule(  # noqa: ANN201
-    project,  # noqa: ANN001, ARG001
-    tap,  # noqa: ANN001, ARG001
-    target,  # noqa: ANN001, ARG001
-    schedule_service,  # noqa: ANN001
+def job_schedule(
+    project,  # noqa: ARG001
+    tap,  # noqa: ARG001
+    target,  # noqa: ARG001
+    schedule_service,
 ):
     try:
         return schedule_service.add(
@@ -2059,7 +2059,7 @@ def job_schedule(  # noqa: ANN201
 
 
 @pytest.fixture()
-def environment_service(project):  # noqa: ANN001, ANN201
+def environment_service(project):
     service = EnvironmentService(project)
     try:
         yield service
@@ -2070,17 +2070,17 @@ def environment_service(project):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def elt_context_builder(project):  # noqa: ANN001, ANN201
+def elt_context_builder(project):
     return ELTContextBuilder(project)
 
 
 @pytest.fixture(scope="class")
-def job_logging_service(project):  # noqa: ANN001, ANN201
+def job_logging_service(project):
     return JobLoggingService(project)
 
 
 @contextmanager
-def project_directory(project_init_service):  # noqa: ANN001, ANN201
+def project_directory(project_init_service):
     project = project_init_service.init()
     logging.debug(f"Created new project at {project.root}")  # noqa: G004, TID251
 
@@ -2101,8 +2101,8 @@ def project_directory(project_init_service):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture(scope="class")
-def project(  # noqa: ANN201
-    project_init_service,  # noqa: ANN001
+def project(
+    project_init_service,
     tmp_path_factory: pytest.TempPathFactory,
     hub_mock_adapter: t.Callable[[str], BaseAdapter],
 ):
@@ -2117,13 +2117,13 @@ def project(  # noqa: ANN201
 
 
 @pytest.fixture()
-def project_function(project_init_service, tmp_path: Path):  # noqa: ANN001, ANN201
+def project_function(project_init_service, tmp_path: Path):
     with cd(tmp_path), project_directory(project_init_service) as project:
         yield project
 
 
 @pytest.fixture(scope="class")
-def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):  # noqa: ANN001, ANN201
+def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):
     with cd(tmp_path_factory.mktemp("meltano-project-files")), tmp_project(
         "a_multifile_meltano_project_core",
         current_dir / "multifile_project",
@@ -2133,7 +2133,7 @@ def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree
 
 
 @pytest.fixture(scope="class")
-def mapper(project_add_service):  # noqa: ANN001, ANN201
+def mapper(project_add_service):
     try:
         return project_add_service.add(
             PluginType.MAPPERS,
@@ -2180,7 +2180,7 @@ def num_params() -> int:
 
 
 @pytest.fixture()
-def payloads(num_params):  # noqa: ANN001, ANN201
+def payloads(num_params):
     mock_payloads_dict = {
         "mock_state_payloads": [
             {
@@ -2198,8 +2198,8 @@ def payloads(num_params):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def state_ids(  # noqa: ANN201
-    num_params,  # noqa: ANN001, ARG001
+def state_ids(
+    num_params,  # noqa: ARG001
 ):
     state_id_dict = {
         "single_incomplete_state_id": create_state_id("single-incomplete"),
@@ -2218,8 +2218,8 @@ def state_ids(  # noqa: ANN201
 
 
 @pytest.fixture()
-def mock_time():  # noqa: ANN201
-    def _mock_time():  # noqa: ANN202
+def mock_time():
+    def _mock_time():
         for idx in itertools.count():
             yield datetime.datetime(
                 1,
@@ -2232,7 +2232,7 @@ def mock_time():  # noqa: ANN201
 
 
 @pytest.fixture()
-def job_args():  # noqa: ANN201
+def job_args():
     job_args_dict = {
         "complete_job_args": {"state": State.SUCCESS, "payload_flags": Payload.STATE},
         "incomplete_job_args": {
@@ -2245,7 +2245,7 @@ def job_args():  # noqa: ANN201
 
 
 @pytest.fixture()
-def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):  # noqa: ANN001, ANN201
+def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
             Job(
@@ -2316,15 +2316,15 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):  # noqa: ANN0
 
 
 @pytest.fixture()
-def jobs(state_ids_with_jobs):  # noqa: ANN001, ANN201
+def jobs(state_ids_with_jobs):
     return [job for job_list in state_ids_with_jobs.values() for job in job_list]
 
 
 @pytest.fixture()
-def state_ids_with_expected_states(  # noqa: ANN201
-    state_ids,  # noqa: ANN001
-    payloads,  # noqa: ANN001
-    state_ids_with_jobs,  # noqa: ANN001
+def state_ids_with_expected_states(
+    state_ids,
+    payloads,
+    state_ids_with_jobs,
 ):
     final_state = {}
     for state in payloads.mock_state_payloads:
@@ -2376,7 +2376,7 @@ def state_ids_with_expected_states(  # noqa: ANN201
 
 
 @pytest.fixture()
-def job_history_session(jobs, session):  # noqa: ANN001, ANN201
+def job_history_session(jobs, session):
     job: Job
     job_names = set()
     for job in jobs:
@@ -2389,12 +2389,12 @@ def job_history_session(jobs, session):  # noqa: ANN001, ANN201
 
 
 @pytest.fixture()
-def state_service(job_history_session, project):  # noqa: ANN001, ANN201
+def state_service(job_history_session, project):
     return StateService(project, session=job_history_session)
 
 
 @pytest.fixture()
-def project_with_environment(project: Project):  # noqa: ANN201
+def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.environment.env["ENVIRONMENT_ENV_VAR"] = "${MELTANO_PROJECT_ROOT}/file.txt"
     try:
@@ -2432,7 +2432,7 @@ test_log_config = {
 
 
 @pytest.fixture()
-def use_test_log_config():  # noqa: ANN201
+def use_test_log_config():
     with mock.patch(
         "meltano.core.logging.utils.default_config",
         return_value=test_log_config,

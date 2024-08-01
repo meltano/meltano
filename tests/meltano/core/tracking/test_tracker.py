@@ -54,7 +54,7 @@ def delete_analytics_json(project: Project) -> t.Generator[None, None, None]:
 
 class TestTracker:
     @pytest.fixture(autouse=True)
-    def clear_telemetry_settings(self, project, monkeypatch: pytest.MonkeyPatch):  # noqa: ANN001, ANN201
+    def clear_telemetry_settings(self, project, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.delenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", raising=False)
         config = project.settings.meltano_yml_config
         config.pop("send_anonymous_usage_stats", None)
@@ -267,7 +267,7 @@ class TestTracker:
         project.settings.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
-    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch) -> None:  # noqa: ANN001
+    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch) -> None:
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
@@ -366,8 +366,8 @@ class TestTracker:
     def test_timeout_if_endpoint_unavailable(
         self,
         project: Project,
-        sleep_duration,  # noqa: ANN001
-        timeout_should_occur,  # noqa: ANN001
+        sleep_duration,
+        timeout_should_occur,
     ) -> None:
         """Test to ensure that the default tracker timeout is respected.
 
@@ -413,9 +413,9 @@ class TestTracker:
     def test_project_context_send_anonymous_usage_stats_source(
         self,
         project: Project,
-        monkeypatch,  # noqa: ANN001
+        monkeypatch,
     ) -> None:
-        def get_source():  # noqa: ANN202
+        def get_source():
             return ProjectContext(project, uuid.uuid4()).to_json()["data"][
                 "send_anonymous_usage_stats_source"
             ]

@@ -11,7 +11,7 @@ from meltano.cli import cli
 
 class TestCliJob:
     @pytest.mark.usefixtures("session", "project")
-    def test_job_add(self, cli_runner, task_sets_service) -> None:  # noqa: ANN001
+    def test_job_add(self, cli_runner, task_sets_service) -> None:
         # singular task with job
         with mock.patch(
             "meltano.cli.job.TaskSetsService",
@@ -95,7 +95,7 @@ class TestCliJob:
             assert "Failed to parse yaml" in str(res.exception)
 
     @pytest.mark.usefixtures("session", "project")
-    def test_job_set(self, cli_runner, task_sets_service) -> None:  # noqa: ANN001
+    def test_job_set(self, cli_runner, task_sets_service) -> None:
         # singular task with job
         with mock.patch(
             "meltano.cli.job.TaskSetsService",
@@ -131,7 +131,7 @@ class TestCliJob:
 
     @pytest.mark.order(after="test_job_add")
     @pytest.mark.usefixtures("session", "project")
-    def test_job_remove(self, cli_runner, task_sets_service) -> None:  # noqa: ANN001
+    def test_job_remove(self, cli_runner, task_sets_service) -> None:
         # singular task with job
         with mock.patch(
             "meltano.cli.job.TaskSetsService",
@@ -155,7 +155,7 @@ class TestCliJob:
             assert not task_sets_service.exists("job-remove-mock")
 
     @pytest.mark.usefixtures("session", "project")
-    def test_job_list(self, cli_runner, task_sets_service) -> None:  # noqa: ANN001
+    def test_job_list(self, cli_runner, task_sets_service) -> None:
         # singular task with job
         with mock.patch(
             "meltano.cli.job.TaskSetsService",
