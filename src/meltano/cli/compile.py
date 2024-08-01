@@ -60,13 +60,12 @@ def compile_command(
     lint: bool,
     indent: int,
 ) -> None:
-    """
-    Compile a Meltano project into environment-specific manifest files.
+    """Compile a Meltano project into environment-specific manifest files.
 
     This command is in beta, and subject to change without corresponding semantic version updates.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#compile
-    """  # noqa: E501
+    """  # noqa: D301, E501
     tracker: Tracker = ctx.obj["tracker"]
 
     try:

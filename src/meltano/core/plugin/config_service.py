@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import os
 import shutil
@@ -20,7 +20,7 @@ class PluginConfigService:
     environment variables.
     """
 
-    def __init__(
+    def __init__(  # noqa: D107
         self,
         plugin: ProjectPlugin,
         config_dir: str | Path,
@@ -30,7 +30,7 @@ class PluginConfigService:
         self.config_dir = Path(config_dir)
         self.run_dir = Path(run_dir)
 
-    def configure(self):  # noqa: ANN201
+    def configure(self):  # noqa: ANN201, D102
         os.makedirs(self.run_dir, exist_ok=True)
 
         config_file = self.config_dir.joinpath

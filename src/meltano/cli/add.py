@@ -127,11 +127,10 @@ async def add(
     python: str | None = None,
     **flags,  # noqa: ANN003
 ) -> None:
-    """
-    Add a plugin to your project.
+    """Add a plugin to your project.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
-    """
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
     plugin_type = PluginType.from_cli_argument(plugin_type)

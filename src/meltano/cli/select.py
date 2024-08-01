@@ -35,8 +35,7 @@ def selection_color(selection) -> str | None:  # noqa: ANN001
 
 
 def selection_mark(selection) -> str:  # noqa: ANN001
-    """
-    Return the mark to indicate the selection type of an attribute.
+    """Return the mark to indicate the selection type of an attribute.
 
     Examples:
       [automatic]
@@ -91,11 +90,10 @@ async def select(
     install_plugins: InstallPlugins,
     **flags: bool,
 ) -> None:
-    """
-    Manage extractor selection patterns.
+    """Manage extractor selection patterns.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
-    """
+    """  # noqa: D301
     try:
         if flags["list"]:
             await show(

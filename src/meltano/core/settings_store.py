@@ -1034,12 +1034,11 @@ class DbStoreManager(SettingsStoreManager):
 
     @property
     def all_settings(self) -> dict[str, Setting]:
-        """
-        Fetch all settings from the system database for this namespace that are enabled.
+        """Fetch all settings from the system database for this namespace that are enabled.
 
         Returns:
             A dictionary of Setting models.
-        """
+        """  # noqa: E501
         if self._all_settings is None:
             self._all_settings = {
                 setting.name: setting.value

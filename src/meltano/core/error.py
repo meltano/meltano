@@ -12,7 +12,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-class ExitCode(int, Enum):
+class ExitCode(int, Enum):  # noqa: D101
     OK = 0
     FAIL = 1
     NO_RETRY = 2
@@ -56,14 +56,14 @@ class MeltanoError(Exception):
 class Error(Exception):
     """Base exception for ELT errors."""
 
-    def exit_code(self):  # noqa: ANN201
+    def exit_code(self):  # noqa: ANN201, D102
         return ExitCode.FAIL
 
 
 class ExtractError(Error):
     """Error in the extraction process, like API errors."""
 
-    def exit_code(self):  # noqa: ANN201
+    def exit_code(self):  # noqa: ANN201, D102
         return ExitCode.NO_RETRY
 
 

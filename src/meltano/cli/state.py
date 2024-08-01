@@ -110,11 +110,10 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
 @click.pass_context
 @pass_project(migrate=True)
 def meltano_state(project: Project, ctx: click.Context) -> None:
-    """
-    Manage state.
+    """Manage state.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#state
-    """
+    """  # noqa: D301
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
     ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)

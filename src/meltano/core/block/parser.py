@@ -65,7 +65,7 @@ def validate_block_sets(
     return True
 
 
-class BlockParser:
+class BlockParser:  # noqa: D101
     def __init__(
         self,
         log: structlog.BoundLogger,
@@ -80,8 +80,7 @@ class BlockParser:
         merge_state: bool | None = False,
         run_id: uuid.UUID | None = None,
     ):
-        """
-        Parse a meltano run command invocation into a list of blocks.
+        """Parse a meltano run command invocation into a list of blocks.
 
         Args:
             log: Logger to use.

@@ -154,11 +154,10 @@ def config(
     extras: bool,
     safe: bool,
 ) -> None:
-    """
-    Display Meltano or plugin configuration.
+    """Display Meltano or plugin configuration.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
-    """
+    """  # noqa: D301
     tracker = ctx.obj["tracker"]
     try:
         ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None

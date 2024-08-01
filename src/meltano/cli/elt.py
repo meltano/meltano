@@ -150,8 +150,7 @@ async def el(  # WPS408
     merge_state: bool,
     install_plugins: InstallPlugins,
 ) -> None:
-    """
-    Run an EL pipeline to Extract and Load data.
+    """Run an EL pipeline to Extract and Load data.
 
     meltano el '<extractor_name>' '<loader_name>'
 
@@ -159,7 +158,7 @@ async def el(  # WPS408
     loader_name: loader to be used in this pipeline.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
-    """
+    """  # noqa: D301
     await _run_el_command(
         project=project,
         ctx=ctx,
@@ -226,8 +225,7 @@ async def elt(  # WPS408
     merge_state: bool,
     install_plugins: InstallPlugins,
 ) -> None:
-    """
-    Run an ELT pipeline to Extract, Load, and Transform data.
+    """Run an ELT pipeline to Extract, Load, and Transform data.
 
     meltano elt '<extractor_name>' '<loader_name>'
 
@@ -235,7 +233,7 @@ async def elt(  # WPS408
     loader_name: loader to be used in this pipeline.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
-    """
+    """  # noqa: D301
     logger.warning("The `elt` command is deprecated in favor of `el`")
     await _run_el_command(
         project=project,

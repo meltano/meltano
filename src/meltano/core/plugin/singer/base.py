@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 from uuid import uuid4
@@ -12,7 +12,7 @@ from meltano.core.utils import nest_object
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class SingerPlugin(BasePlugin):
+class SingerPlugin(BasePlugin):  # noqa: D101
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize a `SingerPlugin`.
 
@@ -26,7 +26,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config):  # noqa: ANN001, ANN201
+    def process_config(self, flat_config):  # noqa: ANN001, ANN201, D102
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config

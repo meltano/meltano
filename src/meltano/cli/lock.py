@@ -54,7 +54,7 @@ def lock(
     """Lock plugin definitions.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#lock
-    """
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
     lock_service = PluginLockService(project)

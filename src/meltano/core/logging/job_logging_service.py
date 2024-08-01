@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import os
 import typing as t
@@ -25,8 +25,8 @@ class SizeThresholdJobLogException(Exception):
     """A Job log exceeds the `MAX_FILE_SIZE`."""
 
 
-class JobLoggingService:
-    def __init__(self, project: Project):
+class JobLoggingService:  # noqa: D101
+    def __init__(self, project: Project):  # noqa: D107
         self.project = project
 
     @makedirs
@@ -150,11 +150,11 @@ class JobLoggingService:
         for log_path in self.get_all_logs(state_id):
             log_path.unlink()
 
-    def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201
+    def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
         job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)
         return job_dir if job_dir.exists() else None
 
-    def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201
+    def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
         logs_dir = self.logs_dir(state_id, *joinpaths)
         legacy_logs_dir = self.legacy_logs_dir(state_id, *joinpaths)
 

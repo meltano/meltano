@@ -45,11 +45,10 @@ if t.TYPE_CHECKING:
 @click.pass_context
 @pass_project(migrate=True)
 def schedule(project, ctx) -> None:  # noqa: ANN001
-    """
-    Manage pipeline schedules.
+    """Manage pipeline schedules.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """
+    """  # noqa: D301
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)
@@ -134,8 +133,7 @@ def add(
     interval: str,
     start_date: datetime.datetime | None,
 ) -> None:
-    """
-    Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
+    """Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
     Example usage:
 
@@ -148,7 +146,7 @@ def add(
     \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """  # noqa: E501
+    """  # noqa: D301, E501
     if job and (extractor or loader):
         raise click.ClickException(
             "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101

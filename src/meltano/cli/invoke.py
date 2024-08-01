@@ -94,11 +94,10 @@ async def invoke(
     containers: bool = False,
     print_var: str | None = None,
 ) -> None:
-    """
-    Invoke a plugin's executable with specified arguments.
+    """Invoke a plugin's executable with specified arguments.
 
     \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
-    """
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
