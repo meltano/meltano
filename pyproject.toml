@@ -293,6 +293,7 @@ select = [
   "EM",   # flake8-errmsg
   "ERA", # flake8-eradicate
   "F",   # pyflakes
+  "FBT", # flake8-boolean-trap
   "G",   # flake8-logging-format
   "I",   # isort
   "ICN", # flake8-import-conventions

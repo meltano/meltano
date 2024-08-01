@@ -37,6 +37,7 @@ class CatalogRule:
         self,
         tap_stream_id: str | list[str],
         breadcrumb: list[str] | None = None,
+        *,
         negated: bool = False,
     ):
         """Create a catalog rule for a stream and property."""
@@ -92,6 +93,7 @@ class MetadataRule(CatalogRule):
         tap_stream_id: str | list[str],
         breadcrumb: list[str] | None,
         key: str,
+        *,
         value: bool,
         negated: bool = False,
     ):
@@ -107,6 +109,7 @@ class SchemaRule(CatalogRule):
         tap_stream_id: str | list[str],
         breadcrumb: list[str] | None,
         payload: dict,
+        *,
         negated: bool = False,
     ):
         """Create a schema rule for a stream and property."""

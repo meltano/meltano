@@ -175,7 +175,7 @@ def are_similar_types(left, right):
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):
+def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -551,7 +551,7 @@ def expand_env_vars(
             logger.debug(f"Variable '${var}' is empty.")  # noqa: G004
         return val
 
-    return _expand_env_vars(raw_value, replacer, flat)
+    return _expand_env_vars(raw_value, replacer, flat=flat)
 
 
 # Separate inner-function for `expand_env_vars` for performance reasons. Like
@@ -560,13 +560,14 @@ def expand_env_vars(
 def _expand_env_vars(
     raw_value: Expandable,
     replacer: t.Callable[[re.Match], str],
+    *,
     flat: bool,
 ) -> Expandable:
     if isinstance(raw_value, t.Mapping):
         if flat:
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
-            k: _expand_env_vars(v, replacer, flat)
+            k: _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, (str, t.Mapping, list))
             else v
             for k, v in raw_value.items()
@@ -575,7 +576,7 @@ def _expand_env_vars(
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.
         return [
-            _expand_env_vars(v, replacer, flat)
+            _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, (str, t.Mapping, list))
             else v
             for v in raw_value
@@ -703,7 +704,7 @@ def strtobool(val: str) -> bool:
     raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
 
 
-def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
+def get_boolean_env_var(env_var: str, *, default: bool = False) -> bool:
     """Get the value of an environment variable as a boolean.
 
     Args:

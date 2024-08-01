@@ -276,7 +276,7 @@ class TestSingerTap:
         monkeypatch.setitem(
             invoker.settings_service.config_override,
             "_use_cached_catalog",
-            False,
+            value=False,
         )
 
         async with invoker.prepared(session):

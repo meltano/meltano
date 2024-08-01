@@ -336,6 +336,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def get_plugins_of_type(
         self,
         plugin_type: PluginType,
+        *,
         ensure_parent=True,
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
@@ -355,7 +356,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugins
 
-    def plugins_by_type(self, ensure_parent=True):
+    def plugins_by_type(self, *, ensure_parent=True):
         """Return plugins grouped by type.
 
         Args:
@@ -372,7 +373,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
+    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
         Args:
@@ -387,7 +388,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, keep_config: bool = False):
+    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):
         """Update a plugin.
 
         Args:

@@ -27,6 +27,7 @@ class ProjectSettingsService(SettingsService):
     def __init__(
         self,
         project: Project,
+        *,
         show_hidden: bool = True,
         env_override: dict | None = None,
         config_override: dict | None = None,

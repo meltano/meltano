@@ -142,7 +142,7 @@ class TestSingerBlocks:
         )
         await block.start()
 
-        await block.stop(True)
+        await block.stop(kill=True)
         assert block.process_handle.kill.called
         assert block.invoker.cleanup.called
 
@@ -154,7 +154,7 @@ class TestSingerBlocks:
         )
         await block.start()
 
-        await block.stop(False)
+        await block.stop(kill=False)
         assert block.process_handle.terminate.called
         assert block.invoker.cleanup.called
 

@@ -70,7 +70,11 @@ class TaskSets(NameEq, Canonical):
         self.name = name
         self.tasks = tasks
 
-    def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
+    def _as_args(
+        self,
+        *,
+        preserve_top_level: bool = False,
+    ) -> list[str] | list[list[str]]:
         """Get job tasks as CLI args.
 
         Args:

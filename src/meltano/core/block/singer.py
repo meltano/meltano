@@ -103,7 +103,7 @@ class InvokerBase:
         except Exception as err:
             raise RunnerError(f"Cannot start plugin: {err}") from err  # noqa: EM102
 
-    async def stop(self, kill: bool = True):
+    async def stop(self, *, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
@@ -338,7 +338,7 @@ class SingerBlock(InvokerBase, IOBlock):
         except Exception as err:
             raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102
 
-    async def stop(self, kill: bool = True):
+    async def stop(self, *, kill: bool = True):
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:

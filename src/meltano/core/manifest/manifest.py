@@ -119,7 +119,7 @@ class YamlNoTimestampSafeLoader(
 class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(self, project: Project, path: Path, check_schema: bool) -> None:
+    def __init__(self, project: Project, path: Path, *, check_schema: bool) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data

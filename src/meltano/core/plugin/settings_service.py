@@ -120,7 +120,7 @@ class PluginSettingsService(SettingsService):
         """
         return self.plugin.docs
 
-    def setting_env_vars(self, setting_def: SettingDefinition, for_writing=False):
+    def setting_env_vars(self, setting_def: SettingDefinition, *, for_writing=False):
         """Get environment variables for a setting.
 
         Args:

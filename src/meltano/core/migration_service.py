@@ -64,6 +64,7 @@ class MigrationService:
 
     def upgrade(  # too many expression and too complex
         self,
+        *,
         silent: bool = False,
     ) -> None:
         """Upgrade to the latest revision.

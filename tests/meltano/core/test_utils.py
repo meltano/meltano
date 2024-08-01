@@ -284,7 +284,7 @@ def test_makedirs_decorator(tmp_path):
         return root(*ranks)
 
     @makedirs
-    def species(genus_name, species_name, make_dirs: bool = True):
+    def species(genus_name, species_name, *, make_dirs: bool = True):
         return hierarchy(genus_name, species_name, make_dirs=make_dirs)
 
     cat = species("felis", "catus")

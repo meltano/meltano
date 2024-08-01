@@ -332,8 +332,8 @@ class VenvService:
     async def install(
         self,
         pip_install_args: t.Sequence[str],
-        clean: bool = False,
         *,
+        clean: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
@@ -573,8 +573,8 @@ class VenvService:
     async def _pip_install(
         self,
         pip_install_args: t.Sequence[str],
-        clean: bool = False,
         *,
+        clean: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
