@@ -45,6 +45,9 @@ class TestSuperset:
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
     @pytest.mark.asyncio()
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'SUPERSET_WEBSERVER_PORT':RuntimeWarning",
+    )
     async def test_hooks(
         self,
         subject,

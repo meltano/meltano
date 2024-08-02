@@ -231,6 +231,7 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
+    @pytest.mark.filterwarnings("ignore:Unknown setting 'private_key':RuntimeWarning")
     def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path) -> None:
         result = cli_runner.invoke(
             cli,

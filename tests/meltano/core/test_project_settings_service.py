@@ -87,6 +87,7 @@ class TestProjectSettingsService:
         ):
             changed.append(True)
 
+    @pytest.mark.filterwarnings("ignore:Unknown setting 'ff.allowed':RuntimeWarning")
     def test_feature_flag_allowed(self, subject) -> None:
         changed = []
         subject.set([FEATURE_FLAG_PREFIX, "allowed"], value=True)
@@ -98,6 +99,7 @@ class TestProjectSettingsService:
         should_run()
         assert changed
 
+    @pytest.mark.filterwarnings("ignore:Unknown setting 'ff.disallowed':RuntimeWarning")
     def test_feature_flag_disallowed(self, subject) -> None:
         changed = []
         subject.set([FEATURE_FLAG_PREFIX, "disallowed"], value=False)
@@ -109,6 +111,9 @@ class TestProjectSettingsService:
         with pytest.raises(FeatureNotAllowedException):
             should_not_run()
 
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'stacked_env_var':RuntimeWarning",
+    )
     def test_strict_env_var_mode_on_raises_error(self, subject) -> None:
         subject.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
@@ -121,6 +126,9 @@ class TestProjectSettingsService:
         with pytest.raises(EnvironmentVariableNotSetError):
             subject.get("stacked_env_var")
 
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'stacked_env_var':RuntimeWarning",
+    )
     def test_strict_env_var_mode_off_no_raise_error(self, subject) -> None:
         subject.set(
             [FEATURE_FLAG_PREFIX, str(FeatureFlags.STRICT_ENV_VAR_MODE)],
