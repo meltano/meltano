@@ -18,6 +18,11 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
 from meltano.core.utils import NotFound, find_named
 
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.plugin_invoker import PluginInvoker
+
 logger = get_logger(__name__)
 
 
@@ -704,10 +709,10 @@ class BasePlugin(HookObject):
         """
         return True
 
-    def exec_args(  # noqa: ANN201
+    def exec_args(  # noqa: D417
         self,
-        files: dict,  # noqa: ARG002
-    ):
+        plugin_invoker: PluginInvoker,  # noqa: ARG002
+    ) -> list[str | Path]:
         """Return the arguments to pass to the plugin runner.
 
         Args:

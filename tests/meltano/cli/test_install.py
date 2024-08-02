@@ -376,4 +376,4 @@ def test_new_folder_should_autocreate_on_install(cli_runner) -> None:
     shutil.rmtree(".meltano")
     result = cli_runner.invoke(cli, ["install"])
     assert result
-    assert os.path.exists(".meltano/meltano.db")
+    assert os.path.exists(".meltano/meltano.db")  # noqa: PTH110

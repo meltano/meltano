@@ -42,7 +42,7 @@ class TransformAddService:
         Raises:
             ValueError: If the plugin is missing the git repo URL.
         """
-        if not os.path.exists(self.packages_file):
+        if not os.path.exists(self.packages_file):  # noqa: PTH110
             self.packages_file.touch()
 
         package_yaml = yaml.load(self.packages_file) or {"packages": []}
@@ -67,7 +67,7 @@ class TransformAddService:
             package_ref["revision"] = revision
         package_yaml["packages"].append(package_ref)
 
-        with open(self.packages_file, "w") as f:
+        with open(self.packages_file, "w") as f:  # noqa: PTH123
             yaml.dump(package_yaml, f)
 
     def update_dbt_project(self, plugin: ProjectPlugin) -> None:
@@ -98,5 +98,5 @@ class TransformAddService:
         # Add the package's definition to the list of models:
         dbt_project_yaml["models"][package_name] = model_def
 
-        with open(self.dbt_project_file, "w") as f:
+        with open(self.dbt_project_file, "w") as f:  # noqa: PTH123
             yaml.dump(dbt_project_yaml, f)

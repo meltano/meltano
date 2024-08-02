@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import json
-import os
 import platform
+import typing as t
 
 import mock
 import pytest
@@ -10,6 +10,9 @@ import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli, state
 from meltano.core.utils import merge
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 unconventional_state_ids = [
     "unconventional",
@@ -127,7 +130,7 @@ class TestCliState:
 
     def test_set_from_file(
         self,
-        tmp_path,
+        tmp_path: Path,
         state_service,
         state_ids,
         payloads,
@@ -136,11 +139,8 @@ class TestCliState:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for idx_i, state_id in enumerate(state_ids):
                 for idx_j, state_payload in enumerate(payloads.mock_state_payloads):
-                    filepath = os.path.join(
-                        tmp_path,
-                        f"state-file-{idx_i}-{idx_j}.json",
-                    )
-                    with open(filepath, "w+") as state_file:
+                    filepath = tmp_path / f"state-file-{idx_i}-{idx_j}.json"
+                    with filepath.open("w+") as state_file:
                         json.dump(state_payload, state_file)
                     result = cli_runner.invoke(
                         cli,
@@ -171,7 +171,7 @@ class TestCliState:
     @pytest.mark.usefixtures("payloads")
     def test_merge_from_file(
         self,
-        tmp_path,
+        tmp_path: Path,
         state_service,
         state_ids,
         cli_runner,
@@ -188,8 +188,8 @@ class TestCliState:
             for job_src, job_dst in job_pairs:
                 job_src_state = state_service.get_state(job_src)
                 job_dst_state = state_service.get_state(job_dst)
-                filepath = os.path.join(tmp_path, f"{job_src}-{job_dst}")
-                with open(filepath, "w+") as state_file:
+                filepath = tmp_path / f"{job_src}-{job_dst}"
+                with filepath.open("w+") as state_file:
                     json.dump(job_src_state, state_file)
                 result = cli_runner.invoke(
                     cli,

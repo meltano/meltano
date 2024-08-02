@@ -28,7 +28,7 @@ if t.TYPE_CHECKING:
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
-    with open(project.meltano_dir() / "analytics.json") as analytics_json_file:
+    with project.meltano_dir().joinpath("analytics.json").open() as analytics_json_file:
         return json.load(analytics_json_file)
 
 
@@ -195,7 +195,7 @@ class TestTracker:
         with delete_analytics_json(project):
             # Use `delete_analytics_json` to ensure `analytics.json` is restored after
             analytics_json_path = project.meltano_dir() / "analytics.json"
-            with open(analytics_json_path, "w") as analytics_json_file:
+            with analytics_json_path.open("w") as analytics_json_file:
                 analytics_json_file.write(analytics_json_content)
 
             with pytest.raises((TypeError, KeyError, json.JSONDecodeError)):

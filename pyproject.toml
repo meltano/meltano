@@ -212,7 +212,6 @@ module = [
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
   "meltano.core.elt_context",
-  "meltano.core.meltano_invoker",
   "meltano.core.migration_service",
   "meltano.core.models",
   "meltano.core.plugin_install_service",
@@ -234,16 +233,13 @@ module = [
   "meltano.core.plugin.airflow",
   "meltano.core.plugin.base",
   "meltano.core.plugin.command",
-  "meltano.core.plugin.config_service",
   "meltano.core.plugin.dbt.*",
   "meltano.core.plugin.factory",
   "meltano.core.plugin.file",
   "meltano.core.plugin.meltano_file",
   "meltano.core.plugin.project_plugin",
   "meltano.core.plugin.settings_service",
-  "meltano.core.plugin.singer.base",
   "meltano.core.plugin.singer.catalog",
-  "meltano.core.plugin.singer.mapper",
   "meltano.core.plugin.singer.target",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
@@ -302,6 +298,7 @@ select = [
   "PGH", # pygrep-hooks
   "PIE", # flake8-pie
   "PT",  # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
   "Q",   # flake8-quotes
   "RET", # flake8-return
   "RSE", # flake8-raise
@@ -353,8 +350,6 @@ banned-from = [
 typing = "t"
 
 [tool.ruff.lint.flake8-pytest-style]
-parametrize-names-type = "tuple"
-parametrize-values-row-type = "tuple"
 parametrize-values-type = "tuple"
 
 [tool.ruff.lint.isort]

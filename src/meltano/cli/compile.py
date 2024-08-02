@@ -90,7 +90,7 @@ def compile_command(
         project.refresh(environment=environment)
         manifest = Manifest(project=project, path=path, check_schema=lint)
         try:
-            with open(path, "w") as manifest_file:
+            with path.open("w") as manifest_file:
                 json.dump(
                     manifest.data,
                     manifest_file,

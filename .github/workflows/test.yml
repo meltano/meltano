@@ -10,6 +10,7 @@ on:
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
+      - .github/workflows/resources/docker-compose.mssql.yaml
   push:
     branches: [main]
     paths:
@@ -20,6 +21,7 @@ on:
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
+      - .github/workflows/resources/docker-compose.mssql.yaml
   workflow_dispatch:
     inputs: {}
 

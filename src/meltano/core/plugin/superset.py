@@ -106,7 +106,7 @@ class Superset(BasePlugin):
 
             logger.info(f"Merged in config from {custom_config_path}")  # noqa: G004
         config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
+        with config_path.open("w") as config_file:
             config_file.write("\n".join(config_script_lines))
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 

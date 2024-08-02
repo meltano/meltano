@@ -18,15 +18,15 @@ from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
 
-with open(
+with (
     Path(tracking_module_path).parent
     / "iglu-client-embedded"
     / "schemas"
     / "com.meltano"
     / "exception_context"
     / "jsonschema"
-    / "1-0-0",
-) as exception_context_schema_file:
+    / "1-0-0"
+).open() as exception_context_schema_file:
     EXCEPTION_CONTEXT_SCHEMA = json.load(exception_context_schema_file)
 
 
