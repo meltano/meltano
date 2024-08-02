@@ -126,6 +126,7 @@ asyncio_mode = "auto"
 filterwarnings = [
   "error",
   "ignore:datetime.datetime.utcnow:DeprecationWarning:botocore.auth",
+  "ignore:pytest.PytestUnraisableExceptionWarning",
 ]
 log_cli = 1
 log_cli_format = "%(message)s"
