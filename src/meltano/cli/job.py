@@ -100,7 +100,7 @@ def _list_all_jobs(
 )
 @click.pass_context
 @pass_project(migrate=True)
-def job(project, ctx):
+def job(project, ctx) -> None:  # noqa: ANN001
     """
     Manage jobs.
 
@@ -140,7 +140,7 @@ def job(project, ctx):
 )
 @click.argument("job_name", required=False, default=None)
 @click.pass_context
-def list_jobs(ctx, list_format: str, job_name: str):
+def list_jobs(ctx, list_format: str, job_name: str) -> None:  # noqa: ANN001
     """List available jobs."""
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
@@ -168,7 +168,7 @@ def list_jobs(ctx, list_format: str, job_name: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def add(ctx, job_name: str, raw_tasks: str):
+def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     """Add tasks to a new job.
 
     Example usage:
@@ -227,7 +227,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def set_cmd(ctx, job_name: str, raw_tasks: str):
+def set_cmd(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     """Update the tasks associated with an existing job.
 
     Example usage:
@@ -267,7 +267,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 @job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
-def remove(ctx, job_name: str):
+def remove(ctx, job_name: str) -> None:  # noqa: ANN001
     """Remove a job.
 
     Usage:

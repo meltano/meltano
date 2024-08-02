@@ -87,7 +87,7 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
     return False
 
 
-def assert_log_lines(result_output: str, expected: list[LogEntry]):
+def assert_log_lines(result_output: str, expected: list[LogEntry]) -> None:
     seen_lines: list[dict] = []
     for line in result_output.splitlines():
         parsed_line = json.loads(line)
@@ -97,7 +97,7 @@ def assert_log_lines(result_output: str, expected: list[LogEntry]):
         assert entry.matches(seen_lines), f"Expected log entry not found: {entry}"
 
 
-def failure_help_log_suffix(job_logs_file):
+def failure_help_log_suffix(job_logs_file) -> str:
     return (
         "For more detailed log messages re-run the command using 'meltano "
         "--log-level=debug ...' CLI flag.\nNote that you can also check the "
@@ -184,7 +184,8 @@ def dbt_process(process_mock_factory, dbt):
 @pytest.fixture(autouse=True)
 def mock_plugin_installation_env():
     with mock.patch.object(
-        PluginInstallService, "plugin_installation_env"
+        PluginInstallService,
+        "plugin_installation_env",
     ) as plugin_installation_env:
         yield plugin_installation_env
 
@@ -201,7 +202,7 @@ class TestWindowsELT:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
@@ -231,7 +232,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         result = cli_runner.invoke(cli, [command])
         assert result.exit_code == 2
 
@@ -315,7 +316,7 @@ class TestCliEltScratchpadOne:
         job_logging_service,
         monkeypatch,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}_debug"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -326,7 +327,7 @@ class TestCliEltScratchpadOne:
             SingerTap,
             "apply_catalog_rules",
         ), mock.patch("meltano.cli.params.install_plugins"), mock.patch(
-            "meltano.core.plugin_invoker.asyncio"
+            "meltano.core.plugin_invoker.asyncio",
         ) as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -453,7 +454,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -514,7 +515,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -534,7 +535,7 @@ class TestCliEltScratchpadOne:
 
         # Have `target_process.wait` take 1s to make sure the
         # `stdin.write`/`drain` exceptions can be raised
-        async def target_wait_mock():
+        async def target_wait_mock() -> int:
             await asyncio.sleep(1)
             return 1
 
@@ -595,7 +596,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -656,7 +657,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -726,7 +727,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -801,7 +802,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -839,7 +840,14 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
-    def test_elt_already_running(self, cli_runner, tap, target, session, command: str):
+    def test_elt_already_running(
+        self,
+        cli_runner,
+        tap,
+        target,
+        session,
+        command: str,
+    ) -> None:
         state_id = "already_running"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -864,7 +872,7 @@ class TestCliEltScratchpadOne:
         tap,
         target,
         command: str,
-    ):
+    ) -> None:
         catalog = {"streams": []}
         with project.root.joinpath("catalog.json").open("w") as catalog_file:
             json.dump(catalog, catalog_file)
@@ -896,7 +904,7 @@ class TestCliEltScratchpadOne:
         tap,
         target,
         command: str,
-    ):
+    ) -> None:
         state = {"success": True}
         with project.root.joinpath("state.json").open("w") as state_file:
             json.dump(state, state_file)
@@ -932,7 +940,7 @@ class TestCliEltScratchpadOne:
         target,
         plugin_settings_service_factory,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [
             command,
@@ -967,7 +975,7 @@ class TestCliEltScratchpadOne:
         target,
         plugin_settings_service_factory,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [
             command,
@@ -1015,7 +1023,7 @@ class TestCliEltScratchpadTwo:
         target_process,
         silent_dbt_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
         invoke_async = AsyncMock(
@@ -1077,7 +1085,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         job_logging_service,
-    ):
+    ) -> None:
         state_id = "pytest_test_elt"
         args = [
             "elt",
@@ -1161,7 +1169,7 @@ class TestCliEltScratchpadThree:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch.object(DbtRunner, "run", new=AsyncMock()):
@@ -1195,7 +1203,7 @@ class TestCliEltScratchpadThree:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch.object(DbtRunner, "run", new=AsyncMock()):

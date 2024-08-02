@@ -76,7 +76,7 @@ class TestPluginDefinition:
         },
     }
 
-    def test_init_minimal(self):
+    def test_init_minimal(self) -> None:
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["minimal"])
 
         assert plugin_def.name == "tap-example"
@@ -91,7 +91,7 @@ class TestPluginDefinition:
         variant = plugin_def.variants[0]
         assert variant.name is None
 
-    def test_init_basic(self):
+    def test_init_basic(self) -> None:
         attrs = self.ATTRS["basic"]
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **attrs)
 
@@ -115,7 +115,7 @@ class TestPluginDefinition:
         assert plugin_def.extras == {"foo": "bar", "baz": "qux"}
         assert not variant.extras
 
-    def test_init_variants(self):
+    def test_init_variants(self) -> None:
         attrs = self.ATTRS["variants"]
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **attrs)
 
@@ -156,12 +156,12 @@ class TestPluginDefinition:
         assert not variant.extras
 
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
-    def test_canonical(self, attrs_key):
+    def test_canonical(self, attrs_key) -> None:
         attrs = self.ATTRS[attrs_key]
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **attrs)
         assert plugin_def.canonical() == attrs
 
-    def test_find_variant(self):
+    def test_find_variant(self) -> None:
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
 
         assert plugin_def.find_variant().name == "meltano"
@@ -172,12 +172,12 @@ class TestPluginDefinition:
 
         assert plugin_def.find_variant(plugin_def.variants[1]).name == "singer-io"
 
-    def test_variant_labels(self):
+    def test_variant_labels(self) -> None:
         plugin_def = PluginDefinition(PluginType.EXTRACTORS, **self.ATTRS["variants"])
 
         assert plugin_def.variant_labels == "meltano (default), singer-io (deprecated)"
 
-    def test_label(self):
+    def test_label(self) -> None:
         plugin_def = PluginDefinition(
             PluginType.EXTRACTORS,
             name="tap-foo",
@@ -188,7 +188,7 @@ class TestPluginDefinition:
         plugin_def.label = "Foo"
         assert plugin_def.label == "Foo"
 
-    def test_logo_url(self):
+    def test_logo_url(self) -> None:
         plugin_def = PluginDefinition(
             PluginType.EXTRACTORS,
             name="tap-foo",
@@ -216,23 +216,23 @@ class TestBasePlugin:
     def subject(self, plugin_def, variant):
         return BasePlugin(plugin_def, variant)
 
-    def test_getattr(self, subject, plugin_def, variant):
+    def test_getattr(self, subject, plugin_def, variant) -> None:
         # Falls back to the plugin def
         assert subject.name == plugin_def.name
 
         # And the variant
         assert subject.pip_url == variant.pip_url
 
-    def test_variant(self, subject, variant):
+    def test_variant(self, subject, variant) -> None:
         assert subject.variant == variant.name
 
         variant.name = None
         assert subject.variant is None
 
-    def test_extras(self, subject):
+    def test_extras(self, subject) -> None:
         assert subject.extras == {"foo": "bar", "baz": "qux"}
 
-    def test_extra_settings(self, subject):
+    def test_extra_settings(self, subject) -> None:
         subject.EXTRA_SETTINGS = [
             SettingDefinition(name="_foo", sensitive=True, value="default"),
             SettingDefinition(name="_bar", kind=SettingKind.INTEGER, value=0),
@@ -297,7 +297,7 @@ class TestProjectPlugin:
         },
     }
 
-    def test_init_minimal(self):
+    def test_init_minimal(self) -> None:
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["minimal"])
 
         assert plugin.name == "tap-example"
@@ -306,7 +306,7 @@ class TestProjectPlugin:
         assert not plugin.config
         assert not plugin.is_custom()
 
-    def test_init_basic(self):
+    def test_init_basic(self) -> None:
         attrs = self.ATTRS["basic"]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
 
@@ -317,7 +317,7 @@ class TestProjectPlugin:
         assert plugin.extras == {"baz": "qux"}
         assert not plugin.is_custom()
 
-    def test_init_custom(self):
+    def test_init_custom(self) -> None:
         attrs = self.ATTRS["custom"]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
 
@@ -351,7 +351,7 @@ class TestProjectPlugin:
         assert plugin_def.extras == variant.extras
         assert not plugin_def.extras
 
-    def test_init_inherited(self):
+    def test_init_inherited(self) -> None:
         attrs = self.ATTRS["inherited"]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
 
@@ -364,12 +364,12 @@ class TestProjectPlugin:
         assert plugin.label == plugin.name
 
     @pytest.mark.parametrize("attrs_key", ATTRS.keys())
-    def test_canonical(self, attrs_key):
+    def test_canonical(self, attrs_key) -> None:
         attrs = self.ATTRS[attrs_key]
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **attrs)
         assert plugin.canonical() == attrs
 
-    def test_parent(self, inherited_tap):
+    def test_parent(self, inherited_tap) -> None:
         tap = inherited_tap.parent
         assert isinstance(tap, ProjectPlugin)
 
@@ -424,7 +424,7 @@ class TestProjectPlugin:
         assert inherited_tap.repo == tap.repo == base_plugin.repo
         assert inherited_tap.docs == tap.docs == base_plugin.docs
 
-    def test_set_parent(self):
+    def test_set_parent(self) -> None:
         plugin_one = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-one",
@@ -447,7 +447,7 @@ class TestProjectPlugin:
         with pytest.raises(CyclicInheritanceError):
             plugin_three.parent = plugin_one
 
-    def test_variant(self, project: Project):
+    def test_variant(self, project: Project) -> None:
         # Without a variant set, the "original" name is used
         plugin: ProjectPlugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
         assert plugin.variant == Variant.ORIGINAL_NAME
@@ -476,7 +476,7 @@ class TestProjectPlugin:
 
         assert plugin.variant == base_plugin.variant == "meltano"
 
-    def test_command_inheritance(self, tap, inherited_tap):
+    def test_command_inheritance(self, tap, inherited_tap) -> None:
         # variants
         assert tap.all_commands["cmd"].args == "cmd meltano"
         assert tap.all_commands["cmd"].description == "a description of cmd"
@@ -501,7 +501,7 @@ class TestProjectPlugin:
             "cmd-inherited",
         ]
 
-    def test_command_test(self, tap: BasePlugin):
+    def test_command_test(self, tap: BasePlugin) -> None:
         """Validate the plugin 'test' command."""
         assert "test" in tap.test_commands
         assert tap.test_commands["test"].args == "--test"
@@ -512,7 +512,7 @@ class TestProjectPlugin:
         assert tap.test_commands["test_extra"].description == "Run extra tests"
         assert tap.test_commands["test_extra"].executable == "test-extra"
 
-    def testenv_prefixes(self, inherited_tap, tap):
+    def testenv_prefixes(self, inherited_tap, tap) -> None:
         assert tap.env_prefixes() == ["tap-mock", "tap_mock"]
         assert tap.env_prefixes(for_writing=True) == [
             "tap-mock",
@@ -532,7 +532,7 @@ class TestProjectPlugin:
             "meltano_extract",
         ]
 
-    def test_config_with_extras(self):
+    def test_config_with_extras(self) -> None:
         plugin = ProjectPlugin(PluginType.EXTRACTORS, **self.ATTRS["basic"])
 
         # It reads by combining config with extras (prefixed with _)
@@ -551,7 +551,7 @@ class TestProjectPlugin:
         assert plugin.config == {"foo": "BAR", "bar": "FOO"}
         assert plugin.extras == {"baz": "QUX", "qux": "BAZ"}
 
-    def test_settings(self, tap):
+    def test_settings(self, tap) -> None:
         tap.config["custom"] = "from_meltano_yml"
         tap.config["nested"] = {"custom": True}
 
@@ -566,7 +566,7 @@ class TestProjectPlugin:
         assert "nested.custom" in settings_by_name
         assert settings_by_name["nested.custom"].kind == SettingKind.BOOLEAN
 
-    def test_extra_settings(self, tap):
+    def test_extra_settings(self, tap) -> None:
         tap.extras["custom"] = "from_meltano_yml"
         tap.extras["nested"] = {"custom": True}
 
@@ -581,7 +581,7 @@ class TestProjectPlugin:
         assert "_nested.custom" in settings_by_name
         assert settings_by_name["_nested.custom"].kind == SettingKind.BOOLEAN
 
-    def test_requirements(self, transformer: ProjectPlugin):
+    def test_requirements(self, transformer: ProjectPlugin) -> None:
         """Validate the plugin requirements."""
         assert transformer.all_requires
         requirement = transformer.all_requires[PluginType.FILES][0]
@@ -593,14 +593,14 @@ class TestProjectPlugin:
 
 
 class TestPluginType:
-    def test_properties(self):
+    def test_properties(self) -> None:
         for plugin_type in PluginType:
             # assert no exceptions raised:
             assert plugin_type.descriptor is not None
             assert plugin_type.singular is not None
             assert plugin_type.verb is not None
 
-    def test_specfic_properties(self):
+    def test_specfic_properties(self) -> None:
         assert PluginType.FILES.descriptor == "file bundle"
         assert PluginType.TRANSFORMS.verb == "transform"
         assert PluginType.UTILITIES.verb == "utilize"
@@ -609,7 +609,7 @@ class TestPluginType:
         assert PluginType.MAPPERS.singular == "mapper"
         assert PluginType.MAPPERS.verb == "map"
 
-    def test_from_cli_argument(self):
+    def test_from_cli_argument(self) -> None:
         for plugin_type in PluginType:
             assert PluginType.from_cli_argument(plugin_type.value) == plugin_type
             assert PluginType.from_cli_argument(plugin_type.singular) == plugin_type

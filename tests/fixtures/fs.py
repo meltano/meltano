@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
 def compatible_copy_tree():
     """Copy files recursively from source to destination, ignoring existing dirs."""
 
-    def _compatible_copy_tree(source: Path, destination: Path):
+    def _compatible_copy_tree(source: Path, destination: Path) -> None:
         """Copy files recursively from source to destination, ignoring existing dirs."""
         shutil.copytree(source, destination, dirs_exist_ok=True)
 
@@ -55,7 +55,7 @@ def pushd(request):
 
 
 @pytest.mark.meta()
-def test_pushd(tmp_path, pushd):
+def test_pushd(tmp_path, pushd) -> None:
     os.makedirs(tmp_path / "a")
     os.makedirs(tmp_path / "a" / "b")
 

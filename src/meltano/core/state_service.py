@@ -45,7 +45,7 @@ class StateService:
         self.session = session
         self._state_store_manager = None
 
-    def list_state(self, state_id_pattern: str | None = None):
+    def list_state(self, state_id_pattern: str | None = None):  # noqa: ANN201
         """List all state found in the db.
 
         Args:
@@ -84,7 +84,7 @@ class StateService:
         raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 
     @property
-    def state_store_manager(self):
+    def state_store_manager(self):  # noqa: ANN201
         """Initialize and return the correct StateStoreManager.
 
         Returns:
@@ -98,7 +98,7 @@ class StateService:
         return self._state_store_manager
 
     @staticmethod
-    def validate_state(state: dict[str, t.Any]):
+    def validate_state(state: dict[str, t.Any]) -> None:
         """Check that the given state str is valid.
 
         Args:
@@ -118,8 +118,8 @@ class StateService:
         new_state: str,
         payload_flags: Payload = Payload.STATE,
         *,
-        validate=True,
-    ):
+        validate=True,  # noqa: ANN001
+    ) -> None:
         """Add state for the given Job.
 
         Args:
@@ -150,7 +150,7 @@ class StateService:
         )
         self.state_store_manager.set(job_state)
 
-    def get_state(self, state_id: str):
+    def get_state(self, state_id: str):  # noqa: ANN201
         """Get state for the given state_id.
 
         Args:
@@ -163,7 +163,13 @@ class StateService:
             return json.loads(state.json_merged())
         return {}
 
-    def set_state(self, state_id: str, new_state: str, *, validate: bool = True):
+    def set_state(
+        self,
+        state_id: str,
+        new_state: str,
+        *,
+        validate: bool = True,
+    ) -> None:
         """Set the state for the state_id.
 
         Args:
@@ -178,7 +184,7 @@ class StateService:
             validate=validate,
         )
 
-    def clear_state(self, state_id, *, save: bool = True):  # noqa: ARG002
+    def clear_state(self, state_id, *, save: bool = True) -> None:  # noqa: ANN001, ARG002
         """Clear the state for the state_id.
 
         Args:
@@ -187,7 +193,7 @@ class StateService:
         """
         self.state_store_manager.clear(state_id)
 
-    def merge_state(self, state_id_src: str, state_id_dst: str):
+    def merge_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Merge state from state_id_src into state_id_dst.
 
         Args:
@@ -200,7 +206,7 @@ class StateService:
             payload_flags=Payload.INCOMPLETE_STATE,
         )
 
-    def copy_state(self, state_id_src: str, state_id_dst: str):
+    def copy_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Copy state from Job state_id_src onto Job state_id_dst.
 
         Args:
@@ -209,7 +215,7 @@ class StateService:
         """
         self.set_state(state_id_dst, json.dumps(self.get_state(state_id_src)))
 
-    def move_state(self, state_id_src: str, state_id_dst: str):
+    def move_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Move state from Job state_id_src to Job state_id_dst.
 
         Args:

@@ -74,7 +74,7 @@ class TestTracker:
                 project.settings.config_override,
             ) = original_config_override
 
-    def test_telemetry_state_change_check(self, project: Project):
+    def test_telemetry_state_change_check(self, project: Project) -> None:
         with mock.patch.object(
             Tracker,
             "save_telemetry_settings",
@@ -82,7 +82,7 @@ class TestTracker:
             Tracker(project)
             assert mocked.call_count == 1
 
-    def test_update_analytics_json(self, project: Project):
+    def test_update_analytics_json(self, project: Project) -> None:
         tracker = Tracker(project)
         inital_send_anonymous_usage_stats = tracker.send_anonymous_usage_stats
 
@@ -110,7 +110,7 @@ class TestTracker:
             != analytics_json_post["send_anonymous_usage_stats"]
         )
 
-    def test_restore_project_id_from_analytics_json(self, project: Project):
+    def test_restore_project_id_from_analytics_json(self, project: Project) -> None:
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
         original_project_id = project.settings.get("project_id")
@@ -133,7 +133,10 @@ class TestTracker:
             str(uuid.UUID(hash_sha256(original_project_id)[::2])) == restored_project_id
         )
 
-    def test_no_project_id_state_change_if_tracking_disabled(self, project: Project):
+    def test_no_project_id_state_change_if_tracking_disabled(
+        self,
+        project: Project,
+    ) -> None:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
@@ -150,7 +153,10 @@ class TestTracker:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 0
 
-    def test_no_state_change_event_without_analytics_json(self, project: Project):
+    def test_no_state_change_event_without_analytics_json(
+        self,
+        project: Project,
+    ) -> None:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
@@ -163,7 +169,7 @@ class TestTracker:
                 Tracker(project)
                 assert mocked.call_count == 0
 
-    def test_analytics_json_is_created(self, project: Project):
+    def test_analytics_json_is_created(self, project: Project) -> None:
         Tracker(project)
         check_analytics_json(project)
         with delete_analytics_json(project):
@@ -185,7 +191,7 @@ class TestTracker:
         self,
         project: Project,
         analytics_json_content: str,
-    ):
+    ) -> None:
         with delete_analytics_json(project):
             # Use `delete_analytics_json` to ensure `analytics.json` is restored after
             analytics_json_path = project.meltano_dir() / "analytics.json"
@@ -199,7 +205,10 @@ class TestTracker:
 
             check_analytics_json(project)
 
-    def test_restore_project_id_and_telemetry_state_change(self, project: Project):
+    def test_restore_project_id_and_telemetry_state_change(
+        self,
+        project: Project,
+    ) -> None:
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
         change event is fired because `send_anonymous_usage_stats` is negated.
@@ -253,12 +262,12 @@ class TestTracker:
         snowplow_endpoints: list[str],
         send_stats: bool,
         expected: bool,
-    ):
+    ) -> None:
         project.settings.set("snowplow.collector_endpoints", snowplow_endpoints)
         project.settings.set("send_anonymous_usage_stats", send_stats)
         assert Tracker(project).can_track() is expected
 
-    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch):
+    def test_send_anonymous_usage_stats(self, project: Project, monkeypatch) -> None:
         monkeypatch.setenv("MELTANO_SEND_ANONYMOUS_USAGE_STATS", "True")
         assert Tracker(project).send_anonymous_usage_stats is True
 
@@ -279,15 +288,15 @@ class TestTracker:
         project: Project,
         *,
         setting_value: bool,
-    ):
+    ) -> None:
         project.settings.set("send_anonymous_usage_stats", setting_value)
         assert Tracker(project).send_anonymous_usage_stats is setting_value
 
-    def test_default_send_anonymous_usage_stats(self, project: Project):
+    def test_default_send_anonymous_usage_stats(self, project: Project) -> None:
         assert Tracker(project).send_anonymous_usage_stats
 
     @pytest.mark.usefixtures("project")
-    def test_exit_event_is_fired(self, snowplow: SnowplowMicro):
+    def test_exit_event_is_fired(self, snowplow: SnowplowMicro) -> None:
         subprocess.run(("meltano", "invoke", "alpha-beta-fox"))
 
         event_summary = snowplow.all()
@@ -307,14 +316,14 @@ class TestTracker:
         project: Project,
         *,
         send_anonymous_usage_stats: bool,
-    ):
+    ) -> None:
         tracker = Tracker(project)
         tracker.send_anonymous_usage_stats = send_anonymous_usage_stats
 
         passed = False
 
         class MockSnowplowTracker:
-            def track(self, event: SelfDescribing):
+            def track(self, event: SelfDescribing) -> None:
                 # Can't put asserts in here because this method is executed
                 # withing a try-except block that catches all exceptions.
                 nonlocal passed
@@ -359,7 +368,7 @@ class TestTracker:
         project: Project,
         sleep_duration,
         timeout_should_occur,
-    ):
+    ) -> None:
         """Test to ensure that the default tracker timeout is respected.
 
         An HTTP sever is run on another thread, which handles request sent from
@@ -405,7 +414,7 @@ class TestTracker:
         self,
         project: Project,
         monkeypatch,
-    ):
+    ) -> None:
         def get_source():
             return ProjectContext(project, uuid.uuid4()).to_json()["data"][
                 "send_anonymous_usage_stats_source"
@@ -428,7 +437,7 @@ class TestTracker:
         project: Project,
         monkeypatch: pytest.MonkeyPatch,
         log: pytest_structlog.StructuredLogCapture,
-    ):
+    ) -> None:
         endpoints = """
             [
                 "notvalid:8080",
@@ -471,7 +480,7 @@ class TestTracker:
         self,
         project: Project,
         monkeypatch: pytest.MonkeyPatch,
-    ):
+    ) -> None:
         with delete_analytics_json(project):
             monkeypatch.setenv("MELTANO_CLIENT_ID", "invalid-context-uuid")
             with pytest.warns(RuntimeWarning, match="Invalid telemetry client UUID"):

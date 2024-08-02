@@ -7,7 +7,7 @@ if t.TYPE_CHECKING:
     from click.testing import Result
 
 
-def assert_cli_runner(results: Result, message=None):
+def assert_cli_runner(results: Result, message=None) -> None:
     assertion_message = str(message or results.output)
 
     if results.exception:

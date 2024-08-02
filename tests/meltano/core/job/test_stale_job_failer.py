@@ -51,7 +51,7 @@ class TestStaleJobFailer:
         other_stale_job,
         complete_job,
         session,
-    ):
+    ) -> None:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 
@@ -80,7 +80,7 @@ class TestStaleJobFailer:
         other_stale_job,
         complete_job,
         session,
-    ):
+    ) -> None:
         assert stale_job.is_stale()
         assert other_stale_job.is_stale()
 

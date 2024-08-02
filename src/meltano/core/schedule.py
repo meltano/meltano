@@ -124,7 +124,7 @@ class Schedule(NameEq, Canonical):
             f"--state-id={self.name}",
         ]
 
-    def last_successful_run(self, session) -> StateJob:
+    def last_successful_run(self, session) -> StateJob:  # noqa: ANN001
         """Return the last successful run for this schedule.
 
         Args:

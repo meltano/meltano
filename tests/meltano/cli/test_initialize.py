@@ -9,7 +9,7 @@ from meltano.core.project_init_service import ProjectInitServiceError
 
 
 class TestCliInit:
-    def test_init(self, cli_runner, tmp_path_factory, pushd):
+    def test_init(self, cli_runner, tmp_path_factory, pushd) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
@@ -52,7 +52,12 @@ class TestCliInit:
         assert "send_anonymous_usage_stats: false" in meltano_yml
         assert "project_id:" in meltano_yml
 
-    def test_init_existing_empty_directory(self, cli_runner, tmp_path_factory, pushd):
+    def test_init_existing_empty_directory(
+        self,
+        cli_runner,
+        tmp_path_factory,
+        pushd,
+    ) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         pushd(new_project_root)
 
@@ -77,7 +82,12 @@ class TestCliInit:
 
         Project.deactivate()
 
-    def test_init_existing_meltano_yml(self, cli_runner, tmp_path_factory, pushd):
+    def test_init_existing_meltano_yml(
+        self,
+        cli_runner,
+        tmp_path_factory,
+        pushd,
+    ) -> None:
         new_project_root = tmp_path_factory.mktemp("new_meltano_root")
         new_project_root.joinpath("meltano.yml").touch()
         new_project_root.joinpath("README.md").touch()

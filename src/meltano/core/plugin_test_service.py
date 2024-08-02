@@ -29,7 +29,7 @@ class PluginTestServiceFactory:
         """
         self.plugin_invoker = plugin_invoker
 
-    def get_test_service(self):
+    def get_test_service(self):  # noqa: ANN201
         """Resolve a test service instance for a plugin type.
 
         Returns:

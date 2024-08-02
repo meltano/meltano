@@ -44,12 +44,12 @@ def modified_lockfile(project: Project):
 
 class TestProjectPluginsService:
     @pytest.fixture(autouse=True)
-    def setup(self, project: Project, tap):
+    def setup(self, project: Project, tap) -> None:
         project.plugins.lock_service.save(tap, exists_ok=True)
         project.plugins._prefer_source = DefinitionSource.ANY
 
     @pytest.mark.order(0)
-    def test_plugins(self, project):
+    def test_plugins(self, project) -> None:
         assert all(
             isinstance(plugin.parent, BasePlugin)
             for plugin in project.plugins.plugins()
@@ -62,7 +62,7 @@ class TestProjectPluginsService:
         alternative_tap,
         inherited_tap,
         alternative_target,
-    ):
+    ) -> None:
         # name="tap-mock", variant="meltano"
         plugin = project.plugins.get_plugin(tap)
         assert plugin.type == PluginType.EXTRACTORS
@@ -105,7 +105,7 @@ class TestProjectPluginsService:
         project: Project,
         tap: ProjectPlugin,
         locked_definition_service: LockedDefinitionService,
-    ):
+    ) -> None:
         expected = locked_definition_service.find_base_plugin(
             plugin_type=PluginType.EXTRACTORS,
             plugin_name="tap-mock",
@@ -123,7 +123,7 @@ class TestProjectPluginsService:
         self,
         project: Project,
         tap: ProjectPlugin,
-    ):
+    ) -> None:
         with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
             PluginDefinitionNotFoundError,
         ):
@@ -136,7 +136,7 @@ class TestProjectPluginsService:
         alternative_tap,
         inherited_tap,
         alternative_target,
-    ):
+    ) -> None:
         # The behavior being tested here assumes that no lockfiles exist.
         shutil.rmtree(project.plugins.project.root_dir("plugins"), ignore_errors=True)
         # name="tap-mock", variant="meltano"
@@ -185,7 +185,7 @@ class TestProjectPluginsService:
 
         assert isinstance(excinfo.value.__cause__, PluginParentNotFoundError)
 
-    def test_update_plugin(self, project: Project, tap):
+    def test_update_plugin(self, project: Project, tap) -> None:
         # update a tap with a random value
         tap.config["test"] = 42
         tap, outdated = project.plugins.update_plugin(tap)
@@ -199,7 +199,7 @@ class TestProjectPluginsService:
             project.plugins.get_plugin(tap).config == {}  # (OK compare with falsy)
         )
 
-    def test_update_plugin_not_found(self, project: Project):
+    def test_update_plugin_not_found(self, project: Project) -> None:
         nonexistent_plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-foo",
@@ -208,7 +208,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginNotFoundError):
             project.plugins.update_plugin(nonexistent_plugin)
 
-    def test_find_plugins_by_mapping_name(self, project: Project, mapper):
+    def test_find_plugins_by_mapping_name(self, project: Project, mapper) -> None:
         assert project.plugins.find_plugins_by_mapping_name("mock-mapping-1") == [
             mapper,
         ]
@@ -218,7 +218,7 @@ class TestProjectPluginsService:
         with pytest.raises(PluginNotFoundError):
             project.plugins.find_plugins_by_mapping_name("non-existent-mapping")
 
-    def test_find_plugins(self, project: Project, mapper):
+    def test_find_plugins(self, project: Project, mapper) -> None:
         assert project.plugins.find_plugin("mock-mapping-1") == mapper
         assert project.plugins.find_plugin("mock-mapping-0") == mapper
         with pytest.raises(PluginNotFoundError):

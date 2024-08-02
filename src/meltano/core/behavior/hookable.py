@@ -22,11 +22,11 @@ class hook:  # noqa: N801
     accordingly.
     """
 
-    def __init__(self, hook_name, *, can_fail=False):
+    def __init__(self, hook_name, *, can_fail=False) -> None:  # noqa: ANN001
         self.name = hook_name
         self.can_fail = can_fail
 
-    def __call__(self, func):
+    def __call__(self, func):  # noqa: ANN001, ANN204
         func.__hook__ = self
         return func
 
@@ -37,7 +37,7 @@ class Hookable(type):
     Hooks are registered in declaration order.
     """
 
-    def __new__(cls, name, bases, dct):
+    def __new__(cls, name, bases, dct):  # noqa: ANN001, ANN204
         new_type = type.__new__(cls, name, bases, dct)
         new_type.__hooks__ = {}
 
@@ -54,7 +54,7 @@ class Hookable(type):
 
         return new_type
 
-    def __prepare__(cls, bases, **kwds):
+    def __prepare__(cls, bases, **kwds):  # noqa: ANN001, ANN003, ANN204
         return OrderedDict()
 
 
@@ -66,7 +66,7 @@ class HookObject(metaclass=Hookable):
     """
 
     @asynccontextmanager
-    async def trigger_hooks(self, hook_name, *args, **kwargs):
+    async def trigger_hooks(self, hook_name, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN201
         """Trigger all registered before and after functions for a given hook.
 
         Yields to the caller in between triggers.
@@ -100,7 +100,7 @@ class HookObject(metaclass=Hookable):
             self._triggering_hooks.remove(hook_name)
 
     @classmethod
-    async def trigger(cls, target, hook_name, *args, **kwargs):
+    async def trigger(cls, target, hook_name, *args, **kwargs) -> None:  # noqa: ANN001, ANN002, ANN003
         """Trigger a registered hook function."""
         hooks = [
             hook

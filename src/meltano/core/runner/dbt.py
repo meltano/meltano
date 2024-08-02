@@ -19,14 +19,14 @@ class DbtRunner(Runner):
         self.context = elt_context
 
     @property
-    def project(self):
+    def project(self):  # noqa: ANN201
         return self.context.project
 
     @property
-    def plugin_context(self):
+    def plugin_context(self):  # noqa: ANN201
         return self.context.transformer
 
-    async def invoke(self, dbt: PluginInvoker, *args, log=None, **kwargs):
+    async def invoke(self, dbt: PluginInvoker, *args, log=None, **kwargs) -> None:  # noqa: ANN001, ANN002, ANN003
         """Call the dbt executable with the given arguments in a new process."""
         log = log or sys.stderr
 
@@ -59,7 +59,7 @@ class DbtRunner(Runner):
                 {PluginType.TRANSFORMERS: exitcode},
             )
 
-    async def run(self, log=None):
+    async def run(self, log=None) -> None:  # noqa: ANN001
         dbt = self.context.transformer_invoker()
 
         async with dbt.prepared(self.context.session):

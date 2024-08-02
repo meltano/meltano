@@ -702,12 +702,12 @@ def select_all_executor():
         ),
     ),
 )
-def test_path_property(path, prop):
+def test_path_property(path, prop) -> None:
     assert path_property(path) == prop
 
 
 class TestCatalogRule:
-    def test_match(self):
+    def test_match(self) -> None:
         rule = CatalogRule("tap_stream_id")
 
         # Stream ID matches
@@ -722,7 +722,7 @@ class TestCatalogRule:
         # Stream ID doesn't match
         assert not rule.match("tap_stream")
 
-    def test_match_wildcard(self):
+    def test_match_wildcard(self) -> None:
         rule = CatalogRule("tap_stream*")
 
         # Stream ID pattern matches
@@ -733,7 +733,7 @@ class TestCatalogRule:
         # Stream ID pattern doesn't match
         assert not rule.match("tap_strea")
 
-    def test_match_multiple(self):
+    def test_match_multiple(self) -> None:
         rule = CatalogRule(["tap_stream_id", "other*"])
 
         # Stream ID patterns match
@@ -746,7 +746,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream")
         assert not rule.match("othe")
 
-    def test_match_negated(self):
+    def test_match_negated(self) -> None:
         rule = CatalogRule("tap_stream_id", negated=True)
 
         # Stream ID doesn't match, so the rule does
@@ -763,7 +763,7 @@ class TestCatalogRule:
         # Stream ID doesn't match (good!), but breadcrumb doesn't match
         assert not rule.match("tap_stream", ["property"])
 
-    def test_match_negated_wildcard(self):
+    def test_match_negated_wildcard(self) -> None:
         rule = CatalogRule("tap_stream*", negated=True)
 
         # Stream ID pattern doesn't match, so the rule does
@@ -774,7 +774,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_foo")
         assert not rule.match("tap_stream")
 
-    def test_match_negated_multiple(self):
+    def test_match_negated_multiple(self) -> None:
         rule = CatalogRule(["tap_stream_id", "other*"], negated=True)
 
         # Stream ID pattern doesn't match, so the rule does
@@ -787,7 +787,7 @@ class TestCatalogRule:
         assert not rule.match("other_foo")
         assert not rule.match("other")
 
-    def test_match_breadcrumb(self):
+    def test_match_breadcrumb(self) -> None:
         rule = CatalogRule("tap_stream_id", ["property"])
 
         # Stream ID matches and breadcrumb is not considered
@@ -800,7 +800,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["property", "nested"])
 
-    def test_match_wildcard_breadcrumb(self):
+    def test_match_wildcard_breadcrumb(self) -> None:
         rule = CatalogRule("tap_stream_id", ["proper*"])
 
         # Stream ID and breadcrumb pattern match
@@ -814,7 +814,7 @@ class TestCatalogRule:
         assert not rule.match("tap_stream_id", [])
         assert not rule.match("tap_stream_id", ["other"])
 
-    def test_match_negated_breadcrumb(self):
+    def test_match_negated_breadcrumb(self) -> None:
         rule = CatalogRule("tap_stream_id", ["property"], negated=True)
 
         # Stream ID doesn't match (good!) and breadcrumb is not considered
@@ -846,7 +846,7 @@ class TestLegacyCatalogSelectVisitor:
         return metadata.get("selected", False)
 
     @classmethod
-    def assert_catalog_is_selected(cls, catalog):
+    def assert_catalog_is_selected(cls, catalog) -> None:
         streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
 
         # all streams are selected
@@ -871,7 +871,7 @@ class TestLegacyCatalogSelectVisitor:
                     field_metadata,
                 ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
-    def test_visit(self, catalog, select_all_executor):
+    def test_visit(self, catalog, select_all_executor) -> None:
         visit(catalog, select_all_executor)
 
         self.assert_catalog_is_selected(catalog)
@@ -900,7 +900,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog, select_all_executor):
+    def test_visit(self, catalog, select_all_executor) -> None:
         super().test_visit(catalog, select_all_executor)
 
     @pytest.mark.parametrize(
@@ -908,7 +908,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_select_all(self, catalog, select_all_executor):
+    def test_select_all(self, catalog, select_all_executor) -> None:
         visit(catalog, select_all_executor)
         self.assert_catalog_is_selected(catalog)
 
@@ -942,7 +942,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select(self, catalog, attrs):
+    def test_select(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "UniqueEntitiesName.code",
@@ -975,7 +975,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_escaped(self, catalog, attrs):
+    def test_select_escaped(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "Unique\\.Entities\\.Name.code",
@@ -1001,7 +1001,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         ),
         indirect=["catalog"],
     )
-    def test_select_negated(self, catalog, attrs):
+    def test_select_negated(self, catalog, attrs) -> None:
         selector = SelectExecutor(
             [
                 "*.*",
@@ -1088,13 +1088,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             "no metadata",
         ],
     )
-    def test_node_selection(self, node: dict, selection_type: SelectionType):
+    def test_node_selection(self, node: dict, selection_type: SelectionType) -> None:
         """Test that selection metadata produces the expected selection type member."""
         assert ListSelectedExecutor.node_selection(node) == selection_type
 
 
 class TestSelectionType:
-    def test_selection_type_addition(self):
+    def test_selection_type_addition(self) -> None:
         st = SelectionType
         assert st.EXCLUDED + st.EXCLUDED == st.EXCLUDED
         assert st.SELECTED + st.EXCLUDED == st.EXCLUDED
@@ -1102,7 +1102,7 @@ class TestSelectionType:
         assert st.SELECTED + st.AUTOMATIC == st.AUTOMATIC
         assert st.SELECTED + st.SELECTED == st.SELECTED
 
-    def test_selection_type_repr(self):
+    def test_selection_type_repr(self) -> None:
         assert f"{SelectionType.EXCLUDED}" == "excluded"
         assert f"{SelectionType.AUTOMATIC}" == "automatic"
         assert f"{SelectionType.SELECTED}" == "selected"
@@ -1118,7 +1118,7 @@ class TestMetadataExecutor:
         ("CATALOG", "JSON_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog):
+    def test_visit(self, catalog) -> None:
         executor = MetadataExecutor(
             [
                 MetadataRule(
@@ -1180,7 +1180,7 @@ class TestSchemaExecutor:
         ("CATALOG", "JSON_SCHEMA", "EMPTY_STREAM_SCHEMA"),
         indirect=["catalog"],
     )
-    def test_visit(self, catalog):
+    def test_visit(self, catalog) -> None:
         executor = SchemaExecutor(
             [
                 SchemaRule(
@@ -1246,7 +1246,7 @@ class TestListExecutor:
     def catalog(self):
         return json.loads(CATALOG)
 
-    def test_visit(self, catalog):
+    def test_visit(self, catalog) -> None:
         executor = ListExecutor()
         visit(catalog, executor)
 

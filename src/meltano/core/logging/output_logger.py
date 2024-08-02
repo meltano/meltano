@@ -25,7 +25,7 @@ from .utils import capture_subprocess_output
 class OutputLogger:
     """Output Logger."""
 
-    def __init__(self, file):
+    def __init__(self, file) -> None:  # noqa: ANN001
         """Instantiate an Output Logger.
 
         Args:
@@ -35,12 +35,12 @@ class OutputLogger:
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
-        self.outs = {}
+        self.outs = {}  # type: ignore[var-annotated]
 
     def out(
         self,
         name: str,
-        logger=None,
+        logger=None,  # noqa: ANN001
         write_level: int = logging.INFO,
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
@@ -71,7 +71,7 @@ class OutputLogger:
 class LineWriter:
     """Line Writer."""
 
-    def __init__(self, out):
+    def __init__(self, out) -> None:  # noqa: ANN001
         """Instantiate a Line Writer.
 
         Args:
@@ -79,7 +79,7 @@ class LineWriter:
         """
         self.__out = out
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: ANN001, ANN204
         """Get attribute.
 
         Args:
@@ -90,7 +90,7 @@ class LineWriter:
         """
         return getattr(self.__out, name)
 
-    def write(self, line):
+    def write(self, line) -> None:  # noqa: ANN001
         """Write a line.
 
         Args:
@@ -102,7 +102,7 @@ class LineWriter:
 class FileDescriptorWriter:
     """File Descriptor Writer."""
 
-    def __init__(self, out, fd):
+    def __init__(self, out, fd) -> None:  # noqa: ANN001
         """Instantiate File Descriptor Writer.
 
         Args:
@@ -112,7 +112,7 @@ class FileDescriptorWriter:
         self.__out = out
         self.__writer = os.fdopen(fd, "w")
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: ANN001, ANN204
         """Get attribute.
 
         Args:
@@ -123,7 +123,7 @@ class FileDescriptorWriter:
         """
         return getattr(self.__writer, name)
 
-    def isatty(self):
+    def isatty(self):  # noqa: ANN201
         """Is out location a tty.
 
         Returns:
@@ -179,7 +179,7 @@ class Out:
         return handler
 
     @contextmanager
-    def line_writer(self):
+    def line_writer(self):  # noqa: ANN201
         """Yield a line writer instance.
 
         Yields:
@@ -188,7 +188,7 @@ class Out:
         yield LineWriter(self)
 
     @contextmanager
-    def redirect_logging(self, ignore_errors=()):
+    def redirect_logging(self, ignore_errors=()):  # noqa: ANN001, ANN201
         """Redirect log entries to a temporarily added file handler.
 
         Args:
@@ -218,7 +218,7 @@ class Out:
             logger.removeHandler(self.redirect_log_handler)
 
     @asynccontextmanager
-    async def writer(self):
+    async def writer(self):  # noqa: ANN201
         """Yield a writer.
 
         Yields:
@@ -238,7 +238,7 @@ class Out:
                 await reader
 
     @asynccontextmanager
-    async def redirect_stdout(self):
+    async def redirect_stdout(self):  # noqa: ANN201
         """Redirect STDOUT.
 
         Yields:
@@ -249,7 +249,7 @@ class Out:
                 yield
 
     @asynccontextmanager
-    async def redirect_stderr(self):
+    async def redirect_stderr(self):  # noqa: ANN201
         """Redirect STDERR.
 
         Yields:
@@ -270,7 +270,7 @@ class Out:
         self.last_line = line
         self.logger.log(self.write_level, line.rstrip(), name=self.name)
 
-    async def _read_from_fd(self, read_fd):
+    async def _read_from_fd(self, read_fd) -> None:  # noqa: ANN001
         # Since we're redirecting our own stdout and stderr output,
         # the line length limit can be arbitrarily large.
         line_length_limit = 1024 * 1024 * 1024  # 1 GiB

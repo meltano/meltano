@@ -69,7 +69,7 @@ class BlockParser:
     def __init__(
         self,
         log: structlog.BoundLogger,
-        project,
+        project,  # noqa: ANN001
         blocks: list[str],
         *,
         full_refresh: bool | None = False,

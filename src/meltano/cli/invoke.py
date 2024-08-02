@@ -93,7 +93,7 @@ async def invoke(
     install_plugins: InstallPlugins,
     containers: bool = False,
     print_var: str | None = None,
-):
+) -> None:
     """
     Invoke a plugin's executable with specified arguments.
 
@@ -155,7 +155,7 @@ async def invoke(
     sys.exit(exit_code)
 
 
-async def _invoke(
+async def _invoke(  # noqa: ANN202
     *,
     invoker: PluginInvoker,
     plugin_args: str,
@@ -203,7 +203,7 @@ async def _invoke(
     return exit_code
 
 
-def do_list_commands(plugin):
+def do_list_commands(plugin) -> None:  # noqa: ANN001
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
@@ -222,7 +222,7 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-async def dump_file(invoker: PluginInvoker, file_id: str):
+async def dump_file(invoker: PluginInvoker, file_id: str) -> None:
     """Dump file."""
     try:
         content = await invoker.dump(file_id)

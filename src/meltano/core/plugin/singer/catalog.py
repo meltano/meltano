@@ -46,7 +46,7 @@ class CatalogRule:
         self.negated = negated
 
     @classmethod
-    def matching(
+    def matching(  # noqa: ANN206
         cls: type[T],
         rules: list[T],
         tap_stream_id: str,
@@ -126,7 +126,7 @@ class SelectPattern(t.NamedTuple):
     raw: str
 
     @classmethod
-    def parse(cls, pattern: str):
+    def parse(cls, pattern: str):  # noqa: ANN206
         """Parse a SelectPattern instance from a string pattern.
 
         Args:
@@ -310,10 +310,10 @@ class SelectionType(str, ReprEnum):
     EXCLUDED = "excluded"
     AUTOMATIC = "automatic"
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return self is not self.__class__.EXCLUDED
 
-    def __add__(self, other):
+    def __add__(self, other):  # noqa: ANN001, ANN204
         if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
             return SelectionType.EXCLUDED
 
@@ -325,15 +325,15 @@ class SelectionType(str, ReprEnum):
 
 @singledispatch
 def visit(
-    node,  # noqa: ARG001
-    executor,  # noqa: ARG001
+    node,  # noqa: ANN001, ARG001
+    executor,  # noqa: ANN001, ARG001
     path: str = "",
-):
+) -> None:
     logger.debug("Skipping node at '%s'", path)
 
 
 @visit.register(dict)
-def _(node: dict, executor, path=""):
+def _(node: dict, executor, path="") -> None:  # noqa: ANN001
     node_type = None
 
     if re.search(r"streams\[\d+\]$", path):
@@ -358,14 +358,14 @@ def _(node: dict, executor, path=""):
 
 
 @visit.register(list)
-def _(node: list, executor, path=""):
+def _(node: list, executor, path="") -> None:  # noqa: ANN001
     for index, child_node in enumerate(node):
         executor.visit(child_node, path=f"{path}[{index}]")
 
 
 @visit_with(visit)
 class CatalogExecutor:
-    def execute(self, node_type: CatalogNode, node: Node, path: str):
+    def execute(self, node_type: CatalogNode, node: Node, path: str) -> None:
         """Dispatch all node methods."""
         dispatch = {
             CatalogNode.STREAM: self.stream_node,
@@ -378,26 +378,26 @@ class CatalogExecutor:
         except KeyError:  # pragma: no cover
             logger.debug("Unknown node type '%s'.", node_type)
 
-    def stream_node(self, node: Node, path: str):
+    def stream_node(self, node: Node, path: str) -> None:
         """Process stream node."""
 
-    def property_node(self, node: Node, path: str):
+    def property_node(self, node: Node, path: str) -> None:
         """Process property node."""
 
-    def metadata_node(self, node: Node, path: str):
+    def metadata_node(self, node: Node, path: str) -> None:
         """Process metadata node."""
         if len(node["breadcrumb"]) == 0:
             self.stream_metadata_node(node, path)
         else:
             self.property_metadata_node(node, path)
 
-    def stream_metadata_node(self, node: Node, path: str):
+    def stream_metadata_node(self, node: Node, path: str) -> None:
         """Process stream metadata node."""
 
-    def property_metadata_node(self, node: Node, path: str):
+    def property_metadata_node(self, node: Node, path: str) -> None:
         """Process property metadata node."""
 
-    def __call__(self, node_type, node: Node, path: str):
+    def __call__(self, node_type, node: Node, path: str):  # noqa: ANN001, ANN204
         """Call this instance as a function."""
         return self.execute(node_type, node, path)
 
@@ -407,7 +407,7 @@ class MetadataExecutor(CatalogExecutor):
         self._stream = None
         self._rules = rules
 
-    def ensure_metadata(self, breadcrumb: list[str]):
+    def ensure_metadata(self, breadcrumb: list[str]) -> None:
         """Handle missing metadata entries."""
         metadata_list: list[dict] = self._stream["metadata"]
         match = next(
@@ -436,7 +436,7 @@ class MetadataExecutor(CatalogExecutor):
 
             metadata_list.append(entry)
 
-    def stream_node(self, node: Node, path: str):
+    def stream_node(self, node: Node, path: str) -> None:
         """Process stream metadata node."""
         self._stream = node
         tap_stream_id = self._stream["tap_stream_id"]
@@ -454,14 +454,14 @@ class MetadataExecutor(CatalogExecutor):
         self,
         node: Node,  # noqa: ARG002
         path: str,
-    ):
+    ) -> None:
         """Process property metadata node."""
         breadcrumb_idx = path.index("properties")
         breadcrumb = path[breadcrumb_idx:].split(".")
 
         self.ensure_metadata(breadcrumb)
 
-    def metadata_node(self, node: Node, path: str):
+    def metadata_node(self, node: Node, path: str) -> None:
         """Process metadata node."""
         tap_stream_id = self._stream["tap_stream_id"]
         breadcrumb = node["breadcrumb"]
@@ -480,7 +480,7 @@ class MetadataExecutor(CatalogExecutor):
                 rule.value,
             )
 
-    def set_metadata(self, node: Node, path: str, key: str, value: t.Any):
+    def set_metadata(self, node: Node, path: str, key: str, value: t.Any) -> None:  # noqa: ANN401
         """Set selection and inclusion keys in a metadata node."""
         # Unsupported fields cannot be selected
         if (
@@ -504,7 +504,7 @@ class SchemaExecutor(CatalogExecutor):
         self._stream = None
         self._rules = rules
 
-    def ensure_property(self, breadcrumb: list[str]):
+    def ensure_property(self, breadcrumb: list[str]) -> None:
         """Create nodes for the breadcrumb and schema extra that matches."""
         next_node: dict[str, t.Any] = self._stream["schema"]
 
@@ -530,8 +530,8 @@ class SchemaExecutor(CatalogExecutor):
     def stream_node(
         self,
         node: Node,
-        path,  # noqa: ARG002
-    ):
+        path,  # noqa: ANN001, ARG002
+    ) -> None:
         """Process stream schema node."""
         self._stream = node
         tap_stream_id: str = self._stream["tap_stream_id"]
@@ -542,7 +542,7 @@ class SchemaExecutor(CatalogExecutor):
         for rule in SchemaRule.matching(self._rules, tap_stream_id):
             self.ensure_property(rule.breadcrumb)
 
-    def property_node(self, node: Node, path: str):
+    def property_node(self, node: Node, path: str) -> None:
         """Process property schema node."""
         tap_stream_id = self._stream["tap_stream_id"]
 
@@ -552,7 +552,7 @@ class SchemaExecutor(CatalogExecutor):
         for rule in SchemaRule.matching(self._rules, tap_stream_id, breadcrumb):
             self.set_payload(node, path, rule.payload)
 
-    def set_payload(self, node: Node, path: str, payload: dict):
+    def set_payload(self, node: Node, path: str, payload: dict) -> None:
         """Set node payload from a clean mapping."""
         node.clear()
         node.update(payload)
@@ -560,7 +560,7 @@ class SchemaExecutor(CatalogExecutor):
 
 
 class ListExecutor(CatalogExecutor):
-    def __init__(self):
+    def __init__(self) -> None:
         # properties per stream
         self.properties: dict[str, set[str]] = OrderedDict()
 
@@ -570,7 +570,7 @@ class ListExecutor(CatalogExecutor):
         self,
         node: Node,
         path: str,  # noqa: ARG002
-    ):
+    ) -> None:
         """Initialize empty property set stream."""
         stream = node["tap_stream_id"]
         if stream not in self.properties:
@@ -580,7 +580,7 @@ class ListExecutor(CatalogExecutor):
         self,
         node: Node,  # noqa: ARG002
         path: str,
-    ):
+    ) -> None:
         """Add property to stream collection."""
         prop = path_property(path)
         # current stream
@@ -596,13 +596,13 @@ class SelectedNode(t.NamedTuple):
 
 
 class ListSelectedExecutor(CatalogExecutor):
-    def __init__(self):
+    def __init__(self) -> None:
         self.streams: set[SelectedNode] = set()
         self.properties: dict[str, set[SelectedNode]] = OrderedDict()
         super().__init__()
 
     @property
-    def selected_properties(self):
+    def selected_properties(self):  # noqa: ANN201
         """Get selected streams and properties."""
         # we don't want to mutate the visitor result
         selected_properties = self.properties.copy()
@@ -646,7 +646,7 @@ class ListSelectedExecutor(CatalogExecutor):
         self,
         node: Node,
         path: str,  # noqa: ARG002
-    ):
+    ) -> None:
         """Initialize empty set for selected nodes in stream."""
         self._stream: str = node["tap_stream_id"]
         self.properties[self._stream] = set()
@@ -655,7 +655,7 @@ class ListSelectedExecutor(CatalogExecutor):
         self,
         node: Node,
         path: str,  # noqa: ARG002
-    ):
+    ) -> None:
         """Add stream selection to tap's collection."""
         selection = SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
@@ -664,7 +664,7 @@ class ListSelectedExecutor(CatalogExecutor):
         self,
         node: Node,
         path: str,  # noqa: ARG002
-    ):
+    ) -> None:
         """Add property selection to stream's collection."""
         property_path = ".".join(node["breadcrumb"])
         prop = path_property(property_path)

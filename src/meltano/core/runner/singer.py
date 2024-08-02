@@ -24,7 +24,7 @@ class SingerRunner(Runner):
     def __init__(self, elt_context: ELTContext):
         self.context = elt_context
 
-    def stop(self, process, **wait_args):
+    def stop(self, process, **wait_args):  # noqa: ANN001, ANN003, ANN201
         while True:  # pragma: no cover
             try:
                 code = process.wait(**wait_args)
@@ -38,11 +38,11 @@ class SingerRunner(Runner):
         self,
         tap: PluginInvoker,
         target: PluginInvoker,
-        extractor_log=None,
-        loader_log=None,
-        extractor_out=None,
-        loader_out=None,
-    ):
+        extractor_log=None,  # noqa: ANN001
+        loader_log=None,  # noqa: ANN001
+        extractor_out=None,  # noqa: ANN001
+        loader_out=None,  # noqa: ANN001
+    ) -> None:
         """Invoke tap and target together."""
         extractor_log = extractor_log or sys.stderr
         loader_log = loader_log or sys.stderr
@@ -204,17 +204,17 @@ class SingerRunner(Runner):
         if target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
-    def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
+    def dry_run(self, tap: PluginInvoker, target: PluginInvoker) -> None:
         logger.info("Dry run:")
         logger.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
         logger.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
-    async def run(
+    async def run(  # noqa: ANN201
         self,
-        extractor_log=None,
-        loader_log=None,
-        extractor_out=None,
-        loader_out=None,
+        extractor_log=None,  # noqa: ANN001
+        loader_log=None,  # noqa: ANN001
+        extractor_out=None,  # noqa: ANN001
+        loader_out=None,  # noqa: ANN001
     ):
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
@@ -236,10 +236,10 @@ class SingerRunner(Runner):
 
     def _handle_tap_line_length_limit_error(
         self,
-        exception,
-        line_length_limit,
-        stream_buffer_size,
-    ):
+        exception,  # noqa: ANN001
+        line_length_limit,  # noqa: ANN001
+        stream_buffer_size,  # noqa: ANN001
+    ) -> None:
         # StreamReader.readline can raise a ValueError wrapping a LimitOverrunError:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
         if not isinstance(exception, ValueError):

@@ -21,8 +21,8 @@ class PluginSettingsService(SettingsService):
         self,
         project: Project,
         plugin: ProjectPlugin,
-        *args,
-        **kwargs,
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
     ):
         """Create a new plugin settings manager.
 
@@ -94,7 +94,7 @@ class PluginSettingsService(SettingsService):
         self.env_override.update(environment_plugin_env)
 
     @property
-    def project_settings_service(self):
+    def project_settings_service(self):  # noqa: ANN201
         """Get the settings service for the active project.
 
         Returns:
@@ -103,7 +103,7 @@ class PluginSettingsService(SettingsService):
         return self.project.settings
 
     @property
-    def label(self):
+    def label(self) -> str:
         """Get the label for this plugin.
 
         Returns:
@@ -112,7 +112,7 @@ class PluginSettingsService(SettingsService):
         return f"{self.plugin.type.descriptor} '{self.plugin.name}'"
 
     @property
-    def docs_url(self):
+    def docs_url(self):  # noqa: ANN201
         """Get the documentation URL for this plugin.
 
         Returns:
@@ -120,7 +120,7 @@ class PluginSettingsService(SettingsService):
         """
         return self.plugin.docs
 
-    def setting_env_vars(self, setting_def: SettingDefinition, *, for_writing=False):
+    def setting_env_vars(self, setting_def: SettingDefinition, *, for_writing=False):  # noqa: ANN001, ANN201
         """Get environment variables for a setting.
 
         Args:
@@ -137,7 +137,7 @@ class PluginSettingsService(SettingsService):
         )
 
     @property
-    def db_namespace(self):
+    def db_namespace(self):  # noqa: ANN201
         """Return namespace for setting value records in system database.
 
         Returns:
@@ -163,7 +163,7 @@ class PluginSettingsService(SettingsService):
         return settings
 
     @property
-    def meltano_yml_config(self):
+    def meltano_yml_config(self):  # noqa: ANN201
         """Return current configuration in `meltano.yml`.
 
         Returns:
@@ -172,7 +172,7 @@ class PluginSettingsService(SettingsService):
         return self.plugin.config_with_extras
 
     @property
-    def environment_config(self):
+    def environment_config(self):  # noqa: ANN201
         """Return current environment configuration in `meltano.yml`.
 
         Returns:
@@ -182,7 +182,7 @@ class PluginSettingsService(SettingsService):
             return self.environment_plugin_config.config_with_extras
         return {}
 
-    def update_meltano_yml_config(self, config_with_extras):
+    def update_meltano_yml_config(self, config_with_extras) -> None:  # noqa: ANN001
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -191,7 +191,10 @@ class PluginSettingsService(SettingsService):
         self.plugin.config_with_extras = config_with_extras
         self.project.plugins.update_plugin(self.plugin)
 
-    def update_meltano_environment_config(self, config_with_extras: dict[str, t.Any]):
+    def update_meltano_environment_config(
+        self,
+        config_with_extras: dict[str, t.Any],
+    ) -> None:
         """Update environment configuration in `meltano.yml`.
 
         Args:
@@ -201,7 +204,7 @@ class PluginSettingsService(SettingsService):
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 
     @cached_property
-    def inherited_settings_service(self):
+    def inherited_settings_service(self):  # noqa: ANN201
         """Return settings service to inherit configuration from.
 
         Returns:
@@ -217,7 +220,7 @@ class PluginSettingsService(SettingsService):
             else None
         )
 
-    def process_config(self, config):
+    def process_config(self, config):  # noqa: ANN001, ANN201
         """Process configuration dictionary to be passed to plugin.
 
         Args:

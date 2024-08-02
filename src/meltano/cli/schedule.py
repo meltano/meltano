@@ -44,7 +44,7 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def schedule(project, ctx):
+def schedule(project, ctx) -> None:  # noqa: ANN001
     """
     Manage pipeline schedules.
 
@@ -63,7 +63,7 @@ def _add_elt(
     transform: str,
     interval: str,
     start_date: datetime.datetime | None,
-):
+) -> None:
     """Add a new legacy elt schedule."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -89,7 +89,7 @@ def _add_elt(
         session.close()
 
 
-def _add_job(ctx, name: str, job: str, interval: str):
+def _add_job(ctx, name: str, job: str, interval: str) -> None:  # noqa: ANN001
     """Add a new scheduled job."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -133,7 +133,7 @@ def add(
     transform: str,
     interval: str,
     start_date: datetime.datetime | None,
-):
+) -> None:
     """
     Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
@@ -281,7 +281,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:
 @click.argument("name")
 @click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def run(ctx: click.Context, name: str, elt_options: tuple[str]):
+def run(ctx: click.Context, name: str, elt_options: tuple[str]) -> None:
     """Run a schedule."""
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
@@ -296,7 +296,7 @@ def run(ctx: click.Context, name: str, elt_options: tuple[str]):
 )
 @click.argument("name", required=True)
 @click.pass_context
-def remove(ctx, name):
+def remove(ctx, name) -> None:  # noqa: ANN001
     """Remove a schedule.
 
     Usage:
@@ -379,7 +379,7 @@ class CronParam(click.ParamType):
 
     name = "cron"
 
-    def convert(self, value, *_):
+    def convert(self, value, *_):  # noqa: ANN001, ANN201
         """Validate and con interval."""
         if value not in CRON_INTERVALS and not croniter.is_valid(value):
             raise BadCronError(value)
@@ -416,7 +416,7 @@ def set_cmd(
     extractor: str | None,
     loader: str | None,
     transform: str | None,
-):
+) -> None:
     """Update a schedule.
 
     Usage:

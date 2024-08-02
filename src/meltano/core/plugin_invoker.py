@@ -33,7 +33,7 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
+def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN201
     """Instantiate a plugin invoker from a project plugin.
 
     Args:
@@ -85,7 +85,7 @@ class InvokerNotPreparedError(InvokerError):
 class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
-    def __init__(self, plugin: PluginRef, command):
+    def __init__(self, plugin: PluginRef, command):  # noqa: ANN001
         """Initialize UnknownCommandError.
 
         Args:
@@ -95,7 +95,7 @@ class UnknownCommandError(InvokerError):
         self.plugin = plugin
         self.command = command
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return error message.
 
         Returns:
@@ -131,7 +131,7 @@ class PluginInvoker:
         self,
         project: Project,
         plugin: ProjectPlugin,
-        context: t.Any | None = None,
+        context: t.Any | None = None,  # noqa: ANN401
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
@@ -184,7 +184,7 @@ class PluginInvoker:
         self.plugin_config_env = {}
 
     @property
-    def capabilities(self):
+    def capabilities(self):  # noqa: ANN201
         """Get plugin immutable capabilities.
 
         Makes sure the capabilities are immutable from the `PluginInvoker` interface.
@@ -207,7 +207,7 @@ class PluginInvoker:
             for _key, filename in plugin_files.items()
         }
 
-    async def prepare(self, session: Session):
+    async def prepare(self, session: Session) -> None:
         """Prepare plugin config.
 
         Args:
@@ -231,7 +231,7 @@ class PluginInvoker:
             self.plugin_config_service.configure()
             self._prepared = True
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Reset the plugin config."""
         self.plugin_config = {}
         self.plugin_config_processed = {}
@@ -242,7 +242,7 @@ class PluginInvoker:
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session: Session):
+    async def prepared(self, session: Session):  # noqa: ANN201
         """Context manager that prepares plugin config.
 
         Args:
@@ -280,7 +280,7 @@ class PluginInvoker:
         # Return executable within venv
         return self.venv_service.exec_path(executable)
 
-    def exec_args(self, *args, command=None, env=None):
+    def exec_args(self, *args, command=None, env=None):  # noqa: ANN001, ANN002, ANN201
         """Materialize the arguments to be passed to the executable.
 
         Args:
@@ -303,7 +303,7 @@ class PluginInvoker:
 
         return [str(arg) for arg in (executable, *plugin_args, *args)]
 
-    def find_command(self, name):
+    def find_command(self, name):  # noqa: ANN001, ANN201
         """Find a Command by name.
 
         Args:
@@ -320,7 +320,7 @@ class PluginInvoker:
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Environment variable mapping.
 
         Returns:
@@ -418,7 +418,7 @@ class PluginInvoker:
         require_preparation: bool = True,
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:
         env = env or {}
 
@@ -439,7 +439,7 @@ class PluginInvoker:
                     self.plugin.executable,
                 ) from err
 
-    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:
+    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:  # noqa: ANN002, ANN003
         """Invoke a command.
 
         Args:
@@ -463,8 +463,8 @@ class PluginInvoker:
     async def invoke_docker(
         self,
         plugin_command: str,
-        *args,
-        **kwargs,
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
     ) -> int:
         """Invoke a containerized command.
 
@@ -519,7 +519,7 @@ class PluginInvoker:
             # Unwrap FileNotFoundError
             raise err.__cause__ from None
 
-    def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
+    def add_output_handler(self, src: str, handler: SubprocessOutputWriter) -> None:
         """Append an output handler for a given stdio stream.
 
         Args:

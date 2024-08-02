@@ -103,14 +103,14 @@ class ScheduleService:
 
     def add_elt(
         self,
-        session,
-        name,
+        session,  # noqa: ANN001
+        name,  # noqa: ANN001
         extractor: str,
         loader: str,
         transform: str,
         interval: str,
         start_date: datetime | None = None,
-        **env,
+        **env,  # noqa: ANN003
     ) -> Schedule:
         """Add a scheduled legacy elt task.
 
@@ -143,7 +143,7 @@ class ScheduleService:
         )
         return self.add_schedule(schedule)
 
-    def add(self, name: str, job: str, interval: str, **env) -> Schedule:
+    def add(self, name: str, job: str, interval: str, **env) -> Schedule:  # noqa: ANN003
         """Add a scheduled job.
 
         Args:
@@ -164,7 +164,7 @@ class ScheduleService:
             ),
         )
 
-    def remove(self, name) -> str:
+    def remove(self, name) -> str:  # noqa: ANN001
         """Remove a schedule from the project.
 
         Args:
@@ -175,7 +175,7 @@ class ScheduleService:
         """
         return self.remove_schedule(name)
 
-    def default_start_date(self, session, extractor: str) -> datetime:
+    def default_start_date(self, session, extractor: str) -> datetime:  # noqa: ANN001
         """Obtain the default start date for an elt schedule.
 
         Args:
@@ -259,7 +259,7 @@ class ScheduleService:
 
         return name
 
-    def update_schedule(self, schedule: Schedule):
+    def update_schedule(self, schedule: Schedule) -> None:
         """Update a schedule.
 
         Args:
@@ -314,7 +314,7 @@ class ScheduleService:
         """
         return self.project.meltano.schedules.copy()
 
-    def find_schedule(self, name) -> Schedule:
+    def find_schedule(self, name) -> Schedule:  # noqa: ANN001
         """Find a schedule by name.
 
         Args:
@@ -334,9 +334,9 @@ class ScheduleService:
     def run(
         self,
         schedule: Schedule,
-        *args,
+        *args,  # noqa: ANN002
         env: dict | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 

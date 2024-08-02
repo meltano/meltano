@@ -16,7 +16,7 @@ class TestCommand:
             "test": {"args": "--test", "description": "Run tests"},
         }
 
-    def test_serialize(self, commands):
+    def test_serialize(self, commands) -> None:
         assert Command.parse(commands["foo"]).args == "foo"
         assert Command.parse(commands["bar"]).args == "bar"
         assert Command.parse(commands["baz"]).args == "baz"
@@ -36,7 +36,7 @@ class TestCommand:
         assert serialized["test"].description == "Run tests"
         assert serialized["test"].executable is None
 
-    def test_deserialize(self, commands):
+    def test_deserialize(self, commands) -> None:
         serialized = Command.parse_all(commands)
 
         assert serialized["foo"].canonical() == commands["foo"]
@@ -46,7 +46,7 @@ class TestCommand:
 
         assert Canonical.as_canonical(serialized) == {**commands, "bar": "bar"}
 
-    def test_expanded_args(self):
+    def test_expanded_args(self) -> None:
         expanded_args = Command.parse("some args --flag $ENV_VAR_ARG").expanded_args(
             name="cmd",
             env={
@@ -56,7 +56,7 @@ class TestCommand:
 
         assert expanded_args == ["some", "args", "--flag", "env-var-arg"]
 
-    def test_undefined_env_var(self):
+    def test_undefined_env_var(self) -> None:
         with pytest.raises(UndefinedEnvVarError):
             Command.parse("some args --flag $ENV_VAR_ARG").expanded_args(
                 name="cmd",

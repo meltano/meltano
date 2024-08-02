@@ -276,7 +276,7 @@ class Tracker:  # - too many (public) methods
         except Exception:
             return datetime.now().astimezone().tzname()
 
-    def add_contexts(self, *extra_contexts):
+    def add_contexts(self, *extra_contexts) -> None:  # noqa: ANN002
         """Permanently add additional Snowplow contexts to the `Tracker`.
 
         Args:
@@ -285,7 +285,7 @@ class Tracker:  # - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:
+    def with_contexts(self, *extra_contexts) -> Tracker:  # noqa: ANN002
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
@@ -468,7 +468,7 @@ class Tracker:  # - too many (public) methods
 
     def _uuid_from_str(
         self,
-        from_val: t.Any | None,
+        from_val: t.Any | None,  # noqa: ANN401
         *,
         warn: bool,
     ) -> uuid.UUID | None:
@@ -517,7 +517,7 @@ class Tracker:  # - too many (public) methods
             ),
         )
 
-    def setup_exit_event(self):
+    def setup_exit_event(self) -> None:
         """If not already done, register the atexit handler to fire the exit event.
 
         This method also provides this tracker instance to the CLI module for
@@ -538,7 +538,7 @@ class Tracker:  # - too many (public) methods
         # As a fallback, use atexit to help ensure the exit event is sent.
         atexit.register(self.track_exit_event)
 
-    def track_exit_event(self):
+    def track_exit_event(self) -> None:
         """Fire exit event."""
         from meltano import cli
 

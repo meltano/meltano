@@ -42,7 +42,7 @@ def handle_producer_line_length_limit_error(
     exception: Exception,
     line_length_limit: int,
     stream_buffer_size: int,
-):
+) -> None:
     """Handle `asyncio.LimitOverrunError` from producers.
 
     Args:

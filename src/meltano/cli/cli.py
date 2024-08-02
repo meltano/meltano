@@ -36,7 +36,7 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     typical Meltano commands fail, e.g. `meltano select tap-gitlab tags "*"`.
     """
 
-    def main(self, *args, **kwargs) -> t.Any:
+    def main(self, *args, **kwargs) -> t.Any:  # noqa: ANN002, ANN003, ANN401
         """Invoke the Click CLI with Windows globbing disabled.
 
         Args:
@@ -84,7 +84,7 @@ def cli(
     environment: str,
     no_environment: bool,
     cwd: Path | None,
-):
+) -> None:
     """
     Your CLI for ELT+
 
