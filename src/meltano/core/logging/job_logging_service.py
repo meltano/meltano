@@ -71,7 +71,7 @@ class JobLoggingService:
         log_file_name = self.generate_log_name(state_id, run_id, file_name)
 
         try:
-            with open(log_file_name, "w") as log_file:
+            with log_file_name.open("w") as log_file:
                 yield log_file
         except OSError:
             # Don't stop the Job running if you can not open the log file
@@ -80,7 +80,7 @@ class JobLoggingService:
                 f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )
-            with open(os.devnull, "w") as log_file:
+            with open(os.devnull, "w") as log_file:  # noqa: PTH123
                 yield log_file
 
     def get_latest_log(self, state_id) -> str:  # noqa: ANN001
@@ -137,7 +137,7 @@ class JobLoggingService:
                 for logs_dir in self.logs_dirs(state_id)
                 for log_file in logs_dir.glob("**/*.log")
             ],
-            key=lambda path: os.stat(path).st_ctime_ns,
+            key=lambda path: path.stat().st_ctime_ns,
             reverse=True,
         )
 

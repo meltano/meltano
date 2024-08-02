@@ -9,6 +9,7 @@ from datetime import datetime as dt
 from datetime import timezone as tz
 from functools import partial, reduce
 from operator import xor
+from pathlib import Path
 
 import click
 import structlog
@@ -210,7 +211,7 @@ def move_state(
 )
 @click.option(
     "--input-file",
-    type=click.Path(exists=True),
+    type=click.Path(exists=True, path_type=Path),
     help="Merge state from a JSON file containing Singer state.",
 )
 @click.argument("state-id", type=str)
@@ -222,7 +223,7 @@ def merge_state(
     project: Project,
     state_id: str,
     state: str | None,
-    input_file: click.Path | None,
+    input_file: Path | None,
     from_state_id: str | None,
 ) -> None:
     """Add bookmarks to existing state."""
@@ -237,7 +238,7 @@ def merge_state(
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     if input_file:
-        with open(input_file) as state_f:
+        with input_file.open() as state_f:
             state_service.add_state(
                 state_id,
                 state_f.read(),
@@ -259,7 +260,7 @@ def merge_state(
 )
 @click.option(
     "--input-file",
-    type=click.Path(exists=True),
+    type=click.Path(exists=True, path_type=Path),
     help="Set state from json file containing Singer state.",
 )
 @click.argument("state-id")
@@ -271,7 +272,7 @@ def set_state(
     project: Project,
     state_id: str,
     state: str | None,
-    input_file: click.Path | None,
+    input_file: Path | None,
 ) -> None:
     """Set state."""
     state_service: StateService = (
@@ -284,7 +285,7 @@ def set_state(
     if not reduce(xor, (bool(x) for x in mutually_exclusive_options.values())):
         raise MutuallyExclusiveOptionsError(*mutually_exclusive_options)
     if input_file:
-        with open(input_file) as state_f:
+        with input_file.open() as state_f:
             state_service.set_state(state_id, state_f.read())
     elif state:
         state_service.set_state(state_id, state)

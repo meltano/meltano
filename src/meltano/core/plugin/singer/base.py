@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 from uuid import uuid4
 
 import structlog
@@ -8,6 +9,9 @@ import structlog
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin
 from meltano.core.utils import nest_object
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -26,7 +30,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config):  # noqa: ANN001, ANN201
+    def process_config(self, flat_config) -> dict:  # noqa: ANN001
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
@@ -46,12 +50,12 @@ class SingerPlugin(BasePlugin):
     @hook("before_configure")
     async def before_configure(
         self,
-        invoker,  # noqa: ANN001
+        invoker: PluginInvoker,
         session,  # noqa: ANN001, ARG002
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
-        with open(config_path, "w") as config_file:
+        with config_path.open("w") as config_file:
             config = invoker.plugin_config_processed
             json.dump(config, config_file, indent=2)
 
@@ -65,7 +69,7 @@ class SingerPlugin(BasePlugin):
         logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
 
     @property
-    def instance_uuid(self):  # noqa: ANN201
+    def instance_uuid(self) -> str:
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
             self._instance_uuid = str(uuid4())

@@ -754,7 +754,7 @@ class TestCliAdd:
         invalid_reason,
         cli_runner,
     ) -> None:
-        with open("test.yml", "w") as f:
+        with open("test.yml", "w") as f:  # noqa: PTH123
             yaml.dump(definition, f)
 
         res = cli_runner.invoke(

@@ -53,6 +53,8 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     name: str
     variant: str | None
 
+    config_files: dict[str, str]
+
     def __init__(
         self,
         plugin_type: PluginType,

@@ -22,7 +22,7 @@ class TestPluginInstallService:
         ids=("default", "-p=-1", "-p=2"),
     )
     def subject(self, project: Project, request):
-        with open(project.meltanofile, "w") as file:
+        with project.meltanofile.open("w") as file:
             file.write(
                 yaml.dump(
                     {
@@ -92,7 +92,7 @@ class TestPluginInstallService:
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
     def test_get_quoted_pip_install_args(self, project) -> None:
-        with open(project.meltanofile, "w") as file:
+        with project.meltanofile.open("w") as file:
             file.write(
                 yaml.dump(
                     {

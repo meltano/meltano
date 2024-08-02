@@ -65,7 +65,7 @@ class MeltanoInvoker:
                 return str(executable_symlink)
 
         executable = Path(
-            os.path.dirname(sys.executable),
+            os.path.dirname(sys.executable),  # noqa: PTH120
             f"{command}.exe" if platform.system() == "Windows" else command,
         )
 

@@ -95,10 +95,9 @@ class ProjectSettingsService(SettingsService):
             project_id = None
 
         if project_id is None:
+            analytics_path = self.project.meltano_dir() / "analytics.json"
             try:
-                with open(
-                    self.project.meltano_dir() / "analytics.json",
-                ) as analytics_json_file:
+                with analytics_path.open() as analytics_json_file:
                     project_id = json.load(analytics_json_file)["project_id"]
             except (OSError, KeyError, json.JSONDecodeError) as err:
                 logger.debug(

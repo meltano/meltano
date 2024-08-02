@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import tempfile
 import typing as t
 from functools import wraps
@@ -218,11 +217,11 @@ def config(
                 )
 
                 with tempfile.TemporaryDirectory() as temp_dir:
-                    path = os.path.join(temp_dir, ".env")
+                    path = Path(temp_dir) / ".env"
                     for key, value in env.items():
                         dotenv.set_key(path, key, value)
 
-                    dotenv_content = Path(path).read_text()
+                    dotenv_content = path.read_text()
 
                 click.echo(dotenv_content)
     except Exception:

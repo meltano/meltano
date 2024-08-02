@@ -38,7 +38,7 @@ class ConfigService:
         Returns:
             The project settings.
         """
-        with open(str(bundle.root / "settings.yml")) as settings_yaml:
+        with bundle.root.joinpath("settings.yml").open() as settings_yaml:
             settings_yaml_content = yaml.safe_load(settings_yaml)
         return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
 
@@ -100,7 +100,7 @@ class ConfigService:
 
     def make_meltano_secret_dir(self) -> None:
         """Create the secret directory."""
-        os.makedirs(self.project.meltano_dir(), exist_ok=True)
+        os.makedirs(self.project.meltano_dir(), exist_ok=True)  # noqa: PTH103
 
     @property
     def env(self):  # noqa: ANN201
