@@ -427,7 +427,7 @@ class Tracker:  # - too many (public) methods
             The saved telemetry settings.
         """
         try:
-            with open(self.analytics_json_path) as analytics_json_file:
+            with self.analytics_json_path.open() as analytics_json_file:
                 analytics = json.load(analytics_json_file)
         except (OSError, json.JSONDecodeError):
             return TelemetrySettings(None, None, None)
@@ -454,7 +454,7 @@ class Tracker:  # - too many (public) methods
     def save_telemetry_settings(self) -> None:
         """Attempt to save settings to the 'analytics.json' file."""
         try:
-            with open(self.analytics_json_path, "w") as new_analytics_json_file:
+            with self.analytics_json_path.open("w") as new_analytics_json_file:
                 json.dump(
                     {
                         "client_id": str(self.client_id),

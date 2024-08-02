@@ -103,7 +103,7 @@ def _resolve_python_path(python: Path | str | None) -> str:
             f"not the number {python!r}",
         )
     else:
-        python_path = python if os.path.exists(python) else shutil.which(python)
+        python_path = python if os.path.exists(python) else shutil.which(python)  # noqa: PTH110
 
     if python_path is None:
         raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import contextlib
-import os
+import typing as t
 import uuid
 from pathlib import Path
 
@@ -14,6 +14,9 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.meltano_file import MeltanoFilePlugin
 from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
+
+if t.TYPE_CHECKING:
+    import os
 
 PROJECT_FILENAME = "meltano.yml"
 
@@ -57,10 +60,7 @@ class ProjectInitService:
         try:
             self.project_directory.mkdir()
         except FileExistsError as ex:
-            if (
-                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))
-                and not force
-            ):
+            if self.project_directory.joinpath(PROJECT_FILENAME).exists() and not force:
                 msg = (
                     "A `meltano.yml` file already exists in the target directory. "
                     "Use `--force` to overwrite it."
@@ -101,7 +101,7 @@ class ProjectInitService:
         """
         # explicitly create the .meltano directory if it doesn't exist
         click.secho("Creating .meltano folder", fg="blue")
-        os.makedirs(project.meltano_dir(), exist_ok=True)
+        project.meltano_dir().mkdir(parents=True, exist_ok=True)
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 

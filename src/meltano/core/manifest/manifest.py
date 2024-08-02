@@ -141,7 +141,7 @@ class Manifest:
         self._meltano_file = self.project.meltanofile.read_text()
         self.path = path
         self.check_schema = check_schema
-        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
+        with MANIFEST_SCHEMA_PATH.open() as manifest_schema_file:
             manifest_schema = json.load(manifest_schema_file)
         self._env_locations = meltano_config_env_locations(manifest_schema)
 

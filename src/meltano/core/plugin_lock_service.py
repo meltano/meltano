@@ -83,7 +83,7 @@ class PluginLock:
         """
 
         def _load():  # noqa: ANN202
-            with open(self.path) as lockfile:
+            with self.path.open() as lockfile:
                 return loader(lockfile)
 
         try:
