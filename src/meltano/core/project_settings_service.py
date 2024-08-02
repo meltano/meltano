@@ -70,7 +70,7 @@ class ProjectSettingsService(SettingsService):
             )
 
     @property
-    def project_settings_service(self):
+    def project_settings_service(self):  # noqa: ANN201
         """Get the settings service for this project.
 
         For ProjectSettingsService, just returns self.
@@ -145,7 +145,7 @@ class ProjectSettingsService(SettingsService):
         return self.project.config_service.settings
 
     @property
-    def meltano_yml_config(self):
+    def meltano_yml_config(self):  # noqa: ANN201
         """Return current configuration in `meltano.yml`.
 
         Returns:
@@ -153,7 +153,7 @@ class ProjectSettingsService(SettingsService):
         """
         return self.project.config_service.current_config
 
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config) -> None:  # noqa: ANN001
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -161,7 +161,7 @@ class ProjectSettingsService(SettingsService):
         """
         self.project.config_service.update_config(config)
 
-    def process_config(self, config) -> dict:
+    def process_config(self, config) -> dict:  # noqa: ANN001
         """Process configuration dict for presentation in `meltano config meltano`.
 
         Args:

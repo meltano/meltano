@@ -54,7 +54,7 @@ class EnvVar:
         prefix = "!" if self.negated else ""
         return f"{prefix}{self.key}"
 
-    def get(self, env) -> str:
+    def get(self, env) -> str:  # noqa: ANN001
         """Get env value.
 
         Args:
@@ -91,7 +91,7 @@ class YAMLEnum(str, Enum):
         return self.value
 
     @staticmethod
-    def yaml_representer(dumper, obj) -> str:
+    def yaml_representer(dumper, obj) -> str:  # noqa: ANN001
         """Represent as yaml.
 
         Args:
@@ -104,7 +104,7 @@ class YAMLEnum(str, Enum):
         return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
 
     @classmethod
-    def to_yaml(cls, representer: Representer, node: t.Any) -> ScalarNode:
+    def to_yaml(cls, representer: Representer, node: t.Any) -> ScalarNode:  # noqa: ANN401
         """Represent as yaml.
 
         Args:
@@ -119,7 +119,7 @@ class YAMLEnum(str, Enum):
     @classmethod
     def from_yaml(
         cls,
-        constructor,  # noqa: ARG003
+        constructor,  # noqa: ANN001, ARG003
         node: Node,
     ) -> YAMLEnum:
         """Construct from yaml.
@@ -183,7 +183,7 @@ class SettingDefinition(NameEq, Canonical):
         env: str | None = None,
         env_aliases: list[str] | None = None,
         kind: str | None = None,
-        value=None,
+        value=None,  # noqa: ANN001
         label: str | None = None,
         documentation: str | None = None,
         description: str | None = None,
@@ -195,9 +195,9 @@ class SettingDefinition(NameEq, Canonical):
         hidden: bool | None = None,
         sensitive: bool | None = None,
         custom: bool = False,
-        value_processor=None,
-        value_post_processor=None,
-        **attrs,
+        value_processor=None,  # noqa: ANN001
+        value_post_processor=None,  # noqa: ANN001
+        **attrs,  # noqa: ANN003
     ):
         """Instantiate new SettingDefinition.
 
@@ -290,7 +290,7 @@ class SettingDefinition(NameEq, Canonical):
         cls,
         defs: t.Iterable[SettingDefinition],
         config: dict,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> list[SettingDefinition]:
         """Create SettingDefinition instances for missing settings.
 
@@ -317,10 +317,10 @@ class SettingDefinition(NameEq, Canonical):
     def from_key_value(
         cls,
         key: str,
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         *,
         custom: bool = True,
-        default: t.Any | bool = False,
+        default: t.Any | bool = False,  # noqa: ANN401
     ) -> SettingDefinition:
         """Create SettingDefinition instance from key-value pair.
 
@@ -464,7 +464,7 @@ class SettingDefinition(NameEq, Canonical):
             raise parse_error
         return parsed
 
-    def cast_value(self, value: t.Any) -> t.Any:
+    def cast_value(self, value: t.Any) -> t.Any:  # noqa: ANN401
         """Cast given value.
 
         Args:
@@ -508,7 +508,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def post_process_value(self, value: t.Any) -> t.Any:
+    def post_process_value(self, value: t.Any) -> t.Any:  # noqa: ANN401
         """Post-process given value.
 
         Args:
@@ -526,7 +526,7 @@ class SettingDefinition(NameEq, Canonical):
 
         return value
 
-    def stringify_value(self, value: t.Any) -> str:
+    def stringify_value(self, value: t.Any) -> str:  # noqa: ANN401
         """Return value in string form.
 
         Args:

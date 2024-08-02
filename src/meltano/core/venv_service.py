@@ -241,11 +241,11 @@ class VirtualEnv:
         self.plugin_fingerprint_path.write_text(fingerprint(pip_install_args))
 
 
-async def _extract_stderr(_):
+async def _extract_stderr(_) -> None:
     return None  # pragma: no cover
 
 
-async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
+async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:  # noqa: ANN001, ANN002, ANN003
     """Run an executable asynchronously in a subprocess.
 
     Args:
@@ -366,7 +366,8 @@ class VenvService:
             Whether virtual environment doesn't exist or can't be reused.
         """
 
-        def checks():  # A generator is used to perform the checks lazily
+        # A generator is used to perform the checks lazily
+        def checks():  # noqa: ANN202
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -437,7 +438,7 @@ class VenvService:
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
-        async def extract_stderr(proc: Process):
+        async def extract_stderr(proc: Process):  # noqa: ANN202
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",

@@ -52,7 +52,7 @@ class TestSQLAlchemyModels:
         table: sa.Table,
         inserted: datetime | None,
         expected: datetime | None,
-    ):
+    ) -> None:
         select_stmt = table.select()
         insert_stmt = table.insert().values(created_at=inserted)
 

@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.engine import URL
 
 
-def recreate_database(engine, db_name):
+def recreate_database(engine, db_name) -> None:
     """Drop & Create a new database.
 
     We need to use the master connection to do this.

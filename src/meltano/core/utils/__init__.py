@@ -45,7 +45,7 @@ except AttributeError:
 class NotFound(Exception):
     """An element is not found."""
 
-    def __init__(self, name, obj_type=None):
+    def __init__(self, name, obj_type=None) -> None:  # noqa: ANN001
         """Create a new exception.
 
         Args:
@@ -58,7 +58,7 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
+def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
     """Run the given async function using `asyncio.run`.
 
     Args:
@@ -69,14 +69,14 @@ def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         return asyncio.run(func(*args, **kwargs))
 
     return wrapper
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: t.Callable[[t.Any], t.Any]):
+def compose(*fs: t.Callable[[t.Any], t.Any]):  # noqa: ANN201
     """Create a composition of unary functions.
 
     Args:
@@ -95,7 +95,7 @@ def compose(*fs: t.Callable[[t.Any], t.Any]):
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
-def slugify(s):
+def slugify(s):  # noqa: ANN001, ANN201
     """Normalize strings into something URL-friendly.
 
     Args:
@@ -130,20 +130,20 @@ def slugify(s):
     return s.replace(" ", "-")
 
 
-def get_basic_auth(user, token):
+def get_basic_auth(user, token):  # noqa: ANN001, ANN201
     return HTTPBasicAuth(user, token)
 
 
-def pop_all(keys, d: dict):
+def pop_all(keys, d: dict):  # noqa: ANN001, ANN201
     return {k: d.pop(k) for k in keys}
 
 
-def get_all(keys, d: dict, default=None):
+def get_all(keys, d: dict, default=None):  # noqa: ANN001, ANN201
     return {k: d.get(k, default) for k in keys}
 
 
 # Taken from https://stackoverflow.com/a/20666342
-def merge(src, dest):
+def merge(src, dest):  # noqa: ANN001, ANN201
     """Merge both given dictionaries together at depth, modifying `dest` in-place.
 
     Args:
@@ -171,11 +171,11 @@ def merge(src, dest):
     return dest
 
 
-def are_similar_types(left, right):
+def are_similar_types(left, right):  # noqa: ANN001, ANN201
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):
+def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: ANN001, ANN201
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -227,7 +227,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):
     return cursor[tail]
 
 
-def nest_object(flat_object):
+def nest_object(flat_object):  # noqa: ANN001, ANN201
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -254,7 +254,7 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
+def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper around `flatten_dict.flatten`.
@@ -287,16 +287,16 @@ def compact(xs: t.Iterable) -> t.Iterable:
     return (x for x in xs if x is not None)
 
 
-def file_has_data(file: Path | str):
+def file_has_data(file: Path | str):  # noqa: ANN201
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
 
 
-def identity(x):
+def identity(x):  # noqa: ANN001, ANN201
     return x
 
 
-def noop(*_args, **_kwargs):
+def noop(*_args, **_kwargs) -> None:
     pass
 
 
@@ -390,9 +390,9 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: t.Callable[..., Path]):
+def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201
     @functools.wraps(func)
-    def decorate(*args, **kwargs):
+    def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs, make_dirs=enabled)
@@ -408,11 +408,11 @@ def makedirs(func: t.Callable[..., Path]):
     return decorate
 
 
-def is_email_valid(value: str):
+def is_email_valid(value: str):  # noqa: ANN201
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):
+def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201
     if isinstance(path, str):
         path = path.split(".")
 
@@ -437,7 +437,7 @@ def pop_at_path(d, path, default=None):
     return popped
 
 
-def set_at_path(d, path, value):
+def set_at_path(d, path, value) -> None:  # noqa: ANN001
     if isinstance(path, str):
         path = path.split(".")
 
@@ -600,7 +600,7 @@ def uniques_in(original: t.Sequence[T]) -> list[T]:
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
-def human_size(num, suffix="B"):
+def human_size(num, suffix="B") -> str:  # noqa: ANN001
     """Return human-readable file size.
 
     Args:
@@ -656,7 +656,7 @@ def format_exception(exception: BaseException) -> str:
     )
 
 
-def safe_hasattr(obj: t.Any, name: str) -> bool:
+def safe_hasattr(obj: t.Any, name: str) -> bool:  # noqa: ANN401
     """Safely checks if an object has a given attribute.
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
@@ -759,7 +759,7 @@ class MergeStrategy(t.NamedTuple):
 class Extendable(t.Protocol):
     """A type protocol for types which have an `extend` method."""
 
-    def extend(self, x: t.Any) -> None:
+    def extend(self, x: t.Any) -> None:  # noqa: ANN401
         """Extend the current instance with another value.
 
         Args:
@@ -811,7 +811,7 @@ def deep_merge(
     return reduce(lambda a, b: _deep_merge(a, b, strategies), data)
 
 
-def _deep_merge(a, b, strategies):
+def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
     base: TMapping = copy(a)
     for key, value in b.items():
         for applicable_types, behavior in strategies:

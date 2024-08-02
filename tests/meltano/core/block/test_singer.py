@@ -90,7 +90,7 @@ class TestSingerBlocks:
         elt_context,
         mock_tap_plugin_invoker,
         mock_target_plugin_invoker,
-    ):
+    ) -> None:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -133,7 +133,11 @@ class TestSingerBlocks:
         )
 
     @pytest.mark.asyncio()
-    async def test_singer_block_stop(self, elt_context, mock_target_plugin_invoker):
+    async def test_singer_block_stop(
+        self,
+        elt_context,
+        mock_target_plugin_invoker,
+    ) -> None:
         block = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -159,7 +163,12 @@ class TestSingerBlocks:
         assert block.invoker.cleanup.called
 
     @pytest.mark.asyncio()
-    async def test_singer_block_io(self, elt_context, mock_tap_plugin_invoker, log):
+    async def test_singer_block_io(
+        self,
+        elt_context,
+        mock_tap_plugin_invoker,
+        log,
+    ) -> None:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,
@@ -205,7 +214,7 @@ class TestSingerBlocks:
         elt_context,
         mock_tap_plugin_invoker,
         mock_target_plugin_invoker,
-    ):
+    ) -> None:
         producer = SingerBlock(
             block_ctx=elt_context,
             project=elt_context.project,

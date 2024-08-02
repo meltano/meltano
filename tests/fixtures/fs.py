@@ -14,7 +14,7 @@ from fixtures.utils import cd
 def compatible_copy_tree():
     """Copy files recursively from source to destination, ignoring existing dirs."""
 
-    def _compatible_copy_tree(source: Path, destination: Path):
+    def _compatible_copy_tree(source: Path, destination: Path) -> None:
         """Copy files recursively from source to destination, ignoring existing dirs."""
         shutil.copytree(source, destination, dirs_exist_ok=True)
 

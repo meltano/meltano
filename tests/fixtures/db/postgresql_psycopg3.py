@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.pool import NullPool
 
 
-def recreate_database(engine, db_name):
+def recreate_database(engine, db_name) -> None:
     """Drop & Create a new database, PostgreSQL only."""
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError), engine.begin() as conn:
         conn.execute(text(f"DROP DATABASE {db_name}"))
@@ -19,7 +19,7 @@ def recreate_database(engine, db_name):
 
 
 @pytest.fixture(scope="session")
-def engine_uri(worker_id: str):
+def engine_uri(worker_id: str) -> str:
     host = os.getenv("POSTGRES_ADDRESS")
     port = os.getenv("POSTGRES_PORT", 5432)
     user = os.getenv("POSTGRES_USER")

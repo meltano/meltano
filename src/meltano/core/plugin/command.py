@@ -16,7 +16,7 @@ TCommand = t.TypeVar("TCommand")
 class UndefinedEnvVarError(Error):
     """An environment variable is used as a command argument but is not set."""
 
-    def __init__(self, command_name, var):
+    def __init__(self, command_name, var) -> None:  # noqa: ANN001
         """Initialize UndefinedEnvVarError.
 
         Args:
@@ -58,7 +58,7 @@ class Command(Canonical):
         else:
             self.container_spec = None
 
-    def expanded_args(self, name, env):
+    def expanded_args(self, name, env):  # noqa: ANN001, ANN201
         """Replace any env var arguments with their values.
 
         Args:
@@ -82,7 +82,7 @@ class Command(Canonical):
         return expanded
 
     @classmethod
-    def as_canonical(cls, target):
+    def as_canonical(cls, target):  # noqa: ANN001, ANN206
         """Serialize the target command.
 
         Args:
@@ -100,7 +100,7 @@ class Command(Canonical):
         return canonical
 
     @classmethod
-    def parse(cls, obj):
+    def parse(cls, obj):  # noqa: ANN001, ANN206
         """Deserialize data into a Command.
 
         Args:

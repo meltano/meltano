@@ -48,7 +48,7 @@ class TestSettingDefinition:
         self,
         setting_definition: SettingDefinition,
         uncast_expected_pairs,
-    ):
+    ) -> None:
         for uncast, expected in uncast_expected_pairs:
             if isinstance(expected, type) and issubclass(expected, Exception):
                 with pytest.raises(expected):
@@ -56,7 +56,7 @@ class TestSettingDefinition:
             else:
                 assert setting_definition.cast_value(uncast) == expected
 
-    def test_cast_options(self):
+    def test_cast_options(self) -> None:
         setting_definition = SettingDefinition(
             name="test_setting",
             kind=SettingKind.OPTIONS,
@@ -173,6 +173,6 @@ class TestSettingDefinition:
         *,
         sensitive: bool,
         kind: SettingKind,
-    ):
+    ) -> None:
         assert setting_definition.sensitive is sensitive
         assert setting_definition.kind is kind

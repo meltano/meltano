@@ -14,7 +14,7 @@ class PIDFile:
         self._pid = None
 
     @property
-    def pid(self):
+    def pid(self):  # noqa: ANN201
         return self._pid or self.load_pid()
 
     def load_pid(self) -> int:
@@ -29,7 +29,7 @@ class PIDFile:
         logger.debug(f"Loaded PID {self._pid} from {self.path}")  # noqa: G004
         return self._pid
 
-    def write_pid(self, pid: int):
+    def write_pid(self, pid: int) -> None:
         with self.path.open("w") as raw:
             raw.write(str(pid))
             self._pid = pid
@@ -44,7 +44,7 @@ class PIDFile:
         except psutil.NoSuchProcess as ex:
             raise UnknownProcessError(self) from ex
 
-    def unlink(self):
+    def unlink(self):  # noqa: ANN201
         return self.path.unlink()
 
     def __str__(self) -> str:

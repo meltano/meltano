@@ -56,14 +56,14 @@ class MeltanoError(Exception):
 class Error(Exception):
     """Base exception for ELT errors."""
 
-    def exit_code(self):
+    def exit_code(self):  # noqa: ANN201
         return ExitCode.FAIL
 
 
 class ExtractError(Error):
     """Error in the extraction process, like API errors."""
 
-    def exit_code(self):
+    def exit_code(self):  # noqa: ANN201
         return ExitCode.NO_RETRY
 
 
@@ -132,6 +132,6 @@ class ProjectNotFound(Error):
 class ProjectReadonly(Error):
     """Attempting to update a readonly project."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Instantiate the error."""
         super().__init__("This Meltano project is deployed as read-only")

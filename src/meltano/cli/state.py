@@ -46,10 +46,10 @@ class MutuallyExclusiveOptionsError(Exception):
         return f"Must provide exactly one of: {','.join(self.options)}"
 
 
-def _prompt_for_confirmation(prompt):
+def _prompt_for_confirmation(prompt):  # noqa: ANN001, ANN202
     """Wrap destructive CLI commands which should prompt the user for confirmation."""
 
-    def _prompt_callback(ctx: click.Context, param, value: bool):  # noqa: ARG001, FBT001
+    def _prompt_callback(ctx: click.Context, param, value: bool) -> None:  # noqa: ANN001, ARG001, FBT001
         if not value and not click.confirm(prompt):
             ctx.exit(1)
 
@@ -110,7 +110,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
 )
 @click.pass_context
 @pass_project(migrate=True)
-def meltano_state(project: Project, ctx: click.Context):
+def meltano_state(project: Project, ctx: click.Context) -> None:
     """
     Manage state.
 
@@ -124,7 +124,7 @@ def meltano_state(project: Project, ctx: click.Context):
 @meltano_state.command(cls=InstrumentedCmd, name="list")
 @click.option("--pattern", type=str, help="Filter state IDs by pattern.")
 @click.pass_context
-def list_state(ctx: click.Context, pattern: str | None):
+def list_state(ctx: click.Context, pattern: str | None) -> None:
     """List all state_ids for this project.
 
     Optionally pass a glob-style pattern to filter state_ids by.
@@ -158,7 +158,7 @@ def copy_state(
     project: Project,
     src_state_id: str,
     dst_state_id: str,
-):
+) -> None:
     """Copy state to another job ID."""
     # Retrieve state for copying
     state_service: StateService = (
@@ -188,7 +188,7 @@ def move_state(
     project: Project,
     src_state_id: str,
     dst_state_id: str,
-):
+) -> None:
     """Move state to another job ID, clearing the original."""
     # Retrieve state for moveing
     state_service: StateService = (
@@ -225,7 +225,7 @@ def merge_state(
     state: str | None,
     input_file: Path | None,
     from_state_id: str | None,
-):
+) -> None:
     """Add bookmarks to existing state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -273,7 +273,7 @@ def set_state(
     state_id: str,
     state: str | None,
     input_file: Path | None,
-):
+) -> None:
     """Set state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -299,7 +299,7 @@ def set_state(
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def get_state(ctx: click.Context, project: Project, state_id: str):
+def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
     """Get state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
@@ -313,7 +313,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str):
 @click.argument("state-id")
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str):
+def clear_state(ctx: click.Context, project: Project, state_id: str) -> None:
     """Clear state."""
     state_service: StateService = (
         state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]

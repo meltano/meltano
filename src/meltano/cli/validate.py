@@ -34,7 +34,7 @@ TEST_LINE_LENGTH = 60
 install, no_install, only_install = get_install_options(include_only_install=True)
 
 
-def write_sep_line(title: str, sepchar: str, **kwargs):
+def write_sep_line(title: str, sepchar: str, **kwargs) -> None:  # noqa: ANN003
     """Write a separator line in the terminal."""
     terminal_width, _ = shutil.get_terminal_size()
     char_count = (
@@ -54,7 +54,7 @@ def write_sep_line(title: str, sepchar: str, **kwargs):
 class CommandLineRunner(ValidationsRunner):
     """Validator that runs in the CLI."""
 
-    async def run_test(self, name: str) -> int:
+    async def run_test(self, name: str) -> int:  # type: ignore[override]
         """Run a test command.
 
         Args:
@@ -97,7 +97,7 @@ async def test(
     all_tests: bool,
     install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...] = (),
-):
+) -> None:
     """
     Run validations using plugins' tests.
 
@@ -137,7 +137,7 @@ async def _run_plugin_tests(
     return {runner.plugin_name: await runner.run_all(session) for runner in runners}
 
 
-def _report_and_exit(results: dict[str, dict[str, int]]):
+def _report_and_exit(results: dict[str, dict[str, int]]) -> None:
     exit_code = 0
     failed_count = 0
     passed_count = 0

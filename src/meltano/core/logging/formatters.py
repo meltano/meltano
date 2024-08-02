@@ -50,7 +50,7 @@ def rich_exception_formatter_factory(
     """
 
     def _traceback(
-        sio,
+        sio,  # noqa: ANN001
         exc_info: tuple[type[t.Any], BaseException, TracebackType | None],
     ) -> None:
         sio.write("\n")

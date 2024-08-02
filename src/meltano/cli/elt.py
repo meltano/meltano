@@ -149,7 +149,7 @@ async def el(  # WPS408
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
-):
+) -> None:
     """
     Run an EL pipeline to Extract and Load data.
 
@@ -225,7 +225,7 @@ async def elt(  # WPS408
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
-):
+) -> None:
     """
     Run an ELT pipeline to Extract, Load, and Transform data.
 
@@ -277,7 +277,7 @@ async def _run_el_command(
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
-):
+) -> None:
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "  # noqa: EM101
@@ -342,21 +342,21 @@ async def _run_el_command(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _elt_context_builder(
+def _elt_context_builder(  # noqa: ANN202
     project: Project,
-    job,
-    session,
-    extractor,
-    loader,
-    transform,
+    job,  # noqa: ANN001
+    session,  # noqa: ANN001
+    extractor,  # noqa: ANN001
+    loader,  # noqa: ANN001
+    transform,  # noqa: ANN001
     *,
-    dry_run=False,
-    full_refresh=False,
-    refresh_catalog=False,
-    select_filter=None,
-    catalog=None,
-    state=None,
-    merge_state=False,
+    dry_run=False,  # noqa: ANN001
+    full_refresh=False,  # noqa: ANN001
+    refresh_catalog=False,  # noqa: ANN001
+    select_filter=None,  # noqa: ANN001
+    catalog=None,  # noqa: ANN001
+    state=None,  # noqa: ANN001
+    merge_state=False,  # noqa: ANN001
 ):
     select_filter = select_filter or []
     transform_name = None
@@ -381,7 +381,7 @@ def _elt_context_builder(
     )
 
 
-async def dump_file(context_builder, dumpable):
+async def dump_file(context_builder, dumpable) -> None:  # noqa: ANN001
     """Dump the given dumpable for this pipeline."""
     elt_context = context_builder.context()
 
@@ -400,15 +400,15 @@ async def dump_file(context_builder, dumpable):
 
 
 async def _run_job(
-    tracker,
-    project,
-    job,
-    session,
-    context_builder,
+    tracker,  # noqa: ANN001
+    project,  # noqa: ANN001
+    job,  # noqa: ANN001
+    session,  # noqa: ANN001
+    context_builder,  # noqa: ANN001
     install_plugins: InstallPlugins,
     *,
-    force=False,
-):
+    force=False,  # noqa: ANN001
+) -> None:
     fail_stale_jobs(session, job.job_name)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
@@ -431,7 +431,7 @@ async def _run_job(
 
 
 @asynccontextmanager
-async def _redirect_output(log, output_logger):
+async def _redirect_output(log, output_logger):  # noqa: ANN001, ANN202
     meltano_stdout = output_logger.out(
         "meltano",
         log.bind(stdio="stdout", cmd_type="elt"),
@@ -456,7 +456,7 @@ async def _run_elt(
     context_builder: ELTContextBuilder,
     output_logger: OutputLogger,
     install_plugins: InstallPlugins,
-):
+) -> None:
     elt_context = context_builder.context()
     plugins = [elt_context.extractor, elt_context.loader]
 
@@ -499,11 +499,11 @@ async def _run_elt(
 
 
 async def _run_extract_load(
-    log,
-    elt_context,
-    output_logger,
-    **kwargs,
-):
+    log,  # noqa: ANN001
+    elt_context,  # noqa: ANN001
+    output_logger,  # noqa: ANN001
+    **kwargs,  # noqa: ANN003
+) -> None:
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -571,7 +571,7 @@ async def _run_extract_load(
     log.info("Extract & load complete!")
 
 
-async def _run_transform(log, elt_context, output_logger, **kwargs):
+async def _run_transform(log, elt_context, output_logger, **kwargs) -> None:  # noqa: ANN001, ANN003
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
         state_id=elt_context.job.job_name,
@@ -597,7 +597,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs):
     log.info("Transformation complete!")
 
 
-def _find_extractor(project: Project, extractor_name: str):
+def _find_extractor(project: Project, extractor_name: str):  # noqa: ANN202
     try:
         return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
@@ -610,7 +610,7 @@ def _find_extractor(project: Project, extractor_name: str):
         )
 
 
-def _find_transform_for_extractor(
+def _find_transform_for_extractor(  # noqa: ANN202
     project: Project,
     extractor_name: str,
 ):

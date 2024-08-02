@@ -36,7 +36,7 @@ def test_environment_name_hash(
     expected: str,
     snowplow: SnowplowMicro,
     cli_runner: MeltanoCliRunner,
-):
+) -> None:
     results = cli_runner.invoke(cli, cmd.split())
     assert_cli_runner(results)
     for event in snowplow.good():

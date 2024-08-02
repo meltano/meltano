@@ -2175,7 +2175,7 @@ def create_state_id(description: str, env: str = "dev") -> str:
 
 
 @pytest.fixture()
-def num_params():
+def num_params() -> int:
     return 10
 
 
@@ -2444,7 +2444,7 @@ def use_test_log_config():
 def reset_project_context(
     project: Project,
     project_init_service: ProjectInitService,
-):
+) -> None:
     for path in project.root.iterdir():
         if path.is_dir():
             shutil.rmtree(path)

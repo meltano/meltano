@@ -188,7 +188,7 @@ class PluginType(YAMLEnum):
 class PluginRef(Canonical):
     """A reference to a plugin."""
 
-    def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):
+    def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):  # noqa: ANN003
         """Create a new PluginRef.
 
         Args:
@@ -239,7 +239,7 @@ class PluginRef(Canonical):
         """
         return hash((self.type, self.name))
 
-    def set_presentation_attrs(self, extras):
+    def set_presentation_attrs(self, extras) -> None:  # noqa: ANN001
         """Set the presentation attributes of the plugin reference.
 
         Args:
@@ -277,7 +277,7 @@ class Variant(NameEq, Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a new Variant.
 
@@ -335,7 +335,7 @@ class PluginDefinition(PluginRef):
         variant: str | None = None,
         variants: list | None = None,
         is_default_variant: bool | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a new PluginDefinition.
 
@@ -354,7 +354,7 @@ class PluginDefinition(PluginRef):
 
         self._defaults["label"] = lambda plugin: plugin.name
 
-        def default_logo_url(plugin_def):
+        def default_logo_url(plugin_def) -> str:  # noqa: ANN001
             short_name = re.sub(
                 r"^(tap|target)-",
                 "",
@@ -382,7 +382,7 @@ class PluginDefinition(PluginRef):
         self.variants = [Variant.parse(x) for x in variants]
         self.is_default_variant = is_default_variant
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Iterate over the variants of the plugin definition.
 
         Yields:
@@ -417,7 +417,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant | None = None):
+    def find_variant(self, variant_or_name: str | Variant | None = None):  # noqa: ANN201
         """Find the variant with the given name or variant.
 
         Args:
@@ -440,7 +440,7 @@ class PluginDefinition(PluginRef):
 
         return self.get_variant(variant_or_name)
 
-    def variant_label(self, variant):
+    def variant_label(self, variant):  # noqa: ANN001, ANN201
         """Return label for specified variant.
 
         Args:
@@ -462,7 +462,7 @@ class PluginDefinition(PluginRef):
         return label
 
     @property
-    def variant_labels(self):
+    def variant_labels(self):  # noqa: ANN201
         """Return labels for supported variants.
 
         Returns:
@@ -524,7 +524,7 @@ class BasePlugin(HookObject):
         self._plugin_def = plugin_def
         self._variant = variant
 
-    def __eq__(self, other: BasePlugin):
+    def __eq__(self, other: BasePlugin):  # noqa: ANN204
         """Compare two plugins.
 
         Args:
@@ -543,7 +543,7 @@ class BasePlugin(HookObject):
         """
         return hash((self._plugin_def, self._variant))
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Iterate over the settings of the plugin.
 
         Yields:
@@ -551,7 +551,7 @@ class BasePlugin(HookObject):
         """
         yield from self._plugin_def
 
-    def __getattr__(self, attr: str):
+    def __getattr__(self, attr: str):  # noqa: ANN204
         """Get the value of the setting.
 
         Args:
@@ -584,7 +584,7 @@ class BasePlugin(HookObject):
         return self._variant.executable or self._plugin_def.name
 
     @property
-    def extras(self):
+    def extras(self):  # noqa: ANN201
         """Return the plugin extras.
 
         Returns:
@@ -593,7 +593,7 @@ class BasePlugin(HookObject):
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
-    def all_commands(self):
+    def all_commands(self):  # noqa: ANN201
         """Return a dictionary of supported commands.
 
         Returns:
@@ -615,7 +615,7 @@ class BasePlugin(HookObject):
         }
 
     @property
-    def all_settings(self):
+    def all_settings(self):  # noqa: ANN201
         """Return a list of settings.
 
         Returns:
@@ -624,7 +624,7 @@ class BasePlugin(HookObject):
         return self._variant.settings
 
     @property
-    def extra_settings(self):
+    def extra_settings(self):  # noqa: ANN201
         """Return the extra settings for this plugin.
 
         Returns:
@@ -654,7 +654,7 @@ class BasePlugin(HookObject):
         return existing_settings
 
     @property
-    def all_requires(self):
+    def all_requires(self):  # noqa: ANN201
         """Return a list of requires.
 
         Returns:
@@ -665,7 +665,7 @@ class BasePlugin(HookObject):
     def env_prefixes(
         self,
         *,
-        for_writing=False,  # noqa: ARG002
+        for_writing=False,  # noqa: ANN001, ARG002
     ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
@@ -724,7 +724,7 @@ class BasePlugin(HookObject):
         return []
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -733,7 +733,7 @@ class BasePlugin(HookObject):
         return {}
 
     @property
-    def output_files(self):
+    def output_files(self):  # noqa: ANN201
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -741,7 +741,7 @@ class BasePlugin(HookObject):
         """
         return {}
 
-    def process_config(self, config):
+    def process_config(self, config):  # noqa: ANN001, ANN201
         """Process the config for this plugin.
 
         Args:
@@ -785,7 +785,7 @@ class StandalonePlugin(Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a locked plugin.
 
@@ -863,7 +863,7 @@ class StandalonePlugin(Canonical):
                 )
 
     @classmethod
-    def from_variant(
+    def from_variant(  # noqa: ANN206
         cls: type[StandalonePlugin],
         variant: Variant,
         plugin_def: PluginDefinition,

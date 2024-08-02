@@ -43,7 +43,7 @@ else:
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
-def pytest_runtest_setup(item):
+def pytest_runtest_setup(item) -> None:
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database

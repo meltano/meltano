@@ -17,7 +17,7 @@ logger = structlog.stdlib.get_logger(__name__)
 
 
 class SingerPlugin(BasePlugin):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize a `SingerPlugin`.
 
         Args:
@@ -30,7 +30,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config) -> dict:
+    def process_config(self, flat_config) -> dict:  # noqa: ANN001
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
@@ -51,7 +51,7 @@ class SingerPlugin(BasePlugin):
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ARG002
+        session,  # noqa: ANN001, ARG002
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
@@ -62,7 +62,7 @@ class SingerPlugin(BasePlugin):
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker) -> None:
+    async def before_cleanup(self, invoker) -> None:  # noqa: ANN001
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()

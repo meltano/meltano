@@ -52,7 +52,7 @@ class TestSuperset:
         session,
         plugin_invoker_factory,
         monkeypatch,
-    ):
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -151,7 +151,7 @@ class TestSuperset:
             assert not run_dir.joinpath("superset_config.py").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

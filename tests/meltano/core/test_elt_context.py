@@ -8,7 +8,7 @@ from meltano.core.plugin import PluginType, Variant
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 
-def assert_extractor_env(extractor, env):
+def assert_extractor_env(extractor, env) -> None:
     assert env["MELTANO_EXTRACTOR_NAME"] == extractor.name
     assert env["MELTANO_EXTRACTOR_NAMESPACE"] == extractor.namespace
     assert env["MELTANO_EXTRACTOR_VARIANT"] == extractor.variant
@@ -17,7 +17,7 @@ def assert_extractor_env(extractor, env):
     assert env["MELTANO_EXTRACT__SELECT"] == env["TAP_MOCK__SELECT"] == '["*.*"]'
 
 
-def assert_loader_env(loader, env):
+def assert_loader_env(loader, env) -> None:
     assert env["MELTANO_LOADER_NAME"] == loader.name
     assert env["MELTANO_LOADER_NAMESPACE"] == loader.namespace
     assert env["MELTANO_LOADER_VARIANT"] == loader.variant
@@ -31,13 +31,13 @@ def assert_loader_env(loader, env):
     )
 
 
-def assert_transform_env(transform, env):
+def assert_transform_env(transform, env) -> None:
     assert env["MELTANO_TRANSFORM_NAME"] == transform.name
     assert env["MELTANO_TRANSFORM_NAMESPACE"] == transform.namespace
     assert env["MELTANO_TRANSFORM_VARIANT"] == Variant.ORIGINAL_NAME
 
 
-def assert_transformer_env(transformer, env):
+def assert_transformer_env(transformer, env) -> None:
     assert env["MELTANO_TRANSFORMER_NAME"] == transformer.name
     assert env["MELTANO_TRANSFORMER_NAMESPACE"] == transformer.namespace
     assert env["MELTANO_TRANSFORMER_VARIANT"] == "dbt-labs"
@@ -95,7 +95,7 @@ class TestELTContext:
         )
 
     @pytest.mark.asyncio()
-    async def test_extractor(self, elt_context, session, tap):
+    async def test_extractor(self, elt_context, session, tap) -> None:
         extractor = elt_context.extractor
         assert extractor.type == PluginType.EXTRACTORS
         assert extractor.name == tap.name
@@ -107,7 +107,7 @@ class TestELTContext:
         assert_extractor_env(extractor, env)
 
     @pytest.mark.asyncio()
-    async def test_loader(self, elt_context, session, target_postgres):
+    async def test_loader(self, elt_context, session, target_postgres) -> None:
         loader = elt_context.loader
         assert loader.type == PluginType.LOADERS
         assert loader.name == target_postgres.name
@@ -127,7 +127,7 @@ class TestELTContext:
         session,
         tap_mock_transform,
         dbt,
-    ):
+    ) -> None:
         transformer = elt_context.transformer
         assert transformer.type == PluginType.TRANSFORMERS
         assert transformer.name == dbt.name
@@ -147,7 +147,7 @@ class TestELTContext:
         assert_transformer_env(transformer, env)
 
     @pytest.mark.asyncio()
-    async def test_select_filter(self, elt_context, session):
+    async def test_select_filter(self, elt_context, session) -> None:
         assert elt_context.select_filter
 
         invoker = elt_context.extractor_invoker()

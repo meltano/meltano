@@ -79,7 +79,7 @@ class EnvironmentContext(SelfDescribingJson):
                 except ValueError:
                     yield env_var_name, None
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the environment context."""
         super().__init__(
             EnvironmentContextSchema.url,

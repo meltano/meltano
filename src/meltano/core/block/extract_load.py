@@ -135,7 +135,7 @@ class ELBContextBuilder:
 
         self._base_output_logger = None
 
-    def with_job(self, job: Job):
+    def with_job(self, job: Job):  # noqa: ANN201
         """Set the associated job for the context.
 
         Args:
@@ -147,7 +147,7 @@ class ELBContextBuilder:
         self._job = job
         return self
 
-    def with_merge_state(self, *, merge_state: bool):
+    def with_merge_state(self, *, merge_state: bool):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -160,7 +160,7 @@ class ELBContextBuilder:
         self._merge_state = merge_state
         return self
 
-    def with_full_refresh(self, *, full_refresh: bool):
+    def with_full_refresh(self, *, full_refresh: bool):  # noqa: ANN201
         """Set whether this is a full refresh.
 
         Args:
@@ -172,7 +172,7 @@ class ELBContextBuilder:
         self._full_refresh = full_refresh
         return self
 
-    def with_refresh_catalog(self, *, refresh_catalog: bool):
+    def with_refresh_catalog(self, *, refresh_catalog: bool):  # noqa: ANN201
         """Set whether cached catalog should be ignored.
 
         Args:
@@ -184,7 +184,7 @@ class ELBContextBuilder:
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_no_state_update(self, *, no_state_update: bool):
+    def with_no_state_update(self, *, no_state_update: bool):  # noqa: ANN201
         """Set whether this run should not update state.
 
         By default we typically attempt to track state. This allows avoiding
@@ -199,7 +199,7 @@ class ELBContextBuilder:
         self._state_update = not no_state_update
         return self
 
-    def with_force(self, *, force: bool):
+    def with_force(self, *, force: bool):  # noqa: ANN201
         """Set whether the execution of the job should be forced if it is stale.
 
         Args:
@@ -211,7 +211,7 @@ class ELBContextBuilder:
         self._force = force
         return self
 
-    def with_state_id_suffix(self, state_id_suffix: str):
+    def with_state_id_suffix(self, state_id_suffix: str):  # noqa: ANN201
         """Set a state ID suffix for this run.
 
         Args:
@@ -223,7 +223,7 @@ class ELBContextBuilder:
         self._state_id_suffix = state_id_suffix
         return self
 
-    def with_run_id(self, run_id: uuid.UUID | None):
+    def with_run_id(self, run_id: uuid.UUID | None):  # noqa: ANN201
         """Set a run ID for this run.
 
         Args:
@@ -436,7 +436,7 @@ class ExtractLoadBlocks(BlockSet):
                 continue
             return False
 
-    async def upstream_stop(self, index) -> None:
+    async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.
 
         Args:

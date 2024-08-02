@@ -71,7 +71,7 @@ async def install(
     parallelism: int,
     force: bool,
     schedule_name: str,
-):
+) -> None:
     """
     Install all the dependencies of your project based on the meltano.yml file.
 
@@ -117,7 +117,7 @@ async def install(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):
+def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()

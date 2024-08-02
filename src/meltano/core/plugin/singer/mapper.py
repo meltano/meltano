@@ -53,8 +53,8 @@ class SingerMapper(SingerPlugin):
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ARG002
-    ):
+        session,  # noqa: ANN001, ARG002
+    ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
 

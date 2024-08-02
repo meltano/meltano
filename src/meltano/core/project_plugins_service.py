@@ -117,7 +117,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
-    def current_plugins(self):
+    def current_plugins(self):  # noqa: ANN201
         """Return the current plugins.
 
         Returns:
@@ -126,7 +126,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
-    def update_plugins(self):
+    def update_plugins(self):  # noqa: ANN201
         """Update the current plugins.
 
         Yields:
@@ -135,7 +135,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin):
+    def add_to_file(self, plugin: ProjectPlugin):  # noqa: ANN201
         """Add plugin to `meltano.yml`.
 
         Args:
@@ -167,7 +167,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugin
 
-    def remove_from_file(self, plugin: ProjectPlugin):
+    def remove_from_file(self, plugin: ProjectPlugin):  # noqa: ANN201
         """Remove plugin from `meltano.yml`.
 
         Args:
@@ -203,8 +203,8 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self,
         plugin_name: str,
         plugin_type: PluginType | None = None,
-        invokable=None,
-        configurable=None,
+        invokable=None,  # noqa: ANN001
+        configurable=None,  # noqa: ANN001
     ) -> ProjectPlugin:
         """
         Find a plugin.
@@ -337,7 +337,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self,
         plugin_type: PluginType,
         *,
-        ensure_parent=True,
+        ensure_parent=True,  # noqa: ANN001
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -356,7 +356,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugins
 
-    def plugins_by_type(self, *, ensure_parent=True):
+    def plugins_by_type(self, *, ensure_parent=True):  # noqa: ANN001, ANN201
         """Return plugins grouped by type.
 
         Args:
@@ -373,7 +373,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
+    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:  # noqa: ANN001
         """Return all plugins.
 
         Args:
@@ -388,7 +388,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):
+    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):  # noqa: ANN201
         """Update a plugin.
 
         Args:
@@ -420,7 +420,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             except StopIteration as stop:
                 raise PluginNotFoundError(plugin) from stop
 
-    def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
+    def update_environment_plugin(self, plugin: EnvironmentPluginConfig) -> None:
         """Update a plugin configuration inside a Meltano environment.
 
         Args:

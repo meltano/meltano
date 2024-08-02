@@ -26,7 +26,7 @@ Store = SettingValueStore
 class DummySettingsService(SettingsService):
     """Dummy SettingsService for testing."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Instantiate new DummySettingsService instance.
 
         Args:
@@ -45,7 +45,7 @@ class DummySettingsService(SettingsService):
         self._inherited_settings = None
 
     @property
-    def label(self):
+    def label(self) -> str:
         return "Dummy"
 
     @property
@@ -53,7 +53,7 @@ class DummySettingsService(SettingsService):
         return ProjectSettingsService(Project.find())
 
     @property
-    def docs_url(self):
+    def docs_url(self) -> str:
         return "https://docs.meltano.com/"
 
     @property
@@ -61,7 +61,7 @@ class DummySettingsService(SettingsService):
         return ["dummy"]
 
     @property
-    def db_namespace(self):
+    def db_namespace(self) -> str:
         return "dummy"
 
     @property
@@ -72,10 +72,10 @@ class DummySettingsService(SettingsService):
     def meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config) -> None:
         self.__meltano_yml_config = config
 
-    def update_meltano_environment_config(self, config):
+    def update_meltano_environment_config(self, config) -> None:
         self._meltano_environment_config = config
 
     @property
@@ -130,7 +130,7 @@ class TestAutoStoreManager:
 
     @pytest.fixture()
     def set_value_store(self, subject):
-        def _set_value_store(value, store, name="regular"):
+        def _set_value_store(value, store, name="regular") -> None:
             subject.manager_for(store).set(
                 name,
                 [name],
@@ -146,7 +146,7 @@ class TestAutoStoreManager:
 
     @pytest.fixture()
     def assert_value_source(self, subject):
-        def _assert_value_source(value, source, name="regular"):
+        def _assert_value_source(value, source, name="regular") -> None:
             new_value, metadata = subject.get(
                 name,
                 setting_def=subject.find_setting(name),
@@ -174,7 +174,7 @@ class TestAutoStoreManager:
         unsupported,
         environment,
         monkeypatch,
-    ):
+    ) -> None:
         assert subject.auto_store(setting_name) == preferred_store
 
         # Meltano environment is selected only when there's an active environment
@@ -223,7 +223,7 @@ class TestAutoStoreManager:
         set_value_store,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         value, metadata = subject.get("regular")
         assert value == "from_default"
         assert metadata["source"] == Store.DEFAULT
@@ -311,7 +311,7 @@ class TestAutoStoreManager:
         assert_value_source,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         def set_value(value):
             return subject.set("regular", ["regular"], value)
 
@@ -386,7 +386,7 @@ class TestAutoStoreManager:
         assert_value_source,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         set_value_store("from_dotenv", Store.DOTENV, name="password")
 
         set_value_store("from_dotenv", Store.DOTENV)
@@ -448,7 +448,7 @@ class TestAutoStoreManager:
         project,
         environment,
         monkeypatch,
-    ):
+    ) -> None:
         set_value_store("from_db", Store.DB)
         set_value_store("from_meltano_yml", Store.MELTANO_YML, name="unknown")
         set_value_store("from_dotenv", Store.DOTENV, name="password")
@@ -520,7 +520,7 @@ class TestMeltanoYmlStoreManager:
         yield manager
         manager.reset()
 
-    def test_get(self, subject):
+    def test_get(self, subject) -> None:
         def get():
             return subject.get(
                 "regular",
@@ -538,7 +538,7 @@ class TestMeltanoYmlStoreManager:
 
         assert get() == ("value", {"expandable": True, "key": "regular"})
 
-    def test_set(self, subject):
+    def test_set(self, subject) -> None:
         def set_value(key, value):
             return subject.set(
                 key,
@@ -559,7 +559,7 @@ class TestMeltanoYmlStoreManager:
         assert "basic" not in subject.flat_config
         assert subject.flat_config["regular"] == "new_value"
 
-    def test_unset(self, subject):
+    def test_unset(self, subject) -> None:
         def unset_value(key):
             return subject.unset(
                 key,
@@ -567,7 +567,7 @@ class TestMeltanoYmlStoreManager:
                 setting_def=subject.settings_service.find_setting(key),
             )
 
-        def set_values():
+        def set_values() -> None:
             subject.flat_config["regular"] = "value"
             subject.flat_config["basic"] = "alias_value"
 
@@ -601,7 +601,7 @@ class TestInheritedStoreManager:
     def subject(self, dummy_settings_service):
         return InheritedStoreManager(dummy_settings_service)
 
-    def test_get(self, subject, project):
+    def test_get(self, subject, project) -> None:
         def get(key="regular"):
             return subject.get(
                 key,

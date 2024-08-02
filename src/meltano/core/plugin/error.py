@@ -10,7 +10,7 @@ from . import PluginRef
 class PluginNotFoundError(Exception):
     """Base exception when a plugin could not be found."""
 
-    def __init__(self, plugin_or_name):
+    def __init__(self, plugin_or_name) -> None:  # noqa: ANN001
         if isinstance(plugin_or_name, PluginRef):
             self.plugin_type = plugin_or_name.type.descriptor
             self.plugin_name = plugin_or_name.name
@@ -18,7 +18,7 @@ class PluginNotFoundError(Exception):
             self.plugin_type = "plugin"
             self.plugin_name = plugin_or_name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{self.plugin_type.capitalize()} '{self.plugin_name}' is not "
             "known to Meltano"
@@ -28,12 +28,12 @@ class PluginNotFoundError(Exception):
 class PluginParentNotFoundError(Exception):
     """Base exception when a plugin's parent could not be found."""
 
-    def __init__(self, plugin, parent_not_found_error):
+    def __init__(self, plugin, parent_not_found_error) -> None:  # noqa: ANN001
         """Initialize exception for when plugin's parent could not be found."""
         self.plugin = plugin
         self.parent_not_found_error = parent_not_found_error
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"Could not find parent plugin for {self.plugin.type.descriptor} "
             f"'{self.plugin.name}': {self.parent_not_found_error}"
@@ -47,7 +47,7 @@ class PluginNotSupportedError(Exception):
         """Construct a PluginNotSupportedError instance."""
         self.plugin = plugin
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             "Operation not supported for "
             f"{self.plugin.type.descriptor} '{self.plugin.name}'"
@@ -65,7 +65,7 @@ class PluginLacksCapabilityError(Exception):
 class InvalidPluginDefinitionError(Exception):
     """Base exception when a plugin definition is invalid."""
 
-    def __init__(self, definition=None):
+    def __init__(self, definition=None) -> None:  # noqa: ANN001
         """Construct a new "InvalidPluginDefinitionError instance.
 
         Args:
@@ -82,5 +82,5 @@ class InvalidPluginDefinitionError(Exception):
         else:
             self.reason = "incorrect format"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Plugin definition is invalid: {self.reason}"

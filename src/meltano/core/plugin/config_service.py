@@ -29,7 +29,7 @@ class PluginConfigService:
         self.config_dir = Path(config_dir)
         self.run_dir = Path(run_dir)
 
-    def configure(self):
+    def configure(self):  # noqa: ANN201
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         config_file = self.config_dir.joinpath

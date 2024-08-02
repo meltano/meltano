@@ -44,7 +44,7 @@ class TestCli:
             shutil.rmtree(project.root)
 
     @pytest.fixture()
-    def deactivate_project(self):
+    def deactivate_project(self) -> None:
         Project.deactivate()
 
     @pytest.fixture()
@@ -60,7 +60,7 @@ class TestCli:
             Project.deactivate()
 
     @pytest.mark.order(0)
-    def test_activate_project(self, test_cli_project, cli_runner, pushd):
+    def test_activate_project(self, test_cli_project, cli_runner, pushd) -> None:
         project = test_cli_project
 
         pushd(project.root)
@@ -71,7 +71,7 @@ class TestCli:
         assert Project._default.readonly is False
 
     @pytest.mark.order(1)
-    def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd):
+    def test_empty_meltano_yml_project(self, empty_project, cli_runner, pushd) -> None:
         pushd(empty_project.root)
         with pytest.raises(EmptyMeltanoFileException):
             cli_runner.invoke(cli, ["config"], catch_exceptions=False)
@@ -83,7 +83,7 @@ class TestCli:
         cli_runner,
         pushd,
         monkeypatch,
-    ):
+    ) -> None:
         monkeypatch.setenv(PROJECT_READONLY_ENV, "true")
         assert Project._default is None
         pushd(test_cli_project.root)
@@ -96,7 +96,7 @@ class TestCli:
         test_cli_project,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         test_cli_project.settings.set("project_readonly", value=True)
         assert Project._default is None
         pushd(test_cli_project.root)
@@ -109,7 +109,7 @@ class TestCli:
         pushd,
         cli_runner: MeltanoCliRunner,
         monkeypatch: pytest.MonkeyPatch,
-    ):
+    ) -> None:
         pushd(project.root)
         monkeypatch.delenv(PROJECT_ENVIRONMENT_ENV, raising=False)
         environment_names = {
@@ -140,7 +140,7 @@ class TestCli:
                 == f"Environment {name!r} was not found."
             )
 
-    def test_version(self, cli_runner):
+    def test_version(self, cli_runner) -> None:
         cli_version = cli_runner.invoke(cli, ["--version"])
 
         assert cli_version.output == f"meltano, version {meltano.__version__}\n"
@@ -151,7 +151,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -165,7 +165,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -181,7 +181,7 @@ class TestCli:
         cli_runner,
         pushd,
         monkeypatch,
-    ):
+    ) -> None:
         monkeypatch.setenv("MELTANO_ENVIRONMENT", "test-subconfig-2-yml")
         pushd(project_files_cli.root)
         cli_runner.invoke(
@@ -196,7 +196,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -210,7 +210,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -224,7 +224,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -238,7 +238,7 @@ class TestCli:
         project_files_cli,
         cli_runner,
         pushd,
-    ):
+    ) -> None:
         pushd(project_files_cli.root)
         cli_runner.invoke(
             cli,
@@ -246,13 +246,18 @@ class TestCli:
         )
         assert Project._default.environment is None
 
-    def test_handle_meltano_error(self):
+    def test_handle_meltano_error(self) -> None:
         exception = MeltanoError(reason="This failed", instruction="Try again")
         with pytest.raises(CliError, match="This failed. Try again."):
             handle_meltano_error(exception)
 
     @pytest.mark.usefixtures("pushd")
-    def test_cwd_option(self, cli_runner, test_cli_project, tmp_path: Path):
+    def test_cwd_option(
+        self,
+        cli_runner,
+        test_cli_project,
+        tmp_path: Path,
+    ) -> t.NoReturn:
         project = test_cli_project
         with cd(project.root_dir()):
             assert_cli_runner(cli_runner.invoke(cli, ("dragon",)))
@@ -300,7 +305,7 @@ class TestCli:
         self,
         tmp_path: Path,
         command_args: tuple[str, ...],
-    ):
+    ) -> None:
         # Unless this test runs before every test that uses a project, we
         # cannot use `cli_runner` to test this because the code path taken
         # differs after any project has been found.
@@ -447,7 +452,7 @@ class TestCliColors:
         log_colors_expected,
         tmp_path,
         monkeypatch,
-    ):
+    ) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
         styled_text = click.style(self.TEST_TEXT, fg="red")
 
@@ -458,7 +463,7 @@ class TestCliColors:
             log_config_path = None
 
         @click.command("dummy")
-        def dummy_command():
+        def dummy_command() -> None:
             setup_logging(None, "DEBUG", log_config_path)
             logger = get_logger("meltano.cli.dummy")
             logger.info(self.TEST_TEXT)
@@ -478,7 +483,7 @@ class TestCliColors:
 
 class TestLargeConfigProject:
     @pytest.mark.usefixtures("large_config_project")
-    def test_list_config_performance(self, cli_runner):
+    def test_list_config_performance(self, cli_runner) -> None:
         start = perf_counter_ns()
         assert (
             cli_runner.invoke(

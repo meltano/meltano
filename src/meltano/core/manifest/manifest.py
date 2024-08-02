@@ -76,9 +76,9 @@ class YamlLimitedSafeLoader(type):
 
     def __new__(
         cls,
-        name,
-        bases,
-        namespace,
+        name,  # noqa: ANN001
+        bases,  # noqa: ANN001
+        namespace,  # noqa: ANN001
         do_not_resolve: Iterable[str],
     ) -> YamlLimitedSafeLoader:
         """Generate a new instance of this metaclass.
@@ -254,7 +254,7 @@ class Manifest:
         self,
         data: t.MutableMapping[str, t.Any],
         key: str,
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         _: tuple[t.Any, ...] | None = None,
     ) -> None:
         """Merge behavior for `deep_merge` that expands env vars when the key is "env".
@@ -438,7 +438,7 @@ def _plugins_by_name_by_type(
 
 
 def _locations_trie(paths: Iterable[Iterable[str]]) -> Trie:
-    def defaultdict_defaultdict():
+    def defaultdict_defaultdict():  # noqa: ANN202
         return defaultdict(defaultdict_defaultdict)
 
     root = defaultdict_defaultdict()

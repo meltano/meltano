@@ -49,7 +49,7 @@ def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     return True
 
 
-def test_null_exception_context():
+def test_null_exception_context() -> None:
     ctx = ExceptionContext()
     assert isinstance(ctx.data, dict)
     assert isinstance(ctx.data["context_uuid"], str)
@@ -57,7 +57,7 @@ def test_null_exception_context():
     assert ctx.data["exception"] is None
 
 
-def test_simple_exception_context():
+def test_simple_exception_context() -> None:
     msg = "The error message"
 
     ex = ValueError(msg)
@@ -93,7 +93,7 @@ def test_simple_exception_context():
         assert key in tb_data[0]
 
 
-def test_complex_exception_context():
+def test_complex_exception_context() -> None:
     if platform.system() == "Windows":
         pytest.xfail("Fails on Windows: https://github.com/meltano/meltano/issues/3444")
 
