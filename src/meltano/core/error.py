@@ -18,12 +18,19 @@ class ExitCode(int, Enum):
     NO_RETRY = 2
 
 
-class MeltanoError(Exception):
+class Error(Exception):
+    """Base exception for ELT errors."""
+
+    def exit_code(self):  # noqa: ANN201
+        return ExitCode.FAIL
+
+
+class MeltanoError(Error):
     """Base class for all user-facing errors."""
 
     def __init__(
         self,
-        reason: str,
+        reason: str | Exception | None = None,
         instruction: str | None = None,
         *args: t.Any,
         **kwargs: t.Any,
@@ -51,13 +58,6 @@ class MeltanoError(Exception):
             if self.instruction
             else f"{self.reason}."
         )
-
-
-class Error(Exception):
-    """Base exception for ELT errors."""
-
-    def exit_code(self):  # noqa: ANN201
-        return ExitCode.FAIL
 
 
 class ExtractError(Error):

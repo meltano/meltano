@@ -20,7 +20,6 @@ from rich.table import Table
 from rich.text import Text
 
 from meltano.cli.interactive.utils import InteractionStatus
-from meltano.cli.utils import CliError
 from meltano.core.environment_service import EnvironmentService
 from meltano.core.settings_service import (
     REDACTED_VALUE,
@@ -92,9 +91,9 @@ class InteractiveConfig:
         )
 
     @property
-    def setting_choices(self):  # noqa: ANN201
+    def setting_choices(self) -> list[tuple[str, str, str]]:
         """Return simplified setting choices, for easy printing."""
-        setting_choices = []
+        setting_choices: list[tuple[str, str, str]] = []
         for index, (name, config_metadata) in enumerate(
             self.configurable_settings.items(),
         ):
@@ -407,15 +406,12 @@ class InteractiveConfig:
                 store=store,
                 session=self.session,
             )
-        except StoreNotSupportedError as err:
+        except StoreNotSupportedError:
             if interactive:
                 self.tracker.track_command_event(CliEvent.inflight)
             else:
                 self.tracker.track_command_event(CliEvent.aborted)
-            raise CliError(
-                f"{settings.label.capitalize()} setting '{path}' could not be "  # noqa: EM102
-                f"set in {store.label}: {err}",
-            ) from err
+            raise
 
         name = metadata["name"]
         store = metadata["store"]

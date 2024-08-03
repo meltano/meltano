@@ -110,7 +110,7 @@ class SettingsService(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def label(self):  # noqa: ANN201
+    def label(self) -> str:
         """Return label.
 
         Returns:
