@@ -142,7 +142,8 @@ async def run(
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#run
     """  # noqa: D301, E501
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")

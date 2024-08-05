@@ -27,7 +27,8 @@ ENVIRONMENT_SERVICE_KEY = "environment_service"
 def meltano_environment(project: Project, ctx: click.Context) -> None:
     """Manage Environments.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#environment
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#environment
     """  # noqa: D301
     ctx.obj[ENVIRONMENT_SERVICE_KEY] = EnvironmentService(project)
 

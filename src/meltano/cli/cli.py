@@ -87,7 +87,8 @@ def cli(
 ) -> None:
     """Your CLI for ELT+
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
     ctx.ensure_object(dict)
 

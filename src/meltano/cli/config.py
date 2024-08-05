@@ -155,7 +155,8 @@ def config(
 ) -> None:
     """Display Meltano or plugin configuration.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#config
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#config
     """  # noqa: D301
     tracker = ctx.obj["tracker"]
     try:

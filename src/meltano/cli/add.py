@@ -129,7 +129,8 @@ async def add(
 ) -> None:
     """Add a plugin to your project.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#add
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 

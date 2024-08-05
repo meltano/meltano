@@ -47,7 +47,8 @@ if t.TYPE_CHECKING:
 def schedule(project, ctx) -> None:  # noqa: ANN001
     """Manage pipeline schedules.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#schedule
     """  # noqa: D301
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
@@ -143,9 +144,11 @@ def add(
     \t# Schedule an ELT task to run hourly
     \tmeltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
 
-    \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
+    \b
+    Note that the --job option and --extractor/--loader options are mutually exclusive.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#schedule
     """  # noqa: D301, E501
     if job and (extractor or loader):
         raise click.ClickException(

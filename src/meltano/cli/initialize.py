@@ -39,6 +39,7 @@ path_type = click.Path(file_okay=False, path_type=Path)
 def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool) -> None:  # noqa: ANN001
     """Create a new Meltano project.
 
+    \b
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """

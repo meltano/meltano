@@ -124,7 +124,8 @@ def job(project, ctx) -> None:  # noqa: ANN001
     \t# Remove a named job
     \tmeltano job remove <job_name>
 
-    \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#jobs
     """  # noqa: D301, E501
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)

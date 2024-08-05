@@ -157,7 +157,8 @@ async def el(  # WPS408
     extractor_name: extractor to be used in this pipeline.
     loader_name: loader to be used in this pipeline.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#el
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#el
     """  # noqa: D301
     await _run_el_command(
         project=project,
@@ -232,7 +233,8 @@ async def elt(  # WPS408
     extractor_name: extractor to be used in this pipeline.
     loader_name: loader to be used in this pipeline.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#elt
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#elt
     """  # noqa: D301
     logger.warning("The `elt` command is deprecated in favor of `el`")
     await _run_el_command(

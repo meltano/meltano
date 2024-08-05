@@ -30,7 +30,8 @@ def upgrade(ctx, project) -> None:  # noqa: ANN001
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
     engine, _ = project_engine(project)  # (unreachable code)
     upgrade_service = UpgradeService(engine, project)  # (unreachable code)
@@ -71,7 +72,8 @@ def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
     upgrade_service = ctx.obj["upgrade_service"]
 

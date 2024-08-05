@@ -92,7 +92,8 @@ async def select(
 ) -> None:
     """Manage extractor selection patterns.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#select
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#select
     """  # noqa: D301
     try:
         if flags["list"]:
