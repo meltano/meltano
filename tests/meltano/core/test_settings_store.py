@@ -12,6 +12,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
+    EnvStoreManager,
     InheritedStoreManager,
     MeltanoEnvStoreManager,
     MeltanoYmlStoreManager,
@@ -637,3 +638,15 @@ class TestInheritedStoreManager:
         assert metadata["inherited_source"] is Store.DOTENV
         # Lack of env var expandability is inherited
         assert not metadata["expandable"]
+
+
+class TestEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> EnvStoreManager:
+        return EnvStoreManager(dummy_settings_service)
+
+    def test_ensure_supported(self, subject: EnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError):
+            subject.ensure_supported(method="set")
+
+        subject.ensure_supported(method="get")
