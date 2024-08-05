@@ -12,6 +12,7 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
+    DotEnvStoreManager,
     EnvStoreManager,
     InheritedStoreManager,
     MeltanoEnvStoreManager,
@@ -646,7 +647,21 @@ class TestEnvStoreManager:
         return EnvStoreManager(dummy_settings_service)
 
     def test_ensure_supported(self, subject: EnvStoreManager) -> None:
-        with pytest.raises(StoreNotSupportedError):
+        with pytest.raises(StoreNotSupportedError, match="Store is not writable"):
             subject.ensure_supported(method="set")
 
         subject.ensure_supported(method="get")
+
+
+class TestDotEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> DotEnvStoreManager:
+        return DotEnvStoreManager(dummy_settings_service)
+
+    def test_set_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.set("undefined", [], "my-value", setting_def=None)
+
+    def test_unset_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.unset("undefined", [], setting_def=None)
