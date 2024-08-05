@@ -63,6 +63,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         namespace: str | None = None,
         variant: str | None = None,
         pip_url: str | None = None,
+        pip_requirements: list | None = None,
         python: str | None = None,
         executable: str | None = None,
         capabilities: list | None = None,
@@ -84,6 +85,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             namespace: Plugin namespace.
             variant: Plugin variant.
             pip_url: Plugin install pip url.
+            pip_requirements: Plugin install pip requirements.
             python: The python version to use for this plugin, specified as a path, or a
                 executable name to find within a directory in $PATH.
             executable: Executable name.
@@ -119,6 +121,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 namespace,
                 variant=variant,
                 pip_url=pip_url,
+                pip_requirements=pip_requirements,
                 python=python,
                 executable=executable,
                 capabilities=capabilities,
@@ -144,6 +147,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
+        self.pip_requirements = pip_requirements
         self.python = python
         self.executable = executable
         self.capabilities = capabilities
@@ -159,6 +163,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 "description",
                 self.VARIANT_ATTR,
                 "pip_url",
+                "pip_requirements",
                 "python",
                 "executable",
                 "capabilities",

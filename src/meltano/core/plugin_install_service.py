@@ -8,6 +8,7 @@ import os
 import shlex
 import sys
 import typing as t
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
 from functools import cached_property
@@ -37,6 +38,9 @@ from meltano.core.venv_service import (
 )
 
 if t.TYPE_CHECKING:
+    import io
+    from pathlib import Path
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -398,12 +402,14 @@ class PluginInstallService:
         plugin: ProjectPlugin,
         *,
         env: t.Mapping[str, str] | None = None,
+        requirements_file: str | None = None,
     ) -> bool:
         try:
             pip_install_args = get_pip_install_args(
                 self.project,
                 plugin,
                 env,
+                requirements_file,
                 if_missing=EnvVarMissingBehavior.raise_exception,
             )
         except EnvironmentVariableNotSetError as e:
@@ -509,6 +515,7 @@ def get_pip_install_args(
     project: Project,
     plugin: ProjectPlugin,
     env: t.Mapping[str, str] | None = None,
+    requirements_file: str | None = None,
     if_missing: EnvVarMissingBehavior | None = None,
 ) -> list[str]:
     """Get the pip install arguments for the given plugin.
@@ -523,6 +530,9 @@ def get_pip_install_args(
     Returns:
         The list of pip install arguments for the given plugin.
     """
+    if requirements_file:
+        return ["-r", requirements_file]
+
     with project.settings.feature_flag(
         FeatureFlags.STRICT_ENV_VAR_MODE,
         raise_error=False,
@@ -559,7 +569,17 @@ async def install_pip_plugin(
     Raises:
         ValueError: If the venv backend is not supported.
     """
-    pip_install_args = get_pip_install_args(project, plugin, env=env)
+    requirements = plugin.pip_requirements or []
+    requirements_file = (
+        project.plugin_dir(plugin) / f"{fingerprint(requirements)}.requirements.txt"
+    )
+
+    pip_install_args = get_pip_install_args(
+        project,
+        plugin,
+        env=env,
+        requirements_file=str(requirements_file) if requirements else None,
+    )
     backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":
@@ -580,13 +600,30 @@ async def install_pip_plugin(
         msg = f"Unsupported venv backend: {backend}"
         raise ValueError(msg)
 
-    await service.install(
-        pip_install_args=("--ignore-requires-python", *pip_install_args)
-        if force
-        else pip_install_args,
-        clean=clean,
-        env={
-            **os.environ,
-            **project.dotenv_env,
-        },
-    )
+    with temp_file(requirements_file) as f:
+        f.writelines(requirements)
+        f.flush()
+
+        await service.install(
+            pip_install_args=("--ignore-requires-python", *pip_install_args)
+            if force
+            else pip_install_args,
+            clean=clean,
+            env={
+                **os.environ,
+                **project.dotenv_env,
+            },
+        )
+
+
+@contextmanager
+def temp_file(path: Path) -> t.Generator[io.TextIOWrapper, None, None]:
+    if path.exists():
+        msg = f"Cannot create temp file at {path}"
+        raise FileExistsError(msg)
+
+    try:
+        with path.open("w+") as f:
+            yield f
+    finally:
+        path.unlink()
