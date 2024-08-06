@@ -709,7 +709,7 @@ class BasePlugin(HookObject):
         """
         return True
 
-    def exec_args(
+    def exec_args(  # noqa: D417
         self,
         plugin_invoker: PluginInvoker,  # noqa: ARG002
     ) -> list[str | Path]:

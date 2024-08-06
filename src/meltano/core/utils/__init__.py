@@ -130,15 +130,15 @@ def slugify(s):  # noqa: ANN001, ANN201
     return s.replace(" ", "-")
 
 
-def get_basic_auth(user, token):  # noqa: ANN001, ANN201
+def get_basic_auth(user, token):  # noqa: ANN001, ANN201, D103
     return HTTPBasicAuth(user, token)
 
 
-def pop_all(keys, d: dict):  # noqa: ANN001, ANN201
+def pop_all(keys, d: dict):  # noqa: ANN001, ANN201, D103
     return {k: d.pop(k) for k in keys}
 
 
-def get_all(keys, d: dict, default=None):  # noqa: ANN001, ANN201
+def get_all(keys, d: dict, default=None):  # noqa: ANN001, ANN201, D103
     return {k: d.get(k, default) for k in keys}
 
 
@@ -171,7 +171,7 @@ def merge(src, dest):  # noqa: ANN001, ANN201
     return dest
 
 
-def are_similar_types(left, right):  # noqa: ANN001, ANN201
+def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
@@ -227,7 +227,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: 
     return cursor[tail]
 
 
-def nest_object(flat_object):  # noqa: ANN001, ANN201
+def nest_object(flat_object):  # noqa: ANN001, ANN201, D103
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -287,24 +287,24 @@ def compact(xs: t.Iterable) -> t.Iterable:
     return (x for x in xs if x is not None)
 
 
-def file_has_data(file: Path | str):  # noqa: ANN201
+def file_has_data(file: Path | str):  # noqa: ANN201, D103
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
 
 
-def identity(x):  # noqa: ANN001, ANN201
+def identity(x):  # noqa: ANN001, ANN201, D103
     return x
 
 
-def noop(*_args, **_kwargs) -> None:
+def noop(*_args, **_kwargs) -> None:  # noqa: D103
     pass
 
 
-async def async_noop(*_args, **_kwargs) -> bool:
+async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103
     return True
 
 
-def truthy(val: str) -> bool:
+def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
 
 
@@ -343,7 +343,7 @@ def iso8601_datetime(d: None) -> None: ...
 def iso8601_datetime(d: str) -> datetime: ...
 
 
-def iso8601_datetime(d: str | None):
+def iso8601_datetime(d: str | None):  # noqa: D103
     if d is None:
         return None
 
@@ -390,7 +390,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201
+def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201, D103
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
@@ -408,11 +408,11 @@ def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201
     return decorate
 
 
-def is_email_valid(value: str):  # noqa: ANN201
+def is_email_valid(value: str):  # noqa: ANN201, D103
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201
+def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     if isinstance(path, str):
         path = path.split(".")
 
@@ -437,7 +437,7 @@ def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201
     return popped
 
 
-def set_at_path(d, path, value) -> None:  # noqa: ANN001
+def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
     if isinstance(path, str):
         path = path.split(".")
 

@@ -24,8 +24,7 @@ class MeltanoInvoker:
     """Class used to find and invoke all commands passed to it."""
 
     def __init__(self, project: Project):
-        """
-        Load the class with the project and service settings.
+        """Load the class with the project and service settings.
 
         Args:
             project: Project instance.

@@ -22,8 +22,7 @@ from meltano.core.upgrade_service import UpgradeService
 @pass_project()
 @click.pass_context
 def upgrade(ctx, project) -> None:  # noqa: ANN001
-    """
-    Upgrade Meltano and your entire project to the latest version.
+    """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
 
@@ -31,8 +30,9 @@ def upgrade(ctx, project) -> None:  # noqa: ANN001
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    """  # noqa: D301
     engine, _ = project_engine(project)  # (unreachable code)
     upgrade_service = UpgradeService(engine, project)  # (unreachable code)
     ctx.obj["upgrade_service"] = upgrade_service  # (unreachable code)
@@ -64,8 +64,7 @@ def upgrade(ctx, project) -> None:  # noqa: ANN001
 )
 @click.pass_context
 def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
-    """
-    Upgrade Meltano and your entire project to the latest version.
+    """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
 
@@ -73,8 +72,9 @@ def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    """  # noqa: D301
     upgrade_service = ctx.obj["upgrade_service"]
 
     if skip_package:

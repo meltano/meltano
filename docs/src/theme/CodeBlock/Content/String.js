@@ -47,8 +47,6 @@ export default function CodeBlockString({
   const showLineNumbers =
     showLineNumbersProp ?? containsLineNumbers(metastring);
 
-  const updatedCode = code.replaceAll('==', '');
-
   return (
     <Container
       as="div"
@@ -101,7 +99,7 @@ export default function CodeBlockString({
               isEnabled={wordWrap.isEnabled}
             />
           )}
-          <CopyButton className={styles.codeButton} code={updatedCode} />
+          <CopyButton className={styles.codeButton} code={code} />
         </div>
       </div>
     </Container>

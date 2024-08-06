@@ -5,6 +5,9 @@ Revises: e4fbabc3fed6
 Create Date: 2021-01-14 12:45:55.821947
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -20,12 +23,12 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
 
     op.add_column("job", sa.Column("last_heartbeat_at", datetime_type, nullable=True))
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_column("user", "last_heartbeat_at")

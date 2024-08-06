@@ -150,8 +150,7 @@ def plugin_command_invoker(
     command_args: list[str] | None = None,
     run_dir: str | None = None,
 ) -> InvokerCommand:
-    """
-    Make an InvokerCommand from a plugin.
+    """Make an InvokerCommand from a plugin.
 
     Args:
         plugin: Plugin to make command from.

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 import typing as t
@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class SingerPlugin(BasePlugin):
+class SingerPlugin(BasePlugin):  # noqa: D101
     def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize a `SingerPlugin`.
 
@@ -30,7 +30,7 @@ class SingerPlugin(BasePlugin):
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config) -> dict:  # noqa: ANN001
+    def process_config(self, flat_config) -> dict:  # noqa: ANN001, D102
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config

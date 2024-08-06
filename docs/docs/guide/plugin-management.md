@@ -46,21 +46,29 @@ meltano add utility airflow
 
 This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
-```yml{3-5,7-9,11-12,14-15}
+```yaml title="meltano.yml"
 plugins:
   extractors:
+  # highlight-start
   - name: tap-gitlab
     variant: meltano
     pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+  # highlight-end
   loaders:
+  # highlight-start
   - name: target-postgres
     variant: datamill-co
     pip_url: singer-target-postgres
+  # highlight-end
   utilities:
+  # highlight-start
   - name: dbt-snowflake
     variant: dbt-labs
+  # highlight-end
+  # highlight-start
   - name: airflow
     variant: apache
+  # highlight-end
 ```
 
 If multiple [variants](/concepts/plugins#variants) of the discoverable plugin are available,
@@ -92,12 +100,14 @@ meltano add loader target-postgres --variant=transferwise
 
 As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/concepts/project#plugins):
 
-```yml{4-5}
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-postgres
+  # highlight-start
     variant: transferwise
     pip_url: pipelinewise-target-postgres
+  # highlight-end
 ```
 
 If you'd like to use multiple variants of the same discoverable plugin in your project at the same time, refer to ["Multiple variants" under "Explicit inheritance"](#multiple-variants) below.
@@ -125,10 +135,11 @@ meltano add extractor tap-postgres --as tap-postgres--billing
 
 The corresponding [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
-```yml{4}
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-postgres--billing
+    # highlight-next-line
     inherit_from: tap-postgres
     variant: transferwise
     pip_url: pipelinewise-tap-postgres
@@ -151,19 +162,23 @@ meltano add loader target-snowflake --variant=meltano --as target-snowflake--mel
 Assuming a regular (shadowing) `target-snowflake` was added before using `meltano add loader target-snowflake`,
 the resulting [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in [`meltano.yml` project file](/concepts/project#plugins) will look as follows:
 
-```yml{6-8,10-12}
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-snowflake
     variant: datamill-co
     pip_url: target-snowflake
+  # highlight-start
   - name: target-snowflake--transferwise
     inherit_from: target-snowflake
     variant: transferwise
+  # highlight-end
     pip_url: pipelinewise-target-snowflake
+  # highlight-start
   - name: target-snowflake--meltano
     inherit_from: target-snowflake
     variant: meltano
+  # highlight-end
     pip_url: git+https://gitlab.com/meltano/target-snowflake.git
 ```
 
@@ -199,7 +214,7 @@ Since Meltano doesn't have the [base plugin description](/concepts/plugins#proje
 `meltano add --custom` will ask you to find and provide this metadata yourself:
 (Note that more context is provided in the actual command prompts.)
 
-```{11,24,30,45,64}
+```console
 $ meltano add --custom extractor tap-covid-19
 Adding new custom extractor with name 'tap-covid-19'...
 
@@ -210,6 +225,7 @@ Specify the plugin's namespace, which will serve as the:
 
 Hit Return to accept the default: plugin name with underscores instead of dashes
 
+# highlight-next-line
 (namespace) [tap_covid_19]: tap_covid_19
 
 Specify the plugin's `pip install` argument, for example:
@@ -223,12 +239,14 @@ Specify the plugin's `pip install` argument, for example:
 
 Default: plugin name as PyPI package name
 
+# highlight-next-line
 (pip_url) [tap-covid-19]: -e extract/tap-covid-19
 
 Specify the plugin's executable name
 
 Default: name derived from `pip_url`
 
+# highlight-next-line
 (executable) [tap-covid-19]: tap-covid-19
 
 Specify the tap's supported Singer features (executable flags), for example:
@@ -244,6 +262,7 @@ Multiple capabilities can be separated using commas.
 
 Default: no capabilities
 
+# highlight-next-line
 (capabilities) [[]]: catalog,discover,state
 
 Specify the tap's supported settings (`config.json` keys)
@@ -263,6 +282,7 @@ string | integer | boolean | date_iso8601 | email | password | oauth | options |
 
 Default: no settings
 
+# highlight-next-line
 (settings) [[]]: api_token:password,user_agent:string,start_date:date_iso8601
 Added extractor 'tap-covid-19' to your Meltano project
 
@@ -282,9 +302,10 @@ To find out what `settings` a tap or target supports, reference the README in th
 
 This will add a [custom plugin definition](/concepts/project#custom-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
-```yml{3-14}
+```yaml title="meltano.yml"
 plugins:
   extractors:
+  # highlight-start
   - name: tap-covid-19
     namespace: tap_covid_19
     pip_url: tap-covid-19
@@ -297,6 +318,7 @@ plugins:
     - name: api_token
     - name: user_agent
     - name: start_date
+  # highlight-end
 ```
 
 The `pip_url`, `executable`, `capabilities`, and `settings` properties
@@ -325,18 +347,20 @@ meltano add extractor tap-ga--client-foo--project-baz --inherit-from tap-ga--cli
 
 The corresponding [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
-```yml{6-11}
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-google-analytics
     variant: meltano
     pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
+  # highlight-start
   - name: tap-ga--client-foo
     inherit_from: tap-google-analytics
   - name: tap-ga--client-bar
     inherit_from: tap-google-analytics
   - name: tap-ga--client-foo--project-baz
     inherit_from: tap-ga--client-foo
+  # highlight-end
 ```
 
 Note that the `--inherit-from` option and `inherit_from` property can also be used to
@@ -397,14 +421,16 @@ To pin the latest version:
 
 1. Add an `==<version>` or `~=<version>` [version specifier](https://pip.pypa.io/en/stable/reference/pip_install/#requirement-specifiers) to the `pip_url`:
 
-   ```yaml{5,8}
+   ```yaml
    # Before:
    pip_url: tap-shopify
 
    # After:
+   # highlight-next-line
    pip_url: tap-shopify==1.2.6 # Always install version 1.2.6
 
    # Alternatively:
+   # highlight-next-line
    pip_url: tap-shopify~=1.2.6 # Install 1.2.6 or a newer version in the 1.2.x range
    ```
 
@@ -425,18 +451,22 @@ To pin the latest version:
 
 1. Add an `@<tag>` or `@<sha>` [Git ref specifier](https://pip.pypa.io/en/stable/reference/pip_install/#git) to the `pip_url`:
 
-   ```yaml{6-7,10-11}
+   ```yaml
    # Before:
    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
    pip_url: git+https://github.com/adswerve/target-bigquery.git
 
    # After:
+   # highlight-start
    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@v0.9.11
    pip_url: git+https://github.com/adswerve/target-bigquery.git@v0.10.2
+   # highlight-end
 
    # Alternatively:
+   # highlight-start
    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@2657b89e8896face4ce320a03b8413bbc196cec9
    pip_url: git+https://github.com/adswerve/target-bigquery.git@3df97b951b7eebdfa331a1ff570f1fe3487d632f
+   # highlight-end
    ```
 
 ## Installing plugins from a custom Python Package Index (PyPI)
@@ -475,13 +505,15 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 
 1. Modify the plugin definition's `pip_url` in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
 
-   ```yaml{5-6}
+   ```yaml title="meltano.yml"
    plugins:
      extractors:
      - name: tap-gitlab
        variant: meltano
+       # highlight-start
        pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
        # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
+       # highlight-end
    ```
 
    If your plugin source is stored in a private repository, you have two options:
@@ -535,7 +567,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
 1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project):
 
-   ```yml{12-13}
+   ```yaml title="meltano.yml"
    # Before:
    plugins:
      loaders:
@@ -547,8 +579,10 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
    plugins:
      loaders:
      - name: target-postgres
+       # highlight-start
        variant: meltano
        pip_url: git+https://github.com/meltano/target-postgres.git # Optional
+       # highlight-end
    ```
 
    If you don't know the new variant's `pip_url` (its [`pip install`](https://pip.pypa.io/en/stable/reference/pip_install/#usage) argument),
@@ -581,7 +615,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 1. Assuming at least one setting did not carry over correctly from the old variant to the new variant,
    modify the plugin's configuration in your [`meltano.yml` project file](/concepts/project#plugin-configuration) to use the new setting names:
 
-   ```yml{10-13}
+   ```yaml
    # Before:
    config:
      postgres_host: postgres.example.com
@@ -591,10 +625,12 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
    # After:
    config:
+     # highlight-start
      host: postgres.example.com
      port: 5432
      user: my_user
      dbname: my_database
+     # highlight-end
    ```
 
    If any of the old settings are stored in [places other than `meltano.yml`](/guide/configuration#configuration-layers),

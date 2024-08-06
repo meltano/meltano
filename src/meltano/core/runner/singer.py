@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import asyncio
 import subprocess
@@ -20,11 +20,11 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class SingerRunner(Runner):
-    def __init__(self, elt_context: ELTContext):
+class SingerRunner(Runner):  # noqa: D101
+    def __init__(self, elt_context: ELTContext):  # noqa: D107
         self.context = elt_context
 
-    def stop(self, process, **wait_args):  # noqa: ANN001, ANN003, ANN201
+    def stop(self, process, **wait_args):  # noqa: ANN001, ANN003, ANN201, D102
         while True:  # pragma: no cover
             try:
                 code = process.wait(**wait_args)
@@ -204,12 +204,12 @@ class SingerRunner(Runner):
         if target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
-    def dry_run(self, tap: PluginInvoker, target: PluginInvoker) -> None:
+    def dry_run(self, tap: PluginInvoker, target: PluginInvoker) -> None:  # noqa: D102
         logger.info("Dry run:")
         logger.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
         logger.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
-    async def run(  # noqa: ANN201
+    async def run(  # noqa: ANN201, D102
         self,
         extractor_log=None,  # noqa: ANN001
         loader_log=None,  # noqa: ANN001
