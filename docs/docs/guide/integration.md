@@ -261,16 +261,18 @@ Also note that if you already have a state file you'd like to use, it can be pro
 
 If you're using the `elt` syntax with [`meltano schedule`](/reference/command-line-interface#schedule) to [schedule your pipelines](/guide/orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
 
-```yaml{7-9}
+```yaml
 schedules:
 - name: foo-to-bar
   extractor: tap-foo
   loader: target-bar
   transform: skip
   interval: '@hourly'
+  # highlight-start
   env:
     TAP_FOO_BAR: bar
     TAP_FOO_BAZ: baz
+  # highlight-end
 ```
 
 Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.

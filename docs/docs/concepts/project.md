@@ -69,19 +69,21 @@ install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, 
 A plugin defined with an `inherit_from` property inherits its [base plugin description](/concepts/plugins#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
 [discoverable plugins](/concepts/plugins#discoverable-plugins):
 
-```yml{5,7}
+```yml
 plugins:
   extractors:
   - name: tap-postgres          # Shadows discoverable `tap-postgres` (see below)
   - name: tap-postgres--billing
+    # highlight-next-line
     inherit_from: tap-postgres  # Inherits from project's `tap-postgres`
   - name: tap-bigquery--events
+    # highlight-next-line
     inherit_from: tap-bigquery  # Inherits from discoverable `tap-bigquery`
 ```
 
 When inheriting from another plugin in your project, its [configuration](/guide/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
 
-```yml{10-12,15-18}
+```yml
 plugins:
   extractors:
   - name: tap-google-analytics
@@ -91,31 +93,38 @@ plugins:
       start_date: '2020-10-01T00:00:00Z'
   - name: tap-ga--view-foo
     inherit_from: tap-google-analytics
+    # highlight-start
     config:
       # `key_file_location` and `start_date` are inherited
       view_id: 123456
+    # highlight-end
   - name: tap-ga--view-bar
     inherit_from: tap-google-analytics
+    # highlight-start
     config:
       # `key_file_location` is inherited
       start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
       view_id: 789012
+    # highlight-end
 ```
 
 Note that the presence of a [`variant` property](#variants) causes only discoverable plugins to be considered
 (even if there is also a matching plugin in the project),
 since only these can have multiple [variants](/concepts/plugins#variants):
 
-```yml{6,8-9}
+```yml
 plugins:
   loaders:
   - name: target-snowflake          # Shadows discoverable `target-snowflake` (see below)
     variant: datamill-co            # using variant `datamill-co`
   - name: target-snowflake--derived
+    # highlight-next-line
     inherit_from: target-snowflake  # Inherits from project's `target-snowflake`
   - name: target-snowflake--transferwise
+    # highlight-start
     inherit_from: target-snowflake  # Inherits from discoverable `target-snowflake`
     variant: transferwise           # using variant `transferwise`
+    # highlight-end
 ```
 
 To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
