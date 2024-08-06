@@ -20,11 +20,11 @@ from meltano.core.plugin_remove_service import PluginRemoveService
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
 def remove(project, plugin_type, plugin_names) -> None:  # noqa: ANN001
-    """
-    Remove plugins from your project.
+    """Remove plugins from your project.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#remove
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#remove
+    """  # noqa: D301
     plugins = [
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
         for plugin_name in plugin_names

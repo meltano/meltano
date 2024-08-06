@@ -415,8 +415,7 @@ def add_required_plugins(  # noqa: ANN201
 
 
 def install_status_update(install_state: PluginInstallState) -> None:
-    """
-    Print the status of plugin installation.
+    """Print the status of plugin installation.
 
     Used as the callback for PluginInstallService.
     """
@@ -509,7 +508,7 @@ def propagate_stop_signals(proc):  # noqa: ANN001, ANN201
         signal.signal(signal.SIGTERM, original_termination_handler)
 
 
-def check_dependencies_met(
+def check_dependencies_met(  # noqa: D417
     plugin_refs: list[PluginRef],
     plugins_service: ProjectPluginsService,
 ) -> tuple[bool, str]:
@@ -544,7 +543,7 @@ def check_dependencies_met(
     return passed, message
 
 
-def activate_environment(
+def activate_environment(  # noqa: D417
     ctx: click.Context,
     project: Project,
     *,

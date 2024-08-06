@@ -212,7 +212,7 @@ class TestTracker:
         """
         Test that `project_id` is restored from `analytics.json`, and a telemetry state
         change event is fired because `send_anonymous_usage_stats` is negated.
-        """
+        """  # noqa: D205, D212
         Tracker(project)  # Ensure `analytics.json` exists and is valid
 
         original_project_id = project.settings.get("project_id")

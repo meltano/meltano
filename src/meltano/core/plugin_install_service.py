@@ -232,8 +232,7 @@ class PluginInstallService:
         self,
         reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> tuple[PluginInstallState]:
-        """
-        Install all the plugins for the project.
+        """Install all the plugins for the project.
 
         Blocks until all plugins are installed.
 
@@ -275,8 +274,7 @@ class PluginInstallService:
         plugin: ProjectPlugin,
         reason=PluginInstallReason.INSTALL,  # noqa: ANN001
     ) -> PluginInstallState:
-        """
-        Install a plugin.
+        """Install a plugin.
 
         Blocks until the plugin is installed.
 

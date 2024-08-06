@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import typing as t
 from pathlib import Path
@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-class MeltanoFilePlugin(FilePlugin):
+class MeltanoFilePlugin(FilePlugin):  # noqa: D101
     overwrite: t.ClassVar[set[str]] = {"meltano.yml"}
 
     def __init__(self) -> None:
@@ -39,7 +39,7 @@ class MeltanoFilePlugin(FilePlugin):
                 for relative_path, content in yaml.safe_load(f).items()
             }
 
-    def update_config(self, project):  # noqa: ANN001, ANN201, ARG002
+    def update_config(self, project):  # noqa: ANN001, ANN201, ARG002, D102
         return {}
 
     def files_to_create(

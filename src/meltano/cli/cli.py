@@ -85,11 +85,11 @@ def cli(
     no_environment: bool,
     cwd: Path | None,
 ) -> None:
-    """
-    Your CLI for ELT+
+    """Your CLI for ELT+
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface
+    """  # noqa: D301, D415
     ctx.ensure_object(dict)
 
     if log_level:
@@ -145,7 +145,7 @@ def cli(
         sys.exit(3)
 
 
-def detect_selected_environment(
+def detect_selected_environment(  # noqa: D417
     *,
     cli_environment: str | None,
     cli_no_environment: bool,

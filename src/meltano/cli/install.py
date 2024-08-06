@@ -72,11 +72,11 @@ async def install(
     force: bool,
     schedule_name: str,
 ) -> None:
-    """
-    Install all the dependencies of your project based on the meltano.yml file.
+    """Install all the dependencies of your project based on the meltano.yml file.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#install
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#install
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
     try:
         if plugin_type and plugin_type != ANY:
