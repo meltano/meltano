@@ -87,7 +87,7 @@ meltano select tap-gitlab --exclude "*" "*_url"
 
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-```yaml
+```yaml title="meltano.yml"
         extractors:
           - name: tap-gitlab
             config:
@@ -128,7 +128,7 @@ meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
 
 This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
-```yaml
+```yaml title="meltano.yml"
         extractors:
           - name: tap-postgres
             metadata:
@@ -261,7 +261,7 @@ Also note that if you already have a state file you'd like to use, it can be pro
 
 If you're using the `elt` syntax with [`meltano schedule`](/reference/command-line-interface#schedule) to [schedule your pipelines](/guide/orchestration), you can specify environment variables for each pipeline in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), where each entry in the `schedules` array can have an `env` dictionary:
 
-```yaml
+```yaml title="meltano.yml"
 schedules:
 - name: foo-to-bar
   extractor: tap-foo

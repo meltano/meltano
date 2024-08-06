@@ -69,7 +69,7 @@ install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, 
 A plugin defined with an `inherit_from` property inherits its [base plugin description](/concepts/plugins#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
 [discoverable plugins](/concepts/plugins#discoverable-plugins):
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-postgres          # Shadows discoverable `tap-postgres` (see below)
@@ -83,7 +83,7 @@ plugins:
 
 When inheriting from another plugin in your project, its [configuration](/guide/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-google-analytics
@@ -112,7 +112,7 @@ Note that the presence of a [`variant` property](#variants) causes only discover
 (even if there is also a matching plugin in the project),
 since only these can have multiple [variants](/concepts/plugins#variants):
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-snowflake          # Shadows discoverable `target-snowflake` (see below)
@@ -133,7 +133,7 @@ To learn how to add an inheriting plugin to your project, refer to the [Plugin M
 
 A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/concepts/plugins#custom-plugins) that explicitly defines its [base plugin description](/concepts/plugins#project-plugins):
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-covid-19
@@ -158,7 +158,7 @@ To learn how to add a custom plugin to your project, refer to the [Plugin Manage
 
 A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/concepts/plugins#project-plugins) from the [discoverable plugin](/concepts/plugins#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   # highlight-next-line
@@ -172,7 +172,7 @@ To learn how to add a discoverable plugin to your project, refer to the [Plugin 
 If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 the `variant` property can be used to choose a specific one:
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-gitlab

@@ -46,7 +46,7 @@ meltano add utility airflow
 
 This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   # highlight-end
@@ -100,7 +100,7 @@ meltano add loader target-postgres --variant=transferwise
 
 As you might expect, this will be reflected in the `variant` and `pip_url` properties in your [`meltano.yml` project file](/concepts/project#plugins):
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-postgres
@@ -135,7 +135,7 @@ meltano add extractor tap-postgres --as tap-postgres--billing
 
 The corresponding [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-postgres--billing
@@ -162,7 +162,7 @@ meltano add loader target-snowflake --variant=meltano --as target-snowflake--mel
 Assuming a regular (shadowing) `target-snowflake` was added before using `meltano add loader target-snowflake`,
 the resulting [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in [`meltano.yml` project file](/concepts/project#plugins) will look as follows:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-snowflake
@@ -302,7 +302,7 @@ To find out what `settings` a tap or target supports, reference the README in th
 
 This will add a [custom plugin definition](/concepts/project#custom-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   # highlight-start
@@ -347,7 +347,7 @@ meltano add extractor tap-ga--client-foo--project-baz --inherit-from tap-ga--cli
 
 The corresponding [inheriting plugin definitions](/concepts/project#inheriting-plugin-definitions) in your [`meltano.yml` project file](/concepts/project#plugins) will use `inherit_from`:
 
-```yml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-google-analytics
@@ -505,7 +505,7 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 
 1. Modify the plugin definition's `pip_url` in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project) to point at your fork using a [`git+http(s)` URL](https://pip.pypa.io/en/stable/reference/pip_install/#git), with an optional branch or tag name:
 
-   ```yaml
+   ```yaml title="meltano.yml"
    plugins:
      extractors:
      - name: tap-gitlab
@@ -567,7 +567,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 
 1. Modify the plugin definition's `variant` and `pip_url` properties in the [`plugins` section](/concepts/project#plugins) of your [`meltano.yml` project file](/concepts/project):
 
-   ```yml
+   ```yaml title="meltano.yml"
    # Before:
    plugins:
      loaders:
@@ -615,7 +615,7 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 1. Assuming at least one setting did not carry over correctly from the old variant to the new variant,
    modify the plugin's configuration in your [`meltano.yml` project file](/concepts/project#plugin-configuration) to use the new setting names:
 
-   ```yml
+   ```yaml
    # Before:
    config:
      postgres_host: postgres.example.com
