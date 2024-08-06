@@ -19,23 +19,11 @@ export default function CodeBlockLine({
     line[0].content = '';
   }
 
-  // eslint-disable-next-line react/prop-types
-  const lineIsHighlight = line.some((l) => l.content.includes('=='));
-
-  // eslint-disable-next-line react/prop-types
-  line.map((l) => {
-    l.content.includes('==')
-      ? (l.content = l.content.replace('==', ''))
-      : l.content;
-    return l;
-  });
-
   const lineProps = getLineProps({
     line,
     className: clsx(
       classNames,
-      showLineNumbers && styles.codeLine,
-      lineIsHighlight && styles.highlightedLine
+      showLineNumbers && styles.codeLine
     ),
   });
   // eslint-disable-next-line react/prop-types
