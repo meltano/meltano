@@ -96,7 +96,8 @@ async def invoke(
 ) -> None:
     """Invoke a plugin's executable with specified arguments.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#invoke
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 

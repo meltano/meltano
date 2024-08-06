@@ -64,7 +64,8 @@ def compile_command(
 
     This command is in beta, and subject to change without corresponding semantic version updates.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#compile
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#compile
     """  # noqa: D301, E501
     tracker: Tracker = ctx.obj["tracker"]
 
