@@ -16,7 +16,7 @@ from meltano.core.utils import NotFound
 TEnv = t.TypeVar("TEnv", bound="Environment")
 
 
-class NoActiveEnvironment(Exception):  # noqa: N818
+class NoActiveEnvironment(Exception):
     """Exception raised when invocation has no active environment."""
 
 
@@ -44,7 +44,7 @@ class EnvironmentPluginConfig(PluginRef):
         name: str,
         config: dict | None = None,
         env: dict | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a new plugin configuration object.
 
@@ -61,7 +61,7 @@ class EnvironmentPluginConfig(PluginRef):
         self.extras = extras
 
     @property
-    def extra_config(self):
+    def extra_config(self):  # noqa: ANN201
         """Get extra config from the Meltano environment, like `select` and `schema`.
 
         Returns:
@@ -70,7 +70,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {f"_{key}": value for key, value in self.extras.items()}
 
     @property
-    def config_with_extras(self):
+    def config_with_extras(self):  # noqa: ANN201
         """Get plugin configuration values from the Meltano environment.
 
         Returns:
@@ -79,7 +79,7 @@ class EnvironmentPluginConfig(PluginRef):
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
-    def config_with_extras(self, new_config_with_extras: dict[str, t.Any]):
+    def config_with_extras(self, new_config_with_extras: dict[str, t.Any]) -> None:
         """Set plugin configuration values from the Meltano environment.
 
         Args:
@@ -115,7 +115,7 @@ class EnvironmentPluginConfig(PluginRef):
 class EnvironmentConfig(Canonical):
     """Meltano environment configuration."""
 
-    def __init__(self, plugins: dict[str, list[dict]] | None = None, **extras):
+    def __init__(self, plugins: dict[str, list[dict]] | None = None, **extras):  # noqa: ANN003
         """Create a new environment configuration.
 
         Args:

@@ -29,7 +29,7 @@ class TestLock:
         ),
         ids=("noop", "all-and-plugin-name"),
     )
-    def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]):
+    def test_lock_invalid_options(self, cli_runner: CliRunner, args: list[str]) -> None:
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
 
@@ -42,7 +42,7 @@ class TestLock:
         self,
         cli_runner: CliRunner,
         project: Project,
-    ):
+    ) -> None:
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         assert len(lockfiles) == 2
 
@@ -59,7 +59,7 @@ class TestLock:
         project: Project,
         tap: ProjectPlugin,
         hub_endpoints: MeltanoHubService,
-    ):
+    ) -> None:
         tap_lock = PluginLock(project, tap)
 
         assert tap_lock.path.exists()
@@ -94,7 +94,7 @@ class TestLock:
         self,
         cli_runner: CliRunner,
         project: Project,
-    ):
+    ) -> None:
         lockfiles = list(project.root_plugins_dir().glob("./*/*.lock"))
         # 1 tap, 1 target
         assert len(lockfiles) == 2
@@ -108,7 +108,7 @@ class TestLock:
         assert "Locked definition for extractor tap-mock" in result.stdout
         assert "Extractor tap-mock-inherited is an inherited plugin" in result.stdout
 
-    def test_lock_plugin_not_found(self, cli_runner: CliRunner):
+    def test_lock_plugin_not_found(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(cli, ["lock", "not-a-plugin"])
         assert result.exit_code == 1
         assert isinstance(result.exception, CliError)

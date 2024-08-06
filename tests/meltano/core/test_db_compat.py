@@ -39,7 +39,7 @@ class TestDatabaseCompatibility:
             ),
         ),
     )
-    def test_db_compatibility(self, dialect, version, expected):
+    def test_db_compatibility(self, dialect, version, expected) -> None:
         engine_mock = Mock()
         engine_mock.dialect.name = dialect
         engine_mock.dialect.server_version_info = version

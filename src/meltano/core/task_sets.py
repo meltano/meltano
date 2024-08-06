@@ -45,7 +45,7 @@ class InvalidTasksError(Exception):
         super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
-def _flat_split(items):
+def _flat_split(items):  # noqa: ANN001, ANN202
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)
@@ -70,7 +70,11 @@ class TaskSets(NameEq, Canonical):
         self.name = name
         self.tasks = tasks
 
-    def _as_args(self, preserve_top_level: bool = False) -> list[str] | list[list[str]]:
+    def _as_args(
+        self,
+        *,
+        preserve_top_level: bool = False,
+    ) -> list[str] | list[list[str]]:
         """Get job tasks as CLI args.
 
         Args:
@@ -118,7 +122,7 @@ class TaskSets(NameEq, Canonical):
 
         Returns:
             The per-task run arguments.
-        """  # noqa: F721
+        """
         return self._as_args(preserve_top_level=True)
 
 

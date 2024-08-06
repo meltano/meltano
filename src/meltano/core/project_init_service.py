@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import contextlib
-import os
+import typing as t
 import uuid
 from pathlib import Path
 
@@ -14,6 +14,9 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.meltano_file import MeltanoFilePlugin
 from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
+
+if t.TYPE_CHECKING:
+    import os
 
 PROJECT_FILENAME = "meltano.yml"
 
@@ -36,7 +39,7 @@ class ProjectInitService:
         with contextlib.suppress(ValueError):
             self.project_directory = self.project_directory.relative_to(Path.cwd())
 
-    def init(  # noqa: C901
+    def init(
         self,
         *,
         activate: bool = True,
@@ -57,10 +60,7 @@ class ProjectInitService:
         try:
             self.project_directory.mkdir()
         except FileExistsError as ex:
-            if (
-                os.path.exists(os.path.join(self.project_directory, PROJECT_FILENAME))
-                and not force
-            ):
+            if self.project_directory.joinpath(PROJECT_FILENAME).exists() and not force:
                 msg = (
                     "A `meltano.yml` file already exists in the target directory. "
                     "Use `--force` to overwrite it."
@@ -93,7 +93,7 @@ class ProjectInitService:
 
         return project
 
-    def create_dot_meltano_dir(self, project: Project):
+    def create_dot_meltano_dir(self, project: Project) -> None:
         """Create .meltano directory.
 
         Args:
@@ -101,11 +101,11 @@ class ProjectInitService:
         """
         # explicitly create the .meltano directory if it doesn't exist
         click.secho("Creating .meltano folder", fg="blue")
-        os.makedirs(project.meltano_dir(), exist_ok=True)
+        project.meltano_dir().mkdir(parents=True, exist_ok=True)
         click.secho("created", fg="blue", nl=False)
         click.echo(f" .meltano in {project.sys_dir_root}")
 
-    def create_files(self, project: Project):
+    def create_files(self, project: Project) -> None:
         """Create project files.
 
         Args:
@@ -128,7 +128,7 @@ class ProjectInitService:
                 click.secho("   |--", fg="yellow", nl=False)
                 click.echo(f" {path} (skipped)")
 
-    def set_send_anonymous_usage_stats(self, project: Project):
+    def set_send_anonymous_usage_stats(self, project: Project) -> None:
         """Set Anonymous Usage Stats flag.
 
         Args:
@@ -142,7 +142,7 @@ class ProjectInitService:
                 store=SettingValueStore.MELTANO_YML,
             )
 
-    def create_system_database(self, project: Project):
+    def create_system_database(self, project: Project) -> None:
         """Create Meltano System DB.
 
         Args:
@@ -165,7 +165,7 @@ class ProjectInitService:
         except MigrationError as err:
             raise ProjectInitServiceError(str(err)) from err
 
-    def echo_instructions(self, project: Project):
+    def echo_instructions(self, project: Project) -> None:
         """Echo Next Steps to Click CLI.
 
         Args:

@@ -19,12 +19,12 @@ class AsyncReader(asyncio.StreamReader):
 
 
 @pytest.mark.asyncio()
-async def test_capture_subprocess_output():
+async def test_capture_subprocess_output() -> None:
     input_lines = [b"LINE\n", b"LINE 2\n", b"\xed\n"]
     output_lines = []
 
     class LineWriter:
-        def writeline(self, line: str):
+        def writeline(self, line: str) -> None:
             output_lines.append(line)
 
     reader = AsyncReader(input_lines)

@@ -48,15 +48,15 @@ def _get_parent_context_uuid_str() -> str | None:
 class EnvironmentContext(SelfDescribingJson):
     """Environment context for the Snowplow tracker."""
 
-    ci_markers = {
+    ci_markers: t.ClassVar[set[str]] = {
         "GITHUB_ACTIONS",
         "CI",
     }
-    notable_flag_env_vars = {
+    notable_flag_env_vars: t.ClassVar[set[str]] = {
         "CODESPACES",
         *ci_markers,
     }
-    notable_hashed_env_vars = {
+    notable_hashed_env_vars: t.ClassVar[set[str]] = {
         "CODESPACE_NAME",
         "GITHUB_REPOSITORY",
         "GITHUB_USER",
@@ -79,7 +79,7 @@ class EnvironmentContext(SelfDescribingJson):
                 except ValueError:
                     yield env_var_name, None
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the environment context."""
         super().__init__(
             EnvironmentContextSchema.url,

@@ -39,7 +39,7 @@ class InvalidIncludePathError(Exception):
     """Included file path matches a provided pattern but is not a valid config file."""
 
 
-class ProjectFiles:  # noqa: WPS214
+class ProjectFiles:
     """Interface for working with multiple project yaml files."""
 
     def __init__(self, root: Path, meltano_file_path: Path) -> None:
@@ -186,7 +186,7 @@ class ProjectFiles:  # noqa: WPS214
 
         self._plugin_file_map.update({key: str(include_path)})
 
-    def _index_file(  # noqa: WPS210
+    def _index_file(
         self,
         include_file_path: Path,
         include_file_contents: CommentedMap,
@@ -247,26 +247,26 @@ class ProjectFiles:  # noqa: WPS214
                 included_file_contents.append(contents)
         return included_file_contents
 
-    def _add_mapping_entry(self, file_dicts, file, key, value):
+    def _add_mapping_entry(self, file_dicts, file, key, value) -> None:  # noqa: ANN001
         file_dict = file_dicts.setdefault(file, CommentedMap())
         entries = file_dict.setdefault(key, CommentedSeq())
         if value["name"] not in {scd["name"] for scd in entries}:
             entries.append(value)
 
-    def _add_sequence_entry(self, file_dicts, key, elements):
+    def _add_sequence_entry(self, file_dicts, key, elements) -> None:  # noqa: ANN001
         for elem in elements:
             file_key = (key, elem["name"])
             file = self._plugin_file_map.get(file_key, str(self._meltano_file_path))
             self._add_mapping_entry(file_dicts, file, key, elem)
 
-    def _add_plugin(self, file_dicts, file, plugin_type, plugin):
+    def _add_plugin(self, file_dicts, file, plugin_type, plugin) -> None:  # noqa: ANN001
         file_dict = file_dicts.setdefault(file, CommentedMap())
         plugins_dict = file_dict.setdefault("plugins", CommentedMap())
         plugins = plugins_dict.setdefault(plugin_type, CommentedSeq())
         if plugin["name"] not in {plg["name"] for plg in plugins}:
             plugins.append(plugin)
 
-    def _add_plugins(self, file_dicts, all_plugins):
+    def _add_plugins(self, file_dicts, all_plugins) -> None:  # noqa: ANN001
         for plugin_type, plugins in all_plugins.items():
             plugin_type = str(plugin_type)
             for plugin in plugins:
@@ -274,7 +274,7 @@ class ProjectFiles:  # noqa: WPS214
                 file = self._plugin_file_map.get(key, str(self._meltano_file_path))
                 self._add_plugin(file_dicts, file, plugin_type, plugin)
 
-    def _split_config_dict(self, config: CommentedMap):
+    def _split_config_dict(self, config: CommentedMap):  # noqa: ANN202
         file_dicts: dict[str, CommentedMap] = {}
 
         # Fill in the top-level entries
@@ -296,7 +296,7 @@ class ProjectFiles:  # noqa: WPS214
         self._copy_yaml_attributes(sorted_file_dicts)
         return sorted_file_dicts
 
-    def _restore_file_key_order(self, file_dicts: dict[str, CommentedMap]):
+    def _restore_file_key_order(self, file_dicts: dict[str, CommentedMap]):  # noqa: ANN202
         """Restore the order of the keys in the meltano project files.
 
         Args:
@@ -325,10 +325,10 @@ class ProjectFiles:  # noqa: WPS214
 
         return sorted_file_dicts
 
-    def _copy_yaml_attributes(  # noqa: WPS210
+    def _copy_yaml_attributes(
         self,
         file_dicts: dict[str, CommentedMap],
-    ):
+    ) -> None:
         """Restore comments from top-level YAML entries in project files.
 
         For every file, use the top-level entries (e.g. "plugins") to copy the comments
@@ -365,6 +365,6 @@ class ProjectFiles:  # noqa: WPS214
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: t.Mapping):
+    def _write_file(self, file_path: PathLike, contents: t.Mapping) -> None:
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)

@@ -42,7 +42,7 @@ HOME_SCREEN_TEMPLATE = """[bold underline]Configuring [{{ plugin_color }}]{{ plu
 
 Following the prompts below, you will be guided through configuration of this plugin.
 
-Meltano is responsible for managing the configuration of all of a project’s plugins.
+Meltano is responsible for managing the configuration of all of a project's plugins.
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
 To determine the values of settings, Meltano will look in 4 main places, with each taking precedence over the next:
@@ -65,10 +65,10 @@ To learn more about configuration options, see the [link=https://docs.meltano.co
 """  # noqa: E501
 
 
-class InteractiveConfig:  # noqa: WPS230, WPS214
+class InteractiveConfig:
     """Manage Config interactively."""
 
-    def __init__(self, ctx, store, extras=False, max_width=None):
+    def __init__(self, ctx, store, *, extras=False, max_width=None) -> None:  # noqa: ANN001
         """Initialise InteractiveConfig instance."""
         self.ctx = ctx
         self.store = store
@@ -78,12 +78,12 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.session = self.ctx.obj["session"]
         self.tracker = self.ctx.obj["tracker"]
         self.environment_service = EnvironmentService(self.project)
-        self.max_width = max_width or 75  # noqa: WPS432
+        self.max_width = max_width or 75
         self.console = Console()
         self.safe: bool = ctx.obj["safe"]
 
     @property
-    def configurable_settings(self):
+    def configurable_settings(self):  # noqa: ANN201
         """Return settings available for interactive configuration."""
         return self.settings.config_with_metadata(
             session=self.session,
@@ -92,7 +92,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
 
     @property
-    def setting_choices(self):
+    def setting_choices(self):  # noqa: ANN201
         """Return simplified setting choices, for easy printing."""
         setting_choices = []
         for index, (name, config_metadata) in enumerate(
@@ -109,7 +109,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             return f"{text[: self.max_width - 3]}..."
         return text
 
-    def _print_home_screen(self):
+    def _print_home_screen(self) -> None:
         """Print screen for this interactive."""
         markdown_template = Environment(
             loader=BaseLoader(),
@@ -138,7 +138,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         self.console.print(Panel(Text.from_markup(markdown_text)))
 
-    def _print_setting(self, name, config_metadata, index, last_index):
+    def _print_setting(self, name, config_metadata, index, last_index) -> None:  # noqa: ANN001
         """Print setting."""
         value = config_metadata["value"]
         source = config_metadata["source"]
@@ -183,10 +183,10 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         else:
             label = f"from {source.label}"
 
-        def value_is_defined(v=value):
+        def value_is_defined(v=value):  # noqa: ANN001, ANN202
             return v is not None
 
-        def value_for_display(v=value):
+        def value_for_display(v=value):  # noqa: ANN001, ANN202
             return v if value_is_defined(v) else "(empty string)"
 
         expanded_value = value_for_display()
@@ -239,7 +239,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         self.console.print(Panel(Group(*pre, details, *post)))
 
     @staticmethod
-    def _value_prompt(config_metadata):
+    def _value_prompt(config_metadata):  # noqa: ANN001, ANN205
         if config_metadata["setting"].kind != SettingKind.OPTIONS:
             return (
                 click.prompt(
@@ -272,7 +272,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
         )
         return options_index[chosen_index][1]
 
-    def configure(self, name, index=None, last_index=None, show_set_prompt=True):
+    def configure(self, name, index=None, last_index=None, *, show_set_prompt=True):  # noqa: ANN001, ANN201
         """Configure a single setting interactively."""
         config_metadata = next(
             (
@@ -333,7 +333,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
             return InteractionStatus.EXIT
         return None
 
-    def configure_all(self):
+    def configure_all(self) -> None:
         """Configure all settings."""
         numeric_choices = [idx for idx, _, _ in self.setting_choices]
         if not numeric_choices:
@@ -396,7 +396,7 @@ class InteractiveConfig:  # noqa: WPS230, WPS214
                     show_set_prompt=False,
                 )
 
-    def set_value(self, setting_name, value, store, interactive=False):
+    def set_value(self, setting_name, value, store, *, interactive=False) -> None:  # noqa: ANN001
         """Set value helper function."""
         settings = self.settings
         path = list(setting_name)

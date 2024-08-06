@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D104
 
 from meltano.core.plugin import PluginType
 

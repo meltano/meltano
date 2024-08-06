@@ -24,14 +24,14 @@ class TestAirflow:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    @pytest.mark.asyncio()  # noqa:  WPS210
-    async def test_before_configure(  # noqa:  WPS210
+    @pytest.mark.asyncio()
+    async def test_before_configure(
         self,
         subject,
         project,
         session,
         plugin_invoker_factory,
-    ):
+    ) -> None:
         run_dir = project.run_dir("airflow")
 
         handle_mock = mock.Mock()
@@ -99,7 +99,7 @@ class TestAirflow:
             assert not run_dir.joinpath("airflow.cfg").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: AirflowInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

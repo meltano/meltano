@@ -22,7 +22,7 @@ class TestPluginInstallService:
         ids=("default", "-p=-1", "-p=2"),
     )
     def subject(self, project: Project, request):
-        with open(project.meltanofile, "w") as file:
+        with project.meltanofile.open("w") as file:
             file.write(
                 yaml.dump(
                     {
@@ -31,7 +31,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -42,7 +42,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "namespace": "target_csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 },
                             ],
                         },
@@ -52,10 +52,10 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    def test_default_init_should_not_fail(self, subject):
+    def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
 
-    def test_remove_duplicates(self, subject):
+    def test_remove_duplicates(self, subject) -> None:
         states, deduped_plugins = subject.remove_duplicates(
             plugins=subject.project.plugins.plugins(),
             reason=PluginInstallReason.INSTALL,
@@ -72,7 +72,7 @@ class TestPluginInstallService:
         ]
 
     @pytest.mark.slow()
-    async def test_install_all(self, subject):
+    async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
 
@@ -91,8 +91,8 @@ class TestPluginInstallService:
         assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
-    def test_get_quoted_pip_install_args(self, project):
-        with open(project.meltanofile, "w") as file:
+    def test_get_quoted_pip_install_args(self, project) -> None:
+        with project.meltanofile.open("w") as file:
             file.write(
                 yaml.dump(
                     {
@@ -121,7 +121,7 @@ class TestPluginInstallService:
         self,
         project: Project,
         subject: PluginInstallService,
-    ):
+    ) -> None:
         plugin = next(project.plugins.plugins())
         state = await subject.install_plugin_async(
             plugin,

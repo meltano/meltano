@@ -61,21 +61,22 @@ logger = structlog.getLogger(__name__)
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def install(  # noqa: C901
+async def install(
     project: Project,
     ctx: click.Context,
+    *,
     plugin_type: str,
     plugin_name: str,
     clean: bool,
     parallelism: int,
     force: bool,
     schedule_name: str,
-):
-    """
-    Install all the dependencies of your project based on the meltano.yml file.
+) -> None:
+    """Install all the dependencies of your project based on the meltano.yml file.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#install
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#install
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
     try:
         if plugin_type and plugin_type != ANY:
@@ -116,7 +117,7 @@ async def install(  # noqa: C901
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):
+def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()

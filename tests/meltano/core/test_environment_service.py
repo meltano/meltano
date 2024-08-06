@@ -26,7 +26,7 @@ class TestEnvironmentService:
         return environment_service.add("test-environment")
 
     @pytest.mark.order(0)
-    def test_add_environment(self, subject: EnvironmentService):
+    def test_add_environment(self, subject: EnvironmentService) -> None:
         count = 10
         environments = [Environment(f"environment_{idx}") for idx in range(count)]
         for environment in environments:
@@ -51,7 +51,7 @@ class TestEnvironmentService:
         self,
         subject: EnvironmentService,
         environment: Environment,
-    ):
+    ) -> None:
         assert subject.list_environments() == [environment]
         subject.remove(environment.name)
         assert not subject.list_environments()
@@ -66,7 +66,7 @@ class TestEnvironmentService:
     def test_list_environments(
         self,
         subject: EnvironmentService,
-    ):
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -77,6 +77,6 @@ class TestEnvironmentService:
     def test_add_name_contains_state_id_component_delimiter(
         self,
         subject: EnvironmentService,
-    ):
+    ) -> None:
         with pytest.raises(EnvironmentNameContainsStateIdDelimiterError):
             subject.add(f"test{STATE_ID_COMPONENT_DELIMITER}")

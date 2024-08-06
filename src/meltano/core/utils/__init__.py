@@ -45,7 +45,7 @@ except AttributeError:
 class NotFound(Exception):
     """An element is not found."""
 
-    def __init__(self, name, obj_type=None):
+    def __init__(self, name, obj_type=None) -> None:  # noqa: ANN001
         """Create a new exception.
 
         Args:
@@ -58,7 +58,7 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
+def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
     """Run the given async function using `asyncio.run`.
 
     Args:
@@ -69,14 +69,14 @@ def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         return asyncio.run(func(*args, **kwargs))
 
     return wrapper
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: t.Callable[[t.Any], t.Any]):
+def compose(*fs: t.Callable[[t.Any], t.Any]):  # noqa: ANN201
     """Create a composition of unary functions.
 
     Args:
@@ -95,7 +95,7 @@ def compose(*fs: t.Callable[[t.Any], t.Any]):
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
-def slugify(s):
+def slugify(s):  # noqa: ANN001, ANN201
     """Normalize strings into something URL-friendly.
 
     Args:
@@ -130,20 +130,20 @@ def slugify(s):
     return s.replace(" ", "-")
 
 
-def get_basic_auth(user, token):
+def get_basic_auth(user, token):  # noqa: ANN001, ANN201, D103
     return HTTPBasicAuth(user, token)
 
 
-def pop_all(keys, d: dict):
+def pop_all(keys, d: dict):  # noqa: ANN001, ANN201, D103
     return {k: d.pop(k) for k in keys}
 
 
-def get_all(keys, d: dict, default=None):
+def get_all(keys, d: dict, default=None):  # noqa: ANN001, ANN201, D103
     return {k: d.get(k, default) for k in keys}
 
 
 # Taken from https://stackoverflow.com/a/20666342
-def merge(src, dest):
+def merge(src, dest):  # noqa: ANN001, ANN201
     """Merge both given dictionaries together at depth, modifying `dest` in-place.
 
     Args:
@@ -171,11 +171,11 @@ def merge(src, dest):
     return dest
 
 
-def are_similar_types(left, right):
+def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS210
+def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: ANN001, ANN201
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:
@@ -202,7 +202,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
         >>> alist.append("works")
         >>> d
         {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
-    """  # noqa: P102
+    """
     if value is None:
         value = {}
 
@@ -219,9 +219,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
 
         cursor = cursor[key]
 
-    if tail not in cursor or (
-        (not are_similar_types(cursor[tail], value)) and force  # noqa: WPS516
-    ):
+    if tail not in cursor or ((not are_similar_types(cursor[tail], value)) and force):
         # We need to copy the value to make sure
         # the `value` parameter is not mutated.
         cursor[tail] = deepcopy(value)
@@ -229,7 +227,7 @@ def nest(d: dict, path: str, value=None, maxsplit=-1, force=False):  # noqa: WPS
     return cursor[tail]
 
 
-def nest_object(flat_object):
+def nest_object(flat_object):  # noqa: ANN001, ANN201, D103
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -256,7 +254,7 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):
+def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper around `flatten_dict.flatten`.
@@ -289,37 +287,37 @@ def compact(xs: t.Iterable) -> t.Iterable:
     return (x for x in xs if x is not None)
 
 
-def file_has_data(file: Path | str):
+def file_has_data(file: Path | str):  # noqa: ANN201, D103
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
 
 
-def identity(x):
+def identity(x):  # noqa: ANN001, ANN201, D103
     return x
 
 
-def noop(*_args, **_kwargs):
+def noop(*_args, **_kwargs) -> None:  # noqa: D103
     pass
 
 
-async def async_noop(*_args, **_kwargs) -> bool:
+async def async_noop(*_args, **_kwargs) -> bool:  # noqa: D103
     return True
 
 
-def truthy(val: str) -> bool:
+def truthy(val: str) -> bool:  # noqa: D103
     return str(val).lower() in TRUTHY
 
 
 @t.overload
-def coerce_datetime(d: None) -> None: ...  # noqa: WPS428
+def coerce_datetime(d: None) -> None: ...
 
 
 @t.overload
-def coerce_datetime(d: datetime) -> datetime: ...  # noqa: WPS428
+def coerce_datetime(d: datetime) -> datetime: ...
 
 
 @t.overload
-def coerce_datetime(d: date) -> datetime: ...  # noqa: WPS428
+def coerce_datetime(d: date) -> datetime: ...
 
 
 def coerce_datetime(d):
@@ -338,23 +336,23 @@ def coerce_datetime(d):
 
 
 @t.overload
-def iso8601_datetime(d: None) -> None: ...  # noqa: WPS428
+def iso8601_datetime(d: None) -> None: ...
 
 
 @t.overload
-def iso8601_datetime(d: str) -> datetime: ...  # noqa: WPS428
+def iso8601_datetime(d: str) -> datetime: ...
 
 
-def iso8601_datetime(d: str | None):
+def iso8601_datetime(d: str | None):  # noqa: D103
     if d is None:
         return None
 
     isoformats = [
-        "%Y-%m-%dT%H:%M:%SZ",  # noqa: WPS323
-        "%Y-%m-%dT%H:%M:%S+00:00",  # noqa: WPS323
-        "%Y-%m-%dT%H:%M:%S",  # noqa: WPS323
-        "%Y-%m-%d %H:%M:%S",  # noqa: WPS323
-        "%Y-%m-%d",  # noqa: WPS323
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S+00:00",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
     ]
 
     for format_string in isoformats:
@@ -366,7 +364,7 @@ def iso8601_datetime(d: str | None):
 
 
 class _GetItemProtocol(t.Protocol):
-    def __getitem__(self, key: str) -> str: ...  # noqa: WPS428
+    def __getitem__(self, key: str) -> str: ...
 
 
 _G = t.TypeVar("_G", bound=_GetItemProtocol)
@@ -392,9 +390,9 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func):
+def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201, D103
     @functools.wraps(func)
-    def decorate(*args, **kwargs):
+    def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
 
         path = func(*args, **kwargs, make_dirs=enabled)
@@ -403,18 +401,18 @@ def makedirs(func):
             return path
 
         # if there is an extension, only create the base dir
-        _, ext = os.path.splitext(path)
-        os.makedirs(os.path.dirname(path) if ext else path, exist_ok=True)
+        dir_path = path.parent if path.suffix else path
+        dir_path.mkdir(parents=True, exist_ok=True)
         return path
 
     return decorate
 
 
-def is_email_valid(value: str):
+def is_email_valid(value: str):  # noqa: ANN201, D103
     return re.match(REGEX_EMAIL, value)
 
 
-def pop_at_path(d, path, default=None):  # noqa: WPS210
+def pop_at_path(d, path, default=None):  # noqa: ANN001, ANN201, D103
     if isinstance(path, str):
         path = path.split(".")
 
@@ -439,7 +437,7 @@ def pop_at_path(d, path, default=None):  # noqa: WPS210
     return popped
 
 
-def set_at_path(d, path, value):
+def set_at_path(d, path, value) -> None:  # noqa: ANN001, D103
     if isinstance(path, str):
         path = path.split(".")
 
@@ -526,7 +524,7 @@ def expand_env_vars(
         The string or env dict with env vars expanded. For backwards
         compatibility, if anything other than an `str` or mapping is provided
         as the `raw_value`, it is returned unchanged.
-    """  # noqa: DAR402
+    """
     if_missing = EnvVarMissingBehavior(if_missing)
 
     if not isinstance(raw_value, (str, t.Mapping, list)):
@@ -553,7 +551,7 @@ def expand_env_vars(
             logger.debug(f"Variable '${var}' is empty.")  # noqa: G004
         return val
 
-    return _expand_env_vars(raw_value, replacer, flat)
+    return _expand_env_vars(raw_value, replacer, flat=flat)
 
 
 # Separate inner-function for `expand_env_vars` for performance reasons. Like
@@ -562,13 +560,14 @@ def expand_env_vars(
 def _expand_env_vars(
     raw_value: Expandable,
     replacer: t.Callable[[re.Match], str],
+    *,
     flat: bool,
 ) -> Expandable:
     if isinstance(raw_value, t.Mapping):
         if flat:
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
-            k: _expand_env_vars(v, replacer, flat)
+            k: _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, (str, t.Mapping, list))
             else v
             for k, v in raw_value.items()
@@ -577,7 +576,7 @@ def _expand_env_vars(
         # `flat=True` doesn't seem to be used anywhere and probably doesn't make sense
         # for lists anyway, so we don't support it here.
         return [
-            _expand_env_vars(v, replacer, flat)
+            _expand_env_vars(v, replacer, flat=flat)
             if isinstance(v, (str, t.Mapping, list))
             else v
             for v in raw_value
@@ -601,7 +600,7 @@ def uniques_in(original: t.Sequence[T]) -> list[T]:
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
-def human_size(num, suffix="B"):
+def human_size(num, suffix="B") -> str:  # noqa: ANN001
     """Return human-readable file size.
 
     Args:
@@ -657,7 +656,7 @@ def format_exception(exception: BaseException) -> str:
     )
 
 
-def safe_hasattr(obj: t.Any, name: str) -> bool:
+def safe_hasattr(obj: t.Any, name: str) -> bool:  # noqa: ANN401
     """Safely checks if an object has a given attribute.
 
     This is a hacky workaround for the fact that `hasattr` is not allowed by WPS.
@@ -705,7 +704,7 @@ def strtobool(val: str) -> bool:
     raise ValueError(f"invalid truth value {val!r}")  # noqa: EM102
 
 
-def get_boolean_env_var(env_var: str, default: bool = False) -> bool:
+def get_boolean_env_var(env_var: str, *, default: bool = False) -> bool:
     """Get the value of an environment variable as a boolean.
 
     Args:
@@ -760,7 +759,7 @@ class MergeStrategy(t.NamedTuple):
 class Extendable(t.Protocol):
     """A type protocol for types which have an `extend` method."""
 
-    def extend(self, x: t.Any) -> None:
+    def extend(self, x: t.Any) -> None:  # noqa: ANN401
         """Extend the current instance with another value.
 
         Args:
@@ -812,7 +811,7 @@ def deep_merge(
     return reduce(lambda a, b: _deep_merge(a, b, strategies), data)
 
 
-def _deep_merge(a, b, strategies):
+def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
     base: TMapping = copy(a)
     for key, value in b.items():
         for applicable_types, behavior in strategies:
@@ -895,7 +894,7 @@ def sanitize_filename(filename: str) -> str:
         Windows file names.
     """
     return functools.reduce(
-        lambda x, y: y(x),  # noqa: WPS442
+        lambda x, y: y(x),
         _sanitize_filename_transformations,
         filename,
     )

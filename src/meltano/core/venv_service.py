@@ -29,12 +29,12 @@ if t.TYPE_CHECKING:
 if sys.version_info < (3, 10):
     from typing_extensions import TypeAlias
 else:
-    from typing import TypeAlias
+    from typing import TypeAlias  # noqa: ICN003
 
 if sys.version_info < (3, 12):
     from typing_extensions import override
 else:
-    from typing import override
+    from typing import override  # noqa: ICN003
 
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -103,7 +103,7 @@ def _resolve_python_path(python: Path | str | None) -> str:
             f"not the number {python!r}",
         )
     else:
-        python_path = python if os.path.exists(python) else shutil.which(python)
+        python_path = python if os.path.exists(python) else shutil.which(python)  # noqa: PTH110
 
     if python_path is None:
         raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
@@ -117,7 +117,7 @@ def _resolve_python_path(python: Path | str | None) -> str:
 class VirtualEnv:
     """Info about a single virtual environment."""
 
-    _SUPPORTED_PLATFORMS = {
+    _SUPPORTED_PLATFORMS: t.ClassVar[set[str]] = {
         "Linux",
         "Darwin",
         "Windows",
@@ -241,11 +241,11 @@ class VirtualEnv:
         self.plugin_fingerprint_path.write_text(fingerprint(pip_install_args))
 
 
-async def _extract_stderr(_):
+async def _extract_stderr(_) -> None:
     return None  # pragma: no cover
 
 
-async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:
+async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process:  # noqa: ANN001, ANN002, ANN003
     """Run an executable asynchronously in a subprocess.
 
     Args:
@@ -292,7 +292,7 @@ def fingerprint(pip_install_args: Iterable[str]) -> str:
     return hashlib.sha256(" ".join(sorted(set(pip_install_args))).encode()).hexdigest()
 
 
-class VenvService:  # noqa: WPS214
+class VenvService:
     """Manages virtual environments.
 
     The methods in this class are not thread-safe.
@@ -332,8 +332,8 @@ class VenvService:  # noqa: WPS214
     async def install(
         self,
         pip_install_args: t.Sequence[str],
-        clean: bool = False,
         *,
+        clean: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> None:
         """Configure a virtual environment, then run pip install with the given args.
@@ -366,7 +366,8 @@ class VenvService:  # noqa: WPS214
             Whether virtual environment doesn't exist or can't be reused.
         """
 
-        def checks():  # A generator is used to perform the checks lazily
+        # A generator is used to perform the checks lazily
+        def checks():  # noqa: ANN202
             # The Python installation used to create this venv no longer exists
             yield not self.exec_path("python").exists()
             # The fingerprint of the venv does not match the pip install args
@@ -394,7 +395,7 @@ class VenvService:  # noqa: WPS214
         try:
             shutil.rmtree(self.venv.root)
             logger.debug(
-                "Removed old virtual environment for '%s/%s'",  # noqa: WPS323
+                "Removed old virtual environment for '%s/%s'",
                 self.namespace,
                 self.name,
             )
@@ -437,7 +438,7 @@ class VenvService:  # noqa: WPS214
         """
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
-        async def extract_stderr(proc: Process):
+        async def extract_stderr(proc: Process):  # noqa: ANN202
             return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",
@@ -561,7 +562,7 @@ class VenvService:  # noqa: WPS214
             The error that occurred during installation with additional context.
         """
         logger.info(
-            "Logged pip install output to %s",  # noqa: WPS323
+            "Logged pip install output to %s",
             self.pip_log_path,
         )
         return AsyncSubprocessError(
@@ -573,8 +574,8 @@ class VenvService:  # noqa: WPS214
     async def _pip_install(
         self,
         pip_install_args: t.Sequence[str],
-        clean: bool = False,
         *,
+        clean: bool = False,
         env: dict[str, str | None] | None = None,
     ) -> Process:
         """Install a package using `pip` in the proper virtual environment.
@@ -617,7 +618,7 @@ class VenvService:  # noqa: WPS214
                 extract_stderr=extract_stderr,
                 env=env,
             )
-        except AsyncSubprocessError as err:  # noqa: WPS329
+        except AsyncSubprocessError as err:
             raise await self.handle_installation_error(err) from err
 
 

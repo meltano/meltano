@@ -52,7 +52,7 @@ class LogEntry:
         Returns:
             True if a matching log line is found, else False
         """
-        for line in lines:  # noqa: RET503
+        for line in lines:
             matches = (
                 line.get("name") == self.name
                 and line.get("cmd_type") == self.cmd_type
@@ -81,23 +81,25 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
 
-    for line in seen_lines:
-        if line.get("event") and exc.args[0] in line.get("event"):
-            return True
-    return False
+    return any(
+        line.get("event") and exc.args[0] in line.get("event") for line in seen_lines
+    )
 
 
-def assert_log_lines(result_output: str, expected: list[LogEntry]):
+def assert_log_lines(result_output: str, expected: list[LogEntry]) -> None:
     seen_lines: list[dict] = []
     for line in result_output.splitlines():
-        parsed_line = json.loads(line)
+        try:
+            parsed_line = json.loads(line)
+        except json.JSONDecodeError:  # pragma: no cover
+            continue
         seen_lines.append(parsed_line)
 
     for entry in expected:
         assert entry.matches(seen_lines), f"Expected log entry not found: {entry}"
 
 
-def failure_help_log_suffix(job_logs_file):
+def failure_help_log_suffix(job_logs_file) -> str:
     return (
         "For more detailed log messages re-run the command using 'meltano "
         "--log-level=debug ...' CLI flag.\nNote that you can also check the "
@@ -184,7 +186,8 @@ def dbt_process(process_mock_factory, dbt):
 @pytest.fixture(autouse=True)
 def mock_plugin_installation_env():
     with mock.patch.object(
-        PluginInstallService, "plugin_installation_env"
+        PluginInstallService,
+        "plugin_installation_env",
     ) as plugin_installation_env:
         yield plugin_installation_env
 
@@ -201,7 +204,7 @@ class TestWindowsELT:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name]
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
@@ -231,7 +234,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         result = cli_runner.invoke(cli, [command])
         assert result.exit_code == 2
 
@@ -315,7 +318,7 @@ class TestCliEltScratchpadOne:
         job_logging_service,
         monkeypatch,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}_debug"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -326,7 +329,7 @@ class TestCliEltScratchpadOne:
             SingerTap,
             "apply_catalog_rules",
         ), mock.patch("meltano.cli.params.install_plugins"), mock.patch(
-            "meltano.core.plugin_invoker.asyncio"
+            "meltano.core.plugin_invoker.asyncio",
         ) as asyncio_mock:
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
@@ -453,7 +456,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -514,7 +517,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -534,7 +537,7 @@ class TestCliEltScratchpadOne:
 
         # Have `target_process.wait` take 1s to make sure the
         # `stdin.write`/`drain` exceptions can be raised
-        async def target_wait_mock():
+        async def target_wait_mock() -> int:
             await asyncio.sleep(1)
             return 1
 
@@ -595,7 +598,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -656,7 +659,7 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -726,20 +729,20 @@ class TestCliEltScratchpadOne:
         target_process,
         job_logging_service,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
-        try:  # noqa: WPS328
+        try:
             raise asyncio.LimitOverrunError(
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:
-            try:  # noqa: WPS328, WPS505
+            try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
                 raise ValueError(str(err))
@@ -801,7 +804,7 @@ class TestCliEltScratchpadOne:
         tap_process,
         target_process,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -839,7 +842,14 @@ class TestCliEltScratchpadOne:
             )
 
     @pytest.mark.parametrize("command", ("elt", "el"), ids=["elt", "el"])
-    def test_elt_already_running(self, cli_runner, tap, target, session, command: str):
+    def test_elt_already_running(
+        self,
+        cli_runner,
+        tap,
+        target,
+        session,
+        command: str,
+    ) -> None:
         state_id = "already_running"
         args = [command, "--state-id", state_id, tap.name, target.name]
 
@@ -864,7 +874,7 @@ class TestCliEltScratchpadOne:
         tap,
         target,
         command: str,
-    ):
+    ) -> None:
         catalog = {"streams": []}
         with project.root.joinpath("catalog.json").open("w") as catalog_file:
             json.dump(catalog, catalog_file)
@@ -896,7 +906,7 @@ class TestCliEltScratchpadOne:
         tap,
         target,
         command: str,
-    ):
+    ) -> None:
         state = {"success": True}
         with project.root.joinpath("state.json").open("w") as state_file:
             json.dump(state, state_file)
@@ -932,7 +942,7 @@ class TestCliEltScratchpadOne:
         target,
         plugin_settings_service_factory,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [
             command,
@@ -967,7 +977,7 @@ class TestCliEltScratchpadOne:
         target,
         plugin_settings_service_factory,
         command: str,
-    ):
+    ) -> None:
         state_id = f"pytest_test_{command}"
         args = [
             command,
@@ -1015,7 +1025,7 @@ class TestCliEltScratchpadTwo:
         target_process,
         silent_dbt_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "run"]
 
         invoke_async = AsyncMock(
@@ -1077,7 +1087,7 @@ class TestCliEltScratchpadTwo:
         silent_dbt_process,
         dbt_process,
         job_logging_service,
-    ):
+    ) -> None:
         state_id = "pytest_test_elt"
         args = [
             "elt",
@@ -1161,7 +1171,7 @@ class TestCliEltScratchpadThree:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch.object(DbtRunner, "run", new=AsyncMock()):
@@ -1195,7 +1205,7 @@ class TestCliEltScratchpadThree:
         cli_runner,
         tap,
         target,
-    ):
+    ) -> None:
         args = ["elt", tap.name, target.name, "--transform", "only"]
 
         with mock.patch.object(DbtRunner, "run", new=AsyncMock()):

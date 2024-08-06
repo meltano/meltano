@@ -28,7 +28,7 @@ def engine_uri_env(engine_uri: str) -> t.Generator:
 
 
 @pytest.fixture()
-def un_engine_uri(monkeypatch):
+def un_engine_uri(monkeypatch) -> None:
     """When we want to test functionality that doesn't use the current DB URI.
 
     Note that this fixture must run before the project fixture as
@@ -57,9 +57,9 @@ def engine_sessionmaker(engine_uri):
 
 
 @pytest.fixture()
-def connection(engine_sessionmaker):  # noqa: WPS442
+def connection(engine_sessionmaker):
     engine, _ = engine_sessionmaker
-    connection = engine.connect()  # noqa: WPS442
+    connection = engine.connect()
     transaction = connection.begin()
 
     try:
@@ -81,7 +81,7 @@ def session(
     project: Project,  # noqa: ARG001
     engine_sessionmaker,
     connection,
-):  # noqa: WPS442
+):
     """Create a new database session for a test.
 
     Args:

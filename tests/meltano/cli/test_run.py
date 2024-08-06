@@ -183,7 +183,7 @@ class TestCliRunScratchpadOne:
         target,
         tap_process,
         target_process,
-    ):
+    ) -> None:
         result = cli_runner.invoke(cli, ["run"])
         assert result.exit_code == 0
 
@@ -267,7 +267,7 @@ class TestCliRunScratchpadOne:
         target_process,
         mapper_process,
         dbt_process,
-    ):
+    ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process),
@@ -326,7 +326,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         job_logging_service: JobLoggingService,
-    ):
+    ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
@@ -391,7 +391,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         job_logging_service: JobLoggingService,
-    ):
+    ) -> None:
         state_id_suffix, expected_suffix, suffix_env = suffix_args
 
         # exit cleanly when everything is fine
@@ -432,7 +432,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_multiple_commands(self, cli_runner, dbt_process):
+    def test_run_multiple_commands(self, cli_runner, dbt_process) -> None:
         # Verify that requesting the same command plugin multiple time with
         # different args works
         invoke_async = AsyncMock(
@@ -487,7 +487,7 @@ class TestCliRunScratchpadOne:
         target_process,
         mapper_process,
         dbt_process,
-    ):
+    ) -> None:
         invoke_async = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process, dbt_process),
         )
@@ -549,7 +549,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
         dbt_process.wait.return_value = 1
@@ -616,7 +616,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         dbt_process,
-    ):
+    ) -> None:
         # In this scenario, the tap fails on the third read. Target should still
         # complete, but dbt should not.
         args = ["run", tap.name, target.name, "dbt:run"]
@@ -678,7 +678,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_before_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_before_tap_finished(
         self,
         cli_runner,
         tap,
@@ -686,7 +686,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
         # Have `tap_process.wait` take 2s to make sure the target can fail
@@ -708,7 +708,7 @@ class TestCliRunScratchpadOne:
 
         # Have `target_process.wait` take 1s to make sure the
         # `stdin.write`/`drain` exceptions can be raised
-        async def target_wait_mock():
+        async def target_wait_mock() -> int:
             await asyncio.sleep(1)
             return 1
 
@@ -774,7 +774,7 @@ class TestCliRunScratchpadOne:
         "dbt",
         "job_logging_service",
     )
-    def test_run_elb_target_failure_after_tap_finished(  # noqa: WPS118
+    def test_run_elb_target_failure_after_tap_finished(
         self,
         cli_runner,
         tap,
@@ -782,7 +782,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
         target_process.wait.return_value = 1
@@ -852,7 +852,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         dbt_process,
-    ):
+    ) -> None:
         args = ["run", tap.name, target.name, "dbt:run"]
 
         tap_process.wait.return_value = 1
@@ -931,19 +931,19 @@ class TestCliRunScratchpadOne:
         target,
         tap_process,
         target_process,
-    ):
+    ) -> None:
         args = ["run", tap.name, target.name]
 
         # Raise a `ValueError` wrapping a `LimitOverrunError`, like
         # `StreamReader.readline` does:
         # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
-        try:  # noqa: WPS328
+        try:
             raise asyncio.LimitOverrunError(
                 "Separator is not found, and chunk exceed the limit",  # noqa: EM101
                 0,
             )
         except asyncio.LimitOverrunError as err:
-            try:  # noqa: WPS328, WPS505
+            try:
                 # `ValueError` needs to be raised from inside the except block
                 # for `LimitOverrunError` so that `__context__` is set.
                 raise ValueError(str(err))
@@ -1002,7 +1002,7 @@ class TestCliRunScratchpadOne:
         target_process,
         mapper_process,
         project_add_service,
-    ):
+    ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process),
@@ -1148,7 +1148,7 @@ class TestCliRunScratchpadOne:
         target_process,
         mapper_process,
         dbt_process,
-    ):
+    ) -> None:
         # In this scenario, the map fails on the second read. Target should
         # still complete, but dbt should not.
         args = ["run", tap.name, "mock-mapping-0", target.name, "dbt:run"]
@@ -1225,7 +1225,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         mapper_process,
-    ):
+    ) -> None:
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(
             side_effect=(tap_process, mapper_process, target_process),
@@ -1269,7 +1269,7 @@ class TestCliRunScratchpadOne:
         tap_process,
         target_process,
         monkeypatch: pytest.MonkeyPatch,
-    ):
+    ) -> None:
         monkeypatch.delenv("FORCE_COLOR", raising=False)
         # toggle color in logging configuration
         logging_config = default_config(log_level="info")
@@ -1314,11 +1314,11 @@ class TestUUIDParamType:
             pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
         ),
     )
-    def test_valid_uuid(self, value: str):
+    def test_valid_uuid(self, value: str) -> None:
         param = UUIDParamType()
         assert param.convert(value, None, None) == uuid.UUID(value)
 
-    def test_invalid_uuid(self):
+    def test_invalid_uuid(self) -> None:
         param = UUIDParamType()
         value = "zzz"
         with pytest.raises(click.BadParameter, match="is not a valid UUID"):

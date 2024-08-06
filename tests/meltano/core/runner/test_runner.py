@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import os
 import typing as t
-from pathlib import Path
 
 import mock
 import pytest
@@ -14,25 +12,27 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.runner.singer import SingerRunner
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
 
 TEST_STATE_ID = "test_job"
 
 
 class AnyInstanceOf:
-    def __init__(self, target_cls):
+    def __init__(self, target_cls) -> None:
         self.target_cls = target_cls
 
     def __eq__(self, other):
         return isinstance(other, self.target_cls)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Any({self.target_cls}>"
 
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
-        Path(os.path.join(config_dir, file)).touch()
+        config_dir.joinpath(file).touch()
 
     return config_dir
 
@@ -108,7 +108,7 @@ class TestSingerRunner:
         tap,
         target,
         plugin_invoker_factory,
-    ):
+    ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
 
@@ -136,10 +136,10 @@ class TestSingerRunner:
         tap_process,
         target_process,
         plugin_invoker_factory,
-    ):
+    ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        async with tap_invoker.prepared(  # noqa: WPS316
+        async with tap_invoker.prepared(
             session,
         ), target_invoker.prepared(session):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))
@@ -233,7 +233,7 @@ class TestSingerRunner:
         payload_flag,
         elt_context,
         merge_state,
-    ):
+    ) -> None:
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
         # testing with a real subprocess proved to be pretty
@@ -277,8 +277,8 @@ class TestSingerRunner:
             assert job.payload_flags == payload_flag
 
     @pytest.mark.asyncio()
-    async def test_run(self, subject):
-        async def invoke_mock(*args, **kwargs):  # noqa: ARG001
+    async def test_run(self, subject) -> None:
+        async def invoke_mock(*args, **kwargs) -> None:  # noqa: ARG001
             pass
 
         with mock.patch.object(

@@ -69,8 +69,9 @@ class BlockParser:  # noqa: D101
     def __init__(
         self,
         log: structlog.BoundLogger,
-        project,
+        project,  # noqa: ANN001
         blocks: list[str],
+        *,
         full_refresh: bool | None = False,
         refresh_catalog: bool | None = False,
         no_state_update: bool | None = False,
@@ -79,8 +80,7 @@ class BlockParser:  # noqa: D101
         merge_state: bool | None = False,
         run_id: uuid.UUID | None = None,
     ):
-        """
-        Parse a meltano run command invocation into a list of blocks.
+        """Parse a meltano run command invocation into a list of blocks.
 
         Args:
             log: Logger to use.
@@ -225,13 +225,13 @@ class BlockParser:  # noqa: D101
             else:
                 raise BlockSetValidationError(
                     "Unknown command type or bad block sequence at index "  # noqa: EM102
-                    f"{cur + 1}, starting block '{plugin.name}'",  # noqa: WPS237
+                    f"{cur + 1}, starting block '{plugin.name}'",
                 )
 
-    def _find_next_elb_set(  # noqa: WPS231, WPS213
+    def _find_next_elb_set(
         self,
         offset: int = 0,
-    ) -> tuple[ExtractLoadBlocks | None, int]:  # noqa: WPS231, WPS213
+    ) -> tuple[ExtractLoadBlocks | None, int]:
         """Search plugins to find an extract EL block set.
 
         Args:
@@ -247,12 +247,12 @@ class BlockParser:  # noqa: D101
 
         builder = (
             ELBContextBuilder(self.project)
-            .with_force(self._force)
-            .with_full_refresh(self._full_refresh)
-            .with_refresh_catalog(self._refresh_catalog)
-            .with_no_state_update(self._no_state_update)
+            .with_force(force=self._force)
+            .with_full_refresh(full_refresh=self._full_refresh)
+            .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
+            .with_no_state_update(no_state_update=self._no_state_update)
             .with_state_id_suffix(self._state_id_suffix)
-            .with_merge_state(self._merge_state)
+            .with_merge_state(merge_state=self._merge_state)
             .with_run_id(self._run_id)
         )
 
@@ -271,7 +271,7 @@ class BlockParser:  # noqa: D101
 
         blocks.append(builder.make_block(self._plugins[offset]))
 
-        for idx, plugin in enumerate(self._plugins[offset + 1 :]):  # noqa: E203
+        for idx, plugin in enumerate(self._plugins[offset + 1 :]):
             next_block = idx + 1
 
             if plugin.type not in CONSUMERS:

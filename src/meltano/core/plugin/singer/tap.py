@@ -46,9 +46,9 @@ logger = structlog.getLogger(__name__)
 
 async def _stream_redirect(
     stream: asyncio.StreamReader | None,
-    *file_like_objs,
-    write_str=False,
-):
+    *file_like_objs,  # noqa: ANN002
+    write_str=False,  # noqa: ANN001
+) -> None:
     """Redirect stream to a file like obj.
 
     Args:
@@ -67,7 +67,7 @@ def _debug_logging_handler(
     name: str,
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
-    *other_dsts,
+    *other_dsts,  # noqa: ANN002
 ) -> asyncio.Task:
     """Route debug log lines.
 
@@ -90,7 +90,7 @@ def _debug_logging_handler(
                 stderr,
                 sys.stderr,
                 *other_dsts,
-                write_str=True,  # noqa: WPS517
+                write_str=True,
             ),
         )
 
@@ -104,12 +104,12 @@ def _debug_logging_handler(
                 stderr,
                 outerr,
                 *other_dsts,
-                write_str=True,  # noqa: WPS517
+                write_str=True,
             ),
         )
 
 
-def config_metadata_rules(config):  # noqa: WPS210
+def config_metadata_rules(config):  # noqa: ANN001, ANN201
     """Get metadata rules from config.
 
     Args:
@@ -141,7 +141,7 @@ def config_metadata_rules(config):  # noqa: WPS210
     return rules
 
 
-def config_schema_rules(config):
+def config_schema_rules(config):  # noqa: ANN001, ANN201
     """Get schema rules from config.
 
     Args:
@@ -161,12 +161,12 @@ def config_schema_rules(config):
     ]
 
 
-class SingerTap(SingerPlugin):  # noqa: WPS214
+class SingerTap(SingerPlugin):
     """A Plugin for Singer Taps."""
 
     __plugin_type__ = PluginType.EXTRACTORS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(name="_catalog"),
         SettingDefinition(name="_state"),
         SettingDefinition(name="_load_schema", value="$MELTANO_EXTRACTOR_NAMESPACE"),
@@ -192,7 +192,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         ),
     ]
 
-    def exec_args(self, plugin_invoker):
+    def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Return the arguments list with the complete runtime paths.
 
         Args:
@@ -229,9 +229,9 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         return args
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Get the configuration files for this tap."""
-        return {  # noqa: DAR201
+        return {
             "config": f"tap.{self.instance_uuid}.config.json",
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
@@ -239,16 +239,16 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         }
 
     @property
-    def output_files(self):
+    def output_files(self):  # noqa: ANN201
         """Get the output files for this tap."""
-        return {"output": "tap.out"}  # noqa: DAR201
+        return {"output": "tap.out"}
 
     @hook("before_invoke")
     async def look_up_state_hook(
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Look up state before being invoked if in sync mode.
 
         Args:
@@ -265,10 +265,10 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             await self.look_up_state(plugin_invoker)
 
-    async def look_up_state(  # noqa: WPS231, WPS213, WPS210
+    async def look_up_state(
         self,
         plugin_invoker: PluginInvoker,
-    ):
+    ) -> None:
         """Look up state, cleaning up and refreshing as needed.
 
         Args:
@@ -346,7 +346,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Discover Singer catalog before invoking tap if in sync mode.
 
         Args:
@@ -363,10 +363,10 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(  # noqa: WPS231, WPS210,
+    async def discover_catalog(  # ,
         self,
         plugin_invoker: PluginInvoker,
-    ):
+    ) -> None:
         """Perform catalog discovery.
 
         Args:
@@ -430,11 +430,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
             ) from err
 
-    async def run_discovery(  # noqa: WPS238, WPS210
+    async def run_discovery(
         self,
         plugin_invoker: PluginInvoker,
         catalog_path: Path,
-    ):  # noqa: DAR401
+    ) -> None:
         """Run tap in discovery mode and store the result.
 
         Args:
@@ -493,7 +493,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                         future for future in done if future.exception() is not None
                     ]:
                         failed_future = failed.pop()
-                        raise failed_future.exception()  # type: ignore[misc] # noqa: RSE102
+                        raise failed_future.exception()  # type: ignore[misc]
                 exit_code = handle.returncode
             except Exception:
                 catalog_path.unlink()
@@ -513,7 +513,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),
-    ):
+    ) -> None:
         """Apply catalog rules before invoke if in sync mode.
 
         Args:
@@ -530,11 +530,11 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
         with suppress(PluginLacksCapabilityError):
             self.apply_catalog_rules(plugin_invoker, exec_args)
 
-    def apply_catalog_rules(  # noqa: WPS213, WPS231, WPS210
+    def apply_catalog_rules(
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),  # noqa: ARG002
-    ):
+    ) -> None:
         """Apply Singer catalog and schema rules to discovered catalog.
 
         Args:
@@ -608,7 +608,7 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
                 f"Applying catalog rules failed: catalog file is invalid: {err}",  # noqa: EM102
             ) from err
 
-    def catalog_cache_key(self, plugin_invoker):
+    def catalog_cache_key(self, plugin_invoker):  # noqa: ANN001, ANN201
         """Get a cache key for the catalog.
 
         Args:
@@ -645,30 +645,30 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
 
         key_json = json.dumps(key_dict)
 
-        return sha1(key_json.encode()).hexdigest()  # noqa: S303 S324
+        return sha1(key_json.encode()).hexdigest()  # noqa: S324
 
     @staticmethod
     @lru_cache
-    def _warn_missing_stream(stream_id: str):
+    def _warn_missing_stream(stream_id: str) -> None:
         logger.warning(
-            "Stream `%s` was not found in the catalog",  # noqa: WPS323
+            "Stream `%s` was not found in the catalog",
             stream_id,
         )
 
     @staticmethod
     @lru_cache
-    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]):
+    def _warn_missing_property(stream_id: str, breadcrumb: tuple[str, ...]) -> None:
         logger.warning(
-            "Property `%s` was not found in the schema of stream `%s`",  # noqa: E501, WPS323
+            "Property `%s` was not found in the schema of stream `%s`",
             ".".join(breadcrumb[1:]),
             stream_id,
         )
 
-    def warn_property_not_found(  # noqa: C901
+    def warn_property_not_found(
         self,
         rules: list[MetadataRule],
         catalog: CatalogDict,
-    ):
+    ) -> None:
         """Validate MetadataRules conforms to discovered Catalog.
 
         Validate MetadataRules against the tap's discovered Catalog & emit
@@ -690,10 +690,10 @@ class SingerTap(SingerPlugin):  # noqa: WPS214
             if isinstance(stream, dict)
         }
 
-        def is_not_star(x):
+        def is_not_star(x):  # noqa: ANN001, ANN202
             return "*" not in x
 
-        def dict_get(dictionary, key):
+        def dict_get(dictionary, key):  # noqa: ANN001, ANN202
             return dictionary.get(key, {})
 
         for rule in rules:

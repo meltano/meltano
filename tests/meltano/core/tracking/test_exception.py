@@ -18,15 +18,15 @@ from meltano.core.utils import hash_sha256
 
 THIS_FILE_BASENAME = Path(__file__).name
 
-with open(
+with (
     Path(tracking_module_path).parent
     / "iglu-client-embedded"
     / "schemas"
     / "com.meltano"
     / "exception_context"
     / "jsonschema"
-    / "1-0-0",
-) as exception_context_schema_file:
+    / "1-0-0"
+).open() as exception_context_schema_file:
     EXCEPTION_CONTEXT_SCHEMA = json.load(exception_context_schema_file)
 
 
@@ -49,7 +49,7 @@ def is_valid_exception_context(instance: dict[str, t.Any]) -> bool:
     return True
 
 
-def test_null_exception_context():
+def test_null_exception_context() -> None:
     ctx = ExceptionContext()
     assert isinstance(ctx.data, dict)
     assert isinstance(ctx.data["context_uuid"], str)
@@ -57,11 +57,11 @@ def test_null_exception_context():
     assert ctx.data["exception"] is None
 
 
-def test_simple_exception_context():
+def test_simple_exception_context() -> None:
     msg = "The error message"
 
     ex = ValueError(msg)
-    try:  # noqa: WPS328
+    try:
         raise ex
     except Exception:
         ctx = ExceptionContext()
@@ -93,7 +93,7 @@ def test_simple_exception_context():
         assert key in tb_data[0]
 
 
-def test_complex_exception_context():
+def test_complex_exception_context() -> None:
     if platform.system() == "Windows":
         pytest.xfail("Fails on Windows: https://github.com/meltano/meltano/issues/3444")
 
@@ -111,7 +111,7 @@ def test_complex_exception_context():
             raise ValueError("that path was a bad value") from ex  # noqa: EM101
 
     try:
-        try:  # noqa: WPS505
+        try:
             line_nums.append(1 + inspect.currentframe().f_lineno)
             _function_to_deepen_traceback()
         except Exception:

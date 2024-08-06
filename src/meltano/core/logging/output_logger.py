@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import sys
+import typing as t
 from contextlib import (
     asynccontextmanager,
     contextmanager,
@@ -21,11 +22,19 @@ from meltano.core.runner import RunnerError
 from .formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
 from .utils import capture_subprocess_output
 
+if t.TYPE_CHECKING:
+    if sys.version_info < (3, 10):
+        from typing import TypeAlias  # noqa: ICN003
+    else:
+        from typing_extensions import TypeAlias
+
+StrPath: TypeAlias = t.Union[str, os.PathLike]
+
 
 class OutputLogger:
     """Output Logger."""
 
-    def __init__(self, file):
+    def __init__(self, file: StrPath) -> None:
         """Instantiate an Output Logger.
 
         Args:
@@ -35,12 +44,12 @@ class OutputLogger:
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
-        self.outs = {}
+        self.outs: dict[str, Out] = {}
 
     def out(
         self,
         name: str,
-        logger=None,
+        logger=None,  # noqa: ANN001
         write_level: int = logging.INFO,
     ) -> Out:
         """Obtain an Out instance for use as a logger or use for output capture.
@@ -71,7 +80,7 @@ class OutputLogger:
 class LineWriter:
     """Line Writer."""
 
-    def __init__(self, out):
+    def __init__(self, out) -> None:  # noqa: ANN001
         """Instantiate a Line Writer.
 
         Args:
@@ -79,7 +88,7 @@ class LineWriter:
         """
         self.__out = out
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: ANN001, ANN204
         """Get attribute.
 
         Args:
@@ -90,7 +99,7 @@ class LineWriter:
         """
         return getattr(self.__out, name)
 
-    def write(self, line):
+    def write(self, line) -> None:  # noqa: ANN001
         """Write a line.
 
         Args:
@@ -102,7 +111,7 @@ class LineWriter:
 class FileDescriptorWriter:
     """File Descriptor Writer."""
 
-    def __init__(self, out, fd):
+    def __init__(self, out, fd) -> None:  # noqa: ANN001
         """Instantiate File Descriptor Writer.
 
         Args:
@@ -112,7 +121,7 @@ class FileDescriptorWriter:
         self.__out = out
         self.__writer = os.fdopen(fd, "w")
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: ANN001, ANN204
         """Get attribute.
 
         Args:
@@ -123,7 +132,7 @@ class FileDescriptorWriter:
         """
         return getattr(self.__writer, name)
 
-    def isatty(self):
+    def isatty(self):  # noqa: ANN201
         """Is out location a tty.
 
         Returns:
@@ -132,7 +141,7 @@ class FileDescriptorWriter:
         return self.__out.isatty()
 
 
-class Out:  # noqa: WPS230
+class Out:
     """Simple Out class to log anything written in a stream."""
 
     def __init__(
@@ -141,7 +150,7 @@ class Out:  # noqa: WPS230
         name: str,
         logger: structlog.stdlib.BoundLogger,
         write_level: int,
-        file: str,
+        file: StrPath,
     ):
         """Log anything written in a stream.
 
@@ -179,7 +188,7 @@ class Out:  # noqa: WPS230
         return handler
 
     @contextmanager
-    def line_writer(self):
+    def line_writer(self):  # noqa: ANN201
         """Yield a line writer instance.
 
         Yields:
@@ -188,7 +197,7 @@ class Out:  # noqa: WPS230
         yield LineWriter(self)
 
     @contextmanager
-    def redirect_logging(self, ignore_errors=()):
+    def redirect_logging(self, ignore_errors=()):  # noqa: ANN001, ANN201
         """Redirect log entries to a temporarily added file handler.
 
         Args:
@@ -196,7 +205,7 @@ class Out:  # noqa: WPS230
 
         Yields:
             With the side-effect of redirecting logging.
-        """  # noqa: DAR401
+        """
         logger = logging.getLogger()  # noqa: TID251
         logger.addHandler(self.redirect_log_handler)
         ignored_errors = (
@@ -206,7 +215,7 @@ class Out:  # noqa: WPS230
         )
         try:
             yield
-        except ignored_errors:  # noqa: WPS329
+        except ignored_errors:
             raise
         except RunnerError as err:
             logger.error(str(err))
@@ -218,7 +227,7 @@ class Out:  # noqa: WPS230
             logger.removeHandler(self.redirect_log_handler)
 
     @asynccontextmanager
-    async def writer(self):
+    async def writer(self):  # noqa: ANN201
         """Yield a writer.
 
         Yields:
@@ -238,7 +247,7 @@ class Out:  # noqa: WPS230
                 await reader
 
     @asynccontextmanager
-    async def redirect_stdout(self):
+    async def redirect_stdout(self):  # noqa: ANN201
         """Redirect STDOUT.
 
         Yields:
@@ -249,7 +258,7 @@ class Out:  # noqa: WPS230
                 yield
 
     @asynccontextmanager
-    async def redirect_stderr(self):
+    async def redirect_stderr(self):  # noqa: ANN201
         """Redirect STDERR.
 
         Yields:
@@ -270,7 +279,7 @@ class Out:  # noqa: WPS230
         self.last_line = line
         self.logger.log(self.write_level, line.rstrip(), name=self.name)
 
-    async def _read_from_fd(self, read_fd):
+    async def _read_from_fd(self, read_fd) -> None:  # noqa: ANN001
         # Since we're redirecting our own stdout and stderr output,
         # the line length limit can be arbitrarily large.
         line_length_limit = 1024 * 1024 * 1024  # 1 GiB

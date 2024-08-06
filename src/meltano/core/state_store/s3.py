@@ -27,7 +27,7 @@ except ImportError:
 class MissingBoto3Error(Exception):
     """Raised when boto3 is required but not installed."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize a MissingBoto3Error."""
         super().__init__(
             "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
@@ -35,7 +35,7 @@ class MissingBoto3Error(Exception):
 
 
 @contextmanager
-def requires_boto3():
+def requires_boto3():  # noqa: ANN201
     """Raise MissingBoto3Error if boto3 is required but missing in context.
 
     Raises:
@@ -61,7 +61,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         endpoint_url: str | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -151,7 +151,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         if with_prefix:
             kwargs["Prefix"] = self.prefix
 
-        for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):  # noqa: WPS526
+        for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):
             yield state_obj["Key"]
 
     def copy_file(self, src: str, dst: str) -> None:

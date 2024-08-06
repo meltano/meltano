@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import typing as t
 from collections import defaultdict
 
 import yaml
@@ -16,6 +17,11 @@ from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
 from meltano.core.utils import NotFound, find_named
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
+    from meltano.core.plugin_invoker import PluginInvoker
 
 logger = get_logger(__name__)
 
@@ -64,7 +70,7 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 
 
-class PluginType(YAMLEnum):  # noqa: WPS214
+class PluginType(YAMLEnum):
     """The type of a plugin."""
 
     EXTRACTORS = "extractors"
@@ -182,7 +188,7 @@ class PluginType(YAMLEnum):  # noqa: WPS214
 class PluginRef(Canonical):
     """A reference to a plugin."""
 
-    def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):
+    def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):  # noqa: ANN003
         """Create a new PluginRef.
 
         Args:
@@ -233,7 +239,7 @@ class PluginRef(Canonical):
         """
         return hash((self.type, self.name))
 
-    def set_presentation_attrs(self, extras):
+    def set_presentation_attrs(self, extras) -> None:  # noqa: ANN001
         """Set the presentation attributes of the plugin reference.
 
         Args:
@@ -271,7 +277,7 @@ class Variant(NameEq, Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a new Variant.
 
@@ -329,7 +335,7 @@ class PluginDefinition(PluginRef):
         variant: str | None = None,
         variants: list | None = None,
         is_default_variant: bool | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a new PluginDefinition.
 
@@ -348,9 +354,9 @@ class PluginDefinition(PluginRef):
 
         self._defaults["label"] = lambda plugin: plugin.name
 
-        def default_logo_url(plugin_def):
+        def default_logo_url(plugin_def) -> str:  # noqa: ANN001
             short_name = re.sub(
-                r"^(tap|target)-",  # noqa: WPS360
+                r"^(tap|target)-",
                 "",
                 plugin_def.name,
             )
@@ -376,7 +382,7 @@ class PluginDefinition(PluginRef):
         self.variants = [Variant.parse(x) for x in variants]
         self.is_default_variant = is_default_variant
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Iterate over the variants of the plugin definition.
 
         Yields:
@@ -411,7 +417,7 @@ class PluginDefinition(PluginRef):
         except NotFound as err:
             raise VariantNotFoundError(self, variant_name) from err
 
-    def find_variant(self, variant_or_name: str | Variant | None = None):
+    def find_variant(self, variant_or_name: str | Variant | None = None):  # noqa: ANN201
         """Find the variant with the given name or variant.
 
         Args:
@@ -434,7 +440,7 @@ class PluginDefinition(PluginRef):
 
         return self.get_variant(variant_or_name)
 
-    def variant_label(self, variant):
+    def variant_label(self, variant):  # noqa: ANN001, ANN201
         """Return label for specified variant.
 
         Args:
@@ -456,7 +462,7 @@ class PluginDefinition(PluginRef):
         return label
 
     @property
-    def variant_labels(self):
+    def variant_labels(self):  # noqa: ANN201
         """Return labels for supported variants.
 
         Returns:
@@ -501,10 +507,10 @@ class PluginDefinition(PluginRef):
         )
 
 
-class BasePlugin(HookObject):  # noqa: WPS214
+class BasePlugin(HookObject):
     """A base plugin."""
 
-    EXTRA_SETTINGS = []
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = []
 
     def __init__(self, plugin_def: PluginDefinition, variant: Variant):
         """Create a new BasePlugin.
@@ -518,7 +524,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         self._plugin_def = plugin_def
         self._variant = variant
 
-    def __eq__(self, other: BasePlugin):
+    def __eq__(self, other: BasePlugin):  # noqa: ANN204
         """Compare two plugins.
 
         Args:
@@ -527,10 +533,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         Returns:
             True if the plugins are equal, False otherwise.
         """
-        return (
-            self._plugin_def == other._plugin_def  # noqa: WPS437
-            and self._variant == other._variant  # noqa: WPS437
-        )
+        return self._plugin_def == other._plugin_def and self._variant == other._variant
 
     def __hash__(self) -> int:
         """Return the hash of the plugin.
@@ -540,7 +543,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return hash((self._plugin_def, self._variant))
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Iterate over the settings of the plugin.
 
         Yields:
@@ -548,7 +551,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         yield from self._plugin_def
 
-    def __getattr__(self, attr: str):
+    def __getattr__(self, attr: str):  # noqa: ANN204
         """Get the value of the setting.
 
         Args:
@@ -581,7 +584,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return self._variant.executable or self._plugin_def.name
 
     @property
-    def extras(self):
+    def extras(self):  # noqa: ANN201
         """Return the plugin extras.
 
         Returns:
@@ -590,7 +593,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return {**self._plugin_def.extras, **self._variant.extras}
 
     @property
-    def all_commands(self):
+    def all_commands(self):  # noqa: ANN201
         """Return a dictionary of supported commands.
 
         Returns:
@@ -612,7 +615,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         }
 
     @property
-    def all_settings(self):
+    def all_settings(self):  # noqa: ANN201
         """Return a list of settings.
 
         Returns:
@@ -620,8 +623,8 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return self._variant.settings
 
-    @property  # noqa: WPS210
-    def extra_settings(self):  # noqa: WPS210
+    @property
+    def extra_settings(self):  # noqa: ANN201
         """Return the extra settings for this plugin.
 
         Returns:
@@ -651,7 +654,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return existing_settings
 
     @property
-    def all_requires(self):
+    def all_requires(self):  # noqa: ANN201
         """Return a list of requires.
 
         Returns:
@@ -661,7 +664,8 @@ class BasePlugin(HookObject):  # noqa: WPS214
 
     def env_prefixes(
         self,
-        for_writing=False,  # noqa: ARG002
+        *,
+        for_writing=False,  # noqa: ANN001, ARG002
     ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
@@ -705,10 +709,10 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return True
 
-    def exec_args(
+    def exec_args(  # noqa: D417
         self,
-        files: dict,  # noqa: ARG002
-    ):
+        plugin_invoker: PluginInvoker,  # noqa: ARG002
+    ) -> list[str | Path]:
         """Return the arguments to pass to the plugin runner.
 
         Args:
@@ -720,7 +724,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return []
 
     @property
-    def config_files(self):
+    def config_files(self):  # noqa: ANN201
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -729,7 +733,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         return {}
 
     @property
-    def output_files(self):
+    def output_files(self):  # noqa: ANN201
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -737,7 +741,7 @@ class BasePlugin(HookObject):  # noqa: WPS214
         """
         return {}
 
-    def process_config(self, config):
+    def process_config(self, config):  # noqa: ANN001, ANN201
         """Process the config for this plugin.
 
         Args:
@@ -781,7 +785,7 @@ class StandalonePlugin(Canonical):
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         env: dict[str, str] | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """Create a locked plugin.
 
@@ -855,11 +859,11 @@ class StandalonePlugin(Canonical):
                     + ". "
                     + "Please open an issue or pull request to update the plugin "
                     + "definition on Meltano Hub at "
-                    + f"https://github.com/meltano/hub/blob/main/_data/meltano/{self.plugin_type}/{self.name}/{self.variant}.yml.",  # noqa: E501
+                    + f"https://github.com/meltano/hub/blob/main/_data/meltano/{self.plugin_type}/{self.name}/{self.variant}.yml.",
                 )
 
     @classmethod
-    def from_variant(
+    def from_variant(  # noqa: ANN206
         cls: type[StandalonePlugin],
         variant: Variant,
         plugin_def: PluginDefinition,

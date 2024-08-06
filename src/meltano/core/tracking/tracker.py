@@ -86,10 +86,10 @@ class TelemetrySettings(t.NamedTuple):
     send_anonymous_usage_stats: bool | None
 
 
-class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
+class Tracker:  # - too many (public) methods
     """Meltano tracker backed by Snowplow."""
 
-    def __init__(  # noqa: WPS210, WPS213 - too many local variables, too many expressions
+    def __init__(  # - too many local variables, too many expressions
         self,
         project: Project,
         request_timeout: float | tuple[float, float] | None = 3.5,
@@ -103,7 +103,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
                 `read` timeout, or as tuple with two float values which specify
                 the `connect` and `read` timeouts separately.
         """
-        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+        from meltano.core.tracking.contexts import (
             ProjectContext,
             environment_context,
         )
@@ -111,7 +111,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         self.project = project
         self.send_anonymous_usage_stats = project.settings.get(
             "send_anonymous_usage_stats",
-            not project.settings.get("disable_tracking", False),
+            redacted=not project.settings.get("disable_tracking"),
         )
 
         endpoints = project.settings.get("snowplow.collector_endpoints")
@@ -270,13 +270,13 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         Returns:
             The local timezone as an IANA TZ database name if possible, or
             abbreviation otherwise.
-        """  # noqa: F821
+        """
         try:
             return tzlocal.get_localzone_name()
         except Exception:
             return datetime.now().astimezone().tzname()
 
-    def add_contexts(self, *extra_contexts):
+    def add_contexts(self, *extra_contexts) -> None:  # noqa: ANN002
         """Permanently add additional Snowplow contexts to the `Tracker`.
 
         Args:
@@ -285,7 +285,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         self._contexts = (*self._contexts, *extra_contexts)
 
     @contextmanager
-    def with_contexts(self, *extra_contexts) -> Tracker:
+    def with_contexts(self, *extra_contexts) -> Tracker:  # noqa: ANN002
         """Context manager within which the `Tracker` has additional Snowplow contexts.
 
         Args:
@@ -354,7 +354,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             from_value: the old value
             to_value: the new value
         """
-        from meltano.core.tracking.contexts import (  # noqa: WPS442, F811
+        from meltano.core.tracking.contexts import (
             EnvironmentContext,
             ProjectContext,
         )
@@ -427,7 +427,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             The saved telemetry settings.
         """
         try:
-            with open(self.analytics_json_path) as analytics_json_file:
+            with self.analytics_json_path.open() as analytics_json_file:
                 analytics = json.load(analytics_json_file)
         except (OSError, json.JSONDecodeError):
             return TelemetrySettings(None, None, None)
@@ -454,7 +454,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
     def save_telemetry_settings(self) -> None:
         """Attempt to save settings to the 'analytics.json' file."""
         try:
-            with open(self.analytics_json_path, "w") as new_analytics_json_file:
+            with self.analytics_json_path.open("w") as new_analytics_json_file:
                 json.dump(
                     {
                         "client_id": str(self.client_id),
@@ -468,8 +468,9 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
 
     def _uuid_from_str(
         self,
-        from_val: t.Any | None,
-        warn: bool,  # noqa: WPS442
+        from_val: t.Any | None,  # noqa: ANN401
+        *,
+        warn: bool,
     ) -> uuid.UUID | None:
         """Safely convert string to a UUID. Return None if invalid UUID.
 
@@ -516,7 +517,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
             ),
         )
 
-    def setup_exit_event(self):
+    def setup_exit_event(self) -> None:
         """If not already done, register the atexit handler to fire the exit event.
 
         This method also provides this tracker instance to the CLI module for
@@ -537,7 +538,7 @@ class Tracker:  # noqa: WPS214, WPS230 - too many (public) methods
         # As a fallback, use atexit to help ensure the exit event is sent.
         atexit.register(self.track_exit_event)
 
-    def track_exit_event(self):
+    def track_exit_event(self) -> None:
         """Fire exit event."""
         from meltano import cli
 

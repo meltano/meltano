@@ -35,7 +35,7 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
 
     if sys.version_info < (3, 10):
-        from typing import TypeAlias
+        from typing import TypeAlias  # noqa: ICN003
     else:
         from typing_extensions import TypeAlias
 
@@ -51,23 +51,23 @@ PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
 
 
-def walk_parent_directories():
+def walk_parent_directories() -> t.Generator[Path, None, None]:
     """Yield each directory starting with the current up to the root.
 
     Yields:
         parent directories
     """
-    directory = os.getcwd()
+    directory = Path.cwd()
     while True:
         yield directory
 
-        parent_directory = os.path.dirname(directory)
+        parent_directory = directory.parent
         if parent_directory == directory:
             return
         directory = parent_directory
 
 
-class Project(Versioned):  # noqa: WPS214
+class Project(Versioned):
     """Represents a Meltano project."""
 
     __version__ = 1
@@ -80,6 +80,7 @@ class Project(Versioned):  # noqa: WPS214
         self,
         root: StrPath,
         environment: Environment | None = None,
+        *,
         readonly: bool = False,
     ):
         """Initialize a `Project` instance.
@@ -96,7 +97,7 @@ class Project(Versioned):  # noqa: WPS214
             os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
-    def refresh(self, **kwargs) -> None:
+    def refresh(self, **kwargs) -> None:  # noqa: ANN003
         """Refresh the project instance to reflect external changes.
 
         This should be called whenever env vars change, project files change,
@@ -115,7 +116,7 @@ class Project(Versioned):  # noqa: WPS214
             "readonly": self.readonly,
             **kwargs,
         }
-        cls = type(self)  # noqa: WPS117
+        cls = type(self)
         # Clear the dictionary backing `self` to invalidate outdated info,
         # cached properties, etc., then instantiate an up-to-date instance,
         # then steal its attributes to update the dictionary backing `self`.
@@ -125,7 +126,7 @@ class Project(Versioned):  # noqa: WPS214
         self.__dict__.update(cls(**kwargs).__dict__)
 
     @cached_property
-    def config_service(self):
+    def config_service(self):  # noqa: ANN201
         """Get the project config service.
 
         Returns:
@@ -143,7 +144,7 @@ class Project(Versioned):  # noqa: WPS214
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     @cached_property
-    def settings(self):
+    def settings(self):  # noqa: ANN201
         """Get the project settings.
 
         Returns:
@@ -152,7 +153,7 @@ class Project(Versioned):  # noqa: WPS214
         return ProjectSettingsService(self)
 
     @cached_property
-    def plugins(self):
+    def plugins(self):  # noqa: ANN201
         """Get the project plugins.
 
         Returns:
@@ -161,7 +162,7 @@ class Project(Versioned):  # noqa: WPS214
         return ProjectPluginsService(self)
 
     @cached_property
-    def hub_service(self):
+    def hub_service(self):  # noqa: ANN201
         """Get the Meltano Hub service.
 
         Returns:
@@ -170,11 +171,11 @@ class Project(Versioned):  # noqa: WPS214
         return MeltanoHubService(self)
 
     @cached_property
-    def _meltano_interprocess_lock(self):
+    def _meltano_interprocess_lock(self):  # noqa: ANN202
         return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
     @property
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Get environment variables for this project.
 
         Returns:
@@ -189,7 +190,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
-    def activate(cls, project: Project):
+    def activate(cls, project: Project) -> None:
         """Activate the given Project.
 
         Args:
@@ -214,7 +215,7 @@ class Project(Versioned):  # noqa: WPS214
                     else:
                         logger.warning(
                             "Could not create symlink: meltano.exe not "  # noqa: G004
-                            f"present in {str(Path(sys.executable).parent)}",
+                            f"present in {Path(sys.executable).parent!s}",
                         )
                 else:
                     logger.warning(
@@ -242,12 +243,12 @@ class Project(Versioned):  # noqa: WPS214
         cls._default = project
 
     @classmethod
-    def deactivate(cls):
+    def deactivate(cls) -> None:
         """Deactivate the given Project."""
         cls._default = None
 
     @property
-    def file_version(self):
+    def file_version(self):  # noqa: ANN201
         """Get the version of Meltano found in this project's meltano.yml.
 
         Returns:
@@ -257,7 +258,7 @@ class Project(Versioned):  # noqa: WPS214
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Path | str | None = None, activate=True):
+    def find(cls, project_root: Path | str | None = None, *, activate=True):  # noqa: ANN001, ANN206
         """Find a Project.
 
         Args:
@@ -290,7 +291,7 @@ class Project(Versioned):  # noqa: WPS214
                 if project.meltanofile.exists():
                     break
             if not project.meltanofile.exists():
-                raise ProjectNotFound(Project(os.getcwd()))
+                raise ProjectNotFound(Project(Path.cwd()))
 
         readonly = project.settings.get("project_readonly")
         if readonly != project.readonly:
@@ -321,7 +322,7 @@ class Project(Versioned):  # noqa: WPS214
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
-    def meltano_update(self):
+    def meltano_update(self):  # noqa: ANN201
         """Yield the current meltano configuration.
 
         Update the meltanofile if the context ends gracefully.
@@ -344,12 +345,12 @@ class Project(Versioned):  # noqa: WPS214
             try:
                 self.project_files.update(meltano_config.canonical())
             except Exception as err:
-                logger.critical("Could not update meltano.yml: %s", err)  # noqa: WPS323
+                logger.critical("Could not update meltano.yml: %s", err)
                 raise
 
         self.refresh()
 
-    def root_dir(self, *joinpaths: StrPath) -> Path:  # noqa: ARG002
+    def root_dir(self, *joinpaths: StrPath) -> Path:
         """Return the root directory of this project, optionally joined with path.
 
         Args:
@@ -405,7 +406,7 @@ class Project(Versioned):  # noqa: WPS214
             self.refresh(environment=None)
 
     @contextmanager
-    def dotenv_update(self):
+    def dotenv_update(self):  # noqa: ANN201
         """Raise error if project is readonly.
 
         Used in context where .env files would be updated.
@@ -501,7 +502,7 @@ class Project(Versioned):  # noqa: WPS214
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, state_id, *joinpaths: StrPath, make_dirs: bool = True) -> Path:
+    def job_dir(self, state_id, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ANN001
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
@@ -522,7 +523,7 @@ class Project(Versioned):  # noqa: WPS214
     @makedirs
     def job_logs_dir(
         self,
-        state_id,
+        state_id,  # noqa: ANN001
         *joinpaths: StrPath,
         make_dirs: bool = True,
     ) -> Path:
@@ -581,13 +582,13 @@ class Project(Versioned):  # noqa: WPS214
         return self.root_dir("plugins", *joinpaths)
 
     @makedirs
-    def plugin_lock_path(
+    def plugin_lock_path(  # noqa: ANN201
         self,
         plugin_type: str,
         plugin_name: str,
         *,
         variant_name: str | None = None,
-        make_dirs: bool = True,  # noqa: ARG002
+        make_dirs: bool = True,
     ):
         """Path to the project lock file.
 
@@ -611,7 +612,7 @@ class Project(Versioned):  # noqa: WPS214
             make_dirs=make_dirs,
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # noqa: ANN001, ANN204
         """Project equivalence check.
 
         Args:
@@ -622,10 +623,10 @@ class Project(Versioned):  # noqa: WPS214
         """
         return self.root == getattr(other, "root", object())
 
-    def __hash__(self):
+    def __hash__(self):  # noqa: ANN204
         """Project hash.
 
         Returns:
             Project hash.
         """
-        return self.root.__hash__()  # noqa: WPS609
+        return self.root.__hash__()

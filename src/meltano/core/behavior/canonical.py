@@ -15,13 +15,13 @@ if t.TYPE_CHECKING:
 
     from ruamel.yaml import Representer
 
-T = t.TypeVar("T", bound="Canonical")  # noqa: WPS111 (name too short)
+T = t.TypeVar("T", bound="Canonical")  # (name too short)
 
 
 class IdHashBox:
     """Wrapper class that makes the hash of an object its Python ID."""
 
-    def __init__(self, content: t.Any):
+    def __init__(self, content: t.Any):  # noqa: ANN401
         """Initialize the `IdHashBox`.
 
         Parameters:
@@ -38,7 +38,7 @@ class IdHashBox:
         """
         return id(self.content)
 
-    def __eq__(self, other: t.Any) -> bool:
+    def __eq__(self, other: t.Any) -> bool:  # noqa: ANN401
         """Check equality of this instance and some other object.
 
         Parameters:
@@ -63,7 +63,7 @@ class Annotations(t.NamedTuple):
 class AnnotationsMeta(type):
     """Metaclass to intercept and store annotations before calling `__init__`."""
 
-    def __call__(cls, *args: t.Any, **kwargs: t.Any) -> t.Any:
+    def __call__(cls, *args: t.Any, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Create and return an instance of the class this metaclass is applied to.
 
         Args:
@@ -84,11 +84,11 @@ class AnnotationsMeta(type):
         )
         instance = super().__call__(*args, **kwargs)
         # Store the annotations for later re-insertion during serialization
-        instance._annotations = extracted_annotations  # noqa: WPS437
+        instance._annotations = extracted_annotations
         return instance
 
 
-class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
+class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
     """Defines an object that can be represented as a subset of its attributes.
 
     Its purpose is to be serializable as the smallest possible form.
@@ -122,7 +122,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         self._defaults = {}
 
     @classmethod
-    def _canonize(cls, val: t.Any) -> t.Any:
+    def _canonize(cls, val: t.Any) -> t.Any:  # noqa: ANN401
         """Call `as_canonical` on `val`, respecting `Canonical` subclasses.
 
         Args:
@@ -138,8 +138,8 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
     @classmethod
     def as_canonical(
         cls: type[T],
-        target: t.Any,
-    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:
+        target: t.Any,  # noqa: ANN401
+    ) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
         """Return a canonical representation of the given instance.
 
         Args:
@@ -150,11 +150,11 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         if isinstance(target, Canonical):
             result = CommentedMap((key, cls._canonize(val)) for key, val in target)
-            if target._annotations is not None:  # noqa: WPS437
+            if target._annotations is not None:
                 result.insert(
-                    target._annotations.index,  # noqa: WPS437
+                    target._annotations.index,
                     "annotations",
-                    target._annotations.data,  # noqa: WPS437
+                    target._annotations.data,
                 )
             target.attrs.copy_attributes(result)
             return result
@@ -177,7 +177,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
 
         return copy.deepcopy(target)
 
-    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | t.Any:
+    def canonical(self) -> dict | list | CommentedMap | CommentedSeq | t.Any:  # noqa: ANN401
         """Return a canonical representation of the current instance.
 
         Returns:
@@ -198,7 +198,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         return type(self)(*args, **{**self.canonical(), **kwargs})
 
     @classmethod
-    def parse(cls: type[T], obj: t.Any) -> T:
+    def parse(cls: type[T], obj: t.Any) -> T:  # noqa: ANN401
         """Parse a 'Canonical' object from a dictionary or return the instance.
 
         Args:
@@ -244,7 +244,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return self._dict
 
-    def is_attr_set(self, attr):
+    def is_attr_set(self, attr):  # noqa: ANN001, ANN201
         """Return whether specified attribute has a non-default/fallback value set.
 
         Args:
@@ -255,7 +255,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return self._dict.get(attr) is not None
 
-    def __getattr__(self, attr: str) -> t.Any:  # noqa: C901
+    def __getattr__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Return the value of the given attribute.
 
         Args:
@@ -289,19 +289,19 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
 
         return value
 
-    def __setattr__(self, attr: str, value: t.Any):
+    def __setattr__(self, attr: str, value: t.Any) -> None:  # noqa: ANN401
         """Set the given attribute to the given value.
 
         Args:
             attr: Attribute to set.
             value: Value to set.
         """
-        if attr.startswith("_") or hasattr(type(self), attr):  # noqa: WPS421
+        if attr.startswith("_") or hasattr(type(self), attr):
             super().__setattr__(attr, value)
         else:
             self._dict[attr] = value
 
-    def __getitem__(self, attr: str) -> t.Any:
+    def __getitem__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Return the value of the given attribute.
 
         Args:
@@ -312,7 +312,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return getattr(self, attr)
 
-    def __setitem__(self, attr: str, value: t.Any) -> None:
+    def __setitem__(self, attr: str, value: t.Any) -> None:  # noqa: ANN401
         """Set the given attribute to the given value.
 
         Args:
@@ -324,7 +324,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return setattr(self, attr, value)
 
-    def __iter__(self):
+    def __iter__(self):  # noqa: ANN204
         """Return an iterator over the attributes set on the current instance.
 
         Yields:
@@ -352,7 +352,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
             else:
                 yield (key, val)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of attributes set on the current instance.
 
         Returns:
@@ -360,7 +360,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         """
         return len(self._dict)
 
-    def __contains__(self, obj: t.Any):
+    def __contains__(self, obj: t.Any) -> bool:  # noqa: ANN401
         """Return whether the current instance contains the given object.
 
         Args:
@@ -388,7 +388,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
                 setattr(self, key, val)
 
     @classmethod
-    def yaml(cls, dumper: yaml.BaseDumper, obj: t.Any) -> yaml.MappingNode:
+    def yaml(cls, dumper: yaml.BaseDumper, obj: t.Any) -> yaml.MappingNode:  # noqa: ANN401
         """YAML serializer for Canonical objects.
 
         Args:
@@ -405,7 +405,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         )
 
     @classmethod
-    def to_yaml(cls, representer: Representer, obj: t.Any):
+    def to_yaml(cls, representer: Representer, obj: t.Any):  # noqa: ANN206, ANN401
         """YAML serializer for Canonical objects.
 
         Args:
@@ -430,7 +430,7 @@ class Canonical(metaclass=AnnotationsMeta):  # noqa: WPS214 (too many methods)
         Returns:
             A standalone plugin definition.
         """
-        with open(path) as file:
+        with open(path) as file:  # noqa: PTH123
             return cls.parse(json.load(file))
 
 

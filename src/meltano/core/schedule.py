@@ -24,7 +24,7 @@ CRON_INTERVALS: dict[str, str | None] = {
 }
 
 
-class Schedule(NameEq, Canonical):  # noqa: WPS230
+class Schedule(NameEq, Canonical):
     """A schedule is an elt command or a job configured to run at a certain interval."""
 
     name: str
@@ -124,7 +124,7 @@ class Schedule(NameEq, Canonical):  # noqa: WPS230
             f"--state-id={self.name}",
         ]
 
-    def last_successful_run(self, session) -> StateJob:
+    def last_successful_run(self, session) -> StateJob:  # noqa: ANN001
         """Return the last successful run for this schedule.
 
         Args:

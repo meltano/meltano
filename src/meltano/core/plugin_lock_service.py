@@ -64,6 +64,7 @@ class PluginLock:
 
     def load(
         self,
+        *,
         create: bool = False,
         loader: t.Callable = lambda x: StandalonePlugin(**json.load(x)),
     ) -> StandalonePlugin:
@@ -81,8 +82,8 @@ class PluginLock:
             The loaded plugin.
         """
 
-        def _load():
-            with open(self.path) as lockfile:
+        def _load():  # noqa: ANN202
+            with self.path.open() as lockfile:
                 return loader(lockfile)
 
         try:
@@ -119,7 +120,7 @@ class PluginLockService:
         plugin: ProjectPlugin,
         *,
         exists_ok: bool = False,
-    ):
+    ) -> None:
         """Save the plugin lockfile.
 
         Args:
