@@ -665,3 +665,18 @@ class TestDotEnvStoreManager:
     def test_unset_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
         with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
             subject.unset("undefined", [], setting_def=None)
+
+    def test_reset_readonly_project_failure(
+        self,
+        project,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(project, "readonly", True)
+        settings_service = DummySettingsService(project)
+        manager = DotEnvStoreManager(settings_service)
+
+        with pytest.raises(
+            StoreNotSupportedError,
+            match="This Meltano project is deployed as read-only",
+        ):
+            manager.reset()
