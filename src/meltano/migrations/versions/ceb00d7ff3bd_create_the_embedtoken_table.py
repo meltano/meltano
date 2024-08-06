@@ -1,10 +1,13 @@
-"""Create the EmbedToken table
+"""Create the EmbedToken table.
 
 Revision ID: ceb00d7ff3bd
 Revises: 990c0665f3ce
 Create Date: 2020-01-27 09:59:36.427138
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -21,7 +24,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -35,5 +38,5 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_table("embed_tokens")

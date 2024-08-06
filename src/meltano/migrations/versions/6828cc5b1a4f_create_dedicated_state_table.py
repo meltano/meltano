@@ -1,21 +1,21 @@
-"""Create dedicated state table
+"""Create dedicated state table.
 
 Revision ID: 6828cc5b1a4f
 Revises: 5b43800443d1
 Create Date: 2022-09-26 12:47:53.512069
 
 """
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime, timedelta
 from enum import Enum
 
+import sqlalchemy
 import sqlalchemy as sa
 from alembic import op
-import sqlalchemy
 from sqlalchemy import Column, MetaData, func, select, types
-from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm.session import Session
@@ -35,6 +35,7 @@ depends_on = None
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)
+
 
 # Copied from core/job_state.py
 class JobState(SystemModel):
@@ -57,7 +58,7 @@ class JobState(SystemModel):
     completed_state = Column(MutableDict.as_mutable(JSONEncodedDict))
 
     @classmethod
-    def from_job_history(cls, session: Session, state_id: str):
+    def from_job_history(cls, session: Session, state_id: str):  # noqa: ANN206, D417
         """Build JobState from job run history.
 
         Args:
@@ -109,7 +110,7 @@ class JobFinder:
         """
         self.state_id = state_id
 
-    def latest(self, session):
+    def latest(self, session):  # noqa: ANN001, ANN201
         """Get the latest state for this instance's state ID.
 
         Args:
@@ -125,7 +126,7 @@ class JobFinder:
             .first()
         )
 
-    def successful(self, session):
+    def successful(self, session):  # noqa: ANN001, ANN201
         """Get all successful jobs for this instance's state ID.
 
         Args:
@@ -135,12 +136,12 @@ class JobFinder:
             All successful jobs for this instance's state ID
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.SUCCESS)  # noqa: WPS465
+            (Job.job_name == self.state_id)
+            & (Job.state == State.SUCCESS)
             & Job.ended_at.isnot(None)
         )
 
-    def running(self, session):
+    def running(self, session):  # noqa: ANN001, ANN201
         """Find states in the running state.
 
         Args:
@@ -150,11 +151,10 @@ class JobFinder:
             All runnings states for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id)  # noqa: WPS465
-            & (Job.state == State.RUNNING)
+            (Job.job_name == self.state_id) & (Job.state == State.RUNNING)
         )
 
-    def latest_success(self, session):
+    def latest_success(self, session):  # noqa: ANN001, ANN201
         """Get the latest successful state for this instance's state ID.
 
         Args:
@@ -165,7 +165,7 @@ class JobFinder:
         """
         return self.successful(session).order_by(Job.ended_at.desc()).first()
 
-    def latest_running(self, session):
+    def latest_running(self, session):  # noqa: ANN001, ANN201
         """Find the most recent state in the running state, if any.
 
         Args:
@@ -176,7 +176,7 @@ class JobFinder:
         """
         return self.running(session).order_by(Job.started_at.desc()).first()
 
-    def with_payload(self, session, flags=0, since=None, state=None):
+    def with_payload(self, session, flags=0, since=None, state=None):  # noqa: ANN001, ANN201
         """Get all states for this instance's state ID matching the given args.
 
         Args:
@@ -191,9 +191,9 @@ class JobFinder:
         query = (
             session.query(Job)
             .filter(
-                (Job.job_name == self.state_id)  # noqa: WPS465
-                & (Job.payload_flags != 0)  # noqa: WPS465
-                & (Job.payload_flags.op("&")(flags) == flags)  # noqa: WPS465
+                (Job.job_name == self.state_id)
+                & (Job.payload_flags != 0)
+                & (Job.payload_flags.op("&")(flags) == flags)
                 & Job.ended_at.isnot(None)
             )
             .order_by(Job.ended_at.asc())
@@ -205,7 +205,7 @@ class JobFinder:
             query = query.filter(Job.state == state)
         return query
 
-    def latest_with_payload(self, session, **kwargs):
+    def latest_with_payload(self, session, **kwargs):  # noqa: ANN001, ANN003, ANN201
         """Return the latest state matching the given kwargs.
 
         Args:
@@ -223,7 +223,7 @@ class JobFinder:
         )
 
     @classmethod
-    def all_stale(cls, session):
+    def all_stale(cls, session):  # noqa: ANN001, ANN206
         """Return all stale states.
 
         Args:
@@ -232,25 +232,25 @@ class JobFinder:
         Returns:
             All stale states with any state ID
         """
-        now = datetime.utcnow()
+        now = datetime.utcnow()  # noqa: DTZ003
         last_valid_heartbeat_at = now - timedelta(minutes=HEARTBEAT_VALID_MINUTES)
         last_valid_started_at = now - timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
 
         return session.query(Job).filter(
-            (Job.state == State.RUNNING)  # noqa: WPS465
+            (Job.state == State.RUNNING)
             & (
                 (
-                    Job.last_heartbeat_at.isnot(None)  # noqa: WPS465
+                    Job.last_heartbeat_at.isnot(None)
                     & (Job.last_heartbeat_at < last_valid_heartbeat_at)
                 )
                 | (
-                    Job.last_heartbeat_at.is_(None)  # noqa: WPS465
+                    Job.last_heartbeat_at.is_(None)
                     & (Job.started_at < last_valid_started_at)
                 )
             )
         )
 
-    def stale(self, session):
+    def stale(self, session):  # noqa: ANN001, ANN201
         """Return stale states with the instance's state ID.
 
         Args:
@@ -261,7 +261,7 @@ class JobFinder:
         """
         return self.all_stale(session).filter(Job.job_name == self.state_id)
 
-    def get_all(self, session: object, since=None):
+    def get_all(self, session: object, since=None):  # noqa: ANN001, ANN201
         """Return all state with the instance's state ID.
 
         Args:
@@ -305,7 +305,7 @@ class Payload(IntFlag):
     INCOMPLETE_STATE = 2
 
 
-class Job(SystemModel):  # noqa: WPS214
+class Job(SystemModel):
     """Model class that represents a `meltano elt` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
@@ -328,7 +328,7 @@ class Job(SystemModel):  # noqa: WPS214
     trigger = Column(types.String, default="")
 
 
-def upgrade():
+def upgrade() -> None:
     # Create state table
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -361,7 +361,7 @@ def upgrade():
     session.commit()
 
 
-def downgrade():
+def downgrade() -> None:
     # Remove job_state table
     # Job run history is still maintained, so no need to copy
     op.drop_table("state")

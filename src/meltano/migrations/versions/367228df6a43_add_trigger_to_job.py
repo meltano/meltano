@@ -1,10 +1,13 @@
-"""Add 'trigger' to Job
+"""Add 'trigger' to Job.
 
 Revision ID: 367228df6a43
 Revises: 87d9638f6ac6
 Create Date: 2020-02-19 14:40:30.229756
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -20,12 +23,12 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
     op.add_column("job", sa.Column("trigger", sa.String(max_string_length)))
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_column("job", "trigger")
