@@ -41,7 +41,7 @@ class AutomaticPackageUpgradeError(Exception):
         self.instructions = instructions
 
 
-class UpgradeService:  # noqa: WPS214
+class UpgradeService:
     """Meltano upgrade service."""
 
     def __init__(self, engine: Engine, project: Project):
@@ -54,7 +54,7 @@ class UpgradeService:  # noqa: WPS214
         self.project = project
         self.engine = engine
 
-    def _upgrade_package(self, pip_url: str | None, force: bool) -> bool:
+    def _upgrade_package(self, pip_url: str | None, *, force: bool) -> bool:
         fail_reason = None
         instructions = ""
 
@@ -65,7 +65,7 @@ class UpgradeService:  # noqa: WPS214
             fail_reason = "it is installed from source"
             instructions = f"navigate to `{meltano_dir}` and run `git pull`"
 
-        elif os.path.exists("/.dockerenv"):
+        elif os.path.exists("/.dockerenv"):  # noqa: PTH110
             fail_reason = "it is installed inside Docker"
             instructions = (
                 "pull the latest Docker image using "
@@ -95,7 +95,12 @@ class UpgradeService:  # noqa: WPS214
 
         return True
 
-    def upgrade_package(self, pip_url: str | None = None, force: bool = False) -> bool:
+    def upgrade_package(
+        self,
+        pip_url: str | None = None,
+        *,
+        force: bool = False,
+    ) -> bool:
         """Upgrade the Meltano package.
 
         Args:
@@ -108,7 +113,7 @@ class UpgradeService:  # noqa: WPS214
         click.secho("Upgrading `meltano` package...", fg="blue")
 
         try:
-            self._upgrade_package(pip_url, force)
+            self._upgrade_package(pip_url=pip_url, force=force)
         except AutomaticPackageUpgradeError as err:
             msg = click.style(
                 "The `meltano` package could not be upgraded automatically",
@@ -123,7 +128,7 @@ class UpgradeService:  # noqa: WPS214
         click.echo()
         return True
 
-    def update_files(self):
+    def update_files(self) -> None:
         """Update the files managed by Meltano inside the current project.
 
         Raises:
@@ -141,12 +146,12 @@ class UpgradeService:  # noqa: WPS214
                 self.project,
                 file_plugins,
                 reason=PluginInstallReason.UPGRADE,
-            )
+            ),
         )
         if not success:
             raise MeltanoError("Failed to upgrade plugin(s)")  # noqa: EM101
 
-    def migrate_database(self):
+    def migrate_database(self) -> None:
         """Migrate the Meltano database.
 
         Raises:
@@ -162,7 +167,7 @@ class UpgradeService:  # noqa: WPS214
         except MigrationError as err:
             raise UpgradeError(str(err)) from err
 
-    def migrate_state(self):
+    def migrate_state(self) -> None:
         """Move cloud state files to deduplicated prefix paths.
 
         See: https://github.com/meltano/meltano/issues/7938
@@ -191,7 +196,7 @@ class UpgradeService:  # noqa: WPS214
                     manager.copy_file(filepath, new_path)
                     click.secho(f"Copied state from {filepath} to {new_path}")
 
-    def upgrade(self, skip_package: bool = False, **kwargs):  # noqa: WPS213
+    def upgrade(self, *, skip_package: bool = False, **kwargs) -> None:  # noqa: ANN003
         """Upgrade Meltano.
 
         Note: this is not actually called as part of the `meltano upgrade` command

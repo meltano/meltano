@@ -55,17 +55,18 @@ if t.TYPE_CHECKING:
 def compile_command(
     project: Project,
     ctx: click.Context,
+    *,
     directory: Path,
     lint: bool,
     indent: int,
-):
-    """
-    Compile a Meltano project into environment-specific manifest files.
+) -> None:
+    """Compile a Meltano project into environment-specific manifest files.
 
     This command is in beta, and subject to change without corresponding semantic version updates.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#compile
-    """  # noqa: E501
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#compile
+    """  # noqa: D301, E501
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
@@ -90,7 +91,7 @@ def compile_command(
         project.refresh(environment=environment)
         manifest = Manifest(project=project, path=path, check_schema=lint)
         try:
-            with open(path, "w") as manifest_file:
+            with path.open("w") as manifest_file:
                 json.dump(
                     manifest.data,
                     manifest_file,

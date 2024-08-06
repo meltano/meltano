@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
 
 EXIT_CODE_OK = 0
 
-T = t.TypeVar("T", bound="ValidationsRunner")  # noqa: WPS111
+T = t.TypeVar("T", bound="ValidationsRunner")
 
 
 class ValidationOutcome(str, Enum):
@@ -35,7 +35,7 @@ class ValidationOutcome(str, Enum):
         return "green" if self == self.SUCCESS else "red"
 
     @classmethod
-    def from_exit_code(cls, exit_code: int):
+    def from_exit_code(cls, exit_code: int):  # noqa: ANN206
         """Create validation outcome from an exit code.
 
         Args:
@@ -106,7 +106,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         if not self.tests_selection:
             return {}
 
-        results = {}
+        results = {}  # type: ignore[var-annotated]
         async with self.invoker.prepared(session):
             for name, selected in self.tests_selection.items():
                 if selected:
@@ -117,6 +117,7 @@ class ValidationsRunner(metaclass=ABCMeta):
     def collect(
         cls: type[T],
         project: Project,
+        *,
         select_all: bool = True,
     ) -> dict[str, T]:
         """Collect all tests for CLI invocation.
@@ -140,7 +141,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         }
 
     @abstractmethod
-    async def run_test(self, name: str):
+    async def run_test(self, name: str) -> t.NoReturn:
         """Run a test command.
 
         Args:

@@ -74,7 +74,7 @@ class StateBackend(str, Enum):
         return self._managers[self]
 
 
-def state_store_manager_from_project_settings(  # noqa: WPS210
+def state_store_manager_from_project_settings(
     settings_service: ProjectSettingsService,
     session: Session | None = None,
 ) -> StateStoreManager:
@@ -98,7 +98,7 @@ def state_store_manager_from_project_settings(  # noqa: WPS210
     # AND top-level state_backend settings
     setting_defs = filter(
         lambda setting_def: setting_def.name.startswith(
-            f"state_backend.{'gcs' if scheme == 'gs' else scheme}",  # noqa: WPS509
+            f"state_backend.{'gcs' if scheme == 'gs' else scheme}",
         )
         or (
             setting_def.name.startswith("state_backend")

@@ -25,7 +25,7 @@ except ImportError:
 class MissingAzureError(Exception):
     """Raised when azure is required but no installed."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize a MissingAzureError."""
         super().__init__(
             "azure required but not installed. Install meltano[azure] to use Azure Blob Storage as a state backend.",  # noqa: E501
@@ -33,7 +33,7 @@ class MissingAzureError(Exception):
 
 
 @contextmanager
-def requires_azure():
+def requires_azure():  # noqa: ANN201
     """Raise MissingAzureError if azure is required but missing in context.
 
     Raises:
@@ -57,7 +57,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         connection_string: str | None = None,
         prefix: str | None = None,
         storage_account_url: str | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -77,7 +77,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
         if not self.parsed.hostname:
             raise MeltanoError(
                 f"Azure state backend URI must include a container name: {self.uri}",  # noqa: EM102
-                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",  # noqa: E501
+                "Verify state backend URI. Must be in the form of azure://<container>/<prefix>",
             )
 
         self.container_name = self.parsed.hostname
@@ -129,7 +129,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
             )
 
-    def delete(self, file_path: str):
+    def delete(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -155,7 +155,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             The next file in the backend.
         """
         container_client = self.client.get_container_client(self.container_name)
-        for blob in container_client.list_blobs(  # noqa: WPS526
+        for blob in container_client.list_blobs(
             name_starts_with=self.prefix.lstrip("/"),
         ):
             yield blob.name

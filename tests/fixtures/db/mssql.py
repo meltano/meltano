@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     from sqlalchemy.engine import URL
 
 
-def recreate_database(engine, db_name):
+def recreate_database(engine, db_name) -> None:
     """Drop & Create a new database.
 
     We need to use the master connection to do this.
@@ -91,4 +91,4 @@ def pg_stats(request, session):
     from meltano.core.job import Job
 
     jobs = session.query(Job).all()
-    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: TID251, WPS323
+    logging.info("%s created %d Job.", request.node.name, len(jobs))  # noqa: TID251

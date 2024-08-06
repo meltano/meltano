@@ -40,7 +40,7 @@ class JsonschemaRefLocationParser:
         self.target_ref = target_ref
         self._resolved_refs: dict[str, t.Any] = {}
 
-    def parse(  # noqa: C901
+    def parse(
         self,
         schema: dict[str, t.Any] | None = None,
         path: tuple[str, ...] = (),
@@ -128,4 +128,4 @@ class JsonschemaRefLocationParser:
         Returns:
             A jsonschema ref to the same location as the provided path.
         """
-        return "#" + "".join(path).replace(".", "/").replace("[]", "")  # noqa: WPS336
+        return "#" + "".join(path).replace(".", "/").replace("[]", "")

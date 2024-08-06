@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import os
 import typing as t
@@ -25,12 +25,12 @@ class SizeThresholdJobLogException(Exception):
     """A Job log exceeds the `MAX_FILE_SIZE`."""
 
 
-class JobLoggingService:
-    def __init__(self, project: Project):
+class JobLoggingService:  # noqa: D101
+    def __init__(self, project: Project):  # noqa: D107
         self.project = project
 
     @makedirs
-    def logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):  # noqa: ARG002
+    def logs_dir(self, state_id, *joinpaths, make_dirs: bool = True):  # noqa: ANN001, ANN002, ANN201
         """Return the logs directory for a given state_id.
 
         Args:
@@ -62,16 +62,16 @@ class JobLoggingService:
         return self.logs_dir(state_id, str(run_id), file_name)
 
     @contextmanager
-    def create_log(self, state_id, run_id, file_name="elt.log"):
+    def create_log(self, state_id, run_id, file_name="elt.log"):  # noqa: ANN001, ANN201
         """Open a new log file for logging and yield it.
 
         Log will be created inside the logs_dir, which is
         `.meltano/logs/elt/:state_id/:run_id`
-        """  # noqa: DAR101, DAR301
+        """
         log_file_name = self.generate_log_name(state_id, run_id, file_name)
 
         try:
-            with open(log_file_name, "w") as log_file:
+            with log_file_name.open("w") as log_file:
                 yield log_file
         except OSError:
             # Don't stop the Job running if you can not open the log file
@@ -80,10 +80,10 @@ class JobLoggingService:
                 f"Could open log file {log_file_name!r} for writing. "  # noqa: G004
                 "Using `/dev/null`",
             )
-            with open(os.devnull, "w") as log_file:
+            with open(os.devnull, "w") as log_file:  # noqa: PTH123
                 yield log_file
 
-    def get_latest_log(self, state_id) -> str:
+    def get_latest_log(self, state_id) -> str:  # noqa: ANN001
         """Get the latest log.
 
         Args:
@@ -92,7 +92,7 @@ class JobLoggingService:
         Returns:
             The contents of the most recent log for any ELT job that ran with
             the provided `state_id`.
-        """  # noqa: DAR301, DAR401
+        """
         try:
             latest_log = next(iter(self.get_all_logs(state_id)))
 
@@ -112,8 +112,8 @@ class JobLoggingService:
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 
-    def get_downloadable_log(self, state_id):
-        """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501, DAR101, DAR201, DAR401
+    def get_downloadable_log(self, state_id):  # noqa: ANN001, ANN201
+        """Get the `*.log` file of the most recent log for any ELT job that ran with the provided `state_id`."""  # noqa: E501
         try:
             latest_log = next(iter(self.get_all_logs(state_id)))
             return str(latest_log.resolve())
@@ -126,7 +126,7 @@ class JobLoggingService:
                 f"Cannot log for job with ID '{state_id}': '{latest_log}' is missing.",  # noqa: EM102
             ) from ex
 
-    def get_all_logs(self, state_id):
+    def get_all_logs(self, state_id):  # noqa: ANN001, ANN201
         """Get all the log files for any ELT job that ran with the provided `state_id`.
 
         The result is ordered so that the most recent is first on the list.
@@ -137,11 +137,11 @@ class JobLoggingService:
                 for logs_dir in self.logs_dirs(state_id)
                 for log_file in logs_dir.glob("**/*.log")
             ],
-            key=lambda path: os.stat(path).st_ctime_ns,
+            key=lambda path: path.stat().st_ctime_ns,
             reverse=True,
         )
 
-    def delete_all_logs(self, state_id) -> None:
+    def delete_all_logs(self, state_id) -> None:  # noqa: ANN001
         """Delete all the logs for any ELT job that ran with the provided `state_id`.
 
         Args:
@@ -150,11 +150,11 @@ class JobLoggingService:
         for log_path in self.get_all_logs(state_id):
             log_path.unlink()
 
-    def legacy_logs_dir(self, state_id, *joinpaths):
+    def legacy_logs_dir(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
         job_dir = self.project.run_dir("elt").joinpath(slugify(state_id), *joinpaths)
         return job_dir if job_dir.exists() else None
 
-    def logs_dirs(self, state_id, *joinpaths):
+    def logs_dirs(self, state_id, *joinpaths):  # noqa: ANN001, ANN002, ANN201, D102
         logs_dir = self.logs_dir(state_id, *joinpaths)
         legacy_logs_dir = self.legacy_logs_dir(state_id, *joinpaths)
 

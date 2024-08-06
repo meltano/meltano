@@ -15,7 +15,7 @@ if t.TYPE_CHECKING:
 
 
 class TestConnectionRetries:
-    def test_ping_failure(self):
+    def test_ping_failure(self) -> None:
         engine_mock = Mock()
 
         # check if OperationalError is raised if a connection can't be made
@@ -45,7 +45,7 @@ class TestProjectEngine:
         self,
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
-    ):
+    ) -> None:
         with tmp_path.joinpath("meltano.yml").open("w") as meltano_yml:
             yaml.dump(
                 {

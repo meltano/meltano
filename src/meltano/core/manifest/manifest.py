@@ -39,7 +39,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
     if sys.version_info >= (3, 10):
-        from typing import TypeAlias
+        from typing import TypeAlias  # noqa: ICN003
     else:
         from typing_extensions import TypeAlias
 
@@ -76,9 +76,9 @@ class YamlLimitedSafeLoader(type):
 
     def __new__(
         cls,
-        name,
-        bases,
-        namespace,
+        name,  # noqa: ANN001
+        bases,  # noqa: ANN001
+        namespace,  # noqa: ANN001
         do_not_resolve: Iterable[str],
     ) -> YamlLimitedSafeLoader:
         """Generate a new instance of this metaclass.
@@ -116,10 +116,10 @@ class YamlNoTimestampSafeLoader(
     """A safe YAML loader that leaves timestamps as strings."""
 
 
-class Manifest:  # noqa: WPS214
+class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(self, project: Project, path: Path, check_schema: bool) -> None:
+    def __init__(self, project: Project, path: Path, *, check_schema: bool) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data
@@ -141,7 +141,7 @@ class Manifest:  # noqa: WPS214
         self._meltano_file = self.project.meltanofile.read_text()
         self.path = path
         self.check_schema = check_schema
-        with open(MANIFEST_SCHEMA_PATH) as manifest_schema_file:
+        with MANIFEST_SCHEMA_PATH.open() as manifest_schema_file:
             manifest_schema = json.load(manifest_schema_file)
         self._env_locations = meltano_config_env_locations(manifest_schema)
 
@@ -226,7 +226,7 @@ class Manifest:  # noqa: WPS214
         )
 
         # Merge the locked plugins with the root-level plugins from `meltano.yml`:
-        manifest["plugins"] = deep_merge(  # noqa: WPS204
+        manifest["plugins"] = deep_merge(
             _plugins_by_name_by_type(manifest["plugins"]),
             _plugins_by_name_by_type(locked_plugins),
         )
@@ -254,7 +254,7 @@ class Manifest:  # noqa: WPS214
         self,
         data: t.MutableMapping[str, t.Any],
         key: str,
-        value: t.Any,
+        value: t.Any,  # noqa: ANN401
         _: tuple[t.Any, ...] | None = None,
     ) -> None:
         """Merge behavior for `deep_merge` that expands env vars when the key is "env".
@@ -363,7 +363,7 @@ class Manifest:  # noqa: WPS214
             # expects there to be exactly one environment. It is omitted from
             # the final output, and during processing it only affects things if
             # it has content, which this mock does not.
-            manifest["environments"] = [{"name": "mock"}]  # noqa: WPS204
+            manifest["environments"] = [{"name": "mock"}]
         else:
             manifest["environments"] = [
                 x
@@ -438,7 +438,7 @@ def _plugins_by_name_by_type(
 
 
 def _locations_trie(paths: Iterable[Iterable[str]]) -> Trie:
-    def defaultdict_defaultdict():
+    def defaultdict_defaultdict():  # noqa: ANN202
         return defaultdict(defaultdict_defaultdict)
 
     root = defaultdict_defaultdict()

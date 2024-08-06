@@ -31,7 +31,7 @@ class ProcessWaitError(Exception):
     """Raised when a process can be waited on."""
 
 
-class InvokerBase:  # noqa: WPS230, WPS214
+class InvokerBase:
     """Base class for creating IOBlock's built on top of existing Meltano plugins."""
 
     def __init__(
@@ -82,7 +82,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         """
         return self.invoker.plugin.name
 
-    async def start(self, *args, **kwargs):
+    async def start(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Invoke the process asynchronously.
 
         Args:
@@ -103,7 +103,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         except Exception as err:
             raise RunnerError(f"Cannot start plugin: {err}") from err  # noqa: EM102
 
-    async def stop(self, kill: bool = True):
+    async def stop(self, *, kill: bool = True) -> None:
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:
@@ -222,7 +222,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         else:
             raise IOLinkError("IO capture already in flight")  # noqa: EM101
 
-    def stderr_link(self, dst: SubprocessOutputWriter):
+    def stderr_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stderr_link to instruct block to link/write stderr content to dst.
 
         Args:
@@ -236,7 +236,7 @@ class InvokerBase:  # noqa: WPS230, WPS214
         else:
             raise IOLinkError("IO capture already in flight")  # noqa: EM101
 
-    async def pre(self, context) -> None:
+    async def pre(self, context) -> None:  # noqa: ANN001
         """Pre triggers preparation of the underlying plugin.
 
         Args:
@@ -318,7 +318,7 @@ class SingerBlock(InvokerBase, IOBlock):
         """
         return "state" in self.invoker.capabilities
 
-    async def start(self):
+    async def start(self) -> None:
         """Start the SingerBlock by invoking the underlying plugin.
 
         Raises:
@@ -338,7 +338,7 @@ class SingerBlock(InvokerBase, IOBlock):
         except Exception as err:
             raise RunnerError(f"Cannot start plugin {self.string_id}: {err}") from err  # noqa: EM102
 
-    async def stop(self, kill: bool = True):
+    async def stop(self, *, kill: bool = True) -> None:
         """Stop (kill) the underlying process and cancel output proxying.
 
         Args:

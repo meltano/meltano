@@ -24,8 +24,7 @@ class MeltanoInvoker:
     """Class used to find and invoke all commands passed to it."""
 
     def __init__(self, project: Project):
-        """
-        Load the class with the project and service settings.
+        """Load the class with the project and service settings.
 
         Args:
             project: Project instance.
@@ -57,7 +56,7 @@ class MeltanoInvoker:
             env=self._executable_env(env),
         )
 
-    def _executable_path(self, command):
+    def _executable_path(self, command):  # noqa: ANN001, ANN202
         if command == MELTANO_COMMAND:
             # This symlink is created by Project.activate
             executable_symlink = self.project.run_dir().joinpath("bin")
@@ -65,7 +64,7 @@ class MeltanoInvoker:
                 return str(executable_symlink)
 
         executable = Path(
-            os.path.dirname(sys.executable),
+            os.path.dirname(sys.executable),  # noqa: PTH120
             f"{command}.exe" if platform.system() == "Windows" else command,
         )
 

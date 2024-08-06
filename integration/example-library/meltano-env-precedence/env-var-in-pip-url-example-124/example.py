@@ -7,4 +7,4 @@ import sys
 
 def echo() -> None:
     """Echo process arguments."""
-    print(*sys.argv[1:])  # noqa: T201, WPS421
+    print(*sys.argv[1:])  # noqa: T201

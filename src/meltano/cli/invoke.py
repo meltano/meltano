@@ -81,9 +81,10 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
-async def invoke(  # noqa: C901
+async def invoke(
     project: Project,
     ctx: click.Context,
+    *,
     plugin_type: str,
     dump: str,
     list_commands: bool,
@@ -92,12 +93,12 @@ async def invoke(  # noqa: C901
     install_plugins: InstallPlugins,
     containers: bool = False,
     print_var: str | None = None,
-):
-    """
-    Invoke a plugin's executable with specified arguments.
+) -> None:
+    """Invoke a plugin's executable with specified arguments.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#invoke
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#invoke
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
@@ -135,12 +136,12 @@ async def invoke(  # noqa: C901
     invoker = invoker_factory(project, plugin)
     try:
         exit_code = await _invoke(
-            invoker,
-            plugin_args,
-            session,
-            dump,
-            command_name,
-            containers,
+            invoker=invoker,
+            plugin_args=plugin_args,
+            session=session,
+            dump=dump,
+            command_name=command_name,
+            containers=containers,
             print_var=print_var,
         )
     except Exception as invoke_err:
@@ -154,7 +155,8 @@ async def invoke(  # noqa: C901
     sys.exit(exit_code)
 
 
-async def _invoke(
+async def _invoke(  # noqa: ANN202
+    *,
     invoker: PluginInvoker,
     plugin_args: str,
     session: sessionmaker,
@@ -176,7 +178,7 @@ async def _invoke(
             if dump:
                 await dump_file(invoker, dump)
                 exit_code = 0
-            elif (  # noqa: WPS337
+            elif (
                 containers
                 and command_name is not None
                 and command.container_spec is not None
@@ -201,7 +203,7 @@ async def _invoke(
     return exit_code
 
 
-def do_list_commands(plugin):
+def do_list_commands(plugin) -> None:  # noqa: ANN001
     """List the commands supported by plugin."""
     if not plugin.supported_commands:
         click.secho(
@@ -220,7 +222,7 @@ def do_list_commands(plugin):
         click.echo(desc)
 
 
-async def dump_file(invoker: PluginInvoker, file_id: str):
+async def dump_file(invoker: PluginInvoker, file_id: str) -> None:
     """Dump file."""
     try:
         content = await invoker.dump(file_id)
@@ -228,4 +230,4 @@ async def dump_file(invoker: PluginInvoker, file_id: str):
         raise CliError(f"Could not find {file_id}") from err  # noqa: EM102
     except Exception as err:
         raise CliError(f"Could not dump {file_id}: {err}") from err  # noqa: EM102
-    print(content)  # noqa: T201, WPS421
+    print(content)  # noqa: T201

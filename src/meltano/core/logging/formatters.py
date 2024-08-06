@@ -30,6 +30,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN = (
 
 def rich_exception_formatter_factory(
     color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
+    *,
     no_color: bool | None = None,
     show_locals: bool = False,
 ) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:
@@ -49,7 +50,7 @@ def rich_exception_formatter_factory(
     """
 
     def _traceback(
-        sio,
+        sio,  # noqa: ANN001
         exc_info: tuple[type[t.Any], BaseException, TracebackType | None],
     ) -> None:
         sio.write("\n")
@@ -83,6 +84,7 @@ def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormat
 
 
 def console_log_formatter(
+    *,
     colors: bool = False,
     show_locals: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
@@ -117,6 +119,7 @@ def console_log_formatter(
 
 
 def key_value_formatter(
+    *,
     sort_keys: bool = False,
     key_order: t.Sequence[str] | None = None,
     drop_missing: bool = False,

@@ -28,7 +28,7 @@ ExceptionContextJSON = t.Dict[
 class ExceptionContext(SelfDescribingJson):
     """Exception context for the Snowplow tracker."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Init the exceptions context with the exceptions currently being handled."""
         ex = sys.exc_info()[1]
         super().__init__(
@@ -50,7 +50,7 @@ def get_exception_json(ex: BaseException) -> ExceptionContextJSON:
         A JSON-compatible dictionary of anonymized telemetry data compliant
         with the exception context schema for an exception.
     """
-    cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__  # noqa: WPS609
+    cause, context, tb = ex.__cause__, ex.__context__, ex.__traceback__
     return {
         "type": str(type(ex).__qualname__),
         "str_hash": hash_sha256(str(ex)),

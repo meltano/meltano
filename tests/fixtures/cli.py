@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
 import typing as t
 from pathlib import Path
 
@@ -38,7 +37,7 @@ class MeltanoCliRunner(CliRunner):
 
 @pytest.fixture()
 def cli_runner(pushd, snowplow_optional: SnowplowMicro | None):
-    pushd(os.getcwd())  # Ensure we return to the CWD after the test
+    pushd(Path.cwd())  # Ensure we return to the CWD after the test
     root_logger = logging.getLogger()  # noqa: TID251
     log_level = root_logger.level
     try:

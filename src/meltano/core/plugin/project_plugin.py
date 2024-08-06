@@ -35,7 +35,7 @@ class CyclicInheritanceError(Exception):
         self.plugin = plugin
         self.ancestor = ancestor
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return error message.
 
         Returns:
@@ -48,7 +48,7 @@ class CyclicInheritanceError(Exception):
         )
 
 
-class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and methods
+class ProjectPlugin(PluginRef):  # too many attrs and methods
     """ProjectPlugin class."""
 
     VARIANT_ATTR = "variant"
@@ -58,6 +58,8 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
     name: str
     variant: str | None
     executable: str
+
+    config_files: dict[str, str]
 
     def __init__(
         self,
@@ -75,9 +77,9 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         commands: dict | None = None,
         requires: dict[PluginType, list] | None = None,
         config: dict | None = None,
-        default_variant=Variant.ORIGINAL_NAME,
+        default_variant=Variant.ORIGINAL_NAME,  # noqa: ANN001
         env: dict[str, str] | None = None,
-        **extras,
+        **extras,  # noqa: ANN003
     ):
         """ProjectPlugin.
 
@@ -208,7 +210,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return self._parent
 
     @parent.setter
-    def parent(self, new_parent):
+    def parent(self, new_parent) -> None:  # noqa: ANN001
         ancestor = new_parent
         while isinstance(ancestor, self.__class__):
             if ancestor == self:
@@ -280,7 +282,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         """
         return list(self.all_commands.keys())
 
-    def env_prefixes(self, for_writing=False) -> list[str]:
+    def env_prefixes(self, *, for_writing=False) -> list[str]:  # noqa: ANN001
         """Return environment variable prefixes.
 
         Args:
@@ -317,7 +319,7 @@ class ProjectPlugin(PluginRef):  # noqa: WPS230, WPS214 # too many attrs and met
         return {**self.config, **self.extra_config}
 
     @config_with_extras.setter
-    def config_with_extras(self, new_config_with_extras):
+    def config_with_extras(self, new_config_with_extras) -> None:  # noqa: ANN001
         self.config.clear()
         self.extras.clear()
 

@@ -17,7 +17,7 @@ schemas_dir = (
 
 versions_in_use = {
     x.name: x.version.split("-")
-    for x in vars(schemas).values()  # noqa: WPS421
+    for x in vars(schemas).values()
     if isinstance(x, schemas.IgluSchema)
 }
 
@@ -29,5 +29,5 @@ versions_available = {
 }
 
 
-def test_using_latest_schemas():
+def test_using_latest_schemas() -> None:
     assert versions_in_use == versions_available

@@ -31,7 +31,7 @@ if t.TYPE_CHECKING:
 logger = structlog.getLogger(__name__)
 
 
-def _list_single_job(
+def _list_single_job(  # noqa: D417
     task_sets_service: TaskSetsService,
     list_format: str,
     job_name: str,
@@ -62,7 +62,7 @@ def _list_single_job(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _list_all_jobs(
+def _list_all_jobs(  # noqa: D417
     task_sets_service: TaskSetsService,
     list_format: str,
     ctx: click.Context,
@@ -100,9 +100,8 @@ def _list_all_jobs(
 )
 @click.pass_context
 @pass_project(migrate=True)
-def job(project, ctx):
-    """
-    Manage jobs.
+def job(project, ctx) -> None:  # noqa: ANN001
+    """Manage jobs.
 
     Example usage:
 
@@ -125,8 +124,9 @@ def job(project, ctx):
     \t# Remove a named job
     \tmeltano job remove <job_name>
 
-    \bRead more at https://docs.meltano.com/reference/command-line-interface#jobs
-    """  # noqa: E501
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#jobs
+    """  # noqa: D301, E501
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
@@ -140,7 +140,7 @@ def job(project, ctx):
 )
 @click.argument("job_name", required=False, default=None)
 @click.pass_context
-def list_jobs(ctx, list_format: str, job_name: str):
+def list_jobs(ctx, list_format: str, job_name: str) -> None:  # noqa: ANN001
     """List available jobs."""
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
 
@@ -168,7 +168,7 @@ def list_jobs(ctx, list_format: str, job_name: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def add(ctx, job_name: str, raw_tasks: str):
+def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     """Add tasks to a new job.
 
     Example usage:
@@ -181,7 +181,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list of string lists, or mix of both.
     \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """  # noqa: E501
+    """  # noqa: D301, E501
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
@@ -227,7 +227,7 @@ def add(ctx, job_name: str, raw_tasks: str):
     help="Tasks that will be run as part of this job.",
 )
 @click.pass_context
-def set_cmd(ctx, job_name: str, raw_tasks: str):
+def set_cmd(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     """Update the tasks associated with an existing job.
 
     Example usage:
@@ -240,7 +240,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
     \t# The list of tasks must be yaml formatted and consist of a list of strings, list string lists, or mix of both.
     \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
-    """  # noqa: E501
+    """  # noqa: D301, E501
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
@@ -267,7 +267,7 @@ def set_cmd(ctx, job_name: str, raw_tasks: str):
 @job.command(cls=PartialInstrumentedCmd, name="remove", short_help="Remove a job.")
 @click.argument("job_name", required=True)
 @click.pass_context
-def remove(ctx, job_name: str):  # noqa: WPS442
+def remove(ctx, job_name: str) -> None:  # noqa: ANN001
     """Remove a job.
 
     Usage:
@@ -280,7 +280,7 @@ def remove(ctx, job_name: str):  # noqa: WPS442
     tracker.track_command_event(CliEvent.completed)
 
 
-def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:
+def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) -> bool:  # noqa: D417
     """Validate a job's tasks.
 
     Validates the tasks by attempting to parse them into valid `Blocks`, and by

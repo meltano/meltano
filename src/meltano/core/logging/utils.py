@@ -21,7 +21,7 @@ from meltano.core.utils import get_no_color_flag
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-LEVELS: dict[str, int] = {  # noqa: WPS407
+LEVELS: dict[str, int] = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
     "warning": logging.WARNING,
@@ -30,7 +30,7 @@ LEVELS: dict[str, int] = {  # noqa: WPS407
 }
 DEFAULT_LEVEL = "info"
 FORMAT = (
-    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"  # noqa: WPS323, E501
+    "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
 
 
@@ -55,8 +55,8 @@ def read_config(config_file: os.PathLike | None = None) -> dict | None:
     Returns:
         dict: parsed yaml config
     """
-    if config_file and os.path.exists(config_file):
-        with open(config_file) as cf:
+    if config_file and os.path.exists(config_file):  # noqa: PTH110
+        with open(config_file) as cf:  # noqa: PTH123
             return yaml.safe_load(cf.read())
     else:
         return None
@@ -123,7 +123,7 @@ def default_config(log_level: str) -> dict:
     }
 
 
-def setup_logging(  # noqa: WPS210
+def setup_logging(
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
     log_config: os.PathLike | None = None,
@@ -150,7 +150,6 @@ def setup_logging(  # noqa: WPS210
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,
             structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],
         logger_factory=structlog.stdlib.LoggerFactory(),
@@ -180,7 +179,7 @@ def change_console_log_level(log_level: int = logging.DEBUG) -> None:
 class SubprocessOutputWriter(t.Protocol):
     """A basic interface suitable for use with `capture_subprocess_output`."""
 
-    def writeline(self, line: str):
+    def writeline(self, line: str) -> None:
         """Write the provided line to an output.
 
         Args:
@@ -188,7 +187,7 @@ class SubprocessOutputWriter(t.Protocol):
         """
 
 
-async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes):
+async def _write_line_writer(writer: SubprocessOutputWriter, line: bytes) -> bool:
     # StreamWriters like a subprocess's stdin need special consideration
     if isinstance(writer, asyncio.StreamWriter):
         try:

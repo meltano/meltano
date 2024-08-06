@@ -24,7 +24,7 @@ class TestProjectAddService:
     def subject(self, project_add_service):
         return project_add_service
 
-    def test_missing_plugin_exception(self, subject, hub_request_counter):
+    def test_missing_plugin_exception(self, subject, hub_request_counter) -> None:
         with pytest.raises(PluginDefinitionNotFoundError):
             subject.add(PluginType.EXTRACTORS, "tap-missing")
 
@@ -51,7 +51,7 @@ class TestProjectAddService:
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         used_variant = variant or default_variant
         lockfile_path = project.plugin_lock_path(
             plugin_type,
@@ -87,7 +87,7 @@ class TestProjectAddService:
         subject,
         project: Project,
         hub_request_counter,
-    ):
+    ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
         project.plugins.remove_from_file(tap)
 
@@ -124,7 +124,7 @@ class TestProjectAddService:
         self,
         subject: ProjectAddService,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         child = subject.add(
             PluginType.EXTRACTORS,
             "tap-mock-inherited-new",
@@ -176,7 +176,7 @@ class TestProjectAddService:
     def test_add_name_contains_state_id_component_delimiter(
         self,
         subject: ProjectAddService,
-    ):
+    ) -> None:
         with pytest.raises(PluginRefNameContainsStateIdDelimiterError):
             subject.add(
                 PluginType.EXTRACTORS,
@@ -191,7 +191,7 @@ class TestProjectAddService:
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         target.config = {
             "username": "meltano",
             "password": "meltano",
@@ -209,7 +209,7 @@ class TestProjectAddService:
             ],
         }
 
-        assert not target.canonical().items() >= updated_attrs.items()  # noqa: WPS508
+        assert not target.canonical().items() >= updated_attrs.items()
 
         updated = subject.add(
             target.type,
@@ -235,7 +235,7 @@ class TestProjectAddService:
         subject: ProjectAddService,
         project: Project,
         hub_request_counter: Counter,
-    ):
+    ) -> None:
         custom_plugin = subject.add(
             PluginType.EXTRACTORS,
             "tap-custom",

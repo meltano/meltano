@@ -49,7 +49,7 @@ class State(Enum):
     DEAD = (4, ())
     STATE_EDIT = (5, ())
 
-    def transitions(self):
+    def transitions(self):  # noqa: ANN201
         """Get possible next States for a job of this State.
 
         Returns:
@@ -57,7 +57,7 @@ class State(Enum):
         """
         return self.value[1]
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Get a string representation of this State.
 
         Returns:
@@ -69,7 +69,7 @@ class State(Enum):
 class StateComparator(Comparator):
     """Compare Job._state to State enums."""
 
-    def __eq__(self, other):
+    def __eq__(self, other):  # noqa: ANN001, ANN204
         """Enable SQLAlchemy to directly compare Job.state values with State.
 
         Args:
@@ -81,7 +81,7 @@ class StateComparator(Comparator):
         return self.__clause_element__() == literal(other.name)
 
 
-def current_trigger():
+def current_trigger():  # noqa: ANN201
     """Get the trigger for running job.
 
     Returns:
@@ -97,7 +97,7 @@ class Payload(EnumIntFlag):
     INCOMPLETE_STATE = 2
 
 
-class Job(SystemModel):  # noqa: WPS214
+class Job(SystemModel):
     """Model class that represents a `meltano elt` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
@@ -123,7 +123,7 @@ class Job(SystemModel):  # noqa: WPS214
         default=current_trigger,
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
         """Construct a Job.
 
         Args:
@@ -144,7 +144,7 @@ class Job(SystemModel):  # noqa: WPS214
         return State[self._state]
 
     @state.setter
-    def state(self, value):
+    def state(self, value) -> None:  # noqa: ANN001
         """Set the _state value for this Job from a State enum.
 
         Args:
@@ -153,7 +153,7 @@ class Job(SystemModel):  # noqa: WPS214
         self._state = str(value)
 
     @state.comparator
-    def state(cls):  # noqa: N805
+    def state(cls):  # noqa: ANN201, N805
         """Use this comparison to compare Job.state to State.
 
         See:
@@ -164,7 +164,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return StateComparator(cls._state)
 
-    def is_running(self):
+    def is_running(self):  # noqa: ANN201
         """Return whether Job is running.
 
         Returns:
@@ -172,7 +172,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return self.state is State.RUNNING
 
-    def is_stale(self):
+    def is_stale(self):  # noqa: ANN201
         """Return whether Job has gone stale.
 
         Running jobs with a heartbeat are considered stale after no heartbeat
@@ -195,7 +195,7 @@ class Job(SystemModel):  # noqa: WPS214
 
         return datetime.now(timezone.utc) - timestamp > valid_for
 
-    def has_error(self):
+    def has_error(self):  # noqa: ANN201
         """Return whether a job has failed.
 
         Returns:
@@ -203,7 +203,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return self.state is State.FAIL
 
-    def is_complete(self):
+    def is_complete(self):  # noqa: ANN201
         """Return whether a job has completed.
 
         Returns:
@@ -211,7 +211,7 @@ class Job(SystemModel):  # noqa: WPS214
         """
         return self.state in {State.SUCCESS, State.FAIL}
 
-    def is_success(self):
+    def is_success(self):  # noqa: ANN201
         """Return whether a job has succeeded.
 
         Returns:
@@ -256,7 +256,7 @@ class Job(SystemModel):  # noqa: WPS214
         return transition
 
     @asynccontextmanager
-    async def run(self, session):
+    async def run(self, session):  # noqa: ANN001, ANN201
         """Run wrapped code in context of a job.
 
         Transitions state to RUNNING and SUCCESS/FAIL as appropriate and
@@ -268,7 +268,7 @@ class Job(SystemModel):  # noqa: WPS214
         Raises:
             BaseException: re-raises an exception occurring in the job running
                 in this context
-        """  # noqa: DAR301
+        """
         try:
             self.start()
             self.save(session)
@@ -279,7 +279,7 @@ class Job(SystemModel):  # noqa: WPS214
 
             self.success()
             self.save(session)
-        except BaseException as err:  # noqa: WPS424
+        except BaseException as err:
             if not self.is_running():
                 raise
 
@@ -287,12 +287,12 @@ class Job(SystemModel):  # noqa: WPS214
             self.save(session)
             raise
 
-    def start(self):
+    def start(self) -> None:
         """Mark the job has having started."""
         self.started_at = datetime.now(timezone.utc)
         self.transit(State.RUNNING)
 
-    def fail(self, error=None):
+    def fail(self, error=None) -> None:  # noqa: ANN001
         """Mark the job as having failed.
 
         Args:
@@ -303,12 +303,12 @@ class Job(SystemModel):  # noqa: WPS214
         if error:
             self.payload.update({"error": str(error)})
 
-    def success(self):
+    def success(self) -> None:
         """Mark the job as having succeeded."""
         self.ended_at = datetime.now(timezone.utc)
         self.transit(State.SUCCESS)
 
-    def fail_stale(self):
+    def fail_stale(self) -> bool:
         """Mark job as failed if it's gone stale.
 
         Returns:
@@ -326,7 +326,7 @@ class Job(SystemModel):  # noqa: WPS214
 
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Represent as a string.
 
         Returns:
@@ -338,7 +338,7 @@ class Job(SystemModel):  # noqa: WPS214
             f"ended_at='{self.ended_at}')>"
         )
 
-    def save(self, session):
+    def save(self, session):  # noqa: ANN001, ANN201
         """Save the job in the db.
 
         Args:
@@ -352,29 +352,29 @@ class Job(SystemModel):  # noqa: WPS214
 
         return self
 
-    def _heartbeat(self):
+    def _heartbeat(self) -> None:
         """Update last_heartbeat_at for this job in the db."""
         self.last_heartbeat_at = datetime.now(timezone.utc)
 
-    async def _heartbeater(self, session):
+    async def _heartbeater(self, session) -> None:  # noqa: ANN001
         """Heartbeat to the db every second.
 
         Args:
             session: the session to use for writing to the db
         """
-        while True:  # noqa: WPS457
+        while True:
             self._heartbeat()
             self.save(session)
 
             await asyncio.sleep(1)
 
     @asynccontextmanager
-    async def _heartbeating(self, session):
+    async def _heartbeating(self, session):  # noqa: ANN001, ANN202
         """Provide a context for heartbeating jobs.
 
         Args:
             session: the session to use for writing to the db
-        """  # noqa: DAR301
+        """
         heartbeat_future = asyncio.ensure_future(self._heartbeater(session))
         try:
             yield
@@ -386,11 +386,11 @@ class Job(SystemModel):  # noqa: WPS214
                 await heartbeat_future
 
     @contextmanager
-    def _handling_sigterm(
+    def _handling_sigterm(  # noqa: ANN202
         self,
-        session,  # noqa: ARG002
+        session,  # noqa: ANN001, ARG002
     ):
-        def handler(*_):  # noqa: WPS430
+        def handler(*_) -> t.NoReturn:
             sigterm_status = 143
             raise SystemExit(sigterm_status)
 
@@ -401,7 +401,7 @@ class Job(SystemModel):  # noqa: WPS214
         finally:
             signal.signal(signal.SIGTERM, original_termination_handler)
 
-    def _error_message(self, err):
+    def _error_message(self, err):  # noqa: ANN001, ANN202
         if isinstance(err, SystemExit):
             return "The process was terminated"
 

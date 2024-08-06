@@ -61,7 +61,7 @@ class TestCliInvoke:
         ) as invoke_async:
             yield invoke_async
 
-    def test_invoke(self, cli_runner, mock_invoke):
+    def test_invoke(self, cli_runner, mock_invoke) -> None:
         res = cli_runner.invoke(cli, ["invoke", "utility-mock"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -70,7 +70,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert isinstance(kwargs, dict)
 
-    def test_invoke_args(self, cli_runner, mock_invoke):
+    def test_invoke_args(self, cli_runner, mock_invoke) -> None:
         res = cli_runner.invoke(cli, ["invoke", "utility-mock", "--help"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -79,7 +79,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1] == "--help"
 
-    def test_invoke_command(self, cli_runner, mock_invoke):
+    def test_invoke_command(self, cli_runner, mock_invoke) -> None:
         res = cli_runner.invoke(
             cli,
             ["invoke", "utility-mock:cmd"],
@@ -93,12 +93,12 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_command_containerized(  # noqa: WPS210
+    def test_invoke_command_containerized(
         self,
         project,
         cli_runner,
         mock_invoke_containers,
-    ):
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -106,11 +106,11 @@ class TestCliInvoke:
 
         async def async_generator(*args, **kwargs):  # noqa: ARG001
             yield "Line 1"
-            yield "Line 2"  # noqa: WPS354
+            yield "Line 2"
 
         docker = mock_invoke_containers.return_value
         docker_context = mock.AsyncMock()
-        docker.__aenter__.return_value = docker_context  # noqa: WPS609
+        docker.__aenter__.return_value = docker_context
 
         container = mock.AsyncMock()
         docker_context.containers.run.return_value = container
@@ -156,7 +156,7 @@ class TestCliInvoke:
         volume_bindings = args[0]["HostConfig"]["Binds"]
         assert volume_bindings[0].startswith(str(project.root))
 
-    def test_invoke_command_args(self, cli_runner, mock_invoke):
+    def test_invoke_command_args(self, cli_runner, mock_invoke) -> None:
         res = cli_runner.invoke(
             cli,
             ["invoke", "utility-mock:cmd"],
@@ -170,7 +170,7 @@ class TestCliInvoke:
         assert args[0].endswith("utility-mock")
         assert args[1:] == ("--option", "arg")
 
-    def test_invoke_exit_code(self, cli_runner, mock_invoke):
+    def test_invoke_exit_code(self, cli_runner, mock_invoke) -> None:
         mock_invoke.return_value.wait.return_value = 2
 
         basic = cli_runner.invoke(cli, ["invoke", "utility-mock"])
@@ -181,7 +181,7 @@ class TestCliInvoke:
         cli_runner: CliRunner,
         project: Project,
         tap: ProjectPlugin,
-    ):
+    ) -> None:
         with patch.object(
             SingerTap,
             "discover_catalog",
@@ -219,7 +219,12 @@ class TestCliInvoke:
             assert apply_catalog_rules.call_count == 2
             assert look_up_state.call_count == 2
 
-    def test_invoke_dump_config(self, cli_runner, tap, plugin_settings_service_factory):
+    def test_invoke_dump_config(
+        self,
+        cli_runner,
+        tap,
+        plugin_settings_service_factory,
+    ) -> None:
         settings_service = plugin_settings_service_factory(tap)
 
         with patch.object(SingerTap, "discover_catalog"), patch.object(
@@ -233,7 +238,7 @@ class TestCliInvoke:
                 process=True,
             )
 
-    def test_list_commands(self, cli_runner, mock_invoke):
+    def test_list_commands(self, cli_runner, mock_invoke) -> None:
         res = cli_runner.invoke(cli, ["invoke", "--list-commands", "utility-mock"])
 
         assert res.exit_code == 0, f"exit code: {res.exit_code} - {res.exception}"
@@ -241,7 +246,7 @@ class TestCliInvoke:
         assert "utility-mock:cmd" in res.output
         assert "description of utility command" in res.output
 
-    def test_invoke_only_install(self, cli_runner, project: Project, utility):
+    def test_invoke_only_install(self, cli_runner, project: Project, utility) -> None:
         with patch.object(
             ProjectPluginsService,
             "find_plugin",

@@ -119,7 +119,7 @@ class TaskSetsService:
                 return job
         raise JobNotFoundError(name)
 
-    def list(self) -> list[TaskSets]:  # noqa: WPS125
+    def list(self) -> list[TaskSets]:
         """List all TaskSets in the project.
 
         Returns:

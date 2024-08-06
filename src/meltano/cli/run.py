@@ -103,6 +103,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 async def run(
     ctx: click.Context,
     project: Project,
+    *,
     dry_run: bool,
     full_refresh: bool,
     refresh_catalog: bool,
@@ -113,9 +114,8 @@ async def run(
     run_id: uuid.UUID | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
-):
-    """
-    Run a set of command blocks in series.
+) -> None:
+    """Run a set of command blocks in series.
 
     Blocks are specified as either:\n
       - a list of plugin names\n
@@ -135,8 +135,9 @@ async def run(
 
     The above command will create two jobs with state IDs `prod:tap-gitlab-to-target-postgres` and `prod:tap-salesforce-to-target-mysql`.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#run
-    """  # noqa: E501
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#run
+    """  # noqa: D301, E501
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")
         change_console_log_level()
@@ -188,6 +189,7 @@ async def run(
 async def _run_blocks(
     tracker: Tracker,
     parsed_blocks: list[BlockSet | PluginCommandBlock],
+    *,
     dry_run: bool,
 ) -> None:
     for idx, blk in enumerate(parsed_blocks):

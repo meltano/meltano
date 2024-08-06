@@ -21,7 +21,7 @@ SINGER_STATE_KEY = "singer_state"
 STATE_ID_COMPONENT_DELIMITER = ":"
 
 
-class JobState(SystemModel):  # noqa: WPS214
+class JobState(SystemModel):
     """Model class that represents the current state of a given job.
 
     Modified during `meltano elt` or `meltano run` runs whenever a
@@ -60,8 +60,8 @@ class JobState(SystemModel):  # noqa: WPS214
             and (self.completed_state == other.completed_state)
         )
 
-    @classmethod  # noqa: WPS210
-    def from_job_history(cls, session: Session, state_id: str):  # noqa: WPS210
+    @classmethod
+    def from_job_history(cls, session: Session, state_id: str):  # noqa: ANN206
         """Build JobState from job run history.
 
         Args:
@@ -154,13 +154,13 @@ class JobState(SystemModel):  # noqa: WPS214
     def merge_partial(
         self,
         state: JobState,
-    ):
+    ) -> None:
         """Merge provided partial state onto this JobState.
 
         Args:
             state: the partial state to merge onto this state.
         """
-        self.partial_state = merge(  # noqa: WPS601
+        self.partial_state = merge(
             state.partial_state,
             self.partial_state,
         )
@@ -173,7 +173,7 @@ class JobState(SystemModel):  # noqa: WPS214
         """
         return bool(self.completed_state)
 
-    def to_file(self, file_obj: TextIOWrapper):
+    def to_file(self, file_obj: TextIOWrapper) -> None:
         """Persist JobState to a file-like object.
 
         Args:

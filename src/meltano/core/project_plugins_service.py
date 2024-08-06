@@ -102,7 +102,7 @@ class AmbiguousMappingName(MeltanoError):
         )
 
 
-class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attributes)
+class ProjectPluginsService:  # (too many methods, attributes)
     """Project Plugins Service."""
 
     def __init__(self, project: Project):
@@ -117,7 +117,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
-    def current_plugins(self):
+    def current_plugins(self):  # noqa: ANN201
         """Return the current plugins.
 
         Returns:
@@ -126,7 +126,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
-    def update_plugins(self):
+    def update_plugins(self):  # noqa: ANN201
         """Update the current plugins.
 
         Yields:
@@ -135,7 +135,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin):
+    def add_to_file(self, plugin: ProjectPlugin):  # noqa: ANN201
         """Add plugin to `meltano.yml`.
 
         Args:
@@ -167,7 +167,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         return plugin
 
-    def remove_from_file(self, plugin: ProjectPlugin):
+    def remove_from_file(self, plugin: ProjectPlugin):  # noqa: ANN201
         """Remove plugin from `meltano.yml`.
 
         Args:
@@ -203,11 +203,10 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         self,
         plugin_name: str,
         plugin_type: PluginType | None = None,
-        invokable=None,
-        configurable=None,
+        invokable=None,  # noqa: ANN001
+        configurable=None,  # noqa: ANN001
     ) -> ProjectPlugin:
-        """
-        Find a plugin.
+        """Find a plugin.
 
         Args:
             plugin_name: The name of the plugin to find.
@@ -230,7 +229,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         for plugin in self.plugins(ensure_parent=False):
             if (
-                plugin.name == plugin_name  # noqa: WPS222 (with too much logic)
+                plugin.name == plugin_name  # (with too much logic)
                 and (plugin_type is None or plugin.type == plugin_type)
                 and (
                     invokable is None
@@ -264,8 +263,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
         plugin_type: PluginType,
         namespace: str,
     ) -> ProjectPlugin:
-        """
-        Find a plugin based on its PluginType and namespace.
+        """Find a plugin based on its PluginType and namespace.
 
         For example, PluginType.EXTRACTORS and namespace tap_custom
         will return the extractor for the tap-custom plugin.
@@ -336,7 +334,8 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
     def get_plugins_of_type(
         self,
         plugin_type: PluginType,
-        ensure_parent=True,
+        *,
+        ensure_parent=True,  # noqa: ANN001
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -355,7 +354,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
 
         return plugins
 
-    def plugins_by_type(self, ensure_parent=True):
+    def plugins_by_type(self, *, ensure_parent=True):  # noqa: ANN001, ANN201
         """Return plugins grouped by type.
 
         Args:
@@ -372,7 +371,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin_type in PluginType
         }
 
-    def plugins(self, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:
+    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:  # noqa: ANN001
         """Return all plugins.
 
         Args:
@@ -387,7 +386,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, keep_config: bool = False):
+    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):  # noqa: ANN201
         """Update a plugin.
 
         Args:
@@ -419,7 +418,7 @@ class ProjectPluginsService:  # noqa: WPS214, WPS230 (too many methods, attribut
             except StopIteration as stop:
                 raise PluginNotFoundError(plugin) from stop
 
-    def update_environment_plugin(self, plugin: EnvironmentPluginConfig):
+    def update_environment_plugin(self, plugin: EnvironmentPluginConfig) -> None:
         """Update a plugin configuration inside a Meltano environment.
 
         Args:

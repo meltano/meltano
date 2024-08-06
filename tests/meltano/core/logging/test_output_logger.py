@@ -15,7 +15,7 @@ from structlog.testing import LogCapture
 from meltano.core.logging.output_logger import Out, OutputLogger
 
 
-def assert_lines(output, *lines):
+def assert_lines(output, *lines) -> None:
     for line in lines:
         assert line in output
 
@@ -64,7 +64,7 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log")
-    async def test_stdio_capture(self, subject, log_output):
+    async def test_stdio_capture(self, subject, log_output) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -76,7 +76,7 @@ class TestOutputLogger:
         async with stdout_out.redirect_stdout():
             sys.stdout.write("STD")
             sys.stdout.write("OUT\n")
-            print("STDOUT 2")  # noqa: T201, WPS421
+            print("STDOUT 2")  # noqa: T201
 
         assert_lines(
             log_output.entries,
@@ -95,7 +95,7 @@ class TestOutputLogger:
         async with stderr_out.redirect_stderr():
             sys.stderr.write("STD")
             sys.stderr.write("ERR\n")
-            print("STDERR 2", file=sys.stderr)  # noqa: T201, WPS421
+            print("STDERR 2", file=sys.stderr)  # noqa: T201
 
         assert_lines(
             log_output.entries,
@@ -113,7 +113,7 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log")
-    async def test_out_writers(self, subject, log_output):
+    async def test_out_writers(self, subject, log_output) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -167,7 +167,7 @@ class TestOutputLogger:
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log")
-    async def test_set_custom_logger(self, subject, log_output):
+    async def test_set_custom_logger(self, subject, log_output) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -193,7 +193,11 @@ class TestOutputLogger:
     )
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("log", "log_output")
-    async def test_logging_redirect(self, subject: OutputLogger, redirect_handler):
+    async def test_logging_redirect(
+        self,
+        subject: OutputLogger,
+        redirect_handler,
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -210,7 +214,7 @@ class TestOutputLogger:
             logging.warning("warning")  # noqa: TID251
             logging.error("error")  # noqa: TID251
 
-        with open(subject.file) as logf:
+        with open(subject.file) as logf:  # noqa: PTH123
             log_file_contents = [json.loads(line) for line in logf.readlines()]
 
         assert_lines(
@@ -224,7 +228,7 @@ class TestOutputLogger:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    def test_logging_exception(self, log, subject, redirect_handler):
+    def test_logging_exception(self, log, subject, redirect_handler) -> t.NoReturn:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",

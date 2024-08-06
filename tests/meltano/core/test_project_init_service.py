@@ -24,7 +24,12 @@ from meltano.core.project_init_service import (
         "empty directory",
     ),
 )
-def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
+def test_project_init_success(
+    *,
+    create_project_dir: bool,
+    tmp_path: Path,
+    pushd,
+) -> None:
     projects_dir = tmp_path.joinpath("success")
     projects_dir.mkdir()
     pushd(projects_dir)
@@ -44,7 +49,7 @@ def test_project_init_success(create_project_dir: bool, tmp_path: Path, pushd):
     ProjectInitService(project_dir.absolute()).init(activate=False)
 
 
-def test_project_init_non_empty_directory(tmp_path: Path, pushd):
+def test_project_init_non_empty_directory(tmp_path: Path, pushd) -> None:
     projects_dir = tmp_path.joinpath("exists")
     projects_dir.mkdir()
     pushd(projects_dir)
@@ -54,7 +59,7 @@ def test_project_init_non_empty_directory(tmp_path: Path, pushd):
     ProjectInitService(project_dir).init(activate=False)
 
 
-def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
+def test_project_init_existing_meltano_yml(tmp_path: Path, pushd) -> None:
     projects_dir = tmp_path.joinpath("exists")
     projects_dir.mkdir()
     pushd(projects_dir)
@@ -75,7 +80,7 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd):
     ProjectInitService(project_dir).init(activate=False, force=True)
 
 
-def test_project_init_no_write_permission(tmp_path: Path, pushd):
+def test_project_init_no_write_permission(tmp_path: Path, pushd) -> None:
     if platform.system() == "Windows":
         pytest.xfail(
             "Windows can still create new directories inside a read-only directory.",
@@ -96,7 +101,7 @@ def test_project_init_no_write_permission(tmp_path: Path, pushd):
         ProjectInitService(project_dir).init(activate=False)
 
 
-def test_project_init_missing_parent_directory(tmp_path: Path, pushd):
+def test_project_init_missing_parent_directory(tmp_path: Path, pushd) -> None:
     if platform.system() == "Windows":
         pytest.xfail(
             "Windows can't remove a directory that is in use. "

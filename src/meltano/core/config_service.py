@@ -38,7 +38,7 @@ class ConfigService:
         Returns:
             The project settings.
         """
-        with open(str(bundle.root / "settings.yml")) as settings_yaml:
+        with bundle.root.joinpath("settings.yml").open() as settings_yaml:
             settings_yaml_content = yaml.safe_load(settings_yaml)
         return [SettingDefinition.parse(x) for x in settings_yaml_content["settings"]]
 
@@ -52,7 +52,7 @@ class ConfigService:
         return self.project.meltano
 
     @contextmanager
-    def update_meltano_yml(self):
+    def update_meltano_yml(self):  # noqa: ANN201
         """Update meltano.yml.
 
         This method is a context manager that will update meltano.yml with the
@@ -65,7 +65,7 @@ class ConfigService:
             yield meltano_yml
 
     @contextmanager
-    def update_active_environment(self):
+    def update_active_environment(self):  # noqa: ANN201
         """Update active environment.
 
         Yields:
@@ -81,7 +81,7 @@ class ConfigService:
             yield environments[env_idx]
 
     @property
-    def current_config(self):
+    def current_config(self):  # noqa: ANN201
         """Return the current configuration.
 
         Returns:
@@ -89,7 +89,7 @@ class ConfigService:
         """
         return self.current_meltano_yml.extras
 
-    def update_config(self, config):
+    def update_config(self, config) -> None:  # noqa: ANN001
         """Update top-level Meltano configuration.
 
         Args:
@@ -98,12 +98,12 @@ class ConfigService:
         with self.update_meltano_yml() as meltano_yml:
             meltano_yml.extras = config
 
-    def make_meltano_secret_dir(self):
+    def make_meltano_secret_dir(self) -> None:
         """Create the secret directory."""
-        os.makedirs(self.project.meltano_dir(), exist_ok=True)
+        os.makedirs(self.project.meltano_dir(), exist_ok=True)  # noqa: PTH103
 
     @property
-    def env(self):
+    def env(self):  # noqa: ANN201
         """Return the top-level env vars from meltano.yml.
 
         Returns:
