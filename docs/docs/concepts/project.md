@@ -137,17 +137,19 @@ A plugin defined with a `namespace` property (but no `inherit_from` property) is
 plugins:
   extractors:
   - name: tap-covid-19
-    ==namespace: tap_covid_19
-    ==pip_url: tap-covid-19
-    ==executable: tap-covid-19
-    ==capabilities:
-    ==- catalog
-    ==- discover
-    ==- state
-    ==settings:
-    ==- name: api_token
-    ==- name: user_agent
-    ==- name: start_date
+    # highlight-start
+    namespace: tap_covid_19
+    pip_url: tap-covid-19
+    executable: tap-covid-19
+    capabilities:
+    - catalog
+    - discover
+    - state
+    settings:
+    - name: api_token
+    - name: user_agent
+    - name: start_date
+    # highlight-end
 ```
 
 To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
@@ -159,7 +161,8 @@ A plugin defined without an `inherit_from` or `namespace` property implicitly in
 ```yaml
 plugins:
   extractors:
-  ==- name: tap-gitlab
+  # highlight-next-line
+  - name: tap-gitlab
 ```
 
 To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
@@ -173,7 +176,8 @@ the `variant` property can be used to choose a specific one:
 plugins:
   extractors:
   - name: tap-gitlab
-    ==variant: meltano
+    # highlight-next-line
+    variant: meltano
 ```
 
 If no `variant` is specified, the _original_ variant supported by Meltano is used.
@@ -187,11 +191,13 @@ Values for [plugin extras](/guide/configuration#plugin-extras) are stored among 
 ```yaml
 extractors:
 - name: tap-example
-  ==config:
-    ==# Configuration goes here!
-    ==example_setting: value
-  ==# Extras go here!
-  ==example_extra: value
+  # highlight-start
+  config:
+    # Configuration goes here!
+    example_setting: value
+  # Extras go here!
+  example_extra: value
+  # highlight-end
 ```
 
 #### Plugin commands
@@ -280,9 +286,11 @@ schedules:
 - name: foo-to-bar
   job: tap-foo-to-target-bat
   interval: "@hourly"
-  ==env:
-    ==TAP_FOO_BAR: bar
-    ==TAP_FOO_BAZ: baz
+  # highlight-start
+  env:
+    TAP_FOO_BAR: bar
+    TAP_FOO_BAZ: baz
+  # highlight-end
 ```
 
 To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/guide/orchestration).
@@ -383,7 +391,7 @@ While you would usually not want to modify the system database directly, knowing
 Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).=======
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 
 ### Support for other database types
 
