@@ -49,7 +49,7 @@ This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  # highlight-end
+  # highlight-start
   - name: tap-gitlab
     variant: meltano
     pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
