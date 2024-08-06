@@ -81,16 +81,18 @@ def exception_logged(result_output: str, exc: Exception) -> bool:
         parsed_line = json.loads(line)
         seen_lines.append(parsed_line)
 
-    for line in seen_lines:
-        if line.get("event") and exc.args[0] in line.get("event"):
-            return True
-    return False
+    return any(
+        line.get("event") and exc.args[0] in line.get("event") for line in seen_lines
+    )
 
 
 def assert_log_lines(result_output: str, expected: list[LogEntry]) -> None:
     seen_lines: list[dict] = []
     for line in result_output.splitlines():
-        parsed_line = json.loads(line)
+        try:
+            parsed_line = json.loads(line)
+        except json.JSONDecodeError:  # pragma: no cover
+            continue
         seen_lines.append(parsed_line)
 
     for entry in expected:
