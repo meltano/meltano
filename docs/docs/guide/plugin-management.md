@@ -214,7 +214,7 @@ Since Meltano doesn't have the [base plugin description](/concepts/plugins#proje
 `meltano add --custom` will ask you to find and provide this metadata yourself:
 (Note that more context is provided in the actual command prompts.)
 
-```
+```bash
 $ meltano add --custom extractor tap-covid-19
 Adding new custom extractor with name 'tap-covid-19'...
 
