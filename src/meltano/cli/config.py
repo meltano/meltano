@@ -475,12 +475,9 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     path = list(setting_name)
     try:
         metadata = settings.unset(path, store=store, session=session)
-    except StoreNotSupportedError as err:
+    except StoreNotSupportedError:
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} "  # noqa: EM102
-            f"could not be unset: {err}",
-        ) from err
+        raise
 
     name = metadata["name"]
     store = metadata["store"]
