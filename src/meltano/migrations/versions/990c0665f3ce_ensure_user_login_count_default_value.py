@@ -1,10 +1,13 @@
-"""ensure user.login_count default value
+"""ensure user.login_count default value.
 
 Revision ID: 990c0665f3ce
 Revises: a3e2b0a4937d
 Create Date: 2020-01-15 15:58:25.416129
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.sql import column, table
@@ -16,15 +19,15 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     # update the existing Users
     user = table("user", column("login_count", sa.Integer))
     connection = op.get_bind()
 
     connection.execute(
-        user.update().where(user.c.login_count == None).values({"login_count": 0})
+        user.update().where(user.c.login_count is None).values({"login_count": 0})
     )
 
 
-def downgrade():
+def downgrade() -> None:
     pass

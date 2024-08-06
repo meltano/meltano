@@ -98,11 +98,11 @@ async def test(
     install_plugins: InstallPlugins,
     plugin_tests: tuple[str, ...] = (),
 ) -> None:
-    """
-    Run validations using plugins' tests.
+    """Run validations using plugins' tests.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#test
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#test
+    """  # noqa: D301
     _, session_maker = project_engine(project)
     session = session_maker()
 

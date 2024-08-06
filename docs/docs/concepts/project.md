@@ -69,19 +69,21 @@ install the plugin and will inject the major and minor versions (e.g. 3.8, 3.9, 
 A plugin defined with an `inherit_from` property inherits its [base plugin description](/concepts/plugins#project-plugins) from another plugin identified by name. To find the matching plugin, other plugins in your project are considered first, followed by
 [discoverable plugins](/concepts/plugins#discoverable-plugins):
 
-```yml{5,7}
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-postgres          # Shadows discoverable `tap-postgres` (see below)
   - name: tap-postgres--billing
+    # highlight-next-line
     inherit_from: tap-postgres  # Inherits from project's `tap-postgres`
   - name: tap-bigquery--events
+    # highlight-next-line
     inherit_from: tap-bigquery  # Inherits from discoverable `tap-bigquery`
 ```
 
 When inheriting from another plugin in your project, its [configuration](/guide/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
 
-```yml{10-12,15-18}
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-google-analytics
@@ -91,31 +93,38 @@ plugins:
       start_date: '2020-10-01T00:00:00Z'
   - name: tap-ga--view-foo
     inherit_from: tap-google-analytics
+    # highlight-start
     config:
       # `key_file_location` and `start_date` are inherited
       view_id: 123456
+    # highlight-end
   - name: tap-ga--view-bar
     inherit_from: tap-google-analytics
+    # highlight-start
     config:
       # `key_file_location` is inherited
       start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
       view_id: 789012
+    # highlight-end
 ```
 
 Note that the presence of a [`variant` property](#variants) causes only discoverable plugins to be considered
 (even if there is also a matching plugin in the project),
 since only these can have multiple [variants](/concepts/plugins#variants):
 
-```yml{6,8-9}
+```yaml title="meltano.yml"
 plugins:
   loaders:
   - name: target-snowflake          # Shadows discoverable `target-snowflake` (see below)
     variant: datamill-co            # using variant `datamill-co`
   - name: target-snowflake--derived
+    # highlight-next-line
     inherit_from: target-snowflake  # Inherits from project's `target-snowflake`
   - name: target-snowflake--transferwise
+    # highlight-start
     inherit_from: target-snowflake  # Inherits from discoverable `target-snowflake`
     variant: transferwise           # using variant `transferwise`
+    # highlight-end
 ```
 
 To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
@@ -124,21 +133,23 @@ To learn how to add an inheriting plugin to your project, refer to the [Plugin M
 
 A plugin defined with a `namespace` property (but no `inherit_from` property) is a [custom plugin](/concepts/plugins#custom-plugins) that explicitly defines its [base plugin description](/concepts/plugins#project-plugins):
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-covid-19
-    ==namespace: tap_covid_19
-    ==pip_url: tap-covid-19
-    ==executable: tap-covid-19
-    ==capabilities:
-    ==- catalog
-    ==- discover
-    ==- state
-    ==settings:
-    ==- name: api_token
-    ==- name: user_agent
-    ==- name: start_date
+    # highlight-start
+    namespace: tap_covid_19
+    pip_url: tap-covid-19
+    executable: tap-covid-19
+    capabilities:
+    - catalog
+    - discover
+    - state
+    settings:
+    - name: api_token
+    - name: user_agent
+    - name: start_date
+    # highlight-end
 ```
 
 To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
@@ -147,10 +158,11 @@ To learn how to add a custom plugin to your project, refer to the [Plugin Manage
 
 A plugin defined without an `inherit_from` or `namespace` property implicitly inherits its [base plugin description](/concepts/plugins#project-plugins) from the [discoverable plugin](/concepts/plugins#discoverable-plugins) with the same `name`, as a form of [shadowing](https://en.wikipedia.org/wiki/Variable_shadowing):
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
-  ==- name: tap-gitlab
+  # highlight-next-line
+  - name: tap-gitlab
 ```
 
 To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
@@ -160,11 +172,12 @@ To learn how to add a discoverable plugin to your project, refer to the [Plugin 
 If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are available,
 the `variant` property can be used to choose a specific one:
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   extractors:
   - name: tap-gitlab
-    ==variant: meltano
+    # highlight-next-line
+    variant: meltano
 ```
 
 If no `variant` is specified, the _original_ variant supported by Meltano is used.
@@ -178,11 +191,13 @@ Values for [plugin extras](/guide/configuration#plugin-extras) are stored among 
 ```yaml
 extractors:
 - name: tap-example
-  ==config:
-    ==# Configuration goes here!
-    ==example_setting: value
-  ==# Extras go here!
-  ==example_extra: value
+  # highlight-start
+  config:
+    # Configuration goes here!
+    example_setting: value
+  # Extras go here!
+  example_extra: value
+  # highlight-end
 ```
 
 #### Plugin commands
@@ -271,9 +286,11 @@ schedules:
 - name: foo-to-bar
   job: tap-foo-to-target-bat
   interval: "@hourly"
-  ==env:
-    ==TAP_FOO_BAR: bar
-    ==TAP_FOO_BAZ: baz
+  # highlight-start
+  env:
+    TAP_FOO_BAR: bar
+    TAP_FOO_BAZ: baz
+  # highlight-end
 ```
 
 To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/guide/orchestration).
@@ -374,7 +391,7 @@ While you would usually not want to modify the system database directly, knowing
 Meltano's CLI utilizes the following tables:
 
 - `runs` table: One row for each [`meltano el`](/reference/command-line-interface#el), [`meltano elt`](/reference/command-line-interface#elt) or [`meltano run`](/reference/command-line-interface#run) pipeline run, holding started/ended timestamps and [incremental replication state](/guide/integration#incremental-replication-state).
-- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).=======
+- `plugin_settings` table: [Plugin configuration](/guide/configuration#configuration-layers) set using [`meltano config <plugin> set`](/reference/command-line-interface#config) or [the UI](/reference/ui) when the project is [deployed as read-only](/reference/settings#project-readonly).
 
 ### Support for other database types
 

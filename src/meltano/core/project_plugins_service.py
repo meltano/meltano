@@ -206,8 +206,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         invokable=None,  # noqa: ANN001
         configurable=None,  # noqa: ANN001
     ) -> ProjectPlugin:
-        """
-        Find a plugin.
+        """Find a plugin.
 
         Args:
             plugin_name: The name of the plugin to find.
@@ -264,8 +263,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         plugin_type: PluginType,
         namespace: str,
     ) -> ProjectPlugin:
-        """
-        Find a plugin based on its PluginType and namespace.
+        """Find a plugin based on its PluginType and namespace.
 
         For example, PluginType.EXTRACTORS and namespace tap_custom
         will return the extractor for the tap-custom plugin.

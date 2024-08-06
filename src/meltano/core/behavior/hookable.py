@@ -22,11 +22,11 @@ class hook:  # noqa: N801
     accordingly.
     """
 
-    def __init__(self, hook_name, *, can_fail=False) -> None:  # noqa: ANN001
+    def __init__(self, hook_name, *, can_fail=False) -> None:  # noqa: ANN001, D107
         self.name = hook_name
         self.can_fail = can_fail
 
-    def __call__(self, func):  # noqa: ANN001, ANN204
+    def __call__(self, func):  # noqa: ANN001, ANN204, D102
         func.__hook__ = self
         return func
 
@@ -37,7 +37,7 @@ class Hookable(type):
     Hooks are registered in declaration order.
     """
 
-    def __new__(cls, name, bases, dct):  # noqa: ANN001, ANN204
+    def __new__(cls, name, bases, dct):  # noqa: ANN001, ANN204, D102
         new_type = type.__new__(cls, name, bases, dct)
         new_type.__hooks__ = {}
 
@@ -54,7 +54,7 @@ class Hookable(type):
 
         return new_type
 
-    def __prepare__(cls, bases, **kwds):  # noqa: ANN001, ANN003, ANN204
+    def __prepare__(cls, bases, **kwds):  # noqa: ANN001, ANN003, ANN204, D105
         return OrderedDict()
 
 

@@ -1,10 +1,13 @@
-"""add_state_edit_to_job_state_enum
+"""add_state_edit_to_job_state_enum.
 
 Revision ID: 13e8639c6d2b
 Revises: d135f52a6f49
 Create Date: 2022-04-21 09:35:35.435614
 
 """
+
+from __future__ import annotations
+
 from enum import Enum
 
 import sqlalchemy as sa
@@ -34,7 +37,7 @@ class State(Enum):
     STATE_EDIT = (5, ())
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
@@ -56,7 +59,7 @@ def upgrade():
         conn.execute(sa.text("DROP TYPE job_state;"))
 
 
-def downgrade():
+def downgrade() -> None:
     conn = op.get_bind()
     # In sqlite, the field is already a varchar.
     # "ALTER COLUMN" statements are also not supported.
