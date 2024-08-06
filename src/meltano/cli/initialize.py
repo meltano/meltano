@@ -42,7 +42,7 @@ def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool) -> 
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
-    """
+    """  # noqa: D301
     if not project_directory:
         click.echo("We need a project name to get started!")
         project_directory = click.prompt(
