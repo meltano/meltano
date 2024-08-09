@@ -12,6 +12,8 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
+    DotEnvStoreManager,
+    EnvStoreManager,
     InheritedStoreManager,
     MeltanoEnvStoreManager,
     MeltanoYmlStoreManager,
@@ -637,3 +639,44 @@ class TestInheritedStoreManager:
         assert metadata["inherited_source"] is Store.DOTENV
         # Lack of env var expandability is inherited
         assert not metadata["expandable"]
+
+
+class TestEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> EnvStoreManager:
+        return EnvStoreManager(dummy_settings_service)
+
+    def test_ensure_supported(self, subject: EnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Store is not writable"):
+            subject.ensure_supported(method="set")
+
+        subject.ensure_supported(method="get")
+
+
+class TestDotEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> DotEnvStoreManager:
+        return DotEnvStoreManager(dummy_settings_service)
+
+    def test_set_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.set("undefined", [], "my-value", setting_def=None)
+
+    def test_unset_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.unset("undefined", [], setting_def=None)
+
+    def test_reset_readonly_project_failure(
+        self,
+        project,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(project, "readonly", True)
+        settings_service = DummySettingsService(project)
+        manager = DotEnvStoreManager(settings_service)
+
+        with pytest.raises(
+            StoreNotSupportedError,
+            match="This Meltano project is deployed as read-only",
+        ):
+            manager.reset()
