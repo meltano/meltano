@@ -88,7 +88,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
-    def client(self):  # noqa: ANN201
+    def client(self) -> google.cloud.storage.Client:
         """Get an authenticated google.cloud.storage.Client.
 
         Returns:
@@ -121,15 +121,19 @@ class GCSStateStoreManager(CloudStateStoreManager):
             else:
                 raise e
 
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The next file in the backend.
         """
+        blob: google.cloud.storage.Blob
         for blob in self.client.list_blobs(
             bucket_or_name=self.bucket,
-            prefix=self.state_dir,
+            prefix=self.state_dir if with_prefix else None,
         ):
             yield blob.name
 
