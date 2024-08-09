@@ -18,6 +18,12 @@ VERSION = 1
 class MeltanoFile(Canonical):
     """Data and loading methods for meltano.yml files."""
 
+    version: int
+    schedules: list[Schedule]
+    environments: list[Environment]
+    jobs: list[TaskSets]
+    env: dict[str, t.Any]
+
     def __init__(
         self,
         version: int = VERSION,
