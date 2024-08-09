@@ -430,9 +430,14 @@ async def test(
         reason=PluginInstallReason.AUTO,
     )
 
+    stream_buffer_size = project.settings.get("elt.buffer_size")
+    line_length_limit = stream_buffer_size // 2
+
     try:
         async with plugin_test_service.plugin_invoker.prepared(session):
-            is_valid, detail = await plugin_test_service.validate()
+            is_valid, detail = await plugin_test_service.validate(
+                limit=line_length_limit,
+            )
     except Exception:
         tracker.track_command_event(CliEvent.failed)
         raise
