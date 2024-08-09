@@ -58,14 +58,14 @@ class PluginTestService(ABC):
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
-    async def validate(self) -> tuple[bool, str]:
+    async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
         """Abstract method to validate plugin configuration."""
 
 
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self) -> tuple[bool, str | None]:
+    async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
         """Validate extractor configuration.
 
         Returns:
@@ -77,6 +77,7 @@ class ExtractorTestService(PluginTestService):
             process = await self.plugin_invoker.invoke_async(
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
+                **kwargs,
             )
         except Exception as exc:
             return False, str(exc)
