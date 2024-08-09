@@ -14,6 +14,8 @@ from meltano.core.state_store.filesystem import (
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from mypy_boto3_s3 import S3Client
+
 BOTO_INSTALLED = True
 
 try:
@@ -74,7 +76,9 @@ class S3StateStoreManager(CloudStateStoreManager):
         super().__init__(**kwargs)
         self.aws_access_key_id = aws_access_key_id or self.parsed.username
         self.aws_secret_access_key = aws_secret_access_key or self.parsed.password
-        self.bucket = bucket or self.parsed.hostname
+
+        # TODO: Make this type-safe. Maybe use https://github.com/fsspec/universal_pathlib?
+        self.bucket: str = bucket or self.parsed.hostname  # type: ignore[assignment]
         self.prefix = prefix or self.parsed.path
         self.endpoint_url = endpoint_url
 
@@ -95,7 +99,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
-    def client(self):  # noqa: ANN201
+    def client(self) -> S3Client:
         """Get an authenticated boto3.Client.
 
         Returns:
@@ -134,15 +138,20 @@ class S3StateStoreManager(CloudStateStoreManager):
             Delete={"Objects": [{"Key": file_path}]},
         )
 
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The path to each file in the backend.
         """
-        for state_obj in self.client.list_objects_v2(
-            Bucket=self.bucket,
-        ).get("Contents", []):
+        kwargs: dict[str, t.Any] = {"Bucket": self.bucket}
+        if with_prefix:
+            kwargs["Prefix"] = self.prefix
+
+        for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):
             yield state_obj["Key"]
 
     def copy_file(self, src: str, dst: str) -> None:

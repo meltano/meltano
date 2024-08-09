@@ -148,15 +148,18 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
             if not self.is_file_not_found_error(e):
                 raise e
 
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The next file in the backend.
         """
         container_client = self.client.get_container_client(self.container_name)
         for blob in container_client.list_blobs(
-            name_starts_with=self.prefix.lstrip("/"),
+            name_starts_with=self.prefix.lstrip("/") if with_prefix else None,
         ):
             yield blob.name
 
