@@ -20,7 +20,7 @@ install(suppress=[click])
 
 TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
-LEVELED_TIMESTAMPED_PRE_CHAIN = (
+LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
     # Add the log level and a timestamp to the event_dict if the log entry
     # is not from structlog.
     structlog.stdlib.add_log_level,
@@ -64,7 +64,11 @@ def rich_exception_formatter_factory(
     return _traceback
 
 
-def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormatter:
+def _process_formatter(
+    processor: Processor,
+    *,
+    include_callsite_parameters: bool = False,
+) -> structlog.stdlib.ProcessorFormatter:
     """Use _process_formatter to configure a structlog.stdlib.ProcessFormatter.
 
     It will automatically add log level and timestamp fields to any log entries
@@ -73,13 +77,31 @@ def _process_formatter(processor: Processor) -> structlog.stdlib.ProcessorFormat
     Args:
         processor: A structlog message processor such as
             `structlog.dev.ConsoleRenderer`.
+        include_callsite_parameters: Whether to include callsite parameters in
+            the output.
 
     Returns:
         A configured log processor.
     """
+    foreign_pre_chain = LEVELED_TIMESTAMPED_PRE_CHAIN
+
+    if include_callsite_parameters:
+        foreign_pre_chain = (  # noqa: WPS434
+            *foreign_pre_chain,
+            structlog.processors.CallsiteParameterAdder(
+                # Most folks probably don't need thread and process process IDs, so
+                # these three should be enough to start with.
+                parameters=(
+                    structlog.processors.CallsiteParameter.PATHNAME,
+                    structlog.processors.CallsiteParameter.LINENO,
+                    structlog.processors.CallsiteParameter.FUNC_NAME,
+                ),
+            ),
+        )
+
     return structlog.stdlib.ProcessorFormatter(
         processor=processor,
-        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+        foreign_pre_chain=foreign_pre_chain,
     )
 
 
@@ -87,12 +109,15 @@ def console_log_formatter(
     *,
     colors: bool = False,
     show_locals: bool = False,
+    include_callsite_parameters: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
     Args:
         colors: Add color to output.
         show_locals: Whether to show local variables in the traceback.
+        include_callsite_parameters: Whether to include callsite parameters in
+            the console output.
 
     Returns:
         A configured console log formatter.
@@ -115,6 +140,7 @@ def console_log_formatter(
             colors=colors,
             exception_formatter=exception_formatter,
         ),
+        include_callsite_parameters=include_callsite_parameters,
     )
 
 
@@ -123,6 +149,8 @@ def key_value_formatter(
     sort_keys: bool = False,
     key_order: t.Sequence[str] | None = None,
     drop_missing: bool = False,
+    *,
+    include_callsite_parameters: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.
 
@@ -133,6 +161,8 @@ def key_value_formatter(
             *sort_keys* and the dict class.
         drop_missing: When True, extra keys in *key_order* will be dropped
             rather than rendered as None.
+        include_callsite_parameters: Whether to include callsite parameters in
+            the key=value output.
 
     Returns:
         A configured key=value formatter.
@@ -143,13 +173,24 @@ def key_value_formatter(
             key_order=key_order,
             drop_missing=drop_missing,
         ),
+        include_callsite_parameters=include_callsite_parameters,
     )
 
 
-def json_formatter() -> structlog.stdlib.ProcessorFormatter:
+def json_formatter(
+    *,
+    include_callsite_parameters: bool = False,
+) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in JSON format.
+
+    Args:
+        include_callsite_parameters: Whether to include callsite parameters in
+            the JSON output.
 
     Returns:
         A configured JSON formatter.
     """
-    return _process_formatter(processor=structlog.processors.JSONRenderer())
+    return _process_formatter(
+        processor=structlog.processors.JSONRenderer(),
+        include_callsite_parameters=include_callsite_parameters,
+    )
