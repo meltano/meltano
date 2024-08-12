@@ -214,7 +214,6 @@ module = [
   "meltano.core.migration_service",
   "meltano.core.models",
   "meltano.core.plugin_install_service",
-  "meltano.core.plugin_test_service",
   "meltano.core.project_add_service",
   "meltano.core.project_files",
   "meltano.core.project_plugins_service",

@@ -158,7 +158,7 @@ def mypy(session: Session) -> None:
     """
     session.install(
         ".[mssql,azure,gcs,s3,uv]",
-        "boto3-stubs",
+        "boto3-stubs[essential]",
         "mypy",
         "types-croniter",
         "types-jsonschema",

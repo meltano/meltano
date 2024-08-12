@@ -208,6 +208,11 @@
       "default": 5,
       "minimum": 0
     },
+    "project_readonly": {
+      "type": "boolean",
+      "description": "Whether the project is read-only.",
+      "default": false
+    },
     "cli": {
       "type": "object",
       "description": "CLI related settings.",
