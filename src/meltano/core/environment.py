@@ -19,6 +19,10 @@ TEnv = t.TypeVar("TEnv", bound="Environment")
 class NoActiveEnvironment(Exception):
     """Exception raised when invocation has no active environment."""
 
+    def __init__(self) -> None:
+        """Create a new exception."""
+        super().__init__("No active environment found")
+
 
 class EnvironmentNameContainsStateIdDelimiterError(Exception):
     """An environment name contains the state ID component delimiter."""
