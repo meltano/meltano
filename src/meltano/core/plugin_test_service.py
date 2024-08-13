@@ -58,26 +58,31 @@ class PluginTestService(ABC):
         self.plugin_invoker = plugin_invoker
 
     @abstractmethod
-    async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
+    async def validate(self) -> tuple[bool, str | None]:
         """Abstract method to validate plugin configuration."""
 
 
 class ExtractorTestService(PluginTestService):
     """Handle extractor test operations."""
 
-    async def validate(self, **kwargs: t.Any) -> tuple[bool, str | None]:
+    async def validate(self) -> tuple[bool, str | None]:
         """Validate extractor configuration.
 
         Returns:
             The validation result and supporting context message (if applicable).
         """
         process = None
+        project_settings = self.plugin_invoker.project.settings
+        plugin_settings = self.plugin_invoker.settings_service
+
+        plugin_buffer_size = plugin_settings.get("_buffer_size") or 0
+        project_buffer_size = project_settings.get("elt.buffer_size")
 
         try:
             process = await self.plugin_invoker.invoke_async(
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,
-                **kwargs,
+                limit=max(plugin_buffer_size, project_buffer_size),
             )
         except Exception as exc:
             return False, str(exc)
