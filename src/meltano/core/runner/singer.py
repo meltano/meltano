@@ -51,7 +51,11 @@ class SingerRunner(Runner):  # noqa: D101
         # which cannot be set directly:
         # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L423-L424
         # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L510
-        stream_buffer_size = self.context.project.settings.get("elt.buffer_size")
+        stream_buffer_size = max(
+            self.context.project.settings.get("elt.buffer_size"),
+            tap.settings_service.get("_buffer_size") or 0,
+        )
+
         line_length_limit = stream_buffer_size // 2
 
         # Start tap

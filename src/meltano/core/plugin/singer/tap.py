@@ -190,6 +190,7 @@ class SingerTap(SingerPlugin):
             kind=SettingKind.BOOLEAN,
             value=True,
         ),
+        SettingDefinition(name="_buffer_size", kind=SettingKind.INTEGER),
     ]
 
     def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
