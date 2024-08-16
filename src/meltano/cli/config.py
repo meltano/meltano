@@ -352,12 +352,9 @@ def reset(ctx, store) -> None:  # noqa: ANN001
 
     try:
         metadata = settings.reset(store=store, session=session)
-    except StoreNotSupportedError as err:
+    except StoreNotSupportedError:  # pragma: no cover
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(
-            f"{settings.label.capitalize()} settings in {store.label} could "  # noqa: EM102
-            f"not be reset: {err}",
-        ) from err
+        raise
 
     store = metadata["store"]
     click.secho(
@@ -433,9 +430,14 @@ async def test(
         reason=PluginInstallReason.AUTO,
     )
 
+    stream_buffer_size = project.settings.get("elt.buffer_size")
+    line_length_limit = stream_buffer_size // 2
+
     try:
         async with plugin_test_service.plugin_invoker.prepared(session):
-            is_valid, detail = await plugin_test_service.validate()
+            is_valid, detail = await plugin_test_service.validate(
+                limit=line_length_limit,
+            )
     except Exception:
         tracker.track_command_event(CliEvent.failed)
         raise
@@ -475,12 +477,9 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     path = list(setting_name)
     try:
         metadata = settings.unset(path, store=store, session=session)
-    except StoreNotSupportedError as err:
+    except StoreNotSupportedError:  # pragma: no cover
         tracker.track_command_event(CliEvent.aborted)
-        raise CliError(
-            f"{settings.label.capitalize()} setting '{path}' in {store.label} "  # noqa: EM102
-            f"could not be unset: {err}",
-        ) from err
+        raise
 
     name = metadata["name"]
     store = metadata["store"]

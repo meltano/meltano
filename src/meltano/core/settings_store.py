@@ -15,7 +15,7 @@ import sqlalchemy
 import structlog
 
 from meltano.core.environment import NoActiveEnvironment
-from meltano.core.error import Error, ProjectReadonly
+from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
@@ -74,8 +74,16 @@ class MultipleEnvVarsSetException(Exception):
         )
 
 
-class StoreNotSupportedError(Error):
+class StoreNotSupportedError(MeltanoError):
     """Error raised when write actions are performed on a Store that is not writable."""
+
+    def __init__(
+        self,
+        reason: str | Exception = "Store is not supported",
+        **kwds: t.Any,
+    ) -> None:
+        """Instantiate the error."""
+        return super().__init__(reason, **kwds)
 
 
 def cast_setting_value(
@@ -298,7 +306,12 @@ class SettingsStoreManager(ABC):
             StoreNotSupportedError: if method is not "get" a store is not writable.
         """
         if method != "get" and not self.writable:
-            raise StoreNotSupportedError
+            reason = "Store is not writable"
+            instruction = f"Use one of {set(SettingValueStore.writables())}."
+            raise StoreNotSupportedError(
+                reason,
+                instruction=instruction,
+            )
 
     def log(self, message: str) -> None:
         """Log method.
@@ -372,7 +385,8 @@ class BaseEnvStoreManager(SettingsStoreManager):
             A tuple the got value and a dictionary containing metadata.
         """
         if not setting_def:
-            raise StoreNotSupportedError
+            reason = "Can not retrieve unknown setting from environment variables"
+            raise StoreNotSupportedError(reason)
 
         vals_with_metadata = []
         for env_var in self.setting_env_vars(setting_def):
@@ -517,7 +531,11 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             An empty dictionary.
         """
         if not setting_def:
-            raise StoreNotSupportedError
+            reason = f"Unknown setting '{name}' can not be set in `.env`"
+            instruction = (
+                "Define the setting in 'meltano.yml' or use a different setting store"
+            )
+            raise StoreNotSupportedError(reason, instruction=instruction)
 
         primary_var, *other_vars = self.setting_env_vars(setting_def)
         primary_key = primary_var.key
@@ -538,7 +556,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
 
     def unset(
         self,
-        name: str,  # noqa: ARG002
+        name: str,
         path: list[str],  # noqa: ARG002
         setting_def: SettingDefinition | None = None,
     ) -> dict:
@@ -556,7 +574,11 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             StoreNotSupportedError: if setting_def not passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError
+            reason = f"Unknown setting {name} can not be unset in `.env`"
+            instruction = (
+                "Define the setting in 'meltano.yml' or use a different setting store"
+            )
+            raise StoreNotSupportedError(reason, instruction=instruction)
 
         env_vars = self.setting_env_vars(setting_def)
         env_keys = [var.key for var in env_vars]
@@ -845,9 +867,8 @@ class MeltanoEnvStoreManager(MeltanoYmlStoreManager):
         """
         super().ensure_supported(method)
         if not self.settings_service.supports_environments:
-            raise StoreNotSupportedError(
-                "Project config cannot be stored in an Environment.",  # noqa: EM101
-            )
+            reason = "Project config cannot be stored in an Environment"
+            raise StoreNotSupportedError(reason)
         if self.settings_service.project.environment is None:
             raise StoreNotSupportedError(NoActiveEnvironment())
 
@@ -1095,7 +1116,7 @@ class InheritedStoreManager(SettingsStoreManager):
             StoreNotSupportedError: if no setting_def is passed.
         """
         if not setting_def:
-            raise StoreNotSupportedError("Setting is missing")  # noqa: EM101
+            raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101
 
         if not self.inherited_settings_service:
             raise StoreNotSupportedError("Inherited settings service is missing")  # noqa: EM101
