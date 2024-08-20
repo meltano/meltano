@@ -5,21 +5,29 @@ from __future__ import annotations
 import typing as t
 from abc import ABCMeta, abstractmethod
 
+from meltano.core.error import MeltanoError
+
 if t.TYPE_CHECKING:
     from meltano.core.block.ioblock import IOBlock
 
 
-class BlockSetValidationError(Exception):
+class BlockSetValidationError(MeltanoError):
     """Base exception when a block in a BlockSet violates the sets requirements."""
 
-    def __init__(self, error: str, message: str = "block violates set requirements"):
+    def __init__(
+        self,
+        error: str,
+        message: str = "block violates set requirements",
+        instruction: str | None = None,
+    ):
         """Initialize exception for when plugin violates the BlockSet requirements.
 
         Args:
             error: The error.
             message: The message.
+            instruction: An optional instruction to help the user.
         """
-        super().__init__(f"{message}: {error}")
+        super().__init__(f"{message}: {error}", instruction=instruction)
 
 
 class BlockSet(metaclass=ABCMeta):

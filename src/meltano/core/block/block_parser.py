@@ -325,4 +325,6 @@ class BlockParser:  # noqa: D101
                 raise BlockSetValidationError(
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",  # noqa: EM102
                 )
-        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101
+        errmsg = "Loader missing in block set!"
+        instruction = "Ensure the last block is a loader, e.g. 'target-postgres'"
+        raise BlockSetValidationError(errmsg, instruction=instruction)
