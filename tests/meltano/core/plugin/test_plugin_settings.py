@@ -226,6 +226,7 @@ class TestPluginSettingsService:
             assert full_config.get(key) == value
             assert redacted_config.get(key) == value
 
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_environment_only_config(
         self,
         environment: Environment,
@@ -452,6 +453,7 @@ class TestPluginSettingsService:
         ]
 
     @pytest.mark.usefixtures("tap")
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_store_db(self, session, subject) -> None:
         store = SettingValueStore.DB
 
@@ -469,6 +471,7 @@ class TestPluginSettingsService:
         assert session.query(Setting).count() == 0
 
     @pytest.mark.usefixtures("tap")
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_store_meltano_yml(self, subject, project) -> None:
         store = SettingValueStore.MELTANO_YML
 
@@ -622,6 +625,7 @@ class TestPluginSettingsService:
 
     @pytest.mark.order(3)
     @pytest.mark.usefixtures("tap")
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_nested_keys(self, session, subject, project) -> None:
         def set_config(path, value) -> None:
             subject.set(path, value, store=SettingValueStore.MELTANO_YML)
@@ -683,6 +687,7 @@ class TestPluginSettingsService:
         assert "metadata.stream.replication-key" not in final_config()
 
     @pytest.mark.usefixtures("tap")
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_custom_setting(self, session, subject, env_var) -> None:
         subject.set("custom_string", "from_yml", store=SettingValueStore.MELTANO_YML)
         subject.set("custom_bool", value=True, store=SettingValueStore.MELTANO_YML)
@@ -730,6 +735,7 @@ class TestPluginSettingsService:
         assert subject.get("start_date") == now.isoformat()
 
     @pytest.mark.usefixtures("tap")
+    @pytest.mark.filterwarnings("ignore:Unknown setting:RuntimeWarning")
     def test_kind_object(
         self,
         subject: PluginSettingsService,
