@@ -231,8 +231,6 @@ module = [
   "meltano.core.plugin.meltano_file",
   "meltano.core.plugin.project_plugin",
   "meltano.core.plugin.settings_service",
-  "meltano.core.plugin.singer.catalog",
-  "meltano.core.plugin.singer.target",
   "meltano.core.runner.*",
   "meltano.core.tracking.*",
   "meltano.core.utils.*",
