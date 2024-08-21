@@ -213,7 +213,6 @@ module = [
   "meltano.core.elt_context",
   "meltano.core.migration_service",
   "meltano.core.models",
-  "meltano.core.plugin_install_service",
   "meltano.core.plugin_invoker",
   "meltano.core.project_add_service",
   "meltano.core.project_files",

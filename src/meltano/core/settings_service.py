@@ -35,7 +35,7 @@ EXPERIMENTAL = "experimental"
 FEATURE_FLAG_PREFIX = "ff"
 
 
-class FeatureFlags(Enum):
+class FeatureFlags(str, Enum):
     """Available Meltano Feature Flags."""
 
     STRICT_ENV_VAR_MODE = "strict_env_var_mode"
