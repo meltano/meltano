@@ -112,7 +112,7 @@ class JsonschemaRefLocationParser:
         for key in parts[1:]:
             try:
                 current_schema = current_schema[key]
-            except KeyError as ex:
+            except KeyError as ex:  # noqa: PERF203
                 raise KeyError(
                     f"Unable to resolve local jsonschema ref {ref!r} at level {key!r}",  # noqa: EM102
                 ) from ex

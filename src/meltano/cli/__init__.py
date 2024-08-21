@@ -89,7 +89,7 @@ def handle_meltano_error(error: MeltanoError) -> t.NoReturn:
     Raises:
         CliError: always.
     """
-    raise CliError(str(error)) from error
+    raise CliError(str(error), exit_code=error.exit_code()) from error
 
 
 def _run_cli() -> None:
@@ -113,7 +113,7 @@ def _run_cli() -> None:
             raise CliError(f"{troubleshooting_message}\n{err}") from err  # noqa: EM102
     except CliError as cli_error:
         cli_error.print()
-        sys.exit(1)
+        sys.exit(cli_error.exit_code)
 
 
 def main() -> None:
