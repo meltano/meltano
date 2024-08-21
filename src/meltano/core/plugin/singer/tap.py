@@ -14,6 +14,7 @@ from hashlib import sha1
 from io import StringIO
 from itertools import takewhile
 
+import anyio
 import structlog
 from jsonschema import Draft4Validator
 
@@ -47,7 +48,7 @@ logger = structlog.getLogger(__name__)
 async def _stream_redirect(
     stream: asyncio.StreamReader | None,
     *file_like_objs,  # noqa: ANN002
-    write_str=False,  # noqa: ANN001
+    write_str: bool = False,
 ) -> None:
     """Redirect stream to a file like obj.
 
@@ -60,7 +61,10 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            file_like_obj.write(data.decode(encoding) if write_str else data)
+            if asyncio.iscoroutinefunction(file_like_obj.write):
+                await file_like_obj.write(data.decode(encoding) if write_str else data)
+            else:
+                file_like_obj.write(data.decode(encoding) if write_str else data)
 
 
 def _debug_logging_handler(
@@ -336,8 +340,9 @@ class SingerTap(SingerPlugin):
 
         if state:
             if state.get(SINGER_STATE_KEY):
-                with state_path.open("w") as state_file:
-                    json.dump(state.get(SINGER_STATE_KEY), state_file, indent=2)
+                async with await anyio.open_file(state_path, "w") as state_file:
+                    content = json.dumps(state.get(SINGER_STATE_KEY), indent=2)
+                    await state_file.write(content)
         else:
             logger.warning("No state was found, complete import.")
 
@@ -363,7 +368,7 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(  # ,
+    async def discover_catalog(
         self,
         plugin_invoker: PluginInvoker,
     ) -> None:
@@ -419,8 +424,8 @@ class SingerTap(SingerPlugin):
 
         # test for the result to be a valid catalog
         try:
-            with catalog_path.open("r") as catalog_file:
-                catalog = json.load(catalog_file)
+            async with await anyio.open_file(catalog_path) as catalog_file:
+                catalog = json.loads(await catalog_file.read())
                 Draft4Validator.check_schema(catalog)
         except Exception as err:
             catalog_path.unlink()
@@ -452,7 +457,7 @@ class SingerTap(SingerPlugin):
             )
         with StringIO("") as stderr_buff:
             try:
-                with catalog_path.open(mode="wb") as catalog:
+                async with await anyio.open_file(catalog_path, mode="wb") as catalog:
                     handle = await plugin_invoker.invoke_async(
                         "--discover",
                         stdout=asyncio.subprocess.PIPE,
