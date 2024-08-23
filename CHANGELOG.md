@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.6.0 (2024-08-23)
+
+### 🐛 Fixes
+
+- [#8689](https://github.com/meltano/meltano/issues/8689) Emit a clearer error message when trying to set/unset an unknown setting in `.env`
+- [#8658](https://github.com/meltano/meltano/issues/8658) List only the state IDs within the specified prefix in the S3 URI
+- [#8698](https://github.com/meltano/meltano/issues/8698) `meltano config ... test` now uses the `elt.buffer` setting
+- [#8699](https://github.com/meltano/meltano/issues/8699) Add missing `project_readonly` setting to JSON schema
+- [#8691](https://github.com/meltano/meltano/issues/8691) Addressed `structlog` warning by removing `format_exc_info` from the processor chain
+
+### 📚 Documentation Improvements
+
+- [#8721](https://github.com/meltano/meltano/issues/8721) Added instructions for installing Meltano with uv
+- [#8695](https://github.com/meltano/meltano/issues/8695) Fixed line highlighting and handling of `==` in code blocks
+
 ## v3.5.0 (2024-07-23)
 
 ### ✨ New
