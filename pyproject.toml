@@ -47,8 +47,8 @@ azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.30.2", optional = true}
 azure-identity = {version = "^1.17.1", optional = true}
 azure-storage-blob = {version = "^12.22.0", optional = true}
-boto3 = {version = "^1.35.0", optional = true}
-check-jsonschema = "^0.29.1"
+boto3 = {version = "^1.35.5", optional = true}
+check-jsonschema = "^0.29.2"
 click = "^8.1"
 click-default-group = "^1.2.4"
 click-didyoumean = "^0.3.1"
@@ -62,7 +62,7 @@ packaging = "^24.1"
 psutil = "^6.0.0"
 psycopg = {version = "^3.2.1", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
-pymssql = {version = "^2.3.0", optional = true}
+pymssql = {version = "^2.3.1", optional = true}
 python = ">=3.8,<3.13"
 python-dotenv = "^1.0.1"
 pyyaml = "^6.0.2"
@@ -78,7 +78,7 @@ typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-uv = { version = ">=0.1.24,<0.3", optional = true }
+uv = { version = ">=0.1.24,<0.4", optional = true }
 virtualenv = "^20.26.3"
 
 [tool.poetry.extras]
