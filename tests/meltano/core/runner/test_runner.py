@@ -278,7 +278,7 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio()
     async def test_run(self, subject) -> None:
-        async def invoke_mock(*args, **kwargs) -> None:  # noqa: ARG001
+        async def invoke_mock(*args, **kwargs) -> None:
             pass
 
         with mock.patch.object(
