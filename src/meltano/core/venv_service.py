@@ -733,7 +733,7 @@ class UvVenvService(VenvService):
         """
         return await exec_async(
             self.uv,
-            "virtualenv",
+            "venv",
             "--python",
             self.venv.python_path,
             str(self.venv.root),
