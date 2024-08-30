@@ -11,8 +11,8 @@ import typing as t
 import click
 
 import meltano
-from meltano.cli.utils import PluginInstallReason, install_plugins
 from meltano.core.error import MeltanoError
+from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_plugins_service import PluginType
 from meltano.core.state_service import StateService
 from meltano.core.state_store.filesystem import CloudStateStoreManager

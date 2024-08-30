@@ -7,10 +7,10 @@ import typing as t
 
 import click
 
-from meltano.cli.utils import AutoInstallBehavior, CliError, install_plugins
+from meltano.cli.utils import AutoInstallBehavior, CliError
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationError
-from meltano.core.plugin_install_service import PluginInstallReason
+from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
 

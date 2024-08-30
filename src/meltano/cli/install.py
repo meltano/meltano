@@ -8,9 +8,10 @@ import click
 import structlog
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd, install_plugins
+from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.block.parser import BlockParser
 from meltano.core.plugin import PluginType
+from meltano.core.plugin_install_service import install_plugins
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
