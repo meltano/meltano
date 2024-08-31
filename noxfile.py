@@ -45,14 +45,12 @@ main_python_version = "3.12"
 pytest_deps = (
     "backoff",
     "colorama",  # colored output in Windows
-    "hypothesis",
     "mock",
     "moto",
     "pytest",
     "pytest-asyncio",
     "pytest-cov",
     "pytest-docker",
-    "pytest-httpserver",
     "pytest-order",
     "pytest-randomly",
     "pytest-structlog",
@@ -63,7 +61,7 @@ pytest_deps = (
 
 
 def _run_pytest(session: Session) -> None:
-    random_seed = randint(0, 2**32 - 1)  # noqa: S311, WPS432
+    random_seed = randint(0, 2**32 - 1)  # noqa: S311
     args = session.posargs or ("tests/",)
     try:
         session.env.update(
@@ -160,15 +158,12 @@ def mypy(session: Session) -> None:
     """
     session.install(
         ".[mssql,azure,gcs,s3,uv]",
-        "boto3-stubs",
+        "boto3-stubs[essential]",
         "mypy",
         "types-croniter",
-        "types-python-dateutil",
         "types-jsonschema",
         "types-psutil",
-        "types-python-slugify",
         "types-PyYAML",
         "types-requests",
-        "types-tabulate",
     )
     session.run("mypy", *session.posargs)

@@ -1,10 +1,13 @@
-"""add_login_audit_columns
+"""add_login_audit_columns.
 
 Revision ID: a3e2b0a4937d
 Revises: 53e97221d99f
 Create Date: 2020-01-09 14:23:56.880364
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -20,7 +23,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
 
@@ -28,6 +31,6 @@ def upgrade():
     op.add_column("user", sa.Column("login_count", sa.Integer, default=0))
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_column("user", "last_login_at")
     op.drop_column("user", "login_count")

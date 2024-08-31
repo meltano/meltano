@@ -1,10 +1,13 @@
-"""add resource type to embed token
+"""add resource type to embed token.
 
 Revision ID: 23ea52e6d784
 Revises: ceb00d7ff3bd
 Create Date: 2020-02-12 09:29:31.592426
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 import sqlalchemy.orm
 from alembic import op
@@ -23,7 +26,7 @@ depends_on = None
 Session = sa.orm.sessionmaker()
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     max_string_length = max_string_length_for_dialect(dialect_name)
 
@@ -32,9 +35,9 @@ def upgrade():
     )
 
     metadata = sa.MetaData()
-    Embed_Tokens = sa.Table("embed_tokens", metadata, autoload_with=op.get_bind())
+    Embed_Tokens = sa.Table("embed_tokens", metadata, autoload_with=op.get_bind())  # noqa: N806
     op.execute(Embed_Tokens.update().values({"resource_type": "report"}))
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_column("embed_tokens", "resource_type")

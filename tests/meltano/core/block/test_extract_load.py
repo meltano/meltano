@@ -42,7 +42,7 @@ MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
-        Path(os.path.join(config_dir, file)).touch()
+        Path(os.path.join(config_dir, file)).touch()  # noqa: PTH118
 
     return config_dir
 
@@ -74,7 +74,12 @@ def elb_context(project, session, test_job, output_logger) -> ELBContext:
 
 
 class TestELBContext:
-    def test_elt_run_dir_is_returned(self, project, test_job, elb_context: ELBContext):
+    def test_elt_run_dir_is_returned(
+        self,
+        project,
+        test_job,
+        elb_context: ELBContext,
+    ) -> None:
         expected_path = project.job_dir(test_job.job_name, str(test_job.run_id))
         assert elb_context.elt_run_dir == Path(expected_path)
 
@@ -88,7 +93,7 @@ class TestELBContextBuilder:
             return err.plugin
 
     @pytest.mark.usefixtures("target")
-    def test_builder_returns_elb_context(self, project, session, tap):
+    def test_builder_returns_elb_context(self, project, session, tap) -> None:
         """Ensure that builder is returning ELBContext and not itself."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -96,7 +101,13 @@ class TestELBContextBuilder:
         assert isinstance(builder.context(), ELBContext)
         assert isinstance(builder.make_block(tap).invoker.context, ELBContext)
 
-    def test_make_block_returns_valid_singer_block(self, project, session, tap, target):
+    def test_make_block_returns_valid_singer_block(
+        self,
+        project,
+        session,
+        tap,
+        target,
+    ) -> None:
         """Ensure that calling make_block returns a valid SingerBlock."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -111,7 +122,7 @@ class TestELBContextBuilder:
         assert block.consumer
         assert not block.producer
 
-    def test_make_block_tracks_envs(self, project, session, tap, target):
+    def test_make_block_tracks_envs(self, project, session, tap, target) -> None:
         """Ensure that calling make_block correctly stacks env vars."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -127,7 +138,7 @@ class TestELBContextBuilder:
         assert builder._env.items() >= block2.context.env.items()
 
     @pytest.mark.asyncio()
-    async def test_validate_envs(self, project, session, tap, target_postgres):
+    async def test_validate_envs(self, project, session, tap, target_postgres) -> None:
         """Ensure that expected environment variables are present."""
         builder = ELBContextBuilder(project)
         builder.session = session
@@ -222,27 +233,27 @@ class TestExtractLoadBlocks:
     @pytest.fixture()
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
-        tap.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        tap.stdout.readline = AsyncMock(return_value="{}")
         tap.wait = AsyncMock(return_value=0)
         return tap
 
     @pytest.fixture()
     def mapper_process(self, process_mock_factory, mapper):
         mapper = process_mock_factory(mapper)
-        mapper.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        mapper.stdout.readline = AsyncMock(return_value="{}")
         mapper.wait = AsyncMock(return_value=0)
         return mapper
 
     @pytest.fixture()
     def target_process(self, process_mock_factory, target):
         target = process_mock_factory(target)
-        target.stdout.readline = AsyncMock(return_value="{}")  # noqa: P103
+        target.stdout.readline = AsyncMock(return_value="{}")
         target.wait = AsyncMock(return_value=0)
         return target
 
     @pytest.mark.asyncio()
     @pytest.mark.usefixtures("session", "subject", "log", "log_level_debug")
-    async def test_link_io(  # noqa: WPS210
+    async def test_link_io(
         self,
         tap_config_dir,
         target_config_dir,
@@ -255,7 +266,7 @@ class TestExtractLoadBlocks:
         mapper_process,
         plugin_invoker_factory,
         elb_context,
-    ):
+    ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
@@ -341,7 +352,7 @@ class TestExtractLoadBlocks:
         mapper_process,
         plugin_invoker_factory,
         elb_context,
-    ):
+    ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
@@ -419,7 +430,7 @@ class TestExtractLoadBlocks:
         target_process,
         plugin_invoker_factory,
         elb_context,
-    ):
+    ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
@@ -515,7 +526,7 @@ class TestExtractLoadBlocks:
         plugin_invoker_factory,
         elb_context,
         project,
-    ):
+    ) -> None:
         tap_process.sterr.at_eof.side_effect = True
         tap_process.stdout.at_eof.side_effect = (False, False, True)
         tap_process.stdout.readline = AsyncMock(
@@ -584,7 +595,7 @@ class TestExtractLoadBlocks:
         tap,
         target,
         project_with_environment: Project,
-    ):
+    ) -> None:
         run_id = uuid.UUID("12345678-1234-5678-1234-567812345678")
         builder = ELBContextBuilder(project_with_environment).with_run_id(run_id)
         assert builder._run_id == run_id
@@ -599,7 +610,7 @@ class TestExtractLoadBlocks:
 
 
 class TestExtractLoadUtils:
-    def test_generate_state_id(self):
+    def test_generate_state_id(self) -> None:
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -619,7 +630,7 @@ class TestExtractLoadUtils:
             == "test:block1-to-block2:suffix"
         )
 
-    def test_generate_state_id_no_environment(self):
+    def test_generate_state_id_no_environment(self) -> None:
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 
@@ -634,7 +645,7 @@ class TestExtractLoadUtils:
         with pytest.raises(RunnerError):
             generate_state_id(project, None, block1, block2)
 
-    def test_generate_state_id_component_contains_delimiter(self):
+    def test_generate_state_id_component_contains_delimiter(self) -> None:
         block1 = mock.Mock(spec=IOBlock)
         block1.string_id = "block1"
 

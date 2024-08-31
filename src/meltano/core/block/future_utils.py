@@ -42,7 +42,7 @@ def handle_producer_line_length_limit_error(
     exception: Exception,
     line_length_limit: int,
     stream_buffer_size: int,
-):
+) -> None:
     """Handle `asyncio.LimitOverrunError` from producers.
 
     Args:
@@ -60,7 +60,7 @@ def handle_producer_line_length_limit_error(
     if not isinstance(exception, ValueError):
         return
 
-    exception = exception.__context__  # noqa: WPS609
+    exception = exception.__context__
     if not isinstance(exception, asyncio.LimitOverrunError):
         return
 

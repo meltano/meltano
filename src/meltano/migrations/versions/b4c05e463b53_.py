@@ -1,15 +1,17 @@
-"""Create meltano.core base tables
+"""Create meltano.core base tables.
 
 Revision ID: b4c05e463b53
 Revises: 6f28844bcd3c
 Create Date: 2019-07-23 16:05:29.073296
 
 """
+
+from __future__ import annotations
+
 from enum import Enum
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects.mssql import DATETIME2
 from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.migrations import IntFlag, JSONEncodedDict
@@ -27,7 +29,7 @@ depends_on = None
 
 
 # from `src/meltano/core/job.py`
-class State(Enum):
+class State(Enum):  # noqa: D101
     IDLE = (0, ("RUNNING", "FAIL"))
     RUNNING = (1, ("SUCCESS", "FAIL"))
     SUCCESS = (2, ())
@@ -35,7 +37,7 @@ class State(Enum):
     DEAD = (4, ())
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
     max_string_length = max_string_length_for_dialect(dialect_name)
@@ -65,6 +67,6 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_table("job")
     op.drop_table("plugin_settings")

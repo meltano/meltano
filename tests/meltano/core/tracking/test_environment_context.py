@@ -10,11 +10,11 @@ if t.TYPE_CHECKING:
     import pytest
 
 
-def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
+def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
         monkeypatch.delenv(notable_flag_env_var, raising=False)
 
-    assert EnvironmentContext().data["notable_flag_env_vars"] == {}  # noqa: WPS520
+    assert EnvironmentContext().data["notable_flag_env_vars"] == {}
 
     def check(env_var_values: tuple[str, ...], expected: bool | None) -> None:
         for notable_flag_env_var in EnvironmentContext.notable_flag_env_vars:
@@ -28,15 +28,15 @@ def test_notable_flag_env_vars(monkeypatch: pytest.MonkeyPatch):
             expected,
         )
 
-    check(("Yes", "TRUE", "1", "true", "y", "on", "t"), True)
-    check(("No", "FALSE", "0", "false", "n", "off", "f"), False)
-    check(("trew", "Fallse", "nah", "si", "okay", "01"), None)
+    check(("Yes", "TRUE", "1", "true", "y", "on", "t"), expected=True)
+    check(("No", "FALSE", "0", "false", "n", "off", "f"), expected=False)
+    check(("trew", "Fallse", "nah", "si", "okay", "01"), expected=None)
 
 
-def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch):
+def test_notable_hashed_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     for notable_hashed_env_var in EnvironmentContext.notable_hashed_env_vars:
         monkeypatch.delenv(notable_hashed_env_var, raising=False)
-    assert EnvironmentContext().data["notable_hashed_env_vars"] == {}  # noqa: WPS520
+    assert EnvironmentContext().data["notable_hashed_env_vars"] == {}
 
     github_username = "test_user"
     monkeypatch.setenv("GITHUB_USER", github_username)

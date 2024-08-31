@@ -18,12 +18,19 @@ class ExitCode(int, Enum):  # noqa: D101
     NO_RETRY = 2
 
 
-class MeltanoError(Exception):
+class Error(Exception):
+    """Base exception for ELT errors."""
+
+    def exit_code(self):  # noqa: ANN201, D102
+        return ExitCode.FAIL
+
+
+class MeltanoError(Error):
     """Base class for all user-facing errors."""
 
     def __init__(
         self,
-        reason: str,
+        reason: str | Exception | None = None,
         instruction: str | None = None,
         *args: t.Any,
         **kwargs: t.Any,
@@ -53,17 +60,10 @@ class MeltanoError(Exception):
         )
 
 
-class Error(Exception):
-    """Base exception for ELT errors."""
-
-    def exit_code(self):  # noqa: D102
-        return ExitCode.FAIL
-
-
 class ExtractError(Error):
     """Error in the extraction process, like API errors."""
 
-    def exit_code(self):  # noqa: D102
+    def exit_code(self):  # noqa: ANN201, D102
         return ExitCode.NO_RETRY
 
 
@@ -75,7 +75,7 @@ class AsyncSubprocessError(Exception):
         message: str,
         process: Process,
         stderr: str | None = None,
-    ):  # noqa: DAR101
+    ):
         """Initialize AsyncSubprocessError."""
         self.process = process
         self._stderr: str | StreamReader | None = stderr or process.stderr
@@ -84,7 +84,7 @@ class AsyncSubprocessError(Exception):
     @property
     async def stderr(self) -> str | None:
         """Return the output of the process to stderr."""
-        if not self._stderr:  # noqa: DAR201
+        if not self._stderr:
             return None
         if not isinstance(self._stderr, str):
             stream = await self._stderr.read()
@@ -132,6 +132,6 @@ class ProjectNotFound(Error):
 class ProjectReadonly(Error):
     """Attempting to update a readonly project."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Instantiate the error."""
         super().__init__("This Meltano project is deployed as read-only")

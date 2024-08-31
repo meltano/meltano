@@ -25,7 +25,7 @@ class PluginContext(t.NamedTuple):
     settings_service: PluginSettingsService
     session: Session
 
-    def __getattr__(self, attr: str) -> t.Any:
+    def __getattr__(self, attr: str) -> t.Any:  # noqa: ANN401
         """Get plugin attribute.
 
         Args:
@@ -36,7 +36,7 @@ class PluginContext(t.NamedTuple):
         """
         return getattr(self.plugin, attr)
 
-    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:
+    def get_config(self, name: str, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Get plugin config by name.
 
         Args:
@@ -48,7 +48,7 @@ class PluginContext(t.NamedTuple):
         """
         return self.settings_service.get(name, session=self.session, **kwargs)
 
-    def config_dict(self, **kwargs) -> dict:
+    def config_dict(self, **kwargs) -> dict:  # noqa: ANN003
         """Get plugins config dict.
 
         Args:
@@ -59,7 +59,7 @@ class PluginContext(t.NamedTuple):
         """
         return self.settings_service.as_dict(session=self.session, **kwargs)
 
-    def config_env(self, **kwargs) -> dict[str, str]:
+    def config_env(self, **kwargs) -> dict[str, str]:  # noqa: ANN003
         """Get plugins config environment.
 
         Args:
@@ -80,14 +80,15 @@ class PluginContext(t.NamedTuple):
         return {**self.plugin.info_env, **self.config_env()}
 
 
-class ELTContext:  # noqa: WPS230
+class ELTContext:
     """ELT Context."""
 
     def __init__(
         self,
+        *,
         project: Project,
         job: Job | None = None,
-        session=None,
+        session=None,  # noqa: ANN001
         extractor: PluginContext | None = None,
         loader: PluginContext | None = None,
         transform: PluginContext | None = None,
@@ -143,7 +144,7 @@ class ELTContext:  # noqa: WPS230
         self.merge_state = merge_state
 
     @property
-    def elt_run_dir(self):
+    def elt_run_dir(self):  # noqa: ANN201
         """Get the ELT run directory.
 
         Returns:
@@ -201,7 +202,7 @@ class ELTContext:  # noqa: WPS230
         return self.invoker_for(PluginType.TRANSFORMERS)
 
 
-class ELTContextBuilder:  # noqa: WPS214
+class ELTContextBuilder:
     """ELT Context Builder."""
 
     def __init__(self, project: Project):
@@ -307,7 +308,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._transformer = PluginRef(PluginType.TRANSFORMERS, transformer_name)
         return self
 
-    def with_only_transform(self, only_transform: bool) -> ELTContextBuilder:
+    def with_only_transform(self, *, only_transform: bool) -> ELTContextBuilder:
         """Include only transform flag when building context.
 
         Args:
@@ -319,7 +320,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._only_transform = only_transform
         return self
 
-    def with_dry_run(self, dry_run: bool) -> ELTContextBuilder:
+    def with_dry_run(self, *, dry_run: bool) -> ELTContextBuilder:
         """Include dry run flag when building context.
 
         Args:
@@ -331,7 +332,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._dry_run = dry_run
         return self
 
-    def with_full_refresh(self, full_refresh: bool) -> ELTContextBuilder:
+    def with_full_refresh(self, *, full_refresh: bool) -> ELTContextBuilder:
         """Include full refresh flag when building context.
 
         Args:
@@ -344,7 +345,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._full_refresh = full_refresh
         return self
 
-    def with_refresh_catalog(self, refresh_catalog: bool) -> ELTContextBuilder:
+    def with_refresh_catalog(self, *, refresh_catalog: bool) -> ELTContextBuilder:
         """Ignore cached catalog.
 
         Args:
@@ -356,7 +357,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_merge_state(self, merge_state: bool):
+    def with_merge_state(self, *, merge_state: bool):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
@@ -404,7 +405,7 @@ class ELTContextBuilder:  # noqa: WPS214
         self._state = state
         return self
 
-    def set_base_output_logger(self, base_output_logger: OutputLogger):  # noqa: WPS615
+    def set_base_output_logger(self, base_output_logger: OutputLogger) -> None:
         """Set the base output logger for use in this ELTContext.
 
         Args:
@@ -508,7 +509,7 @@ class ELTContextBuilder:  # noqa: WPS214
             )
 
         return ELTContext(
-            self.project,
+            project=self.project,
             job=self._job,
             session=self._session,
             extractor=extractor,

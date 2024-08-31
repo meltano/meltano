@@ -21,7 +21,7 @@ class TestCliInstall:
             return err.plugin
 
     @pytest.mark.order(0)
-    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner):
+    def test_install(self, project, tap, tap_gitlab, target, dbt, cli_runner) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -59,7 +59,7 @@ class TestCliInstall:
         target,
         mapper,
         cli_runner,
-    ):
+    ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
@@ -113,7 +113,7 @@ class TestCliInstall:
         target,
         mapper,
         cli_runner,
-    ):
+    ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock_e:
             install_plugin_mock_e.return_value = True
 
@@ -160,7 +160,7 @@ class TestCliInstall:
             assert mappings_seen == 2
 
     @pytest.mark.usefixtures("target", "dbt")
-    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner):
+    def test_install_multiple(self, project, tap, tap_gitlab, cli_runner) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -179,7 +179,14 @@ class TestCliInstall:
             )
 
     @pytest.mark.usefixtures("dbt")
-    def test_install_multiple_any_type(self, project, tap, target, dbt, cli_runner):
+    def test_install_multiple_any_type(
+        self,
+        project,
+        tap,
+        target,
+        dbt,
+        cli_runner,
+    ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -206,7 +213,7 @@ class TestCliInstall:
         dbt,
         mapper,
         cli_runner,
-    ):
+    ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -242,7 +249,7 @@ class TestCliInstall:
         dbt,
         mapper,
         cli_runner,
-    ):
+    ) -> None:
         with mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
 
@@ -281,7 +288,7 @@ class TestCliInstall:
         schedule_service,
         job_schedule,
         task_sets_service,
-    ):
+    ) -> None:
         with mock.patch(
             "meltano.cli.install.ScheduleService",
             return_value=schedule_service,
@@ -324,7 +331,7 @@ class TestCliInstall:
         schedule_service,
         elt_schedule,
         task_sets_service,
-    ):
+    ) -> None:
         with mock.patch(
             "meltano.cli.install.ScheduleService",
             return_value=schedule_service,
@@ -360,7 +367,7 @@ class TestCliInstall:
 # For more details
 @pytest.mark.order(-1)
 @pytest.mark.usefixtures("un_engine_uri", "project_function")
-def test_new_folder_should_autocreate_on_install(cli_runner):
+def test_new_folder_should_autocreate_on_install(cli_runner) -> None:
     """Be sure .meltano auto creates a db on install by default.
 
     We had a case https://github.com/meltano/meltano/issues/6383
@@ -369,4 +376,4 @@ def test_new_folder_should_autocreate_on_install(cli_runner):
     shutil.rmtree(".meltano")
     result = cli_runner.invoke(cli, ["install"])
     assert result
-    assert os.path.exists(".meltano/meltano.db")
+    assert os.path.exists(".meltano/meltano.db")  # noqa: PTH110

@@ -44,12 +44,12 @@ if t.TYPE_CHECKING:
 )
 @click.pass_context
 @pass_project(migrate=True)
-def schedule(project, ctx):
-    """
-    Manage pipeline schedules.
+def schedule(project, ctx) -> None:  # noqa: ANN001
+    """Manage pipeline schedules.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#schedule
+    """  # noqa: D301
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)
@@ -63,7 +63,7 @@ def _add_elt(
     transform: str,
     interval: str,
     start_date: datetime.datetime | None,
-):
+) -> None:
     """Add a new legacy elt schedule."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -89,7 +89,7 @@ def _add_elt(
         session.close()
 
 
-def _add_job(ctx, name: str, job: str, interval: str):
+def _add_job(ctx, name: str, job: str, interval: str) -> None:  # noqa: ANN001
     """Add a new scheduled job."""
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -107,12 +107,33 @@ def _add_job(ctx, name: str, job: str, interval: str):
         session.close()
 
 
+class CronParam(click.ParamType):
+    """Custom type definition for cron parameter."""
+
+    name = "cron"
+
+    def convert(self, value, *_):  # noqa: ANN001, ANN201
+        """Validate and con interval."""
+        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+            raise BadCronError(value)
+
+        return value
+
+
 @schedule.command(
     cls=PartialInstrumentedCmd,
     short_help="[default] Add a new schedule.",
 )
 @click.argument("name")
-@click.option("--interval", required=True, help="Interval of the schedule.")
+@click.option(
+    "--interval",
+    required=True,
+    help=(
+        f"Interval of the schedule. One of {', '.join(CRON_INTERVALS)} "
+        "or a cron expression."
+    ),
+    type=CronParam(),
+)
 @click.option("--job", help="The name of the job to run.")
 @click.option("--extractor", required=False, help="ELT Only")
 @click.option("--loader", required=False, help="ELT Only")
@@ -133,9 +154,8 @@ def add(
     transform: str,
     interval: str,
     start_date: datetime.datetime | None,
-):
-    """
-    Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
+) -> None:
+    """Add a new schedule. Schedules can be used to run Meltano jobs or ELT tasks at a specific interval.
 
     Example usage:
 
@@ -145,10 +165,12 @@ def add(
     \t# Schedule an ELT task to run hourly
     \tmeltano schedule add <schedule_name> --extractor <tap> --loader <target> --transform run --interval "@hourly"
 
-    \b\nNote that the --job option and --extractor/--loader options are mutually exclusive.
+    \b
+    Note that the --job option and --extractor/--loader options are mutually exclusive.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#schedule
-    """  # noqa: E501
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#schedule
+    """  # noqa: D301, E501
     if job and (extractor or loader):
         raise click.ClickException(
             "Cannot mix --job with --extractor/--loader/--transform",  # noqa: EM101
@@ -203,7 +225,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     }
 
 
-@schedule.command(  # noqa: WPS125
+@schedule.command(
     cls=PartialInstrumentedCmd,
     name="list",
     short_help="List available schedules.",
@@ -215,7 +237,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     default="text",
 )
 @click.pass_context
-def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
+def list_schedules(ctx: click.Context, list_format: str) -> None:
     """List available schedules."""
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
@@ -229,7 +251,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
         if list_format == "text":
             transform_elt_markers = {
                 "run": ("→", "→"),
-                "only": ("×", "→"),
+                "only": ("×", "→"),  # noqa: RUF001
                 "skip": ("→", "x"),
             }
 
@@ -281,7 +303,7 @@ def list_schedules(ctx: click.Context, list_format: str) -> None:  # noqa: C901
 @click.argument("name")
 @click.argument("elt_options", nargs=-1, type=click.UNPROCESSED)
 @click.pass_context
-def run(ctx: click.Context, name: str, elt_options: tuple[str]):
+def run(ctx: click.Context, name: str, elt_options: tuple[str]) -> None:
     """Run a schedule."""
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     process = schedule_service.run(schedule_service.find_schedule(name), *elt_options)
@@ -296,7 +318,7 @@ def run(ctx: click.Context, name: str, elt_options: tuple[str]):
 )
 @click.argument("name", required=True)
 @click.pass_context
-def remove(ctx, name):
+def remove(ctx, name) -> None:  # noqa: ANN001
     """Remove a schedule.
 
     Usage:
@@ -374,19 +396,6 @@ def _update_elt_schedule(
     return candidate
 
 
-class CronParam(click.ParamType):
-    """Custom type definition for cron parameter."""
-
-    name = "cron"
-
-    def convert(self, value, *_):
-        """Validate and con interval."""
-        if value not in CRON_INTERVALS and not croniter.is_valid(value):
-            raise BadCronError(value)
-
-        return value
-
-
 @schedule.command(
     cls=PartialInstrumentedCmd,
     name="set",
@@ -395,7 +404,10 @@ class CronParam(click.ParamType):
 @click.argument("name", required=True)
 @click.option(
     "--interval",
-    help="Update the interval of the schedule.",
+    help=(
+        f"Update the interval of the schedule. One of {', '.join(CRON_INTERVALS)} "
+        "or a cron expression."
+    ),
     type=CronParam(),
 )
 @click.option("--job", help="Update the name of the job to run a scheduled job.")
@@ -416,7 +428,7 @@ def set_cmd(
     extractor: str | None,
     loader: str | None,
     transform: str | None,
-):
+) -> None:
     """Update a schedule.
 
     Usage:

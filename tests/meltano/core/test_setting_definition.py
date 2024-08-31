@@ -10,7 +10,7 @@ class TestSettingDefinition:
         ("setting_definition", "uncast_expected_pairs"),
         (
             (
-                SettingDefinition("test_setting", kind=SettingKind.ARRAY),
+                SettingDefinition(name="test_setting", kind=SettingKind.ARRAY),
                 (
                     ('["abc", "xyz"]', ["abc", "xyz"]),
                     ('["abc", "xyz",]', ["abc", "xyz"]),
@@ -25,7 +25,7 @@ class TestSettingDefinition:
                 ),
             ),
             (
-                SettingDefinition("test_setting", kind=SettingKind.OBJECT),
+                SettingDefinition(name="test_setting", kind=SettingKind.OBJECT),
                 (
                     (
                         '{"key_1": "value_1", "key_2": "value_2"}',
@@ -48,7 +48,7 @@ class TestSettingDefinition:
         self,
         setting_definition: SettingDefinition,
         uncast_expected_pairs,
-    ):
+    ) -> None:
         for uncast, expected in uncast_expected_pairs:
             if isinstance(expected, type) and issubclass(expected, Exception):
                 with pytest.raises(expected):
@@ -56,9 +56,9 @@ class TestSettingDefinition:
             else:
                 assert setting_definition.cast_value(uncast) == expected
 
-    def test_cast_options(self):
+    def test_cast_options(self) -> None:
         setting_definition = SettingDefinition(
-            "test_setting",
+            name="test_setting",
             kind=SettingKind.OPTIONS,
             options=[
                 {"value": "abc", "label": "ABC"},
@@ -77,7 +77,7 @@ class TestSettingDefinition:
         (
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=True,
                     kind=SettingKind.STRING,
                 ),
@@ -87,7 +87,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=True,
                     kind=SettingKind.PASSWORD,
                 ),
@@ -97,7 +97,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=False,
                     kind=None,
                 ),
@@ -107,7 +107,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=False,
                     kind=SettingKind.STRING,
                 ),
@@ -117,7 +117,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=False,
                     kind=SettingKind.PASSWORD,
                 ),
@@ -127,7 +127,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=False,
                     kind=None,
                 ),
@@ -137,7 +137,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=None,
                     kind=SettingKind.STRING,
                 ),
@@ -147,7 +147,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=None,
                     kind=SettingKind.PASSWORD,
                 ),
@@ -157,7 +157,7 @@ class TestSettingDefinition:
             ),
             pytest.param(
                 SettingDefinition(
-                    "test_setting",
+                    name="test_setting",
                     sensitive=None,
                     kind=None,
                 ),
@@ -170,8 +170,9 @@ class TestSettingDefinition:
     def test_parse(
         self,
         setting_definition: SettingDefinition,
+        *,
         sensitive: bool,
         kind: SettingKind,
-    ):
+    ) -> None:
         assert setting_definition.sensitive is sensitive
         assert setting_definition.kind is kind

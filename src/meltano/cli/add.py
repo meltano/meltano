@@ -51,7 +51,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
     return yaml.load(content) or {}
 
 
-@click.command(  # noqa: WPS238
+@click.command(
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )
@@ -114,8 +114,8 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
 @pass_project()
 @click.pass_context
 @run_async
-async def add(  # noqa: C901 WPS238
-    ctx,
+async def add(
+    ctx,  # noqa: ANN001
     project: Project,
     plugin_type: str,
     plugin_name: str,
@@ -125,13 +125,13 @@ async def add(  # noqa: C901 WPS238
     as_name: str | None = None,
     plugin_yaml: dict | None = None,
     python: str | None = None,
-    **flags,
-):
-    """
-    Add a plugin to your project.
+    **flags,  # noqa: ANN003
+) -> None:
+    """Add a plugin to your project.
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#add
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#add
+    """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
     plugin_type = PluginType.from_cli_argument(plugin_type)
@@ -213,7 +213,7 @@ async def add(  # noqa: C901 WPS238
     tracker.track_command_event(CliEvent.completed)
 
 
-def _print_plugins(plugins):
+def _print_plugins(plugins) -> None:  # noqa: ANN001
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

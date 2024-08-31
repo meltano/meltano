@@ -21,9 +21,8 @@ from meltano.core.upgrade_service import UpgradeService
 )
 @pass_project()
 @click.pass_context
-def upgrade(ctx, project):
-    """
-    Upgrade Meltano and your entire project to the latest version.
+def upgrade(ctx, project) -> None:  # noqa: ANN001
+    """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
 
@@ -31,14 +30,15 @@ def upgrade(ctx, project):
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
-    """
-    engine, _ = project_engine(project)  # noqa: WPS427 (unreachable code)
-    upgrade_service = UpgradeService(engine, project)  # noqa: WPS427 (unreachable code)
-    ctx.obj["upgrade_service"] = upgrade_service  # noqa: WPS427 (unreachable code)
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    """  # noqa: D301
+    engine, _ = project_engine(project)  # (unreachable code)
+    upgrade_service = UpgradeService(engine, project)  # (unreachable code)
+    ctx.obj["upgrade_service"] = upgrade_service  # (unreachable code)
 
 
-@upgrade.command(  # noqa: WPS125
+@upgrade.command(
     cls=InstrumentedCmd,
     name="all",
     short_help="Upgrade Meltano and your entire project to the latest version.",
@@ -63,9 +63,8 @@ def upgrade(ctx, project):
     help="Skip updating the Meltano package.",
 )
 @click.pass_context
-def all_(ctx, pip_url, force, skip_package):
-    """
-    Upgrade Meltano and your entire project to the latest version.
+def all_(ctx, pip_url, force, skip_package) -> None:  # noqa: ANN001
+    """Upgrade Meltano and your entire project to the latest version.
 
     When called without arguments, this will:
 
@@ -73,8 +72,9 @@ def all_(ctx, pip_url, force, skip_package):
     - Update files managed by file bundles\n
     - Apply migrations to system database\n
 
-    \b\nRead more at https://docs.meltano.com/reference/command-line-interface#upgrade
-    """
+    \b
+    Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
+    """  # noqa: D301
     upgrade_service = ctx.obj["upgrade_service"]
 
     if skip_package:
@@ -128,7 +128,7 @@ def all_(ctx, pip_url, force, skip_package):
     help="Force upgrade.",
 )
 @click.pass_context
-def package(ctx, **kwargs):
+def package(ctx, **kwargs) -> None:  # noqa: ANN001, ANN003
     """Upgrade the Meltano package only."""
     ctx.obj["upgrade_service"].upgrade_package(**kwargs)
 
@@ -138,7 +138,7 @@ def package(ctx, **kwargs):
     short_help="Update files managed by file bundles only.",
 )
 @click.pass_context
-def files(ctx):
+def files(ctx) -> None:  # noqa: ANN001
     """Update files managed by file bundles only."""
     ctx.obj["upgrade_service"].update_files()
 
@@ -148,6 +148,6 @@ def files(ctx):
     short_help="Apply migrations to system database only.",
 )
 @click.pass_context
-def database(ctx):
+def database(ctx) -> None:  # noqa: ANN001
     """Apply migrations to system database only."""
     ctx.obj["upgrade_service"].migrate_database()

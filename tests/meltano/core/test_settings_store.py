@@ -12,6 +12,8 @@ from meltano.core.setting_definition import SettingDefinition
 from meltano.core.settings_service import SettingsService
 from meltano.core.settings_store import (
     AutoStoreManager,
+    DotEnvStoreManager,
+    EnvStoreManager,
     InheritedStoreManager,
     MeltanoEnvStoreManager,
     MeltanoYmlStoreManager,
@@ -26,7 +28,7 @@ Store = SettingValueStore
 class DummySettingsService(SettingsService):
     """Dummy SettingsService for testing."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Instantiate new DummySettingsService instance.
 
         Args:
@@ -38,14 +40,14 @@ class DummySettingsService(SettingsService):
         self.__meltano_yml_config = {}
         self._meltano_environment_config = {}
         self.__definitions = [
-            SettingDefinition("regular", aliases=["basic"], value="from_default"),
-            SettingDefinition("password", sensitive=True),
-            SettingDefinition("env_specific", env_specific=True),
+            SettingDefinition(name="regular", aliases=["basic"], value="from_default"),
+            SettingDefinition(name="password", sensitive=True),
+            SettingDefinition(name="env_specific", env_specific=True),
         ]
         self._inherited_settings = None
 
     @property
-    def label(self):
+    def label(self) -> str:
         return "Dummy"
 
     @property
@@ -53,7 +55,7 @@ class DummySettingsService(SettingsService):
         return ProjectSettingsService(Project.find())
 
     @property
-    def docs_url(self):
+    def docs_url(self) -> str:
         return "https://docs.meltano.com/"
 
     @property
@@ -61,7 +63,7 @@ class DummySettingsService(SettingsService):
         return ["dummy"]
 
     @property
-    def db_namespace(self):
+    def db_namespace(self) -> str:
         return "dummy"
 
     @property
@@ -72,10 +74,10 @@ class DummySettingsService(SettingsService):
     def meltano_yml_config(self):
         return self.__meltano_yml_config
 
-    def update_meltano_yml_config(self, config):
+    def update_meltano_yml_config(self, config) -> None:
         self.__meltano_yml_config = config
 
-    def update_meltano_environment_config(self, config):
+    def update_meltano_environment_config(self, config) -> None:
         self._meltano_environment_config = config
 
     @property
@@ -130,7 +132,7 @@ class TestAutoStoreManager:
 
     @pytest.fixture()
     def set_value_store(self, subject):
-        def _set_value_store(value, store, name="regular"):
+        def _set_value_store(value, store, name="regular") -> None:
             subject.manager_for(store).set(
                 name,
                 [name],
@@ -146,7 +148,7 @@ class TestAutoStoreManager:
 
     @pytest.fixture()
     def assert_value_source(self, subject):
-        def _assert_value_source(value, source, name="regular"):
+        def _assert_value_source(value, source, name="regular") -> None:
             new_value, metadata = subject.get(
                 name,
                 setting_def=subject.find_setting(name),
@@ -174,7 +176,7 @@ class TestAutoStoreManager:
         unsupported,
         environment,
         monkeypatch,
-    ):
+    ) -> None:
         assert subject.auto_store(setting_name) == preferred_store
 
         # Meltano environment is selected only when there's an active environment
@@ -215,7 +217,7 @@ class TestAutoStoreManager:
         assert subject.auto_store(setting_name) == Store.DB
 
     @pytest.mark.usefixtures("assert_value_source")
-    def test_get(  # noqa: WPS213
+    def test_get(
         self,
         subject,
         project,
@@ -223,7 +225,7 @@ class TestAutoStoreManager:
         set_value_store,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         value, metadata = subject.get("regular")
         assert value == "from_default"
         assert metadata["source"] == Store.DEFAULT
@@ -311,7 +313,7 @@ class TestAutoStoreManager:
         assert_value_source,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         def set_value(value):
             return subject.set("regular", ["regular"], value)
 
@@ -377,7 +379,7 @@ class TestAutoStoreManager:
         # Even though `.env` can't be overwritten
         assert_value_source("from_dotenv", Store.DOTENV)
 
-    def test_unset(  # noqa: WPS213
+    def test_unset(
         self,
         subject,
         project,
@@ -386,7 +388,7 @@ class TestAutoStoreManager:
         assert_value_source,
         monkeypatch,
         environment,
-    ):
+    ) -> None:
         set_value_store("from_dotenv", Store.DOTENV, name="password")
 
         set_value_store("from_dotenv", Store.DOTENV)
@@ -439,7 +441,7 @@ class TestAutoStoreManager:
         subject.unset("custom_in_env", ["custom_in_env"])
         assert_value_source(None, Store.DEFAULT, name="custom_in_env")
 
-    def test_reset(  # noqa: WPS213
+    def test_reset(
         self,
         subject,
         unsupported,
@@ -448,7 +450,7 @@ class TestAutoStoreManager:
         project,
         environment,
         monkeypatch,
-    ):
+    ) -> None:
         set_value_store("from_db", Store.DB)
         set_value_store("from_meltano_yml", Store.MELTANO_YML, name="unknown")
         set_value_store("from_dotenv", Store.DOTENV, name="password")
@@ -520,7 +522,7 @@ class TestMeltanoYmlStoreManager:
         yield manager
         manager.reset()
 
-    def test_get(self, subject):
+    def test_get(self, subject) -> None:
         def get():
             return subject.get(
                 "regular",
@@ -538,7 +540,7 @@ class TestMeltanoYmlStoreManager:
 
         assert get() == ("value", {"expandable": True, "key": "regular"})
 
-    def test_set(self, subject):
+    def test_set(self, subject) -> None:
         def set_value(key, value):
             return subject.set(
                 key,
@@ -559,7 +561,7 @@ class TestMeltanoYmlStoreManager:
         assert "basic" not in subject.flat_config
         assert subject.flat_config["regular"] == "new_value"
 
-    def test_unset(self, subject):
+    def test_unset(self, subject) -> None:
         def unset_value(key):
             return subject.unset(
                 key,
@@ -567,7 +569,7 @@ class TestMeltanoYmlStoreManager:
                 setting_def=subject.settings_service.find_setting(key),
             )
 
-        def set_values():
+        def set_values() -> None:
             subject.flat_config["regular"] = "value"
             subject.flat_config["basic"] = "alias_value"
 
@@ -601,7 +603,7 @@ class TestInheritedStoreManager:
     def subject(self, dummy_settings_service):
         return InheritedStoreManager(dummy_settings_service)
 
-    def test_get(self, subject, project):
+    def test_get(self, subject, project) -> None:
         def get(key="regular"):
             return subject.get(
                 key,
@@ -637,3 +639,44 @@ class TestInheritedStoreManager:
         assert metadata["inherited_source"] is Store.DOTENV
         # Lack of env var expandability is inherited
         assert not metadata["expandable"]
+
+
+class TestEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> EnvStoreManager:
+        return EnvStoreManager(dummy_settings_service)
+
+    def test_ensure_supported(self, subject: EnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Store is not writable"):
+            subject.ensure_supported(method="set")
+
+        subject.ensure_supported(method="get")
+
+
+class TestDotEnvStoreManager:
+    @pytest.fixture()
+    def subject(self, dummy_settings_service) -> DotEnvStoreManager:
+        return DotEnvStoreManager(dummy_settings_service)
+
+    def test_set_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.set("undefined", [], "my-value", setting_def=None)
+
+    def test_unset_undefined_setting_failure(self, subject: DotEnvStoreManager) -> None:
+        with pytest.raises(StoreNotSupportedError, match="Unknown setting"):
+            subject.unset("undefined", [], setting_def=None)
+
+    def test_reset_readonly_project_failure(
+        self,
+        project,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(project, "readonly", True)
+        settings_service = DummySettingsService(project)
+        manager = DotEnvStoreManager(settings_service)
+
+        with pytest.raises(
+            StoreNotSupportedError,
+            match="This Meltano project is deployed as read-only",
+        ):
+            manager.reset()

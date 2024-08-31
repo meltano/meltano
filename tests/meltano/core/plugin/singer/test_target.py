@@ -21,7 +21,7 @@ class TestSingerTarget:
             return err.plugin
 
     @pytest.mark.asyncio()
-    async def test_exec_args(self, subject, session, plugin_invoker_factory):
+    async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
@@ -33,7 +33,7 @@ class TestSingerTarget:
         session,
         plugin_invoker_factory,
         elt_context_builder,
-    ):
+    ) -> None:
         job = Job(job_name="pytest_test_runner")
 
         # test noop run outside of pipeline context
@@ -91,7 +91,7 @@ class TestSingerTarget:
             .with_loader(subject.name)
             .with_job(job)
             .with_select_filter(["entity", "!other_entity"])
-            .with_full_refresh(True)
+            .with_full_refresh(full_refresh=True)
             .context()
         )
 

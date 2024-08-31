@@ -29,7 +29,7 @@ class TestCliConfig:
         tap,
         session,
         plugin_settings_service_factory,
-    ):
+    ) -> None:
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
             "secure",
@@ -45,7 +45,7 @@ class TestCliConfig:
         assert json_config["secure"] == "*****"
 
     @pytest.mark.usefixtures("project")
-    def test_config_extras(self, cli_runner, tap):
+    def test_config_extras(self, cli_runner, tap) -> None:
         result = cli_runner.invoke(cli, ["config", "--extras", tap.name])
         assert_cli_runner(result)
 
@@ -59,7 +59,7 @@ class TestCliConfig:
         tap,
         session,
         plugin_settings_service_factory,
-    ):
+    ) -> None:
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
             "secure",
@@ -75,7 +75,7 @@ class TestCliConfig:
         assert env_config["TAP_MOCK_SECURE"] == "*****"
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano(self, cli_runner, engine_uri):
+    def test_config_meltano(self, cli_runner, engine_uri) -> None:
         result = cli_runner.invoke(cli, ["config", "meltano"])
         assert_cli_runner(result)
 
@@ -84,7 +84,7 @@ class TestCliConfig:
         assert json_config["cli"]["log_level"] == "info"
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano_set(self, cli_runner):
+    def test_config_meltano_set(self, cli_runner) -> None:
         result = cli_runner.invoke(
             cli,
             ["config", "meltano", "set", "cli.log_config", "log_config.yml"],
@@ -97,7 +97,7 @@ class TestCliConfig:
 
     @pytest.mark.usefixtures("project")
     @pytest.mark.parametrize("message_type", ("RECORD", "BATCH"))
-    def test_config_test(self, cli_runner, tap, message_type: str):
+    def test_config_test(self, cli_runner, tap, message_type: str) -> None:
         mock_invoke = mock.Mock()
         mock_invoke.stderr.at_eof.side_effect = True
         mock_invoke.stdout.at_eof.side_effect = (False, True)
@@ -117,7 +117,7 @@ class TestCliConfig:
             assert "Plugin configuration is valid" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_meltano_test(self, cli_runner):
+    def test_config_meltano_test(self, cli_runner) -> None:
         result = cli_runner.invoke(cli, ["config", "meltano", "test"])
 
         assert result.exit_code == 1
@@ -133,7 +133,7 @@ class TestCliConfig:
         tap,
         session,
         plugin_settings_service_factory,
-    ):
+    ) -> None:
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
             "secure",
@@ -158,7 +158,7 @@ class TestCliConfig:
         inherited_tap,
         session,
         plugin_settings_service_factory,
-    ):
+    ) -> None:
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
             "secure",
@@ -182,7 +182,7 @@ class TestCliConfig:
         tap,
         session,
         plugin_settings_service_factory,
-    ):
+    ) -> None:
         value = "thisisatest"
 
         plugin_settings_service = plugin_settings_service_factory(tap)
@@ -204,7 +204,7 @@ class TestCliConfig:
 
 class TestCliConfigSet:
     @pytest.mark.usefixtures("project")
-    def test_config_set_redacted(self, cli_runner, tap):
+    def test_config_set_redacted(self, cli_runner, tap) -> None:
         result = cli_runner.invoke(
             cli,
             ["config", tap.name, "set", "secure", "thisisatest"],
@@ -217,7 +217,7 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_set_unsafe(self, cli_runner, tap):
+    def test_config_set_unsafe(self, cli_runner, tap) -> None:
         value = "thisisatest"
 
         result = cli_runner.invoke(
@@ -231,7 +231,8 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path):
+    @pytest.mark.filterwarnings("ignore:Unknown setting 'private_key':RuntimeWarning")
+    def test_config_set_from_file(self, cli_runner, tap, tmp_path: Path) -> None:
         result = cli_runner.invoke(
             cli,
             ["config", tap.name, "set", "private_key", "--from-file", "-"],
@@ -259,7 +260,11 @@ class TestCliConfigSet:
         ) in result.stdout
 
     @pytest.mark.usefixtures("tap")
-    def test_environments_order_of_precedence(self, project: Project, cli_runner):
+    def test_environments_order_of_precedence(
+        self,
+        project: Project,
+        cli_runner,
+    ) -> None:
         # set base config in `meltano.yml`
         result = cli_runner.invoke(
             cli,

@@ -24,7 +24,7 @@ class StateIDLockedError(Exception):
 class StateStoreManager(ABC):
     """Base state store manager."""
 
-    def __init__(self, **kwargs):  # noqa: B027
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003, B027
         """Initialize state store manager.
 
         Args:
@@ -37,7 +37,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def set(self, state: JobState):
+    def set(self, state: JobState):  # noqa: ANN201
         """Set the job state for the given state_id.
 
         Args:
@@ -49,7 +49,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get(self, state_id) -> JobState | None:
+    def get(self, state_id) -> JobState | None:  # noqa: ANN001
         """Get the job state for the given state_id.
 
         Args:
@@ -61,7 +61,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def clear(self, state_id):
+    def clear(self, state_id):  # noqa: ANN001, ANN201
         """Clear state for the given state_id.
 
         Args:
@@ -70,7 +70,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get_state_ids(self, pattern=None):
+    def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -79,7 +79,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def acquire_lock(self, state_id):
+    def acquire_lock(self, state_id):  # noqa: ANN001, ANN201
         """Acquire a naive lock for the given job's state.
 
         Args:

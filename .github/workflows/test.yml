@@ -10,6 +10,7 @@ on:
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
+      - .github/workflows/resources/docker-compose.mssql.yaml
   push:
     branches: [main]
     paths:
@@ -20,6 +21,7 @@ on:
       - pyproject.toml
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
+      - .github/workflows/resources/docker-compose.mssql.yaml
   workflow_dispatch:
     inputs: {}
 
@@ -113,7 +115,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.5.0
+      uses: docker/setup-buildx-action@v3.6.1
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')

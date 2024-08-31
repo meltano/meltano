@@ -22,12 +22,12 @@ class hook:  # noqa: N801
     accordingly.
     """
 
-    def __init__(self, hook_name, can_fail=False):
+    def __init__(self, hook_name, *, can_fail=False) -> None:  # noqa: ANN001, D107
         self.name = hook_name
         self.can_fail = can_fail
 
-    def __call__(self, func):
-        func.__hook__ = self  # noqa: WPS609
+    def __call__(self, func):  # noqa: ANN001, ANN204, D102
+        func.__hook__ = self
         return func
 
 
@@ -37,24 +37,24 @@ class Hookable(type):
     Hooks are registered in declaration order.
     """
 
-    def __new__(cls, name, bases, dct):
-        new_type = type.__new__(cls, name, bases, dct)  # noqa: WPS609
-        new_type.__hooks__ = {}  # noqa: WPS609
+    def __new__(cls, name, bases, dct):  # noqa: ANN001, ANN204, D102
+        new_type = type.__new__(cls, name, bases, dct)
+        new_type.__hooks__ = {}
 
-        for hook_name, hook in (  # noqa: WPS442
-            (func.__hook__.name, func)  # noqa: WPS609, WPS335
+        for hook_name, hook in (
+            (func.__hook__.name, func)
             for func in dct.values()
-            if hasattr(func, "__hook__")  # noqa: WPS421
+            if hasattr(func, "__hook__")
         ):
-            new_type.__hooks__[hook_name] = new_type.__hooks__.get(  # noqa: WPS609
+            new_type.__hooks__[hook_name] = new_type.__hooks__.get(
                 hook_name,
                 [],
-            )  # noqa: WPS609
-            new_type.__hooks__[hook_name].append(hook)  # noqa: WPS609
+            )
+            new_type.__hooks__[hook_name].append(hook)
 
         return new_type
 
-    def __prepare__(cls, bases, **kwds):
+    def __prepare__(cls, bases, **kwds):  # noqa: ANN001, ANN003, ANN204, D105
         return OrderedDict()
 
 
@@ -66,7 +66,7 @@ class HookObject(metaclass=Hookable):
     """
 
     @asynccontextmanager
-    async def trigger_hooks(self, hook_name, *args, **kwargs):
+    async def trigger_hooks(self, hook_name, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN201
         """Trigger all registered before and after functions for a given hook.
 
         Yields to the caller in between triggers.
@@ -100,20 +100,20 @@ class HookObject(metaclass=Hookable):
             self._triggering_hooks.remove(hook_name)
 
     @classmethod
-    async def trigger(cls, target, hook_name, *args, **kwargs):
+    async def trigger(cls, target, hook_name, *args, **kwargs) -> None:  # noqa: ANN001, ANN002, ANN003
         """Trigger a registered hook function."""
         hooks = [
             hook
             for hook_cls in reversed(cls.__mro__)
-            if hasattr(hook_cls, "__hooks__")  # noqa: WPS421
-            for hook in hook_cls.__hooks__.get(hook_name, [])  # noqa: WPS361, WPS609
+            if hasattr(hook_cls, "__hooks__")
+            for hook in hook_cls.__hooks__.get(hook_name, [])
         ]
 
         for hook_func in hooks:
             try:
                 await hook_func(target, *args, **kwargs)
-            except Exception as err:
-                if hook_func.__hook__.can_fail:  # noqa: WPS609
+            except Exception as err:  # noqa: PERF203
+                if hook_func.__hook__.can_fail:
                     logger.debug(str(err), exc_info=True)
                     logger.warning(
                         f"{hook_name} hook '{hook_func.__name__}' has failed: {err}",  # noqa: G004

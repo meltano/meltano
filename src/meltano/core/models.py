@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import typing as t
 from datetime import datetime
 
 from sqlalchemy import MetaData, types
@@ -14,7 +15,7 @@ class SystemModel(DeclarativeBase):
     """Base class for all database models."""
 
     metadata = SystemMetadata
-    type_annotation_map = {
+    type_annotation_map: t.ClassVar[dict] = {
         str: types.String(),
         bool: types.Boolean(),
         datetime: types.DateTime(),

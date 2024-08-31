@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import errno
 import os
+from typing import NoReturn  # noqa: ICN003
 
 import mock
 import pytest
@@ -17,8 +18,8 @@ class TestPluginRemoveService:
         return PluginRemoveService(project)
 
     @pytest.fixture()
-    def add(self, subject: PluginRemoveService):
-        with open(subject.project.meltanofile, "w") as meltano_yml:
+    def add(self, subject: PluginRemoveService) -> None:
+        with subject.project.meltanofile.open("w") as meltano_yml:
             meltano_yml.write(
                 yaml.dump(
                     {
@@ -26,13 +27,13 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                                 },
                             ],
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",  # noqa: E501
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                                 },
                             ],
                         },
@@ -41,7 +42,7 @@ class TestPluginRemoveService:
             )
 
     @pytest.fixture()
-    def install(self, subject: PluginRemoveService):
+    def install(self, subject: PluginRemoveService) -> None:
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
             "tap-gitlab",
@@ -50,11 +51,11 @@ class TestPluginRemoveService:
             "loaders",
             "target-csv",
         )
-        os.makedirs(tap_gitlab_installation, exist_ok=True)
-        os.makedirs(target_csv_installation, exist_ok=True)
+        tap_gitlab_installation.mkdir(parents=True, exist_ok=True)
+        target_csv_installation.mkdir(parents=True, exist_ok=True)
 
     @pytest.fixture()
-    def lock(self, subject: PluginRemoveService):
+    def lock(self, subject: PluginRemoveService) -> None:
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",
             "tap-gitlab",
@@ -68,11 +69,11 @@ class TestPluginRemoveService:
         tap_gitlab_lockfile.touch()
         target_csv_lockfile.touch()
 
-    def test_default_init_should_not_fail(self, subject):
+    def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
 
     @pytest.mark.usefixtures("add", "install", "lock")
-    def test_remove(self, subject: PluginRemoveService):
+    def test_remove(self, subject: PluginRemoveService) -> None:
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
@@ -80,16 +81,15 @@ class TestPluginRemoveService:
 
         for plugin in plugins:
             # check removed from meltano.yml
-            with open(subject.project.meltanofile) as meltanofile:
+            with subject.project.meltanofile.open() as meltanofile:
                 meltano_yml = yaml.safe_load(meltanofile)
 
                 with pytest.raises(KeyError):
-                    meltano_yml[plugin.type, plugin.name]  # noqa: WPS428
+                    meltano_yml[plugin.type, plugin.name]
 
             # check removed installation
-            assert not os.path.exists(
-                subject.project.meltano_dir().joinpath(plugin.type, plugin.name),
-            )
+            path = subject.project.meltano_dir().joinpath(plugin.type, plugin.name)
+            assert not path.exists()
 
             # check removed lock files
             lock_file_paths = list(
@@ -99,14 +99,14 @@ class TestPluginRemoveService:
             )
             assert all(not path.exists() for path in lock_file_paths)
 
-    def test_remove_not_added_or_installed(self, subject: PluginRemoveService):
+    def test_remove_not_added_or_installed(self, subject: PluginRemoveService) -> None:
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
 
     @pytest.mark.usefixtures("add", "install", "lock")
-    def test_remove_db_error(self, subject: PluginRemoveService):
+    def test_remove_db_error(self, subject: PluginRemoveService) -> None:
         plugins = list(subject.project.plugins.plugins())
 
         with mock.patch(
@@ -122,8 +122,8 @@ class TestPluginRemoveService:
         assert removed_plugins == 0
 
     @pytest.mark.usefixtures("add", "install", "lock")
-    def test_remove_meltano_yml_error(self, subject: PluginRemoveService):
-        def raise_permissionerror(filename):
+    def test_remove_meltano_yml_error(self, subject: PluginRemoveService) -> None:
+        def raise_permissionerror(filename) -> NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())
@@ -137,8 +137,8 @@ class TestPluginRemoveService:
         assert removed_plugins == 0
 
     @pytest.mark.usefixtures("add", "install", "lock")
-    def test_remove_installation_error(self, subject: PluginRemoveService):
-        def raise_permissionerror(filename):
+    def test_remove_installation_error(self, subject: PluginRemoveService) -> None:
+        def raise_permissionerror(filename) -> NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())
@@ -150,7 +150,7 @@ class TestPluginRemoveService:
         assert removed_plugins == 0
 
     @pytest.mark.usefixtures("add", "install")
-    def test_remove_lockfile_not_found(self, subject: PluginRemoveService):
+    def test_remove_lockfile_not_found(self, subject: PluginRemoveService) -> None:
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, _ = subject.remove_plugins(plugins)
 

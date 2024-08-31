@@ -99,7 +99,7 @@ class HubPluginVariantNotFoundError(Exception):
         )
 
 
-class MeltanoHubService(PluginRepository):  # noqa: WPS214
+class MeltanoHubService(PluginRepository):
     """PluginRepository implementation for the Meltano Hub."""
 
     session = requests.Session()
@@ -156,7 +156,7 @@ class MeltanoHubService(PluginRepository):  # noqa: WPS214
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
     @property
-    def hub_url_auth(self):
+    def hub_url_auth(self):  # noqa: ANN201
         """Return the `hub_url_auth` setting.
 
         Returns:

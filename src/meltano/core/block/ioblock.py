@@ -92,7 +92,7 @@ class IOBlock(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    async def stop(self, kill: bool = True) -> None:
+    async def stop(self, *, kill: bool = True) -> None:
         """Stop a block.
 
         Args:

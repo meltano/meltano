@@ -19,7 +19,7 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 class FakeCode:
     """A fake code object that can be used to test log formatters."""
 
-    def __init__(self, co_filename, co_name):
+    def __init__(self, co_filename, co_name) -> None:
         self.co_filename = co_filename
         self.co_name = co_name
 
@@ -27,7 +27,7 @@ class FakeCode:
 class FakeFrame:
     """A fake traceback frame that can be used to test log formatters."""
 
-    def __init__(self, f_code, f_globals, f_locals=None):
+    def __init__(self, f_code, f_globals, f_locals=None) -> None:
         self.f_code = f_code
         self.f_globals = f_globals
         self.f_locals = f_locals or {}
@@ -36,7 +36,7 @@ class FakeFrame:
 class FakeTraceback:  # pragma: no cover
     """A fake traceback that can be used to test log formatters."""
 
-    def __init__(self, frames, line_nums):
+    def __init__(self, frames, line_nums) -> None:
         if len(frames) != len(line_nums):
             raise ValueError("Ya messed up!")  # noqa: EM101
         self._frames = frames
@@ -97,22 +97,22 @@ class TestLogFormatters:
             ),
         )
 
-    def test_console_log_formatter_colors(self, record, monkeypatch):
+    def test_console_log_formatter_colors(self, record, monkeypatch) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
         formatter = console_log_formatter(colors=True)
         assert ANSI_RE.match(formatter.format(record))
 
-    def test_console_log_formatter_no_colors(self, record):
+    def test_console_log_formatter_no_colors(self, record) -> None:
         formatter = console_log_formatter(colors=False)
         assert not ANSI_RE.match(formatter.format(record))
 
-    def test_console_log_formatter_no_locals(self, record_with_exception):
+    def test_console_log_formatter_no_locals(self, record_with_exception) -> None:
         formatter = console_log_formatter(show_locals=False)
         output = formatter.format(record_with_exception)
         assert "locals" not in output
         assert "my_var = 'my_value'" not in output
 
-    def test_console_log_formatter_show_locals(self, record_with_exception):
+    def test_console_log_formatter_show_locals(self, record_with_exception) -> None:
         formatter = console_log_formatter(show_locals=True)
         output = formatter.format(record_with_exception)
         assert "locals" in output

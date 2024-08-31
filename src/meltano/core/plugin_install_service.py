@@ -80,7 +80,7 @@ class PluginInstallState:
     details: str | None = None
 
     @cached_property
-    def successful(self):
+    def successful(self) -> bool:
         """Plugin install success status.
 
         Returns:
@@ -89,7 +89,7 @@ class PluginInstallState:
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @cached_property
-    def skipped(self):
+    def skipped(self) -> bool:
         """Plugin install skipped status.
 
         Returns:
@@ -120,7 +120,7 @@ class PluginInstallState:
         return "Errored"
 
 
-def with_semaphore(func):
+def with_semaphore(func):  # noqa: ANN001, ANN201
     """Gate access to the method using its class's semaphore.
 
     Args:
@@ -130,21 +130,22 @@ def with_semaphore(func):
         Wrapped function.
     """
 
-    @functools.wraps(func)  # noqa: WPS430
-    async def wrapper(self, *args, **kwargs):  # noqa: WPS430
+    @functools.wraps(func)
+    async def wrapper(self, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
         async with self.semaphore:
             return await func(self, *args, **kwargs)
 
     return wrapper
 
 
-class PluginInstallService:  # noqa: WPS214
+class PluginInstallService:
     """Plugin install service."""
 
     def __init__(
         self,
         project: Project,
         status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
+        *,
         parallelism: int | None = None,
         clean: bool = False,
         force: bool = False,
@@ -178,19 +179,19 @@ class PluginInstallService:  # noqa: WPS214
         return self._parallelism
 
     @cached_property
-    def semaphore(self):
+    def semaphore(self) -> asyncio.Semaphore:
         """An asyncio semaphore with a counter starting at `self.parallelism`.
 
         Returns:
             An asyncio semaphore with a counter starting at `self.parallelism`.
-        """  # noqa: D401
+        """
         return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
     def remove_duplicates(
         plugins: t.Iterable[ProjectPlugin],
         reason: PluginInstallReason,
-    ):
+    ) -> tuple[list[PluginInstallState], list[ProjectPlugin]]:
         """Deduplicate list of plugins, keeping the last occurrences.
 
         Trying to install multiple plugins into the same venv via `asyncio.run`
@@ -207,8 +208,8 @@ class PluginInstallService:  # noqa: WPS214
             skipped plugins) and a deduplicated list of plugins to install.
         """
         seen_venvs = set()
-        deduped_plugins = []
-        states = []
+        deduped_plugins: list[ProjectPlugin] = []
+        states: list[PluginInstallState] = []
         for plugin in plugins:
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
@@ -229,10 +230,9 @@ class PluginInstallService:  # noqa: WPS214
 
     async def install_all_plugins(
         self,
-        reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
-        """
-        Install all the plugins for the project.
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    ) -> list[PluginInstallState]:
+        """Install all the plugins for the project.
 
         Blocks until all plugins are installed.
 
@@ -247,8 +247,8 @@ class PluginInstallService:  # noqa: WPS214
     async def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,
-    ) -> tuple[PluginInstallState]:
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    ) -> list[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
@@ -272,10 +272,9 @@ class PluginInstallService:  # noqa: WPS214
     def install_plugin(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> PluginInstallState:
-        """
-        Install a plugin.
+        """Install a plugin.
 
         Blocks until the plugin is installed.
 
@@ -297,7 +296,7 @@ class PluginInstallService:  # noqa: WPS214
     async def install_plugin_async(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
@@ -396,7 +395,7 @@ class PluginInstallService:  # noqa: WPS214
         self,
         plugin: ProjectPlugin,
         *,
-        env: t.Mapping[str, str] = None,
+        env: t.Mapping[str, str] | None = None,
     ) -> bool:
         try:
             pip_install_args = get_pip_install_args(
@@ -434,7 +433,9 @@ class PluginInstallService:  # noqa: WPS214
             A boolean determining if the given plugin is a mapping (of type
             `PluginType.MAPPERS`).
         """
-        return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
+        return plugin.type == PluginType.MAPPERS and bool(
+            plugin.extra_config.get("_mapping")
+        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -450,7 +451,7 @@ class PluginInstallService:  # noqa: WPS214
             A special env var (with lowest precedence) `$MELTANO__PYTHON_VERSION`
             is included, and has the value
             `<major Python version>.<minor Python version>`.
-        """  # noqa: E501
+        """
         plugin_settings_service = PluginSettingsService(self.project, plugin)
         with self.project.settings.feature_flag(
             FeatureFlags.STRICT_ENV_VAR_MODE,
@@ -493,7 +494,7 @@ class PluginInstaller(t.Protocol):
         *,
         project: Project,
         plugin: ProjectPlugin,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ) -> None:
         """Install the plugin.
 
@@ -528,8 +529,8 @@ def get_pip_install_args(
     ) as strict_env_var_mode:
         return shlex.split(
             expand_env_vars(
-                plugin.pip_url,
-                env,
+                plugin.pip_url or "",
+                env or {},
                 if_missing=if_missing or EnvVarMissingBehavior(strict_env_var_mode),
             )
             or "",
@@ -543,8 +544,8 @@ async def install_pip_plugin(
     clean: bool = False,
     force: bool = False,
     env: t.Mapping[str, str] | None = None,
-    **kwargs,  # noqa: ARG001
-):
+    **kwargs,  # noqa: ANN003, ARG001
+) -> None:
     """Install the plugin with pip.
 
     Args:
@@ -559,7 +560,7 @@ async def install_pip_plugin(
         ValueError: If the venv backend is not supported.
     """
     pip_install_args = get_pip_install_args(project, plugin, env=env)
-    backend = project.settings.get("venv.backend", "virtualenv")
+    backend = project.settings.get("venv.backend")
 
     if backend == "virtualenv":
         service = VenvService(

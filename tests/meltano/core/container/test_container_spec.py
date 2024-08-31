@@ -62,7 +62,7 @@ class TestContainerService:
         ids=["port-mapping", "custom-entrypoint"],
     )
     @pytest.mark.asyncio()
-    async def test_docker_config(self, spec: ContainerSpec, payload: dict):
+    async def test_docker_config(self, spec: ContainerSpec, payload: dict) -> None:
         """Check Docker container config from container spec."""
         if platform.system() == "Windows":
             pytest.xfail(

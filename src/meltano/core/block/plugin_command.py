@@ -113,7 +113,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         """
         return self._command_args
 
-    async def _start(self):
+    async def _start(self) -> None:
         invoke_args = (self.command_args,) if self.command_args else ()
         await self.start(*invoke_args)
 
@@ -123,7 +123,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         Raises:
             RunnerError: if the command fails.
         """
-        try:  # noqa: WPS501
+        try:
             async with self.invoker.prepared(self.context.session):
                 await self._start()
 
@@ -150,8 +150,7 @@ def plugin_command_invoker(
     command_args: list[str] | None = None,
     run_dir: str | None = None,
 ) -> InvokerCommand:
-    """
-    Make an InvokerCommand from a plugin.
+    """Make an InvokerCommand from a plugin.
 
     Args:
         plugin: Plugin to make command from.

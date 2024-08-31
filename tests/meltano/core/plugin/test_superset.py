@@ -44,15 +44,18 @@ class TestSuperset:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.asyncio()  # noqa:  WPS210
-    async def test_hooks(  # noqa:  WPS210
+    @pytest.mark.asyncio()
+    @pytest.mark.filterwarnings(
+        "ignore:Unknown setting 'SUPERSET_WEBSERVER_PORT':RuntimeWarning",
+    )
+    async def test_hooks(
         self,
         subject,
         project,
         session,
         plugin_invoker_factory,
         monkeypatch,
-    ):
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -111,7 +114,7 @@ class TestSuperset:
 
                 config_module = load_module_from_path("superset_config", config_path)
 
-                config_keys = dir(config_module)  # noqa: WPS421
+                config_keys = dir(config_module)
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
                     f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
@@ -137,7 +140,7 @@ class TestSuperset:
 
                 config_module = load_module_from_path("superset_config", config_path)
 
-                config_keys = dir(config_module)  # noqa: WPS421
+                config_keys = dir(config_module)
                 # Verify default Meltano-managed settings are here
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert "SECRET_KEY" in config_keys
@@ -151,7 +154,7 @@ class TestSuperset:
             assert not run_dir.joinpath("superset_config.py").exists()
 
     @pytest.mark.asyncio()
-    async def test_before_cleanup(self, subject, plugin_invoker_factory):
+    async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 
         assert not invoker.files["config"].exists()

@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # noqa: D100
 
 import json
 import typing as t
@@ -10,12 +10,14 @@ from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from meltano.core.plugin_invoker import invoker_factory
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm.session import Session
+
     from meltano.core.plugin.base import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
-class SelectService:
+class SelectService:  # noqa: D101
     def __init__(self, project: Project, extractor: str):
         """Initialize a `SelectService` instance.
 
@@ -35,11 +37,16 @@ class SelectService:
         return self._extractor
 
     @property
-    def current_select(self):
+    def current_select(self) -> list[str]:
+        """Get the current select patterns.
+
+        Returns:
+            The current select pattern.
+        """
         plugin_settings_service = PluginSettingsService(self.project, self.extractor)
         return plugin_settings_service.get("_select")
 
-    async def load_catalog(self, session, refresh=False):
+    async def load_catalog(self, session: Session, *, refresh: bool = False) -> dict:
         """Load the catalog."""
         invoker = invoker_factory(self.project, self.extractor)
 
@@ -51,10 +58,15 @@ class SelectService:
 
         return json.loads(catalog_json)
 
-    async def list_all(self, session, refresh=False) -> ListSelectedExecutor:
+    async def list_all(
+        self,
+        session: Session,
+        *,
+        refresh: bool = False,
+    ) -> ListSelectedExecutor:
         """List all select."""
         try:
-            catalog = await self.load_catalog(session, refresh)
+            catalog = await self.load_catalog(session, refresh=refresh)
         except FileNotFoundError as err:
             raise PluginExecutionError(
                 "Could not find catalog. Verify that the tap supports discovery "  # noqa: EM101
@@ -63,11 +75,22 @@ class SelectService:
             ) from err
 
         list_all = ListSelectedExecutor()
-        list_all.visit(catalog)
+
+        # TODO: revisit the visit_with decorator when mypy has better support
+        # for class decorators
+        # https://github.com/python/mypy/issues/3135
+        list_all.visit(catalog)  # type: ignore[attr-defined]
 
         return list_all
 
-    def update(self, entities_filter, attributes_filter, exclude, remove=False):
+    def update(
+        self,
+        entities_filter: str,
+        attributes_filter: str,
+        exclude: bool,  # noqa: FBT001
+        *,
+        remove: bool = False,
+    ) -> None:
         """Update plugins' select patterns."""
         plugin: PluginRef
 
@@ -97,7 +120,11 @@ class SelectService:
             self.project.plugins.update_environment_plugin(plugin)
 
     @staticmethod
-    def _get_pattern_string(entities_filter, attributes_filter, exclude) -> str:
+    def _get_pattern_string(
+        entities_filter: str,
+        attributes_filter: str,
+        exclude: bool,  # noqa: FBT001
+    ) -> str:
         """Return a select pattern in string form."""
-        exclude = "!" if exclude else ""
-        return f"{exclude}{entities_filter}.{attributes_filter}"
+        exclude_char = "!" if exclude else ""
+        return f"{exclude_char}{entities_filter}.{attributes_filter}"

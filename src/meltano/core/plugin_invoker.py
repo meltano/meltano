@@ -33,7 +33,7 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
+def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN201
     """Instantiate a plugin invoker from a project plugin.
 
     Args:
@@ -45,10 +45,10 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):
     Returns:
         A plugin invoker.
     """
-    cls = PluginInvoker  # noqa: WPS117
+    cls = PluginInvoker
 
-    if hasattr(plugin, "invoker_class"):  # noqa: WPS421
-        cls = plugin.invoker_class  # noqa: WPS117
+    if hasattr(plugin, "invoker_class"):
+        cls = plugin.invoker_class
 
     return cls(project, plugin, *args, **kwargs)
 
@@ -85,7 +85,7 @@ class InvokerNotPreparedError(InvokerError):
 class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
-    def __init__(self, plugin: PluginRef, command):
+    def __init__(self, plugin: PluginRef, command):  # noqa: ANN001
         """Initialize UnknownCommandError.
 
         Args:
@@ -95,7 +95,7 @@ class UnknownCommandError(InvokerError):
         self.plugin = plugin
         self.command = command
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return error message.
 
         Returns:
@@ -117,7 +117,7 @@ class UnknownCommandError(InvokerError):
         )
 
 
-class PluginInvoker:  # noqa: WPS214, WPS230
+class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
     class StdioSource(str, enum.Enum):
@@ -131,7 +131,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self,
         project: Project,
         plugin: ProjectPlugin,
-        context: t.Any | None = None,
+        context: t.Any | None = None,  # noqa: ANN401
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
@@ -184,7 +184,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         self.plugin_config_env = {}
 
     @property
-    def capabilities(self):
+    def capabilities(self):  # noqa: ANN201
         """Get plugin immutable capabilities.
 
         Makes sure the capabilities are immutable from the `PluginInvoker` interface.
@@ -207,7 +207,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             for _key, filename in plugin_files.items()
         }
 
-    async def prepare(self, session: Session):
+    async def prepare(self, session: Session) -> None:
         """Prepare plugin config.
 
         Args:
@@ -231,7 +231,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             self.plugin_config_service.configure()
             self._prepared = True
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Reset the plugin config."""
         self.plugin_config = {}
         self.plugin_config_processed = {}
@@ -242,7 +242,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session: Session):
+    async def prepared(self, session: Session):  # noqa: ANN201
         """Context manager that prepares plugin config.
 
         Args:
@@ -280,7 +280,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         # Return executable within venv
         return self.venv_service.exec_path(executable)
 
-    def exec_args(self, *args, command=None, env=None):
+    def exec_args(self, *args, command=None, env=None):  # noqa: ANN001, ANN002, ANN201
         """Materialize the arguments to be passed to the executable.
 
         Args:
@@ -303,7 +303,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
 
         return [str(arg) for arg in (executable, *plugin_args, *args)]
 
-    def find_command(self, name):
+    def find_command(self, name):  # noqa: ANN001, ANN201
         """Find a Command by name.
 
         Args:
@@ -320,7 +320,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):  # noqa: WPS210
+    def env(self):  # noqa: ANN201
         """Environment variable mapping.
 
         Returns:
@@ -335,7 +335,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 **expand_env_vars(
                     self.project.settings.env,
                     os.environ,
-                    if_missing=EnvVarMissingBehavior(  # noqa: WPS204
+                    if_missing=EnvVarMissingBehavior(
                         strict_env_var_mode,
                     ),
                 ),
@@ -418,8 +418,8 @@ class PluginInvoker:  # noqa: WPS214, WPS230
         require_preparation: bool = True,
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
-        **kwargs,
-    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:  # noqa: WPS221
+        **kwargs,  # noqa: ANN003
+    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -439,7 +439,7 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     self.plugin.executable,
                 ) from err
 
-    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:
+    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:  # noqa: ANN002, ANN003
         """Invoke a command.
 
         Args:
@@ -460,11 +460,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                 env=popen_env,
             )
 
-    async def invoke_docker(  # noqa: WPS210
+    async def invoke_docker(
         self,
         plugin_command: str,
-        *args,
-        **kwargs,
+        *args,  # noqa: ANN002
+        **kwargs,  # noqa: ANN003
     ) -> int:
         """Invoke a containerized command.
 
@@ -515,11 +515,11 @@ class PluginInvoker:  # noqa: WPS214, WPS230
                     return self.files[file_id].read_text()
 
             return self.files[file_id].read_text()
-        except ExecutableNotFoundError as err:  # noqa: WPS329. Allow "useless" except.
+        except ExecutableNotFoundError as err:  # . Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__ from None  # noqa: WPS469, WPS609
+            raise err.__cause__ from None
 
-    def add_output_handler(self, src: str, handler: SubprocessOutputWriter):
+    def add_output_handler(self, src: str, handler: SubprocessOutputWriter) -> None:
         """Append an output handler for a given stdio stream.
 
         Args:

@@ -17,14 +17,14 @@ if t.TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def stop_container(container: DockerContainer):
+def stop_container(container: DockerContainer) -> None:
     """Stop a Docker container.
 
     Args:
         container: Running container.
     """
     logger.info("Stopping container", container_id=container.id)
-    asyncio.ensure_future(container.stop())
+    asyncio.ensure_future(container.stop())  # noqa: RUF006
 
 
 class ContainerService:

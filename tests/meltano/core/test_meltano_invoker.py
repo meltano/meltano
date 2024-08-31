@@ -23,16 +23,20 @@ class TestMeltanoInvoker:
     def subject(self, project):
         return MeltanoInvoker(project)
 
-    def test_invoke(self, subject: MeltanoInvoker):
+    def test_invoke(self, subject: MeltanoInvoker) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
         process = subject.invoke(["--version"], stdout=subprocess.PIPE)
         assert process.returncode == 0
-        assert meltano.__version__ in str(process.stdout)  # noqa: WPS609
+        assert meltano.__version__ in str(process.stdout)
 
-    def test_env(self, subject: MeltanoInvoker, monkeypatch: pytest.MonkeyPatch):
+    def test_env(
+        self,
+        subject: MeltanoInvoker,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         # Process env vars are injected
         monkeypatch.setenv("ENV_VAR_KEY", "ENV_VAR_VALUE_1")
         assert subject._executable_env()["ENV_VAR_KEY"] == "ENV_VAR_VALUE_1"
@@ -47,7 +51,7 @@ class TestMeltanoInvoker:
             == environment_context.data["context_uuid"]
         )
 
-    def test_invoke_executable(self, subject: MeltanoInvoker, project: Project):
+    def test_invoke_executable(self, subject: MeltanoInvoker, project: Project) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
@@ -65,7 +69,7 @@ class TestMeltanoInvoker:
 
             # ...the symlink is not relevant and we find the executable next
             # to the `python` executable
-            pip_path = Path(os.path.dirname(sys.executable), "pip")
+            pip_path = Path(os.path.dirname(sys.executable), "pip")  # noqa: PTH120
             assert run_mock.call_args[0][0][0] == str(pip_path)
 
             # If the `meltano` symlink does not exist...
@@ -73,7 +77,7 @@ class TestMeltanoInvoker:
             subject.invoke(["--version"])
 
             # we find the executable next to the `python` executable
-            meltano_path = Path(os.path.dirname(sys.executable), MELTANO_COMMAND)
+            meltano_path = Path(os.path.dirname(sys.executable), MELTANO_COMMAND)  # noqa: PTH120
             assert run_mock.call_args[0][0][0] == str(meltano_path)
 
             # If the executable doesn't exist in either place...

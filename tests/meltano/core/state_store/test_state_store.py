@@ -6,7 +6,7 @@ import typing as t
 import pytest
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
-from azure.storage.blob._shared.authentication import (  # noqa: WPS436
+from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
 
@@ -28,7 +28,7 @@ if t.TYPE_CHECKING:
 
 
 class TestSystemDBStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         project.settings.set(["state_backend", "uri"], StateBackend.SYSTEMDB)
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
@@ -44,7 +44,7 @@ class TestLocalFilesystemStateBackend:
         finally:
             shutil.rmtree(path)
 
-    def test_manager_from_settings(self, project: Project, state_path: str):
+    def test_manager_from_settings(self, project: Project, state_path: str) -> None:
         project.settings.set(["state_backend", "uri"], f"file://{state_path}")
         file_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(file_state_store, LocalFilesystemStateStoreManager)
@@ -52,7 +52,7 @@ class TestLocalFilesystemStateBackend:
 
 
 class TestAzureStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # Azure
         project.settings.set(
             ["state_backend", "uri"],
@@ -115,11 +115,11 @@ class TestAzureStateBackend:
         assert isinstance(az_state_store, AZStorageStateStoreManager)
         # Should raise error
         with pytest.raises(MeltanoError):
-            _ = az_state_store.client  # noqa: WPS122
+            _ = az_state_store.client
 
 
 class TestGCSStateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
         gs_state_store = state_store_manager_from_project_settings(project.settings)
@@ -129,7 +129,7 @@ class TestGCSStateBackend:
 
 
 class TestS3StateBackend:
-    def test_manager_from_settings(self, project: Project):
+    def test_manager_from_settings(self, project: Project) -> None:
         # AWS S3 (credentials in URI)
         project.settings.set(
             ["state_backend", "uri"],
@@ -139,7 +139,7 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store, S3StateStoreManager)
         assert s3_state_store.bucket == "some_bucket"
         assert s3_state_store.prefix == "/some/path"
-        assert s3_state_store.aws_access_key_id == "aws_access_key_id"  # noqa: S105
+        assert s3_state_store.aws_access_key_id == "aws_access_key_id"
         assert (
             s3_state_store.aws_secret_access_key == "aws_secret_access_key"  # noqa: S105
         )

@@ -13,6 +13,8 @@ from meltano.core.setting_definition import SettingDefinition, SettingKind
 from . import PluginType, SingerPlugin
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -23,7 +25,7 @@ class SingerMapper(SingerPlugin):
 
     __plugin_type__ = PluginType.MAPPERS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(
             name="_mappings",
             kind=SettingKind.ARRAY,
@@ -38,12 +40,12 @@ class SingerMapper(SingerPlugin):
         ),
     ]
 
-    def exec_args(self, plugin_invoker: PluginInvoker):
+    def exec_args(self, plugin_invoker: PluginInvoker) -> list[str | Path]:
         """Return the arguments to be passed to the plugin's executable."""
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):
+    def config_files(self) -> dict[str, str]:
         """Return the configuration files required by the plugin."""
         return {"config": f"mapper.{self.instance_uuid}.config.json"}
 
@@ -51,13 +53,13 @@ class SingerMapper(SingerPlugin):
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ARG002
-    ):
-        """Create configuration file."""  # noqa: DAR101
+        session,  # noqa: ANN001, ARG002
+    ) -> None:
+        """Create configuration file."""
         config_path = invoker.files["config"]
 
         config_payload: dict = {}
-        with open(config_path, "w") as config_file:
+        with config_path.open("w") as config_file:
             config_payload = {
                 **invoker.plugin_config_processed,
                 **self._get_mapping_config(invoker.plugin.extra_config),

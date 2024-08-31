@@ -1,5 +1,7 @@
 """StateStoreManagers for filesystems."""
 
+# ruff: noqa: PTH107, PTH118, PTH119, PTH120, PTH207
+
 from __future__ import annotations
 
 import glob
@@ -34,12 +36,12 @@ class InvalidStateBackendConfigurationException(Exception):
     """State backend configuration is invalid."""
 
 
-class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
+class BaseFilesystemStateStoreManager(StateStoreManager):
     """Base class for filesystem state backends."""
 
     delimiter = "/"
 
-    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs):
+    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs):  # noqa: ANN003
         """Initialize the BaseFilesystemStateStoreManager.
 
         Args:
@@ -72,7 +74,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
 
     @staticmethod
     @abstractmethod
-    def is_file_not_found_error(err: Exception) -> bool:  # noqa: N805
+    def is_file_not_found_error(err: Exception) -> bool:
         """Check if err is equivalent to file not being found.
 
         Args:
@@ -139,7 +141,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                 yield writer
 
     @abstractproperty
-    def client(self):
+    def client(self):  # noqa: ANN201
         """Get a client for performing fs operations.
 
         Used for cloud backends, particularly in deleting and listing blobs.
@@ -233,7 +235,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                 return False
             raise e
 
-    def create_state_id_dir_if_not_exists(self, state_id: str):
+    def create_state_id_dir_if_not_exists(self, state_id: str) -> None:
         """Create the directory or prefix for a given state_id.
 
         Does nothing, but not @abstractmethod because many state backends
@@ -301,7 +303,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                     return None
                 raise e
 
-    def set(self, state: JobState):
+    def set(self, state: JobState) -> None:
         """Set state for the given state_id.
 
         Args:
@@ -332,7 +334,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
                 writer.write(state_to_write.json())
 
     @abstractmethod
-    def delete(self, file_or_dir_path: str):
+    def delete(self, file_or_dir_path: str):  # noqa: ANN201
         """Delete the file/blob/directory/prefix at the given path.
 
         Args:
@@ -340,7 +342,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
         """
         ...
 
-    def clear(self, state_id: str):
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -350,12 +352,12 @@ class BaseFilesystemStateStoreManager(StateStoreManager):  # noqa: WPS214
             self.delete(self.get_state_path(state_id))
 
 
-class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa: WPS214
+class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     label: str = "Local Filesystem"
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -378,13 +380,13 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         return isinstance(err, FileNotFoundError)
 
     @property
-    def client(self):
+    def client(self) -> None:
         """Get a client for performing fs operations.
 
         Returns:
             None
         """
-        return None  # noqa: RET501
+        return None
 
     @property
     def state_dir(self) -> str:
@@ -409,7 +411,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         """
         return os.path.join(*components)
 
-    def create_state_id_dir_if_not_exists(self, state_id: str):
+    def create_state_id_dir_if_not_exists(self, state_id: str) -> None:
         """Create the directory for a given state_id.
 
         Args:
@@ -417,7 +419,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
         """
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
-    def get_state_ids(self, pattern: str | None = None):
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -431,14 +433,14 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
             for state_file in glob.glob(
                 os.path.join(
                     self.state_dir,
-                    os.path.join(pattern, "state.json")  # noqa: WPS509
+                    os.path.join(pattern, "state.json")
                     if pattern
                     else os.path.join("*", "state.json"),
                 ),
             )
         ]
 
-    def delete(self, file_or_dir_path: str):
+    def delete(self, file_or_dir_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path, if it exists.
 
         Args:
@@ -455,7 +457,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):  # noqa
             if not self.is_file_not_found_error(e):
                 raise e
 
-    def clear(self, state_id: str):
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -471,7 +473,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
     label: str = "Local Windows Filesystem"
     delimiter = "\\"
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:  # noqa: ANN003
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -498,7 +500,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             else self.join_path(self.state_dir, state_id)
         )
 
-    def get_state_ids(self, pattern: str | None = None):
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -527,7 +529,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
 class CloudStateStoreManager(BaseFilesystemStateStoreManager):
     """Base class for cloud storage state store managers."""
 
-    def __init__(self, prefix: str | None = None, **kwargs):
+    def __init__(self, prefix: str | None = None, **kwargs):  # noqa: ANN003
         """Initialize the CloudStateStoreManager.
 
         Args:
@@ -558,8 +560,11 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         return self.join_path(remove_suffix(self.uri, self.prefix), path)
 
     @abstractmethod
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The next file in the backend.
@@ -576,7 +581,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         ...
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: WPS210
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
         """Get list of state_ids stored in the backend.
 
         Args:

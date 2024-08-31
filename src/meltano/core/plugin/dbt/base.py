@@ -25,7 +25,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class DbtInvoker(PluginInvoker):
     """dbt plugin invoker."""
 
-    def Popen_options(self):  # noqa: N802
+    def Popen_options(self):  # noqa: ANN201, N802
         """Get options for `subprocess.Popen`.
 
         Returns:
@@ -47,7 +47,7 @@ async def install_dbt_plugin(
     project: Project,
     plugin: ProjectPlugin,
     reason: PluginInstallReason,
-    **kwargs,  # noqa: ARG001
+    **kwargs,  # noqa: ANN003, ARG001
 ) -> None:
     """Install the transform into the project.
 
@@ -99,12 +99,12 @@ class DbtTransformPlugin(BasePlugin):
 
     __plugin_type__ = PluginType.TRANSFORMS
 
-    EXTRA_SETTINGS = [
+    EXTRA_SETTINGS: t.ClassVar[list[SettingDefinition]] = [
         SettingDefinition(name="_package_name", value="$MELTANO_TRANSFORM_NAMESPACE"),
         SettingDefinition(name="_vars", kind=SettingKind.OBJECT, value={}),
     ]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize the `DbtTransformPlugin`.
 
         Args:

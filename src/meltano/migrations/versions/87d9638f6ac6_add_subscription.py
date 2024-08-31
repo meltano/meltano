@@ -1,10 +1,13 @@
-"""Add Subscription
+"""Add Subscription.
 
 Revision ID: 87d9638f6ac6
 Revises: 23ea52e6d784
 Create Date: 2020-02-17 16:03:27.765240
 
 """
+
+from __future__ import annotations
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -21,7 +24,7 @@ branch_labels = None
 depends_on = None
 
 
-def upgrade():
+def upgrade() -> None:
     dialect_name = get_dialect_name()
     datetime_type = datetime_for_dialect(dialect_name)
 
@@ -37,5 +40,5 @@ def upgrade():
     )
 
 
-def downgrade():
+def downgrade() -> None:
     op.drop_table("subscriptions")

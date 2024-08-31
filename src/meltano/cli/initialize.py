@@ -36,13 +36,13 @@ path_type = click.Path(file_okay=False, path_type=Path)
     is_flag=True,
 )
 @database_uri_option
-def init(ctx, project_directory: Path, no_usage_stats: bool, force: bool):
-    """
-    Create a new Meltano project.
+def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool) -> None:  # noqa: ANN001
+    """Create a new Meltano project.
 
+    \b
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
-    """
+    """  # noqa: D301
     if not project_directory:
         click.echo("We need a project name to get started!")
         project_directory = click.prompt(

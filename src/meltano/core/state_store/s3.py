@@ -14,6 +14,8 @@ from meltano.core.state_store.filesystem import (
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
 
+    from mypy_boto3_s3 import S3Client
+
 BOTO_INSTALLED = True
 
 try:
@@ -25,7 +27,7 @@ except ImportError:
 class MissingBoto3Error(Exception):
     """Raised when boto3 is required but not installed."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize a MissingBoto3Error."""
         super().__init__(
             "boto3 required but not installed. Install meltano[s3] to use S3 as a state backend.",  # noqa: E501
@@ -33,7 +35,7 @@ class MissingBoto3Error(Exception):
 
 
 @contextmanager
-def requires_boto3():
+def requires_boto3():  # noqa: ANN201
     """Raise MissingBoto3Error if boto3 is required but missing in context.
 
     Raises:
@@ -59,7 +61,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         endpoint_url: str | None = None,
-        **kwargs,
+        **kwargs,  # noqa: ANN003
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -74,7 +76,9 @@ class S3StateStoreManager(CloudStateStoreManager):
         super().__init__(**kwargs)
         self.aws_access_key_id = aws_access_key_id or self.parsed.username
         self.aws_secret_access_key = aws_secret_access_key or self.parsed.password
-        self.bucket = bucket or self.parsed.hostname
+
+        # TODO: Make this type-safe. Maybe use https://github.com/fsspec/universal_pathlib?
+        self.bucket: str = bucket or self.parsed.hostname  # type: ignore[assignment]
         self.prefix = prefix or self.parsed.path
         self.endpoint_url = endpoint_url
 
@@ -95,7 +99,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         )
 
     @cached_property
-    def client(self):
+    def client(self) -> S3Client:
         """Get an authenticated boto3.Client.
 
         Returns:
@@ -123,7 +127,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             session = boto3.Session()
             return session.client("s3")
 
-    def delete(self, file_path: str):
+    def delete(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -134,15 +138,20 @@ class S3StateStoreManager(CloudStateStoreManager):
             Delete={"Objects": [{"Key": file_path}]},
         )
 
-    def list_all_files(self) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
         """List all files in the backend.
+
+        Args:
+            with_prefix: Whether to include the prefix in the lookup.
 
         Yields:
             The path to each file in the backend.
         """
-        for state_obj in self.client.list_objects_v2(  # noqa: WPS526
-            Bucket=self.bucket,
-        ).get("Contents", []):
+        kwargs: dict[str, t.Any] = {"Bucket": self.bucket}
+        if with_prefix:
+            kwargs["Prefix"] = self.prefix
+
+        for state_obj in self.client.list_objects_v2(**kwargs).get("Contents", []):
             yield state_obj["Key"]
 
     def copy_file(self, src: str, dst: str) -> None:

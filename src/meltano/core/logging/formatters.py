@@ -30,6 +30,7 @@ LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
 
 def rich_exception_formatter_factory(
     color_system: t.Literal["auto", "standard", "256", "truecolor", "windows"] = "auto",
+    *,
     no_color: bool | None = None,
     show_locals: bool = False,
 ) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:
@@ -49,7 +50,7 @@ def rich_exception_formatter_factory(
     """
 
     def _traceback(
-        sio,
+        sio,  # noqa: ANN001
         exc_info: tuple[type[t.Any], BaseException, TracebackType | None],
     ) -> None:
         sio.write("\n")
@@ -85,7 +86,7 @@ def _process_formatter(
     foreign_pre_chain = LEVELED_TIMESTAMPED_PRE_CHAIN
 
     if include_callsite_parameters:
-        foreign_pre_chain = (  # noqa: WPS434
+        foreign_pre_chain = (
             *foreign_pre_chain,
             structlog.processors.CallsiteParameterAdder(
                 # Most folks probably don't need thread and process process IDs, so
@@ -105,6 +106,7 @@ def _process_formatter(
 
 
 def console_log_formatter(
+    *,
     colors: bool = False,
     show_locals: bool = False,
     include_callsite_parameters: bool = False,
@@ -143,10 +145,10 @@ def console_log_formatter(
 
 
 def key_value_formatter(
+    *,
     sort_keys: bool = False,
     key_order: t.Sequence[str] | None = None,
     drop_missing: bool = False,
-    *,
     include_callsite_parameters: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.

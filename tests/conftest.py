@@ -43,7 +43,7 @@ else:
 BACKEND = ["sqlite", "postgresql", "mssql", "mysql"]
 
 
-def pytest_runtest_setup(item):
+def pytest_runtest_setup(item) -> None:
     backend_marker = item.get_closest_marker("backend")
 
     # currently, there is no distinction between the SYSTEM database
@@ -59,12 +59,12 @@ def concurrency():
     return {
         "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),
         "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
-        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),  # noqa: WPS432
+        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),
     }
 
 
 class MockAdapter(BaseAdapter):
-    RETURN_500 = {
+    RETURN_500: t.ClassVar[dict[str, t.Any]] = {
         "/extractors/this-returns-500--original": {"error": "Server error"},
     }
 
@@ -163,8 +163,9 @@ class MockAdapter(BaseAdapter):
     def send(
         self,
         request: requests.PreparedRequest,
+        *,
         stream: bool = False,  # noqa: ARG002
-        timeout: float  # noqa: ARG002, WPS320
+        timeout: float  # noqa: ARG002
         | tuple[float, float]
         | tuple[float, None]
         | None = None,

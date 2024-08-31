@@ -53,13 +53,14 @@ class NullConnectionStringError(MeltanoError):
         "to check for missing environment variables"
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the exception."""
         super().__init__(self.REASON, self.INSTRUCTION)
 
 
 def project_engine(
     project: Project,
+    *,
     default: bool = False,
 ) -> tuple[Engine, sessionmaker]:
     """Create and register a SQLAlchemy engine for a Meltano project instance.
@@ -80,7 +81,7 @@ def project_engine(
 
     database_uri = project.settings.get("database_uri")
     parsed_db_uri = urlparse(database_uri)
-    sanitized_db_uri = parsed_db_uri._replace(  # noqa: WPS437
+    sanitized_db_uri = parsed_db_uri._replace(
         netloc=(
             f"{parsed_db_uri.username}:********@"  # user:pass auth case
             if parsed_db_uri.password
@@ -141,7 +142,7 @@ def connect(
     while True:
         try:
             return engine.connect()
-        except OperationalError:
+        except OperationalError:  # noqa: PERF203
             if attempt >= max_retries:
                 logger.error(
                     f"Could not connect to the database after {attempt} "  # noqa: G004
