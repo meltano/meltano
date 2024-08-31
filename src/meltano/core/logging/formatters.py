@@ -43,6 +43,11 @@ class LoggingFeatures(t.TypedDict, total=False):
     https://www.structlog.org/en/stable/api.html#structlog.processors.CallsiteParameter.
     """
 
+    dict_tracebacks: bool
+    """Enable tracebacks dictionaries in log entries.
+    https://www.structlog.org/en/stable/api.html#structlog.processors.dict_tracebacks.
+    """
+
 
 # Convert boolean kwargs to LoggingFeatures enum.
 def _processors_from_kwargs(
@@ -56,6 +61,9 @@ def _processors_from_kwargs(
                 structlog.processors.CallsiteParameter.FUNC_NAME,
             ),
         )
+
+    if features.get("dict_tracebacks", False):
+        yield structlog.processors.dict_tracebacks
 
 
 def rich_exception_formatter_factory(
