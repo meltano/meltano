@@ -8,7 +8,7 @@ from types import TracebackType
 
 import pytest
 
-from meltano.core.logging.formatters import console_log_formatter, json_formatter
+from meltano.core.logging import formatters
 
 if t.TYPE_CHECKING:
     from pathlib import Path
@@ -99,27 +99,27 @@ class TestLogFormatters:
 
     def test_console_log_formatter_colors(self, record, monkeypatch) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
-        formatter = console_log_formatter(colors=True)
+        formatter = formatters.console_log_formatter(colors=True)
         assert ANSI_RE.match(formatter.format(record))
 
     def test_console_log_formatter_no_colors(self, record) -> None:
-        formatter = console_log_formatter(colors=False)
+        formatter = formatters.console_log_formatter(colors=False)
         assert not ANSI_RE.match(formatter.format(record))
 
     def test_console_log_formatter_no_locals(self, record_with_exception) -> None:
-        formatter = console_log_formatter(show_locals=False)
+        formatter = formatters.console_log_formatter(show_locals=False)
         output = formatter.format(record_with_exception)
         assert "locals" not in output
         assert "my_var = 'my_value'" not in output
 
     def test_console_log_formatter_show_locals(self, record_with_exception) -> None:
-        formatter = console_log_formatter(show_locals=True)
+        formatter = formatters.console_log_formatter(show_locals=True)
         output = formatter.format(record_with_exception)
         assert "locals" in output
         assert "my_var = 'my_value'" in output
 
     def test_json_formatter_callsite_parameters(self, record):
-        formatter = json_formatter(include_callsite_parameters=True)
+        formatter = formatters.json_formatter(callsite_parameters=True)
         output = formatter.format(record)
         message_dict = json.loads(output)
         assert message_dict["pathname"] == "/path/to/my_module.py"
