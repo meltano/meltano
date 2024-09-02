@@ -1298,6 +1298,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "cfeduke",
+      "name": "Charles Feduke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/135105?v=4",
+      "profile": "http://www.deploymentzone.com",
+      "contributions": [
+        "question"
+      ]
     }
   ],
   "contributorsPerLine": 7,
