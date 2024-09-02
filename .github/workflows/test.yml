@@ -104,7 +104,7 @@ jobs:
         poetry --version
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
@@ -259,7 +259,7 @@ jobs:
         poetry --version
 
     - name: Set up Python 3.12
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: '3.12'
         architecture: x64
@@ -314,7 +314,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.12
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: '3.12'
         architecture: x64
