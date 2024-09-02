@@ -179,6 +179,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://www.littlekitune.org"><img src="https://avatars.githubusercontent.com/u/10099583?v=4?s=100" width="100px;" alt="Trish Gillett-Kawamoto"/><br /><sub><b>Trish Gillett-Kawamoto</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=TrishGillett" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://linkedin.com/in/jovezhong"><img src="https://avatars.githubusercontent.com/u/5076438?v=4?s=100" width="100px;" alt="Jove Zhong"/><br /><sub><b>Jove Zhong</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=jovezhong" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://www.deploymentzone.com"><img src="https://avatars.githubusercontent.com/u/135105?v=4?s=100" width="100px;" alt="Charles Feduke"/><br /><sub><b>Charles Feduke</b></sub></a><br /><a href="#question-cfeduke" title="Answering Questions">💬</a></td>
+    </tr>
   </tbody>
 </table>
 
