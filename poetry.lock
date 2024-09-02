@@ -326,17 +326,17 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.35.5"
+version = "1.35.10"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.35.5-py3-none-any.whl", hash = "sha256:2cef3aa476181395c260f4b6e6c5565e5a3022a874fb6b579d8e6b169f94e0b3"},
-    {file = "boto3-1.35.5.tar.gz", hash = "sha256:5724ddeda8e18c7614c20a09c20159ed87ff7439755cf5e250a1a3feaf9afb7e"},
+    {file = "boto3-1.35.10-py3-none-any.whl", hash = "sha256:add26dd58e076dfd387013da4704716d5cff215cf14f6d4347c4b9b7fc1f0b8e"},
+    {file = "boto3-1.35.10.tar.gz", hash = "sha256:189ab1e2b4cd86df56f82438d89b4040eb140c92683f1bda7cb2e62624f20ea5"},
 ]
 
 [package.dependencies]
-botocore = ">=1.35.5,<1.36.0"
+botocore = ">=1.35.10,<1.36.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -758,13 +758,13 @@ xray = ["mypy-boto3-xray (>=1.35.0,<1.36.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.35.5"
+version = "1.35.10"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.35.5-py3-none-any.whl", hash = "sha256:8116b72c7ae845c195146e437e2afd9d17538a37b3f3548dcf67c12c86ba0742"},
-    {file = "botocore-1.35.5.tar.gz", hash = "sha256:3a0086c7124cb3b0d9f98563d00ffd14a942c3f9e731d8d1ccf0d3a1ac7ed884"},
+    {file = "botocore-1.35.10-py3-none-any.whl", hash = "sha256:0d96d023b9b0cea99a0a428a431d011329d3a958730aee6ed6a6fec5d9bfbc03"},
+    {file = "botocore-1.35.10.tar.gz", hash = "sha256:6c8a1377b6636a0d80218115e1cd41bcceba0a2f050b79c206f4cf8d002c54d7"},
 ]
 
 [package.dependencies]
@@ -3252,13 +3252,13 @@ tests = ["coverage (>=6.0.0)", "flake8", "mypy", "pytest (>=7.0.0)", "pytest-asy
 
 [[package]]
 name = "rich"
-version = "13.7.1"
+version = "13.8.0"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "rich-13.7.1-py3-none-any.whl", hash = "sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222"},
-    {file = "rich-13.7.1.tar.gz", hash = "sha256:9be308cb1fe2f1f57d67ce99e95af38a1e2bc71ad9813b0e247cf7ffbcc3a432"},
+    {file = "rich-13.8.0-py3-none-any.whl", hash = "sha256:2e85306a063b9492dffc86278197a60cbece75bcb766022f3436f567cae11bdc"},
+    {file = "rich-13.8.0.tar.gz", hash = "sha256:a5ac1f1cd448ade0d59cc3356f7db7a7ccda2c8cbae9c7a90c28ff463d3e91f4"},
 ]
 
 [package.dependencies]
@@ -3643,17 +3643,18 @@ zst = ["zstandard"]
 
 [[package]]
 name = "snowplow-tracker"
-version = "1.0.2"
+version = "1.0.3"
 description = "Snowplow event tracker for Python. Add analytics to your Python and Django apps, webapps and games"
 optional = false
 python-versions = "*"
 files = [
-    {file = "snowplow-tracker-1.0.2.tar.gz", hash = "sha256:40093edf4ce72c85e180abc6cba04aea3dcb22325710c4284e8a2655394d87e3"},
-    {file = "snowplow_tracker-1.0.2-py3-none-any.whl", hash = "sha256:8b323c3d0d02e3ffa8b2ea4e6e4190c105bfb879b3ba71957b3987d3a8a9e557"},
+    {file = "snowplow_tracker-1.0.3-py3-none-any.whl", hash = "sha256:46da5cde0e925778dd3c347fa97c8ff8dc4a3b52253da5fbf523ce6d0f1072c7"},
+    {file = "snowplow_tracker-1.0.3.tar.gz", hash = "sha256:b780636007638485053fbeda0f05ac4e2ae8a570ba66bd230db3a6a1b5fd145b"},
 ]
 
 [package.dependencies]
 requests = ">=2.25.1,<3.0"
+types-requests = ">=2.25.1,<3.0"
 typing-extensions = ">=3.7.4"
 
 [[package]]
@@ -4002,29 +4003,29 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uv"
-version = "0.3.3"
+version = "0.4.2"
 description = "An extremely fast Python package and project manager, written in Rust."
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "uv-0.3.3-py3-none-linux_armv6l.whl", hash = "sha256:ba5d09a21729d6c7b0b94b4960127fa0d36f287b51e7d95aaf5c57a146c44706"},
-    {file = "uv-0.3.3-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:eea08b2b183d0ae960a162e3e1e9525b6d734e7c3e36a860ba565e59d736c0c6"},
-    {file = "uv-0.3.3-py3-none-macosx_11_0_arm64.whl", hash = "sha256:0f30d8bca3c1dfd35b555adeb654e83b1ebacf9bdbf27255f78e8e9924a62dd3"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:d8a916b1f005e993d08bcba545dd71dd06a5665f20fd19031a4a25d795ada6b9"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:fc9bd9c2c08703aa962567e34645e34b707fd7eaba211fe2e88b080a0875933e"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:07fd6da67ee35a1d1b36612981edd56527a5b44f953eded2005672eb7b1ffaca"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:3789887b4f6f5f3b91f8432726ca7e172efd4030b121fd347fa108d4724d13ac"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:df5a8d536ddce8cd3a3efadab73b4f2e71bb51ee39d5844241cf499ba107a27b"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:61f8d32c40d5b4fdb63748bf2f244272ce2b10ce13623b8233a4cc8df7bdc19f"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1d7bf7913f3b29d15608dc3f1c8c840ec8b79494a9b7e3b535419e01014e32a5"},
-    {file = "uv-0.3.3-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:de158a3e5c5d09d774d5170442392e4fff85b5f2864662c3e904815b35e1158a"},
-    {file = "uv-0.3.3-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:ba6971490edd30fd41e416892741cb70a121438c9a4d8a4ea6aa68d737ae15c0"},
-    {file = "uv-0.3.3-py3-none-musllinux_1_1_i686.whl", hash = "sha256:97bb2c052429944e2bcf91933f019ab68a7dde136983f643b9c95c80a2751b27"},
-    {file = "uv-0.3.3-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:28adae4f63059fd6a3dd9f5c7b6e5e3aeff07a7c50dd87ad0ba26bce640a9369"},
-    {file = "uv-0.3.3-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:ae7722f4eb6ceb996474e9d66321c1f816e3be4f5ec8c05c829aa12b61629940"},
-    {file = "uv-0.3.3-py3-none-win32.whl", hash = "sha256:405bfff62e9c87af28fe3a32d48d4be1c4f59cbf5bf5ea2d5c05f51c75c31723"},
-    {file = "uv-0.3.3-py3-none-win_amd64.whl", hash = "sha256:94ae6b56bba1d51669e7a76d742ce94c774b17447656d564fe5acc82c1fd3f6e"},
-    {file = "uv-0.3.3.tar.gz", hash = "sha256:ea5831a529f1a5b526ae22f96451ccbe73766b4d746d4c71bb4abeddfcac2cc1"},
+    {file = "uv-0.4.2-py3-none-linux_armv6l.whl", hash = "sha256:1374b17da794decdea2bcf4ffd4e54c2d07c610f54dd6f0dbbdef66fb1c49c32"},
+    {file = "uv-0.4.2-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:22db3b707c7e22be67d6ba5209795584bb0890cec5c5d64c751f311252731787"},
+    {file = "uv-0.4.2-py3-none-macosx_11_0_arm64.whl", hash = "sha256:51213d541dd1603d938ef8b27dcda97350d8dba2438b2a9a627c2c7f009fdc5a"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:4f4f673ba445394c9d189915463da89692fe3b7378ce3dd51b03b9c1e34a04eb"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:0b508e7c93dc60b184c82a3bc73dcacf5fa5141c7b8bfef29968615157d206b6"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:e34e63761ec3ce921d17e73e5584b9398c4192d7439489d8ca6a87366ced89b3"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:0b54932a0d341db3c8bfc4ec56960e3e082559a944fc5c0fc9dba3fb2c088e17"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:721f5d0f3bc79c8fe080474459f4c43dcad60ba2901a83c8854b9d27f6f99b3b"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:5b33e48d06eef2d2c1f7db08426c6df87e47d475812a8b1c177eaa279a356d6a"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:505aa8f21ca3e28af96dc2985e25db93593690d83a70126d7ca105ad7e108a7d"},
+    {file = "uv-0.4.2-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:63a18737aca1a6804d3f670e1bf47c91812d56fb668c577a3405c09bd2d6fbe9"},
+    {file = "uv-0.4.2-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:8289141779aeccddb72be3a541c973db5c00ae9838d4fd76e79a9b27ae95968d"},
+    {file = "uv-0.4.2-py3-none-musllinux_1_1_i686.whl", hash = "sha256:2150130c4a4b7058ffbad5dc31dc83bbaf0f023ff7f6652415357b80b3e34632"},
+    {file = "uv-0.4.2-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:6f3b407a7ea601f92212e99ae15c9d460731c2c9d6376470ce2576152e6726fa"},
+    {file = "uv-0.4.2-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:69ae75af5dcaec17f89be07ae04c86021b2ecb9e6596b113f04f730f2ddfdb3c"},
+    {file = "uv-0.4.2-py3-none-win32.whl", hash = "sha256:f7e9e465d01cd7f4e8d40243db5683815eba851a15c310fb83b301adb5297629"},
+    {file = "uv-0.4.2-py3-none-win_amd64.whl", hash = "sha256:d669eabd18cf7f2c1fb7dab2699c9a7cb2b3fc51f461503a17220d79994ae258"},
+    {file = "uv-0.4.2.tar.gz", hash = "sha256:90c0a2267443e9a257c0b543f63b8a908fbfda692da2e921c350a804f394d311"},
 ]
 
 [[package]]
@@ -4284,4 +4285,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "4ebfdaec77412d27ba5faf0098e2e92e4c6caee547d8b558ff6dfad63d1507c6"
+content-hash = "7c74cdc64a0a29a57c2631e8db242b4587226dd1bf96ff7cc2051a22bd1a97fd"
