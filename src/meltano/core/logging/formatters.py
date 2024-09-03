@@ -203,6 +203,7 @@ def json_formatter(
     Returns:
         A configured JSON formatter.
     """
+    features.setdefault("dict_tracebacks", True)
     return _process_formatter(
         *_processors_from_kwargs(**features),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
