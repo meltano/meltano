@@ -143,7 +143,7 @@ def console_log_formatter(
         )
 
     return _process_formatter(
-        # *_processors_from_kwargs(**features),
+        *_processors_from_kwargs(**features),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.dev.ConsoleRenderer(
             colors=colors,
