@@ -56,7 +56,7 @@ jobs:
         poetry --version
 
     - name: Setup Python 3.12
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: '3.12'
         architecture: x64
