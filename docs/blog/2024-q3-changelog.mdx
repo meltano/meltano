@@ -1,0 +1,52 @@
+---
+slug: 2024-q3-updates-and-changes
+title: 2024 Q3 Updates and Changes
+---
+
+## Meltano
+
+We've released version [3.5.0](https://github.com/meltano/meltano/releases/tag/v3.5.0) of Meltano!
+
+This release includes, among other things, the following changes:
+
+* Plugins are now auto-installed when commands require them. This change involves two new features:
+
+  * New [CLI options](https://docs.meltano.com/reference/command-line-interface#auto-install-behavior):
+    * `--install`
+    * `--no-install`
+    * `--only-install`
+  * A new project-level setting [`auto_install`](https://docs.meltano.com/reference/settings/#auto_install). The value of this determines whether plugins are auto-installed when none of the above options are passed (the default). Set it to `false` to require `--install` to auto-install plugins.
+
+  Thanks to [Reuben Frankel](https://github.com/ReubenFrankel/) for their work on this feature!
+
+- A new CLI option [`--refresh-catalog`](https://docs.meltano.com/reference/command-line-interface) and plugin-level extra [`use_cached_catalog`](https://docs.meltano.com/concepts/plugins/#use_cached_catalog-extra). Use this if you need the extractor's catalog to reflect changes that occurred upstream, like often happens with database sources.
+
+  Thanks to [Andy O'Neal](https://github.com/andyoneal/) for contributing this feature!
+
+You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/tag/v3.5.0).
+
+## MeltanoHub
+
+The Hub has seen some UX improvements and bug fixes, as well as the addition of new plugins:
+
+### Extractors
+
+* Added the Bohdan Stadnyk variant of tap-bitbucket - [Hub Link](https://hub.meltano.com/extractors/tap-bitbucket--humblebeck/)
+* Added the Afonso Diniz variant of tap-calendly - [Hub Link](https://hub.meltano.com/extractors/tap-calendly--afonsodiniz/)
+* Added the Shaped AI variant of tap-iceberg - [Hub Link](https://hub.meltano.com/extractors/tap-iceberg--shaped-ai/)
+
+### Loaders
+
+* Added the Infostrux Solutions variant of target-db2 - [Hub Link](https://hub.meltano.com/loaders/target-db2--infostrux/)
+
+## SDK
+
+We shipped two minor releases of the SDK:
+
+* [v0.39.0](https://github.com/meltano/sdk/releases/tag/v0.39.0)
+* [v0.40.0](https://github.com/meltano/sdk/releases/tag/v0.40.0)
+
+Among other things, these releases shipped the following changes:
+
+- Targets now emit basic metrics, like the number of records written and the processing time of each batch of records.
+- Improved handling of reserved keywords for SQL-based targets. This is part of our ongoing effort to make SQL-based targets more robust and easier to use.
