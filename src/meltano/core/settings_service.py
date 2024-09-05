@@ -35,7 +35,7 @@ EXPERIMENTAL = "experimental"
 FEATURE_FLAG_PREFIX = "ff"
 
 
-class FeatureFlags(Enum):
+class FeatureFlags(str, Enum):
     """Available Meltano Feature Flags."""
 
     STRICT_ENV_VAR_MODE = "strict_env_var_mode"
@@ -283,7 +283,7 @@ class SettingsService(metaclass=ABCMeta):
             settings as environment variables
         """
         env = {}
-        for _, config in self.config_with_metadata(*args, **kwargs).items():
+        for config in self.config_with_metadata(*args, **kwargs).values():
             value = config["value"]
             if value is None:
                 continue

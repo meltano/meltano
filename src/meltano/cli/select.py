@@ -118,13 +118,13 @@ async def select(
 
 
 def update(
-    project,  # noqa: ANN001
-    extractor,  # noqa: ANN001
-    entities_filter,  # noqa: ANN001
-    attributes_filter,  # noqa: ANN001
+    project: Project,
+    extractor: str,
+    entities_filter: str,
+    attributes_filter: str,
     *,
-    exclude=False,  # noqa: ANN001
-    remove=False,  # noqa: ANN001
+    exclude: bool = False,
+    remove: bool = False,
 ) -> None:
     """Update select pattern for a specific extractor."""
     select_service = SelectService(project, extractor)

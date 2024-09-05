@@ -22,7 +22,7 @@
 # Integration tests
 /docs/example-library/ @meltano/product @meltano/engineering
 
-# Release Ops (see `/.bumpversion.cfg` for list of bumped files)
+# Release Ops (see the `[tool.commitizen]` table in pyproject.toml for a list of bumped files)
 /CHANGELOG.md @meltano/engineering
 /docs/package.json @meltano/engineering
 /pyproject.toml @meltano/engineering
