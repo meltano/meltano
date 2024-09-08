@@ -38,6 +38,10 @@ You can read the complete release notes [on GitHub](https://github.com/meltano/m
 
 * Added the Infostrux Solutions variant of target-db2 - [Hub Link](https://hub.meltano.com/loaders/target-db2--infostrux/)
 
+### Utilities
+
+All dbt packages, which use [the Meltano dbt utility extension](https://github.com/meltano/dbt-ext/), now depend on the `meltano-dbt-ext` package directly [from PyPI](https://pypi.org/project/meltano-dbt-ext/) instead of the GitHub repository. This change makes installing dbt packages faster and more reliable.
+
 ## SDK
 
 We shipped two minor releases of the SDK:
