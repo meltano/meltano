@@ -97,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.10.0
+      uses: pypa/gh-action-pypi-publish@v1.10.1
