@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 
 import pytest
@@ -31,7 +32,7 @@ class TestDBStateStoreManager:
             state_id="partial_only",
             partial_state={"singer_state": {"partial": 1}},
         )
-        subject.set(partial_only)
+        subject.set(copy.deepcopy(partial_only))
         assert subject.get(partial_only.state_id) == partial_only
 
         # Partial merges onto existing partial
@@ -39,17 +40,15 @@ class TestDBStateStoreManager:
             state_id="partial_only",
             partial_state={"singer_state": {"partial": 2}},
         )
-        subject.set(new_partial)
-        updated_state = subject.get(partial_only.state_id)
-        assert updated_state == new_partial
-        assert updated_state.partial_state["singer_state"]["partial"] == 2
+        subject.set(copy.deepcopy(new_partial))
+        assert subject.get(new_partial.state_id) == new_partial
 
         # New complete is set
         complete_only = JobState(
             state_id="complete_only",
             completed_state={"singer_state": {"complete": 1}},
         )
-        subject.set(complete_only)
+        subject.set(copy.deepcopy(complete_only))
         assert subject.get(complete_only.state_id) == complete_only
 
         # Complete overwrites partial
@@ -57,7 +56,7 @@ class TestDBStateStoreManager:
             state_id="partial_only",
             completed_state={"singer_state": {"complete": 1}},
         )
-        subject.set(new_complete)
+        subject.set(copy.deepcopy(new_complete))
         assert subject.get(partial_only.state_id) == new_complete
 
         # Complete overwrites complete
@@ -65,7 +64,7 @@ class TestDBStateStoreManager:
             state_id="complete_only",
             completed_state={"singer_state": {"complete": 1}},
         )
-        subject.set(new_complete_overwritten)
+        subject.set(copy.deepcopy(new_complete_overwritten))
         assert subject.get(complete_only.state_id) == new_complete_overwritten
 
         # Partial merges onto complete
@@ -73,7 +72,7 @@ class TestDBStateStoreManager:
             state_id="complete_only",
             partial_state={"singer_state": {"partial": 1}},
         )
-        subject.set(complete_with_partial)
+        subject.set(copy.deepcopy(complete_with_partial))
         assert subject.get(complete_only.state_id) == JobState(
             state_id="complete_only",
             partial_state={"singer_state": {"partial": 1}},

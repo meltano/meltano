@@ -34,19 +34,13 @@ class DBStateStoreManager(StateStoreManager):
         Args:
             state: the state to set.
         """
-        existing_job_state = (
-            self.session.query(JobState)
-            .filter(JobState.state_id == state.state_id)
-            .first()
-        )
-
         new_job_state = JobState(
             state_id=state.state_id,
             partial_state=state.partial_state,
             completed_state=state.completed_state,
         )
 
-        if existing_job_state:
+        if existing_job_state := self.get(state.state_id):
             if existing_job_state.partial_state and not state.is_complete():
                 new_job_state.partial_state = existing_job_state.partial_state
                 new_job_state.merge_partial(state)
