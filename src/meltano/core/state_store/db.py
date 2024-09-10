@@ -28,6 +28,11 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(**kwargs)
         self.session = session
 
+    def _get_one(self, state_id) -> JobState | None:  # noqa: ANN001
+        return (
+            self.session.query(JobState).filter(JobState.state_id == state_id).first()
+        )
+
     def set(self, state: JobState) -> None:
         """Set the job state for the given state_id.
 
@@ -40,7 +45,7 @@ class DBStateStoreManager(StateStoreManager):
             completed_state=state.completed_state,
         )
 
-        if existing_job_state := self.get(state.state_id):
+        if existing_job_state := self._get_one(state.state_id):
             if existing_job_state.partial_state and not state.is_complete():
                 new_job_state.partial_state = existing_job_state.partial_state
                 new_job_state.merge_partial(state)
@@ -61,9 +66,7 @@ class DBStateStoreManager(StateStoreManager):
         Returns:
             The current state for the given job
         """
-        return (
-            self.session.query(JobState).filter(JobState.state_id == state_id).first()
-        )
+        return self._get_one(state_id)
 
     def clear(self, state_id) -> None:  # noqa: ANN001
         """Clear state for the given state_id.

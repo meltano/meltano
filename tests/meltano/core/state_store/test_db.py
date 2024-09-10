@@ -41,7 +41,7 @@ class TestDBStateStoreManager:
             partial_state={"singer_state": {"partial": 2}},
         )
         subject.set(copy.deepcopy(new_partial))
-        assert subject.get(new_partial.state_id) == new_partial
+        assert subject.get(partial_only.state_id) == new_partial
 
         # New complete is set
         complete_only = JobState(
