@@ -40,7 +40,9 @@ class TestDBStateStoreManager:
             partial_state={"singer_state": {"partial": 2}},
         )
         subject.set(new_partial)
-        assert subject.get(partial_only.state_id) == new_partial
+        updated_state = subject.get(partial_only.state_id)
+        assert updated_state == new_partial
+        assert updated_state.partial_state["singer_state"]["partial"] == 2
 
         # New complete is set
         complete_only = JobState(
