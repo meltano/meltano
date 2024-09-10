@@ -8,7 +8,6 @@ from sqlalchemy import select
 
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
-from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -40,23 +39,22 @@ class DBStateStoreManager(StateStoreManager):
             .filter(JobState.state_id == state.state_id)
             .first()
         )
-        partial_state = state.partial_state
-        completed_state = state.completed_state
-        if existing_job_state:
-            if existing_job_state.partial_state and not state.is_complete():
-                partial_state = merge(
-                    state.partial_state,
-                    existing_job_state.partial_state,
-                )
-            if not state.is_complete():
-                completed_state = existing_job_state.completed_state
+
         new_job_state = JobState(
             state_id=state.state_id,
-            partial_state=partial_state,
-            completed_state=completed_state,
+            partial_state=state.partial_state,
+            completed_state=state.completed_state,
         )
+
         if existing_job_state:
+            if existing_job_state.partial_state and not state.is_complete():
+                new_job_state.partial_state = existing_job_state.partial_state
+                new_job_state.merge_partial(state)
+            if not state.is_complete():
+                new_job_state.completed_state = existing_job_state.completed_state
+
             self.session.delete(existing_job_state)
+
         self.session.add(new_job_state)
         self.session.commit()
 
