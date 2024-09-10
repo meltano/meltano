@@ -160,7 +160,7 @@ class JobState(SystemModel):
         Args:
             state: the partial state to merge onto this state.
         """
-        self.partial_state = merge(
+        merge(
             state.partial_state,
             self.partial_state,
         )
