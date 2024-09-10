@@ -85,3 +85,15 @@ class TestDBStateStoreManager:
         state_ids_with_jobs,
     ) -> None:
         assert set(subject.get_state_ids()) == set(state_ids_with_jobs.keys())
+
+    def test_clear_state(self, subject: DBStateStoreManager) -> None:
+        state_id = "to_clear"
+        state = JobState(
+            state_id=state_id,
+            partial_state={"singer_state": {"partial": 1}},
+        )
+        subject.set(state)
+        assert subject.get(state_id) == state
+
+        subject.clear(state_id)
+        assert subject.get(state_id) is None
