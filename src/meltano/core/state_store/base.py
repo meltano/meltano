@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from meltano.core.job_state import JobState
@@ -31,7 +31,8 @@ class StateStoreManager(ABC):
             kwargs: additional keyword arguments
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def label(self) -> str:
         """Get the label for the StateStoreManager."""
         ...
@@ -49,7 +50,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get(self, state_id) -> JobState | None:  # noqa: ANN001
+    def get(self, state_id: str) -> JobState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -61,7 +62,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def clear(self, state_id):  # noqa: ANN001, ANN201
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -70,7 +71,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
+    def get_state_ids(self, pattern: str | None = None) -> t.Iterable[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -79,7 +80,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def acquire_lock(self, state_id):  # noqa: ANN001, ANN201
+    def acquire_lock(self, state_id: str):  # noqa: ANN201
         """Acquire a naive lock for the given job's state.
 
         Args:

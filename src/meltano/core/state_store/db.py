@@ -18,7 +18,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
-    def __init__(self, session: Session, **kwargs):  # noqa: ANN003
+    def __init__(self, session: Session, **kwargs: t.Any) -> None:
         """Initialize the DBStateStoreManager.
 
         Args:
@@ -28,10 +28,8 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(**kwargs)
         self.session = session
 
-    def _get_one(self, state_id) -> JobState | None:  # noqa: ANN001
-        return (
-            self.session.query(JobState).filter(JobState.state_id == state_id).first()
-        )
+    def _get_one(self, state_id: str) -> JobState | None:
+        return self.session.get(JobState, state_id)
 
     def set(self, state: JobState) -> None:
         """Set the job state for the given state_id.
@@ -57,7 +55,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id):  # noqa: ANN001, ANN201
+    def get(self, state_id: str) -> JobState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -68,7 +66,7 @@ class DBStateStoreManager(StateStoreManager):
         """
         return self._get_one(state_id)
 
-    def clear(self, state_id) -> None:  # noqa: ANN001
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -78,7 +76,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> t.Iterable[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -87,19 +85,13 @@ class DBStateStoreManager(StateStoreManager):
         Returns:
             Generator yielding names of available jobs
         """
+        q = select(JobState.state_id)
         if pattern:
-            return (
-                job_state.state_id
-                for job_state in self.session.query(JobState)
-                .filter(JobState.state_id.like(pattern.replace("*", "%")))
-                .all()
-            )
-        return (
-            record[0]
-            for record in self.session.execute(select(JobState.state_id)).all()
-        )
+            q = q.filter(JobState.state_id.like(pattern.replace("*", "%")))
 
-    def acquire_lock(self, state_id) -> None:  # noqa: ANN001
+        return self.session.execute(q).scalars().all()
+
+    def acquire_lock(self, state_id: str) -> None:
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
@@ -109,7 +101,7 @@ class DBStateStoreManager(StateStoreManager):
             state_id: the state_id to lock
         """
 
-    def release_lock(self, state_id) -> None:  # noqa: ANN001
+    def release_lock(self, state_id: str) -> None:
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
