@@ -110,9 +110,7 @@ Later invocations of the plugin will use this file to determine the settings, in
 
 :::info
 
-  <p>Note that <a href="#custom-plugins">custom</a> and <a href="#plugin-inheritance">inherited</a> plugins
-  do not get a lock file.
-  </p>
+  <p>Note that <a href="#custom-plugins">custom</a> and <a href="#plugin-inheritance">inherited</a> plugins do not get a lock file.</p>
 :::
 
 ## Types
@@ -941,7 +939,7 @@ files:
 
 :::info
 
-  <p>If a file path starts with a <code>*</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>*.yml</code> to match all <code>.yml</code> files:</p>
+  <p>If a file path starts with a <code>%2A</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>%2A.yml</code> to match all <code>.yml</code> files:</p>
 <pre>
 files:
 - name: dbt

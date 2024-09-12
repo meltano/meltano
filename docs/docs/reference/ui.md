@@ -38,7 +38,7 @@ Start the Meltano UI web server using [`meltano ui`](/reference/command-line-int
 meltano ui
 ```
 
-Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now be available at <http://localhost:5000>.
+Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now be available at http://localhost:5000.
 
 ### Docker Compose
 
@@ -58,7 +58,7 @@ meltano add files files-docker-compose
 docker-compose up -d
 ```
 
-Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now be available at <http://localhost:5000>.
+Unless [configured otherwise](/reference/settings#ui-bind-port), the UI will now be available at http://localhost:5000.
 
 For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.
 
@@ -726,15 +726,15 @@ yarn
 yarn serve
 ```
 
-The development build of the Meltano UI will now be available at <http://localhost:8080/>.
+The development build of the Meltano UI will now be available at http://localhost:8080/.
 
-A production build of the API will be available at <http://localhost:5000/> to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/contribute/api) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000.
+A production build of the API will be available at http://localhost:5000/ to support the UI, but you will not need to interact with this directly. However, as mentioned in the [API Development section](/contribute/api) above, users on MacOS may need to specify an alternate [bind to port](/reference/settings#ui-bind-port) to prevent a port conflict with a MacOS system service also running on port 5000.
 
 :::caution
 
   <p><strong>If you're developing for the _Embed_ app (embeddable <code>iframe</code> for reports) you can toggle <code>MELTANO_EMBED</code>:</strong></p>
 
-<pre>
+```
 # Develop for the embed app
 export MELTANO_EMBED=1
 
@@ -743,7 +743,7 @@ export MELTANO_EMBED=0
 
 # Start local development environment
 yarn serve
-</pre>
+```
 
 :::
 
