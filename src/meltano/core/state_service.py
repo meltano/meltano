@@ -192,6 +192,11 @@ class StateService:
             save: Whether to immediately save the state
         """
         self.state_store_manager.clear(state_id)
+    
+    def clear_all_states(self) -> None:
+        """Clear all states."""
+        for state_id in self.state_store_manager.get_state_ids("*"):
+            self.state_store_manager.clear(state_id)
 
     def merge_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Merge state from state_id_src into state_id_dst.
