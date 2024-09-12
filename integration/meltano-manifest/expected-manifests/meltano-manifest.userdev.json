@@ -2193,7 +2193,7 @@
         "capabilities": [
           "about",
           "stream-maps",
-          "record-flattening"
+          "schema-flattening"
         ],
         "config": {
           "stream_maps": {

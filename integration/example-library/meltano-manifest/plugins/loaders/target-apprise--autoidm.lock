@@ -12,7 +12,7 @@
   "capabilities": [
     "about",
     "stream-maps",
-    "record-flattening"
+    "schema-flattening"
   ],
   "settings_group_validation": [
     [
