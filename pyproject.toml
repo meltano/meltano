@@ -47,7 +47,7 @@ azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.30.2", optional = true}
 azure-identity = {version = "^1.17.1", optional = true}
 azure-storage-blob = {version = "^12.22.0", optional = true}
-boto3 = {version = "^1.35.10", optional = true}
+boto3 = {version = "^1.35.14", optional = true}
 check-jsonschema = "^0.29.2"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -69,17 +69,17 @@ pyyaml = "^6.0.2"
 requests = "^2.32.3"
 rich = "^13.8.0"
 "ruamel.yaml" = "^0.18.6"
-setuptools = {version = "^74.0.0", python = ">=3.12"}
+setuptools = {version = "^74.1.2", python = ">=3.12"}
 smart-open = "^7.0.4"
 snowplow-tracker = "^1.0.3"
-sqlalchemy = "^2.0.32"
+sqlalchemy = "^2.0.34"
 structlog = "^24.4.0"
 typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
 uv = { version = ">=0.1.24,<0.5", optional = true }
-virtualenv = "^20.26.3"
+virtualenv = "^20.26.4"
 
 [tool.poetry.extras]
 azure = ["azure-storage-blob", "azure-common", "azure-core", "azure-identity"]
@@ -92,11 +92,11 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.10"}
+boto3-stubs = {extras = ["essential"], version = "1.35.14"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
-moto = "^5.0.13"
+moto = "^5.0.14"
 mypy = "^1.11.2"
 pre-commit = "^3.5.0"
 pytest = "^8.3.2"
