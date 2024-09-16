@@ -119,7 +119,14 @@ class YamlNoTimestampSafeLoader(
 class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(self, project: Project, path: Path, *, check_schema: bool, redact_secrets: bool = False) -> None:
+    def __init__(
+        self,
+        project: Project,
+        path: Path,
+        *,
+        check_schema: bool,
+        redact_secrets: bool = False,
+    ) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data
@@ -135,6 +142,8 @@ class Manifest:
                 jsonschema validation failure error messages.
             check_schema: Whether the project files and generated manifest
                 files should be validated against the Meltano schema.
+            redact_secrets: Whether to redact secret values from the generated
+                manifest.
         """
         self.project = project
         self._project_root_str = str(self.project.root.resolve())

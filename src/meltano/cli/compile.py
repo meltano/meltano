@@ -96,7 +96,9 @@ def compile_command(
             else f"meltano-manifest.{environment.name}.json"
         )
         project.refresh(environment=environment)
-        manifest = Manifest(project=project, path=path, check_schema=lint, redact_secrets=safe)
+        manifest = Manifest(
+            project=project, path=path, check_schema=lint, redact_secrets=safe
+        )
         try:
             with path.open("w") as manifest_file:
                 json.dump(
