@@ -345,13 +345,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.35.14"
-description = "Type annotations for boto3 1.35.14 generated with mypy-boto3-builder 8.0.1"
+version = "1.35.19"
+description = "Type annotations for boto3 1.35.19 generated with mypy-boto3-builder 8.0.1"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.35.14-py3-none-any.whl", hash = "sha256:c9b3c92b5b9b1278ca03bbb942075c5f9378f4bd26d7bce3ab1068246b088928"},
-    {file = "boto3_stubs-1.35.14.tar.gz", hash = "sha256:cfa0d7189862cbd02c6cef1c6ce597728340056687547e8a2c50d2033bf979b6"},
+    {file = "boto3_stubs-1.35.19-py3-none-any.whl", hash = "sha256:6adace32995ae7b88675cf0bbde3b4f31876cbf57520db1ec1f392ac32660b4c"},
+    {file = "boto3_stubs-1.35.19.tar.gz", hash = "sha256:c5842cd82d4a1570613f178831c2b6d1b60f511b87f56cc014f2a216c03ecf5a"},
 ]
 
 [package.dependencies]
@@ -409,7 +409,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.35.0,<1.36.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.35.0,<1.36.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.35.0,<1.36.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.35.0,<1.36.0)"]
-boto3 = ["boto3 (==1.35.14)", "botocore (==1.35.14)"]
+boto3 = ["boto3 (==1.35.19)", "botocore (==1.35.19)"]
 braket = ["mypy-boto3-braket (>=1.35.0,<1.36.0)"]
 budgets = ["mypy-boto3-budgets (>=1.35.0,<1.36.0)"]
 ce = ["mypy-boto3-ce (>=1.35.0,<1.36.0)"]
@@ -2812,13 +2812,13 @@ files = [
 
 [[package]]
 name = "pytest"
-version = "8.3.2"
+version = "8.3.3"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytest-8.3.2-py3-none-any.whl", hash = "sha256:4ba08f9ae7dcf84ded419494d229b48d0903ea6407b030eaec46df5e6a73bba5"},
-    {file = "pytest-8.3.2.tar.gz", hash = "sha256:c132345d12ce551242c87269de812483f5bcc87cdbb4722e48487ba194f9fdce"},
+    {file = "pytest-8.3.3-py3-none-any.whl", hash = "sha256:a6853c7375b2663155079443d2e45de913a911a11d669df02a50814944db57b2"},
+    {file = "pytest-8.3.3.tar.gz", hash = "sha256:70b98107bd648308a7952b06e6ca9a50bc660be218d53c257cc1fc94fda10181"},
 ]
 
 [package.dependencies]
@@ -4301,4 +4301,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "63196435fb6484edead59bade5ecc73ec8283e9d98d68f9c365715f5b3fd1fbd"
+content-hash = "8d7a8706ba6dabcb6d031d992b69d56bc0de85c9e199ba711c8ee4df2746548f"
