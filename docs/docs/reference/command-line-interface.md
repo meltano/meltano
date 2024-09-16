@@ -256,6 +256,14 @@ meltano compile --indent 0
 meltano compile --indent -1
 ```
 
+#### Sensitive values
+By default, values for sensitive settings are redacted from the output of `meltano compile` commands and replaced with `(redacted)`. If this behaviour is not desirable, you can expose them with the `--unsafe` flag instead. The default behaviour can be reaffirmed with the counterpart `--safe` flag (although functionally, this has no effect).
+
+```bash
+# Expose sensitive setting values
+meltano compile --unsafe
+```
+
 ### Using `compile` with Environments
 
 The `compile` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
