@@ -13,5 +13,5 @@ meltano --environment=prod compile --unsafe
 By default a manifest file for each environment is compiled:
 
 ```shell
-meltano compile --indent 2
+meltano compile --indent 2 --unsafe
 ```
