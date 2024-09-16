@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.5.2 (2024-09-16)
+
+### 🐛 Fixes
+
+- [#8770](https://github.com/meltano/meltano/issues/8770) Redact secret settings by default in `meltano compile` -- _**Thanks @holly-evans!**_
+- [#8731](https://github.com/meltano/meltano/issues/8731) Valid options are now printed for the `--interval` option of the schedule subcommand
+
+### ⚙️ Under the Hood
+
+- [#8762](https://github.com/meltano/meltano/issues/8762) Remove `record-flattening` capability in favour of `schema-flattening` -- _**Thanks @ReubenFrankel!**_
+- [#8748](https://github.com/meltano/meltano/issues/8748) Move `install_plugins` to `meltano.core.plugin_install_service`
+- [#8732](https://github.com/meltano/meltano/issues/8732) Use `uv venv` instead of `uv virtualenv` alias
+
+### 📚 Documentation Improvements
+
+- [#8764](https://github.com/meltano/meltano/issues/8764) Migrate to Docusaurus v3
+- [#8756](https://github.com/meltano/meltano/issues/8756) Updated docs to reference `meltano-dbt-ext` PyPI distribution
+
 ## v3.5.1 (2024-08-23)
 
 ### 🐛 Fixes
