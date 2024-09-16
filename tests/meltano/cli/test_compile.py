@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import shutil
 import typing as t
 from pathlib import Path
@@ -25,7 +24,7 @@ if t.TYPE_CHECKING:
 
 schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
 
-SECURE_VALUE = 'a-very-secure-value'
+SECURE_VALUE = "a-very-secure-value"
 
 
 def check_indent(json_path: Path, indent: int) -> None:
@@ -44,16 +43,6 @@ class TestCompile:
     @pytest.fixture(autouse=True)
     def clear_default_manifest_dir(self, manifest_dir: Path) -> None:
         shutil.rmtree(manifest_dir, ignore_errors=True)
-
-    @pytest.fixture()
-    def tap_secure(self, tap, session, plugin_settings_service_factory):
-        plugin_settings_service = plugin_settings_service_factory(tap)
-        plugin_settings_service.set(
-            "secure",
-            value,
-            store=SettingValueStore.DOTENV,
-            session=session,
-        )
 
     def test_compile(self, manifest_dir: Path, cli_runner: CliRunner) -> None:
         assert cli_runner.invoke(cli, ("compile",)).exit_code == 0
@@ -163,8 +152,16 @@ class TestCompile:
             },
         ]
 
-    # First option tests default behavior. The "--no-lint" flag has no effect as it is the default
-    @pytest.mark.parametrize("flag,expected_value", [("--no-lint", REDACTED_VALUE), ("--safe", REDACTED_VALUE), ("--unsafe", SECURE_VALUE)])
+    # First option tests default behavior.
+    # The "--no-lint" flag has no effect as it is the default
+    @pytest.mark.parametrize(
+        ("flag", "expected_value"),
+        (
+            ("--no-lint", REDACTED_VALUE),
+            ("--safe", REDACTED_VALUE),
+            ("--unsafe", SECURE_VALUE),
+        ),
+    )
     def test_safe_unsafe(
         self,
         manifest_dir: Path,
@@ -173,7 +170,7 @@ class TestCompile:
         plugin_settings_service_factory,
         cli_runner: CliRunner,
         flag: str,
-        expected_value: bool,
+        expected_value: str,
     ) -> None:
         plugin_settings_service = plugin_settings_service_factory(tap)
         plugin_settings_service.set(
@@ -186,5 +183,6 @@ class TestCompile:
         result = cli_runner.invoke(cli, ("--no-environment", "compile", flag))
         assert result.exit_code == 0
 
-        manifest_text = Path(os.path.join(manifest_dir, "meltano-manifest.json")).read_text()
+        manifest_filepath = Path(manifest_dir) / "meltano-manifest.json"
+        manifest_text = manifest_filepath.read_text()
         assert expected_value in manifest_text
