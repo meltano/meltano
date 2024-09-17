@@ -92,7 +92,7 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.19"}
+boto3-stubs = {extras = ["essential"], version = "1.35.21"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
@@ -113,7 +113,7 @@ time-machine = "^2.15.0"
 types-croniter = "^3.0.0"
 types-jsonschema = "^4.23.0.20240813"
 types-psutil = "^6.0.0.20240901"
-types-pyyaml = "^6.0.12.20240808"
+types-pyyaml = "^6.0.12.20240917"
 types-requests = "^2.31.0"
 
 [tool.poetry.scripts]
