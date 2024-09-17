@@ -5,6 +5,7 @@ layout: doc
 sidebar_position: 2
 ---
 
+import Link from '@docusaurus/Link';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -29,7 +30,7 @@ For plugin settings, refer to the specific plugin's documentation
 or use [`meltano config <plugin> list`](/reference/command-line-interface#config)
 to list all available settings with their names, environment variables, and current values.
 
-### <a name="plugin-python"></a>`python`
+### <Link id="plugin-python"/>`python`
 
 The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in `$PATH`. You can set it at the time you add a plugin using [`meltano add --python <python>`](/reference/command-line-interface#add).
 
@@ -57,7 +58,7 @@ plugins:
 
 These are settings specific to [your Meltano project](/concepts/project).
 
-### <a name="project-python"></a>`python`
+### <Link id="project-python"/>`python`
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_PYTHON`
 
@@ -80,7 +81,7 @@ plugins:
   loaders: ...
 ```
 
-### <a name="send_anonymous_usage_stats"></a>`send_anonymous_usage_stats`
+### <Link id="send-anonymous-usage-stats"/>`send_anonymous_usage_stats`
 
 - [Environment variable](../guide/configuration#configuring-settings): `MELTANO_SEND_ANONYMOUS_USAGE_STATS`
 - [`meltano init`](../reference/command-line-interface#init) CLI option: `--no-usage-stats` (implies value `false`)
@@ -185,7 +186,7 @@ We hope you will choose to enable reporting, because this really does help us - 
 
 If you still have any concerns about keeping anonymous reporting enabled, we hope you'll share those concerns with us. You can do so by emailing `hello@meltano.com` or by logging an issue in our [Meltano Issue Tracker](https://github.com/meltano/meltano/issues).
 
-### <a name="project-id"></a>`project_id`
+### <Link id="project-id"/>`project_id`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_ID`
 - Default: None
@@ -211,7 +212,7 @@ export MELTANO_PROJECT_ID='<unique identifier>'
   </TabItem>
 </Tabs>
 
-### <a name="database-uri"></a>`database_uri`
+### <Link id="database-uri"/>`database_uri`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_DATABASE_URI`
 - `meltano *` CLI option: `--database-uri`
@@ -357,7 +358,7 @@ export MELTANO_DATABASE_RETRY_TIMEOUT=5
   </TabItem>
 </Tabs>
 
-### <a name="project-readonly"></a>`project_readonly`
+### <Link id="project-readonly"/>`project_readonly`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_PROJECT_READONLY`
 - Default: `false`
@@ -388,7 +389,7 @@ export MELTANO_PROJECT_READONLY=true
   </TabItem>
 </Tabs>
 
-### <a name="hub-api-root"></a>`hub_api_root`
+### <Link id="hub-api-root"/>`hub_api_root`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_API_ROOT`
 - Default: None
@@ -418,7 +419,7 @@ export MELTANO_HUB_API_ROOT=false
   </TabItem>
 </Tabs>
 
-### <a name="hub-url"></a>`hub_url`
+### <Link id="hub-url"/>`hub_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL`
 - Default: `https://hub.meltano.com`
@@ -446,7 +447,7 @@ export MELTANO_HUB_URL=http://localhost:4000
   </TabItem>
 </Tabs>
 
-### <a name="hub-url-auth"></a>`hub_url_auth`
+### <Link id="hub-url-auth"/>`hub_url_auth`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_HUB_URL_AUTH`
 - Default: None
@@ -479,7 +480,7 @@ export MELTANO_HUB_URL_AUTH=false
   </TabItem>
 </Tabs>
 
-### <a name="auto-install"></a>`auto_install`
+### <Link id="auto-install"/>`auto_install`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_AUTO_INSTALL`
 - Default: `true`
@@ -520,7 +521,7 @@ export MELTANO_AUTO_INSTALL=false
 
 These settings can be used to modify the behavior of the [`meltano` CLI](/reference/command-line-interface).
 
-### <a name="cli-log-level"></a>`cli.log_level`
+### <Link id="cli-log-level"/>`cli.log_level`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
@@ -628,7 +629,7 @@ root:
   handlers: [console, file]
 ```
 
-### <a name="cli-cwd"></a>`cli.cwd`
+### <Link id="cli-cwd"/>`cli.cwd`
 
 - `meltano` CLI option: `--cwd`
 - Default: `Current directory`
@@ -684,7 +685,7 @@ export MELTANO_ELT_BUFFER_SIZE=52428800
 
 ## State Backends
 
-### <a name="state-backend-uri"></a>`state_backend.uri`
+### <Link id="state-backend-uri"/>`state_backend.uri`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_URI`
 - Default: `systemdb`
@@ -710,7 +711,7 @@ export MELTANO_STATE_BACKEND_URI="s3://your_bucket/meltano/state"
   </TabItem>
 </Tabs>
 
-### <a name="state-backend-uri"></a>`state_backend.lock_timeout_seconds`
+### <Link id="state-backend-uri"/>`state_backend.lock_timeout_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS`
 - Default: `360`
@@ -736,7 +737,7 @@ export MELTANO_STATE_BACKEND_LOCK_TIMEOUT_SECONDS=720
   </TabItem>
 </Tabs>
 
-### <a name="state-backend-uri"></a>`state_backend.lock_retry_seconds`
+### <Link id="state-backend-uri"/>`state_backend.lock_retry_seconds`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS`
 - Default: `360`
@@ -766,7 +767,7 @@ export MELTANO_STATE_BACKEND_LOCK_RETRY_SECONDS=720
 
 ---
 
-### <a name="state-backend-uri"></a>`state_backend.azure.storage_account_url`
+### <Link id="state-backend-uri"/>`state_backend.azure.storage_account_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL`
 - Default: None
@@ -798,7 +799,7 @@ export MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL="https://<myStorageAccoun
   </TabItem>
 </Tabs>
 
-### <a name="state-backend-uri"></a>`state_backend.azure.connection_string`
+### <Link id="state-backend-uri"/>`state_backend.azure.connection_string`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING`
 - Default: None
@@ -828,7 +829,7 @@ export MELTANO_STATE_BACKEND_AZURE_CONNECTION_STRING="DefaultEndpointsProtocol=h
 
 ---
 
-### <a name="state-backend-uri"></a>`state_backend.s3.aws_access_key_id`
+### <Link id="state-backend-uri"/>`state_backend.s3.aws_access_key_id`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ACCESS_KEY_ID`
 - Default: None
@@ -854,7 +855,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_ACCESS_KEY_ID="someaccesskeyid"
   </TabItem>
 </Tabs>
 
-### <a name="state-backend-uri"></a>`state_backend.s3.aws_secret_access_key`
+### <Link id="state-backend-uri"/>`state_backend.s3.aws_secret_access_key`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_SECRET_ACCESS_KEY`
 - Default: None
@@ -880,7 +881,7 @@ export MELTANO_STATE_BACKEND_S3_AWS_SECRET_ACCESS_KEY="somesecretaccesskey"
   </TabItem>
 </Tabs>
 
-### <a name="state-backend-uri"></a>`state_backend.s3.endpoint_url`
+### <Link id="state-backend-uri"/>`state_backend.s3.endpoint_url`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_AWS_ENDPOINT_URL`
 - Default: None
@@ -910,7 +911,7 @@ export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 
 ---
 
-### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
+### <Link id="state-backend-uri"/>`state_backend.gcs.application_credentials`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_APPLICATION_CREDENTIALS`
 - Default: None
@@ -973,14 +974,14 @@ Snowplow collector endpoints to be used if the [`send_anonymous_usage_stats` set
 
 ## Feature Flags
 
-### <a name="ff-strict-env-var-mode"></a>`ff.strict_env_var_mode`
+### <Link id="ff-strict-env-var-mode"/>`ff.strict_env_var_mode`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_STRICT_ENV_VAR_MODE`
 - Default: `False`
 
 Causes an exception to be raised if an environment variable is used within the project's Meltano configuration but that environment variable is not set.
 
-### <a name="ff-plugin-locks-required"></a>`ff.plugin_locks_required`
+### <Link id="ff-plugin-locks-required"/>`ff.plugin_locks_required`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_FF_PLUGIN_LOCKS_REQUIRED`
 - Default: `False`

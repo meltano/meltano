@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 3
 ---
 
+import Link from '@docusaurus/Link';
+
 Meltano is responsible for managing the configuration of all of a [project](/concepts/project)'s [plugins](/concepts/plugins).
 It knows what settings are supported by each plugin, and how and when different types of plugins expect to be fed that configuration.
 
@@ -236,7 +238,7 @@ export <PLUGIN_NAME>_<SETTING_NAME>=<value>
 export TAP_GITLAB_API_URL=https://gitlab.example.com
 ```
 
-Plugins can also specify alternative variables ([aliases](#aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
+Plugins can also specify alternative variables ([aliases](#settings-aliases) for their settings, to match existing usage or variables expected by plugin executables. You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list all available settings for a plugin along with their variables, in order of precedence.
 
 Since environment variable values are always strings, Meltano will cast values to the appropriate type before passing them on to the plugin.
 
@@ -321,7 +323,7 @@ Conflicting values for setting found in: ['MY_CUSTOM_TAP_CUSTOM_TAP_USERNAME', '
 
 Inside the values of settings in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file), environment variables can be referenced to dynamically adapt a plugin's configuration to the environment it is run in, specific properties of your project, or the plugins it is run with inside a [`meltano run`](/reference/command-line-interface#run) pipeline.
 
-#### Available plugin environment variables
+#### <Link id="available-environment-variables"/> Available plugin environment variables
 
 The following variables can be referenced from any setting:
 

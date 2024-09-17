@@ -5,6 +5,8 @@ layout: doc
 sidebar_position: 3
 ---
 
+import Link from '@docusaurus/Link';
+
 This document describes the syntax for defining plugins contributed to Meltano Hub.
 
 ## `name`
@@ -458,7 +460,7 @@ settings:
   hidden: true
 ```
 
-### `settings[*].kind`
+### <Link id="settingskind"/> `settings[*].kind`
 
 Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 

@@ -7,6 +7,7 @@ redirect_from:
 sidebar_position: 2
 ---
 
+import Link from '@docusaurus/Link';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -172,7 +173,7 @@ by running the extractor in [discovery mode](https://hub.meltano.com/singer/spec
 While this extra can be managed using [`meltano config`](/reference/command-line-interface#config) or environment variables like any other setting,
 a catalog file is typically provided using [`meltano elt`](/reference/command-line-interface#elt)'s `--catalog` option.
 
-If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/guide/integration#validate-tap-capabilities).
+If the catalog does not seem to take effect, you may need to [validate the capabilities of the tap](/guide/troubleshooting#validate-tap-capabilities).
 
 ##### How to use
 
@@ -215,7 +216,7 @@ export TAP_GITLAB__CATALOG=extract/tap-gitlab.catalog.json
   </TabItem>
 </Tabs>
 
-#### <a name="load-schema-extra"></a>`load_schema` extra
+#### <Link id="load-schema-extra"/>`load_schema` extra
 
 - Setting: `_load_schema`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__LOAD_SCHEMA`, e.g. `TAP_GITLAB__LOAD_SCHEMA`
@@ -504,7 +505,7 @@ export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
 </Tabs>
 
 
-#### <a name="select-filter-extra"></a>`select_filter` extra
+#### <Link id="select-filter-extra"/>`select_filter` extra
 
 - Setting: `_select_filter`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__SELECT_FILTER`, e.g. `TAP_GITLAB__SELECT_FILTER`
@@ -630,7 +631,7 @@ export TAP_GITLAB__STATE=extract/tap-gitlab.state.json
   </TabItem>
 </Tabs>
 
-#### <a name="cache-catalog-extra"></a>`use_cached_catalog` extra
+#### <Link id="cache-catalog-extra"/>`use_cached_catalog` extra
 
 - Setting: `_use_cached_catalog`
 - [Environment variable](/guide/configuration#configuring-settings): `<EXTRACTOR>__USE_CACHED_CATALOG`, e.g. `TAP_GITLAB__USE_CACHED_CATALOG`
@@ -765,7 +766,7 @@ Transforms support the following [extras](/guide/configuration#plugin-extras):
 - [`package_name`](#package-name-extra)
 - [`vars`](#vars-extra)
 
-#### <a name="package-name-extra"></a>`package_name` extra
+#### <Link id="package-name-extra"/>`package_name` extra
 
 - Setting: `_package_name`
 - [Environment variable](/guide/configuration#configuring-settings): `<TRANSFORM>__PACKAGE_NAME`, e.g. `TAP_GITLAB__PACKAGE_NAME`

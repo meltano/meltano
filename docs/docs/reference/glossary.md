@@ -25,7 +25,7 @@ DataOps brings the benefits of DevOps best practices to the data lifecycle. [Lea
 
 ELT means Extract, Load, Transform. It is a method of data replication and transformation used to perform data integration at any scale. The purpose of ELT is to extract specific data, such as customer information or billing records, from its source, and deliver it to its end point in the fastest, most reliable way possible. [Learn more...](https://meltano.com/meltano-elt/)
 
-## [.env File](#env)
+## [.env File](#env-file)
 
 .env (pronounced "dot ehnv") files allow you to configure environment variables within an application. This is useful for passing credentials and secrets to an app without so that you don't need to check passwords or keys into version control.
 
@@ -45,7 +45,7 @@ A Docker container image is a lightweight, standalone, executable package of sof
 
 Orchestration refers to the sequencing and running of any tasks. Orchestrators are responsible for running tasks at specified times and handling advanced features like retries. [Learn more...](https://docs.meltano.com/guide/orchestration)
 
-## [Python Virtual Environment](#python-venv)
+## [Python Virtual Environment](#python-virtual-environment)
 
 A virtual environment is a Python environment such that the Python interpreter, libraries and scripts installed into it are isolated from those installed in other virtual environments, and (by default) any libraries installed in a “system” Python, i.e., one which is installed as part of your operating system. [Learn more...](https://docs.python.org/3/library/venv.html)
 
@@ -61,7 +61,7 @@ In Singer extract-load pipelines, the word 'state' is used to refer to progress 
 
 In the Singer ecosystem, a stream typically represents a table, API endpoint, or discrete set of data. [Learn more...](https://hub.meltano.com/singer/spec)
 
-## [Stream Map](#streammap)
+## [Stream Map](#stream-map)
 
 In the Singer ecosystem, a stream map is an inline transformation that is applied to data on the fly before it arrives at a target. [Learn more...](https://sdk.meltano.com/en/latest/stream_maps.html)
 

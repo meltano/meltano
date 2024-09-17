@@ -80,7 +80,7 @@ Some components of Meltano are optional and not installed by default. See the gu
 
 ### Next Steps
 
-Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
+Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started/part1#create-your-meltano-project).
 
 ## Windows
 
@@ -88,7 +88,7 @@ Please note that Windows is not fully supported yet so some features like the EL
 See the GitHub [Windows Label](https://github.com/meltano/meltano/labels/Windows) for more information.
 
 If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
-You may also try [installing Meltano on Docker](#installing-on-docker).
+You may also try [installing Meltano on Docker](#docker).
 
 ### Requirements
 
@@ -147,11 +147,11 @@ meltano --version
 
 ### Next Steps
 
-Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started#create-your-meltano-project).
+Now that you've installed Meltano and its requirements, you can continue setting up your Meltano project by following the [Getting Started guide](/getting-started/part1#create-your-meltano-project).
 
 ## Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/concepts/python_virtual_environments). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ### Using Pre-built Docker Images
 

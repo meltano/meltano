@@ -5,7 +5,9 @@ layout: doc
 sidebar_position: 1
 ---
 
-<!-- The following is reproduced in docs/src/README.md#meltano-init -->
+import Link from '@docusaurus/Link';
+
+{/* The following is reproduced in docs/src/README.md#meltano-init */}
 
 At the core of the Meltano experience is your Meltano project,
 which represents the single source of truth regarding your ELT pipelines:
@@ -20,7 +22,7 @@ and continuous integration and deployment (CI/CD).
 
 You can initialize a new Meltano project using [`meltano init`](/reference/command-line-interface#init).
 
-## <a name="meltano-yml-project-file"></a>`meltano.yml` project file
+## <Link id="meltano-yml-project-file"/>`meltano.yml` project file
 
 At a minimum, a Meltano project must contain a project file named `meltano.yml`,
 which contains your project configuration and tells Meltano that a particular directory is a Meltano project.

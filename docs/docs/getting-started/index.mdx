@@ -5,6 +5,8 @@ layout: getting_started
 sidebar_position: 5
 ---
 
+import Link from '@docusaurus/Link';
+
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
@@ -64,7 +66,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
     meltano --version
     ```
 
-If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
+If anything's not performing as expected, refer to the "Local Installation" section of the [Installation guide](/guide/installation-guide) for more details.
 
 ## Create Your Meltano Project
 
@@ -775,7 +777,7 @@ export TARGET_POSTGRES_PASSWORD=meltano
    }
    ```
 
-## Run a Data Integration (EL) Pipeline
+## <Link id="run-a-data-integration-el-pipeline"/>Run a Data Integration (EL) Pipeline
 
 Now that [your Meltano project](#create-your-meltano-project), [extractor](#add-an-extractor-to-pull-data-from-a-source), and [loader](#add-a-loader-to-send-data-to-a-destination) are all set up, we've reached the final chapter of this adventure, and it's time to run your first data integration (EL) pipeline!
 

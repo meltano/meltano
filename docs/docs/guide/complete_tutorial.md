@@ -64,7 +64,7 @@ You will need to be running Linux, macOS, or Windows, and have [Python](https://
     meltano --version
     ```
 
-If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
+If anything's not performing as expected, refer to the "Local Installation" section of the [Installation guide](/guide/installation-guide) for more details.
 
 ## Create Your Meltano Project
 

@@ -11,7 +11,7 @@ Most of Meltano's features are available without installing any additional packa
 
 ### System Database
 
-The following extras add support for different [system database](/concepts/project/#system-database) types, which function as the default [state backend](/concepts/state_backends):
+The following extras add support for different [system database](/concepts/project#system-database) types, which function as the default [state backend](/concepts/state_backends):
 
 - `mssql` - Microsoft SQL Server.
 - `psycopg2` - PostgreSQL. It uses the legacy `psycopg2` driver.

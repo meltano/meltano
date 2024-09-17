@@ -25,7 +25,7 @@ These Singer taps and targets can be cumbersome to run manually so the easiest w
 
 The following steps will demonstrate how to implement a custom extractor to extract data from a JSON placeholder REST API to a JSONL file using Meltano and the Meltano SDK. You can check out the complete custom extractor code on this [GitHub repo](https://github.com/vicradon/tap-jsonplaceholder).
 
-There a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
+There a few prerequisites that you need before continuing. The [first step](#1-installing-the-dependencies) details how you can install these dependencies.
 
 1. [Python3](https://www.python.org/downloads/) for running Python-based scripts
 2. [Pip3](https://pypi.org/project/pip/#files) for installing pipx
@@ -274,7 +274,7 @@ You can also use the `--discover` flag to see details about the supported stream
 meltano invoke tap-my-custom-source --discover
 ```
 
-You can also use [`meltano select`](/getting-started#select-entities-and-attributes-to-extract)
+You can also use [`meltano select`](/getting-started/index#select-entities-and-attributes-to-extract)
 to parse your `catalog` and list all available entities and attributes:
 
 ```bash
@@ -468,7 +468,7 @@ _**It is best practice not to store sensitive values directly in `meltano.yml`.*
 
 Note in our example above, we provided values directly for `username` and `start_date` but we did not enter a value
 for password. This was to avoid storing sensitive credentials in clear text within our source code. Instead, make sure the setting is set to `sensitive: true` and then
-run [`meltano config <plugin> set password <value>`](/getting-started#configure-the-extractor). You can also set the matching environment variable for this
+run [`meltano config <plugin> set password <value>`](/getting-started/guide#configure-the-extractor). You can also set the matching environment variable for this
 setting by running `export TAP_MY_CUSTOM_SOURCE_PASSWORD=<value>`.
 
 You may use any of the following to configure setting values (in order of precedence):

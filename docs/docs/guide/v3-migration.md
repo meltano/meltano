@@ -64,7 +64,7 @@ meltano lock --all
 
 In line with the deprecation of the [`meltano elt`](/reference/command-line-interface#elt) command in favor of [`meltano el`](/reference/command-line-interface#el), the `target_schema` extra setting of [loaders](/concepts/plugins#loaders) has been removed.
 
-This should impact very few users, as the `target_schema` extra setting was only used by the [`dbt` transformer](/concepts/plugins#transformers), which has been deprecated in favor of [adapter-specific dbt utilities](/guide/migrate-an-existing-dbt-project/#add-dbt-transformer).
+This should impact very few users, as the `target_schema` extra setting was only used by the [`dbt` transformer](/concepts/plugins#transformers), which has been deprecated in favor of [adapter-specific dbt utilities](/guide/migrate-an-existing-dbt-project#add-dbt-transformer).
 
 #### Migration steps
 

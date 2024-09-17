@@ -5,6 +5,7 @@ layout: doc
 sidebar_position: 3
 ---
 
+import Link from '@docusaurus/Link';
 import Termy from '@site/src/utils/Termy'
 
 Let’s learn by example.
@@ -109,7 +110,7 @@ environments:
 cd my-meltano-project
 ```
 
-## Add an Extractor to Pull Data from a Source
+## <Link id="add-an-extractor-to-pull-data-from-a-source"/>Add an Extractor to Pull Data from a Source
 
 Now that you have your very own Meltano project, it's time to add [plugins](/concepts/plugins) to it. We're going to add an extrator for GitHub to get our data. An [extractor](/concepts/plugins#extractors) is responsible for pulling data out of any data source. In this case, we choose a specific one with the `--variant` option to make this tutorial easy to work with.
 
@@ -361,7 +362,7 @@ plugins:
 meltano select tap-github --list
 ```
 
-## Add a dummy loader to dump the data into JSON
+## <Link id="add-a-loader-to-send-data-to-a-destination"/>Add a dummy loader to dump the data into JSON
 
 To test that the extraction process works, we add a JSON target.
 
