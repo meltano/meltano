@@ -46,8 +46,8 @@ atomicwrites = "^1.2.1"
 azure-common = {version = "^1.1.28", optional = true}
 azure-core = {version = "^1.31.0", optional = true}
 azure-identity = {version = "^1.17.1", optional = true}
-azure-storage-blob = {version = "^12.22.0", optional = true}
-boto3 = {version = "^1.35.19", optional = true}
+azure-storage-blob = {version = "^12.23.0", optional = true}
+boto3 = {version = "^1.35.21", optional = true}
 check-jsonschema = "^0.29.2"
 click = "^8.1"
 click-default-group = "^1.2.4"
@@ -72,7 +72,7 @@ rich = "^13.8.1"
 setuptools = {version = "^75.1.0", python = ">=3.12"}
 smart-open = "^7.0.4"
 snowplow-tracker = "^1.0.3"
-sqlalchemy = "^2.0.34"
+sqlalchemy = "^2.0.35"
 structlog = "^24.4.0"
 typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
