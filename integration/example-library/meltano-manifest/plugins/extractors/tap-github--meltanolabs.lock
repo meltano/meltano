@@ -11,6 +11,7 @@
   "logo_url": "https://hub.meltano.com/assets/logos/extractors/github.png",
   "capabilities": [
     "about",
+    "batch",
     "catalog",
     "discover",
     "schema-flattening",
@@ -43,9 +44,50 @@
     },
     {
       "name": "auth_token",
+      "kind": "string",
       "label": "Auth Token",
       "description": "GitHub token to authenticate with.",
       "sensitive": true
+    },
+    {
+      "name": "batch_config.encoding.compression",
+      "kind": "options",
+      "label": "Batch Config Encoding Compression",
+      "description": "Compression format to use for batch files.",
+      "options": [
+        {
+          "label": "Gzip",
+          "value": "gzip"
+        },
+        {
+          "label": "None",
+          "value": "none"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.encoding.format",
+      "kind": "options",
+      "label": "Batch Config Encoding Format",
+      "description": "Format to use for batch files.",
+      "options": [
+        {
+          "label": "Jsonl",
+          "value": "jsonl"
+        }
+      ]
+    },
+    {
+      "name": "batch_config.storage.prefix",
+      "kind": "string",
+      "label": "Batch Config Storage Prefix",
+      "description": "Prefix to use when writing batch files."
+    },
+    {
+      "name": "batch_config.storage.root",
+      "kind": "string",
+      "label": "Batch Config Storage Root",
+      "description": "Root path to use when writing batch files."
     },
     {
       "name": "flattening_enabled",
