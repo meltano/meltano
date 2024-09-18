@@ -6,33 +6,17 @@
   "label": "Superset",
   "docs": "https://hub.meltano.com/utilities/superset--apache",
   "repo": "https://github.com/apache/superset",
-  "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1 cryptography==3.4.7",
+  "pip_url": "apache-superset==3.1.1 flask==2.2.5 werkzeug==2.3.3 jinja2==3.0.1 wtforms==2.3.3",
   "description": "A modern, enterprise-ready business intelligence web application.",
   "logo_url": "https://hub.meltano.com/assets/logos/utilities/superset.png",
   "settings": [
     {
-      "name": "ui.bind_host",
-      "value": "0.0.0.0",
-      "label": "UI Bind Host",
-      "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`."
-    },
-    {
-      "name": "ui.port",
-      "value": 8088,
-      "label": "UI Port",
-      "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`."
-    },
-    {
-      "name": "ui.timeout",
-      "value": 60,
-      "label": "UI Timeout",
-      "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option"
-    },
-    {
-      "name": "ui.workers",
-      "value": 4,
-      "label": "UI Workers",
-      "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option"
+      "name": "SECRET_KEY",
+      "kind": "string",
+      "value": "thisisnotapropersecretkey",
+      "label": "Secret Key",
+      "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
+      "sensitive": true
     },
     {
       "name": "SQLALCHEMY_DATABASE_URI",
@@ -41,11 +25,31 @@
       "description": "Superset metadata database connection string. Equivalent to the `SQLALCHEMY_DATABASE_URI` setting in `superset_config.py`.\n\nSQLite is used by default, but in production PostgreSQL or MySQL is more appropriate. See the [Superset documentation](https://superset.apache.org/docs/installation/configuring-superset/#using-a-production-metastore) for more information. To add a database driver like `psycopg2` or `mysqlclient`, refer to the [Add additional database drivers](#add-additional-database-drivers) section above.\n"
     },
     {
-      "name": "SECRET_KEY",
-      "value": "thisisnotapropersecretkey",
-      "label": "Secret Key",
-      "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
-      "sensitive": true
+      "name": "ui.bind_host",
+      "value": "0.0.0.0",
+      "label": "UI Bind Host",
+      "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`."
+    },
+    {
+      "name": "ui.port",
+      "kind": "integer",
+      "value": 8088,
+      "label": "UI Port",
+      "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`."
+    },
+    {
+      "name": "ui.timeout",
+      "kind": "integer",
+      "value": 60,
+      "label": "UI Timeout",
+      "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option"
+    },
+    {
+      "name": "ui.workers",
+      "kind": "integer",
+      "value": 4,
+      "label": "UI Workers",
+      "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option"
     }
   ],
   "commands": {

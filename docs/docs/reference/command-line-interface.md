@@ -274,10 +274,6 @@ When no environment is explicitly specified, a manifest JSON file for each envir
 
 To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`, pass the `--no-environment` CLI option to `meltano`.
 
-## `cloud`
-
-See the full [Cloud CLI reference](/cloud/cloud-cli).
-
 ## `config`
 
 Enables you to manage the [configuration](/guide/configuration) of Meltano itself or any of its plugins, as well as [plugin extras](#how-to-use-plugin-extras).
