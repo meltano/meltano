@@ -210,6 +210,7 @@
         "settings": [
           {
             "description": "The access key for your AWS account.",
+            "kind": "string",
             "label": "AWS Access Key ID",
             "name": "aws_access_key_id",
             "sensitive": true
@@ -227,19 +228,21 @@
             "name": "aws_profile"
           },
           {
-            "description": "The AWS region name (e.g. us-east-1) ",
+            "description": "The AWS region name (e.g. us-east-1)",
             "kind": "string",
             "label": "AWS Region Name",
             "name": "aws_region_name"
           },
           {
             "description": "The secret key for your AWS account.",
+            "kind": "string",
             "label": "AWS Secret Access Key",
             "name": "aws_secret_access_key",
             "sensitive": true
           },
           {
             "description": "The session key for your AWS account. This is only needed when you are using temporary credentials.",
+            "kind": "string",
             "label": "AWS Session Token",
             "name": "aws_session_token",
             "sensitive": true
@@ -269,6 +272,10 @@
               {
                 "label": "Jsonl",
                 "value": "jsonl"
+              },
+              {
+                "label": "Parquet",
+                "value": "parquet"
               }
             ]
           },
@@ -351,21 +358,23 @@
       },
       {
         "capabilities": [
-          "catalog",
-          "state",
-          "discover",
           "about",
-          "stream-maps",
-          "schema-flattening"
+          "catalog",
+          "discover",
+          "schema-flattening",
+          "state",
+          "stream-maps"
         ],
         "docs": "https://hub.meltano.com/extractors/tap-meltanohub--autoidm",
         "env": {
+          "MELTANO_EXTRACT_API_URL": "https://hub.meltano.com",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_meltanohub",
           "MELTANO_EXTRACT__METADATA": "{}",
           "MELTANO_EXTRACT__SCHEMA": "{}",
           "MELTANO_EXTRACT__SELECT": "[\"plugins.*\"]",
           "MELTANO_EXTRACT__SELECT_FILTER": "[]",
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
+          "TAP_MELTANOHUB_API_URL": "https://hub.meltano.com",
           "TAP_MELTANOHUB__LOAD_SCHEMA": "tap_meltanohub",
           "TAP_MELTANOHUB__METADATA": "{}",
           "TAP_MELTANOHUB__SCHEMA": "{}",
@@ -386,20 +395,10 @@
         "settings": [
           {
             "description": "The url for the API service",
-            "label": "Api Url",
-            "name": "api_url"
-          },
-          {
-            "description": "Config object for stream maps capability.",
-            "kind": "object",
-            "label": "Stream Maps",
-            "name": "stream_maps"
-          },
-          {
-            "description": "User-defined config values to be used within map expressions.",
-            "kind": "object",
-            "label": "Stream Map Config",
-            "name": "stream_map_config"
+            "kind": "string",
+            "label": "API URL",
+            "name": "api_url",
+            "value": "https://hub.meltano.com"
           },
           {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
@@ -412,6 +411,18 @@
             "kind": "integer",
             "label": "Flattening Max Depth",
             "name": "flattening_max_depth"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html).",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
           }
         ],
         "settings_group_validation": [
@@ -527,6 +538,7 @@
         "env": {
           "MELTANO_EXTRACT_AUTO_JOIN_CHANNELS": "false",
           "MELTANO_EXTRACT_CHANNEL_TYPES": "[\"private_channel\"]",
+          "MELTANO_EXTRACT_INCLUDE_ADMIN_STREAMS": "false",
           "MELTANO_EXTRACT_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
           "MELTANO_EXTRACT_START_DATE": "2021-01-01",
           "MELTANO_EXTRACT_THREAD_LOOKBACK_DAYS": "1",
@@ -538,6 +550,7 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_CHANNEL_TYPES": "[\"private_channel\"]",
+          "TAP_SLACK_INCLUDE_ADMIN_STREAMS": "false",
           "TAP_SLACK_SELECTED_CHANNELS": "[\"C01SK13R9NJ\"]",
           "TAP_SLACK_START_DATE": "2021-01-01",
           "TAP_SLACK_THREAD_LOOKBACK_DAYS": "1",
@@ -563,6 +576,7 @@
         "settings": [
           {
             "description": "The token to authenticate against the Slack API service",
+            "kind": "string",
             "label": "API Key",
             "name": "api_key",
             "sensitive": true
@@ -571,7 +585,8 @@
             "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages.",
             "kind": "boolean",
             "label": "Auto Join Channels",
-            "name": "auto_join_channels"
+            "name": "auto_join_channels",
+            "value": false
           },
           {
             "description": "Compression format to use for batch files.",
@@ -598,6 +613,10 @@
               {
                 "label": "Jsonl",
                 "value": "jsonl"
+              },
+              {
+                "label": "Parquet",
+                "value": "parquet"
               }
             ]
           },
@@ -644,7 +663,8 @@
             "description": "Whether to include streams that require admin privileges or not. If the user does not have the proper scopes then the tap will throw and exception.",
             "kind": "boolean",
             "label": "Include Admin Streams",
-            "name": "include_admin_streams"
+            "name": "include_admin_streams",
+            "value": false
           },
           {
             "description": "A list of channel IDs that should be retrieved. If not defined then all are selected.",
@@ -698,6 +718,7 @@
         "env": {
           "MELTANO_EXTRACT_AUTO_JOIN_CHANNELS": "false",
           "MELTANO_EXTRACT_CHANNEL_TYPES": "[\"public_channel\"]",
+          "MELTANO_EXTRACT_INCLUDE_ADMIN_STREAMS": "false",
           "MELTANO_EXTRACT_SELECTED_CHANNELS": "[]",
           "MELTANO_EXTRACT_START_DATE": "2021-01-01",
           "MELTANO_EXTRACT_THREAD_LOOKBACK_DAYS": "7",
@@ -709,8 +730,10 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SLACK_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_CHANNEL_TYPES": "[\"public_channel\"]",
+          "TAP_SLACK_INCLUDE_ADMIN_STREAMS": "false",
           "TAP_SLACK_PUBLIC_AUTO_JOIN_CHANNELS": "false",
           "TAP_SLACK_PUBLIC_CHANNEL_TYPES": "[\"public_channel\"]",
+          "TAP_SLACK_PUBLIC_INCLUDE_ADMIN_STREAMS": "false",
           "TAP_SLACK_PUBLIC_SELECTED_CHANNELS": "[]",
           "TAP_SLACK_PUBLIC_START_DATE": "2021-01-01",
           "TAP_SLACK_PUBLIC_THREAD_LOOKBACK_DAYS": "7",
@@ -757,7 +780,7 @@
         "env": {
           "MELTANO_EXTRACT_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
           "MELTANO_EXTRACT_START_DATE": "2022-02-20",
-          "MELTANO_EXTRACT_VIEW_ID": "188392047",
+          "MELTANO_EXTRACT_VIEW_ID": "(redacted)",
           "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_google_analytics",
           "MELTANO_EXTRACT__METADATA": "{}",
           "MELTANO_EXTRACT__SCHEMA": "{}",
@@ -766,7 +789,7 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_GOOGLE_ANALYTICS_REPORTS": "./extract/ga_reports/cli_events_report_definition.json",
           "TAP_GOOGLE_ANALYTICS_START_DATE": "2022-02-20",
-          "TAP_GOOGLE_ANALYTICS_VIEW_ID": "188392047",
+          "TAP_GOOGLE_ANALYTICS_VIEW_ID": "(redacted)",
           "TAP_GOOGLE_ANALYTICS__LOAD_SCHEMA": "tap_google_analytics",
           "TAP_GOOGLE_ANALYTICS__METADATA": "{}",
           "TAP_GOOGLE_ANALYTICS__SCHEMA": "{}",
@@ -809,6 +832,7 @@
           },
           {
             "description": "#### How to get\n\nFollow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.\n\nThis extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.\n\nTo access your Google Analytics data, the \"Analytics Reporting API\" and \"Analytics API\" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.\n\n##### Step 1: Creating Service Account Credentials\n\nAs a first step, you need to create a new project in Google Cloud Platform or use an existing one:\n\n1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).\n\n2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.\n\n  ![Screenshot of Google Service Accounts page](/assets/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)\n\n3. Click \"Create service account\"\n\n  In the Create service account window, type a name for the service account, and click `Create`.\n\n  We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.\n\n  We also do not need to grant access to any users for this service account, as we only need the key.\n\n  ![Screenshot of Google Service Account Configuration for new Account](/assets/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)\n\n  Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.\n\nMeltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.\n\n##### Step 2: Linking Credentials to Google Analytics\n\nThe newly created service account will have an email address that looks similar to:\n\n```\nservice-account-name@PROJECT-ID.iam.gserviceaccount.com\n```\n\nTo grant this service account access to your Google Analytics data, add the email address as a [new user](https://support.google.com/analytics/answer/1009702) to your Google Analytics account, property or view through the \"Admin > User Management\" page.\n\nOnly the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.\n\n![Screenshot of Google Analytics Add User](/assets/images/tap-google-analytics/03-ga-add-user.png)\n\n##### Step 3: Enabling the APIs\n\n1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.\n\n  Now enable the API using the button at the top, so that the button will say \"Disable API\" instead:\n\n  ![Screenshot of Google Analytics Reporting API](/assets/images/tap-google-analytics/04-ga-reporting-api.png)\n\n2. Next, visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable this API as well.\n\n  ![Screenshot of Google Analytics API](/assets/images/tap-google-analytics/05-ga-api.png)\n",
+            "kind": "string",
             "label": "Key File Location",
             "name": "key_file_location",
             "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json",
@@ -816,24 +840,28 @@
           },
           {
             "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "string",
             "label": "OAuth Credentials Access Token",
             "name": "oauth_credentials.access_token",
             "sensitive": true
           },
           {
             "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
+            "kind": "string",
             "label": "OAuth Credentials Client ID",
             "name": "oauth_credentials.client_id",
             "sensitive": true
           },
           {
             "description": "Google Analytics Client Secret. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "string",
             "label": "OAuth Credentials Client Secret",
             "name": "oauth_credentials.client_secret",
             "sensitive": true
           },
           {
             "description": "Google Analytics Refresh Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+            "kind": "string",
             "label": "OAuth Credentials Refresh Token",
             "name": "oauth_credentials.refresh_token",
             "sensitive": true
@@ -846,7 +874,7 @@
             "placeholder": "Ex. my_report_definition.json"
           },
           {
-            "description": "This property determines how much historical data will be extracted.Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
+            "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
             "kind": "date_iso8601",
             "label": "Start Date",
             "name": "start_date"
@@ -865,6 +893,7 @@
           },
           {
             "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
+            "kind": "string",
             "label": "View ID",
             "name": "view_id",
             "placeholder": "Ex. 198343027",
@@ -959,35 +988,6 @@
             "value": "https://gitlab.com"
           },
           {
-            "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
-            "label": "Access Token",
-            "name": "private_token",
-            "placeholder": "Ex. *****************",
-            "sensitive": true,
-            "value": ""
-          },
-          {
-            "description": "This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).\n\nLeave empty if you'd like to pull data from a project in a personal user namespace.\n\nFor example, `https://github.com/MeltanoLabs/tap-gitlab` has a group of `meltano`.\n\nMultiple group names can be separated using space characters.\n",
-            "label": "Groups",
-            "name": "groups",
-            "placeholder": "Ex. my-organization",
-            "value": ""
-          },
-          {
-            "description": "This property allows you to scope the project(s) that the extractor fetches.\n\nLeave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.\n\nThe format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:\n\n- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/meltano)\n- `meltano/sdk` - The project for the [Meltano SDK for Singer Taps and Targets ](https://gitlab.com/meltano/sdk)\n\nMultiple group paths can be separated using space characters.\n",
-            "label": "Project",
-            "name": "projects",
-            "placeholder": "Ex. my-organization/project-1",
-            "value": ""
-          },
-          {
-            "description": "Enable to pull in extra data (like Epics, Epic Issues and other entities)\nonly available to GitLab Ultimate and GitLab.com Gold accounts.\n\nThe `epics` and `epic_issues` entities cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
-            "kind": "boolean",
-            "label": "Ultimate License",
-            "name": "ultimate_license",
-            "value": false
-          },
-          {
             "description": "For each Merge Request, also fetch the MR's commits and create the join table `merge_request_commits` with the Merge Request and related Commit IDs.\n\nThis can slow down extraction considerably because of the many API calls required.\n\nThe `merge_request_commits` entity cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
             "kind": "boolean",
             "label": "Fetch Merge Request Commits",
@@ -1002,10 +1002,40 @@
             "value": false
           },
           {
+            "description": "This property allows you to scope data that the extractor fetches to only the desired group. The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a [project](#projects).\n\nLeave empty if you'd like to pull data from a project in a personal user namespace.\n\nFor example, `https://github.com/MeltanoLabs/tap-gitlab` has a group of `meltano`.\n\nMultiple group names can be separated using space characters.\n",
+            "label": "Groups",
+            "name": "groups",
+            "placeholder": "Ex. my-organization",
+            "value": ""
+          },
+          {
+            "description": "GitLab personal access token or other API token.\n\n#### How to get\n\nThe process for getting the private token or personal access token is very simple:\n\n<video controls style=\"max-width: 100%\">\n  <source src=\"/assets/videos/tap-gitlab/personal-access-token.mov\">\n</video>\n\n1. Navigate to your [profile's access tokens](https://gitlab.com/-/profile/personal_access_tokens).\n\n2. Fill out the personal access token form with the following properties:\n\n- **Name:** meltano-gitlab-tutorial\n- **Expires:** _leave blank unless you have a specific reason to expire the token_\n- **Scopes:**\n  - api\n\n3. Click on `Create personal access token` to submit your request.\n\n4. You should see your token appear at the top of your screen. It should look something like this: `I8vxHsiVAaDnAX3hA`\n",
+            "kind": "string",
+            "label": "Access Token",
+            "name": "private_token",
+            "placeholder": "Ex. *****************",
+            "sensitive": true,
+            "value": ""
+          },
+          {
+            "description": "This property allows you to scope the project(s) that the extractor fetches.\n\nLeave empty if you've specified one or more [groups](#groups) and would like to pull data from all projects inside these groups.\n\nThe format for it is `namespace/project`, where namespace can be a username or group name. Here are a couple examples:\n\n- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/meltano)\n- `meltano/sdk` - The project for the [Meltano SDK for Singer Taps and Targets ](https://gitlab.com/meltano/sdk)\n\nMultiple group paths can be separated using space characters.\n",
+            "label": "Project",
+            "name": "projects",
+            "placeholder": "Ex. my-organization/project-1",
+            "value": ""
+          },
+          {
             "description": "Determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take.",
             "kind": "date_iso8601",
             "label": "Start Date",
             "name": "start_date"
+          },
+          {
+            "description": "Enable to pull in extra data (like Epics, Epic Issues and other entities)\nonly available to GitLab Ultimate and GitLab.com Gold accounts.\n\nThe `epics` and `epic_issues` entities cannot be [selected](https://docs.meltano.com/guide/integration#selecting-entities-and-attributes-for-extraction) unless this setting is enabled.\n",
+            "kind": "boolean",
+            "label": "Ultimate License",
+            "name": "ultimate_license",
+            "value": false
           }
         ],
         "settings_group_validation": [
@@ -1025,6 +1055,7 @@
       {
         "capabilities": [
           "about",
+          "batch",
           "catalog",
           "discover",
           "schema-flattening",
@@ -1072,9 +1103,50 @@
           },
           {
             "description": "GitHub token to authenticate with.",
+            "kind": "string",
             "label": "Auth Token",
             "name": "auth_token",
             "sensitive": true
+          },
+          {
+            "description": "Compression format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Compression",
+            "name": "batch_config.encoding.compression",
+            "options": [
+              {
+                "label": "Gzip",
+                "value": "gzip"
+              },
+              {
+                "label": "None",
+                "value": "none"
+              }
+            ]
+          },
+          {
+            "description": "Format to use for batch files.",
+            "kind": "options",
+            "label": "Batch Config Encoding Format",
+            "name": "batch_config.encoding.format",
+            "options": [
+              {
+                "label": "Jsonl",
+                "value": "jsonl"
+              }
+            ]
+          },
+          {
+            "description": "Prefix to use when writing batch files.",
+            "kind": "string",
+            "label": "Batch Config Storage Prefix",
+            "name": "batch_config.storage.prefix"
+          },
+          {
+            "description": "Root path to use when writing batch files.",
+            "kind": "string",
+            "label": "Batch Config Storage Root",
+            "name": "batch_config.storage.root"
           },
           {
             "description": "'True' to enable schema flattening and automatically expand nested properties.",
@@ -1321,7 +1393,7 @@
         "env": {
           "MELTANO_EXTRACT_ACCOUNT": "epa06486",
           "MELTANO_EXTRACT_DBNAME": "PROD",
-          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT_INSECURE_MODE": "false",
           "MELTANO_EXTRACT_ROLE": "REPORTER",
           "MELTANO_EXTRACT_USER": "MELTANO",
           "MELTANO_EXTRACT_WAREHOUSE": "REPORTER",
@@ -1333,7 +1405,7 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "false",
           "TAP_SNOWFLAKE_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_USER": "MELTANO",
           "TAP_SNOWFLAKE_WAREHOUSE": "REPORTER",
@@ -1364,35 +1436,18 @@
             "name": "dbname"
           },
           {
-            "description": "Snowflake User",
-            "label": "User",
-            "name": "user"
+            "description": "Use insecure mode to avoid \"Failed to get OCSP response\" warnings.",
+            "kind": "boolean",
+            "label": "Insecure Mode",
+            "name": "insecure_mode",
+            "value": false
           },
           {
             "description": "Snowflake Password",
+            "kind": "string",
             "label": "Password",
             "name": "password",
             "sensitive": true
-          },
-          {
-            "description": "Snowflake virtual warehouse name",
-            "label": "Warehouse",
-            "name": "warehouse"
-          },
-          {
-            "description": "A comma separated list of the table names that you want to sync. The table names should be fully qualified including the db and schema name. For example, syncing table1 and table2 would look like `db.schema.table1,db.schema.table2`.",
-            "label": "Tables",
-            "name": "tables"
-          },
-          {
-            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
-            "label": "Role",
-            "name": "role"
-          },
-          {
-            "description": "A path to your private key used for authenticating using Key Pair authentication instead of user/pass.",
-            "label": "Private Key Path",
-            "name": "private_key_path"
           },
           {
             "description": "The private key passphrase used for authenticating using Key Pair authentication instead of user/pass.",
@@ -1400,10 +1455,29 @@
             "name": "private_key_passphrase"
           },
           {
-            "description": "Use insecure mode to avoid \"Failed to get OCSP response\" warnings.",
-            "label": "Insecure Mode",
-            "name": "insecure_mode",
-            "value": false
+            "description": "A path to your private key used for authenticating using Key Pair authentication instead of user/pass.",
+            "label": "Private Key Path",
+            "name": "private_key_path"
+          },
+          {
+            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "A comma separated list of the table names that you want to sync. The table names should be fully qualified including the db and schema name. For example, syncing table1 and table2 would look like `db.schema.table1,db.schema.table2`.",
+            "label": "Tables",
+            "name": "tables"
+          },
+          {
+            "description": "Snowflake User",
+            "label": "User",
+            "name": "user"
+          },
+          {
+            "description": "Snowflake virtual warehouse name",
+            "label": "Warehouse",
+            "name": "warehouse"
           }
         ],
         "settings_group_validation": [
@@ -1411,18 +1485,18 @@
             "account",
             "dbname",
             "password",
+            "tables",
             "user",
-            "warehouse",
-            "tables"
+            "warehouse"
           ],
           [
             "account",
             "dbname",
-            "user",
-            "warehouse",
-            "tables",
+            "private_key_passphrase",
             "private_key_path",
-            "private_key_passphrase"
+            "tables",
+            "user",
+            "warehouse"
           ]
         ],
         "variant": "transferwise"
@@ -1434,7 +1508,8 @@
         "env": {
           "MELTANO_EXTRACT_ACCOUNT": "epa06486",
           "MELTANO_EXTRACT_DBNAME": "PROD",
-          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT_INSECURE_MODE": "false",
+          "MELTANO_EXTRACT_PASSWORD": "(redacted)",
           "MELTANO_EXTRACT_ROLE": "REPORTER",
           "MELTANO_EXTRACT_TABLES": "PROD.MELTANO_HUB.FACT_VARIANT_HUB_METRICS",
           "MELTANO_EXTRACT_USER": "MELTANO",
@@ -1448,10 +1523,11 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "false",
           "TAP_SNOWFLAKE_METRICS_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_METRICS_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_METRICS_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_METRICS_INSECURE_MODE": "false",
+          "TAP_SNOWFLAKE_METRICS_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_METRICS_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_METRICS_TABLES": "PROD.MELTANO_HUB.FACT_VARIANT_HUB_METRICS",
           "TAP_SNOWFLAKE_METRICS_USER": "MELTANO",
@@ -1463,6 +1539,7 @@
           "TAP_SNOWFLAKE_METRICS__SELECT": "[\"*FACT_VARIANT_HUB_METRICS.NAME\", \"*FACT_VARIANT_HUB_METRICS.VARIANT\", \"*FACT_VARIANT_HUB_METRICS.REPO\", \"*FACT_VARIANT_HUB_METRICS.PLUGIN_TYPE\", \"*FACT_VARIANT_HUB_METRICS.PIP_URL\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_PROJECTS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.ALL_EXECS_UNSTRUCT_BY_VARIANT\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_NAME\", \"*FACT_VARIANT_HUB_METRICS.SUCCESS_EXECS_UNSTRUCT_BY_VARIANT\"]",
           "TAP_SNOWFLAKE_METRICS__SELECT_FILTER": "[]",
           "TAP_SNOWFLAKE_METRICS__USE_CACHED_CATALOG": "true",
+          "TAP_SNOWFLAKE_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_TABLES": "PROD.MELTANO_HUB.FACT_VARIANT_HUB_METRICS",
           "TAP_SNOWFLAKE_USER": "MELTANO",
@@ -1511,7 +1588,8 @@
         "env": {
           "MELTANO_EXTRACT_ACCOUNT": "epa06486",
           "MELTANO_EXTRACT_DBNAME": "PROD",
-          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT_INSECURE_MODE": "false",
+          "MELTANO_EXTRACT_PASSWORD": "(redacted)",
           "MELTANO_EXTRACT_ROLE": "REPORTER",
           "MELTANO_EXTRACT_TABLES": "PROD.MELTANO_HUB.HUB_METRICS_AUDIT",
           "MELTANO_EXTRACT_USER": "MELTANO",
@@ -1526,7 +1604,8 @@
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_AUDIT_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_AUDIT_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_AUDIT_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_AUDIT_INSECURE_MODE": "false",
+          "TAP_SNOWFLAKE_AUDIT_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_AUDIT_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_AUDIT_TABLES": "PROD.MELTANO_HUB.HUB_METRICS_AUDIT",
           "TAP_SNOWFLAKE_AUDIT_USER": "MELTANO",
@@ -1539,7 +1618,8 @@
           "TAP_SNOWFLAKE_AUDIT__SELECT_FILTER": "[]",
           "TAP_SNOWFLAKE_AUDIT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "false",
+          "TAP_SNOWFLAKE_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_TABLES": "PROD.MELTANO_HUB.HUB_METRICS_AUDIT",
           "TAP_SNOWFLAKE_USER": "MELTANO",
@@ -1571,7 +1651,8 @@
         "env": {
           "MELTANO_EXTRACT_ACCOUNT": "epa06486",
           "MELTANO_EXTRACT_DBNAME": "PROD",
-          "MELTANO_EXTRACT_INSECURE_MODE": "False",
+          "MELTANO_EXTRACT_INSECURE_MODE": "false",
+          "MELTANO_EXTRACT_PASSWORD": "(redacted)",
           "MELTANO_EXTRACT_ROLE": "REPORTER",
           "MELTANO_EXTRACT_TABLES": "PROD.SLACK_NOTIFICATIONS.SLACK_ALERTS",
           "MELTANO_EXTRACT_USER": "MELTANO",
@@ -1585,11 +1666,13 @@
           "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
           "TAP_SNOWFLAKE_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_INSECURE_MODE": "false",
+          "TAP_SNOWFLAKE_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY_ACCOUNT": "epa06486",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY_DBNAME": "PROD",
-          "TAP_SNOWFLAKE_SINGER_ACTIVITY_INSECURE_MODE": "False",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY_INSECURE_MODE": "false",
+          "TAP_SNOWFLAKE_SINGER_ACTIVITY_PASSWORD": "(redacted)",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY_ROLE": "REPORTER",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY_TABLES": "PROD.SLACK_NOTIFICATIONS.SLACK_ALERTS",
           "TAP_SNOWFLAKE_SINGER_ACTIVITY_USER": "MELTANO",
@@ -1739,6 +1822,7 @@
           },
           {
             "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list.",
+            "kind": "string",
             "label": "Record Key Property Name",
             "name": "record_key_property_name",
             "sensitive": true
@@ -1793,7 +1877,7 @@
           "MELTANO_LOAD_FILE_NAMING_SCHEME": "variant_metrics.yml",
           "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
           "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.metrics",
-          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "MELTANO_LOAD_RECORD_SORT_PROPERTY_NAME": "REPO",
           "MELTANO_LOAD_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "MELTANO_LOAD_TIMESTAMP_TIMEZONE": "UTC",
@@ -1806,14 +1890,14 @@
           "TARGET_YAML_METRICS_FILE_NAMING_SCHEME": "variant_metrics.yml",
           "TARGET_YAML_METRICS_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_METRICS_RECORD_INSERT_JSONPATH": "$.metrics",
-          "TARGET_YAML_METRICS_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_METRICS_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "TARGET_YAML_METRICS_RECORD_SORT_PROPERTY_NAME": "REPO",
           "TARGET_YAML_METRICS_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "TARGET_YAML_METRICS_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML_METRICS__DIALECT": "target_yaml_metrics",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.metrics",
-          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "REPO",
+          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "TARGET_YAML_RECORD_SORT_PROPERTY_NAME": "REPO",
           "TARGET_YAML_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "TARGET_YAML_TIMESTAMP_TIMEZONE": "UTC",
@@ -1836,7 +1920,7 @@
           "MELTANO_LOAD_FILE_NAMING_SCHEME": "audit.yml",
           "MELTANO_LOAD_OVERWRITE_BEHAVIOR": "replace_file",
           "MELTANO_LOAD_RECORD_INSERT_JSONPATH": "$.audit_log",
-          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "MELTANO_LOAD_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "MELTANO_LOAD_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "MELTANO_LOAD_TIMESTAMP_TIMEZONE": "UTC",
           "MELTANO_LOAD__DIALECT": "target_yaml_audit",
@@ -1845,7 +1929,7 @@
           "TARGET_YAML_AUDIT_FILE_NAMING_SCHEME": "audit.yml",
           "TARGET_YAML_AUDIT_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_AUDIT_RECORD_INSERT_JSONPATH": "$.audit_log",
-          "TARGET_YAML_AUDIT_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML_AUDIT_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "TARGET_YAML_AUDIT_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "TARGET_YAML_AUDIT_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML_AUDIT__DIALECT": "target_yaml_audit",
@@ -1854,7 +1938,7 @@
           "TARGET_YAML_FILE_NAMING_SCHEME": "audit.yml",
           "TARGET_YAML_OVERWRITE_BEHAVIOR": "replace_file",
           "TARGET_YAML_RECORD_INSERT_JSONPATH": "$.audit_log",
-          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "METRIC_TYPE",
+          "TARGET_YAML_RECORD_KEY_PROPERTY_NAME": "(redacted)",
           "TARGET_YAML_TIMESTAMP_FORMAT": "%Y-%m-%d.T%H%M%S",
           "TARGET_YAML_TIMESTAMP_TIMEZONE": "UTC",
           "TARGET_YAML__DIALECT": "target_yaml_audit"
@@ -1932,58 +2016,34 @@
             "placeholder": "E.g. rtXXXXX.eu-central-1"
           },
           {
-            "aliases": [
-              "database"
-            ],
-            "description": "Snowflake Database name",
-            "label": "Database Name",
-            "name": "dbname"
+            "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in snowflake etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Snowflake.",
+            "kind": "boolean",
+            "label": "Add Metadata Columns",
+            "name": "add_metadata_columns",
+            "value": false
           },
           {
-            "aliases": [
-              "username"
-            ],
-            "description": "Snowflake User",
-            "label": "User",
-            "name": "user"
+            "description": "When enabled, the files loaded to Snowflake will also be stored in\n`archive_load_files_s3_bucket` under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/.\n\nAll archived files will have tap, schema, table and archived-by as S3 metadata keys.\n\nWhen incremental replication is used, the archived files will also have\nthe following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.\n",
+            "kind": "boolean",
+            "label": "Archive Load Files",
+            "name": "archive_load_files",
+            "value": false
           },
           {
-            "description": "Snowflake Password",
-            "label": "Password",
-            "name": "password",
-            "sensitive": true
+            "description": "When archive_load_files is enabled, the archived files will be placed in this bucket.",
+            "label": "Archive Load Files S3 Bucket",
+            "name": "archive_load_files_s3_bucket"
           },
           {
-            "description": "Snowflake virtual warehouse name",
-            "label": "Warehouse",
-            "name": "warehouse"
-          },
-          {
-            "description": "The Snowflake file format object name which needs to be manually created as part of the [requirements](#requirements) section of the docs. Has to be the fully qualified name including the schema. Refer to the [Snowflake docs](https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements) for more details.",
-            "label": "File Format",
-            "name": "file_format"
-          },
-          {
-            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
-            "label": "Role",
-            "name": "role"
+            "description": "When `archive_load_files` is enabled, the archived files will be placed in the archive S3 bucket under this prefix.",
+            "label": "Archive Load Files S3 Prefix",
+            "name": "archive_load_files_s3_prefix"
           },
           {
             "description": "S3 Access Key Id. If not provided, `AWS_ACCESS_KEY_ID` environment variable or IAM role will be used",
+            "kind": "string",
             "label": "AWS Access Key ID",
             "name": "aws_access_key_id",
-            "sensitive": true
-          },
-          {
-            "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used",
-            "label": "AWS Secret Access Key",
-            "name": "aws_secret_access_key",
-            "sensitive": true
-          },
-          {
-            "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used",
-            "label": "AWS Session Token",
-            "name": "aws_session_token",
             "sensitive": true
           },
           {
@@ -1992,44 +2052,18 @@
             "name": "aws_profile"
           },
           {
-            "aliases": [
-              "schema"
-            ],
-            "description": "Note `$MELTANO_EXTRACT__LOAD_SCHEMA` [will expand to](https://docs.meltano.com/guide/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](https://docs.meltano.com/concepts/plugins#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/extractors/gitlab). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.\n\nName of the schema where the tables will be created, without database\nprefix. If `schema_mapping` is not defined then every stream sent by the tap is\nloaded into this schema.\n",
-            "label": "Default Target Schema",
-            "name": "default_target_schema",
-            "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
-            "value_processor": "upcase_string"
+            "description": "S3 Secret Access Key. If not provided, `AWS_SECRET_ACCESS_KEY` environment variable or IAM role will be used",
+            "kind": "string",
+            "label": "AWS Secret Access Key",
+            "name": "aws_secret_access_key",
+            "sensitive": true
           },
           {
-            "description": "S3 Bucket name",
-            "label": "S3 Bucket",
-            "name": "s3_bucket"
-          },
-          {
-            "description": "A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket.",
-            "label": "S3 Key Prefix",
-            "name": "s3_key_prefix"
-          },
-          {
-            "description": "The complete URL to use for the constructed client. This is allowing to use non-native s3 account.",
-            "label": "S3 Endpoint URL",
-            "name": "s3_endpoint_url"
-          },
-          {
-            "description": "Default region when creating new connections",
-            "label": "S3 Region Name",
-            "name": "s3_region_name"
-          },
-          {
-            "description": "S3 ACL name to set on the uploaded files",
-            "label": "S3 ACL",
-            "name": "s3_acl"
-          },
-          {
-            "description": "Named external stage name created at pre-requirements section. Has to be a fully qualified name including the schema name",
-            "label": "Stage",
-            "name": "stage"
+            "description": "AWS Session token. If not provided, `AWS_SESSION_TOKEN` environment variable will be used",
+            "kind": "string",
+            "label": "AWS Session Token",
+            "name": "aws_session_token",
+            "sensitive": true
           },
           {
             "description": "Maximum number of rows in each batch. At the end of each batch, the rows in the batch are loaded into Snowflake.",
@@ -2045,10 +2079,78 @@
             "name": "batch_wait_limit_seconds"
           },
           {
+            "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string.",
+            "kind": "string",
+            "label": "Client Side Encryption Master Key",
+            "name": "client_side_encryption_master_key",
+            "sensitive": true
+          },
+          {
+            "description": "Required when `client_side_encryption_master_key` is defined. The name of the encrypted stage object in Snowflake that created separately and using the same encryption master key.",
+            "label": "Client Side Encryption Stage Object",
+            "name": "client_side_encryption_stage_object"
+          },
+          {
+            "description": "Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.",
+            "kind": "integer",
+            "label": "Data Flattening Max Level",
+            "name": "data_flattening_max_level",
+            "value": 0
+          },
+          {
+            "aliases": [
+              "database"
+            ],
+            "description": "Snowflake Database name",
+            "label": "Database Name",
+            "name": "dbname"
+          },
+          {
+            "aliases": [
+              "schema"
+            ],
+            "description": "Note `$MELTANO_EXTRACT__LOAD_SCHEMA` [will expand to](https://docs.meltano.com/guide/configuration.html#expansion-in-setting-values) the value of the [`load_schema` extra](https://docs.meltano.com/concepts/plugins#load-schema-extra) for the extractor used in the pipeline, which defaults to the extractor's namespace, e.g. `tap_gitlab` for [`tap-gitlab`](/extractors/gitlab). Values are automatically converted to uppercase before they're passed on to the plugin, so `tap_gitlab` becomes `TAP_GITLAB`.\n\nName of the schema where the tables will be created, without database\nprefix. If `schema_mapping` is not defined then every stream sent by the tap is\nloaded into this schema.\n",
+            "label": "Default Target Schema",
+            "name": "default_target_schema",
+            "value": "$MELTANO_EXTRACT__LOAD_SCHEMA",
+            "value_processor": "upcase_string"
+          },
+          {
+            "description": "Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.",
+            "label": "Default Target Schema Select Permission",
+            "name": "default_target_schema_select_permission"
+          },
+          {
+            "description": "By default the connector caches the available table structures in Snowflake at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With `disable_table_cache` option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.",
+            "kind": "boolean",
+            "label": "Disable Table Cache",
+            "name": "disable_table_cache",
+            "value": false
+          },
+          {
+            "description": "The Snowflake file format object name which needs to be manually created as part of the [requirements](#requirements) section of the docs. Has to be the fully qualified name including the schema. Refer to the [Snowflake docs](https://github.com/transferwise/pipelinewise-target-snowflake#pre-requirements) for more details.",
+            "label": "File Format",
+            "name": "file_format"
+          },
+          {
             "description": "Flush and load every stream into Snowflake when one batch is full. Warning: This may trigger the COPY command to use files with low number of records, and may cause performance problems.",
             "kind": "boolean",
             "label": "Flush All Streams",
             "name": "flush_all_streams",
+            "value": false
+          },
+          {
+            "description": "When `hard_delete` option is true then DELETE SQL commands will be performed in Snowflake to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.",
+            "kind": "boolean",
+            "label": "Hard Delete",
+            "name": "hard_delete",
+            "value": false
+          },
+          {
+            "description": "Generate uncompressed CSV files when loading to Snowflake. Normally, by default GZIP compressed files are generated.",
+            "kind": "boolean",
+            "label": "No Compression",
+            "name": "no_compression",
             "value": false
           },
           {
@@ -2066,54 +2168,11 @@
             "value": 16
           },
           {
-            "description": "Grant USAGE privilege on newly created schemas and grant SELECT privilege on newly created tables to a specific role or a list of roles. If `schema_mapping` is not defined then every stream sent by the tap is granted accordingly.",
-            "label": "Default Target Schema Select Permission",
-            "name": "default_target_schema_select_permission"
-          },
-          {
-            "description": "Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.\n\nIf the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.\n\nNote, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.\n",
-            "kind": "object",
-            "label": "Schema Mapping",
-            "name": "schema_mapping"
-          },
-          {
-            "description": "By default the connector caches the available table structures in Snowflake at startup. In this way it doesn't need to run additional queries when ingesting data to check if altering the target tables is required. With `disable_table_cache` option you can turn off this caching. You will always see the most recent table structures but will cause an extra query runtime.",
-            "kind": "boolean",
-            "label": "Disable Table Cache",
-            "name": "disable_table_cache",
-            "value": false
-          },
-          {
-            "description": "When this is defined, Client-Side Encryption is enabled. The data in S3 will be encrypted, No third parties, including Amazon AWS and any ISPs, can see data in the clear. Snowflake COPY command will decrypt the data once it's in Snowflake. The master key must be 256-bit length and must be encoded as base64 string.",
-            "label": "Client Side Encryption Master Key",
-            "name": "client_side_encryption_master_key",
+            "description": "Snowflake Password",
+            "kind": "string",
+            "label": "Password",
+            "name": "password",
             "sensitive": true
-          },
-          {
-            "description": "Required when `client_side_encryption_master_key` is defined. The name of the encrypted stage object in Snowflake that created separately and using the same encryption master key.",
-            "label": "Client Side Encryption Stage Object",
-            "name": "client_side_encryption_stage_object"
-          },
-          {
-            "description": "Metadata columns add extra row level information about data ingestions, (i.e. when was the row read in source, when was inserted or deleted in snowflake etc.) Metadata columns are creating automatically by adding extra columns to the tables with a column prefix `_SDC_`. The column names are following the stitch naming conventions documented at https://www.stitchdata.com/docs/data-structure/integration-schemas#sdc-columns. Enabling metadata columns will flag the deleted rows by setting the `_SDC_DELETED_AT` metadata column. Without the `add_metadata_columns` option the deleted rows from singer taps will not be recongisable in Snowflake.",
-            "kind": "boolean",
-            "label": "Add Metadata Columns",
-            "name": "add_metadata_columns",
-            "value": false
-          },
-          {
-            "description": "When `hard_delete` option is true then DELETE SQL commands will be performed in Snowflake to delete rows in tables. It's achieved by continuously checking the `_SDC_DELETED_AT` metadata column sent by the singer tap. Due to deleting rows requires metadata columns, `hard_delete` option automatically enables the `add_metadata_columns` option as well.",
-            "kind": "boolean",
-            "label": "Hard Delete",
-            "name": "hard_delete",
-            "value": false
-          },
-          {
-            "description": "Object type RECORD items from taps can be loaded into VARIANT columns as JSON (default) or we can flatten the schema by creating columns automatically. When value is 0 (default) then flattening functionality is turned off.",
-            "kind": "integer",
-            "label": "Data Flattening Max Level",
-            "name": "data_flattening_max_level",
-            "value": 0
           },
           {
             "description": "Log based and Incremental replications on tables with no Primary Key cause duplicates when merging UPDATE events. When set to true, stop loading data if no Primary Key is defined.",
@@ -2123,11 +2182,50 @@
             "value": true
           },
           {
-            "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Snowflake. Enabling this option will detect invalid records earlier but could cause performance degradation.",
-            "kind": "boolean",
-            "label": "Validate Records",
-            "name": "validate_records",
-            "value": false
+            "description": "Optional string to tag executed queries in Snowflake. Replaces tokens\n\n`schema` and `table` with the appropriate values. The tags are displayed in the\noutput of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.\n",
+            "label": "Query Tag",
+            "name": "query_tag"
+          },
+          {
+            "description": "Snowflake role to use. If not defined then the user's default role will be used.",
+            "label": "Role",
+            "name": "role"
+          },
+          {
+            "description": "S3 ACL name to set on the uploaded files",
+            "label": "S3 ACL",
+            "name": "s3_acl"
+          },
+          {
+            "description": "S3 Bucket name",
+            "label": "S3 Bucket",
+            "name": "s3_bucket"
+          },
+          {
+            "description": "The complete URL to use for the constructed client. This is allowing to use non-native s3 account.",
+            "label": "S3 Endpoint URL",
+            "name": "s3_endpoint_url"
+          },
+          {
+            "description": "A static prefix before the generated S3 key names. Using prefixes you can upload files into specific directories in the S3 bucket.",
+            "label": "S3 Key Prefix",
+            "name": "s3_key_prefix"
+          },
+          {
+            "description": "Default region when creating new connections",
+            "label": "S3 Region Name",
+            "name": "s3_region_name"
+          },
+          {
+            "description": "Useful if you want to load multiple streams from one tap to multiple Snowflake schemas.\n\nIf the tap sends the `stream_id` in `<schema_name>-<table_name>` format then this option overwrites the `default_target_schema` value.\n\nNote, that using `schema_mapping` you can overwrite the `default_target_schema_select_permission` value to grant SELECT permissions to different groups per schemas or optionally you can create indices automatically for the replicated tables.\n",
+            "kind": "object",
+            "label": "Schema Mapping",
+            "name": "schema_mapping"
+          },
+          {
+            "description": "Named external stage name created at pre-requirements section. Has to be a fully qualified name including the schema name",
+            "label": "Stage",
+            "name": "stage"
           },
           {
             "description": "(Default: platform-dependent) Directory of temporary CSV files with RECORD messages.",
@@ -2135,44 +2233,35 @@
             "name": "temp_dir"
           },
           {
-            "description": "Generate uncompressed CSV files when loading to Snowflake. Normally, by default GZIP compressed files are generated.",
+            "aliases": [
+              "username"
+            ],
+            "description": "Snowflake User",
+            "label": "User",
+            "name": "user"
+          },
+          {
+            "description": "Validate every single record message to the corresponding JSON schema. This option is disabled by default and invalid RECORD messages will fail only at load time by Snowflake. Enabling this option will detect invalid records earlier but could cause performance degradation.",
             "kind": "boolean",
-            "label": "No Compression",
-            "name": "no_compression",
+            "label": "Validate Records",
+            "name": "validate_records",
             "value": false
           },
           {
-            "description": "Optional string to tag executed queries in Snowflake. Replaces tokens\n\n`schema` and `table` with the appropriate values. The tags are displayed in the\noutput of the Snowflake `QUERY_HISTORY`, `QUERY_HISTORY_BY_*` functions.\n",
-            "label": "Query Tag",
-            "name": "query_tag"
-          },
-          {
-            "description": "When enabled, the files loaded to Snowflake will also be stored in\n`archive_load_files_s3_bucket` under the key /{archive_load_files_s3_prefix}/{schema_name}/{table_name}/.\n\nAll archived files will have tap, schema, table and archived-by as S3 metadata keys.\n\nWhen incremental replication is used, the archived files will also have\nthe following S3 metadata keys - incremental-key, incremental-key-min and incremental-key-max.\n",
-            "kind": "boolean",
-            "label": "Archive Load Files",
-            "name": "archive_load_files",
-            "value": false
-          },
-          {
-            "description": "When `archive_load_files` is enabled, the archived files will be placed in the archive S3 bucket under this prefix.",
-            "label": "Archive Load Files S3 Prefix",
-            "name": "archive_load_files_s3_prefix"
-          },
-          {
-            "description": "When archive_load_files is enabled, the archived files will be placed in this bucket.",
-            "label": "Archive Load Files S3 Bucket",
-            "name": "archive_load_files_s3_bucket"
+            "description": "Snowflake virtual warehouse name",
+            "label": "Warehouse",
+            "name": "warehouse"
           }
         ],
         "settings_group_validation": [
           [
             "account",
             "dbname",
-            "user",
-            "password",
-            "warehouse",
+            "default_target_schema",
             "file_format",
-            "default_target_schema"
+            "password",
+            "user",
+            "warehouse"
           ]
         ],
         "target_schema": "$TARGET_SNOWFLAKE_DEFAULT_TARGET_SCHEMA",
@@ -2181,8 +2270,8 @@
       {
         "capabilities": [
           "about",
-          "stream-maps",
-          "record-flattening"
+          "schema-flattening",
+          "stream-maps"
         ],
         "config": {
           "stream_maps": {
@@ -2197,9 +2286,11 @@
         "description": "Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS, Gotify, etc",
         "docs": "https://hub.meltano.com/loaders/target-apprise--autoidm",
         "env": {
+          "MELTANO_LOAD_STREAM_MAPS": "{\"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.TITLE\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.title\": \"TITLE\", \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.BODY\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.body\": \"BODY\"}",
           "MELTANO_LOAD_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_BODY": "BODY",
           "MELTANO_LOAD_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_TITLE": "TITLE",
           "MELTANO_LOAD__DIALECT": "target_apprise",
+          "TARGET_APPRISE_STREAM_MAPS": "{\"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.TITLE\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.title\": \"TITLE\", \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.BODY\": null, \"PROD-SLACK_NOTIFICATIONS-SLACK_ALERTS.body\": \"BODY\"}",
           "TARGET_APPRISE_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_BODY": "BODY",
           "TARGET_APPRISE_STREAM_MAPS_PROD_SLACK_NOTIFICATIONS_SLACK_ALERTS_TITLE": "TITLE",
           "TARGET_APPRISE__DIALECT": "target_apprise"
@@ -2213,9 +2304,33 @@
         "repo": "https://github.com/AutoIDM/target-apprise",
         "settings": [
           {
-            "description": "Array of apprise URIs",
+            "description": "'True' to enable schema flattening and automatically expand nested properties.",
+            "kind": "boolean",
+            "label": "Flattening Enabled",
+            "name": "flattening_enabled"
+          },
+          {
+            "description": "The max depth to flatten schemas.",
+            "kind": "integer",
+            "label": "Flattening Max Depth",
+            "name": "flattening_max_depth"
+          },
+          {
+            "description": "User-defined config values to be used within map expressions.",
+            "kind": "object",
+            "label": "Stream Map Config",
+            "name": "stream_map_config"
+          },
+          {
+            "description": "Config object for stream maps capability.",
+            "kind": "object",
+            "label": "Stream Maps",
+            "name": "stream_maps"
+          },
+          {
+            "description": "Array of apprise URIs,checkout https://github.com/caronc/apprise",
             "kind": "array",
-            "label": "URIs",
+            "label": "Uris",
             "name": "uris"
           }
         ],
@@ -2322,9 +2437,9 @@
         "docs": "https://hub.meltano.com/utilities/airflow--apache",
         "env": {
           "AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
-          "AIRFLOW_CORE_DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "AIRFLOW_CORE_DAGS_ARE_PAUSED_AT_CREATION": "false",
           "AIRFLOW_CORE_DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
-          "AIRFLOW_CORE_LOAD_EXAMPLES": "False",
+          "AIRFLOW_CORE_LOAD_EXAMPLES": "false",
           "AIRFLOW_CORE_PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
           "AIRFLOW_DATABASE_SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
           "AIRFLOW_EXTENSION_AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
@@ -2334,9 +2449,9 @@
           "AIRFLOW_LOGGING_DAG_PROCESSOR_MANAGER_LOG_LOCATION": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
           "AIRFLOW_SCHEDULER_CHILD_PROCESS_LOG_DIRECTORY": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/scheduler",
           "AIRFLOW_WEBSERVER_WEB_SERVER_PORT": "8080",
-          "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION": "false",
           "AIRFLOW__CORE__DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
-          "AIRFLOW__CORE__LOAD_EXAMPLES": "False",
+          "AIRFLOW__CORE__LOAD_EXAMPLES": "false",
           "AIRFLOW__CORE__PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
           "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
           "AIRFLOW__EXT_REPO": "https://github.com/meltano/airflow-ext",
@@ -2344,9 +2459,9 @@
           "AIRFLOW__LOGGING__DAG_PROCESSOR_MANAGER_LOG_LOCATION": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/dag_processor_manager/dag_processor_manager.log",
           "AIRFLOW__SCHEDULER__CHILD_PROCESS_LOG_DIRECTORY": "${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/logs/scheduler",
           "AIRFLOW__WEBSERVER__WEB_SERVER_PORT": "8080",
-          "MELTANO_UTILIZE_CORE_DAGS_ARE_PAUSED_AT_CREATION": "False",
+          "MELTANO_UTILIZE_CORE_DAGS_ARE_PAUSED_AT_CREATION": "false",
           "MELTANO_UTILIZE_CORE_DAGS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/dags",
-          "MELTANO_UTILIZE_CORE_LOAD_EXAMPLES": "False",
+          "MELTANO_UTILIZE_CORE_LOAD_EXAMPLES": "false",
           "MELTANO_UTILIZE_CORE_PLUGINS_FOLDER": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/plugins",
           "MELTANO_UTILIZE_DATABASE_SQL_ALCHEMY_CONN": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/airflow/airflow.db",
           "MELTANO_UTILIZE_EXTENSION_AIRFLOW_CONFIG": "${MELTANO_PROJECT_ROOT}/orchestrate/airflow/airflow.cfg",
@@ -2363,15 +2478,16 @@
         "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
         "name": "airflow",
         "namespace": "airflow",
-        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+        "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
         "plugin_type": "utilities",
         "repo": "https://github.com/apache/airflow",
         "settings": [
           {
-            "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
-            "label": "SQL Alchemy Connection",
-            "name": "database.sql_alchemy_conn",
-            "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db"
+            "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
+            "kind": "boolean",
+            "label": "Pause DAGs at Creation",
+            "name": "core.dags_are_paused_at_creation",
+            "value": false
           },
           {
             "env": "AIRFLOW__CORE__DAGS_FOLDER",
@@ -2380,28 +2496,37 @@
             "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/dags"
           },
           {
+            "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
+            "kind": "boolean",
+            "label": "Load Examples",
+            "name": "core.load_examples",
+            "value": false
+          },
+          {
             "env": "AIRFLOW__CORE__PLUGINS_FOLDER",
             "label": "Plugins Folder",
             "name": "core.plugins_folder",
             "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/plugins"
           },
           {
-            "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
-            "label": "Load Examples",
-            "name": "core.load_examples",
-            "value": false
+            "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
+            "label": "SQL Alchemy Connection",
+            "name": "database.sql_alchemy_conn",
+            "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db"
           },
           {
-            "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
-            "label": "Pause DAGs at Creation",
-            "name": "core.dags_are_paused_at_creation",
-            "value": false
+            "description": "The path where the Airflow configuration file will be stored.\n",
+            "env": "AIRFLOW_CONFIG",
+            "label": "Airflow Home",
+            "name": "extension.airflow_config",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg"
           },
           {
-            "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
-            "label": "Webserver Port",
-            "name": "webserver.web_server_port",
-            "value": 8080
+            "description": "The directory where Airflow will store its configuration, logs, and other files.\n",
+            "env": "AIRFLOW_HOME",
+            "label": "Airflow Home",
+            "name": "extension.airflow_home",
+            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow"
           },
           {
             "description": "The folder where airflow should store its log files. This path must be absolute. There are a few existing\nconfigurations that assume this is set to the default. If you choose to override this you may need to update\nthe dag_processor_manager_log_location and child_process_log_directory settings as well.\n",
@@ -2425,18 +2550,11 @@
             "value": "$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/logs/scheduler"
           },
           {
-            "description": "The directory where Airflow will store its configuration, logs, and other files.\n",
-            "env": "AIRFLOW_HOME",
-            "label": "Airflow Home",
-            "name": "extension.airflow_home",
-            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow"
-          },
-          {
-            "description": "The path where the Airflow configuration file will be stored.\n",
-            "env": "AIRFLOW_CONFIG",
-            "label": "Airflow Home",
-            "name": "extension.airflow_config",
-            "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg"
+            "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
+            "kind": "integer",
+            "label": "Webserver Port",
+            "name": "webserver.web_server_port",
+            "value": 8080
           }
         ],
         "variant": "apache"
@@ -2581,7 +2699,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
         "name": "dbt-snowflake",
         "namespace": "dbt_snowflake",
-        "pip_url": "dbt-core~=1.5.2 dbt-snowflake~=1.5.2 git+https://github.com/meltano/dbt-ext.git@main",
+        "pip_url": "dbt-core dbt-snowflake meltano-dbt-ext~=0.3.0",
         "plugin_type": "utilities",
         "repo": "https://github.com/dbt-labs/dbt-snowflake",
         "settings": [
@@ -2599,6 +2717,7 @@
           },
           {
             "description": "The user password to authenticate with.",
+            "kind": "string",
             "label": "Password",
             "name": "password",
             "sensitive": true
@@ -2783,13 +2902,13 @@
         "description": "A modern, enterprise-ready business intelligence web application.",
         "docs": "https://hub.meltano.com/utilities/superset--apache",
         "env": {
-          "MELTANO_UTILIZE_SECRET_KEY": "thisisnotapropersecretkey",
+          "MELTANO_UTILIZE_SECRET_KEY": "(redacted)",
           "MELTANO_UTILIZE_SQLALCHEMY_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/superset/superset.db",
           "MELTANO_UTILIZE_UI_BIND_HOST": "0.0.0.0",
           "MELTANO_UTILIZE_UI_PORT": "8088",
           "MELTANO_UTILIZE_UI_TIMEOUT": "60",
           "MELTANO_UTILIZE_UI_WORKERS": "4",
-          "SUPERSET_SECRET_KEY": "thisisnotapropersecretkey",
+          "SUPERSET_SECRET_KEY": "(redacted)",
           "SUPERSET_SQLALCHEMY_DATABASE_URI": "sqlite:///${MELTANO_PROJECT_ROOT}/.meltano/utilities/superset/superset.db",
           "SUPERSET_UI_BIND_HOST": "0.0.0.0",
           "SUPERSET_UI_PORT": "8088",
@@ -2800,33 +2919,17 @@
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/superset.png",
         "name": "superset",
         "namespace": "superset",
-        "pip_url": "apache-superset==1.5.0 markupsafe==2.0.1 cryptography==3.4.7",
+        "pip_url": "apache-superset==3.1.1 flask==2.2.5 werkzeug==2.3.3 jinja2==3.0.1 wtforms==2.3.3",
         "plugin_type": "utilities",
         "repo": "https://github.com/apache/superset",
         "settings": [
           {
-            "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`.",
-            "label": "UI Bind Host",
-            "name": "ui.bind_host",
-            "value": "0.0.0.0"
-          },
-          {
-            "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`.",
-            "label": "UI Port",
-            "name": "ui.port",
-            "value": 8088
-          },
-          {
-            "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option",
-            "label": "UI Timeout",
-            "name": "ui.timeout",
-            "value": 60
-          },
-          {
-            "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option",
-            "label": "UI Workers",
-            "name": "ui.workers",
-            "value": 4
+            "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
+            "kind": "string",
+            "label": "Secret Key",
+            "name": "SECRET_KEY",
+            "sensitive": true,
+            "value": "thisisnotapropersecretkey"
           },
           {
             "description": "Superset metadata database connection string. Equivalent to the `SQLALCHEMY_DATABASE_URI` setting in `superset_config.py`.\n\nSQLite is used by default, but in production PostgreSQL or MySQL is more appropriate. See the [Superset documentation](https://superset.apache.org/docs/installation/configuring-superset/#using-a-production-metastore) for more information. To add a database driver like `psycopg2` or `mysqlclient`, refer to the [Add additional database drivers](#add-additional-database-drivers) section above.\n",
@@ -2835,11 +2938,31 @@
             "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/superset/superset.db"
           },
           {
-            "description": "App secret key used for securely signing the session cookie and encrypting sensitive information on the database. Equivalent to the `SECRET_KEY` setting in `superset_config.py`.",
-            "label": "Secret Key",
-            "name": "SECRET_KEY",
-            "sensitive": true,
-            "value": "thisisnotapropersecretkey"
+            "description": "Host used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.port`.",
+            "label": "UI Bind Host",
+            "name": "ui.bind_host",
+            "value": "0.0.0.0"
+          },
+          {
+            "description": "Port used by `meltano invoke superset:ui`. Used in the `gunicorn` `--bind` option along with `ui.bind_host`.",
+            "kind": "integer",
+            "label": "UI Port",
+            "name": "ui.port",
+            "value": 8088
+          },
+          {
+            "description": "Timeout in sections, used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--timeout` option",
+            "kind": "integer",
+            "label": "UI Timeout",
+            "name": "ui.timeout",
+            "value": 60
+          },
+          {
+            "description": "Workers used by `meltano invoke superset:ui`. Corresponds to the `gunicorn` `--workers` option",
+            "kind": "integer",
+            "label": "UI Workers",
+            "name": "ui.workers",
+            "value": 4
           }
         ],
         "variant": "apache"

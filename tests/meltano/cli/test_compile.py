@@ -14,6 +14,7 @@ import pytest
 from meltano import __file__ as meltano_init_file
 from meltano.cli import cli
 from meltano.core.manifest import manifest
+from meltano.core.settings_service import REDACTED_VALUE, SettingValueStore
 
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
@@ -22,6 +23,8 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 schema_path = Path(meltano_init_file).parent / "schemas" / "meltano.schema.json"
+
+SECURE_VALUE = "a-very-secure-value"
 
 
 def check_indent(json_path: Path, indent: int) -> None:
@@ -148,3 +151,38 @@ class TestCompile:
                 "level": "warning",
             },
         ]
+
+    # First option tests default behavior.
+    # The "--no-lint" flag has no effect as it is the default
+    @pytest.mark.parametrize(
+        ("flag", "expected_value"),
+        (
+            ("--no-lint", REDACTED_VALUE),
+            ("--safe", REDACTED_VALUE),
+            ("--unsafe", SECURE_VALUE),
+        ),
+    )
+    def test_safe_unsafe(
+        self,
+        manifest_dir: Path,
+        tap,
+        session,
+        plugin_settings_service_factory,
+        cli_runner: CliRunner,
+        flag: str,
+        expected_value: str,
+    ) -> None:
+        plugin_settings_service = plugin_settings_service_factory(tap)
+        plugin_settings_service.set(
+            "secure",
+            SECURE_VALUE,
+            store=SettingValueStore.DOTENV,
+            session=session,
+        )
+
+        result = cli_runner.invoke(cli, ("--no-environment", "compile", flag))
+        assert result.exit_code == 0
+
+        manifest_filepath = Path(manifest_dir) / "meltano-manifest.json"
+        manifest_text = manifest_filepath.read_text()
+        assert expected_value in manifest_text

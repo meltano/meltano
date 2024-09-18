@@ -62,9 +62,10 @@
     },
     {
       "name": "record_key_property_name",
-      "sensitive": true,
+      "kind": "string",
       "label": "Record Key Property Name",
-      "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list."
+      "description": "A property in the record which will be used as the dictionary key.\n \nIf this property is provided, records will be written as key-value objects; if omitted, records are written as a list.",
+      "sensitive": true
     },
     {
       "name": "record_sort_property_name",

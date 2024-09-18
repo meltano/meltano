@@ -9,7 +9,7 @@ import {
 } from '@docusaurus/theme-common';
 import {
   isActiveSidebarItem,
-  findFirstCategoryLink,
+  findFirstSidebarItemLink,
   useDocSidebarItemsExpandedState,
   isSamePath,
 } from '@docusaurus/theme-common/internal';
@@ -48,7 +48,7 @@ function useCategoryHrefWithSSRFallback(item) {
     if (isBrowser || !item.collapsible) {
       return undefined;
     }
-    return findFirstCategoryLink(item);
+    return findFirstSidebarItemLink(item);
   }, [item, isBrowser]);
 }
 // eslint-disable-next-line react/prop-types

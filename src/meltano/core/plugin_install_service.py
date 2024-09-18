@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import logging
 import os
 import shlex
 import sys
@@ -535,6 +536,82 @@ def get_pip_install_args(
             )
             or "",
         )
+
+
+def install_status_update(install_state: PluginInstallState) -> None:
+    """Print the status of plugin installation.
+
+    Used as the callback for PluginInstallService.
+    """
+    plugin = install_state.plugin
+    desc = plugin.type.descriptor
+
+    if install_state.status is PluginInstallStatus.SKIPPED:
+        level = (
+            logging.DEBUG
+            if install_state.reason == PluginInstallReason.AUTO
+            else logging.INFO
+        )
+        logger.log(level, "%s %s '%s'", install_state.verb, desc, plugin.name)
+    elif install_state.status in {
+        PluginInstallStatus.RUNNING,
+        PluginInstallStatus.SUCCESS,
+    }:
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
+    elif install_state.status is PluginInstallStatus.ERROR:
+        logger.error(install_state.message)
+        logger.info(install_state.details)
+    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
+        logger.warning(install_state.message)
+
+
+async def install_plugins(
+    project: Project,
+    plugins: t.Sequence[ProjectPlugin],
+    *,
+    reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    parallelism: int | None = None,
+    clean: bool = False,
+    force: bool = False,
+) -> bool:
+    """Install the provided plugins and report results to the console."""
+    install_service = PluginInstallService(
+        project,
+        status_cb=install_status_update,
+        parallelism=parallelism,
+        clean=clean,
+        force=force,
+    )
+    install_results = await install_service.install_plugins(plugins, reason=reason)
+    num_successful = len([status for status in install_results if status.successful])
+    num_skipped = len([status for status in install_results if status.skipped])
+    num_failed = len(install_results) - num_successful
+
+    level = logging.INFO
+    if num_failed >= 0 and num_successful == 0:
+        level = logging.ERROR
+    elif num_failed > 0 and num_successful > 0:
+        level = logging.WARNING
+    elif reason == PluginInstallReason.AUTO and num_skipped == len(plugins):
+        level = logging.DEBUG
+
+    if len(plugins) > 1:
+        logger.log(
+            level,
+            "%s %d/%d plugins",
+            "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
+            num_successful - num_skipped,
+            num_successful + num_failed,
+        )
+    if num_skipped:  # pragma: no cover
+        logger.log(
+            level,
+            "Skipped installing %d/%d plugins",
+            num_skipped,
+            num_successful + num_failed,
+        )
+
+    return num_failed == 0
 
 
 async def install_pip_plugin(

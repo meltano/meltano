@@ -256,6 +256,14 @@ meltano compile --indent 0
 meltano compile --indent -1
 ```
 
+#### Sensitive values
+By default, values for sensitive settings are redacted from the output of `meltano compile` commands and replaced with `(redacted)`. If this behaviour is not desirable, you can expose them with the `--unsafe` flag instead. The default behaviour can be reaffirmed with the counterpart `--safe` flag (although functionally, this has no effect).
+
+```bash
+# Expose sensitive setting values
+meltano compile --unsafe
+```
+
 ### Using `compile` with Environments
 
 The `compile` command can accept the `--environment` flag to target a specific [Meltano Environment](https://docs.meltano.com/concepts/environments). However, the [`default_environment` setting](https://docs.meltano.com/concepts/environments#default-environments) in your `meltano.yml` file will be ignored.
@@ -265,10 +273,6 @@ When an environment is specified, only the manifest JSON file for that environme
 When no environment is explicitly specified, a manifest JSON file for each environment is compiled, including `meltano-manifest.json`, which is the manifest file for the project when no environment is active.
 
 To only compile the no-environment manifest JSON file, i.e. `meltano-manifest.json`, pass the `--no-environment` CLI option to `meltano`.
-
-## `cloud`
-
-See the full [Cloud CLI reference](/cloud/cloud-cli).
 
 ## `config`
 
@@ -1444,7 +1448,7 @@ meltano state list [--pattern] <PATTERN>
 
 :::info
 
-  <p>"<samp>*</samp>" is subject to auto-expansion in most shells: you must escape the " <samp>*</samp>" by quoting the pattern.</p>
+  <p>"<samp>%2A</samp>" is subject to auto-expansion in most shells: you must escape the " <samp>%2A</samp>" by quoting the pattern.</p>
 :::
 
 #### Examples
@@ -1467,11 +1471,7 @@ Merge new state onto existing state for a state ID.
 :::info
 
   <p><strong>Not seeing merged state in the system database?</strong></p>
-  <p>Merged state is computed at <em>execution</em> time.
-  The <samp>merge</samp> command merely
-  adds a new <samp>payload</samp> to the database which is merged together with
-  existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.
-  </p>
+  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
 :::
 
 #### How to use

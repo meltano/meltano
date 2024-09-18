@@ -201,6 +201,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
+        include-hidden-files: true
         name: coverage-data-${{ matrix.id }}
         path: ".coverage.*"
 
