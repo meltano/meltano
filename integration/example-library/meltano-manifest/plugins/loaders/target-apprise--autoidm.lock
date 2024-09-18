@@ -11,8 +11,8 @@
   "logo_url": "https://hub.meltano.com/assets/logos/loaders/apprise.png",
   "capabilities": [
     "about",
-    "stream-maps",
-    "record-flattening"
+    "schema-flattening",
+    "stream-maps"
   ],
   "settings_group_validation": [
     [
@@ -21,10 +21,34 @@
   ],
   "settings": [
     {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Flattening Enabled",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Flattening Max Depth",
+      "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "Stream Map Config",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Config object for stream maps capability."
+    },
+    {
       "name": "uris",
       "kind": "array",
-      "label": "URIs",
-      "description": "Array of apprise URIs"
+      "label": "Uris",
+      "description": "Array of apprise URIs,checkout https://github.com/caronc/apprise"
     }
   ]
 }

@@ -65,34 +65,39 @@
     },
     {
       "name": "key_file_location",
-      "sensitive": true,
+      "kind": "string",
       "label": "Key File Location",
       "description": "#### How to get\n\nFollow the steps below if you don't already have a valid `client_secrets.json` to upload. The process below can take over 10 minutes, but it's a one-time setup that's well worth it.\n\nThis extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.\n\nTo access your Google Analytics data, the \"Analytics Reporting API\" and \"Analytics API\" both need to be enabled. These need to be enabled for a project inside the same organization as your Google Analytics account.\n\n##### Step 1: Creating Service Account Credentials\n\nAs a first step, you need to create a new project in Google Cloud Platform or use an existing one:\n\n1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).\n\n2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.\n\n  ![Screenshot of Google Service Accounts page](/assets/images/tap-google-analytics/02-ga-service-account-configuration-create-new-account.png)\n\n3. Click \"Create service account\"\n\n  In the Create service account window, type a name for the service account, and click `Create`.\n\n  We do not need to provide any additional permissions for this account, so click `Continue` in the `Service account permissions` configuration page.\n\n  We also do not need to grant access to any users for this service account, as we only need the key.\n\n  ![Screenshot of Google Service Account Configuration for new Account](/assets/images/tap-google-analytics/02-ga-service-account-configuration-new-account.png)\n\n  Click `Create Key`, select `JSON` as the key type and create a new private key. Then click `Save` and store it locally as `client_secrets.json`.\n\nMeltano will use the private key in this `client_secrets.json` file to connect with the Google Analytics API.\n\n##### Step 2: Linking Credentials to Google Analytics\n\nThe newly created service account will have an email address that looks similar to:\n\n```\nservice-account-name@PROJECT-ID.iam.gserviceaccount.com\n```\n\nTo grant this service account access to your Google Analytics data, add the email address as a [new user](https://support.google.com/analytics/answer/1009702) to your Google Analytics account, property or view through the \"Admin > User Management\" page.\n\nOnly the [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed as Meltano only extracts data to generate reports.\n\n![Screenshot of Google Analytics Add User](/assets/images/tap-google-analytics/03-ga-add-user.png)\n\n##### Step 3: Enabling the APIs\n\n1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.\n\n  Now enable the API using the button at the top, so that the button will say \"Disable API\" instead:\n\n  ![Screenshot of Google Analytics Reporting API](/assets/images/tap-google-analytics/04-ga-reporting-api.png)\n\n2. Next, visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the previous step is selected, and enable this API as well.\n\n  ![Screenshot of Google Analytics API](/assets/images/tap-google-analytics/05-ga-api.png)\n",
-      "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json"
+      "placeholder": "Ex. $MELTANO_PROJECT_ROOT/client_secrets.json",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.access_token",
-      "sensitive": true,
+      "kind": "string",
       "label": "OAuth Credentials Access Token",
-      "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "Google Analytics Access Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.client_id",
-      "sensitive": true,
+      "kind": "string",
       "label": "OAuth Credentials Client ID",
-      "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n"
+      "description": "See <https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing>.\n\nTakes precedence over [Key File Location](#key-file-location) if both are specified.\n",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.client_secret",
-      "sensitive": true,
+      "kind": "string",
       "label": "OAuth Credentials Client Secret",
-      "description": "Google Analytics Client Secret. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "Google Analytics Client Secret. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "oauth_credentials.refresh_token",
-      "sensitive": true,
+      "kind": "string",
       "label": "OAuth Credentials Refresh Token",
-      "description": "Google Analytics Refresh Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing."
+      "description": "Google Analytics Refresh Token. See https://developers.google.com/analytics/devguides/reporting/core/v4/authorization#OAuth2Authorizing.",
+      "sensitive": true
     },
     {
       "name": "reports",
@@ -105,7 +110,7 @@
       "name": "start_date",
       "kind": "date_iso8601",
       "label": "Start Date",
-      "description": "This property determines how much historical data will be extracted.Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take."
+      "description": "This property determines how much historical data will be extracted. Please be aware that the larger the time period and amount of data, the longer the initial extraction can be expected to take."
     },
     {
       "name": "stream_map_config",
@@ -121,10 +126,11 @@
     },
     {
       "name": "view_id",
-      "sensitive": true,
+      "kind": "string",
       "label": "View ID",
       "description": "The ID for the view to fetch data from.\n\n#### How to get\n\nTo get your View ID:\n\n1. Visit Google Analytics: <https://analytics.google.com/>\n2. Log in if you haven't already.\n3. Open the account/property/view selector in the top left corner\n\n![Screenshot of closed account selector](/assets/images/tap-google-analytics/account-selector-closed.png)\n\n3. Select the account, property, and view that you would like to connect with Meltano\n\n![Screenshot of open account selector](/assets/images/tap-google-analytics/account-selector-open.png)\n\n4. You will see the View ID displayed inside the selector below the name of the view (e.g. \"All Web Site Data\"): `188274549`\n",
-      "placeholder": "Ex. 198343027"
+      "placeholder": "Ex. 198343027",
+      "sensitive": true
     }
   ]
 }

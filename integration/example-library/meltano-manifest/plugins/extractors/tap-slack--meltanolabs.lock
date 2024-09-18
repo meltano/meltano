@@ -26,13 +26,15 @@
   "settings": [
     {
       "name": "api_key",
-      "sensitive": true,
+      "kind": "string",
       "label": "API Key",
-      "description": "The token to authenticate against the Slack API service"
+      "description": "The token to authenticate against the Slack API service",
+      "sensitive": true
     },
     {
       "name": "auto_join_channels",
       "kind": "boolean",
+      "value": false,
       "label": "Auto Join Channels",
       "description": "Whether the bot user should attempt to join channels that it has not yet joined. The bot user must be a member of the channel to retrieve messages."
     },
@@ -61,6 +63,10 @@
         {
           "label": "Jsonl",
           "value": "jsonl"
+        },
+        {
+          "label": "Parquet",
+          "value": "parquet"
         }
       ]
     },
@@ -106,6 +112,7 @@
     {
       "name": "include_admin_streams",
       "kind": "boolean",
+      "value": false,
       "label": "Include Admin Streams",
       "description": "Whether to include streams that require admin privileges or not. If the user does not have the proper scopes then the tap will throw and exception."
     },

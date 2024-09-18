@@ -55,10 +55,11 @@ This means that you're ready to start Meltano CLI development.
 
   <p><strong>Metrics (anonymous usage data) tracking</strong></p>
   <p>As you contribute to Meltano, you may want to disable <a href="/reference/settings#send-anonymous-usage-stats">metrics tracking</a> globally rather than by project. You can do this by setting the environment variable `MELTANO_SEND_ANONYMOUS_USAGE_STATS` to `False`:</p>
-<pre>
+
+```
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=False
-</pre>
+```
 :::
 
 ## System Database

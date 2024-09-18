@@ -6,15 +6,16 @@
   "label": "Airflow",
   "docs": "https://hub.meltano.com/utilities/airflow--apache",
   "repo": "https://github.com/apache/airflow",
-  "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.3.3 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.3.3/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+  "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
   "executable": "airflow_invoker",
   "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
   "settings": [
     {
-      "name": "database.sql_alchemy_conn",
-      "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
-      "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db",
-      "label": "SQL Alchemy Connection"
+      "name": "core.dags_are_paused_at_creation",
+      "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
+      "kind": "boolean",
+      "value": false,
+      "label": "Pause DAGs at Creation"
     },
     {
       "name": "core.dags_folder",
@@ -23,28 +24,37 @@
       "label": "DAGs Folder"
     },
     {
+      "name": "core.load_examples",
+      "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
+      "kind": "boolean",
+      "value": false,
+      "label": "Load Examples"
+    },
+    {
       "name": "core.plugins_folder",
       "env": "AIRFLOW__CORE__PLUGINS_FOLDER",
       "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/plugins",
       "label": "Plugins Folder"
     },
     {
-      "name": "core.load_examples",
-      "env": "AIRFLOW__CORE__LOAD_EXAMPLES",
-      "value": false,
-      "label": "Load Examples"
+      "name": "database.sql_alchemy_conn",
+      "env": "AIRFLOW__DATABASE__SQL_ALCHEMY_CONN",
+      "value": "sqlite:///$MELTANO_PROJECT_ROOT/.meltano/utilities/airflow/airflow.db",
+      "label": "SQL Alchemy Connection"
     },
     {
-      "name": "core.dags_are_paused_at_creation",
-      "env": "AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION",
-      "value": false,
-      "label": "Pause DAGs at Creation"
+      "name": "extension.airflow_config",
+      "env": "AIRFLOW_CONFIG",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg",
+      "label": "Airflow Home",
+      "description": "The path where the Airflow configuration file will be stored.\n"
     },
     {
-      "name": "webserver.web_server_port",
-      "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
-      "value": 8080,
-      "label": "Webserver Port"
+      "name": "extension.airflow_home",
+      "env": "AIRFLOW_HOME",
+      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow",
+      "label": "Airflow Home",
+      "description": "The directory where Airflow will store its configuration, logs, and other files.\n"
     },
     {
       "name": "logging.base_log_folder",
@@ -68,18 +78,11 @@
       "description": "Where to send the logs of each scheduler process.\n"
     },
     {
-      "name": "extension.airflow_home",
-      "env": "AIRFLOW_HOME",
-      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow",
-      "label": "Airflow Home",
-      "description": "The directory where Airflow will store its configuration, logs, and other files.\n"
-    },
-    {
-      "name": "extension.airflow_config",
-      "env": "AIRFLOW_CONFIG",
-      "value": "$MELTANO_PROJECT_ROOT/orchestrate/airflow/airflow.cfg",
-      "label": "Airflow Home",
-      "description": "The path where the Airflow configuration file will be stored.\n"
+      "name": "webserver.web_server_port",
+      "env": "AIRFLOW__WEBSERVER__WEB_SERVER_PORT",
+      "kind": "integer",
+      "value": 8080,
+      "label": "Webserver Port"
     }
   ],
   "commands": {
