@@ -3,7 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import styles from './usecases.module.scss';
 import Link from '@docusaurus/Link';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, A11y } from 'swiper';
+import { Navigation, A11y } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
