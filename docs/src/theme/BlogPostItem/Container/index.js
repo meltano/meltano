@@ -9,9 +9,7 @@ export default function BlogPostItemContainer({ children, className }) {
   const { frontMatter, assets, metadata } = useBlogPost();
   const { withBaseUrl } = useBaseUrlUtils();
   const image = assets.image ?? frontMatter.image;
-  const regex = /\b\d{1,2},\s/;
-  const date = metadata.formattedDate.replace(regex, '');
-  const dateArray = date.split(' ');
+  const parsedDate = new Date(metadata.date);
 
   return (
     <div className="flex flex-col md:flex-row">
@@ -21,8 +19,8 @@ export default function BlogPostItemContainer({ children, className }) {
           styles.date
         )}
       >
-        <span className={styles.month}>{dateArray[0]}</span>
-        <span className={styles.year}>{dateArray[1]}</span>
+        <span className={styles.month}>{parsedDate.toLocaleString('en', { month: 'long' })}</span>
+        <span className={styles.year}>{parsedDate.getFullYear()}</span>
       </div>
       <article
         className={className}
