@@ -2,7 +2,7 @@ plugins:
   utilities:
   - name: dbt-snowflake
     variant: dbt-labs
-    pip_url: dbt-core~=1.3.0 dbt-snowflake~=1.3.0 git+https://github.com/meltano/dbt-ext.git@main
+    pip_url: dbt-core~=1.3.0 dbt-snowflake~=1.3.0 meltano-dbt-ext~=0.3.0
     commands:
       create_userdev_env:
         args: "run-operation create_userdev_env --args \"{'db_list': ['RAW'], 'dry_run':\

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import functools
+import logging
 import os
 import shlex
 import sys
@@ -80,7 +81,7 @@ class PluginInstallState:
     details: str | None = None
 
     @cached_property
-    def successful(self):  # noqa: ANN201
+    def successful(self) -> bool:
         """Plugin install success status.
 
         Returns:
@@ -89,7 +90,7 @@ class PluginInstallState:
         return self.status in {PluginInstallStatus.SUCCESS, PluginInstallStatus.SKIPPED}
 
     @cached_property
-    def skipped(self):  # noqa: ANN201
+    def skipped(self) -> bool:
         """Plugin install skipped status.
 
         Returns:
@@ -179,7 +180,7 @@ class PluginInstallService:
         return self._parallelism
 
     @cached_property
-    def semaphore(self):  # noqa: ANN201
+    def semaphore(self) -> asyncio.Semaphore:
         """An asyncio semaphore with a counter starting at `self.parallelism`.
 
         Returns:
@@ -188,10 +189,10 @@ class PluginInstallService:
         return asyncio.Semaphore(self.parallelism)
 
     @staticmethod
-    def remove_duplicates(  # noqa: ANN205
+    def remove_duplicates(
         plugins: t.Iterable[ProjectPlugin],
         reason: PluginInstallReason,
-    ):
+    ) -> tuple[list[PluginInstallState], list[ProjectPlugin]]:
         """Deduplicate list of plugins, keeping the last occurrences.
 
         Trying to install multiple plugins into the same venv via `asyncio.run`
@@ -208,8 +209,8 @@ class PluginInstallService:
             skipped plugins) and a deduplicated list of plugins to install.
         """
         seen_venvs = set()
-        deduped_plugins = []
-        states = []
+        deduped_plugins: list[ProjectPlugin] = []
+        states: list[PluginInstallState] = []
         for plugin in plugins:
             if (plugin.type, plugin.venv_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
@@ -230,8 +231,8 @@ class PluginInstallService:
 
     async def install_all_plugins(
         self,
-        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
-    ) -> tuple[PluginInstallState]:
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    ) -> list[PluginInstallState]:
         """Install all the plugins for the project.
 
         Blocks until all plugins are installed.
@@ -247,8 +248,8 @@ class PluginInstallService:
     async def install_plugins(
         self,
         plugins: t.Iterable[ProjectPlugin],
-        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
-    ) -> tuple[PluginInstallState]:
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    ) -> list[PluginInstallState]:
         """Install all the provided plugins.
 
         Args:
@@ -272,7 +273,7 @@ class PluginInstallService:
     def install_plugin(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> PluginInstallState:
         """Install a plugin.
 
@@ -296,7 +297,7 @@ class PluginInstallService:
     async def install_plugin_async(
         self,
         plugin: ProjectPlugin,
-        reason=PluginInstallReason.INSTALL,  # noqa: ANN001
+        reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> PluginInstallState:
         """Install a plugin asynchronously.
 
@@ -433,7 +434,9 @@ class PluginInstallService:
             A boolean determining if the given plugin is a mapping (of type
             `PluginType.MAPPERS`).
         """
-        return plugin.type == PluginType.MAPPERS and plugin.extra_config.get("_mapping")
+        return plugin.type == PluginType.MAPPERS and bool(
+            plugin.extra_config.get("_mapping")
+        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -527,12 +530,88 @@ def get_pip_install_args(
     ) as strict_env_var_mode:
         return shlex.split(
             expand_env_vars(
-                plugin.pip_url,
-                env,
+                plugin.pip_url or "",
+                env or {},
                 if_missing=if_missing or EnvVarMissingBehavior(strict_env_var_mode),
             )
             or "",
         )
+
+
+def install_status_update(install_state: PluginInstallState) -> None:
+    """Print the status of plugin installation.
+
+    Used as the callback for PluginInstallService.
+    """
+    plugin = install_state.plugin
+    desc = plugin.type.descriptor
+
+    if install_state.status is PluginInstallStatus.SKIPPED:
+        level = (
+            logging.DEBUG
+            if install_state.reason == PluginInstallReason.AUTO
+            else logging.INFO
+        )
+        logger.log(level, "%s %s '%s'", install_state.verb, desc, plugin.name)
+    elif install_state.status in {
+        PluginInstallStatus.RUNNING,
+        PluginInstallStatus.SUCCESS,
+    }:
+        logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
+    elif install_state.status is PluginInstallStatus.ERROR:
+        logger.error(install_state.message)
+        logger.info(install_state.details)
+    elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
+        logger.warning(install_state.message)
+
+
+async def install_plugins(
+    project: Project,
+    plugins: t.Sequence[ProjectPlugin],
+    *,
+    reason: PluginInstallReason = PluginInstallReason.INSTALL,
+    parallelism: int | None = None,
+    clean: bool = False,
+    force: bool = False,
+) -> bool:
+    """Install the provided plugins and report results to the console."""
+    install_service = PluginInstallService(
+        project,
+        status_cb=install_status_update,
+        parallelism=parallelism,
+        clean=clean,
+        force=force,
+    )
+    install_results = await install_service.install_plugins(plugins, reason=reason)
+    num_successful = len([status for status in install_results if status.successful])
+    num_skipped = len([status for status in install_results if status.skipped])
+    num_failed = len(install_results) - num_successful
+
+    level = logging.INFO
+    if num_failed >= 0 and num_successful == 0:
+        level = logging.ERROR
+    elif num_failed > 0 and num_successful > 0:
+        level = logging.WARNING
+    elif reason == PluginInstallReason.AUTO and num_skipped == len(plugins):
+        level = logging.DEBUG
+
+    if len(plugins) > 1:
+        logger.log(
+            level,
+            "%s %d/%d plugins",
+            "Updated" if reason == PluginInstallReason.UPGRADE else "Installed",
+            num_successful - num_skipped,
+            num_successful + num_failed,
+        )
+    if num_skipped:  # pragma: no cover
+        logger.log(
+            level,
+            "Skipped installing %d/%d plugins",
+            num_skipped,
+            num_successful + num_failed,
+        )
+
+    return num_failed == 0
 
 
 async def install_pip_plugin(

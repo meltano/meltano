@@ -2097,7 +2097,7 @@
         "capabilities": [
           "about",
           "stream-maps",
-          "record-flattening"
+          "schema-flattening"
         ],
         "description": "Apprise allows you to send a notification to almost all of the most popular notification services available to us today such as: Telegram, Discord, Slack, Amazon SNS, Gotify, etc",
         "docs": "https://hub.meltano.com/loaders/target-apprise--autoidm",
@@ -2488,7 +2488,7 @@
         "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
         "name": "dbt-snowflake",
         "namespace": "dbt_snowflake",
-        "pip_url": "dbt-core~=1.5.2 dbt-snowflake~=1.5.2 git+https://github.com/meltano/dbt-ext.git@main",
+        "pip_url": "dbt-core~=1.5.2 dbt-snowflake~=1.5.2 meltano-dbt-ext~=0.3.0",
         "plugin_type": "utilities",
         "repo": "https://github.com/dbt-labs/dbt-snowflake",
         "settings": [

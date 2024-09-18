@@ -15,3 +15,10 @@ By default a manifest file for each environment is compiled:
 ```shell
 meltano compile --indent 2
 ```
+
+
+By default, secret values are redacted. These values can be kept unredacted with the `--unsafe` flag.
+
+```shell
+meltano --environment=jigsaw compile --indent 2 --unsafe
+```

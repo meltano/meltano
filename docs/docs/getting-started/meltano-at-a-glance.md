@@ -12,9 +12,9 @@ This document is intended to give you enough technical understanding of Meltano 
 
 ### What users say
 
-_"For us it's a better day at work when we can use Meltano."_ - Nino Müller, Head of Technology at Substring
+<i>"For us it's a better day at work when we can use Meltano."</i> - Nino Müller, Head of Technology at Substring
 
-_"I love Meltano because it’s so pleasant to use with its DevOps and Everything-as-Code style. It is easy to set up, flexible, and integrates with pretty much any orchestrator as well as dbt (data build tool)"._ - Martin Morset
+<i>"I love Meltano because it’s so pleasant to use with its DevOps and Everything-as-Code style. It is easy to set up, flexible, and integrates with pretty much any orchestrator as well as dbt (data build tool)".</i> - Martin Morset
 
 ## Meltano at a glance
 

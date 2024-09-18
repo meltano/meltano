@@ -119,7 +119,14 @@ class YamlNoTimestampSafeLoader(
 class Manifest:
     """A complete unambiguous static representation of a Meltano project."""
 
-    def __init__(self, project: Project, path: Path, *, check_schema: bool) -> None:
+    def __init__(
+        self,
+        project: Project,
+        path: Path,
+        *,
+        check_schema: bool,
+        redact_secrets: bool = False,
+    ) -> None:
         """Initialize the manifest.
 
         This class does not write a manifest file. It merely generates the data
@@ -135,12 +142,15 @@ class Manifest:
                 jsonschema validation failure error messages.
             check_schema: Whether the project files and generated manifest
                 files should be validated against the Meltano schema.
+            redact_secrets: Whether to redact secret values from the generated
+                manifest.
         """
         self.project = project
         self._project_root_str = str(self.project.root.resolve())
         self._meltano_file = self.project.meltanofile.read_text()
         self.path = path
         self.check_schema = check_schema
+        self.redact_secrets = redact_secrets
         with MANIFEST_SCHEMA_PATH.open() as manifest_schema_file:
             manifest_schema = json.load(manifest_schema_file)
         self._env_locations = meltano_config_env_locations(manifest_schema)
@@ -336,7 +346,9 @@ class Manifest:
                 self.env_aware_merge_mappings(
                     manifest["plugins"][plugin_type][plugin.name],
                     "env",
-                    PluginSettingsService(project=self.project, plugin=plugin).as_env(),
+                    PluginSettingsService(project=self.project, plugin=plugin).as_env(
+                        redacted=self.redact_secrets,
+                    ),
                 )
 
         # Merge 'environment level env' into 'root level env':

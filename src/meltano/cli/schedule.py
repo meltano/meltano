@@ -107,12 +107,33 @@ def _add_job(ctx, name: str, job: str, interval: str) -> None:  # noqa: ANN001
         session.close()
 
 
+class CronParam(click.ParamType):
+    """Custom type definition for cron parameter."""
+
+    name = "cron"
+
+    def convert(self, value, *_):  # noqa: ANN001, ANN201
+        """Validate and con interval."""
+        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+            raise BadCronError(value)
+
+        return value
+
+
 @schedule.command(
     cls=PartialInstrumentedCmd,
     short_help="[default] Add a new schedule.",
 )
 @click.argument("name")
-@click.option("--interval", required=True, help="Interval of the schedule.")
+@click.option(
+    "--interval",
+    required=True,
+    help=(
+        f"Interval of the schedule. One of {', '.join(CRON_INTERVALS)} "
+        "or a cron expression."
+    ),
+    type=CronParam(),
+)
 @click.option("--job", help="The name of the job to run.")
 @click.option("--extractor", required=False, help="ELT Only")
 @click.option("--loader", required=False, help="ELT Only")
@@ -375,19 +396,6 @@ def _update_elt_schedule(
     return candidate
 
 
-class CronParam(click.ParamType):
-    """Custom type definition for cron parameter."""
-
-    name = "cron"
-
-    def convert(self, value, *_):  # noqa: ANN001, ANN201
-        """Validate and con interval."""
-        if value not in CRON_INTERVALS and not croniter.is_valid(value):
-            raise BadCronError(value)
-
-        return value
-
-
 @schedule.command(
     cls=PartialInstrumentedCmd,
     name="set",
@@ -396,7 +404,10 @@ class CronParam(click.ParamType):
 @click.argument("name", required=True)
 @click.option(
     "--interval",
-    help="Update the interval of the schedule.",
+    help=(
+        f"Update the interval of the schedule. One of {', '.join(CRON_INTERVALS)} "
+        "or a cron expression."
+    ),
     type=CronParam(),
 )
 @click.option("--job", help="Update the name of the job to run a scheduled job.")
