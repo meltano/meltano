@@ -399,7 +399,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             return self.name
 
         if not self.pip_url or (self.parent.pip_url == self.pip_url):
-            return self.parent.name
+            return self.parent.venv_name
 
         return self.name
 
