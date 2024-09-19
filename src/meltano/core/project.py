@@ -25,6 +25,7 @@ from meltano.core.error import (
     ProjectReadonly,
 )
 from meltano.core.hub import MeltanoHubService
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_files import ProjectFiles
 from meltano.core.project_plugins_service import ProjectPluginsService
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -32,7 +33,7 @@ from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if t.TYPE_CHECKING:
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
-    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin.base import PluginRef
 
     if sys.version_info < (3, 10):
         from typing import TypeAlias  # noqa: ICN003
@@ -547,7 +548,7 @@ class Project(Versioned):
     @makedirs
     def plugin_dir(
         self,
-        plugin: ProjectPlugin,
+        plugin: PluginRef,
         *joinpaths: StrPath,
         make_dirs: bool = True,
     ) -> Path:
@@ -563,7 +564,7 @@ class Project(Versioned):
         """
         return self.meltano_dir(
             plugin.type,
-            plugin.venv_name,
+            plugin.venv_name if isinstance(plugin, ProjectPlugin) else plugin.name,
             *joinpaths,
             make_dirs=make_dirs,
         )
