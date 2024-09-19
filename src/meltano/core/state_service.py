@@ -192,7 +192,7 @@ class StateService:
             save: Whether to immediately save the state
         """
         self.state_store_manager.clear(state_id)
-    
+
     def clear_all_states(self) -> None:
         """Clear all states."""
         for state_id in self.state_store_manager.get_state_ids("*"):
