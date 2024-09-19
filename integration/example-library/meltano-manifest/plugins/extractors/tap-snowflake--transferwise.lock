@@ -19,18 +19,18 @@
       "account",
       "dbname",
       "password",
+      "tables",
       "user",
-      "warehouse",
-      "tables"
+      "warehouse"
     ],
     [
       "account",
       "dbname",
-      "user",
-      "warehouse",
-      "tables",
+      "private_key_passphrase",
       "private_key_path",
-      "private_key_passphrase"
+      "tables",
+      "user",
+      "warehouse"
     ]
   ],
   "settings": [
@@ -46,35 +46,18 @@
       "description": "Snowflake Database name"
     },
     {
-      "name": "user",
-      "label": "User",
-      "description": "Snowflake User"
+      "name": "insecure_mode",
+      "kind": "boolean",
+      "value": false,
+      "label": "Insecure Mode",
+      "description": "Use insecure mode to avoid \"Failed to get OCSP response\" warnings."
     },
     {
       "name": "password",
+      "kind": "string",
       "label": "Password",
       "description": "Snowflake Password",
       "sensitive": true
-    },
-    {
-      "name": "warehouse",
-      "label": "Warehouse",
-      "description": "Snowflake virtual warehouse name"
-    },
-    {
-      "name": "tables",
-      "label": "Tables",
-      "description": "A comma separated list of the table names that you want to sync. The table names should be fully qualified including the db and schema name. For example, syncing table1 and table2 would look like `db.schema.table1,db.schema.table2`."
-    },
-    {
-      "name": "role",
-      "label": "Role",
-      "description": "Snowflake role to use. If not defined then the user's default role will be used."
-    },
-    {
-      "name": "private_key_path",
-      "label": "Private Key Path",
-      "description": "A path to your private key used for authenticating using Key Pair authentication instead of user/pass."
     },
     {
       "name": "private_key_passphrase",
@@ -82,10 +65,29 @@
       "description": "The private key passphrase used for authenticating using Key Pair authentication instead of user/pass."
     },
     {
-      "name": "insecure_mode",
-      "value": false,
-      "label": "Insecure Mode",
-      "description": "Use insecure mode to avoid \"Failed to get OCSP response\" warnings."
+      "name": "private_key_path",
+      "label": "Private Key Path",
+      "description": "A path to your private key used for authenticating using Key Pair authentication instead of user/pass."
+    },
+    {
+      "name": "role",
+      "label": "Role",
+      "description": "Snowflake role to use. If not defined then the user's default role will be used."
+    },
+    {
+      "name": "tables",
+      "label": "Tables",
+      "description": "A comma separated list of the table names that you want to sync. The table names should be fully qualified including the db and schema name. For example, syncing table1 and table2 would look like `db.schema.table1,db.schema.table2`."
+    },
+    {
+      "name": "user",
+      "label": "User",
+      "description": "Snowflake User"
+    },
+    {
+      "name": "warehouse",
+      "label": "Warehouse",
+      "description": "Snowflake virtual warehouse name"
     }
   ]
 }
