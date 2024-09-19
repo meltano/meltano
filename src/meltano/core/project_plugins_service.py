@@ -540,21 +540,6 @@ class ProjectPluginsService:  # (too many methods, attributes)
         )
         return parent
 
-    def get_progenitor(self, plugin: ProjectPlugin) -> ProjectPlugin:
-        """Get plugin's progenitor plugin.
-
-        Args:
-            plugin: The plugin to get the progenitor of.
-
-        Returns:
-            The progenitor plugin.
-        """
-        if not plugin.inherit_from:
-            return plugin
-
-        parent = self.get_parent(plugin)
-        return self.get_progenitor(parent)
-
     def ensure_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Ensure that plugin has a parent set.
 
