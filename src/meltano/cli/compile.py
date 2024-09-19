@@ -50,6 +50,12 @@ if t.TYPE_CHECKING:
         "Meltano schema"
     ),
 )
+@click.option(
+    "--safe/--unsafe",
+    default=True,
+    show_default=True,
+    help="Expose values for sensitive settings.",
+)
 @click.pass_context
 @pass_project(migrate=True)
 def compile_command(
@@ -59,6 +65,7 @@ def compile_command(
     directory: Path,
     lint: bool,
     indent: int,
+    safe: bool,
 ) -> None:
     """Compile a Meltano project into environment-specific manifest files.
 
@@ -89,7 +96,9 @@ def compile_command(
             else f"meltano-manifest.{environment.name}.json"
         )
         project.refresh(environment=environment)
-        manifest = Manifest(project=project, path=path, check_schema=lint)
+        manifest = Manifest(
+            project=project, path=path, check_schema=lint, redact_secrets=safe
+        )
         try:
             with path.open("w") as manifest_file:
                 json.dump(
