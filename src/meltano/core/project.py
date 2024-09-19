@@ -563,7 +563,7 @@ class Project(Versioned):
         """
         return self.meltano_dir(
             plugin.type,
-            plugin.name,
+            self.plugins.get_progenitor(plugin).name,
             *joinpaths,
             make_dirs=make_dirs,
         )
