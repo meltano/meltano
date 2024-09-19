@@ -8,6 +8,7 @@ import structlog
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin, PluginType
+from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
@@ -20,7 +21,6 @@ if t.TYPE_CHECKING:
     from os import PathLike
     from pathlib import Path
 
-    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
@@ -66,7 +66,7 @@ class FilePlugin(BasePlugin):
         Returns:
             A dictionary of file names and their contents.
         """
-        plugin = project.plugins.get_plugin(self)
+        plugin = ProjectPlugin(PluginType.FILES, self.name)
         venv = VirtualEnv(project.plugin_dir(plugin, "venv"))
         bundle_dir = venv.site_packages_dir / "bundle"
 
