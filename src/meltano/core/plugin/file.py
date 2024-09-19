@@ -66,7 +66,8 @@ class FilePlugin(BasePlugin):
         Returns:
             A dictionary of file names and their contents.
         """
-        venv = VirtualEnv(project.plugin_dir(self, "venv"))
+        plugin = project.plugins.get_plugin(self)
+        venv = VirtualEnv(project.plugin_dir(plugin, "venv"))
         bundle_dir = venv.site_packages_dir / "bundle"
 
         return {
