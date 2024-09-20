@@ -25,7 +25,6 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 STATE_SERVICE_KEY = "state_service"
-STATE_CLEAR_USAGE_ERROR_MESSAGE = "Either a state ID or --clear-all flag must be provided. Not both."
 
 logger = structlog.getLogger(__name__)
 
@@ -315,10 +314,10 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 @click.option("--clear-all", is_flag=True, required=False, help="Helps clear all states. Use with --force flag to skip confirmation.")
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str, clear_all: any) -> None:
+def clear_state(ctx: click.Context, project: Project, state_id: str, clear_all: bool) -> None:
     """Clear state."""
-    if (not state_id and not clear_all) or (state_id and clear_all): # Case where neither or both have been provided
-        raise click.UsageError(STATE_CLEAR_USAGE_ERROR_MESSAGE)
+    if bool(state_id) == clear_all: # Case where neither or both have been provided
+        raise click.UsageError("Either a state ID or --clear-all flag must be provided. Not both.") # pragma: no cover
     if state_id:
         state_service: StateService = (
             state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
