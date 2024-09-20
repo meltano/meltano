@@ -225,7 +225,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self) -> dict[str, str]:
+    def info(self) -> dict[str, str | None]:
         """Plugin info dict.
 
         Returns:
@@ -276,7 +276,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         """
         return list(self.all_commands.keys())
 
-    def env_prefixes(self, *, for_writing=False) -> list[str]:  # noqa: ANN001
+    def env_prefixes(self, *, for_writing: bool = False) -> list[str]:
         """Return environment variable prefixes.
 
         Args:
@@ -388,8 +388,11 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return not self.inherit_from
 
     @property
-    def venv_name(self) -> str:
-        """Return the venv name this plugin should use.
+    def plugin_dir_name(self) -> str:
+        """Return the plugin directory name this plugin should use.
+
+        This directory is where the plugin's Python virtual environment will be
+        created, among other things.
 
         Returns:
             The name of this plugins parent if both pip urls are the same, else
@@ -399,7 +402,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             return self.name
 
         if not self.pip_url or (self.parent.pip_url == self.pip_url):
-            return self.parent.name
+            return self.parent.plugin_dir_name
 
         return self.name
 

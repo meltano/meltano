@@ -231,7 +231,6 @@ module = [
   "meltano.core.plugin.command",
   "meltano.core.plugin.dbt.*",
   "meltano.core.plugin.factory",
-  "meltano.core.plugin.file",
   "meltano.core.plugin.meltano_file",
   "meltano.core.plugin.project_plugin",
   "meltano.core.plugin.settings_service",
