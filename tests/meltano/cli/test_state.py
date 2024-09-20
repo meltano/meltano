@@ -283,7 +283,7 @@ class TestCliState:
 
     def test_clear_all(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
-            result = cli_runner.invoke(cli, ["state", "clear", "--force", "--all"])
+            result = cli_runner.invoke(cli, ["state", "clear", "--force", "--clear-all"])
             assert_cli_runner(result)
             for state_id in state_ids:
                 job_state = state_service.get_state(state_id)
