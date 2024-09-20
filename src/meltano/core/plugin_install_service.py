@@ -212,9 +212,9 @@ class PluginInstallService:
         deduped_plugins: list[ProjectPlugin] = []
         states: list[PluginInstallState] = []
         for plugin in plugins:
-            if (plugin.type, plugin.venv_name) not in seen_venvs:
+            if (plugin.type, plugin.plugin_dir_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
-                seen_venvs.add((plugin.type, plugin.venv_name))
+                seen_venvs.add((plugin.type, plugin.plugin_dir_name))
             else:
                 states.append(
                     PluginInstallState(
@@ -644,14 +644,14 @@ async def install_pip_plugin(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
-            name=plugin.venv_name,
+            name=plugin.plugin_dir_name,
         )
     elif backend == "uv":  # pragma: no cover
         service = UvVenvService(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
-            name=plugin.venv_name,
+            name=plugin.plugin_dir_name,
         )
     else:  # pragma: no cover
         msg = f"Unsupported venv backend: {backend}"

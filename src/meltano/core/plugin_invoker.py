@@ -160,7 +160,7 @@ class PluginInvoker:
             self.venv_service = VenvService(
                 project=project,
                 python=self.plugin.python,
-                name=plugin.venv_name,
+                name=plugin.plugin_dir_name,
                 namespace=plugin.type,
             )
         else:
