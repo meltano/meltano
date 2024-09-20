@@ -123,7 +123,10 @@ class TestPluginInstallService:
         assert all_plugins[1].successful
         assert not all_plugins[1].skipped
 
-        assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
+        assert (
+            all_plugins[0].plugin.plugin_dir_name
+            == all_plugins[1].plugin.plugin_dir_name
+        )
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
     def test_get_quoted_pip_install_args(self, project) -> None:
