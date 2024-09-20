@@ -62,7 +62,7 @@ class TestPluginInstallService:
                 "tap-mock",
                 variant="meltano",
             )
-        except PluginAlreadyAddedException as err:
+        except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
     @pytest.fixture()
@@ -73,7 +73,7 @@ class TestPluginInstallService:
                 "tap-mock-inherited",
                 inherit_from=tap.name,
             )
-        except PluginAlreadyAddedException as err:
+        except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
     @pytest.fixture()
@@ -84,7 +84,7 @@ class TestPluginInstallService:
                 "tap-mock-inherited-inherited",
                 inherit_from=inherited_tap.name,
             )
-        except PluginAlreadyAddedException as err:
+        except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
     def test_default_init_should_not_fail(self, subject) -> None:
