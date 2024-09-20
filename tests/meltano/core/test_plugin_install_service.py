@@ -6,11 +6,13 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import yaml
 
+from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import (
     PluginInstallReason,
     PluginInstallService,
     get_pip_install_args,
 )
+from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -52,6 +54,39 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
+    @pytest.fixture()
+    def tap(self, project_add_service):
+        try:
+            return project_add_service.add(
+                PluginType.EXTRACTORS,
+                "tap-mock",
+                variant="meltano",
+            )
+        except PluginAlreadyAddedException as err:  # pragma: no cover
+            return err.plugin
+
+    @pytest.fixture()
+    def inherited_tap(self, project_add_service, tap):
+        try:
+            return project_add_service.add(
+                PluginType.EXTRACTORS,
+                "tap-mock-inherited",
+                inherit_from=tap.name,
+            )
+        except PluginAlreadyAddedException as err:  # pragma: no cover
+            return err.plugin
+
+    @pytest.fixture()
+    def inherited_inherited_tap(self, project_add_service, inherited_tap):
+        try:
+            return project_add_service.add(
+                PluginType.EXTRACTORS,
+                "tap-mock-inherited-inherited",
+                inherit_from=inherited_tap.name,
+            )
+        except PluginAlreadyAddedException as err:  # pragma: no cover
+            return err.plugin
+
     def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
 
@@ -88,7 +123,10 @@ class TestPluginInstallService:
         assert all_plugins[1].successful
         assert not all_plugins[1].skipped
 
-        assert all_plugins[0].plugin.venv_name == all_plugins[1].plugin.venv_name
+        assert (
+            all_plugins[0].plugin.plugin_dir_name
+            == all_plugins[1].plugin.plugin_dir_name
+        )
         assert all_plugins[0].plugin.executable == all_plugins[1].plugin.executable
 
     def test_get_quoted_pip_install_args(self, project) -> None:
@@ -119,10 +157,15 @@ class TestPluginInstallService:
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install(
         self,
-        project: Project,
         subject: PluginInstallService,
+        tap,
+        inherited_tap,
+        inherited_inherited_tap,
     ) -> None:
-        plugin = next(project.plugins.plugins())
+        plugin = tap
+        inherited_plugin = inherited_tap
+        inherited_inherited_plugin = inherited_inherited_tap
+
         state = await subject.install_plugin_async(
             plugin,
             reason=PluginInstallReason.AUTO,
@@ -138,6 +181,26 @@ class TestPluginInstallService:
         assert (
             state.skipped
         ), "Expected plugin with venv and matching fingerprint to not be installed"
+
+        state = await subject.install_plugin_async(
+            inherited_plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert state.skipped, (
+            "Expected plugin inheriting from another plugin with venv and matching"
+            " fingerprint to not be installed"
+        )
+
+        state = await subject.install_plugin_async(
+            inherited_inherited_plugin,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert state.skipped, (
+            "Expected plugin inheriting from another inherited plugin with venv and"
+            " matching fingerprint to not be installed"
+        )
 
         plugin.pip_url = "changed"
         state = await subject.install_plugin_async(
