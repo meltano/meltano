@@ -71,8 +71,7 @@ class StateStoreManager(ABC):
 
     @abstractmethod
     def clear_all(self):  # noqa: ANN201
-        """Clear all states.
-        """
+        """Clear all states."""
         ...
 
     @abstractmethod
