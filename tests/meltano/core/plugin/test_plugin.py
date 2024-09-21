@@ -591,6 +591,52 @@ class TestProjectPlugin:
         # Plugin doesn't have any utility requirements
         assert not transformer.all_requires[PluginType.UTILITIES]
 
+    def test_plugin_dir_name(self):
+        """Validate the virtual environment name.
+
+        - If the plugin has a pip_url, the plugin dir name is the plugin name.
+        - If the plugin is an inherited plugin without a custom pip_url, the plugin dir
+          name is the parent plugin name.
+        - For multiple levels of inheritance, the plugin dir name is the name of the
+          first plugin in the inheritance chain that has a pip_url.
+        """
+        base: ProjectPlugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
+        assert base.plugin_dir_name == "tap-mock"
+
+        inherited: ProjectPlugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock--inherited",
+            inherit_from="tap-mock",
+        )
+        inherited.parent = base
+        assert inherited.plugin_dir_name == "tap-mock"
+
+        inception: ProjectPlugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock--inception",
+            inherit_from="tap-mock--inherited",
+        )
+        inception.parent = inherited
+        assert inception.plugin_dir_name == "tap-mock"
+
+        inherited_custom: ProjectPlugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock--inherited-custom",
+            inherit_from="tap-mock",
+            pip_url="tap-mock--inherited-custom",
+        )
+        inherited_custom.parent = base
+        assert inherited_custom.plugin_dir_name == "tap-mock--inherited-custom"
+
+        inception_custom: ProjectPlugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock--inception-custom",
+            inherit_from="tap-mock--inherited",
+            pip_url="tap-mock--inception-custom",
+        )
+        inception_custom.parent = inherited
+        assert inception_custom.plugin_dir_name == "tap-mock--inception-custom"
+
 
 class TestPluginType:
     def test_properties(self) -> None:

@@ -188,6 +188,8 @@ class PluginType(YAMLEnum):
 class PluginRef(Canonical):
     """A reference to a plugin."""
 
+    name: str
+
     def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):  # noqa: ANN003
         """Create a new PluginRef.
 
@@ -219,6 +221,15 @@ class PluginRef(Canonical):
             The type of the plugin.
         """
         return self._type
+
+    @property
+    def plugin_dir_name(self) -> str:
+        """Return the plugin directory name.
+
+        Returns:
+            The plugin directory name.
+        """
+        return self.name
 
     def __eq__(self, other: PluginRef) -> bool:
         """Compare two plugin references.
@@ -665,7 +676,7 @@ class BasePlugin(HookObject):
     def env_prefixes(
         self,
         *,
-        for_writing=False,  # noqa: ANN001, ARG002
+        for_writing: bool = False,  # noqa: ARG002
     ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 
