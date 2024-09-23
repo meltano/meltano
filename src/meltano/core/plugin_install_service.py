@@ -460,7 +460,6 @@ class PluginInstallService:
                     os.environ,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
-                **plugin_settings_service.as_env(),
                 **plugin_settings_service.plugin.info_env,
                 **expand_env_vars(
                     plugin_settings_service.plugin.env,
