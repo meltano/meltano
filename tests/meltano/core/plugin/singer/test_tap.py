@@ -222,7 +222,7 @@ class TestSingerTap:
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
-        catalog_cache_key_path = invoker.files["catalog_cache_key"]
+        catalog_cache_key_path = catalog_path.with_suffix(".cache_key")
 
         def mock_discovery(*args, **kwargs):  # noqa: ARG001
             future = asyncio.Future()
@@ -420,7 +420,7 @@ class TestSingerTap:
         invoker = plugin_invoker_factory(subject)
 
         catalog_path = invoker.files["catalog"]
-        catalog_cache_key_path = invoker.files["catalog_cache_key"]
+        catalog_cache_key_path = catalog_path.with_suffix(".cache_key")
 
         def reset_catalog() -> None:
             catalog_path.open("w").write('{"rules": []}')

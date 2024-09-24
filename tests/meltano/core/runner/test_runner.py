@@ -32,7 +32,7 @@ class AnyInstanceOf:
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
-        config_dir.joinpath(file).touch()
+        config_dir.joinpath(file.name).touch()
 
     return config_dir
 

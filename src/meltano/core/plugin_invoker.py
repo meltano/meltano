@@ -194,7 +194,8 @@ class PluginInvoker:
         self.plugin_config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
-            run_dir or self.project.run_dir(plugin.name),
+            # run_dir or self.project.run_dir(plugin.name),  # noqa: ERA001
+            run_dir or self.project.tempdir(plugin.name),
         )
 
         self.settings_service = plugin_settings_service or PluginSettingsService(
@@ -228,8 +229,8 @@ class PluginInvoker:
         """
         plugin_files = {**self.plugin.config_files, **self.plugin.output_files}
         return {
-            _key: self.plugin_config_service.run_dir.joinpath(filename)
-            for _key, filename in plugin_files.items()
+            _key: self.plugin_config_service.run_dir.joinpath(file.name)
+            for _key, file in plugin_files.items()
         }
 
     async def prepare(self, session: Session) -> None:

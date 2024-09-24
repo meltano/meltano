@@ -18,6 +18,7 @@ import structlog
 from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
+from meltano.core.plugin.base import PluginFile
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
@@ -229,19 +230,18 @@ class SingerTap(SingerPlugin):
         return args
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, PluginFile]:
         """Get the configuration files for this tap."""
         return {
-            "config": f"tap.{self.instance_uuid}.config.json",
-            "catalog": "tap.properties.json",
-            "catalog_cache_key": "tap.properties.cache_key",
-            "state": "state.json",
+            "config": PluginFile(f"tap.{self.instance_uuid}.config.json"),
+            "catalog": PluginFile("tap.properties.json", cached=True),
+            "state": PluginFile("state.json"),
         }
 
     @property
-    def output_files(self):  # noqa: ANN201
+    def output_files(self) -> dict[str, PluginFile]:
         """Get the output files for this tap."""
-        return {"output": "tap.out"}
+        return {"output": PluginFile("tap.out")}
 
     @hook("before_invoke")
     async def look_up_state_hook(
@@ -363,7 +363,7 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(  # ,
+    async def discover_catalog(
         self,
         plugin_invoker: PluginInvoker,
     ) -> None:
@@ -379,7 +379,7 @@ class SingerTap(SingerPlugin):
             PluginExecutionError: if discovery could not be performed
         """
         catalog_path = plugin_invoker.files["catalog"]
-        catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
+        catalog_cache_key_path = catalog_path.with_suffix(".cache_key")
         elt_context = plugin_invoker.context
 
         use_catalog_cache = True
@@ -577,7 +577,7 @@ class SingerTap(SingerPlugin):
             return
 
         catalog_path = plugin_invoker.files["catalog"]
-        catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
+        catalog_cache_key_path = catalog_path.with_suffix(".cache_key")
 
         try:
             with catalog_path.open() as catalog_file:

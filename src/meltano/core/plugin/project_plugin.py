@@ -17,6 +17,7 @@ from meltano.core.utils import flatten, uniques_in
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from meltano.core.plugin.base import PluginFile
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -61,7 +62,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     variant: str | None
     executable: str
 
-    config_files: dict[str, str]
+    config_files: dict[str, PluginFile]
 
     def __init__(
         self,

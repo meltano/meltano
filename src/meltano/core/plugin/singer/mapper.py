@@ -8,6 +8,7 @@ import typing as t
 import structlog
 
 from meltano.core.behavior.hookable import hook
+from meltano.core.plugin.base import PluginFile
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 
 from . import PluginType, SingerPlugin
@@ -45,9 +46,9 @@ class SingerMapper(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self) -> dict[str, str]:
+    def config_files(self) -> dict[str, PluginFile]:
         """Return the configuration files required by the plugin."""
-        return {"config": f"mapper.{self.instance_uuid}.config.json"}
+        return {"config": PluginFile(f"mapper.{self.instance_uuid}.config.json")}
 
     @hook("before_configure")
     async def before_configure(

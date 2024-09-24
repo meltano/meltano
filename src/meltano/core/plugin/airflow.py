@@ -13,6 +13,7 @@ from packaging.version import Version
 from meltano.core.behavior.hookable import hook
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import BasePlugin, PluginType
+from meltano.core.plugin.base import PluginFile
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import nest
 
@@ -44,13 +45,13 @@ class Airflow(BasePlugin):
     invoker_class = AirflowInvoker
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, PluginFile]:
         """Return the configuration files required by the plugin.
 
         Returns:
             Dictionary of config file identifiers and filenames
         """
-        return {"config": "airflow.cfg"}
+        return {"config": PluginFile("airflow.cfg")}
 
     def process_config(self, flat_config):  # noqa: ANN001, ANN201
         """Unflatten the config.

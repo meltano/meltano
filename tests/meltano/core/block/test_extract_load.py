@@ -42,7 +42,7 @@ MOCK_RECORD_MESSAGE = json.dumps({"type": "RECORD"})
 
 def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
     for file in plugin.config_files.values():
-        Path(os.path.join(config_dir, file)).touch()  # noqa: PTH118
+        Path(os.path.join(config_dir, file.name)).touch()  # noqa: PTH118
 
     return config_dir
 

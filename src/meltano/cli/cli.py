@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import platform
 import sys
+import tempfile
 import typing as t
 from pathlib import Path
 
@@ -91,6 +92,7 @@ def cli(
     Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
     ctx.ensure_object(dict)
+    ctx.obj["tempdir"] = ctx.with_resource(tempfile.TemporaryDirectory())
 
     if log_level:
         ProjectSettingsService.config_override["cli.log_level"] = log_level
@@ -110,7 +112,7 @@ def cli(
             raise Exception(f"Unable to run Meltano from {cwd!r}") from ex  # noqa: EM102
 
     try:
-        project = Project.find()
+        project = Project.find(tempdir=ctx.obj["tempdir"])
         setup_logging(project)
         logger.debug("meltano %s, %s", __version__, platform.system())
         if project.readonly:

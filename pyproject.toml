@@ -59,6 +59,7 @@ google-cloud-storage = {version = ">=1.31.0", optional = true}
 jinja2 = "^3.1.4"
 jsonschema = "^4.23"
 packaging = "^24.2"
+platformdirs = "^4.3.6"
 psutil = "^6.0.0"
 psycopg = {version = "^3.2.3", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}

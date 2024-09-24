@@ -10,6 +10,7 @@ from structlog.stdlib import get_logger
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
+from meltano.core.plugin.base import PluginFile
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.state_service import SINGER_STATE_KEY, StateService
 
@@ -117,22 +118,22 @@ class SingerTarget(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self) -> dict[str, str]:
+    def config_files(self) -> dict[str, PluginFile]:
         """Get config files for this target.
 
         Returns:
             The config_files for this target.
         """
-        return {"config": f"target.{self.instance_uuid}.config.json"}
+        return {"config": PluginFile(f"target.{self.instance_uuid}.config.json")}
 
     @property
-    def output_files(self) -> dict[str, str]:
+    def output_files(self) -> dict[str, PluginFile]:
         """Get output files for this target.
 
         Returns:
             The output files for this target.
         """
-        return {"state": "new_state.json"}
+        return {"state": PluginFile("new_state.json")}
 
     @hook("before_invoke")
     async def setup_bookmark_writer_hook(

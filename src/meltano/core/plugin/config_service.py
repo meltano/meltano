@@ -37,8 +37,8 @@ class PluginConfigService:
 
         # grab the list of files the plugin needs
         stubs = (
-            (run_file(file_name), config_file(file_name))
-            for file_id, file_name in self.plugin.config_files.items()
+            (run_file(file.name), config_file(file.name))
+            for file_id, file in self.plugin.config_files.items()
             if file_id != "config"
         )
 
