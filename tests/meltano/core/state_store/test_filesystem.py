@@ -11,11 +11,13 @@ import platform
 import shutil
 import string
 import typing as t
+import uuid
 from base64 import b64encode
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import moto
 import pytest
 import time_machine
 from azure.core.exceptions import ResourceNotFoundError
@@ -439,6 +441,23 @@ class TestS3StateStoreManager:
 
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
+
+    @pytest.mark.xfail(
+        reason="Fails the first time because the object does not exist",
+        raises=OSError,
+        strict=True,
+    )
+    def test_set_first_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+        state_id = uuid.uuid4().hex
+        with moto.mock_aws():
+            store_manager = S3StateStoreManager(
+                uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
+                lock_timeout_seconds=10,
+            )
+            store_manager.client.create_bucket(Bucket=store_manager.bucket)
+            store_manager.set(JobState(state_id=state_id, completed_state={}))
 
     def test_delete(self, subject: S3StateStoreManager) -> None:
         response = {
