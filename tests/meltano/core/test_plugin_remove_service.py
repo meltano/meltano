@@ -127,6 +127,7 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove(self, subject: PluginRemoveService) -> None:
+        subject.project.refresh()
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
@@ -154,6 +155,7 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("no_plugins")
     def test_remove_not_added_or_installed(self, subject: PluginRemoveService) -> None:
+        subject.project.refresh()
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
@@ -189,6 +191,8 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_meltano_yml_error(self, subject: PluginRemoveService) -> None:
+        subject.project.refresh()
+
         def raise_permissionerror(filename) -> t.NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
@@ -204,6 +208,8 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_installation_error(self, subject: PluginRemoveService) -> None:
+        subject.project.refresh()
+
         def raise_permissionerror(filename) -> t.NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
@@ -217,7 +223,8 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install")
     def test_remove_lockfile_not_found(self, subject: PluginRemoveService) -> None:
-        plugins = list(subject.project.plugins.plugins())
+        subject.project.refresh()
+        plugins = list(subject.project.plugins.plugins(ensure_parent=False))
         removed_plugins, _ = subject.remove_plugins(plugins)
 
         assert removed_plugins == 0
