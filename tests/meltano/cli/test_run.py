@@ -137,7 +137,7 @@ class EventMatcher:
         for line in result_output.splitlines():
             try:
                 parsed_line = json.loads(line)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError:  # pragma: no cover
                 self.seen_raw.append(line)
                 continue
             self.seen_events.append(parsed_line)
