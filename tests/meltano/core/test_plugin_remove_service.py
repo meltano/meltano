@@ -57,6 +57,19 @@ class TestPluginRemoveService:
             meltano_yml.write(yaml.dump(original))
 
     @pytest.fixture()
+    def no_plugins(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+        with subject.project.meltanofile.open("r") as meltano_yml:
+            original = yaml.safe_load(meltano_yml)
+
+        with subject.project.meltanofile.open("w") as meltano_yml:
+            meltano_yml.write(yaml.dump({"plugins": {}}))
+
+        yield
+
+        with subject.project.meltanofile.open("w") as meltano_yml:
+            meltano_yml.write(yaml.dump(original))
+
+    @pytest.fixture()
     def install(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
@@ -139,11 +152,12 @@ class TestPluginRemoveService:
             )
             assert all(not path.exists() for path in lock_file_paths)
 
+    @pytest.mark.usefixtures("no_plugins")
     def test_remove_not_added_or_installed(self, subject: PluginRemoveService) -> None:
         plugins = list(subject.project.plugins.plugins())
         removed_plugins, total_plugins = subject.remove_plugins(plugins)
 
-        assert removed_plugins == 0
+        assert removed_plugins == total_plugins == 0
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_db_error(self, subject: PluginRemoveService) -> None:
