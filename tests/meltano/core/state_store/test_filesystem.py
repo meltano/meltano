@@ -455,6 +455,32 @@ class TestS3StateStoreManager:
             store_manager.client.create_bucket(Bucket=store_manager.bucket)
             store_manager.set(JobState(state_id=state_id, completed_state={}))
 
+    def test_set_fail_object_in_glacier(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+        state_id = uuid.uuid4().hex
+        with moto.mock_aws():
+            store_manager = S3StateStoreManager(
+                uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
+                lock_timeout_seconds=10,
+            )
+            store_manager.client.create_bucket(Bucket=store_manager.bucket)
+            store_manager.client.put_object(
+                Bucket=store_manager.bucket,
+                Key=f"state/{state_id}/state.json",
+                Body=json.dumps({}).encode(),
+                StorageClass="GLACIER",
+            )
+            with pytest.raises(OSError, match="unable to access") as exc_info:
+                store_manager.set(JobState(state_id=state_id, completed_state={}))
+
+            exc = exc_info.value
+            assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
+            assert exc.__cause__.response["Error"]["Code"] == "InvalidObjectState"
+
     def test_set_fail_bucket_does_not_exist(
         self,
         monkeypatch: pytest.MonkeyPatch,
