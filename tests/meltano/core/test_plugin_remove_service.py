@@ -3,6 +3,7 @@ from __future__ import annotations
 import errno
 import json
 import os
+import shutil
 import typing as t
 
 import mock
@@ -22,7 +23,10 @@ class TestPluginRemoveService:
         return PluginRemoveService(project)
 
     @pytest.fixture()
-    def add(self, subject: PluginRemoveService) -> None:
+    def add(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+        with subject.project.meltanofile.open("r") as meltano_yml:
+            original = yaml.safe_load(meltano_yml)
+
         with subject.project.meltanofile.open("w") as meltano_yml:
             meltano_yml.write(
                 yaml.dump(
@@ -47,8 +51,13 @@ class TestPluginRemoveService:
                 ),
             )
 
+        yield
+
+        with subject.project.meltanofile.open("w") as meltano_yml:
+            meltano_yml.write(yaml.dump(original))
+
     @pytest.fixture()
-    def install(self, subject: PluginRemoveService) -> None:
+    def install(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
             "tap-gitlab",
@@ -59,9 +68,12 @@ class TestPluginRemoveService:
         )
         tap_gitlab_installation.mkdir(parents=True, exist_ok=True)
         target_csv_installation.mkdir(parents=True, exist_ok=True)
+        yield
+        shutil.rmtree(tap_gitlab_installation, ignore_errors=True)
+        shutil.rmtree(target_csv_installation, ignore_errors=True)
 
     @pytest.fixture()
-    def lock(self, subject: PluginRemoveService) -> None:
+    def lock(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",
             "tap-gitlab",
@@ -93,6 +105,9 @@ class TestPluginRemoveService:
                 },
                 f,
             )
+        yield
+        tap_gitlab_lockfile.unlink(missing_ok=True)
+        target_csv_lockfile.unlink(missing_ok=True)
 
     def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
