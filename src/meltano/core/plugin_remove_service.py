@@ -32,8 +32,11 @@ class PluginRemoveService:
     def remove_plugins(
         self,
         plugins: t.Sequence[ProjectPlugin],
-        plugin_status_cb=noop,  # noqa: ANN001
-        removal_manager_status_cb=noop,  # noqa: ANN001
+        plugin_status_cb: t.Callable[[ProjectPlugin], None] = noop,
+        removal_manager_status_cb: t.Callable[
+            [PluginLocationRemoveManager],
+            None,
+        ] = noop,
     ) -> tuple[int, int]:
         """Remove multiple plugins.
 
