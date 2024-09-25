@@ -442,11 +442,6 @@ class TestS3StateStoreManager:
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
 
-    @pytest.mark.xfail(
-        reason="Fails the first time because the object does not exist",
-        raises=OSError,
-        strict=True,
-    )
     def test_set_first_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
         monkeypatch.delenv("AWS_PROFILE", raising=False)
