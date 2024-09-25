@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 
 import sqlalchemy
+import sqlalchemy.exc
 
 from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
@@ -32,7 +33,7 @@ class PluginLocationRemoveStatus(Enum):
 class PluginLocationRemoveManager(ABC):
     """Handle removal of a plugin from a given location."""
 
-    def __init__(self, plugin: ProjectPlugin, location):  # noqa: ANN001
+    def __init__(self, plugin: ProjectPlugin, location: str) -> None:
         """Construct a PluginLocationRemoveManager instance.
 
         Args:
@@ -43,10 +44,10 @@ class PluginLocationRemoveManager(ABC):
         self.plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
         self.location = location
         self.remove_status: PluginLocationRemoveStatus | None = None
-        self.remove_message = None
+        self.message: str | None = None
 
     @abstractmethod
-    def remove(self):  # noqa: ANN201
+    def remove(self) -> None:
         """Abstract remove method."""
 
     @property
@@ -80,7 +81,7 @@ class PluginLocationRemoveManager(ABC):
 class DbRemoveManager(PluginLocationRemoveManager):
     """Handle removal from the system db `plugin_settings` table."""
 
-    def __init__(self, plugin, project) -> None:  # noqa: ANN001
+    def __init__(self, plugin: ProjectPlugin, project: Project) -> None:
         """Construct a DbRemoveManager instance.
 
         Args:
@@ -105,7 +106,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
             )
         except sqlalchemy.exc.OperationalError as err:
             self.remove_status = PluginLocationRemoveStatus.ERROR
-            self.message = err.orig
+            self.message = str(err.orig) if err.orig else str(err)
             return
 
         self.remove_status = PluginLocationRemoveStatus.REMOVED
@@ -114,7 +115,7 @@ class DbRemoveManager(PluginLocationRemoveManager):
 class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin from `meltano.yml`."""
 
-    def __init__(self, plugin, project: Project):  # noqa: ANN001
+    def __init__(self, plugin: ProjectPlugin, project: Project) -> None:
         """Construct a MeltanoYmlRemoveManager instance.
 
         Args:
@@ -142,7 +143,7 @@ class MeltanoYmlRemoveManager(PluginLocationRemoveManager):
 class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin locked definition from `plugins/`."""
 
-    def __init__(self, plugin, project: Project):  # noqa: ANN001
+    def __init__(self, plugin: ProjectPlugin, project: Project) -> None:
         """Construct a LockedDefinitionRemoveManager instance.
 
         Args:
@@ -178,7 +179,7 @@ class LockedDefinitionRemoveManager(PluginLocationRemoveManager):
 class InstallationRemoveManager(PluginLocationRemoveManager):
     """Handle removal of a plugin installation from `.meltano`."""
 
-    def __init__(self, plugin, project: Project):  # noqa: ANN001
+    def __init__(self, plugin: ProjectPlugin, project: Project) -> None:
         """Construct a InstallationRemoveManager instance.
 
         Args:

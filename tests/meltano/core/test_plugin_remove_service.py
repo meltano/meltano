@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import errno
+import json
 import os
-from typing import NoReturn  # noqa: ICN003
+import typing as t
 
 import mock
 import pytest
@@ -10,6 +11,9 @@ import yaml
 from sqlalchemy.exc import OperationalError
 
 from meltano.core.plugin_remove_service import PluginRemoveService
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin_location_remove import PluginLocationRemoveManager
 
 
 class TestPluginRemoveService:
@@ -27,13 +31,15 @@ class TestPluginRemoveService:
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "variant": "meltanolabs",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
                                 },
                             ],
                             "loaders": [
                                 {
                                     "name": "target-csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                    "variant": "meltanolabs",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
                                 },
                             ],
                         },
@@ -64,10 +70,29 @@ class TestPluginRemoveService:
         target_csv_lockfile = subject.project.plugin_lock_path(
             "loaders",
             "target-csv",
-            variant_name="hotgluexyz",
+            variant_name="meltanolabs",
         )
-        tap_gitlab_lockfile.touch()
-        target_csv_lockfile.touch()
+        with tap_gitlab_lockfile.open("w") as f:
+            json.dump(
+                {
+                    "plugin_type": "extractors",
+                    "name": "tap-gitlab",
+                    "namespace": "tap_gitlab",
+                    "variant": "meltanolabs",
+                },
+                f,
+            )
+
+        with target_csv_lockfile.open("w") as f:
+            json.dump(
+                {
+                    "plugin_type": "loaders",
+                    "name": "target-csv",
+                    "namespace": "target_csv",
+                    "variant": "meltanolabs",
+                },
+                f,
+            )
 
     def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
@@ -107,7 +132,15 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_db_error(self, subject: PluginRemoveService) -> None:
+        subject.project.refresh()
         plugins = list(subject.project.plugins.plugins())
+
+        assert plugins
+
+        errors = []
+
+        def _collect_error(manager: PluginLocationRemoveManager) -> None:
+            errors.append(manager.message)
 
         with mock.patch(
             "meltano.core.plugin_location_remove.PluginSettingsService.reset",
@@ -117,13 +150,17 @@ class TestPluginRemoveService:
                 ("extractors.tap-csv.default"),
                 "attempt to write a readonly database",
             )
-            removed_plugins, _ = subject.remove_plugins(plugins)
+            removed_plugins, _ = subject.remove_plugins(
+                plugins,
+                removal_manager_status_cb=_collect_error,
+            )
 
         assert removed_plugins == 0
+        assert errors.count("attempt to write a readonly database") == len(plugins)
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_meltano_yml_error(self, subject: PluginRemoveService) -> None:
-        def raise_permissionerror(filename) -> NoReturn:
+        def raise_permissionerror(filename) -> t.NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())
@@ -138,7 +175,7 @@ class TestPluginRemoveService:
 
     @pytest.mark.usefixtures("add", "install", "lock")
     def test_remove_installation_error(self, subject: PluginRemoveService) -> None:
-        def raise_permissionerror(filename) -> NoReturn:
+        def raise_permissionerror(filename) -> t.NoReturn:
             raise OSError(errno.EACCES, os.strerror(errno.ENOENT), filename)
 
         plugins = list(subject.project.plugins.plugins())
