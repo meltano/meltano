@@ -102,6 +102,10 @@ class MetadataRule(CatalogRule):  # noqa: D101
         self.key = key
         self.value = value
 
+    def __repr__(self) -> str:
+        """Return a string representation of the rule."""
+        return f"{self.tap_stream_id} {self.breadcrumb} {self.key}={self.value}"
+
 
 class SchemaRule(CatalogRule):  # noqa: D101
     def __init__(
@@ -151,8 +155,8 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if re.search(UNESCAPED_DOT, pattern):
-            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
+        if UNESCAPED_DOT.search(pattern):
+            stream, prop = UNESCAPED_DOT.split(pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
@@ -206,6 +210,19 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     value=selected,
                 ),
             )
+
+            # If all sub-properties are selected, the parent property is selected too
+            if selected:
+                rules.extend(
+                    MetadataRule(
+                        tap_stream_id=pattern.stream_pattern,
+                        breadcrumb=property_breadcrumb(props[:idx]),
+                        key="selected",
+                        value=selected,
+                    )
+                    for idx, prop in enumerate(props)
+                    if prop == "*"
+                )
 
     return include_rules + exclude_rules
 
