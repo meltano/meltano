@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.5.4 (2024-09-25)
+
+### 🐛 Fixes
+
+- [#8802](https://github.com/meltano/meltano/issues/8802) No longer fail on uploading state to S3 when the object does not initially exist
+- [#8800](https://github.com/meltano/meltano/issues/8800) Failure message is now correctly printed when a plugin can not be removed from the system database
+
+## v3.5.3 (2024-09-24)
+
+### 🐛 Fixes
+
+- [#8784](https://github.com/meltano/meltano/issues/8784) Inheriting plugins are no longer always auto-installed -- _**Thanks @ReubenFrankel!**_
+- [#8785](https://github.com/meltano/meltano/issues/8785) Install plugins correctly given multiple levels of inheritance -- _**Thanks @ReubenFrankel!**_
+
+### 📚 Documentation Improvements
+
+- [#8779](https://github.com/meltano/meltano/issues/8779) Fix layout of troubleshooting page
+
 ## v3.5.2 (2024-09-16)
 
 ### 🐛 Fixes

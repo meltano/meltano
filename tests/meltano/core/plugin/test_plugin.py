@@ -591,17 +591,17 @@ class TestProjectPlugin:
         # Plugin doesn't have any utility requirements
         assert not transformer.all_requires[PluginType.UTILITIES]
 
-    def test_venv_name(self):
+    def test_plugin_dir_name(self):
         """Validate the virtual environment name.
 
-        - If the plugin has a pip_url, the venv name is the plugin name.
-        - If the plugin is an inherited plugin without a custom pip_url, the venv name
-          is the parent plugin name.
-        - For multiple levels of inheritance, the venv name is the name of the first
-          plugin in the inheritance chain that has a pip_url.
+        - If the plugin has a pip_url, the plugin dir name is the plugin name.
+        - If the plugin is an inherited plugin without a custom pip_url, the plugin dir
+          name is the parent plugin name.
+        - For multiple levels of inheritance, the plugin dir name is the name of the
+          first plugin in the inheritance chain that has a pip_url.
         """
         base: ProjectPlugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        assert base.venv_name == "tap-mock"
+        assert base.plugin_dir_name == "tap-mock"
 
         inherited: ProjectPlugin = ProjectPlugin(
             PluginType.EXTRACTORS,
@@ -609,7 +609,7 @@ class TestProjectPlugin:
             inherit_from="tap-mock",
         )
         inherited.parent = base
-        assert inherited.venv_name == "tap-mock"
+        assert inherited.plugin_dir_name == "tap-mock"
 
         inception: ProjectPlugin = ProjectPlugin(
             PluginType.EXTRACTORS,
@@ -617,7 +617,7 @@ class TestProjectPlugin:
             inherit_from="tap-mock--inherited",
         )
         inception.parent = inherited
-        assert inception.venv_name == "tap-mock"
+        assert inception.plugin_dir_name == "tap-mock"
 
         inherited_custom: ProjectPlugin = ProjectPlugin(
             PluginType.EXTRACTORS,
@@ -626,7 +626,7 @@ class TestProjectPlugin:
             pip_url="tap-mock--inherited-custom",
         )
         inherited_custom.parent = base
-        assert inherited_custom.venv_name == "tap-mock--inherited-custom"
+        assert inherited_custom.plugin_dir_name == "tap-mock--inherited-custom"
 
         inception_custom: ProjectPlugin = ProjectPlugin(
             PluginType.EXTRACTORS,
@@ -635,7 +635,7 @@ class TestProjectPlugin:
             pip_url="tap-mock--inception-custom",
         )
         inception_custom.parent = inherited
-        assert inception_custom.venv_name == "tap-mock--inception-custom"
+        assert inception_custom.plugin_dir_name == "tap-mock--inception-custom"
 
 
 class TestPluginType:

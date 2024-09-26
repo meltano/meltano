@@ -181,6 +181,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="http://www.deploymentzone.com"><img src="https://avatars.githubusercontent.com/u/135105?v=4?s=100" width="100px;" alt="Charles Feduke"/><br /><sub><b>Charles Feduke</b></sub></a><br /><a href="#question-cfeduke" title="Answering Questions">💬</a> <a href="#mentoring-cfeduke" title="Mentoring">🧑‍🏫</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/holly-evans"><img src="https://avatars.githubusercontent.com/u/39742776?v=4?s=100" width="100px;" alt="Holly Evans"/><br /><sub><b>Holly Evans</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=holly-evans" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

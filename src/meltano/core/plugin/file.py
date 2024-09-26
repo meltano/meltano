@@ -66,6 +66,9 @@ class FilePlugin(BasePlugin):
         Returns:
             A dictionary of file names and their contents.
         """
+        # This ignores plugin inheritance, but that's fine because the file contents
+        # are bundled with the package, so they should be the same for all plugins that
+        # share a pip_url.
         venv = VirtualEnv(project.plugin_dir(self, "venv"))
         bundle_dir = venv.site_packages_dir / "bundle"
 
@@ -120,7 +123,7 @@ class FilePlugin(BasePlugin):
             A dictionary of file names and their contents.
         """
 
-        def with_update_header(content: str, relative_path: PathLike):  # noqa: ANN202
+        def with_update_header(content: str, relative_path: Path) -> str:
             return (
                 "\n\n".join([self.update_file_header(relative_path), content])
                 if any(relative_path.match(path) for path in paths_to_update)
@@ -192,7 +195,7 @@ class FilePlugin(BasePlugin):
             A dictionary of file names and their contents.
         """
 
-        def rename_if_exists(relative_path: Path):  # noqa: ANN202
+        def rename_if_exists(relative_path: Path) -> Path:
             if not project.root_dir(relative_path).exists():
                 return relative_path
 
