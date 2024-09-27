@@ -15,6 +15,7 @@ from meltano.core.plugin.singer.catalog import (
     SelectExecutor,
     SelectionType,
     path_property,
+    select_metadata_rules,
     visit,
 )
 
@@ -826,6 +827,31 @@ class TestCatalogRule:
         # Stream ID doesn't match (good!), but breadcrumb doesn't match
         assert not rule.match("tap_stream", [])
         assert not rule.match("tap_stream", ["property", "nested"])
+
+
+class TestMetadataRule:
+    def test_all_subproperties_selected(self):
+        pattern = "my_stream.prop.*"
+        assert select_metadata_rules([pattern]) == [
+            MetadataRule(
+                "my_stream",
+                [],
+                "selected",
+                value=True,
+            ),
+            MetadataRule(
+                "my_stream",
+                ["properties", "prop", "properties", "*"],
+                "selected",
+                value=True,
+            ),
+            MetadataRule(
+                "my_stream",
+                ["properties", "prop"],
+                "selected",
+                value=True,
+            ),
+        ]
 
 
 class TestLegacyCatalogSelectVisitor:
