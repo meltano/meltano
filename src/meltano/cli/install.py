@@ -84,7 +84,7 @@ async def install(
             plugin_type = PluginType.from_cli_argument(plugin_type)
             plugins = project.plugins.get_plugins_of_type(plugin_type)
         else:
-            plugins = list(project.plugins.plugins())
+            plugins = [p for p in project.plugins.plugins() if not p.is_mapping()]
 
         if plugin_name:
             plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
