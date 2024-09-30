@@ -122,7 +122,7 @@ class TestPluginInstallService:
                     },
                 ],
             )
-        except PluginAlreadyAddedException as err:
+        except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
     @pytest.fixture()
