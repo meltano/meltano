@@ -310,14 +310,7 @@ class PluginInstallService:
         """
         env = self.plugin_installation_env(plugin)
 
-        if (
-            (
-                reason == PluginInstallReason.AUTO
-                and not self._requires_install(plugin, env=env)
-            )
-            or not plugin.is_installable()
-            or self._is_mapping(plugin)
-        ):
+        if not self._requires_install(plugin, reason, env=env):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -395,9 +388,16 @@ class PluginInstallService:
     def _requires_install(
         self,
         plugin: ProjectPlugin,
+        reason: PluginInstallReason,
         *,
         env: t.Mapping[str, str] | None = None,
     ) -> bool:
+        if not plugin.is_installable():
+            return False
+
+        if reason is not PluginInstallReason.AUTO:
+            return not self._is_mapping(plugin)
+
         try:
             pip_install_args = get_pip_install_args(
                 self.project,
