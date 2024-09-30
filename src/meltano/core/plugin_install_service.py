@@ -21,7 +21,6 @@ from meltano.core.error import (
     PluginInstallError,
     PluginInstallWarning,
 )
-from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import (
@@ -310,14 +309,7 @@ class PluginInstallService:
         """
         env = self.plugin_installation_env(plugin)
 
-        if (
-            (
-                reason == PluginInstallReason.AUTO
-                and not self._requires_install(plugin, env=env)
-            )
-            or not plugin.is_installable()
-            or self._is_mapping(plugin)
-        ):
+        if not self._requires_install(plugin, reason, env=env):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -395,9 +387,16 @@ class PluginInstallService:
     def _requires_install(
         self,
         plugin: ProjectPlugin,
+        reason: PluginInstallReason,
         *,
         env: t.Mapping[str, str] | None = None,
     ) -> bool:
+        if not plugin.is_installable():
+            return False
+
+        if reason is not PluginInstallReason.AUTO:
+            return not plugin.is_mapping()
+
         try:
             pip_install_args = get_pip_install_args(
                 self.project,
@@ -418,25 +417,6 @@ class PluginInstallService:
 
         venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
         return fingerprint(pip_install_args) != venv.read_fingerprint()
-
-    @staticmethod
-    def _is_mapping(plugin: ProjectPlugin) -> bool:
-        """Check if a plugin is a mapping, as mappings are not installed.
-
-        Mappings are `PluginType.MAPPERS` with extra attribute of `_mapping`
-        which will indicate that this instance of the plugin is actually a
-        mapping - and should not be installed.
-
-        Args:
-            plugin: ProjectPlugin to evaluate.
-
-        Returns:
-            A boolean determining if the given plugin is a mapping (of type
-            `PluginType.MAPPERS`).
-        """
-        return plugin.type == PluginType.MAPPERS and bool(
-            plugin.extra_config.get("_mapping")
-        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.

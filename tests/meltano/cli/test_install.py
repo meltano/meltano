@@ -238,7 +238,7 @@ class TestCliInstall:
             assert not kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 1
 
     def test_clean_install(
         self,
@@ -274,7 +274,7 @@ class TestCliInstall:
             assert kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 1
 
     @pytest.mark.usefixtures("tap_gitlab", "target")
     def test_install_schedule(

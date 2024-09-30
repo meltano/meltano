@@ -454,3 +454,18 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             for plugin_type, deps in self.all_requires.items()
             for dep in deps
         ]
+
+    def is_mapping(self) -> bool:
+        """Check if the plugin is a mapping, as mappings are not installed.
+
+        Mappings are `PluginType.MAPPERS` with extra attribute of `_mapping`
+        which will indicate that this instance of the plugin is actually a
+        mapping - and should not be installed.
+
+        Returns:
+            A boolean determining if the plugin is a mapping (of type
+            `PluginType.MAPPERS`).
+        """
+        return self.type is PluginType.MAPPERS and bool(
+            self.extra_config.get("_mapping")
+        )
