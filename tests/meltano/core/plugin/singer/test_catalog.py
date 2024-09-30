@@ -830,28 +830,87 @@ class TestCatalogRule:
 
 
 class TestMetadataRule:
-    def test_all_subproperties_selected(self):
-        pattern = "my_stream.prop.*"
-        assert select_metadata_rules([pattern]) == [
-            MetadataRule(
-                "my_stream",
-                [],
-                "selected",
-                value=True,
+    @pytest.mark.parametrize(
+        ("patterns", "expected"),
+        (
+            pytest.param(
+                ("my_stream.prop.*",),
+                [
+                    MetadataRule(
+                        "my_stream",
+                        [],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "prop", "properties", "*"],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "prop"],
+                        "selected",
+                        value=True,
+                    ),
+                ],
+                id="select all sub-properties of a property",
             ),
-            MetadataRule(
-                "my_stream",
-                ["properties", "prop", "properties", "*"],
-                "selected",
-                value=True,
+            pytest.param(
+                ("my_stream.*",),
+                [
+                    MetadataRule(
+                        "my_stream",
+                        [],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "*"],
+                        "selected",
+                        value=True,
+                    ),
+                ],
+                id="select all properties of a stream",
             ),
-            MetadataRule(
-                "my_stream",
-                ["properties", "prop"],
-                "selected",
-                value=True,
+            pytest.param(
+                ("my_stream.prop.*.*",),
+                [
+                    MetadataRule(
+                        "my_stream",
+                        [],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "prop", "properties", "*", "properties", "*"],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "prop"],
+                        "selected",
+                        value=True,
+                    ),
+                    MetadataRule(
+                        "my_stream",
+                        ["properties", "prop", "properties", "*"],
+                        "selected",
+                        value=True,
+                    ),
+                ],
+                id="select all sub-properties of all properties",
             ),
-        ]
+        ),
+    )
+    def test_rules_from_patterns(
+        self, patterns: tuple[str], expected: list[MetadataRule]
+    ) -> None:
+        assert select_metadata_rules(patterns) == expected
 
 
 class TestLegacyCatalogSelectVisitor:
@@ -1045,7 +1104,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
     @pytest.mark.parametrize(
-        ("rules", "attrs"),
+        ("patterns", "attrs"),
         (
             pytest.param(
                 ["MyStream.*"],
@@ -1130,9 +1189,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             ),
         ),
     )
-    def test_select_stream_star(
-        self, rules: list[MetadataRule], attrs: set[str]
-    ) -> None:
+    def test_select_stream_star(self, patterns: list[str], attrs: set[str]) -> None:
         catalog = {
             "streams": [
                 {
@@ -1249,7 +1306,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 },
             ],
         }
-        selector = SelectExecutor(rules)
+        selector = SelectExecutor(patterns)
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()

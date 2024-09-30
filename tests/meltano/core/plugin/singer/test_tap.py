@@ -367,7 +367,6 @@ class TestSingerTap:
                 ["*", ["properties", "*"], "selected", False],
                 ["*", [], "selected", True],
                 ["*", ["properties", "*"], "selected", True],
-                ["*", [], "selected", True],
             )
 
             reset_catalog()
