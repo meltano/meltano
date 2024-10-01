@@ -1144,13 +1144,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                 id="stream.field.*",
             ),
             pytest.param(
-                ["MyStream.geo", "MyStream.geo.city"],
-                {"id", "geo", "geo.city"},
+                ["MyStream.geo.city"],
+                {"id", "geo.city"},
                 id="stream.field.subfield",
             ),
             pytest.param(
-                ["MyStream.geo", "MyStream.geo.point.*"],
-                {"id", "geo", "geo.point", "geo.point.lat", "geo.point.lon"},
+                ["MyStream.geo.point.*"],
+                {"id", "geo.point", "geo.point.lat", "geo.point.lon"},
                 id="stream.field.subfield.*",
             ),
             pytest.param(
