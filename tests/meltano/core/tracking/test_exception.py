@@ -3,6 +3,7 @@ from __future__ import annotations
 import inspect
 import json
 import platform
+import sys
 import typing as t
 import uuid
 import warnings
@@ -135,7 +136,14 @@ def test_complex_exception_context() -> None:
         "file": f".../{THIS_FILE_BASENAME}",
         "line_number": line_nums[1],
     }
-    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/pathlib.py"
+
+    if sys.version_info < (3, 13):
+        pathlib_loc = "pathlib.py"
+    else:
+        # https://github.com/python/cpython/pull/118582
+        pathlib_loc = "pathlib/_local.py"
+
+    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/{pathlib_loc}"
     assert cause["cause"] is None
     assert cause["context"] is None
 
