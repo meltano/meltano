@@ -326,17 +326,17 @@ tzdata = ["tzdata"]
 
 [[package]]
 name = "boto3"
-version = "1.35.29"
+version = "1.35.34"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.35.29-py3-none-any.whl", hash = "sha256:2244044cdfa8ac345d7400536dc15a4824835e7ec5c55bc267e118af66bb27db"},
-    {file = "boto3-1.35.29.tar.gz", hash = "sha256:7bbb1ee649e09e956952285782cfdebd7e81fc78384f48dfab3d66c6eaf3f63f"},
+    {file = "boto3-1.35.34-py3-none-any.whl", hash = "sha256:291e7b97a34967ed93297e6171f1bebb8529e64633dd48426760e3fdef1cdea8"},
+    {file = "boto3-1.35.34.tar.gz", hash = "sha256:57e6ee8504e7929bc094bb2afc879943906064179a1e88c23b4812e2c6f61532"},
 ]
 
 [package.dependencies]
-botocore = ">=1.35.29,<1.36.0"
+botocore = ">=1.35.34,<1.36.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -761,13 +761,13 @@ xray = ["mypy-boto3-xray (>=1.35.0,<1.36.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.35.29"
+version = "1.35.34"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.35.29-py3-none-any.whl", hash = "sha256:f8e3ae0d84214eff3fb69cb4dc51cea6c43d3bde82027a94d00c52b941d6c3d5"},
-    {file = "botocore-1.35.29.tar.gz", hash = "sha256:4ed28ab03675bb008a290c452c5ddd7aaa5d4e3fa1912aadbdf93057ee84362b"},
+    {file = "botocore-1.35.34-py3-none-any.whl", hash = "sha256:ccb0fe397b11b81c9abc0c87029d17298e17bf658d8db5c0c5a551a12a207e7a"},
+    {file = "botocore-1.35.34.tar.gz", hash = "sha256:789b6501a3bb4a9591c1fe10da200cc315c1fa5df5ada19c720d8ef06439b3e3"},
 ]
 
 [package.dependencies]
@@ -779,7 +779,7 @@ urllib3 = [
 ]
 
 [package.extras]
-crt = ["awscrt (==0.21.5)"]
+crt = ["awscrt (==0.22.0)"]
 
 [[package]]
 name = "botocore-stubs"
@@ -1012,13 +1012,13 @@ files = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.29.2"
+version = "0.29.3"
 description = "A jsonschema CLI and pre-commit hook"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "check_jsonschema-0.29.2-py3-none-any.whl", hash = "sha256:6470ff23d848a26b1e77db1141827002f5fff3138295d3345c19b2410d345aa0"},
-    {file = "check_jsonschema-0.29.2.tar.gz", hash = "sha256:a633aae257f16e5298853edf18fd30ab94878fd88bd6b91902cd7158151c675d"},
+    {file = "check_jsonschema-0.29.3-py3-none-any.whl", hash = "sha256:58d0486e951811744549fa40411e64a6d74bd88c94d9d7fd061e5bf635ff689c"},
+    {file = "check_jsonschema-0.29.3.tar.gz", hash = "sha256:3838b6d6da536496516d08a1779e7a11737628f84b444fe95d397b96fc8cc73f"},
 ]
 
 [package.dependencies]
@@ -1032,7 +1032,7 @@ tomli = {version = ">=2.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 dev = ["click-type-test (==0.0.7)", "coverage (<8)", "pytest (<9)", "pytest-xdist (<4)", "responses (==0.25.3)"]
-docs = ["furo (==2024.7.18)", "sphinx (<8)", "sphinx-issues (<5)"]
+docs = ["furo (==2024.8.6)", "sphinx (<9)", "sphinx-issues (<5)"]
 
 [[package]]
 name = "click"
@@ -3636,13 +3636,13 @@ files = [
 
 [[package]]
 name = "smart-open"
-version = "7.0.4"
+version = "7.0.5"
 description = "Utils for streaming large files (S3, HDFS, GCS, Azure Blob Storage, gzip, bz2...)"
 optional = false
 python-versions = "<4.0,>=3.7"
 files = [
-    {file = "smart_open-7.0.4-py3-none-any.whl", hash = "sha256:4e98489932b3372595cddc075e6033194775165702887216b65eba760dfd8d47"},
-    {file = "smart_open-7.0.4.tar.gz", hash = "sha256:62b65852bdd1d1d516839fcb1f6bc50cd0f16e05b4ec44b52f43d38bcb838524"},
+    {file = "smart_open-7.0.5-py3-none-any.whl", hash = "sha256:8523ed805c12dff3eaa50e9c903a6cb0ae78800626631c5fe7ea073439847b89"},
+    {file = "smart_open-7.0.5.tar.gz", hash = "sha256:d3672003b1dbc85e2013e4983b88eb9a5ccfd389b0d4e5015f39a9ee5620ec18"},
 ]
 
 [package.dependencies]
@@ -3655,7 +3655,7 @@ gcs = ["google-cloud-storage (>=2.6.0)"]
 http = ["requests"]
 s3 = ["boto3"]
 ssh = ["paramiko"]
-test = ["azure-common", "azure-core", "azure-storage-blob", "boto3", "google-cloud-storage (>=2.6.0)", "moto[server]", "paramiko", "pytest", "pytest-rerunfailures", "requests", "responses", "zstandard"]
+test = ["awscli", "azure-common", "azure-core", "azure-storage-blob", "boto3", "google-cloud-storage (>=2.6.0)", "moto[server]", "numpy", "paramiko", "pyopenssl", "pytest", "pytest-benchmark", "pytest-rerunfailures", "requests", "responses", "zstandard"]
 webhdfs = ["requests"]
 zst = ["zstandard"]
 
@@ -4021,29 +4021,29 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uv"
-version = "0.4.17"
+version = "0.4.18"
 description = "An extremely fast Python package and project manager, written in Rust."
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "uv-0.4.17-py3-none-linux_armv6l.whl", hash = "sha256:0da45ca164ef9701dcc5cac3256f1f3a4e6fabe026860101c3b14208bfbde831"},
-    {file = "uv-0.4.17-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:df5dabafa07d9beae719bf4df649cb6d825620f0bb3abf985df99fd0394dbbb6"},
-    {file = "uv-0.4.17-py3-none-macosx_11_0_arm64.whl", hash = "sha256:e88911392d0eef4019a1db64951eefd1081a6dda72e33ee4b5b77b32f1112a33"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:8844740de53f3997175961c90ff4441e0ea7cb1d11e27b662258f8728f7623b2"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:b3cad9f33c38a891c3adc3cedfa8171e5d1d696d03c850ecd454e16551b1308b"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f727a356e772c3cdc7752d8d9971e614670658f5219eda2449290c5c4a5c91cf"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:15cfd020ad4a72f17e669d070a1a8ab50f93ce899486a80029cabf87fac3a8ae"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:897c5d7d50341023f28b96afd0bf2553d67f3f46c12986d5ee02e517cf7d5c5a"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:87e4c3b6415e0ce6880023960d7bb7fc08acafc97a4e03c7ce8b6a49ad0c698e"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:39c862a5fae944ea89dca5bf77bf636ac26398f96179bca19e4db26121707cd0"},
-    {file = "uv-0.4.17-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:dfe717c980d3206d4810b5121566a1e07114b9dd470b6f9f6ebed3706c21517d"},
-    {file = "uv-0.4.17-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:44360f88b8e67e36fed00976b94d3f1144faa1c5291e8f6f5306c3ded650e9bf"},
-    {file = "uv-0.4.17-py3-none-musllinux_1_1_i686.whl", hash = "sha256:489f68441092827fcd590a99f91269d5fb3b5f9cca1da469f7fc3d5ef3bf3e37"},
-    {file = "uv-0.4.17-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:1a4098128ee54f8b4ca1b083d05f818548cf7182b5b6cbb74fd71235bd105b1d"},
-    {file = "uv-0.4.17-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:8acb510475dd8dbce71533384b95a8b2ad204f10081c92d9d012d193bd4df884"},
-    {file = "uv-0.4.17-py3-none-win32.whl", hash = "sha256:7b27e69454d8f65d800bc61a3d05288cacf8e56b9b716b629b2b6977e85ceabe"},
-    {file = "uv-0.4.17-py3-none-win_amd64.whl", hash = "sha256:6141f08aad242372dff4b529b9d26c814e151e95d1a8c85d645a7eb11b0cb34a"},
-    {file = "uv-0.4.17.tar.gz", hash = "sha256:01564bd760eff885ad61f44173647a569732934d1a4a558839c8088fbf75e53f"},
+    {file = "uv-0.4.18-py3-none-linux_armv6l.whl", hash = "sha256:1944c0ee567ca7db60705c5d213a75b25601094b026cc17af3e704651c1e3753"},
+    {file = "uv-0.4.18-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:5234d47abe339c15c318e8b1bbd136ea61c4574503eda6944a5aaea91b7f6775"},
+    {file = "uv-0.4.18-py3-none-macosx_11_0_arm64.whl", hash = "sha256:0c4cb31594cb2ed21bd3b603a207e99dfb9610c3db44da9dbbff0f237270f582"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64.whl", hash = "sha256:8af0b60adcfa2e87c77a3008d3ed6e0b577c0535468dc58e06f905ccbd27124f"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:f043c3c4514c149a00a86c3bf44df43062416d41002114e60df33895e8511c41"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1b59d742b81c7acf75a3aac71d9b24e07407e044bebcf39d3fc3c87094014e20"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:fcc606da545d9a5ec5c2209e7eb2a4eb76627ad75df5eb5616c0b40789fe3933"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:96c3ccee0fd8cf0a9d679407e157b76db1a854638a4ba4fa14f4d116b4e39b03"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:df225a568da01f3d7e126d886c3694c5a4a7d8b85162a4d6e97822716ca0e7c4"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b08564c8c7e8b3665ad1d6c8924d4654451f96c956eb5f3b8ec995c77734163d"},
+    {file = "uv-0.4.18-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:4be600474db6733078503012f2811c4383f490f77366e66b5f686316db52c870"},
+    {file = "uv-0.4.18-py3-none-musllinux_1_1_armv7l.whl", hash = "sha256:3e3ade81af961f48517fcd99318192c9c635ef9a38a7ca65026af0c803c71906"},
+    {file = "uv-0.4.18-py3-none-musllinux_1_1_i686.whl", hash = "sha256:4ec60141f92c9667548ebad8daf4c13aabdb58b22c21dcd834641e791e55f289"},
+    {file = "uv-0.4.18-py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:6566448278b6849846b6c586fc86748c66aa53ed70f5568e713122543cc86a50"},
+    {file = "uv-0.4.18-py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:ade18dbbeb05c8cba4f842cc15b20e59467069183f348844750901227df5008d"},
+    {file = "uv-0.4.18-py3-none-win32.whl", hash = "sha256:157e4a2c063b270de348862dd31abfe600d5601183fd2a6efe552840ac179626"},
+    {file = "uv-0.4.18-py3-none-win_amd64.whl", hash = "sha256:8250148484e1b0f89ec19467946e86ee303619985c23228b5a2f2d94d15c6d8b"},
+    {file = "uv-0.4.18.tar.gz", hash = "sha256:954964eff8c7e2bc63dd4beeb8d45bcaddb5149a7ef29a36abd77ec76c8b837e"},
 ]
 
 [[package]]
@@ -4303,4 +4303,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.13"
-content-hash = "da3aa84195141c8639f83cea914f96a3c51aa11d5d2e802869e85996081fef74"
+content-hash = "94137a7be185a26685b7b8ba8184d1c489badcaf769e5dc1264b92fd7345629a"
