@@ -115,7 +115,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.6.1
+      uses: docker/setup-buildx-action@v3.7.1
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
@@ -295,7 +295,7 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@v4.5.0
+      uses: codecov/codecov-action@v4.6.0
 
   mypy:
     name: "Static type checking"
