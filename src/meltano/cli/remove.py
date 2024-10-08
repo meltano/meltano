@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import click
 
 from meltano.cli.params import pass_project
@@ -14,12 +16,19 @@ from meltano.core.plugin_location_remove import (
 )
 from meltano.core.plugin_remove_service import PluginRemoveService
 
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
 
 @click.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
 @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin_names", nargs=-1, required=True)
 @pass_project()
-def remove(project, plugin_type, plugin_names) -> None:  # noqa: ANN001
+def remove(
+    project: Project,
+    plugin_type: PluginType,
+    plugin_names: tuple[str, ...],
+) -> None:
     """Remove plugins from your project.
 
     \b
@@ -32,7 +41,7 @@ def remove(project, plugin_type, plugin_names) -> None:  # noqa: ANN001
     remove_plugins(project, plugins)
 
 
-def remove_plugins(project, plugins) -> None:  # noqa: ANN001
+def remove_plugins(project: Project, plugins: t.Sequence[ProjectPlugin]) -> None:
     """Invoke PluginRemoveService and output CLI removal overview."""
     remove_service = PluginRemoveService(project)
 
@@ -49,7 +58,7 @@ def remove_plugins(project, plugins) -> None:  # noqa: ANN001
         click.echo()
 
 
-def remove_plugin_status_update(plugin) -> None:  # noqa: ANN001
+def remove_plugin_status_update(plugin: ProjectPlugin) -> None:
     """Print remove status message for a plugin."""
     plugin_descriptor = f"{plugin.type.descriptor} '{plugin.name}'"
 
@@ -63,7 +72,7 @@ def removal_manager_status_update(removal_manager: PluginLocationRemoveManager) 
     plugin_descriptor = removal_manager.plugin_descriptor
     location = removal_manager.location
     if removal_manager.plugin_error:
-        message = removal_manager.remove_message
+        message = removal_manager.message
 
         click.secho(
             f"Error removing plugin {plugin_descriptor} from {location}: {message}",

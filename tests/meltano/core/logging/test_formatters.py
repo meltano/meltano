@@ -23,6 +23,9 @@ class FakeCode:
         self.co_filename = co_filename
         self.co_name = co_name
 
+    def co_positions(self):
+        yield 0, 10, 0, 40
+
 
 class FakeFrame:
     """A fake traceback frame that can be used to test log formatters."""
@@ -31,6 +34,7 @@ class FakeFrame:
         self.f_code = f_code
         self.f_globals = f_globals
         self.f_locals = f_locals or {}
+        self.f_lasti = 0
 
 
 class FakeTraceback:  # pragma: no cover
