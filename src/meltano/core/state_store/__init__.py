@@ -20,7 +20,6 @@ from meltano.core.state_store.filesystem import (
     WindowsFilesystemStateStoreManager,
 )
 from meltano.core.state_store.google import GCSStateStoreManager
-from meltano.core.state_store.s3 import S3StateStoreManager
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
@@ -45,7 +44,6 @@ __all__ = [
     "DBStateStoreManager",
     "GCSStateStoreManager",
     "LocalFilesystemStateStoreManager",
-    "S3StateStoreManager",
     "StateBackend",
     "StateStoreManager",
     "state_store_manager_from_project_settings",
@@ -63,7 +61,6 @@ class BuiltinStateBackendEnum(StrEnum):
     # file://<path>/<to>/<state directory> URI
     LOCAL_FILESYSTEM = "file"
     AZURE = "azure"
-    S3 = "s3"
     GCS = "gs"
 
 
@@ -103,7 +100,6 @@ class StateBackend:
         return {
             BuiltinStateBackendEnum.SYSTEMDB: DBStateStoreManager,
             BuiltinStateBackendEnum.LOCAL_FILESYSTEM: LocalFilesystemStateStoreManager,
-            BuiltinStateBackendEnum.S3: S3StateStoreManager,
             BuiltinStateBackendEnum.AZURE: AZStorageStateStoreManager,
             BuiltinStateBackendEnum.GCS: GCSStateStoreManager,
         }

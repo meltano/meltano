@@ -121,6 +121,15 @@ types-requests = "^2.31.0"
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
 
+[tool.poetry.plugins."meltano.settings"]
+# AWS S3 state backend settings
+s3_aws_access_key_id = "meltano.core.state_store.s3:AWS_ACCESS_KEY_ID"
+s3_aws_secret_access_key = "meltano.core.state_store.s3:AWS_SECRET_ACCESS_KEY"
+s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
+
+[tool.poetry.plugins."meltano.state_backends"]
+s3 = "meltano.core.state_store.s3:S3StateStoreManager"
+
 [tool.pytest.ini_options]
 addopts = "--cov=meltano --cov=tests --doctest-modules --durations=10 --order-scope=module -ra -n auto --dist=loadfile"
 asyncio_mode = "auto"
