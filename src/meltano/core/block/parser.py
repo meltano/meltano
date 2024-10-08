@@ -19,6 +19,7 @@ from meltano.core.task_sets_service import TaskSetsService
 
 if t.TYPE_CHECKING:
     import uuid
+    from collections.abc import Generator
 
     import structlog
 
@@ -189,7 +190,7 @@ class BlockParser:  # noqa: D101
     def find_blocks(
         self,
         offset: int = 0,
-    ) -> t.Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
+    ) -> Generator[BlockSet | PluginCommandBlock | ExtractLoadBlocks, None, None]:
         """Find all blocks in the invocation.
 
         Args:

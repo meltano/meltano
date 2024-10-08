@@ -87,12 +87,13 @@ class TestSuperset:
                 return original_exec(cmd, *popen_args, **kwargs)
             return handle_mock
 
-        with mock.patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            side_effect=popen_mock,
-        ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure",
+        with (
+            mock.patch.object(
+                asyncio,
+                "create_subprocess_exec",
+                side_effect=popen_mock,
+            ) as popen,
+            mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure"),
         ):
             invoker: SupersetInvoker = plugin_invoker_factory(subject)
             # This ends up calling the hooks

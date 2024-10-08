@@ -21,6 +21,8 @@ from meltano.core.tracking.tracker import TelemetrySettings, Tracker
 from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     import pytest_structlog
 
     from fixtures.docker import SnowplowMicro
@@ -44,7 +46,7 @@ def check_analytics_json(project: Project) -> None:
 
 
 @contextmanager
-def delete_analytics_json(project: Project) -> t.Generator[None, None, None]:
+def delete_analytics_json(project: Project) -> Generator[None, None, None]:
     (project.meltano_dir() / "analytics.json").unlink(missing_ok=True)
     try:
         yield
@@ -75,10 +77,13 @@ class TestTracker:
             ) = original_config_override
 
     def test_telemetry_state_change_check(self, project: Project) -> None:
-        with mock.patch.object(
-            Tracker,
-            "save_telemetry_settings",
-        ) as mocked, delete_analytics_json(project):
+        with (
+            mock.patch.object(
+                Tracker,
+                "save_telemetry_settings",
+            ) as mocked,
+            delete_analytics_json(project),
+        ):
             Tracker(project)
             assert mocked.call_count == 1
 

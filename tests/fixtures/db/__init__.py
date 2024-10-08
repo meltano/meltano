@@ -12,11 +12,13 @@ from sqlalchemy.orm import close_all_sessions, sessionmaker
 from sqlalchemy.pool import NullPool
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.project import Project
 
 
 @pytest.fixture(scope="session", autouse=True)
-def engine_uri_env(engine_uri: str) -> t.Generator:
+def engine_uri_env(engine_uri: str) -> Generator:
     """Use the correct meltano database URI for these tests."""
     # No session monkey patch yet https://github.com/pytest-dev/pytest/issues/363
     monkeypatch = pytest.MonkeyPatch()

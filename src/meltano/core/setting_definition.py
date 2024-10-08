@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import ast
+import enum
 import json
+import sys
 import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
-from enum import Enum
 from functools import cached_property
 
 from meltano.core import utils
@@ -15,7 +16,14 @@ from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.error import Error
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from ruamel.yaml import Node, Representer, ScalarNode
 
 VALUE_PROCESSORS = {
@@ -79,16 +87,8 @@ class SettingMissingError(Error):
         super().__init__(f"Cannot find setting {name}")
 
 
-class YAMLEnum(str, Enum):
+class YAMLEnum(StrEnum):
     """Serializable Enum class."""
-
-    def __str__(self) -> str:
-        """Return as string.
-
-        Returns:
-            This enum in string form.
-        """
-        return self.value
 
     @staticmethod
     def yaml_representer(dumper, obj) -> str:  # noqa: ANN001
@@ -137,18 +137,18 @@ class YAMLEnum(str, Enum):
 class SettingKind(YAMLEnum):
     """Supported setting kinds."""
 
-    STRING = "string"
-    INTEGER = "integer"
-    BOOLEAN = "boolean"
-    DATE_ISO8601 = "date_iso8601"
-    EMAIL = "email"
-    PASSWORD = "password"  # noqa: S105
-    OAUTH = "oauth"
-    OPTIONS = "options"
-    FILE = "file"
-    ARRAY = "array"
-    OBJECT = "object"
-    HIDDEN = "hidden"
+    STRING = enum.auto()
+    INTEGER = enum.auto()
+    BOOLEAN = enum.auto()
+    DATE_ISO8601 = enum.auto()
+    EMAIL = enum.auto()
+    PASSWORD = enum.auto()
+    OAUTH = enum.auto()
+    OPTIONS = enum.auto()
+    FILE = enum.auto()
+    ARRAY = enum.auto()
+    OBJECT = enum.auto()
+    HIDDEN = enum.auto()
 
     @cached_property
     def is_sensitive(self) -> bool:
@@ -288,7 +288,7 @@ class SettingDefinition(NameEq, Canonical):
     @classmethod
     def from_missing(
         cls,
-        defs: t.Iterable[SettingDefinition],
+        defs: Iterable[SettingDefinition],
         config: dict,
         **kwargs,  # noqa: ANN003
     ) -> list[SettingDefinition]:

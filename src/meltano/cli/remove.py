@@ -17,6 +17,8 @@ from meltano.core.plugin_location_remove import (
 from meltano.core.plugin_remove_service import PluginRemoveService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from meltano.core.project import Project
 
 
@@ -41,7 +43,7 @@ def remove(
     remove_plugins(project, plugins)
 
 
-def remove_plugins(project: Project, plugins: t.Sequence[ProjectPlugin]) -> None:
+def remove_plugins(project: Project, plugins: Sequence[ProjectPlugin]) -> None:
     """Invoke PluginRemoveService and output CLI removal overview."""
     remove_service = PluginRemoveService(project)
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import enum
 import functools
 import logging
 import os
@@ -10,7 +11,6 @@ import shlex
 import sys
 import typing as t
 from dataclasses import dataclass
-from enum import Enum
 from functools import cached_property
 from multiprocessing import cpu_count
 
@@ -36,30 +36,37 @@ from meltano.core.venv_service import (
     fingerprint,
 )
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 if t.TYPE_CHECKING:
+    from collections.abc import Callable, Iterable, Mapping, Sequence
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class PluginInstallReason(str, Enum):
+class PluginInstallReason(StrEnum):
     """Plugin install reason enum."""
 
-    ADD = "add"
-    AUTO = "auto"
-    INSTALL = "install"
-    UPGRADE = "upgrade"
+    ADD = enum.auto()
+    AUTO = enum.auto()
+    INSTALL = enum.auto()
+    UPGRADE = enum.auto()
 
 
-class PluginInstallStatus(Enum):
+class PluginInstallStatus(StrEnum):
     """The status of the process of installing a plugin."""
 
-    RUNNING = "running"
-    SUCCESS = "success"
-    SKIPPED = "skipped"
-    ERROR = "error"
-    WARNING = "warning"
+    RUNNING = enum.auto()
+    SUCCESS = enum.auto()
+    SKIPPED = enum.auto()
+    ERROR = enum.auto()
+    WARNING = enum.auto()
 
 
 @dataclass(frozen=True)
@@ -144,7 +151,7 @@ class PluginInstallService:
     def __init__(
         self,
         project: Project,
-        status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
+        status_cb: Callable[[PluginInstallState], t.Any] = noop,
         *,
         parallelism: int | None = None,
         clean: bool = False,
@@ -189,7 +196,7 @@ class PluginInstallService:
 
     @staticmethod
     def remove_duplicates(
-        plugins: t.Iterable[ProjectPlugin],
+        plugins: Iterable[ProjectPlugin],
         reason: PluginInstallReason,
     ) -> tuple[list[PluginInstallState], list[ProjectPlugin]]:
         """Deduplicate list of plugins, keeping the last occurrences.
@@ -246,7 +253,7 @@ class PluginInstallService:
 
     async def install_plugins(
         self,
-        plugins: t.Iterable[ProjectPlugin],
+        plugins: Iterable[ProjectPlugin],
         reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> list[PluginInstallState]:
         """Install all the provided plugins.
@@ -389,7 +396,7 @@ class PluginInstallService:
         plugin: ProjectPlugin,
         reason: PluginInstallReason,
         *,
-        env: t.Mapping[str, str] | None = None,
+        env: Mapping[str, str] | None = None,
     ) -> bool:
         if not plugin.is_installable():
             return False
@@ -489,7 +496,7 @@ class PluginInstaller(t.Protocol):
 def get_pip_install_args(
     project: Project,
     plugin: ProjectPlugin,
-    env: t.Mapping[str, str] | None = None,
+    env: Mapping[str, str] | None = None,
     if_missing: EnvVarMissingBehavior | None = None,
 ) -> list[str]:
     """Get the pip install arguments for the given plugin.
@@ -547,7 +554,7 @@ def install_status_update(install_state: PluginInstallState) -> None:
 
 async def install_plugins(
     project: Project,
-    plugins: t.Sequence[ProjectPlugin],
+    plugins: Sequence[ProjectPlugin],
     *,
     reason: PluginInstallReason = PluginInstallReason.INSTALL,
     parallelism: int | None = None,
@@ -600,7 +607,7 @@ async def install_pip_plugin(
     plugin: ProjectPlugin,
     clean: bool = False,
     force: bool = False,
-    env: t.Mapping[str, str] | None = None,
+    env: Mapping[str, str] | None = None,
     **kwargs,  # noqa: ANN003, ARG001
 ) -> None:
     """Install the plugin with pip.

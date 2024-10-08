@@ -12,6 +12,7 @@ from rich.traceback import Traceback, install
 from meltano.core.utils import get_no_color_flag
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable, Sequence
     from types import TracebackType
 
     from structlog.types import Processor
@@ -33,7 +34,7 @@ def rich_exception_formatter_factory(
     *,
     no_color: bool | None = None,
     show_locals: bool = False,
-) -> t.Callable[[t.TextIO, structlog.types.ExcInfo], None]:
+) -> Callable[[t.TextIO, structlog.types.ExcInfo], None]:
     """Create an exception formatter for logging using the rich package.
 
     Examples:
@@ -121,7 +122,7 @@ def console_log_formatter(
 def key_value_formatter(
     *,
     sort_keys: bool = False,
-    key_order: t.Sequence[str] | None = None,
+    key_order: Sequence[str] | None = None,
     drop_missing: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.

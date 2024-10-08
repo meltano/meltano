@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import re
 import typing as t
 from collections import defaultdict
@@ -73,23 +74,15 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 class PluginType(YAMLEnum):
     """The type of a plugin."""
 
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    TRANSFORMS = "transforms"
-    ORCHESTRATORS = "orchestrators"
-    TRANSFORMERS = "transformers"
-    FILES = "files"
-    UTILITIES = "utilities"
-    MAPPERS = "mappers"
-    MAPPINGS = "mappings"
-
-    def __str__(self) -> str:
-        """Return a string representation of the plugin type.
-
-        Returns:
-            The string representation of the plugin type.
-        """
-        return self.value
+    EXTRACTORS = enum.auto()
+    LOADERS = enum.auto()
+    TRANSFORMS = enum.auto()
+    ORCHESTRATORS = enum.auto()
+    TRANSFORMERS = enum.auto()
+    FILES = enum.auto()
+    UTILITIES = enum.auto()
+    MAPPERS = enum.auto()
+    MAPPINGS = enum.auto()
 
     @property
     def descriptor(self) -> str:

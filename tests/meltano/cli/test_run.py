@@ -195,19 +195,21 @@ class TestCliRunScratchpadOne:
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
 
         # check that the various ELB validation checks actually run and fail as expected
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(Exception, match="Found no end in block set!"):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, tap.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -219,10 +221,11 @@ class TestCliRunScratchpadOne:
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, target.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock3:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock3,
+        ):
             asyncio_mock3.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -235,10 +238,11 @@ class TestCliRunScratchpadOne:
 
         # Verify that a vanilla ELB run works
         args = ["run", tap.name, target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock4:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock4,
+        ):
             asyncio_mock4.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=False)
             assert result.exit_code == 0
@@ -275,10 +279,11 @@ class TestCliRunScratchpadOne:
 
         # Verify that a vanilla ELB run works
         args = ["run", tap.name, "mock-mapping-0", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
@@ -334,10 +339,11 @@ class TestCliRunScratchpadOne:
         # generated for an ELB run
         args = ["run", tap.name, target.name, "--state-id-suffix", "test-suffix"]
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
@@ -404,12 +410,14 @@ class TestCliRunScratchpadOne:
 
         args = ["run", tap.name, target.name]
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch(
-            "meltano.core.plugin_invoker.asyncio",
-        ) as asyncio_mock, pytest.MonkeyPatch().context() as mp:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch(
+                "meltano.core.plugin_invoker.asyncio",
+            ) as asyncio_mock,
+            pytest.MonkeyPatch().context() as mp,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             for env in suffix_env:
@@ -1010,10 +1018,11 @@ class TestCliRunScratchpadOne:
 
         # no mapper should be found
         args = ["run", tap.name, "not-a-valid-mapping-name", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
@@ -1027,10 +1036,11 @@ class TestCliRunScratchpadOne:
             inherit_from=mapper.name,
         )
         args = ["run", tap.name, "mapper-collision-01", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -1063,10 +1073,11 @@ class TestCliRunScratchpadOne:
             ],
         )
         args = ["run", tap.name, "mapper-collision-02", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 Exception,
@@ -1118,10 +1129,11 @@ class TestCliRunScratchpadOne:
         )
 
         args = ["run", tap.name, "mock-mapping-dupe", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
+        ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
                 AmbiguousMappingName,
@@ -1232,10 +1244,11 @@ class TestCliRunScratchpadOne:
         )
 
         args = ["run", "--dry-run", tap.name, "mock-mapping-0", target.name]
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
             result = cli_runner.invoke(cli, args, catch_exceptions=True)
             assert result.exit_code == 0
@@ -1293,10 +1306,13 @@ class TestCliRunScratchpadOne:
 
         invoke_async = AsyncMock(side_effect=(tap_process, target_process))
 
-        with mock.patch(
-            "meltano.core.logging.utils.default_config",
-            return_value=logging_config,
-        ), mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async):
+        with (
+            mock.patch(
+                "meltano.core.logging.utils.default_config",
+                return_value=logging_config,
+            ),
+            mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async),
+        ):
             result = cli_runner.invoke(cli, args)
             ansi_color_escape = re.compile(r"\x1b\[[0-9;]+m")
             match = ansi_color_escape.search(result.stderr)

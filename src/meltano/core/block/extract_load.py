@@ -27,6 +27,7 @@ from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
     import uuid
+    from collections.abc import AsyncIterator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -615,7 +616,7 @@ class ExtractLoadBlocks(BlockSet):
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> t.AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:

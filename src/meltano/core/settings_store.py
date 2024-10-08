@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import enum
+import sys
 import typing as t
 from abc import ABC, abstractmethod
 from contextlib import contextmanager, suppress
 from copy import deepcopy
-from enum import Enum
 from functools import reduce
 from operator import eq
 
@@ -19,6 +20,11 @@ from meltano.core.error import MeltanoError, ProjectReadonly
 from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
+
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -113,7 +119,7 @@ def cast_setting_value(
     return value, metadata
 
 
-class SettingValueStore(str, Enum):
+class SettingValueStore(StrEnum):
     """Setting Value Store.
 
     Note: The declaration order of stores determines store precedence when using
@@ -122,15 +128,15 @@ class SettingValueStore(str, Enum):
         iterates over when retrieving setting values.
     """
 
-    CONFIG_OVERRIDE = "config_override"
-    ENV = "env"
-    DOTENV = "dotenv"
-    MELTANO_ENV = "meltano_environment"
-    MELTANO_YML = "meltano_yml"
-    DB = "db"
-    INHERITED = "inherited"
-    DEFAULT = "default"
-    AUTO = "auto"
+    CONFIG_OVERRIDE = enum.auto()
+    ENV = enum.auto()
+    DOTENV = enum.auto()
+    MELTANO_ENVIRONMENT = enum.auto()
+    MELTANO_YML = enum.auto()
+    DB = enum.auto()
+    INHERITED = enum.auto()
+    DEFAULT = enum.auto()
+    AUTO = enum.auto()
 
     @classmethod
     def readables(cls) -> list[SettingValueStore]:
@@ -163,7 +169,7 @@ class SettingValueStore(str, Enum):
             self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,
             self.ENV: EnvStoreManager,
             self.DOTENV: DotEnvStoreManager,
-            self.MELTANO_ENV: MeltanoEnvStoreManager,
+            self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,
             self.MELTANO_YML: MeltanoYmlStoreManager,
             self.DB: DbStoreManager,
             self.INHERITED: InheritedStoreManager,
@@ -1328,8 +1334,8 @@ class AutoStoreManager(SettingsStoreManager):
             return None
 
         # any remaining config routed to meltano environment
-        if self.ensure_supported(store=SettingValueStore.MELTANO_ENV):
-            return SettingValueStore.MELTANO_ENV
+        if self.ensure_supported(store=SettingValueStore.MELTANO_ENVIRONMENT):
+            return SettingValueStore.MELTANO_ENVIRONMENT
         # Fall back to root `meltano.yml`. This is required for Meltano
         # settings, which cannot be stored in an Environment
         if self.ensure_supported(store=SettingValueStore.MELTANO_YML):

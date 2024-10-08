@@ -14,6 +14,9 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 logger = structlog.stdlib.get_logger(__name__)
 
 
@@ -408,7 +411,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     def get_requirements(
         self,
-        plugin_types: t.Iterable[PluginType] | None = None,
+        plugin_types: Iterable[PluginType] | None = None,
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 

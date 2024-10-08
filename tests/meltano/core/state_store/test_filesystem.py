@@ -153,8 +153,9 @@ class TestLocalFilesystemStateStoreManager:
         timeout = subject.lock_timeout_seconds
 
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
-        with time_machine.travel(initial_dt) as frozen_datetime, subject.acquire_lock(
-            state_id,
+        with (
+            time_machine.travel(initial_dt) as frozen_datetime,
+            subject.acquire_lock(state_id),
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
