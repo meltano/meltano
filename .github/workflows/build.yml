@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@v4.2.0
 
     - name: Install Poetry
       env:
@@ -73,7 +73,7 @@ jobs:
     environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@v4.2.0
 
     - name: Download artifacts
       uses: actions/download-artifact@v4
@@ -97,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.10.1
+      uses: pypa/gh-action-pypi-publish@v1.10.3

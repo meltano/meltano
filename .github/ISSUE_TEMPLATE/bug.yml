@@ -5,6 +5,7 @@ labels:
   - kind/Bug
   - flow::triage
   - valuestream/Meltano
+type: Bug
 assignees:
   - edgarrmondragon
 
@@ -18,7 +19,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.5.2"
+      placeholder: "3.5.4"
     validations:
       required: true
   - type: dropdown
@@ -54,7 +55,7 @@ body:
       description: What operating system you are using
       placeholder: "Linux - Ubuntu 20.04"
     validations:
-      required: true
+      required: false
   - type: textarea
     id: what-happened
     attributes:

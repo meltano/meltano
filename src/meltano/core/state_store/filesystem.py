@@ -329,7 +329,8 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                 except Exception as e:
                     if self.is_file_not_found_error(e):
                         state_to_write = state
-                    raise e
+                    else:
+                        raise e
             with self.get_writer(filepath) as writer:
                 writer.write(state_to_write.json())
 
