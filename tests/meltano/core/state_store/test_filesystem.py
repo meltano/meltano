@@ -32,9 +32,9 @@ from meltano.core.state_store import (
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
     MeltanoState,
-    S3StateStoreManager,
     WindowsFilesystemStateStoreManager,
 )
+from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -409,7 +409,7 @@ class TestS3StateStoreManager:
     @contextmanager
     def stubber(self) -> Iterator[Stubber]:
         with patch(
-            "meltano.core.state_store.S3StateStoreManager.client",
+            "meltano.core.state_store.s3.S3StateStoreManager.client",
             new_callable=PropertyMock,
         ) as mock_client:
             mock_client.return_value = client("s3")

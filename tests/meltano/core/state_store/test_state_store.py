@@ -21,10 +21,10 @@ from meltano.core.state_store import (
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
     MeltanoState,
-    S3StateStoreManager,
     StateBackend,
     state_store_manager_from_project_settings,
 )
+from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from pathlib import Path
