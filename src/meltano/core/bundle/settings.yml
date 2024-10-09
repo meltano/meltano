@@ -68,15 +68,6 @@ settings:
   env_specific: true
   description: Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is locked
 
-## Azure state backend
-- name: state_backend.azure.connection_string
-  sensitive: true
-  env_specific: true
-  description: Connection string for the Azure Blob Storage account
-- name: state_backend.azure.storage_account_url
-  env_specific: true
-  description: URL for the Azure Blob Storage account
-
 ## GCS state backend
 - name: state_backend.gcs.application_credentials
   sensitive: true
