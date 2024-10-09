@@ -7,6 +7,7 @@ from contextlib import contextmanager
 from functools import cached_property
 
 from meltano.core.error import MeltanoError
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
 )
@@ -45,6 +46,22 @@ def requires_azure() -> Generator[None, None, None]:
     if not AZURE_INSTALLED:
         raise MissingAzureError
     yield
+
+
+CONNECTION_STRING = SettingDefinition(
+    name="state_backend.azure.connection_string",
+    label="Connection String",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+STORAGE_ACCOUNT_URL = SettingDefinition(
+    name="state_backend.azure.storage_account_url",
+    label="Storage Account URL",
+    kind=SettingKind.STRING,
+    env_specific=True,
+)
 
 
 class AZStorageStateStoreManager(CloudStateStoreManager):

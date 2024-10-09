@@ -28,12 +28,12 @@ from botocore.stub import Stubber
 from google.cloud.storage import Blob, Bucket
 
 from meltano.core.state_store import (
-    AZStorageStateStoreManager,
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
     MeltanoState,
     WindowsFilesystemStateStoreManager,
 )
+from meltano.core.state_store.azure import AZStorageStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
