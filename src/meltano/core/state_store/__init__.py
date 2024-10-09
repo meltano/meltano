@@ -18,7 +18,6 @@ from meltano.core.state_store.filesystem import (
     LocalFilesystemStateStoreManager,
     WindowsFilesystemStateStoreManager,
 )
-from meltano.core.state_store.google import GCSStateStoreManager
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
@@ -40,7 +39,6 @@ else:
 __all__ = [
     "BuiltinStateBackendEnum",
     "DBStateStoreManager",
-    "GCSStateStoreManager",
     "LocalFilesystemStateStoreManager",
     "StateBackend",
     "StateStoreManager",
@@ -58,7 +56,6 @@ class BuiltinStateBackendEnum(StrEnum):
     # the given type. E.g., filesystem state backends have a
     # file://<path>/<to>/<state directory> URI
     LOCAL_FILESYSTEM = "file"
-    GCS = "gs"
 
 
 class StateBackend:
@@ -97,7 +94,6 @@ class StateBackend:
         return {
             BuiltinStateBackendEnum.SYSTEMDB: DBStateStoreManager,
             BuiltinStateBackendEnum.LOCAL_FILESYSTEM: LocalFilesystemStateStoreManager,
-            BuiltinStateBackendEnum.GCS: GCSStateStoreManager,
         }
 
     @property
