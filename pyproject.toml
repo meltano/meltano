@@ -134,6 +134,10 @@ gcs_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDE
 
 [tool.poetry.plugins."meltano.state_backends"]
 azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
+# These strings should match the expected scheme for URIs of
+# the given type. E.g., filesystem state backends have a
+# file://<path>/<to>/<state directory> URI
+file = "meltano.core.state_store.filesystem:LocalFilesystemStateStoreManager"
 gs = "meltano.core.state_store.google:GCSStateStoreManager"
 s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 

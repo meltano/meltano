@@ -14,10 +14,6 @@ from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.db import project_engine
 from meltano.core.state_store.base import StateStoreManager
 from meltano.core.state_store.db import DBStateStoreManager
-from meltano.core.state_store.filesystem import (
-    LocalFilesystemStateStoreManager,
-    WindowsFilesystemStateStoreManager,
-)
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
@@ -39,7 +35,6 @@ else:
 __all__ = [
     "BuiltinStateBackendEnum",
     "DBStateStoreManager",
-    "LocalFilesystemStateStoreManager",
     "StateBackend",
     "StateStoreManager",
     "state_store_manager_from_project_settings",
@@ -52,10 +47,6 @@ class BuiltinStateBackendEnum(StrEnum):
     """State backend."""
 
     SYSTEMDB = "systemdb"
-    # These strings should match the expected scheme for URIs of
-    # the given type. E.g., filesystem state backends have a
-    # file://<path>/<to>/<state directory> URI
-    LOCAL_FILESYSTEM = "file"
 
 
 class StateBackend:
@@ -93,7 +84,6 @@ class StateBackend:
         """
         return {
             BuiltinStateBackendEnum.SYSTEMDB: DBStateStoreManager,
-            BuiltinStateBackendEnum.LOCAL_FILESYSTEM: LocalFilesystemStateStoreManager,
         }
 
     @property
@@ -164,10 +154,5 @@ def state_store_manager_from_project_settings(
     )
     settings = (setting_def.name for setting_def in setting_defs)
     backend = StateBackend(scheme).manager
-    if (
-        scheme == BuiltinStateBackendEnum.LOCAL_FILESYSTEM
-        and "Windows" in platform.system()
-    ):
-        backend = WindowsFilesystemStateStoreManager
     kwargs = {name.split(".")[-1]: settings_service.get(name) for name in settings}
     return backend(**kwargs)
