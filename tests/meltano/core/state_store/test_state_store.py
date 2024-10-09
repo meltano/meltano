@@ -17,12 +17,12 @@ from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
     BuiltinStateBackendEnum,
     DBStateStoreManager,
-    LocalFilesystemStateStoreManager,
     MeltanoState,
     StateBackend,
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
 from meltano.core.state_store.google import GCSStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
 
@@ -84,7 +84,7 @@ class TestLocalFilesystemStateBackend:
     def test_manager_from_settings(self, project: Project, state_path: str) -> None:
         project.settings.set(["state_backend", "uri"], f"file://{state_path}")
         file_state_store = state_store_manager_from_project_settings(project.settings)
-        assert isinstance(file_state_store, LocalFilesystemStateStoreManager)
+        assert isinstance(file_state_store, _LocalFilesystemStateStoreManager)
         assert file_state_store.state_dir == state_path
 
 

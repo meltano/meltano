@@ -27,12 +27,12 @@ from boto3 import client
 from botocore.stub import Stubber
 from google.cloud.storage import Blob, Bucket
 
-from meltano.core.state_store import (
-    LocalFilesystemStateStoreManager,
-    MeltanoState,
-    WindowsFilesystemStateStoreManager,
-)
+from meltano.core.state_store import MeltanoState
 from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.filesystem import (
+    _LocalFilesystemStateStoreManager,
+    _WindowsFilesystemStateStoreManager,
+)
 from meltano.core.state_store.google import GCSStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
 
@@ -54,12 +54,12 @@ class TestLocalFilesystemStateStoreManager:
     @pytest.fixture
     def subject(self, function_scoped_test_dir):
         if on_windows():
-            yield WindowsFilesystemStateStoreManager(
+            yield _WindowsFilesystemStateStoreManager(
                 uri=f"file://{function_scoped_test_dir}\\.meltano\\state\\",
                 lock_timeout_seconds=10,
             )
         else:
-            yield LocalFilesystemStateStoreManager(
+            yield _LocalFilesystemStateStoreManager(
                 uri=f"file://{function_scoped_test_dir}/.meltano/state/",
                 lock_timeout_seconds=10,
             )
@@ -68,7 +68,7 @@ class TestLocalFilesystemStateStoreManager:
     def state_path(
         self,
         function_scoped_test_dir,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
     ):
         Path(subject.state_dir).mkdir(parents=True, exist_ok=True)
         yield os.path.join(function_scoped_test_dir, ".meltano", "state")
@@ -77,7 +77,7 @@ class TestLocalFilesystemStateStoreManager:
             ignore_errors=True,
         )
 
-    def test_join_path(self, subject: LocalFilesystemStateStoreManager) -> None:
+    def test_join_path(self, subject: _LocalFilesystemStateStoreManager) -> None:
         if on_windows():
             assert subject.join_path("a", "b") == "a\\b"
             assert subject.join_path("a", "b", "c", "d", "e") == "a\\b\\c\\d\\e"
@@ -87,7 +87,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_create_state_id_dir_if_not_exists(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         state_id_path = os.path.join(
@@ -100,7 +100,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_reader(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         filepath = os.path.join(state_path, "get_reader")
@@ -110,7 +110,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_writer(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         filepath = os.path.join(state_path, "get_writer")
@@ -119,7 +119,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_state_path(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         assert subject.get_state_path("get_state_path") == os.path.join(
@@ -130,7 +130,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get_lock_path(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         assert subject.get_lock_path("some_state_id") == os.path.join(
@@ -141,14 +141,14 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_acquire_lock(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
     ) -> None:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
         with subject.acquire_lock("acquire_lock"):
             assert os.path.exists(os.path.join(dir_path, "lock"))
 
-    def test_lock_timeout(self, subject: LocalFilesystemStateStoreManager) -> None:
+    def test_lock_timeout(self, subject: _LocalFilesystemStateStoreManager) -> None:
         state_id = "is_locked"
         timeout = subject.lock_timeout_seconds
 
@@ -165,7 +165,7 @@ class TestLocalFilesystemStateStoreManager:
                 assert not subject.is_locked(state_id)
 
     @pytest.mark.usefixtures("state_path")
-    def test_get_state_ids(self, subject: LocalFilesystemStateStoreManager) -> None:
+    def test_get_state_ids(self, subject: _LocalFilesystemStateStoreManager) -> None:
         dev_ids = [f"dev:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         prod_ids = [f"prod:{letter}-to-{letter}" for letter in string.ascii_lowercase]
         for state_id in dev_ids + prod_ids:
@@ -179,7 +179,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_get(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
@@ -200,7 +200,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_set(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
@@ -222,7 +222,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_set_partial_state(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path: str,
         state_ids_with_expected_states,
     ) -> None:
@@ -255,7 +255,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_delete(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
@@ -281,7 +281,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_clear(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
@@ -299,7 +299,7 @@ class TestLocalFilesystemStateStoreManager:
 
     def test_clear_all(
         self,
-        subject: LocalFilesystemStateStoreManager,
+        subject: _LocalFilesystemStateStoreManager,
         state_path: str,
         state_ids_with_expected_states,
     ):
