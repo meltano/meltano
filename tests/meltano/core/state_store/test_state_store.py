@@ -17,13 +17,13 @@ from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
     BuiltinStateBackendEnum,
     DBStateStoreManager,
-    GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
     MeltanoState,
     StateBackend,
     state_store_manager_from_project_settings,
 )
 from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.google import GCSStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
