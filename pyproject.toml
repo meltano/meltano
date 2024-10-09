@@ -129,9 +129,12 @@ s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
 # Azure state backend settings
 azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
 azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
+# Google Cloud Storage state backend settings
+gcs_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"
 
 [tool.poetry.plugins."meltano.state_backends"]
 azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
+gs = "meltano.core.state_store.google:GCSStateStoreManager"
 s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [tool.pytest.ini_options]
