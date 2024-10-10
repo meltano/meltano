@@ -433,7 +433,7 @@ class InteractiveConfig:
 
         current_value, source = settings.get_with_source(name, session=self.session)
         if source != store:
-            current_value = REDACTED_VALUE if is_redacted else f"{value!r}"
+            current_value = REDACTED_VALUE if is_redacted else f"{current_value!r}"
 
             click.secho(
                 f"Current value is still: {current_value} (from {source.label})",
