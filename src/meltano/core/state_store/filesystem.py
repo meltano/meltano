@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import glob
 import os
+import platform
 import re
 import shutil
 import typing as t
@@ -353,7 +354,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             self.delete(self.get_state_path(state_id))
 
 
-class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
+class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     label: str = "Local Filesystem"
@@ -420,7 +421,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN202
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -468,7 +469,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         shutil.rmtree(self.get_state_dir(state_id))
 
 
-class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
+class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     """State backend for local Windows filesystem."""
 
     label: str = "Local Windows Filesystem"
@@ -501,7 +502,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             else self.join_path(self.state_dir, state_id)
         )
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN202
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -525,6 +526,14 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             if pattern_re is None or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids
+
+
+LocalFilesystemStateStoreManager: type[BaseFilesystemStateStoreManager]
+
+if "Windows" in platform.system():
+    LocalFilesystemStateStoreManager = _WindowsFilesystemStateStoreManager
+else:
+    LocalFilesystemStateStoreManager = _LocalFilesystemStateStoreManager
 
 
 class CloudStateStoreManager(BaseFilesystemStateStoreManager):
