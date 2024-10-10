@@ -81,7 +81,7 @@ Meltano will try the `DefaultAzureCredential` approach first, before falling bac
 #### DefaultAzureCredential approach
 To use the DefaultAzureCredential approach, you will need to provide the storage account URL in the `state_backend.azure.storage_account_url` setting, or the `MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL` environment variable.
 
-The order in which the DefaultAzureCredential attempts to resolve authentication is described [here](https://learn.microsoft.com/en-gb/dotnet/azure/sdk/authentication/credential-chains?tabs=dac#defaultazurecredential-overview). 
+The order in which the DefaultAzureCredential attempts to resolve authentication is described [here](https://learn.microsoft.com/en-gb/dotnet/azure/sdk/authentication/credential-chains?tabs=dac#defaultazurecredential-overview).
 If you intend to use a ManagedIdentity for an Azure Host or similar, then you will also need to provide your identity client ID under the `AZURE_CLIENT_ID` environment variable.
 
 An example environment variable configuration is given below:
@@ -90,7 +90,7 @@ An example environment variable configuration is given below:
 MELTANO_STATE_BACKEND_URI='azure://meltano-state'
 MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL='https://mystorageaccount.blob.core.windows.net/'
 # only necessary if using ManagedIdentity
-AZURE_CLIENT_ID='28a00fb0-67ee-4d11-81f8-10157e07c84f' 
+AZURE_CLIENT_ID='28a00fb0-67ee-4d11-81f8-10157e07c84f'
 ```
 
 A benefit of this approach is that you do not need to enable shared key access to your Blob Storage Account.
