@@ -87,7 +87,7 @@ If you intend to use a `ManagedIdentity` for an Azure Host or similar, then you 
 
 An example environment variable configuration is given below:
 
-```env
+```dotenv
 MELTANO_STATE_BACKEND_URI='azure://meltano-state'
 MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL='https://mystorageaccount.blob.core.windows.net/'
 # only necessary if using ManagedIdentity
@@ -103,7 +103,7 @@ If the connection string is not provided via either of these methods, Meltano wi
 
 An example environment variable configuration is given below:
 
-```env
+```dotenv
 MELTANO_STATE_BACKEND_URI='azure://meltano-state'
 AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=mystorageaccount;AccountKey=gSAw....'
 ```
