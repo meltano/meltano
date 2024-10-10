@@ -97,6 +97,7 @@ AZURE_CLIENT_ID='28a00fb0-67ee-4d11-81f8-10157e07c84f'
 A benefit of this approach is that you do not need to enable shared key access to your Blob Storage Account.
 
 #### Using an Azure connection string
+
 You can provide a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to Meltano via the [`state_backend.azure.connection_string`](/reference/settings/#state_backendazureconnection_string) setting.
 If no `state_backend.azure.connection_string` setting is configured, Meltano will use the value of the `AZURE_STORAGE_CONNECTION_STRING` environment variable.
 If the connection string is not provided via either of these methods, Meltano will not be able to authenticate to Azure and any state operations will fail.
