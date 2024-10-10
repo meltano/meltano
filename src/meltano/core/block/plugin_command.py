@@ -17,6 +17,8 @@ from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.runner import RunnerError
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -148,7 +150,7 @@ def plugin_command_invoker(
     project: Project,
     command: str | None,
     command_args: list[str] | None = None,
-    run_dir: str | None = None,
+    run_dir: Path | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.
 

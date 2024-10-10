@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import functools
 import typing as t
+import uuid
 
 import click
 
@@ -164,3 +165,21 @@ class pass_project:  # noqa: N801
             func(project, *args, **kwargs)
 
         return functools.update_wrapper(decorate, func)
+
+
+class UUIDParamType(click.ParamType):
+    """A custom click parameter type for UUIDs."""
+
+    name = "uuid"
+
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,
+        ctx: click.Context | None,
+    ) -> uuid.UUID:
+        """Convert an input value to a UUID."""
+        try:
+            return uuid.UUID(value)
+        except ValueError:
+            self.fail(f"{value} is not a valid UUID.", param, ctx)
