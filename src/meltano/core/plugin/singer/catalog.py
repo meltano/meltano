@@ -1,5 +1,6 @@
 from __future__ import annotations  # noqa: D100
 
+import dataclasses
 import fnmatch
 import re
 import sys
@@ -32,18 +33,12 @@ class CatalogDict(t.TypedDict):
     streams: list[dict[str, t.Any]]
 
 
-class CatalogRule:  # noqa: D101
-    def __init__(
-        self,
-        tap_stream_id: str | list[str],
-        breadcrumb: list[str] | None = None,
-        *,
-        negated: bool = False,
-    ):
-        """Create a catalog rule for a stream and property."""
-        self.tap_stream_id = tap_stream_id
-        self.breadcrumb = breadcrumb or []
-        self.negated = negated
+class _CatalogRuleProtocol(t.Protocol):
+    """A catalog rule for a stream and property."""
+
+    tap_stream_id: str | list[str]
+    breadcrumb: list[str]
+    negated: bool
 
     @classmethod
     def matching(  # noqa: ANN206
@@ -87,34 +82,34 @@ class CatalogRule:  # noqa: D101
         return result
 
 
-class MetadataRule(CatalogRule):  # noqa: D101
-    def __init__(
-        self,
-        tap_stream_id: str | list[str],
-        breadcrumb: list[str] | None,
-        key: str,
-        *,
-        value: bool,
-        negated: bool = False,
-    ):
-        """Create a metadata rule for a stream and property."""
-        super().__init__(tap_stream_id, breadcrumb, negated=negated)
-        self.key = key
-        self.value = value
+@dataclasses.dataclass
+class CatalogRule(_CatalogRuleProtocol):
+    """A catalog rule for a stream and property."""
+
+    tap_stream_id: str | list[str]
+    breadcrumb: list[str] = dataclasses.field(default_factory=list)
+    negated: bool = False
 
 
-class SchemaRule(CatalogRule):  # noqa: D101
-    def __init__(
-        self,
-        tap_stream_id: str | list[str],
-        breadcrumb: list[str] | None,
-        payload: dict,
-        *,
-        negated: bool = False,
-    ):
-        """Create a schema rule for a stream and property."""
-        super().__init__(tap_stream_id, breadcrumb, negated=negated)
-        self.payload = payload
+@dataclasses.dataclass
+class MetadataRule(_CatalogRuleProtocol):
+    """A metadata rule for a stream and property."""
+
+    tap_stream_id: str | list[str]
+    breadcrumb: list[str]
+    key: str
+    value: bool
+    negated: bool = False
+
+
+@dataclasses.dataclass
+class SchemaRule(_CatalogRuleProtocol):
+    """A schema rule for a stream and property."""
+
+    tap_stream_id: str | list[str]
+    breadcrumb: list[str]
+    payload: dict
+    negated: bool = False
 
 
 class SelectPattern(t.NamedTuple):
@@ -151,8 +146,8 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if re.search(UNESCAPED_DOT, pattern):
-            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
+        if UNESCAPED_DOT.search(pattern):
+            stream, prop = UNESCAPED_DOT.split(pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
@@ -206,6 +201,19 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
                     value=selected,
                 ),
             )
+
+            # If all sub-properties are selected, the parent property is selected too
+            if selected and "*" in props:
+                rules.extend(
+                    MetadataRule(
+                        tap_stream_id=pattern.stream_pattern,
+                        breadcrumb=property_breadcrumb(props[:idx]),
+                        key="selected",
+                        value=selected,
+                    )
+                    for idx, prop in enumerate(props)
+                    if prop == "*" and idx > 0
+                )
 
     return include_rules + exclude_rules
 
