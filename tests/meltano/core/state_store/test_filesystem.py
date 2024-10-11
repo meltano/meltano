@@ -27,11 +27,11 @@ from boto3 import client
 from botocore.stub import Stubber
 from google.cloud.storage import Blob, Bucket
 
-from meltano.core.job_state import JobState
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
+    MeltanoState,
     S3StateStoreManager,
     WindowsFilesystemStateStoreManager,
 )
@@ -192,7 +192,7 @@ class TestLocalFilesystemStateStoreManager:
                 json.dump(expected_state, state_file)
 
         for state_id, expected_state in state_ids_with_expected_states:
-            assert subject.get(state_id) == JobState.from_json(
+            assert subject.get(state_id) == MeltanoState.from_json(
                 state_id,
                 json.dumps(expected_state),
             )
@@ -205,16 +205,19 @@ class TestLocalFilesystemStateStoreManager:
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
             subject.set(
-                JobState.from_json(state_id, json.dumps({"completed": expected_state})),
+                MeltanoState.from_json(
+                    state_id,
+                    json.dumps({"completed": expected_state}),
+                ),
             )
         for state_id, expected_state in state_ids_with_expected_states:
             with open(
                 os.path.join(state_path, encode_if_on_windows(state_id), "state.json"),
             ) as state_file:
-                assert JobState.from_json(
+                assert MeltanoState.from_json(
                     state_id,
                     json.dumps({"completed": expected_state}),
-                ) == JobState.from_file(state_id, state_file)
+                ) == MeltanoState.from_file(state_id, state_file)
 
     def test_set_partial_state(
         self,
@@ -237,14 +240,17 @@ class TestLocalFilesystemStateStoreManager:
         for state_id, expected_state in state_ids_with_expected_states:
             _seed_state(state_id, expected_state)
             subject.set(
-                JobState.from_json(state_id, json.dumps({"partial": expected_state})),
+                MeltanoState.from_json(
+                    state_id,
+                    json.dumps({"partial": expected_state}),
+                ),
             )
         for state_id, expected_state in state_ids_with_expected_states:
             with open(_get_state_path(state_id)) as state_file:
-                assert JobState.from_json(
+                assert MeltanoState.from_json(
                     state_id,
                     json.dumps({"partial": expected_state}),
-                ) == JobState.from_file(state_id, state_file)
+                ) == MeltanoState.from_file(state_id, state_file)
 
     def test_delete(
         self,
@@ -453,7 +459,7 @@ class TestS3StateStoreManager:
                 lock_timeout_seconds=10,
             )
             store_manager.client.create_bucket(Bucket=store_manager.bucket)
-            store_manager.set(JobState(state_id=state_id, completed_state={}))
+            store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
 
     def test_set_fail_object_in_glacier(
         self,
@@ -475,7 +481,7 @@ class TestS3StateStoreManager:
                 StorageClass="GLACIER",
             )
             with pytest.raises(OSError, match="unable to access") as exc_info:
-                store_manager.set(JobState(state_id=state_id, completed_state={}))
+                store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
 
             exc = exc_info.value
             assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
@@ -493,7 +499,7 @@ class TestS3StateStoreManager:
                 lock_timeout_seconds=10,
             )
             with pytest.raises(botocore.exceptions.ClientError) as exc_info:
-                store_manager.set(JobState(state_id="state-id", completed_state={}))
+                store_manager.set(MeltanoState(state_id="state-id", completed_state={}))
 
             assert exc_info.value.response["Error"]["Code"] == "NoSuchBucket"
 
