@@ -71,10 +71,43 @@ The local filesystem state backend will utilize the [locking strategy](#locking)
 
 To store state remotely in Azure Blob Storage, set the `state_backend.uri` setting to `azure://<your container_name>/<prefix for state JSON blobs>`.
 
-To authenticate to Azure, Meltano will also need a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string).
-You can provide this via the `state_backend.azure.connection_string` setting.
+To authenticate to Azure, there are two possible approaches
+
+- authorizing using [`DefaultAzureCredential`](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python), which can make use of a Managed Identity, CLI etc.
+- authorizing with a Storage Account connection string
+
+Meltano will try the `DefaultAzureCredential` approach first, before falling back to the connection string approach.
+
+#### Using `DefaultAzureCredential`
+
+To use the `DefaultAzureCredential` approach, you will need to provide the storage account URL in the [`state_backend.azure.storage_account_url`](/reference/settings/#state_backendazurestorage_account_url) setting.
+
+The order in which the `DefaultAzureCredential` attempts to resolve authentication is described [in the Azure SDK documentation](https://learn.microsoft.com/en-gb/dotnet/azure/sdk/authentication/credential-chains?tabs=dac#defaultazurecredential-overview).
+If you intend to use a `ManagedIdentity` for an Azure Host or similar, then you will also need to provide your identity client ID under the `AZURE_CLIENT_ID` environment variable.
+
+An example environment variable configuration is given below:
+
+```shell
+MELTANO_STATE_BACKEND_URI='azure://meltano-state'
+MELTANO_STATE_BACKEND_AZURE_STORAGE_ACCOUNT_URL='https://mystorageaccount.blob.core.windows.net/'
+# only necessary if using ManagedIdentity
+AZURE_CLIENT_ID='28a00fb0-67ee-4d11-81f8-10157e07c84f'
+```
+
+A benefit of this approach is that you do not need to enable shared key access to your Blob Storage Account.
+
+#### Using an Azure connection string
+
+You can provide a [connection string](https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string) to Meltano via the [`state_backend.azure.connection_string`](/reference/settings/#state_backendazureconnection_string) setting.
 If no `state_backend.azure.connection_string` setting is configured, Meltano will use the value of the `AZURE_STORAGE_CONNECTION_STRING` environment variable.
 If the connection string is not provided via either of these methods, Meltano will not be able to authenticate to Azure and any state operations will fail.
+
+An example environment variable configuration is given below:
+
+```shell
+MELTANO_STATE_BACKEND_URI='azure://meltano-state'
+AZURE_STORAGE_CONNECTION_STRING='DefaultEndpointsProtocol=https;AccountName=mystorageaccount;AccountKey=gSAw....'
+```
 
 ### AWS S3
 

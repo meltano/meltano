@@ -343,14 +343,7 @@ class SettingDefinition(NameEq, Canonical):
         elif isinstance(value, list):
             kind = SettingKind.ARRAY
 
-        attrs = {
-            "name": key,
-            "kind": kind,
-            "custom": custom,
-            "value": value if default else None,
-        }
-
-        return cls(**attrs)
+        return cls(name=key, kind=kind, custom=custom, value=value if default else None)
 
     @property
     def is_extra(self) -> bool:
