@@ -36,6 +36,7 @@ if t.TYPE_CHECKING:
     import uuid
 
     import structlog
+    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -155,10 +156,10 @@ async def el(  # WPS408
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
     run_id: uuid.UUID | None,
@@ -234,10 +235,10 @@ async def elt(  # WPS408
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
@@ -288,10 +289,10 @@ async def _run_el_command(
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
@@ -363,23 +364,23 @@ async def _run_el_command(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _elt_context_builder(  # noqa: ANN202
+def _elt_context_builder(
     project: Project,
-    job,  # noqa: ANN001
-    session,  # noqa: ANN001
-    extractor,  # noqa: ANN001
-    loader,  # noqa: ANN001
-    transform,  # noqa: ANN001
+    job: Job,
+    session: Session,
+    extractor: str,
+    loader: str,
+    transform: str,
     *,
-    dry_run=False,  # noqa: ANN001
-    full_refresh=False,  # noqa: ANN001
-    refresh_catalog=False,  # noqa: ANN001
-    select_filter=None,  # noqa: ANN001
-    catalog=None,  # noqa: ANN001
-    state=None,  # noqa: ANN001
-    merge_state=False,  # noqa: ANN001
+    dry_run: bool = False,
+    full_refresh: bool = False,
+    refresh_catalog: bool = False,
+    select_filter: list[str] | None = None,
+    catalog: str | None = None,
+    state: str | None = None,
+    merge_state: bool = False,
     run_id: uuid.UUID | None = None,
-):
+) -> ELTContextBuilder:
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
