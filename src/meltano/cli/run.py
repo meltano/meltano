@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import typing as t
-import uuid
 
 import click
 import structlog
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    InstallPlugins,
+    UUIDParamType,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.parser import BlockParser, validate_block_sets
@@ -23,24 +27,13 @@ from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    import uuid
+
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
 
 install, no_install, only_install = get_install_options(include_only_install=True)
-
-
-class UUIDParamType(click.ParamType):
-    """A custom click parameter type for UUIDs."""
-
-    name = "uuid"
-
-    def convert(self, value, param, ctx):  # noqa: ANN001, ANN201
-        """Convert an input value to a UUID."""
-        try:
-            return uuid.UUID(value)
-        except ValueError:
-            self.fail(f"{value} is not a valid UUID.", param, ctx)
 
 
 @click.command(

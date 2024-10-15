@@ -4,15 +4,13 @@ import asyncio
 import json
 import re
 import typing as t
-import uuid
 
-import click
 import pytest
 from mock import AsyncMock, mock
 
 from meltano.cli import cli
-from meltano.cli.run import UUIDParamType
 from meltano.core.block.ioblock import IOBlock
+from meltano.core.logging.job_logging_service import MissingJobLogException
 from meltano.core.logging.utils import default_config
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
@@ -424,6 +422,46 @@ class TestCliRunScratchpadOne:
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:${expected_suffix}",
             )
+
+    @pytest.mark.backend("sqlite")
+    @pytest.mark.usefixtures("use_test_log_config")
+    def test_run_no_state_update(
+        self,
+        cli_runner,
+        tap,
+        target,
+        tap_process,
+        target_process,
+        job_logging_service: JobLoggingService,
+        worker_id: str,
+    ):
+        # exit cleanly when everything is fine
+        create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
+
+        # Verify that no logs are created when `--no-state-update` is passed
+        args = [
+            "run",
+            tap.name,
+            target.name,
+            "--no-state-update",
+            "--state-id-suffix",
+            worker_id,
+        ]
+        state_id = f"dev:{tap.name}-to-{target.name}:{worker_id}"
+
+        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
+            SingerTap,
+            "apply_catalog_rules",
+        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+            asyncio_mock.create_subprocess_exec = create_subprocess_exec
+            result = cli_runner.invoke(cli, args, catch_exceptions=True)
+            assert result.exit_code == 0
+
+            matcher = EventMatcher(result.stderr)
+            assert matcher.find_by_event("Block run completed.")[0]["success"]
+
+            with pytest.raises(MissingJobLogException):
+                job_logging_service.get_latest_log(state_id)
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -1304,22 +1342,3 @@ class TestCliRunScratchpadOne:
                 assert match
             else:
                 assert not match
-
-
-class TestUUIDParamType:
-    @pytest.mark.parametrize(
-        "value",
-        (
-            pytest.param("123e4567-e89b-12d3-a456-426614174000", id="with hyphens"),
-            pytest.param("123e4567e89b12d3a456426614174000", id="without hyphens"),
-        ),
-    )
-    def test_valid_uuid(self, value: str) -> None:
-        param = UUIDParamType()
-        assert param.convert(value, None, None) == uuid.UUID(value)
-
-    def test_invalid_uuid(self) -> None:
-        param = UUIDParamType()
-        value = "zzz"
-        with pytest.raises(click.BadParameter, match="is not a valid UUID"):
-            param.convert(value, None, None)
