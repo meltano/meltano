@@ -150,25 +150,16 @@ class ELTContext:
         self.run_id = run_id
 
     @property
-    def elt_run_dir(self) -> Path:
+    def elt_run_dir(self) -> Path | None:
         """Get the ELT run directory.
 
         Returns:
-            The job dir.
-
-        Raises:
-            RuntimeError: If a job is not available to get the ELT run directory.
+            The job dir, if a Job is provided, else None.
         """
-        # In an EL/ELT run, there is always a job. This means the run directory
-        # is always ".meltano/run/<state-id>/<run-id>".
-        # This also means the catalog can only be cached for executions that use the
-        # same state and run ID.
-        # See https://github.com/meltano/meltano/issues/2415.
         if self.job:
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
-        msg = "A job is required to get the ELT run directory"
-        raise RuntimeError(msg)  # pragma: no cover
+        return None
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.
