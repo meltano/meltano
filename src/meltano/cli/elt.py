@@ -115,7 +115,7 @@ class ELOptions:
     run_id = click.option(
         "--run-id",
         type=UUIDParamType(),
-        help="Use a custom run ID.",
+        help="Provide a UUID to use as the run ID.",
     )
 
 
