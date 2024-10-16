@@ -210,10 +210,8 @@ module = [
   "meltano.cli.state",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.db",
-  "meltano.core.elt_context",
   "meltano.core.migration_service",
   "meltano.core.models",
-  "meltano.core.plugin_invoker",
   "meltano.core.project_add_service",
   "meltano.core.project_files",
   "meltano.core.project_plugins_service",
