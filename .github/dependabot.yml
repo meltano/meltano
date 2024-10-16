@@ -50,7 +50,7 @@ updates:
         - "minor"
         - "patch"
     commit-message:
-      prefix: "chore(deps): "
+      prefix: "packaging(deps): "
       prefix-development: "chore(deps-dev): "
   - package-ecosystem: npm
     versioning-strategy: increase
