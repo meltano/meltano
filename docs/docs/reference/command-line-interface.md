@@ -559,6 +559,8 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
 
+- The `--run-id` option will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano. The catalog will be cached for executions with the same run ID.
+
 #### Examples
 
 ```bash

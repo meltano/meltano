@@ -313,8 +313,10 @@ class ELBContextBuilder:
         Returns:
             The run directory for the current job.
         """
-        if self._job:  # noqa: RET503
+        if self._job:  # pragma: no cover
             return self.project.job_dir(self._job.job_name, str(self._job.run_id))
+
+        return None
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
