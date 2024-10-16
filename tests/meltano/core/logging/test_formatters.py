@@ -129,3 +129,22 @@ class TestLogFormatters:
         assert message_dict["pathname"] == "/path/to/my_module.py"
         assert message_dict["lineno"] == 1
         assert message_dict["func_name"] == "my_func"
+
+    def test_json_formatter_exception(self, record_with_exception) -> None:
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+
+        assert "exception" in message_dict
+
+        exception_list = message_dict["exception"]
+        assert isinstance(exception_list, list)
+        assert len(exception_list) == 1
+        assert exception_list[0]["exc_type"] == "Exception"
+        assert exception_list[0]["exc_value"] == "test"
+
+        formatter = formatters.json_formatter(dict_tracebacks=False)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+
+        assert "exception" not in message_dict
