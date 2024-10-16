@@ -39,27 +39,32 @@ jobs:
         - { id: '03', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
         - { id: '04', python-version: '3.11', os: ubuntu-latest, backend-db: sqlite }
         - { id: '05', python-version: '3.12', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '06', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '07', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '08', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '09', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '10', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '11', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '12', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '13', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
-        - { id: '14', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
-        - { id: '15', python-version: '3.12', os: ubuntu-latest, backend-db: mssql }
+        - { id: '06', python-version: '3.13', os: ubuntu-latest, backend-db: sqlite }
+        - { id: '07', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '08', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
+        - { id: '09', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '10', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '11', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '12', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql }
+        - { id: '13', python-version: '3.8',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '14', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
+        - { id: '15', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
+        - { id: '16', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
+        - { id: '17', python-version: '3.12', os: ubuntu-latest, backend-db: mssql }
+        - { id: '18', python-version: '3.13', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
-        - { id: '16', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
-        - { id: '17', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
-        - { id: '18', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
-        - { id: '19', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
-        - { id: '20', python-version: '3.12', os: windows-2022,  backend-db: sqlite }
-        - { id: '21', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '22', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '23', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '24', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '25', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '19', python-version: '3.8',  os: windows-2022,  backend-db: sqlite }
+        - { id: '20', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
+        - { id: '21', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
+        - { id: '22', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
+        - { id: '23', python-version: '3.12', os: windows-2022,  backend-db: sqlite }
+        - { id: '24', python-version: '3.13', os: windows-2022,  backend-db: sqlite }
+        - { id: '25', python-version: '3.8',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '26', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '27', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '28', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '29', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '30', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -84,13 +89,19 @@ jobs:
       pytest-results-row-18: ${{ steps.append-results.outputs.pytest-results-row-18 }}
       pytest-results-row-19: ${{ steps.append-results.outputs.pytest-results-row-19 }}
       pytest-results-row-20: ${{ steps.append-results.outputs.pytest-results-row-20 }}
+      pytest-results-row-21: ${{ steps.append-results.outputs.pytest-results-row-21 }}
+      pytest-results-row-22: ${{ steps.append-results.outputs.pytest-results-row-22 }}
+      pytest-results-row-23: ${{ steps.append-results.outputs.pytest-results-row-23 }}
+      pytest-results-row-24: ${{ steps.append-results.outputs.pytest-results-row-24 }}
+      pytest-results-row-25: ${{ steps.append-results.outputs.pytest-results-row-25 }}
+      pytest-results-row-26: ${{ steps.append-results.outputs.pytest-results-row-26 }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: not concurrent
       FORCE_COLOR: 1
-      NOXPYTHON: ${{ matrix.python-version }}
+      NOXFORCEPYTHON: ${{ matrix.python-version }}
 
     steps:
     - name: Check out the repository
@@ -112,6 +123,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
         check-latest: true
+        allow-prereleases: true
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
@@ -172,7 +184,7 @@ jobs:
         MSSQL_DB: pytest_warehouse
       shell: bash
       run: |
-        nox -t test -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
+        nox --verbose -t test -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
           tee >( \
             tail | sed -r "s/[[:cntrl:]]\[([0-9]{1,3};)*[0-9]{1,3}m//g" | grep -E '^=+ [0-9].+ =+$' | \
             { read pytest_results; echo "pytest_results='${pytest_results}'" >> ${GITHUB_ENV}; } )
