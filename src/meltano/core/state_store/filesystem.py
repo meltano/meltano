@@ -82,6 +82,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``.
+
+        Returns:
+            The default transport params for filesystem-based backends.
+        """
+        return {}
+
     def uri_with_path(self, path: str) -> str:
         """Build uri with the given path included.
 
@@ -106,7 +115,10 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         if self.client:
             with open(
                 self.uri_with_path(path),
-                transport_params={"client": self.client},
+                transport_params={
+                    "client": self.client,
+                    **self.extra_transport_params,
+                },
             ) as reader:
                 yield reader
         else:
@@ -125,18 +137,20 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Yields:
             A TextIOWrapper to read the file/blob.
         """
+        transport_params = {"client": self.client} if self.client else {}
+        transport_params.update(self.extra_transport_params)
         try:
             with open(
                 self.uri_with_path(path),
                 "w+",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
         except NotImplementedError:
             with open(
                 self.uri_with_path(path),
                 "w",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
 
