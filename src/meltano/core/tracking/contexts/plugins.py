@@ -50,7 +50,7 @@ def _from_plugin(plugin: ProjectPlugin, cmd: str | None) -> dict:
 class PluginsTrackingContext(SelfDescribingJson):
     """Tracking context for the Meltano plugins."""
 
-    def __init__(self, plugins: list(tuple[ProjectPlugin, str | None])):
+    def __init__(self, plugins: list[tuple[ProjectPlugin, str | None]]):
         """Initialize a meltano tracking plugin context.
 
         Args:

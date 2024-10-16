@@ -14,6 +14,7 @@ from meltano.core import yaml
 from meltano.core.utils import deep_merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Mapping
     from os import PathLike
     from pathlib import Path
 
@@ -184,7 +185,7 @@ class ProjectFiles:
             )
             raise Exception("Duplicate plugin name found.")  # noqa: EM101
 
-        self._plugin_file_map.update({key: str(include_path)})
+        self._plugin_file_map[key] = str(include_path)
 
     def _index_file(
         self,
@@ -365,6 +366,6 @@ class ProjectFiles:
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: t.Mapping) -> None:
+    def _write_file(self, file_path: PathLike, contents: Mapping) -> None:
         with atomic_write(file_path, overwrite=True) as fl:
             yaml.dump(contents, fl)

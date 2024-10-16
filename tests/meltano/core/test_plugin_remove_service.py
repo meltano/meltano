@@ -14,6 +14,8 @@ from sqlalchemy.exc import OperationalError
 from meltano.core.plugin_remove_service import PluginRemoveService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.plugin_location_remove import PluginLocationRemoveManager
 
 
@@ -23,7 +25,7 @@ class TestPluginRemoveService:
         return PluginRemoveService(project)
 
     @pytest.fixture()
-    def add(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+    def add(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         with subject.project.meltanofile.open("r") as meltano_yml:
             original = yaml.safe_load(meltano_yml)
 
@@ -57,7 +59,7 @@ class TestPluginRemoveService:
             meltano_yml.write(yaml.dump(original))
 
     @pytest.fixture()
-    def no_plugins(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+    def no_plugins(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         with subject.project.meltanofile.open("r") as meltano_yml:
             original = yaml.safe_load(meltano_yml)
 
@@ -70,7 +72,7 @@ class TestPluginRemoveService:
             meltano_yml.write(yaml.dump(original))
 
     @pytest.fixture()
-    def install(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+    def install(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
             "tap-gitlab",
@@ -86,7 +88,7 @@ class TestPluginRemoveService:
         shutil.rmtree(target_csv_installation, ignore_errors=True)
 
     @pytest.fixture()
-    def lock(self, subject: PluginRemoveService) -> t.Generator[None, None, None]:
+    def lock(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",
             "tap-gitlab",

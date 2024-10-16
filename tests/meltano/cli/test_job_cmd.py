@@ -13,10 +13,13 @@ class TestCliJob:
     @pytest.mark.usefixtures("session", "project")
     def test_job_add(self, cli_runner, task_sets_service) -> None:
         # singular task with job
-        with mock.patch(
-            "meltano.cli.job.TaskSetsService",
-            return_value=task_sets_service,
-        ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
+        with (
+            mock.patch(
+                "meltano.cli.job.TaskSetsService",
+                return_value=task_sets_service,
+            ),
+            mock.patch("meltano.cli.job._validate_tasks", return_value=True),
+        ):
             res = cli_runner.invoke(
                 cli,
                 [
@@ -97,10 +100,13 @@ class TestCliJob:
     @pytest.mark.usefixtures("session", "project")
     def test_job_set(self, cli_runner, task_sets_service) -> None:
         # singular task with job
-        with mock.patch(
-            "meltano.cli.job.TaskSetsService",
-            return_value=task_sets_service,
-        ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
+        with (
+            mock.patch(
+                "meltano.cli.job.TaskSetsService",
+                return_value=task_sets_service,
+            ),
+            mock.patch("meltano.cli.job._validate_tasks", return_value=True),
+        ):
             res = cli_runner.invoke(
                 cli,
                 [
@@ -133,10 +139,13 @@ class TestCliJob:
     @pytest.mark.usefixtures("session", "project")
     def test_job_remove(self, cli_runner, task_sets_service) -> None:
         # singular task with job
-        with mock.patch(
-            "meltano.cli.job.TaskSetsService",
-            return_value=task_sets_service,
-        ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
+        with (
+            mock.patch(
+                "meltano.cli.job.TaskSetsService",
+                return_value=task_sets_service,
+            ),
+            mock.patch("meltano.cli.job._validate_tasks", return_value=True),
+        ):
             res = cli_runner.invoke(
                 cli,
                 [
@@ -157,10 +166,13 @@ class TestCliJob:
     @pytest.mark.usefixtures("session", "project")
     def test_job_list(self, cli_runner, task_sets_service) -> None:
         # singular task with job
-        with mock.patch(
-            "meltano.cli.job.TaskSetsService",
-            return_value=task_sets_service,
-        ), mock.patch("meltano.cli.job._validate_tasks", return_value=True):
+        with (
+            mock.patch(
+                "meltano.cli.job.TaskSetsService",
+                return_value=task_sets_service,
+            ),
+            mock.patch("meltano.cli.job._validate_tasks", return_value=True),
+        ):
             cli_args = [
                 "job",
                 "add",

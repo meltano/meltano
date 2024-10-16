@@ -767,9 +767,12 @@ class TestCliAdd:
         assert res.exception.reason == invalid_reason
 
     def test_add_with_python_version(self, cli_runner: CliRunner) -> None:
-        with mock.patch(
-            "meltano.core.venv_service._resolve_python_path",
-        ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.VenvService.install"),
+        ):
             python = "python3.X"
             assert_cli_runner(
                 cli_runner.invoke(

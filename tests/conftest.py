@@ -15,6 +15,8 @@ from requests.adapters import BaseAdapter
 from meltano.core.plugin.base import PluginType
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from meltano.core.project import Project
 
 logging.basicConfig(level=logging.INFO)
@@ -200,7 +202,7 @@ class MockAdapter(BaseAdapter):
 
 
 @pytest.fixture(scope="class")
-def hub_mock_adapter(discovery) -> t.Callable[[str], MockAdapter]:
+def hub_mock_adapter(discovery) -> Callable[[str], MockAdapter]:
     def _get_adapter(api_url: str) -> MockAdapter:
         return MockAdapter(api_url, discovery)
 

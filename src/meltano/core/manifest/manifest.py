@@ -7,6 +7,7 @@ import re
 import subprocess
 import typing as t
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import suppress
 from functools import cached_property, reduce
 from operator import getitem
@@ -32,7 +33,7 @@ from meltano.core.utils import (
 
 if t.TYPE_CHECKING:
     import sys
-    from collections.abc import Iterable
+    from collections.abc import Iterable, MutableMapping
 
     from meltano.core.plugin.base import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -60,9 +61,9 @@ MANIFEST_SCHEMA_PATH = (
     Path(package_root_path).parent / "schemas" / "meltano.schema.json"
 )
 
-Trie: TypeAlias = t.Dict[str, "Trie"]
-PluginsByType: TypeAlias = t.Mapping[str, t.List[t.Mapping[str, t.Any]]]
-PluginsByNameByType: TypeAlias = t.Mapping[str, t.Mapping[str, t.Mapping[str, t.Any]]]
+Trie: TypeAlias = dict[str, "Trie"]
+PluginsByType: TypeAlias = Mapping[str, list[Mapping[str, t.Any]]]
+PluginsByNameByType: TypeAlias = Mapping[str, Mapping[str, Mapping[str, t.Any]]]
 
 
 # Ruamel doesn't have this problem where YAML tags like timestamps are
@@ -193,18 +194,12 @@ class Manifest:
             deep_merge(
                 yaml.load(
                     self._meltano_file,
-                    t.cast(  # noqa: S506
-                        t.Type[yaml.SafeLoader],
-                        YamlNoTimestampSafeLoader,
-                    ),
+                    t.cast(type[yaml.SafeLoader], YamlNoTimestampSafeLoader),  # noqa: S506
                 ),
                 *(
                     yaml.load(
                         x.read_text(),
-                        t.cast(  # noqa: S506
-                            t.Type[yaml.SafeLoader],
-                            YamlNoTimestampSafeLoader,
-                        ),
+                        t.cast(type[yaml.SafeLoader], YamlNoTimestampSafeLoader),  # noqa: S506
                     )
                     for x in self.project.project_files.include_paths
                 ),
@@ -225,7 +220,7 @@ class Manifest:
         manifest: dict[str, t.Any],
     ) -> None:
         locked_plugins = t.cast(
-            t.Dict[str, t.List[t.Mapping[str, t.Any]]],
+            dict[str, list[Mapping[str, t.Any]]],
             {
                 plugin_type.value: [
                     PluginLock(self.project, plugin).load(create=True, loader=json.load)
@@ -241,7 +236,7 @@ class Manifest:
             _plugins_by_name_by_type(locked_plugins),
         )
 
-    def sanitize_env_vars(self, env: t.Mapping[str, str]) -> dict[str, str]:
+    def sanitize_env_vars(self, env: Mapping[str, str]) -> dict[str, str]:
         """Sanitize environment variables.
 
         Sanitization is performed by:
@@ -262,7 +257,7 @@ class Manifest:
 
     def env_aware_merge_mappings(
         self,
-        data: t.MutableMapping[str, t.Any],
+        data: MutableMapping[str, t.Any],
         key: str,
         value: t.Any,  # noqa: ANN401
         _: tuple[t.Any, ...] | None = None,

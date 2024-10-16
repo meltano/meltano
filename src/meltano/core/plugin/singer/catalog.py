@@ -13,13 +13,16 @@ import structlog
 from meltano.core.behavior.visitor import visit_with
 
 if sys.version_info < (3, 11):
-    ReprEnum = Enum
+    from backports.strenum import StrEnum
 else:
-    from enum import ReprEnum
+    from enum import StrEnum
+
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
 
 logger = structlog.stdlib.get_logger(__name__)
 
-Node = t.Dict[str, t.Any]
+Node = dict[str, t.Any]
 T = t.TypeVar("T", bound="CatalogRule")
 
 
@@ -165,7 +168,7 @@ class SelectPattern(t.NamedTuple):
         )
 
 
-def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
+def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select` patterns.
 
     Args:
@@ -210,7 +213,7 @@ def select_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
     return include_rules + exclude_rules
 
 
-def select_filter_metadata_rules(patterns: t.Iterable[str]) -> list[MetadataRule]:
+def select_filter_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
     """Create metadata rules from `select_filter` patterns.
 
     Args:
@@ -301,13 +304,12 @@ class CatalogNode(Enum):  # noqa: D101
     METADATA = auto()
 
 
-# TODO: Move to `enum.StrEnum` when support for Python 3.8 is dropped
-class SelectionType(str, ReprEnum):
+class SelectionType(StrEnum):
     """A valid stream or property selection type."""
 
-    SELECTED = "selected"
-    EXCLUDED = "excluded"
-    AUTOMATIC = "automatic"
+    SELECTED = auto()
+    EXCLUDED = auto()
+    AUTOMATIC = auto()
 
     def __bool__(self) -> bool:  # noqa: D105
         return self is not self.__class__.EXCLUDED

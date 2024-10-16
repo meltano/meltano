@@ -16,6 +16,8 @@ from sqlalchemy.sql import text
 from meltano.core.error import MeltanoError
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from sqlalchemy.engine import Connection, Engine
 
     from meltano.core.project import Project
@@ -157,7 +159,7 @@ def connect(
             time.sleep(retry_timeout)
 
 
-init_hooks: dict[str, t.Callable[[Connection], None]] = {
+init_hooks: dict[str, Callable[[Connection], None]] = {
     "sqlite": lambda x: x.execute(text("PRAGMA journal_mode=WAL")),
 }
 

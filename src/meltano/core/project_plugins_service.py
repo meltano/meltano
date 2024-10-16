@@ -16,6 +16,8 @@ from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundE
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -377,7 +379,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:  # noqa: ANN001
+    def plugins(self, *, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:  # noqa: ANN001
         """Return all plugins.
 
         Args:

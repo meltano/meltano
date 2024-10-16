@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import typing as t
 import uuid
+from collections.abc import Callable, Coroutine
 
 import click
 
@@ -18,10 +19,10 @@ from meltano.core.utils import async_noop
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-_AnyCallable = t.Callable[..., t.Any]
+_AnyCallable = Callable[..., t.Any]
 FC = t.TypeVar("FC", bound=_AnyCallable)
 
-InstallPlugins = t.Callable[..., t.Coroutine[t.Any, t.Any, bool]]
+InstallPlugins = Callable[..., Coroutine[t.Any, t.Any, bool]]
 
 
 def _install_plugins_fn(
@@ -80,7 +81,7 @@ def database_uri_option(func):  # noqa: ANN001, ANN201
 def get_install_options(
     *,
     include_only_install: bool,
-) -> tuple[t.Callable[[FC], FC], ...]:
+) -> tuple[Callable[[FC], FC], ...]:
     """Return install options for CLI commands.
 
     Args:

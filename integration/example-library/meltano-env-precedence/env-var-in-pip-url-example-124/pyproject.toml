@@ -9,7 +9,7 @@ packages = [{include = "example.py"}]
 echo = "example:echo"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 [build-system]
 requires = ["poetry-core"]
