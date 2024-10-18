@@ -310,12 +310,28 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
 @prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
-@click.argument("state-id")
+@click.argument("state-id", required=False)
+@click.option(
+    "--clear-all",
+    is_flag=True,
+    required=False,
+    help="Helps clear all states. Use with --force flag to skip confirmation.",
+)
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str) -> None:
+def clear_state(
+    ctx: click.Context, project: Project, state_id: str, clear_all: bool
+) -> None:
     """Clear state."""
-    state_service: StateService = (
-        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
-    state_service.clear_state(state_id)
+    if bool(state_id) == clear_all:  # Case where neither or both have been provided
+        raise click.UsageError(
+            "Either a state ID or --clear-all flag must be provided. Not both."
+        )  # pragma: no cover
+    if state_id:
+        state_service: StateService = (
+            state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+        )
+        state_service.clear_state(state_id)
+    if clear_all:
+        state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+        state_service.clear_all_states()
