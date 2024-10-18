@@ -278,6 +278,7 @@ class Variant(NameEq, Canonical):
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
+        pip_requirements: list | None = None,
         python: str | None = None,
         executable: str | None = None,
         description: str | None = None,
@@ -299,6 +300,7 @@ class Variant(NameEq, Canonical):
             docs: The documentation URL.
             repo: The repository URL.
             pip_url: The pip URL.
+            pip_requirements: The pip requirements.
             python: The path to the Python executable to use, or name to find on the
                 $PATH. Defaults to the Python executable running Meltano.
             executable: The executable name.
@@ -319,6 +321,7 @@ class Variant(NameEq, Canonical):
             docs=docs,
             repo=repo,
             pip_url=pip_url,
+            pip_requirements=pip_requirements,
             python=python,
             executable=executable,
             description=description,
@@ -504,6 +507,7 @@ class PluginDefinition(PluginRef):
             docs=plugin.docs,
             repo=plugin.repo,
             pip_url=plugin.pip_url,
+            pip_requirements=plugin.pip_requirements,
             python=plugin.python,
             executable=plugin.executable,
             description=plugin.description,
@@ -786,6 +790,7 @@ class StandalonePlugin(Canonical):
         docs: str | None = None,
         repo: str | None = None,
         pip_url: str | None = None,
+        pip_requirements: list | None = None,
         python: str | None = None,
         executable: str | None = None,
         description: str | None = None,
@@ -809,6 +814,7 @@ class StandalonePlugin(Canonical):
             docs: The documentation URL of the plugin.
             repo: The repository URL of the plugin.
             pip_url: The pip URL of the plugin.
+            pip_requirements: The pip requirements of the plugin.
             python: The path to the Python executable to use, or name to find on the
                 $PATH. Defaults to the Python executable running Meltano.
             executable: The executable of the plugin.
@@ -831,6 +837,7 @@ class StandalonePlugin(Canonical):
             docs=docs,
             repo=repo,
             pip_url=pip_url,
+            pip_requirements=pip_requirements,
             python=python,
             executable=executable,
             description=description,
@@ -897,6 +904,7 @@ class StandalonePlugin(Canonical):
             docs=variant.docs,
             repo=variant.repo,
             pip_url=variant.pip_url,
+            pip_requirements=variant.pip_requirements,
             python=plugin_def.python,
             executable=variant.executable,
             description=variant.description,
