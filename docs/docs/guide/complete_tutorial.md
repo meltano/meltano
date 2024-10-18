@@ -796,7 +796,7 @@ If that doesn't get you closer to a solution, [feel free to ask for assistance f
 
 If you run `meltano run` at another time, it will automatically pick up where the previous run left off, assuming the extractor supports [incremental replication](/guide/integration#incremental-replication-state) and you have an active environment.
 Behind the scenes Meltano is tracking state using a State ID that's auto-generated based on the extractor name, loader name, and active environment name.
-To override the state and extract all data from the beginning again you can use the `--full-refresh` argument.
+To override the state and extract all data from the beginning again you can use the `--full-refresh` flag, or the `MELTANO_RUN_FULL_REFRESH=1` environment variable.
 
 :::info
 

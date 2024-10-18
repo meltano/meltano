@@ -523,7 +523,7 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - The `--state-id` option identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
-- A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same State ID.
+- A `--full-refresh` flag or the `MELTANO_RUN_FULL_REFRESH=1` environment variable can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same State ID.
 
 - A `--force` flag can be passed to force a new run even when a pipeline with the same State ID is already running, which would result in an error otherwise.
 
@@ -1008,7 +1008,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--dry-run` just parse the invocation, validate it, and explain what would be executed. Does not execute anything.
   (implicitly enables --log-level=debug for 'console' named handlers).
 - `--no-state-update` will disable state saving for this invocation.
-- `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified.
+- `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).

@@ -55,6 +55,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
         "Perform a full refresh (ignore state left behind by any previous "
         "runs). Applies to all pipelines."
     ),
+    envvar="MELTANO_RUN_FULL_REFRESH",
     is_flag=True,
 )
 @click.option(
