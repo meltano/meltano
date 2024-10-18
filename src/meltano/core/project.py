@@ -31,6 +31,8 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import makedirs, sanitize_filename, truthy
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
 
@@ -51,7 +53,7 @@ PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
 
 
-def walk_parent_directories() -> t.Generator[Path, None, None]:
+def walk_parent_directories() -> Generator[Path, None, None]:
     """Yield each directory starting with the current up to the root.
 
     Yields:
@@ -322,7 +324,7 @@ class Project(Versioned):
             return MeltanoFile.parse(self.project_files.load())
 
     @contextmanager
-    def meltano_update(self):  # noqa: ANN201
+    def meltano_update(self) -> Generator[MeltanoFileTypeHint, None, None]:
         """Yield the current meltano configuration.
 
         Update the meltanofile if the context ends gracefully.
@@ -343,7 +345,7 @@ class Project(Versioned):
             meltano_config = MeltanoFile.parse(self.project_files.load())
             yield meltano_config
             try:
-                self.project_files.update(meltano_config.canonical())
+                self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]
             except Exception as err:
                 logger.critical("Could not update meltano.yml: %s", err)
                 raise

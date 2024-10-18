@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import enum
 import os
+import sys
 import typing as t
 import warnings
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager, suppress
-from enum import Enum
 
 import structlog
 
@@ -20,7 +21,14 @@ from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import EnvVarMissingBehavior, flatten
 from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 if t.TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
+
     from meltano.core.project import Project
     from meltano.core.settings_store import SettingsStoreManager
 
@@ -35,19 +43,11 @@ EXPERIMENTAL = "experimental"
 FEATURE_FLAG_PREFIX = "ff"
 
 
-class FeatureFlags(str, Enum):
+class FeatureFlags(StrEnum):
     """Available Meltano Feature Flags."""
 
-    STRICT_ENV_VAR_MODE = "strict_env_var_mode"
-    PLUGIN_LOCKS_REQUIRED = "plugin_locks_required"
-
-    def __str__(self) -> str:
-        """Return feature name.
-
-        Returns:
-            str: Feature name.
-        """
-        return self.value
+    STRICT_ENV_VAR_MODE = enum.auto()
+    PLUGIN_LOCKS_REQUIRED = enum.auto()
 
     @property
     def setting_name(self) -> str:
@@ -581,7 +581,7 @@ class SettingsService(metaclass=ABCMeta):
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras: bool | None = None) -> t.Iterable[SettingDefinition]:
+    def definitions(self, extras: bool | None = None) -> Iterable[SettingDefinition]:
         """Return setting definitions along with extras.
 
         Args:
@@ -674,7 +674,7 @@ class SettingsService(metaclass=ABCMeta):
         feature: str,
         *,
         raise_error: bool = True,
-    ) -> t.Generator[bool, None, None]:
+    ) -> Generator[bool, None, None]:
         """Gate code paths based on feature flags.
 
         Args:

@@ -39,6 +39,8 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from requests.adapters import BaseAdapter
 
 current_dir = Path(__file__).parent
@@ -2104,11 +2106,12 @@ def project_directory(project_init_service):
 def project(
     project_init_service,
     tmp_path_factory: pytest.TempPathFactory,
-    hub_mock_adapter: t.Callable[[str], BaseAdapter],
+    hub_mock_adapter: Callable[[str], BaseAdapter],
 ):
-    with cd(tmp_path_factory.mktemp("meltano-project-dir")), project_directory(
-        project_init_service,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-project-dir")),
+        project_directory(project_init_service) as project,
+    ):
         project.hub_service.session.mount(
             project.hub_service.hub_api_url,
             hub_mock_adapter(project.hub_service.hub_api_url),
@@ -2124,11 +2127,14 @@ def project_function(project_init_service, tmp_path: Path):
 
 @pytest.fixture(scope="class")
 def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):
-    with cd(tmp_path_factory.mktemp("meltano-project-files")), tmp_project(
-        "a_multifile_meltano_project_core",
-        current_dir / "multifile_project",
-        compatible_copy_tree,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-project-files")),
+        tmp_project(
+            "a_multifile_meltano_project_core",
+            current_dir / "multifile_project",
+            compatible_copy_tree,
+        ) as project,
+    ):
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
 

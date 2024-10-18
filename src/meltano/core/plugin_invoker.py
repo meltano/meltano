@@ -22,11 +22,14 @@ from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
 
 if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
     from typing_extensions import Unpack
 else:
+    from enum import StrEnum
     from typing import Unpack  # noqa: ICN003
 
 if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -140,12 +143,12 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
-    class StdioSource(str, enum.Enum):
+    class StdioSource(StrEnum):
         """Describes the available unix style std io sources."""
 
-        STDIN = "stdin"
-        STDOUT = "stdout"
-        STDERR = "stderr"
+        STDIN = enum.auto()
+        STDOUT = enum.auto()
+        STDERR = enum.auto()
 
     def __init__(
         self,
@@ -441,7 +444,7 @@ class PluginInvoker:
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs,  # noqa: ANN003
-    ) -> t.AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]], None]:
+    ) -> AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]], None]:
         """Invoke a command.
 
         Args:

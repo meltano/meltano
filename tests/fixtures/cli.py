@@ -51,19 +51,25 @@ def large_config_project(
     compatible_copy_tree,
     tmp_path_factory: pytest.TempPathFactory,
 ):
-    with cd(tmp_path_factory.mktemp("meltano-large-config-project")), tmp_project(
-        "large_config_project",
-        current_dir / "large_config_project",
-        compatible_copy_tree,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-large-config-project")),
+        tmp_project(
+            "large_config_project",
+            current_dir / "large_config_project",
+            compatible_copy_tree,
+        ) as project,
+    ):
         yield project
 
 
 @pytest.fixture(scope="class")
 def project_files_cli(compatible_copy_tree, tmp_path_factory: pytest.TempPathFactory):
-    with cd(tmp_path_factory.mktemp("meltano-project-files-cli")), tmp_project(
-        "a_multifile_meltano_project_cli",
-        current_dir / "multifile_project",
-        compatible_copy_tree,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-project-files-cli")),
+        tmp_project(
+            "a_multifile_meltano_project_cli",
+            current_dir / "multifile_project",
+            compatible_copy_tree,
+        ) as project,
+    ):
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)

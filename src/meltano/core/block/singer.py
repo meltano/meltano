@@ -13,6 +13,7 @@ from meltano.core.runner import RunnerError
 
 if t.TYPE_CHECKING:
     from asyncio.subprocess import Process
+    from collections.abc import Sequence
 
     from meltano.core.elt_context import PluginContext
     from meltano.core.logging.utils import SubprocessOutputWriter
@@ -269,7 +270,7 @@ class SingerBlock(InvokerBase, IOBlock):
         block_ctx: PluginContext,
         project: Project,
         plugin_invoker: PluginInvoker,
-        plugin_args: t.Sequence[str],
+        plugin_args: Sequence[str],
     ):
         """Configure and return a Singer plugin wrapped as an IOBlock.
 

@@ -455,12 +455,15 @@ class TestSingerTap:
 
             return mock.Mock(visit=visit)
 
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.MetadataExecutor",
-            side_effect=mock_metadata_executor,
-        ), mock.patch(
-            "meltano.core.plugin.singer.tap.SchemaExecutor",
-            side_effect=mock_schema_executor,
+        with (
+            mock.patch(
+                "meltano.core.plugin.singer.tap.MetadataExecutor",
+                side_effect=mock_metadata_executor,
+            ),
+            mock.patch(
+                "meltano.core.plugin.singer.tap.SchemaExecutor",
+                side_effect=mock_schema_executor,
+            ),
         ):
             reset_catalog()
 
@@ -865,19 +868,27 @@ class TestSingerTap:
         invoker.invoke_async = AsyncMock(return_value=process_mock)
         catalog_path = invoker.files["catalog"]
 
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-            return_value=False,
-        ), mock.patch("meltano.core.plugin.singer.tap._stream_redirect") as stream_mock:
+        with (
+            mock.patch(
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+                return_value=False,
+            ),
+            mock.patch(
+                "meltano.core.plugin.singer.tap._stream_redirect"
+            ) as stream_mock,
+        ):
             await subject.run_discovery(invoker, catalog_path)
             assert stream_mock.call_count == 2
 
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-            return_value=True,
-        ), mock.patch(
-            "meltano.core.plugin.singer.tap._stream_redirect",
-        ) as stream_mock2:
+        with (
+            mock.patch(
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+                return_value=True,
+            ),
+            mock.patch(
+                "meltano.core.plugin.singer.tap._stream_redirect",
+            ) as stream_mock2,
+        ):
             await subject.run_discovery(invoker, catalog_path)
             assert stream_mock2.call_count == 2
 
@@ -885,12 +896,15 @@ class TestSingerTap:
         discovery_logger = logging.getLogger("meltano.core.plugin.singer.tap")  # noqa: TID251
         original_level = discovery_logger.getEffectiveLevel()
         discovery_logger.setLevel(logging.INFO)
-        with mock.patch(
-            "meltano.core.plugin.singer.tap.logger.isEnabledFor",
-            return_value=True,
-        ), mock.patch(
-            "meltano.core.plugin.singer.tap._stream_redirect",
-        ) as stream_mock3:
+        with (
+            mock.patch(
+                "meltano.core.plugin.singer.tap.logger.isEnabledFor",
+                return_value=True,
+            ),
+            mock.patch(
+                "meltano.core.plugin.singer.tap._stream_redirect",
+            ) as stream_mock3,
+        ):
             await subject.run_discovery(invoker, catalog_path)
 
             assert stream_mock3.call_count == 2

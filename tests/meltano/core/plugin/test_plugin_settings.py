@@ -24,6 +24,8 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.environment import Environment
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
@@ -75,7 +77,7 @@ def subject(tap, plugin_settings_service_factory) -> PluginSettingsService:
 
 
 @pytest.fixture()
-def environment(project: Project) -> t.Generator[Environment, None, None]:
+def environment(project: Project) -> Generator[Environment, None, None]:
     project.activate_environment("dev")
     try:
         yield project.environment
@@ -952,7 +954,7 @@ class TestPluginSettingsService:
         subject.set(
             "_vars",
             {"dev_setting": "from_dev_env"},
-            store=SettingValueStore.MELTANO_ENV,
+            store=SettingValueStore.MELTANO_ENVIRONMENT,
         )
         assert subject.get_with_source("_vars") == (
             {
@@ -960,7 +962,7 @@ class TestPluginSettingsService:
                 "other": "from_meltano_yml",
                 "dev_setting": "from_dev_env",
             },
-            SettingValueStore.MELTANO_ENV,
+            SettingValueStore.MELTANO_ENVIRONMENT,
         )
 
         subject.project.deactivate_environment()

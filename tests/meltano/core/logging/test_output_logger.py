@@ -14,6 +14,9 @@ from structlog.testing import LogCapture
 
 from meltano.core.logging.output_logger import Out, OutputLogger
 
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 def assert_lines(output, *lines) -> None:
     for line in lines:
@@ -52,7 +55,7 @@ class TestOutputLogger:
     def redirect_handler(
         self,
         subject: OutputLogger,
-    ) -> t.Generator[logging.Handler, None, None]:
+    ) -> Generator[logging.Handler, None, None]:
         formatter = structlog.stdlib.ProcessorFormatter(
             # use a json renderer so output is easier to verify
             processor=structlog.processors.JSONRenderer(),
@@ -205,11 +208,14 @@ class TestOutputLogger:
 
         logging_out = subject.out("logging")
 
-        with mock.patch.object(
-            Out,
-            "redirect_log_handler",
-            redirect_handler,
-        ), logging_out.redirect_logging():
+        with (
+            mock.patch.object(
+                Out,
+                "redirect_log_handler",
+                redirect_handler,
+            ),
+            logging_out.redirect_logging(),
+        ):
             logging.info("info")  # noqa: TID251
             logging.warning("warning")  # noqa: TID251
             logging.error("error")  # noqa: TID251
@@ -239,11 +245,15 @@ class TestOutputLogger:
         # it raises logs unhandled exceptions
         exception = Exception("exception")
 
-        with pytest.raises(Exception) as exc, mock.patch.object(  # noqa: PT011
-            Out,
-            "redirect_log_handler",
-            redirect_handler,
-        ), logging_out.redirect_logging():
+        with (
+            pytest.raises(Exception) as exc,  # noqa: PT011
+            mock.patch.object(
+                Out,
+                "redirect_log_handler",
+                redirect_handler,
+            ),
+            logging_out.redirect_logging(),
+        ):
             raise exception
 
         # make sure it let the exception through

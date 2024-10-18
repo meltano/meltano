@@ -8,6 +8,8 @@ import pytest
 from meltano.core.plugin import PluginType
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -65,7 +67,7 @@ class TestSingerMapper:
         self,
         subject: ProjectPlugin,
         session: Session,
-        plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
     ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -76,7 +78,7 @@ class TestSingerMapper:
         self,
         subject: ProjectPlugin,
         session: Session,
-        plugin_invoker_factory: t.Callable[[ProjectPlugin], PluginInvoker],
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
     ) -> None:
         invoker = plugin_invoker_factory(subject)
 

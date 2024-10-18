@@ -56,7 +56,7 @@ def handle_producer_line_length_limit_error(
     """
     # TODO: reuse from runner/singer.py
     # StreamReader.readline can raise a ValueError wrapping a LimitOverrunError:
-    # https://github.com/python/cpython/blob/v3.8.7/Lib/asyncio/streams.py#L549
+    # https://github.com/python/cpython/blob/v3.12.7/Lib/asyncio/streams.py#L577
     if not isinstance(exception, ValueError):
         return
 

@@ -36,7 +36,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.8, 3.9, 3.10, 3.11 and 3.12 are supported. Some plugins do not yet support Python 3.12.
+Currently Python 3.9, 3.10, 3.11 and 3.12 are supported. Some plugins do not yet support Python 3.12.
 
 #### Install pipx
 
@@ -107,7 +107,7 @@ Use the following command to check that you have a supported Python version inst
 python --version
 ```
 
-Currently Python 3.8, 3.9, 3.10, 3.11 and 3.12 are supported. Some plugins do not yet support Python 3.12.
+Currently Python 3.9, 3.10, 3.11 and 3.12 are supported. Some plugins do not yet support Python 3.12.
 
 #### Install pipx
 
@@ -160,16 +160,16 @@ We maintain the [`meltano/meltano`](https://hub.docker.com/r/meltano/meltano) Do
 To get the latest version of Meltano, pull the `latest` tag. Images for specific versions of Meltano are tagged `v<X.Y.Z>`, e.g. `v1.55.0`.
 
 By default, these images come with a version of Python chosen for a balance of stability and compatibility, currently Python 3.9.
-If you'd like to use a different version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.7` and `v1.54.0-python3.7`.
+If you'd like to use a different version of Python instead, add a `-python<X.Y>` suffix to the image tag, e.g. `latest-python3.11` and `v3.5.4-python3.11`.
 
 ```bash
 # download or update to the latest version
 docker pull meltano/meltano
 
 # Or choose a specific version of Meltano and/or Python:
-# docker pull meltano/meltano:v1.55.0
-# docker pull meltano/meltano:latest-python3.7
-# docker pull meltano/meltano:v1.55.0-python3.8
+# docker pull meltano/meltano:v3.5.4
+# docker pull meltano/meltano:latest-python3.11
+# docker pull meltano/meltano:v3.5.4-python3.12
 
 # check the currently installed version
 docker run meltano/meltano --version

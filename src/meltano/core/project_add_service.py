@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+import sys
 import typing as t
 
 from meltano.core.plugin import BasePlugin, PluginType, Variant
@@ -12,21 +13,26 @@ from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
 )
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-class PluginAddedReason(str, enum.Enum):
+class PluginAddedReason(StrEnum):
     """The reason why a plugin was added to the project."""
 
     #: The plugin was added by the user.
-    USER_REQUEST = "user_request"
+    USER_REQUEST = enum.auto()
 
     #: The plugin was added because it is related to another plugin.
-    RELATED = "related"
+    RELATED = enum.auto()
 
     #: The plugin was added because it is required by another plugin.
-    REQUIRED = "required"
+    REQUIRED = enum.auto()
 
 
 class MissingPluginException(Exception):

@@ -13,7 +13,8 @@ import subprocess
 import sys
 import typing as t
 from asyncio.subprocess import Process
-from functools import cached_property, lru_cache
+from collections.abc import Awaitable, Callable
+from functools import cache, cached_property
 from numbers import Number
 from pathlib import Path
 
@@ -22,7 +23,7 @@ import structlog
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Iterable, Sequence
 
     from meltano.core.project import Project
 
@@ -39,10 +40,10 @@ else:
 
 logger = structlog.stdlib.get_logger(__name__)
 
-StdErrExtractor: TypeAlias = t.Callable[[Process], t.Awaitable[t.Union[str, None]]]
+StdErrExtractor: TypeAlias = Callable[[Process], Awaitable[t.Union[str, None]]]
 
 
-@lru_cache(maxsize=None)
+@cache
 def find_uv() -> str:
     """Find the `uv` executable.
 
@@ -232,7 +233,7 @@ class VirtualEnv:
             return None
         return self.plugin_fingerprint_path.read_text()
 
-    def write_fingerprint(self, pip_install_args: t.Sequence[str]) -> None:
+    def write_fingerprint(self, pip_install_args: Sequence[str]) -> None:
         """Save the fingerprint for this installation.
 
         Args:
@@ -331,7 +332,7 @@ class VenvService:
 
     async def install(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         clean: bool = False,
         env: dict[str, str | None] | None = None,
@@ -355,7 +356,7 @@ class VenvService:
         await self._pip_install(pip_install_args=pip_install_args, clean=clean, env=env)
         self.venv.write_fingerprint(pip_install_args)
 
-    def requires_clean_install(self, pip_install_args: t.Sequence[str]) -> bool:
+    def requires_clean_install(self, pip_install_args: Sequence[str]) -> bool:
         """Determine whether a clean install is needed.
 
         Args:
@@ -502,7 +503,7 @@ class VenvService:
 
     async def install_pip_args(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         env: dict[str, str | None] | None = None,
@@ -573,7 +574,7 @@ class VenvService:
 
     async def _pip_install(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         clean: bool = False,
         env: dict[str, str | None] | None = None,
@@ -651,7 +652,7 @@ class UvVenvService(VenvService):
     @override
     async def install_pip_args(
         self,
-        pip_install_args: t.Sequence[str],
+        pip_install_args: Sequence[str],
         *,
         extract_stderr: StdErrExtractor = _extract_stderr,
         env: dict[str, str | None] | None = None,

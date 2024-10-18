@@ -2,9 +2,12 @@ from __future__ import annotations  # noqa: D100
 
 import typing as t
 
+if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 class visit_with:  # noqa: D101, N801
-    def __init__(self, visit: t.Callable):  # noqa: D107
+    def __init__(self, visit: Callable):  # noqa: D107
         self.visit = visit
 
     def __call__(self, base_cls):  # noqa: ANN001, ANN204, D102

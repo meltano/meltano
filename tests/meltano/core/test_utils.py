@@ -11,7 +11,6 @@ from meltano.core.utils import (
     makedirs,
     nest,
     pop_at_path,
-    remove_suffix,
     set_at_path,
 )
 
@@ -267,12 +266,6 @@ def test_expand_env_vars_nested() -> None:
 )
 def test_expand_env_vars_array_nested(input_array, env, expected_output) -> None:
     assert expand_env_vars(input_array, env) == expected_output
-
-
-def test_remove_suffix() -> None:
-    assert remove_suffix("a_string", "ing") == "a_str"
-    assert remove_suffix("a_string", "in") == "a_string"
-    assert remove_suffix("a_string", "gni") == "a_string"
 
 
 def test_makedirs_decorator(tmp_path) -> None:

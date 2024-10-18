@@ -30,7 +30,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5.2.0
       with:
-        python-version: 3.9
+        python-version: 3.12
         architecture: x64
         cache: 'poetry'
 

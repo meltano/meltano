@@ -21,6 +21,9 @@ import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
 from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 logger = get_logger(__name__)
 
 # This file is only ever created in CI when building a release
@@ -63,14 +66,14 @@ class EnvironmentContext(SelfDescribingJson):
     }
 
     @classmethod
-    def _notable_hashed_env_vars(cls) -> t.Iterable[str]:
+    def _notable_hashed_env_vars(cls) -> Iterable[str]:
         for env_var_name in cls.notable_hashed_env_vars:
             with suppress(KeyError):  # Skip unset env vars
                 env_var_value = os.environ[env_var_name]
                 yield env_var_name, hash_sha256(env_var_value)
 
     @classmethod
-    def _notable_flag_env_vars(cls) -> t.Iterable[str]:
+    def _notable_flag_env_vars(cls) -> Iterable[str]:
         for env_var_name in cls.notable_flag_env_vars:
             with suppress(KeyError):  # Skip unset env vars
                 env_var_value = os.environ[env_var_name]

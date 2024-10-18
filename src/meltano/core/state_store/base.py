@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import typing as t
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 
 if t.TYPE_CHECKING:
     from meltano.core.job_state import JobState
@@ -31,7 +31,8 @@ class StateStoreManager(ABC):
             kwargs: additional keyword arguments
         """
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def label(self) -> str:
         """Get the label for the StateStoreManager."""
         ...
