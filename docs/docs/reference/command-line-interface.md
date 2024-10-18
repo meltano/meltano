@@ -523,7 +523,7 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - The `--state-id` option identifies related EL(T) runs when storing and looking up [incremental replication state](/guide/integration#incremental-replication-state).
 
-- A `--full-refresh` flag can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same State ID.
+- A `--full-refresh` flag or the `MELTANO_RUN_FULL_REFRESH` environment variable can be passed to perform a full refresh, ignoring state left behind by any previous runs with the same State ID.
 
 - A `--force` flag can be passed to force a new run even when a pipeline with the same State ID is already running, which would result in an error otherwise.
 
