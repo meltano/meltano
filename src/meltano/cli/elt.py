@@ -66,6 +66,7 @@ class ELOptions:
     full_refresh = click.option(
         "--full-refresh",
         help="Perform a full refresh (ignore state left behind by any previous runs).",
+        envvar="MELTANO_RUN_FULL_REFRESH",
         is_flag=True,
     )
     refresh_catalog = click.option(
