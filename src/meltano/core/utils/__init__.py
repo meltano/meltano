@@ -10,10 +10,10 @@ import math
 import os
 import platform
 import re
-import sys
 import traceback
 import typing as t
 import unicodedata
+from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from copy import copy, deepcopy
 from datetime import date, datetime, time, timezone
@@ -28,18 +28,13 @@ from requests.auth import HTTPBasicAuth
 
 from meltano.core.error import MeltanoError
 
+if t.TYPE_CHECKING:
+    from collections.abc import Callable, Coroutine, Iterable, MutableMapping
+
 logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-
-
-try:
-    # asyncio.Task.all_tasks() is fully moved to asyncio.all_tasks() starting
-    # with Python 3.9. Also applies to current_task.
-    asyncio_all_tasks = asyncio.all_tasks
-except AttributeError:
-    asyncio_all_tasks = asyncio.Task.all_tasks
 
 
 class NotFound(Exception):
@@ -58,7 +53,7 @@ class NotFound(Exception):
             super().__init__(f"{obj_type.__name__} '{name}' was not found.")
 
 
-def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
+def run_async(func: Callable[..., Coroutine[t.Any, t.Any, t.Any]]):  # noqa: ANN201
     """Run the given async function using `asyncio.run`.
 
     Args:
@@ -76,7 +71,7 @@ def run_async(func: t.Callable[..., t.Coroutine[t.Any, t.Any, t.Any]]):  # noqa:
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
-def compose(*fs: t.Callable[[t.Any], t.Any]):  # noqa: ANN201
+def compose(*fs: Callable[[t.Any], t.Any]):  # noqa: ANN201
     """Create a composition of unary functions.
 
     Args:
@@ -254,7 +249,7 @@ def to_env_var(*xs: str) -> str:
     return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
-def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
+def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
     """Flatten a dictionary with `dot` and `env_var` reducers.
 
     Wrapper around `flatten_dict.flatten`.
@@ -275,7 +270,7 @@ def flatten(d: dict, reducer: str | t.Callable = "tuple", **kwargs):  # noqa: AN
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
-def compact(xs: t.Iterable) -> t.Iterable:
+def compact(xs: Iterable) -> Iterable:
     """Remove None values from an iterable.
 
     Args:
@@ -370,7 +365,7 @@ class _GetItemProtocol(t.Protocol):
 _G = t.TypeVar("_G", bound=_GetItemProtocol)
 
 
-def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _G:
+def find_named(xs: Iterable[_G], name: str, obj_type: type | None = None) -> _G:
     """Find an object by its 'name' key.
 
     Args:
@@ -390,7 +385,7 @@ def find_named(xs: t.Iterable[_G], name: str, obj_type: type | None = None) -> _
         raise NotFound(name, obj_type) from stop
 
 
-def makedirs(func: t.Callable[..., Path]):  # noqa: ANN201, D103
+def makedirs(func: Callable[..., Path]):  # noqa: ANN201, D103
     @functools.wraps(func)
     def decorate(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         enabled = kwargs.pop("make_dirs", True)
@@ -479,8 +474,8 @@ ENV_VAR_PATTERN = re.compile(
 Expandable = t.TypeVar(
     "Expandable",
     str,
-    t.Mapping[str, "Expandable"],
-    t.Sequence["Expandable"],
+    Mapping[str, "Expandable"],
+    Sequence["Expandable"],
 )
 
 
@@ -494,7 +489,7 @@ class EnvVarMissingBehavior(IntEnum):
 
 def expand_env_vars(
     raw_value: Expandable,
-    env: t.Mapping[str, str],
+    env: Mapping[str, str],
     *,
     if_missing: EnvVarMissingBehavior = EnvVarMissingBehavior.use_empty_str,
     flat: bool = False,
@@ -527,7 +522,7 @@ def expand_env_vars(
     """
     if_missing = EnvVarMissingBehavior(if_missing)
 
-    if not isinstance(raw_value, (str, t.Mapping, list)):
+    if not isinstance(raw_value, (str, Mapping, list)):
         return raw_value
 
     def replacer(match: re.Match) -> str:
@@ -559,16 +554,16 @@ def expand_env_vars(
 # `raw_value` is a dict, as opposed to once per key-value pair.
 def _expand_env_vars(
     raw_value: Expandable,
-    replacer: t.Callable[[re.Match], str],
+    replacer: Callable[[re.Match], str],
     *,
     flat: bool,
 ) -> Expandable:
-    if isinstance(raw_value, t.Mapping):
+    if isinstance(raw_value, Mapping):
         if flat:
             return {k: ENV_VAR_PATTERN.sub(replacer, v) for k, v in raw_value.items()}
         return {
             k: _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, t.Mapping, list))
+            if isinstance(v, (str, Mapping, list))
             else v
             for k, v in raw_value.items()
         }
@@ -577,7 +572,7 @@ def _expand_env_vars(
         # for lists anyway, so we don't support it here.
         return [
             _expand_env_vars(v, replacer, flat=flat)
-            if isinstance(v, (str, t.Mapping, list))
+            if isinstance(v, (str, Mapping, list))
             else v
             for v in raw_value
         ]
@@ -587,7 +582,7 @@ def _expand_env_vars(
 T = t.TypeVar("T")
 
 
-def uniques_in(original: t.Sequence[T]) -> list[T]:
+def uniques_in(original: Sequence[T]) -> list[T]:
     """Get unique elements from an iterable while preserving order.
 
     Args:
@@ -749,8 +744,8 @@ class MergeStrategy(t.NamedTuple):
     """
 
     applicable_for_instance_of: type | tuple[type, ...]
-    behavior: t.Callable[
-        [t.MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
+    behavior: Callable[
+        [MutableMapping[str, t.Any], str, t.Any, tuple[MergeStrategy, ...] | None],
         None,
     ]
 
@@ -769,7 +764,7 @@ class Extendable(t.Protocol):
 
 default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
     MergeStrategy(
-        t.Mapping,
+        Mapping,
         lambda x, k, v, s: setitem(
             x,
             k,
@@ -784,7 +779,7 @@ default_deep_merge_strategies: tuple[MergeStrategy, ...] = (
 )
 
 
-TMapping = t.TypeVar("TMapping", bound=t.Mapping)
+TMapping = t.TypeVar("TMapping", bound=Mapping)
 
 
 def deep_merge(
@@ -821,25 +816,6 @@ def _deep_merge(a, b, strategies):  # noqa: ANN001, ANN202
             ):
                 break
     return base
-
-
-def remove_suffix(string: str, suffix: str) -> str:
-    """Remove suffix from string.
-
-    Compatible with Python 3.8
-
-    Args:
-        string: the string to remove suffix from
-        suffix: the suffix to remove
-
-    Returns:
-        The changed string
-    """
-    if sys.version_info >= (3, 9):
-        return string.removesuffix(suffix)
-    if string.endswith(suffix):
-        return string[: -len(suffix)]
-    return string
 
 
 _filename_restriction_pattern = re.compile(r"[^\w.-]")

@@ -18,8 +18,8 @@ if t.TYPE_CHECKING:
 
 BASE_PATHS = (sys.prefix, sys.exec_prefix, sys.base_prefix, sys.base_exec_prefix)
 
-TracebackLevelsJSON = t.List[t.Dict[str, t.Union[str, int]]]
-ExceptionContextJSON = t.Dict[
+TracebackLevelsJSON = list[dict[str, t.Union[str, int]]]
+ExceptionContextJSON = dict[
     str,
     t.Union[str, TracebackLevelsJSON, "ExceptionContextJSON"],
 ]

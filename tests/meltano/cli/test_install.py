@@ -289,10 +289,13 @@ class TestCliInstall:
         job_schedule,
         task_sets_service,
     ) -> None:
-        with mock.patch(
-            "meltano.cli.install.ScheduleService",
-            return_value=schedule_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with (
+            mock.patch(
+                "meltano.cli.install.ScheduleService",
+                return_value=schedule_service,
+            ),
+            mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock,
+        ):
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
             from meltano.core.task_sets import TaskSets
@@ -332,10 +335,13 @@ class TestCliInstall:
         elt_schedule,
         task_sets_service,
     ) -> None:
-        with mock.patch(
-            "meltano.cli.install.ScheduleService",
-            return_value=schedule_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with (
+            mock.patch(
+                "meltano.cli.install.ScheduleService",
+                return_value=schedule_service,
+            ),
+            mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock,
+        ):
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
 

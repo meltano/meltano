@@ -243,10 +243,11 @@ class TestCliEltScratchpadOne:
 
         # exit cleanly when everything is fine
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             result = cli_runner.invoke(cli, args)
@@ -325,12 +326,14 @@ class TestCliEltScratchpadOne:
         job_logging_service.delete_all_logs(state_id)
 
         create_subprocess_exec = AsyncMock(side_effect=(tap_process, target_process))
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
-        ), mock.patch("meltano.cli.params.install_plugins"), mock.patch(
-            "meltano.core.plugin_invoker.asyncio",
-        ) as asyncio_mock:
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
+            mock.patch("meltano.cli.params.install_plugins"),
+            mock.patch(
+                "meltano.core.plugin_invoker.asyncio",
+            ) as asyncio_mock,
+        ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
 
             monkeypatch.setenv("MELTANO_CLI_LOG_LEVEL", "debug")
@@ -924,9 +927,9 @@ class TestCliEltScratchpadOne:
             "state",
         ]
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -956,9 +959,9 @@ class TestCliEltScratchpadOne:
 
         settings_service = plugin_settings_service_factory(tap)
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)
@@ -991,9 +994,9 @@ class TestCliEltScratchpadOne:
 
         settings_service = plugin_settings_service_factory(target)
 
-        with mock.patch.object(SingerTap, "discover_catalog"), mock.patch.object(
-            SingerTap,
-            "apply_catalog_rules",
+        with (
+            mock.patch.object(SingerTap, "discover_catalog"),
+            mock.patch.object(SingerTap, "apply_catalog_rules"),
         ):
             result = cli_runner.invoke(cli, args)
             assert_cli_runner(result)

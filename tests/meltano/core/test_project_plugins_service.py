@@ -124,8 +124,9 @@ class TestProjectPluginsService:
         project: Project,
         tap: ProjectPlugin,
     ) -> None:
-        with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
-            PluginDefinitionNotFoundError,
+        with (
+            project.plugins.use_preferred_source(DefinitionSource.NONE),
+            pytest.raises(PluginDefinitionNotFoundError),
         ):
             project.plugins.get_parent(tap)
 

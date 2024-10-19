@@ -74,7 +74,7 @@ class PluginContext(t.NamedTuple):
         return self.settings_service.as_env(session=self.session, **kwargs)
 
     @property
-    def env(self) -> dict:
+    def env(self) -> dict[str, str]:
         """Get complete plugin environment dict.
 
         Returns:
@@ -491,7 +491,7 @@ class ELTContextBuilder:
         Returns:
             ELTContext instance.
         """
-        env = {}
+        env: dict[str, str] = {}
 
         extractor = None
         if self._extractor:
@@ -508,7 +508,7 @@ class ELTContextBuilder:
                 config=config,
             )
 
-            env.update(extractor.env)
+            env |= extractor.env
 
         loader = None
         if self._loader:
@@ -517,7 +517,7 @@ class ELTContextBuilder:
                 env=env.copy(),
             )
 
-            env.update(loader.env)
+            env |= loader.env
 
         transform = None
         if self._transform:
@@ -526,7 +526,7 @@ class ELTContextBuilder:
                 env=env.copy(),
             )
 
-            env.update(transform.env)
+            env |= transform.env
 
         transformer = None
         if self._transformer:

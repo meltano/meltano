@@ -82,8 +82,9 @@ class TestProjectSettingsService:
 
     def test_experimental_off_by_default(self, subject) -> None:
         changed = []
-        with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
-            EXPERIMENTAL,
+        with (
+            pytest.raises(FeatureNotAllowedException),
+            subject.feature_flag(EXPERIMENTAL),
         ):
             changed.append(True)
 

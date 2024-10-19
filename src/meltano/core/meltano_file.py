@@ -12,6 +12,9 @@ from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.schedule import Schedule
 from meltano.core.task_sets import TaskSets
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 VERSION = 1
 
 
@@ -94,7 +97,7 @@ class MeltanoFile(Canonical):
         return [Schedule.parse(obj) for obj in schedules]
 
     @staticmethod
-    def load_environments(environments: t.Iterable[dict]) -> list[Environment]:
+    def load_environments(environments: Iterable[dict]) -> list[Environment]:
         """Parse `Environment` objects from python objects.
 
         Args:
@@ -106,7 +109,7 @@ class MeltanoFile(Canonical):
         return [Environment.parse(obj) for obj in environments]
 
     @staticmethod
-    def load_job_tasks(jobs: t.Iterable[dict]) -> list[TaskSets]:
+    def load_job_tasks(jobs: Iterable[dict]) -> list[TaskSets]:
         """Parse `TaskSets` objects from python objects.
 
         Args:

@@ -139,9 +139,10 @@ class TestSingerRunner:
     ) -> None:
         tap_invoker = plugin_invoker_factory(tap, config_dir=tap_config_dir)
         target_invoker = plugin_invoker_factory(target, config_dir=target_config_dir)
-        async with tap_invoker.prepared(
-            session,
-        ), target_invoker.prepared(session):
+        async with (
+            tap_invoker.prepared(session),
+            target_invoker.prepared(session),
+        ):
             invoke_async = AsyncMock(side_effect=(tap_process, target_process))
             with mock.patch.object(
                 PluginInvoker,
@@ -253,15 +254,18 @@ class TestSingerRunner:
         )
 
         async with subject.context.job.run(session):
-            with mock.patch.object(
-                session,
-                "add",
-                side_effect=session.add,
-            ) as add_mock, mock.patch.object(
-                session,
-                "commit",
-                side_effect=session.commit,
-            ) as commit_mock:
+            with (
+                mock.patch.object(
+                    session,
+                    "add",
+                    side_effect=session.add,
+                ) as add_mock,
+                mock.patch.object(
+                    session,
+                    "commit",
+                    side_effect=session.commit,
+                ) as commit_mock,
+            ):
                 target.setup_bookmark_writer(target_invoker)
                 bookmark_writer = target_invoker.output_handlers.get(
                     target_invoker.StdioSource.STDOUT,
