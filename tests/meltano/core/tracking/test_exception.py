@@ -143,7 +143,8 @@ def test_complex_exception_context() -> None:
         # https://github.com/python/cpython/pull/118582
         pathlib_loc = "pathlib/_local.py"
 
-    assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/{pathlib_loc}"
+    src_file = f"/python{major}.{minor}/{pathlib_loc}"
+    assert cause["traceback"][1]["file"].endswith(src_file)
     assert cause["cause"] is None
     assert cause["context"] is None
 

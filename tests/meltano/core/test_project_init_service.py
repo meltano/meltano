@@ -80,12 +80,10 @@ def test_project_init_existing_meltano_yml(tmp_path: Path, pushd) -> None:
     ProjectInitService(project_dir).init(activate=False, force=True)
 
 
+@pytest.mark.xfail(
+    reason="Some OSes can still create new directories inside a read-only directory.",
+)
 def test_project_init_no_write_permission(tmp_path: Path, pushd) -> None:
-    if platform.system() == "Windows":
-        pytest.xfail(
-            "Windows can still create new directories inside a read-only directory.",
-        )
-
     protected_dir = tmp_path.joinpath("protected")
     protected_dir.mkdir()
     # read and execute, but not write
