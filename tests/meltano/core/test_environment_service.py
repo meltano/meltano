@@ -17,11 +17,11 @@ from meltano.core.utils import NotFound
 
 
 class TestEnvironmentService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, environment_service):
         return environment_service
 
-    @pytest.fixture()
+    @pytest.fixture
     def environment(self, environment_service: EnvironmentService) -> Environment:
         return environment_service.add("test-environment")
 

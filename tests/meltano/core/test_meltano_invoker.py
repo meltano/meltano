@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
 
 
 class TestMeltanoInvoker:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         return MeltanoInvoker(project)
 

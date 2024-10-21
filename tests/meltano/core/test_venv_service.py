@@ -43,7 +43,7 @@ async def _check_venv_created_with_python_for_plugin(
 
 
 class TestVenvService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
 
@@ -70,7 +70,7 @@ class TestVenvService:
             run_dir.exists()
         ), "Expected all files in the run dir to be removed, but not the dir itself"
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_clean_install(self, subject: VenvService) -> None:
         if platform.system() == "Windows":
@@ -126,7 +126,7 @@ class TestVenvService:
         assert subject.pip_log_path.is_file()
         assert subject.pip_log_path.stat().st_size > 0
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: VenvService) -> None:
         if platform.system() == "Windows":
@@ -150,7 +150,7 @@ class TestVenvService:
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_requires_clean_install(self, subject: VenvService) -> None:
         # Make sure the venv exists already
@@ -306,7 +306,7 @@ class TestVirtualEnv:
 
 
 class TestUvVenvService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
@@ -339,7 +339,7 @@ class TestUvVenvService:
         with pytest.raises(MeltanoError, match="Could not find the 'uv' executable"):
             find_uv()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: UvVenvService) -> None:
         # Make sure the venv exists already

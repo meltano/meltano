@@ -24,13 +24,13 @@ def assert_lines(output, *lines) -> None:
 
 
 class TestOutputLogger:
-    @pytest.fixture()
+    @pytest.fixture
     def log(self, tmp_path):
         file = tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
         yield file
         file.close()
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, log):
         return OutputLogger(log.name)
 
@@ -65,7 +65,7 @@ class TestOutputLogger:
         yield handler
         handler.close()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_stdio_capture(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -114,7 +114,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_out_writers(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -168,7 +168,7 @@ class TestOutputLogger:
             },
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log")
     async def test_set_custom_logger(self, subject, log_output) -> None:
         if platform.system() == "Windows":
@@ -194,7 +194,7 @@ class TestOutputLogger:
         platform.system() == "Windows",
         reason="Test fails if even attempted to be run, xfail can't save us here.",
     )
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("log", "log_output")
     async def test_logging_redirect(
         self,

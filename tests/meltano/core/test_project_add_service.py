@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
 
 
 class TestProjectAddService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project_add_service):
         return project_add_service
 

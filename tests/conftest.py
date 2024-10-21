@@ -215,7 +215,7 @@ def hub_endpoints(project: Project):
     return adapter._mapping
 
 
-@pytest.fixture()
+@pytest.fixture
 def hub_request_counter(project: Project):
     counter: Counter = project.hub_service.session.get_adapter(
         project.hub_service.hub_api_url,

@@ -12,7 +12,7 @@ from fixtures.utils import cd
 from meltano.core.utils import deep_merge
 
 
-@pytest.fixture()
+@pytest.fixture
 def cd_temp_subdir():
     original_dir = Path.cwd()
     with (
@@ -22,7 +22,7 @@ def cd_temp_subdir():
         yield new_dir
 
 
-@pytest.fixture()
+@pytest.fixture
 def cd_temp_dir():
     with tempfile.TemporaryDirectory() as name, cd(Path(name).resolve()) as new_dir:
         yield new_dir

@@ -29,7 +29,7 @@ def engine_uri_env(engine_uri: str) -> Generator:
         monkeypatch.undo()
 
 
-@pytest.fixture()
+@pytest.fixture
 def un_engine_uri(monkeypatch) -> None:
     """When we want to test functionality that doesn't use the current DB URI.
 
@@ -58,7 +58,7 @@ def engine_sessionmaker(engine_uri):
     return (engine, sessionmaker(bind=engine, future=True))
 
 
-@pytest.fixture()
+@pytest.fixture
 def connection(engine_sessionmaker):
     engine, _ = engine_sessionmaker
     connection = engine.connect()
@@ -78,7 +78,7 @@ def connection(engine_sessionmaker):
         connection.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(
     project: Project,  # noqa: ARG001
     engine_sessionmaker,
