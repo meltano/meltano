@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import typing as t
 from datetime import datetime
@@ -160,7 +161,7 @@ class JobState(SystemModel):
         Args:
             state: the partial state to merge onto this state.
         """
-        self.partial_state = merge(
+        merge(
             state.partial_state,
             self.partial_state,
         )
@@ -180,3 +181,18 @@ class JobState(SystemModel):
             file_obj: the file-like object to write to.
         """
         file_obj.write(self.json())
+
+    def __deepcopy__(self, memo: dict[int, t.Any]) -> JobState:
+        """Deepcopy implementation for JobState.
+
+        Args:
+            memo: the memo dict to use in deepcopy
+
+        Returns:
+            deepcopy of this JobState
+        """
+        return JobState(
+            state_id=self.state_id,
+            partial_state=copy.deepcopy(self.partial_state, memo),
+            completed_state=copy.deepcopy(self.completed_state, memo),
+        )
