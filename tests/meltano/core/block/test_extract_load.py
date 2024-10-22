@@ -191,8 +191,9 @@ class TestExtractLoadBlocks:
             root_logger.setLevel(log_level)
 
     @pytest.fixture
-    def log(self, tmp_path: Path):
-        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
     @pytest.fixture
     def tap_config_dir(self, tmp_path: Path, tap) -> Path:

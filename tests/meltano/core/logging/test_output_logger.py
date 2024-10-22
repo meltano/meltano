@@ -16,6 +16,7 @@ from meltano.core.logging.output_logger import Out, OutputLogger
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
 
 
 def assert_lines(output, *lines) -> None:
@@ -25,10 +26,9 @@ def assert_lines(output, *lines) -> None:
 
 class TestOutputLogger:
     @pytest.fixture
-    def log(self, tmp_path):
-        file = tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
-        yield file
-        file.close()
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
     @pytest.fixture
     def subject(self, log):

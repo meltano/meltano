@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+import typing as t
 
 import mock
 import pytest
@@ -13,11 +14,15 @@ from meltano.core.block.singer import SingerBlock
 from meltano.core.job import Job
 from meltano.core.logging import OutputLogger
 
+if t.TYPE_CHECKING:
+    from pathlib import Path
+
 
 class TestSingerBlocks:
     @pytest.fixture
-    def log(self, tmp_path):
-        return tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path)
+    def log(self, tmp_path: Path) -> t.Generator[t.IO[str], None, None]:
+        with tempfile.NamedTemporaryFile(mode="w+", dir=tmp_path) as file:
+            yield file
 
     @pytest.fixture
     def elt_context(
