@@ -131,23 +131,23 @@ class TestGCSStateBackend:
 
 
 class TestS3StateBackend:
-    @pytest.fixture()
+    @pytest.fixture
     def bucket(self) -> str:
         return "some_bucket"
 
-    @pytest.fixture()
+    @pytest.fixture
     def prefix(self) -> str:
         return "some/path"
 
-    @pytest.fixture()
+    @pytest.fixture
     def aws_access_key_id(self) -> str:
         return "aws_access_key_id"
 
-    @pytest.fixture()
+    @pytest.fixture
     def aws_secret_access_key(self) -> str:
         return "aws_secret_access_key"
 
-    @pytest.fixture()
+    @pytest.fixture
     def s3_uri(
         self,
         bucket: str,
