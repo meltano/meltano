@@ -20,11 +20,11 @@ if t.TYPE_CHECKING:
 
 
 class TestPluginRemoveService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         return PluginRemoveService(project)
 
-    @pytest.fixture()
+    @pytest.fixture
     def add(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         with subject.project.meltanofile.open("r") as meltano_yml:
             original = yaml.safe_load(meltano_yml)
@@ -58,7 +58,7 @@ class TestPluginRemoveService:
         with subject.project.meltanofile.open("w") as meltano_yml:
             meltano_yml.write(yaml.dump(original))
 
-    @pytest.fixture()
+    @pytest.fixture
     def no_plugins(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         with subject.project.meltanofile.open("r") as meltano_yml:
             original = yaml.safe_load(meltano_yml)
@@ -71,7 +71,7 @@ class TestPluginRemoveService:
         with subject.project.meltanofile.open("w") as meltano_yml:
             meltano_yml.write(yaml.dump(original))
 
-    @pytest.fixture()
+    @pytest.fixture
     def install(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         tap_gitlab_installation = subject.project.meltano_dir().joinpath(
             "extractors",
@@ -87,7 +87,7 @@ class TestPluginRemoveService:
         shutil.rmtree(tap_gitlab_installation, ignore_errors=True)
         shutil.rmtree(target_csv_installation, ignore_errors=True)
 
-    @pytest.fixture()
+    @pytest.fixture
     def lock(self, subject: PluginRemoveService) -> Generator[None, None, None]:
         tap_gitlab_lockfile = subject.project.plugin_lock_path(
             "extractors",

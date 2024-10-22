@@ -7,7 +7,7 @@ from meltano.core.plugin.command import Command, UndefinedEnvVarError
 
 
 class TestCommand:
-    @pytest.fixture()
+    @pytest.fixture
     def commands(self):
         return {
             "foo": {"args": "foo", "description": "foo desc", "executable": "foo"},

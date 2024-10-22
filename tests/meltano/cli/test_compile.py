@@ -36,7 +36,7 @@ def check_indent(json_path: Path, indent: int) -> None:
 
 
 class TestCompile:
-    @pytest.fixture()
+    @pytest.fixture
     def manifest_dir(self, project: Project) -> Path:
         return project.sys_dir_root / "manifests"
 

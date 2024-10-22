@@ -33,7 +33,7 @@ ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 
 
 class TestCli:
-    @pytest.fixture()
+    @pytest.fixture
     def test_cli_project(self, tmp_path: Path, project_init_service):
         """Return the non-activated project."""
         os.chdir(tmp_path)
@@ -45,11 +45,11 @@ class TestCli:
             Project.deactivate()
             shutil.rmtree(project.root)
 
-    @pytest.fixture()
+    @pytest.fixture
     def deactivate_project(self) -> None:
         Project.deactivate()
 
-    @pytest.fixture()
+    @pytest.fixture
     def empty_project(
         self,
         empty_meltano_yml_dir,

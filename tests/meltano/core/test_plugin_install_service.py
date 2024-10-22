@@ -55,7 +55,7 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap(self, project_add_service):
         try:
             return project_add_service.add(
@@ -66,7 +66,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_tap(self, project_add_service, tap):
         try:
             return project_add_service.add(
@@ -77,7 +77,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_inherited_tap(self, project_add_service, inherited_tap):
         try:
             return project_add_service.add(
@@ -88,7 +88,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapper(self, project_add_service):
         try:
             return project_add_service.add(
@@ -125,7 +125,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def mapping(self, project: Project, mapper: ProjectPlugin):
         name: str = mapper.extra_config["_mappings"][0]["name"]
         return project.plugins.find_plugin(name)
@@ -149,7 +149,7 @@ class TestPluginInstallService:
             "target-csv",
         ]
 
-    @pytest.mark.slow()
+    @pytest.mark.slow
     async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3

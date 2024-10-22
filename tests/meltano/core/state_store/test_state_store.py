@@ -36,7 +36,7 @@ class TestSystemDBStateBackend:
 
 
 class TestLocalFilesystemStateBackend:
-    @pytest.fixture()
+    @pytest.fixture
     def state_path(self, tmp_path: Path):
         path = tmp_path / ".meltano" / "state"
         try:

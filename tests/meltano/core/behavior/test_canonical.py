@@ -17,7 +17,7 @@ definition = {
 
 
 class TestCanonical:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self):
         return Canonical(**definition)
 

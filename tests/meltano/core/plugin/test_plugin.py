@@ -201,18 +201,18 @@ class TestPluginDefinition:
 
 
 class TestBasePlugin:
-    @pytest.fixture()
+    @pytest.fixture
     def plugin_def(self):
         return PluginDefinition(
             PluginType.EXTRACTORS,
             **TestPluginDefinition.ATTRS["variants"],
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def variant(self, plugin_def):
         return plugin_def.find_variant()
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, plugin_def, variant):
         return BasePlugin(plugin_def, variant)
 

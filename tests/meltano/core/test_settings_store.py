@@ -92,12 +92,12 @@ class DummySettingsService(SettingsService):
         return self._meltano_environment_config
 
 
-@pytest.fixture()
+@pytest.fixture
 def dummy_settings_service(project):
     return DummySettingsService(project)
 
 
-@pytest.fixture()
+@pytest.fixture
 def unsupported():
     @contextmanager
     def _unsupported(store):
@@ -129,13 +129,13 @@ def unsupported():
 
 
 class TestAutoStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service, session):
         manager = AutoStoreManager(dummy_settings_service, session=session, cache=False)
         yield manager
         manager.reset()
 
-    @pytest.fixture()
+    @pytest.fixture
     def set_value_store(self, subject):
         def _set_value_store(value, store, name="regular") -> None:
             subject.manager_for(store).set(
@@ -147,11 +147,11 @@ class TestAutoStoreManager:
 
         return _set_value_store
 
-    @pytest.fixture()
+    @pytest.fixture
     def environment(self):
         return Environment("testing", {})
 
-    @pytest.fixture()
+    @pytest.fixture
     def assert_value_source(self, subject):
         def _assert_value_source(value, source, name="regular") -> None:
             new_value, metadata = subject.get(
@@ -523,7 +523,7 @@ class TestAutoStoreManager:
 
 
 class TestMeltanoYmlStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service):
         manager = MeltanoYmlStoreManager(dummy_settings_service)
         yield manager
@@ -594,7 +594,7 @@ class TestMeltanoYmlStoreManager:
 
 
 class TestMeltanoEnvironmentStoreManager(TestMeltanoYmlStoreManager):
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service, project):
         project.refresh(environment=Environment("testing", {}))
         manager = MeltanoEnvStoreManager(dummy_settings_service)
@@ -606,7 +606,7 @@ class TestMeltanoEnvironmentStoreManager(TestMeltanoYmlStoreManager):
 
 
 class TestInheritedStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service):
         return InheritedStoreManager(dummy_settings_service)
 
@@ -649,7 +649,7 @@ class TestInheritedStoreManager:
 
 
 class TestEnvStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service) -> EnvStoreManager:
         return EnvStoreManager(dummy_settings_service)
 
@@ -661,7 +661,7 @@ class TestEnvStoreManager:
 
 
 class TestDotEnvStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, dummy_settings_service) -> DotEnvStoreManager:
         return DotEnvStoreManager(dummy_settings_service)
 
