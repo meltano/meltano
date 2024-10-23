@@ -215,7 +215,7 @@ The `<models>` argument is populated using the Meltano transform `models` settin
 Using this method for executing transforms allows Meltano to make some assumptions about the appropriate configurations for running dbt.
 Based on the target loader you are using, Meltano is able to default your dbt transform `target` [config setting](https://hub.meltano.com/transformers/dbt#target) to the correct SQL dialect (e.g. Snowflake, Postgres, etc.).
 
-Starting with Meltano [`v3`](/guide/v3-migration), the default [`source_schema`]((https://hub.meltano.com/transformers/dbt#source-schema)) value of `$MELTANO_LOAD__TARGET_SCHEMA` will stop working since the target extra was removed. To fix this, you can set the `source_schema` value to the appropriate environment variable for your target (e.g. [`$MELTANO_LOAD__DEFAULT_TARGET_SCHEMA`](https://hub.meltano.com/loaders/target-postgres#default_target_schema-setting) for Postgres).
+Starting with Meltano [`v3`](/guide/v3-migration), the default [`source_schema`](https://hub.meltano.com/transformers/dbt#source_schema-setting) value of `$MELTANO_LOAD__TARGET_SCHEMA` will stop working since the target extra was removed. To fix this, you can set the `source_schema` value to the appropriate environment variable for your target (e.g. [`$MELTANO_LOAD__DEFAULT_TARGET_SCHEMA`](https://hub.meltano.com/loaders/target-postgres#default_target_schema-setting) for Postgres).
 
 #### Transform directly
 

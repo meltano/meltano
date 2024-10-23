@@ -238,7 +238,7 @@ class TestCliInstall:
             assert not kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 1
 
     def test_clean_install(
         self,
@@ -274,7 +274,7 @@ class TestCliInstall:
             assert kwargs["clean"]
 
             mappers = [m for m in commands[0][1] if m == mapper]
-            assert len(mappers) == 3
+            assert len(mappers) == 1
 
     @pytest.mark.usefixtures("tap_gitlab", "target")
     def test_install_schedule(
@@ -289,10 +289,13 @@ class TestCliInstall:
         job_schedule,
         task_sets_service,
     ) -> None:
-        with mock.patch(
-            "meltano.cli.install.ScheduleService",
-            return_value=schedule_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with (
+            mock.patch(
+                "meltano.cli.install.ScheduleService",
+                return_value=schedule_service,
+            ),
+            mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock,
+        ):
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
             from meltano.core.task_sets import TaskSets
@@ -332,10 +335,13 @@ class TestCliInstall:
         elt_schedule,
         task_sets_service,
     ) -> None:
-        with mock.patch(
-            "meltano.cli.install.ScheduleService",
-            return_value=schedule_service,
-        ), mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock:
+        with (
+            mock.patch(
+                "meltano.cli.install.ScheduleService",
+                return_value=schedule_service,
+            ),
+            mock.patch("meltano.cli.install.install_plugins") as install_plugin_mock,
+        ):
             install_plugin_mock.return_value = True
             schedule_service.task_sets_service = task_sets_service
 

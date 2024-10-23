@@ -28,9 +28,9 @@ from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
 if sys.version_info < (3, 11):
-    ReprEnum = Enum
+    from backports.strenum import StrEnum
 else:
-    from enum import ReprEnum
+    from enum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.base import PluginRef
@@ -631,10 +631,9 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         super().invoke(ctx)
 
 
-# TODO: Use StrEnum (and its backport) when we can drop Python 3.8 support
-class AutoInstallBehavior(str, ReprEnum):
+class AutoInstallBehavior(StrEnum):
     """Enum of the different behaviors for automatic plugin installation."""
 
-    install = "install"
-    no_install = "no_install"
-    only_install = "only_install"
+    install = auto()
+    no_install = auto()
+    only_install = auto()

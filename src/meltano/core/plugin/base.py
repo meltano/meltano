@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import enum
 import re
 import typing as t
 from collections import defaultdict
@@ -73,23 +74,15 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 class PluginType(YAMLEnum):
     """The type of a plugin."""
 
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    TRANSFORMS = "transforms"
-    ORCHESTRATORS = "orchestrators"
-    TRANSFORMERS = "transformers"
-    FILES = "files"
-    UTILITIES = "utilities"
-    MAPPERS = "mappers"
-    MAPPINGS = "mappings"
-
-    def __str__(self) -> str:
-        """Return a string representation of the plugin type.
-
-        Returns:
-            The string representation of the plugin type.
-        """
-        return self.value
+    EXTRACTORS = enum.auto()
+    LOADERS = enum.auto()
+    TRANSFORMS = enum.auto()
+    ORCHESTRATORS = enum.auto()
+    TRANSFORMERS = enum.auto()
+    FILES = enum.auto()
+    UTILITIES = enum.auto()
+    MAPPERS = enum.auto()
+    MAPPINGS = enum.auto()
 
     @property
     def descriptor(self) -> str:
@@ -188,6 +181,8 @@ class PluginType(YAMLEnum):
 class PluginRef(Canonical):
     """A reference to a plugin."""
 
+    name: str
+
     def __init__(self, plugin_type: str | PluginType, name: str, **kwargs):  # noqa: ANN003
         """Create a new PluginRef.
 
@@ -219,6 +214,15 @@ class PluginRef(Canonical):
             The type of the plugin.
         """
         return self._type
+
+    @property
+    def plugin_dir_name(self) -> str:
+        """Return the plugin directory name.
+
+        Returns:
+            The plugin directory name.
+        """
+        return self.name
 
     def __eq__(self, other: PluginRef) -> bool:
         """Compare two plugin references.
@@ -669,7 +673,7 @@ class BasePlugin(HookObject):
     def env_prefixes(
         self,
         *,
-        for_writing=False,  # noqa: ANN001, ARG002
+        for_writing: bool = False,  # noqa: ARG002
     ) -> list[str]:
         """Return environment variable prefixes to use for settings.
 

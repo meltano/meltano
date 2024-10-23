@@ -67,7 +67,7 @@ def custom_tap(project):
 
 
 class TestScheduleService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, schedule_service):
         return schedule_service
 

@@ -11,11 +11,14 @@ import platform
 import shutil
 import string
 import typing as t
+import uuid
 from base64 import b64encode
 from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import botocore.exceptions
+import moto
 import pytest
 import time_machine
 from azure.core.exceptions import ResourceNotFoundError
@@ -48,7 +51,7 @@ def encode_if_on_windows(string: str) -> str:
 
 
 class TestLocalFilesystemStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, function_scoped_test_dir):
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
@@ -61,7 +64,7 @@ class TestLocalFilesystemStateStoreManager:
                 lock_timeout_seconds=10,
             )
 
-    @pytest.fixture()
+    @pytest.fixture
     def state_path(
         self,
         function_scoped_test_dir,
@@ -150,8 +153,9 @@ class TestLocalFilesystemStateStoreManager:
         timeout = subject.lock_timeout_seconds
 
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
-        with time_machine.travel(initial_dt) as frozen_datetime, subject.acquire_lock(
-            state_id,
+        with (
+            time_machine.travel(initial_dt) as frozen_datetime,
+            subject.acquire_lock(state_id),
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
@@ -289,7 +293,7 @@ class TestLocalFilesystemStateStoreManager:
 
 
 class TestAZStorageStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -300,7 +304,7 @@ class TestAZStorageStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
@@ -389,7 +393,7 @@ class TestS3StateStoreManager:
             with Stubber(mock_client.return_value) as stubber:
                 yield stubber
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -439,6 +443,60 @@ class TestS3StateStoreManager:
 
     def test_state_path(self, subject: S3StateStoreManager) -> None:
         assert subject.state_dir == "state"
+
+    def test_set_first_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+        state_id = uuid.uuid4().hex
+        with moto.mock_aws():
+            store_manager = S3StateStoreManager(
+                uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
+                lock_timeout_seconds=10,
+            )
+            store_manager.client.create_bucket(Bucket=store_manager.bucket)
+            store_manager.set(JobState(state_id=state_id, completed_state={}))
+
+    def test_set_fail_object_in_glacier(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+        state_id = uuid.uuid4().hex
+        with moto.mock_aws():
+            store_manager = S3StateStoreManager(
+                uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
+                lock_timeout_seconds=10,
+            )
+            store_manager.client.create_bucket(Bucket=store_manager.bucket)
+            store_manager.client.put_object(
+                Bucket=store_manager.bucket,
+                Key=f"state/{state_id}/state.json",
+                Body=json.dumps({}).encode(),
+                StorageClass="GLACIER",
+            )
+            with pytest.raises(OSError, match="unable to access") as exc_info:
+                store_manager.set(JobState(state_id=state_id, completed_state={}))
+
+            exc = exc_info.value
+            assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
+            assert exc.__cause__.response["Error"]["Code"] == "InvalidObjectState"
+
+    def test_set_fail_bucket_does_not_exist(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
+        monkeypatch.delenv("AWS_PROFILE", raising=False)
+        with moto.mock_aws():
+            store_manager = S3StateStoreManager(
+                uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
+                lock_timeout_seconds=10,
+            )
+            with pytest.raises(botocore.exceptions.ClientError) as exc_info:
+                store_manager.set(JobState(state_id="state-id", completed_state={}))
+
+            assert exc_info.value.response["Error"]["Code"] == "NoSuchBucket"
 
     def test_delete(self, subject: S3StateStoreManager) -> None:
         response = {
@@ -576,7 +634,7 @@ class TestS3StateStoreManager:
 
 
 class TestGCSStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -587,7 +645,7 @@ class TestGCSStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "google.cloud.storage.Client",

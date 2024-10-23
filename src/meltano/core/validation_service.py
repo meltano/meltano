@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import enum
+import sys
 import typing as t
 from abc import ABCMeta, abstractmethod
-from enum import Enum
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
+
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
@@ -19,11 +26,11 @@ EXIT_CODE_OK = 0
 T = t.TypeVar("T", bound="ValidationsRunner")
 
 
-class ValidationOutcome(str, Enum):
+class ValidationOutcome(StrEnum):
     """Data validation outcome options."""
 
-    SUCCESS = "SUCCESS"
-    FAILURE = "FAILURE"
+    SUCCESS = enum.auto()
+    FAILURE = enum.auto()
 
     @property
     def color(self) -> str:

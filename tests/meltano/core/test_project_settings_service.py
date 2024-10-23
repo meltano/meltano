@@ -18,7 +18,7 @@ from meltano.core.settings_service import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 
-@pytest.fixture()
+@pytest.fixture
 def config_override():
     try:
         ProjectSettingsService.config_override["project_id"] = "from_config_override"
@@ -28,13 +28,13 @@ def config_override():
         ProjectSettingsService.config_override.pop("project_id")
 
 
-@pytest.fixture()
+@pytest.fixture
 def subject(project):
     return ProjectSettingsService(project)
 
 
 class TestProjectSettingsService:
-    @pytest.fixture()
+    @pytest.fixture
     def environment(self):
         return Environment("testing", {})
 
@@ -82,8 +82,9 @@ class TestProjectSettingsService:
 
     def test_experimental_off_by_default(self, subject) -> None:
         changed = []
-        with pytest.raises(FeatureNotAllowedException), subject.feature_flag(
-            EXPERIMENTAL,
+        with (
+            pytest.raises(FeatureNotAllowedException),
+            subject.feature_flag(EXPERIMENTAL),
         ):
             changed.append(True)
 

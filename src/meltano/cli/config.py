@@ -66,7 +66,7 @@ def _get_store_choices() -> list[SettingValueStore]:
         SettingValueStore.writables(), without meltano_env
     """
     writables = SettingValueStore.writables()
-    writables.remove(SettingValueStore.MELTANO_ENV)
+    writables.remove(SettingValueStore.MELTANO_ENVIRONMENT)
     return writables
 
 
@@ -87,13 +87,16 @@ def _use_meltano_env(func):  # noqa: ANN001, ANN202
     @wraps(func)
     def _wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
         store = kwargs.pop("store")
-        if store not in {SettingValueStore.MELTANO_YML, SettingValueStore.MELTANO_ENV}:
+        if store not in {
+            SettingValueStore.MELTANO_YML,
+            SettingValueStore.MELTANO_ENVIRONMENT,
+        }:
             return func(*args, **kwargs, store=store)
         ctx = _get_ctx_arg(*args)
         store = (
             SettingValueStore.MELTANO_YML
             if ctx.obj["is_default_environment"]
-            else SettingValueStore.MELTANO_ENV
+            else SettingValueStore.MELTANO_ENVIRONMENT
         )
         return func(*args, **kwargs, store=store)
 

@@ -19,7 +19,7 @@ def create_task_set():
 
 
 class TestTaskSetsService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, task_sets_service):
         return task_sets_service
 

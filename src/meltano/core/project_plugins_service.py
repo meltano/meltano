@@ -16,6 +16,8 @@ from meltano.core.plugin.error import PluginNotFoundError, PluginParentNotFoundE
 from meltano.core.plugin_lock_service import PluginLockService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
     from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -177,7 +179,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             The removed plugin.
         """
         # Will raise if the plugin isn't actually in the file
-        self.get_plugin(plugin)
+        self.get_plugin(plugin, ensure_parent=False)
 
         with self.update_plugins() as plugins:
             plugins[plugin.type].remove(plugin)
@@ -308,11 +310,17 @@ class ProjectPluginsService:  # (too many methods, attributes)
             return found
         raise PluginNotFoundError(mapping_name)
 
-    def get_plugin(self, plugin_ref: PluginRef) -> ProjectPlugin:
+    def get_plugin(
+        self,
+        plugin_ref: PluginRef,
+        *,
+        ensure_parent: bool = True,
+    ) -> ProjectPlugin:
         """Get a plugin using its PluginRef.
 
         Args:
             plugin_ref: The plugin reference to use.
+            ensure_parent: If True, ensure that plugin has a parent plugin set.
 
         Returns:
             The plugin if found.
@@ -327,7 +335,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
                 if plugin == plugin_ref
             )
 
-            return self.ensure_parent(plugin)
+            return self.ensure_parent(plugin) if ensure_parent else plugin
         except StopIteration as stop:
             raise PluginNotFoundError(plugin_ref) from stop
 
@@ -371,7 +379,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, *, ensure_parent=True) -> t.Generator[ProjectPlugin, None, None]:  # noqa: ANN001
+    def plugins(self, *, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:  # noqa: ANN001
         """Return all plugins.
 
         Args:

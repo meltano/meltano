@@ -10,8 +10,8 @@ sidebar_class_name: hidden
 
 In order to contribute to Meltano, you will need the following:
 
-1. [Python 3.8+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
-2. [Node 16](https://nodejs.org/)
+1. [Python 3.9+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
+2. [Node 18+](https://nodejs.org/)
 3. [Yarn](https://yarnpkg.com/)
 
 ## Setting Up Your Environment

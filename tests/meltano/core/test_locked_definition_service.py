@@ -12,13 +12,13 @@ from meltano.core.plugin.error import PluginNotFoundError
 HTTP_STATUS_TEAPOT = 418
 
 
-@pytest.fixture()
+@pytest.fixture
 def subject(project):
     return LockedDefinitionService(project)
 
 
 class TestLockedDefinitionService:
-    @pytest.fixture()
+    @pytest.fixture
     def locked_plugin(self, subject: LockedDefinitionService):
         """Locked plugin definition.
 

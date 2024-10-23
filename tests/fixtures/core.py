@@ -39,6 +39,8 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
     from requests.adapters import BaseAdapter
 
 current_dir = Path(__file__).parent
@@ -2058,7 +2060,7 @@ def job_schedule(
         return err.schedule
 
 
-@pytest.fixture()
+@pytest.fixture
 def environment_service(project):
     service = EnvironmentService(project)
     try:
@@ -2104,11 +2106,12 @@ def project_directory(project_init_service):
 def project(
     project_init_service,
     tmp_path_factory: pytest.TempPathFactory,
-    hub_mock_adapter: t.Callable[[str], BaseAdapter],
+    hub_mock_adapter: Callable[[str], BaseAdapter],
 ):
-    with cd(tmp_path_factory.mktemp("meltano-project-dir")), project_directory(
-        project_init_service,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-project-dir")),
+        project_directory(project_init_service) as project,
+    ):
         project.hub_service.session.mount(
             project.hub_service.hub_api_url,
             hub_mock_adapter(project.hub_service.hub_api_url),
@@ -2116,7 +2119,7 @@ def project(
         yield project
 
 
-@pytest.fixture()
+@pytest.fixture
 def project_function(project_init_service, tmp_path: Path):
     with cd(tmp_path), project_directory(project_init_service) as project:
         yield project
@@ -2124,11 +2127,14 @@ def project_function(project_init_service, tmp_path: Path):
 
 @pytest.fixture(scope="class")
 def project_files(tmp_path_factory: pytest.TempPathFactory, compatible_copy_tree):
-    with cd(tmp_path_factory.mktemp("meltano-project-files")), tmp_project(
-        "a_multifile_meltano_project_core",
-        current_dir / "multifile_project",
-        compatible_copy_tree,
-    ) as project:
+    with (
+        cd(tmp_path_factory.mktemp("meltano-project-files")),
+        tmp_project(
+            "a_multifile_meltano_project_core",
+            current_dir / "multifile_project",
+            compatible_copy_tree,
+        ) as project,
+    ):
         yield ProjectFiles(root=project.root, meltano_file_path=project.meltanofile)
 
 
@@ -2174,12 +2180,12 @@ def create_state_id(description: str, env: str = "dev") -> str:
     return f"{env}:tap-{description}-to-target-{description}"
 
 
-@pytest.fixture()
+@pytest.fixture
 def num_params() -> int:
     return 10
 
 
-@pytest.fixture()
+@pytest.fixture
 def payloads(num_params):
     mock_payloads_dict = {
         "mock_state_payloads": [
@@ -2197,7 +2203,7 @@ def payloads(num_params):
     return payloads(**mock_payloads_dict)
 
 
-@pytest.fixture()
+@pytest.fixture
 def state_ids(
     num_params,  # noqa: ARG001
 ):
@@ -2217,7 +2223,7 @@ def state_ids(
     return state_ids(**state_id_dict)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_time():
     def _mock_time():
         for idx in itertools.count():
@@ -2231,7 +2237,7 @@ def mock_time():
     return _mock_time()
 
 
-@pytest.fixture()
+@pytest.fixture
 def job_args():
     job_args_dict = {
         "complete_job_args": {"state": State.SUCCESS, "payload_flags": Payload.STATE},
@@ -2244,7 +2250,7 @@ def job_args():
     return job_args(**job_args_dict)
 
 
-@pytest.fixture()
+@pytest.fixture
 def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     jobs = {
         state_ids.single_incomplete_state_id: [
@@ -2315,12 +2321,12 @@ def state_ids_with_jobs(state_ids, job_args, payloads, mock_time):
     return jobs
 
 
-@pytest.fixture()
+@pytest.fixture
 def jobs(state_ids_with_jobs):
     return [job for job_list in state_ids_with_jobs.values() for job in job_list]
 
 
-@pytest.fixture()
+@pytest.fixture
 def state_ids_with_expected_states(
     state_ids,
     payloads,
@@ -2375,7 +2381,7 @@ def state_ids_with_expected_states(
     return list(expectations.items())
 
 
-@pytest.fixture()
+@pytest.fixture
 def job_history_session(jobs, session):
     job: Job
     job_names = set()
@@ -2388,12 +2394,12 @@ def job_history_session(jobs, session):
     return session
 
 
-@pytest.fixture()
+@pytest.fixture
 def state_service(job_history_session, project):
     return StateService(project, session=job_history_session)
 
 
-@pytest.fixture()
+@pytest.fixture
 def project_with_environment(project: Project):
     project.activate_environment("dev")
     project.environment.env["ENVIRONMENT_ENV_VAR"] = "${MELTANO_PROJECT_ROOT}/file.txt"
@@ -2431,7 +2437,7 @@ test_log_config = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def use_test_log_config():
     with mock.patch(
         "meltano.core.logging.utils.default_config",
@@ -2440,7 +2446,7 @@ def use_test_log_config():
         yield patched_default_config
 
 
-@pytest.fixture()
+@pytest.fixture
 def reset_project_context(
     project: Project,
     project_init_service: ProjectInitService,

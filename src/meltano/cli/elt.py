@@ -11,7 +11,12 @@ from datetime import datetime, timezone
 import click
 from structlog import stdlib as structlog_stdlib
 
-from meltano.cli.params import InstallPlugins, get_install_options, pass_project
+from meltano.cli.params import (
+    InstallPlugins,
+    UUIDParamType,
+    get_install_options,
+    pass_project,
+)
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContextBuilder
@@ -28,7 +33,10 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    import uuid
+
     import structlog
+    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
@@ -58,6 +66,7 @@ class ELOptions:
     full_refresh = click.option(
         "--full-refresh",
         help="Perform a full refresh (ignore state left behind by any previous runs).",
+        envvar="MELTANO_RUN_FULL_REFRESH",
         is_flag=True,
     )
     refresh_catalog = click.option(
@@ -105,6 +114,11 @@ class ELOptions:
         is_flag=True,
         help="Merges state with that of previous runs.",
     )
+    run_id = click.option(
+        "--run-id",
+        type=UUIDParamType(),
+        help="Provide a UUID to use as the run ID.",
+    )
 
 
 @click.command(
@@ -128,6 +142,7 @@ class ELOptions:
 @install
 @no_install
 @only_install
+@ELOptions.run_id
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -142,12 +157,13 @@ async def el(  # WPS408
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
+    run_id: uuid.UUID | None,
     install_plugins: InstallPlugins,
 ) -> None:
     """Run an EL pipeline to Extract and Load data.
@@ -178,6 +194,7 @@ async def el(  # WPS408
         force=force,
         merge_state=merge_state,
         install_plugins=install_plugins,
+        run_id=run_id,
     )
 
 
@@ -203,6 +220,7 @@ async def el(  # WPS408
 @install
 @no_install
 @only_install
+@ELOptions.run_id
 @click.pass_context
 @pass_project(migrate=True)
 @run_async
@@ -218,13 +236,14 @@ async def elt(  # WPS408
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
+    run_id: uuid.UUID | None,
 ) -> None:
     """Run an ELT pipeline to Extract, Load, and Transform data.
 
@@ -255,6 +274,7 @@ async def elt(  # WPS408
         force=force,
         merge_state=merge_state,
         install_plugins=install_plugins,
+        run_id=run_id,
     )
 
 
@@ -270,13 +290,14 @@ async def _run_el_command(
     refresh_catalog: bool,
     select: list[str],
     exclude: list[str],
-    catalog: str,
-    state: str,
-    dump: str,
-    state_id: str,
+    catalog: str | None,
+    state: str | None,
+    dump: str | None,
+    state_id: str | None,
     force: bool,
     merge_state: bool,
     install_plugins: InstallPlugins,
+    run_id: uuid.UUID | None,
 ) -> None:
     if platform.system() == "Windows":
         raise CliError(
@@ -301,6 +322,7 @@ async def _run_el_command(
             f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
             f"--{extractor}--{loader}"
         ),
+        run_id=run_id,
     )
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
@@ -319,6 +341,7 @@ async def _run_el_command(
             catalog=catalog,
             state=state,
             merge_state=merge_state,
+            run_id=run_id,
         )
 
         if dump:
@@ -342,22 +365,23 @@ async def _run_el_command(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _elt_context_builder(  # noqa: ANN202
+def _elt_context_builder(
     project: Project,
-    job,  # noqa: ANN001
-    session,  # noqa: ANN001
-    extractor,  # noqa: ANN001
-    loader,  # noqa: ANN001
-    transform,  # noqa: ANN001
+    job: Job,
+    session: Session,
+    extractor: str,
+    loader: str,
+    transform: str,
     *,
-    dry_run=False,  # noqa: ANN001
-    full_refresh=False,  # noqa: ANN001
-    refresh_catalog=False,  # noqa: ANN001
-    select_filter=None,  # noqa: ANN001
-    catalog=None,  # noqa: ANN001
-    state=None,  # noqa: ANN001
-    merge_state=False,  # noqa: ANN001
-):
+    dry_run: bool = False,
+    full_refresh: bool = False,
+    refresh_catalog: bool = False,
+    select_filter: list[str] | None = None,
+    catalog: str | None = None,
+    state: str | None = None,
+    merge_state: bool = False,
+    run_id: uuid.UUID | None = None,
+) -> ELTContextBuilder:
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
@@ -378,6 +402,7 @@ def _elt_context_builder(  # noqa: ANN202
         .with_catalog(catalog)
         .with_state(state)
         .with_merge_state(merge_state=merge_state)
+        .with_run_id(run_id)
     )
 
 

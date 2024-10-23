@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import enum
 import functools
 import logging
 import os
@@ -11,7 +12,6 @@ import sys
 import typing as t
 from contextlib import contextmanager
 from dataclasses import dataclass
-from enum import Enum
 from functools import cached_property
 from multiprocessing import cpu_count
 
@@ -22,7 +22,6 @@ from meltano.core.error import (
     PluginInstallError,
     PluginInstallWarning,
 )
-from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
 from meltano.core.utils import (
@@ -38,9 +37,15 @@ from meltano.core.venv_service import (
     fingerprint,
 )
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+else:
+    from enum import StrEnum
+
 if t.TYPE_CHECKING:
     import io
     from pathlib import Path
+    from collections.abc import Callable, Iterable, Mapping, Sequence
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
@@ -48,23 +53,23 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
-class PluginInstallReason(str, Enum):
+class PluginInstallReason(StrEnum):
     """Plugin install reason enum."""
 
-    ADD = "add"
-    AUTO = "auto"
-    INSTALL = "install"
-    UPGRADE = "upgrade"
+    ADD = enum.auto()
+    AUTO = enum.auto()
+    INSTALL = enum.auto()
+    UPGRADE = enum.auto()
 
 
-class PluginInstallStatus(Enum):
+class PluginInstallStatus(StrEnum):
     """The status of the process of installing a plugin."""
 
-    RUNNING = "running"
-    SUCCESS = "success"
-    SKIPPED = "skipped"
-    ERROR = "error"
-    WARNING = "warning"
+    RUNNING = enum.auto()
+    SUCCESS = enum.auto()
+    SKIPPED = enum.auto()
+    ERROR = enum.auto()
+    WARNING = enum.auto()
 
 
 @dataclass(frozen=True)
@@ -149,7 +154,7 @@ class PluginInstallService:
     def __init__(
         self,
         project: Project,
-        status_cb: t.Callable[[PluginInstallState], t.Any] = noop,
+        status_cb: Callable[[PluginInstallState], t.Any] = noop,
         *,
         parallelism: int | None = None,
         clean: bool = False,
@@ -194,7 +199,7 @@ class PluginInstallService:
 
     @staticmethod
     def remove_duplicates(
-        plugins: t.Iterable[ProjectPlugin],
+        plugins: Iterable[ProjectPlugin],
         reason: PluginInstallReason,
     ) -> tuple[list[PluginInstallState], list[ProjectPlugin]]:
         """Deduplicate list of plugins, keeping the last occurrences.
@@ -216,9 +221,9 @@ class PluginInstallService:
         deduped_plugins: list[ProjectPlugin] = []
         states: list[PluginInstallState] = []
         for plugin in plugins:
-            if (plugin.type, plugin.venv_name) not in seen_venvs:
+            if (plugin.type, plugin.plugin_dir_name) not in seen_venvs:
                 deduped_plugins.append(plugin)
-                seen_venvs.add((plugin.type, plugin.venv_name))
+                seen_venvs.add((plugin.type, plugin.plugin_dir_name))
             else:
                 states.append(
                     PluginInstallState(
@@ -251,7 +256,7 @@ class PluginInstallService:
 
     async def install_plugins(
         self,
-        plugins: t.Iterable[ProjectPlugin],
+        plugins: Iterable[ProjectPlugin],
         reason: PluginInstallReason = PluginInstallReason.INSTALL,
     ) -> list[PluginInstallState]:
         """Install all the provided plugins.
@@ -314,14 +319,7 @@ class PluginInstallService:
         """
         env = self.plugin_installation_env(plugin)
 
-        if (
-            (
-                reason == PluginInstallReason.AUTO
-                and not self._requires_install(plugin, env=env)
-            )
-            or not plugin.is_installable()
-            or self._is_mapping(plugin)
-        ):
+        if not self._requires_install(plugin, reason, env=env):
             state = PluginInstallState(
                 plugin=plugin,
                 reason=reason,
@@ -399,10 +397,17 @@ class PluginInstallService:
     def _requires_install(
         self,
         plugin: ProjectPlugin,
+        reason: PluginInstallReason,
         *,
-        env: t.Mapping[str, str] | None = None,
+        env: Mapping[str, str] | None = None,
         requirements_file: str | None = None,
     ) -> bool:
+        if not plugin.is_installable():
+            return False
+
+        if reason is not PluginInstallReason.AUTO:
+            return not plugin.is_mapping()
+
         try:
             pip_install_args = get_pip_install_args(
                 self.project,
@@ -424,25 +429,6 @@ class PluginInstallService:
 
         venv = VirtualEnv(self.project.plugin_dir(plugin, "venv", make_dirs=False))
         return fingerprint(pip_install_args) != venv.read_fingerprint()
-
-    @staticmethod
-    def _is_mapping(plugin: ProjectPlugin) -> bool:
-        """Check if a plugin is a mapping, as mappings are not installed.
-
-        Mappings are `PluginType.MAPPERS` with extra attribute of `_mapping`
-        which will indicate that this instance of the plugin is actually a
-        mapping - and should not be installed.
-
-        Args:
-            plugin: ProjectPlugin to evaluate.
-
-        Returns:
-            A boolean determining if the given plugin is a mapping (of type
-            `PluginType.MAPPERS`).
-        """
-        return plugin.type == PluginType.MAPPERS and bool(
-            plugin.extra_config.get("_mapping")
-        )
 
     def plugin_installation_env(self, plugin: ProjectPlugin) -> dict[str, str]:
         """Environment variables to use during plugin installation.
@@ -515,7 +501,7 @@ class PluginInstaller(t.Protocol):
 def get_pip_install_args(
     project: Project,
     plugin: ProjectPlugin,
-    env: t.Mapping[str, str] | None = None,
+    env: Mapping[str, str] | None = None,
     requirements_file: str | None = None,
     if_missing: EnvVarMissingBehavior | None = None,
 ) -> list[str]:
@@ -577,7 +563,7 @@ def install_status_update(install_state: PluginInstallState) -> None:
 
 async def install_plugins(
     project: Project,
-    plugins: t.Sequence[ProjectPlugin],
+    plugins: Sequence[ProjectPlugin],
     *,
     reason: PluginInstallReason = PluginInstallReason.INSTALL,
     parallelism: int | None = None,
@@ -630,7 +616,7 @@ async def install_pip_plugin(
     plugin: ProjectPlugin,
     clean: bool = False,
     force: bool = False,
-    env: t.Mapping[str, str] | None = None,
+    env: Mapping[str, str] | None = None,
     **kwargs,  # noqa: ANN003, ARG001
 ) -> None:
     """Install the plugin with pip.
@@ -664,14 +650,14 @@ async def install_pip_plugin(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
-            name=plugin.venv_name,
+            name=plugin.plugin_dir_name,
         )
     elif backend == "uv":  # pragma: no cover
         service = UvVenvService(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
-            name=plugin.venv_name,
+            name=plugin.plugin_dir_name,
         )
     else:  # pragma: no cover
         msg = f"Unsupported venv backend: {backend}"

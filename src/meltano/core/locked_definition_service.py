@@ -11,6 +11,8 @@ from meltano.core.plugin.factory import base_plugin_factory
 from meltano.core.plugin_repository import PluginRepository
 
 if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from meltano.core.project import Project
 
 
@@ -82,7 +84,7 @@ class LockedDefinitionService(PluginRepository):
     def get_plugins_of_type(
         self,
         plugin_type: PluginType,
-    ) -> t.Iterable[PluginDefinition]:
+    ) -> Iterable[PluginDefinition]:
         """Get all plugin definitions of a given type.
 
         Args:

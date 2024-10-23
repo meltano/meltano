@@ -16,7 +16,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 @pytest.mark.usefixtures("tap")
 async def test_select_service_list_all(
     project: Project,

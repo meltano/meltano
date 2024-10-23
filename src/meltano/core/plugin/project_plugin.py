@@ -14,6 +14,11 @@ from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import flatten, uniques_in
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from meltano.core.plugin_invoker import PluginInvoker
+
 logger = structlog.stdlib.get_logger(__name__)
 
 
@@ -50,8 +55,11 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
 
     VARIANT_ATTR = "variant"
 
+    invoker_class: type[PluginInvoker]
+
     name: str
     variant: str | None
+    executable: str
 
     config_files: dict[str, str]
 
@@ -230,7 +238,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self) -> dict[str, str]:
+    def info(self) -> dict[str, str | None]:
         """Plugin info dict.
 
         Returns:
@@ -281,7 +289,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         """
         return list(self.all_commands.keys())
 
-    def env_prefixes(self, *, for_writing=False) -> list[str]:  # noqa: ANN001
+    def env_prefixes(self, *, for_writing: bool = False) -> list[str]:
         """Return environment variable prefixes.
 
         Args:
@@ -393,8 +401,11 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return not self.inherit_from
 
     @property
-    def venv_name(self) -> str:
-        """Return the venv name this plugin should use.
+    def plugin_dir_name(self) -> str:
+        """Return the plugin directory name this plugin should use.
+
+        This directory is where the plugin's Python virtual environment will be
+        created, among other things.
 
         Returns:
             The name of this plugins parent if both pip urls are the same, else
@@ -404,13 +415,13 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             return self.name
 
         if not self.pip_url or (self.parent.pip_url == self.pip_url):
-            return self.parent.name
+            return self.parent.plugin_dir_name
 
         return self.name
 
     def get_requirements(
         self,
-        plugin_types: t.Iterable[PluginType] | None = None,
+        plugin_types: Iterable[PluginType] | None = None,
     ) -> dict[PluginType, list[PluginRequirement]]:
         """Return the requirements for this plugin.
 
@@ -456,3 +467,18 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             for plugin_type, deps in self.all_requires.items()
             for dep in deps
         ]
+
+    def is_mapping(self) -> bool:
+        """Check if the plugin is a mapping, as mappings are not installed.
+
+        Mappings are `PluginType.MAPPERS` with extra attribute of `_mapping`
+        which will indicate that this instance of the plugin is actually a
+        mapping - and should not be installed.
+
+        Returns:
+            A boolean determining if the plugin is a mapping (of type
+            `PluginType.MAPPERS`).
+        """
+        return self.type is PluginType.MAPPERS and bool(
+            self.extra_config.get("_mapping")
+        )
