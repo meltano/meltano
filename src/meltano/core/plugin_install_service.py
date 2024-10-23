@@ -44,8 +44,8 @@ else:
 
 if t.TYPE_CHECKING:
     import io
-    from pathlib import Path
     from collections.abc import Callable, Iterable, Mapping, Sequence
+    from pathlib import Path
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
