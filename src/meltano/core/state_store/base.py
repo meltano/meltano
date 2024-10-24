@@ -71,6 +71,11 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
+    def clear_all(self):  # noqa: ANN201
+        """Clear all states."""
+        ...
+
+    @abstractmethod
     def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
         """Get all state_ids available in this state store manager.
 
