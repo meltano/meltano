@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 
 from meltano.core.db import project_engine
 from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.base import MeltanoState
 from meltano.core.state_store.db import DBStateStoreManager
 from meltano.core.state_store.filesystem import (
     LocalFilesystemStateStoreManager,
@@ -30,6 +31,9 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project_settings_service import ProjectSettingsService
     from meltano.core.state_store.base import StateStoreManager
+
+
+__all__ = ["MeltanoState", "state_store_manager_from_project_settings"]
 
 
 class StateBackend(StrEnum):

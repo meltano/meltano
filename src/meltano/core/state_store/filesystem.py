@@ -21,8 +21,7 @@ from urllib.parse import urlparse
 import structlog
 from smart_open import open
 
-from meltano.core.job_state import JobState
-from meltano.core.state_store.base import StateStoreManager
+from meltano.core.state_store.base import MeltanoState, StateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -281,7 +280,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
-    def get(self, state_id: str) -> JobState | None:
+    def get(self, state_id: str) -> MeltanoState | None:
         """Get current state for the given state_id.
 
         Args:
@@ -297,14 +296,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         with self.acquire_lock(state_id):
             try:
                 with self.get_reader(self.get_state_path(state_id)) as reader:
-                    return JobState.from_file(state_id, reader)
+                    return MeltanoState.from_file(state_id, reader)
             except Exception as e:
                 if self.is_file_not_found_error(e):
                     logger.info(f"No state found for {state_id}.")  # noqa: G004
                     return None
                 raise e
 
-    def set(self, state: JobState) -> None:
+    def set(self, state: MeltanoState) -> None:
         """Set state for the given state_id.
 
         Args:
@@ -321,7 +320,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             else:
                 try:
                     with self.get_reader(filepath) as current_state_reader:
-                        current_state = JobState.from_file(
+                        current_state = MeltanoState.from_file(
                             state.state_id,
                             current_state_reader,
                         )
