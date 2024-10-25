@@ -38,7 +38,7 @@ def create_plugin_files(config_dir: Path, plugin: ProjectPlugin):
 
 
 class TestSingerRunner:
-    @pytest.fixture()
+    @pytest.fixture
     def elt_context(
         self,
         project,  # noqa: ARG002
@@ -57,17 +57,17 @@ class TestSingerRunner:
             .context()
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.extractor.plugin)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_config_dir(self, tmp_path: Path, elt_context) -> Path:
         create_plugin_files(tmp_path, elt_context.loader.plugin)
         return tmp_path
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, session, elt_context):
         Job(
             job_name=TEST_STATE_ID,
@@ -78,7 +78,7 @@ class TestSingerRunner:
 
         return SingerRunner(elt_context)
 
-    @pytest.fixture()
+    @pytest.fixture
     def process_mock_factory(self):
         def _factory(name):
             process_mock = mock.Mock()
@@ -88,17 +88,17 @@ class TestSingerRunner:
 
         return _factory
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap_process(self, process_mock_factory, tap):
         tap = process_mock_factory(tap)
         tap.stdout.readline = AsyncMock(return_value="{}")
         return tap
 
-    @pytest.fixture()
+    @pytest.fixture
     def target_process(self, process_mock_factory, target):
         return process_mock_factory(target)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("subject")
     async def test_prepare_job(
         self,
@@ -124,7 +124,7 @@ class TestSingerRunner:
 
         assert not target_invoker.files["config"].exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_invoke(
         self,
         session,
@@ -159,7 +159,7 @@ class TestSingerRunner:
                 tap_process.wait.assert_awaited()
                 target_process.wait.assert_awaited()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         ("full_refresh", "merge_state", "select_filter", "payload_flag"),
         (
@@ -280,7 +280,7 @@ class TestSingerRunner:
             assert job.payload["singer_state"] == {"line": 3}
             assert job.payload_flags == payload_flag
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run(self, subject) -> None:
         async def invoke_mock(*args, **kwargs) -> None:
             pass

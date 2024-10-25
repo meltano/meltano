@@ -18,7 +18,7 @@ class AsyncReader(asyncio.StreamReader):
         return self.lines.pop(0) if self.lines else b""
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 async def test_capture_subprocess_output() -> None:
     input_lines = [b"LINE\n", b"LINE 2\n", b"\xed\n"]
     output_lines = []

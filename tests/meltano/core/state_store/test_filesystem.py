@@ -51,7 +51,7 @@ def encode_if_on_windows(string: str) -> str:
 
 
 class TestLocalFilesystemStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, function_scoped_test_dir):
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
@@ -64,7 +64,7 @@ class TestLocalFilesystemStateStoreManager:
                 lock_timeout_seconds=10,
             )
 
-    @pytest.fixture()
+    @pytest.fixture
     def state_path(
         self,
         function_scoped_test_dir,
@@ -293,7 +293,7 @@ class TestLocalFilesystemStateStoreManager:
 
 
 class TestAZStorageStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -304,7 +304,7 @@ class TestAZStorageStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
@@ -393,7 +393,7 @@ class TestS3StateStoreManager:
             with Stubber(mock_client.return_value) as stubber:
                 yield stubber
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -634,7 +634,7 @@ class TestS3StateStoreManager:
 
 
 class TestGCSStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -645,7 +645,7 @@ class TestGCSStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "google.cloud.storage.Client",

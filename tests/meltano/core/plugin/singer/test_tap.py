@@ -52,7 +52,7 @@ class TestSingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.order(0)
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -78,7 +78,7 @@ class TestSingerTap:
                 invoker.files["state"],
             ]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_cleanup(self, subject, session, plugin_invoker_factory) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
@@ -86,7 +86,7 @@ class TestSingerTap:
 
         assert not invoker.files["config"].exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_look_up_state(
         self,
         subject,
@@ -211,7 +211,7 @@ class TestSingerTap:
         await assert_state(None)
 
     @pytest.mark.order(1)
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_discover_catalog(
         self,
         session,
@@ -296,7 +296,7 @@ class TestSingerTap:
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_discover_catalog_custom(
         self,
         project,
@@ -322,7 +322,7 @@ class TestSingerTap:
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_apply_select(
         self,
         session,
@@ -409,7 +409,7 @@ class TestSingerTap:
                 ["UniqueEntitiesName", ["properties", "code"], "selected", True],
             )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_apply_catalog_rules(
         self,
         session,
@@ -579,7 +579,7 @@ class TestSingerTap:
             assert not catalog_cache_key_path.exists()
             assert cache_key is None
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_apply_catalog_rules_select_filter(
         self,
         session,
@@ -708,7 +708,7 @@ class TestSingerTap:
             "five": {"one", "two", "three"},
         }
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_apply_catalog_rules_invalid(
         self,
         session,
@@ -722,7 +722,7 @@ class TestSingerTap:
             with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_catalog_cache_key(
         self,
         session,
@@ -790,7 +790,7 @@ class TestSingerTap:
         monkeypatch.setattr(invoker.plugin, "pip_url", "-e local")
         assert await cache_key() is None
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery(
         self,
@@ -822,7 +822,7 @@ class TestSingerTap:
             resp = json.load(catalog_file)
             assert resp["discovered"]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_failure(
         self,
@@ -847,7 +847,7 @@ class TestSingerTap:
 
         assert not catalog_path.exists(), "Catalog should not be present."
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_stderr_output(
         self,
@@ -913,7 +913,7 @@ class TestSingerTap:
 
         discovery_logger.setLevel(original_level)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_handle_io_exceptions(
         self,
@@ -938,7 +938,7 @@ class TestSingerTap:
 
         assert not catalog_path.exists(), "Catalog should not be present."
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery_utf8_output(
         self,
@@ -968,7 +968,7 @@ class TestSingerTap:
         ):
             await subject.run_discovery(invoker, catalog_path)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("use_test_log_config")
     @pytest.mark.parametrize(
         ("rule_pattern", "catalog", "message"),

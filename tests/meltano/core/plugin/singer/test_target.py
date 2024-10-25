@@ -13,20 +13,20 @@ if t.TYPE_CHECKING:
 
 
 class TestSingerTarget:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project_add_service: ProjectAddService):
         try:
             return project_add_service.add(PluginType.LOADERS, "target-mock")
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_setup_bookmark_writer(
         self,
         subject,

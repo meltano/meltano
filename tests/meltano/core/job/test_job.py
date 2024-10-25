@@ -50,7 +50,7 @@ class TestJob:
         assert transition == (State.RUNNING, State.SUCCESS)
         subject.ended_at = datetime.now(timezone.utc)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run(self, session) -> None:
         subject = self.sample_job().save(session)
 
@@ -76,7 +76,7 @@ class TestJob:
         # Allow one additional second of delay:
         assert subject.ended_at - subject.last_heartbeat_at < timedelta(seconds=2)
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run_failed(self, session) -> NoReturn:
         # A failed run will mark the subject as FAILED an set the payload['error']
         subject = self.sample_job({"original_state": 1}).save(session)
@@ -94,7 +94,7 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run_interrupted(self, session) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
@@ -110,7 +110,7 @@ class TestJob:
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "The process was interrupted"
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_run_terminated(self, session) -> None:
         if platform.system() == "Windows":
             pytest.xfail(

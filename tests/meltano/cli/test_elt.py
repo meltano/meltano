@@ -117,7 +117,7 @@ def tap_mock_transform(project_add_service):
         return err.plugin
 
 
-@pytest.fixture()
+@pytest.fixture
 def process_mock_factory():
     def _factory(name):
         process_mock = mock.Mock()
@@ -130,7 +130,7 @@ def process_mock_factory():
     return _factory
 
 
-@pytest.fixture()
+@pytest.fixture
 def tap_process(process_mock_factory, tap):
     tap = process_mock_factory(tap)
     tap.stdout.at_eof.side_effect = (False, False, False, True)
@@ -142,7 +142,7 @@ def tap_process(process_mock_factory, tap):
     return tap
 
 
-@pytest.fixture()
+@pytest.fixture
 def target_process(process_mock_factory, target):
     target = process_mock_factory(target)
 
@@ -164,7 +164,7 @@ def target_process(process_mock_factory, target):
     return target
 
 
-@pytest.fixture()
+@pytest.fixture
 def silent_dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True, True)
@@ -172,7 +172,7 @@ def silent_dbt_process(process_mock_factory, dbt):
     return dbt
 
 
-@pytest.fixture()
+@pytest.fixture
 def dbt_process(process_mock_factory, dbt):
     dbt = process_mock_factory(dbt)
     dbt.stdout.at_eof.side_effect = (True,)

@@ -68,7 +68,7 @@ class TestCliState:
         assert_cli_runner(result)
         assert self.get_result_set(result) == set(state_ids)
 
-    @pytest.fixture()
+    @pytest.fixture
     def patterns_with_expected_results(self, state_ids):
         return [
             (

@@ -62,7 +62,7 @@ class TestSingerMapper:
             mapping_name="mock-mapping-0",
         )
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_exec_args(
         self,
         subject: ProjectPlugin,
@@ -73,7 +73,7 @@ class TestSingerMapper:
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_merged_config(
         self,
         subject: ProjectPlugin,
