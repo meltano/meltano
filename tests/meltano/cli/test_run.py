@@ -199,7 +199,7 @@ class TestCliRunScratchpadOne:
             mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock,
         ):
             asyncio_mock.create_subprocess_exec = create_subprocess_exec
-            with pytest.raises(Exception, match="Found no end in block set!"):
+            with pytest.raises(Exception, match="Loader missing in block set!"):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
 
         args = ["run", tap.name, tap.name, target.name]
