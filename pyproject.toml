@@ -52,6 +52,7 @@ check-jsonschema = "^0.29.4"
 click = "^8.1"
 click-default-group = "^1.2.4"
 click-didyoumean = "^0.3.1"
+# Pin croniter to 3.0.4 to avoid the breaking changes due to https://github.com/kiorky/croniter/issues/90
 croniter = "==3.0.4"
 fasteners = "^0.19"
 flatten-dict = "^0"
