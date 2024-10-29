@@ -84,7 +84,7 @@ def engine_uri(worker_id: str):
     return testing_engine_uri.render_as_string(hide_password=False)
 
 
-@pytest.fixture()
+@pytest.fixture
 def pg_stats(request, session):
     yield
 

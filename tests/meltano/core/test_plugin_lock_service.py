@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@pytest.fixture()
+@pytest.fixture
 def plugin():
     plugin_definition = PluginDefinition(
         PluginType.EXTRACTORS,
@@ -60,7 +60,7 @@ def plugin():
 
 
 class TestPluginLock:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project: Project, plugin: ProjectPlugin):
         return PluginLock(project, plugin)
 
@@ -86,7 +86,7 @@ class TestPluginLock:
 
 
 class TestPluginLockService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project: Project):
         return PluginLockService(project)
 

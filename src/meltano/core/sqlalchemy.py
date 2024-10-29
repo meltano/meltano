@@ -9,7 +9,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
-from typing_extensions import Annotated
 
 
 class JSONEncodedDict(TypeDecorator):
@@ -131,10 +130,10 @@ class DateTimeUTC(TypeDecorator):
         return value
 
 
-GUIDType = Annotated[uuid.UUID, mapped_column(GUID, default=uuid.uuid4)]
-StateType = Annotated[
-    t.Dict[str, str],
+GUIDType = t.Annotated[uuid.UUID, mapped_column(GUID, default=uuid.uuid4)]
+StateType = t.Annotated[
+    dict[str, str],
     mapped_column(MutableDict.as_mutable(JSONEncodedDict)),
 ]
-IntPK = Annotated[int, mapped_column(primary_key=True)]
-StrPK = Annotated[str, mapped_column(primary_key=True)]
+IntPK = t.Annotated[int, mapped_column(primary_key=True)]
+StrPK = t.Annotated[str, mapped_column(primary_key=True)]

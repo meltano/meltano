@@ -27,6 +27,7 @@ from .singer import SingerBlock
 
 if t.TYPE_CHECKING:
     import uuid
+    from collections.abc import AsyncIterator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -312,8 +313,10 @@ class ELBContextBuilder:
         Returns:
             The run directory for the current job.
         """
-        if self._job:  # noqa: RET503
+        if self._job:  # pragma: no cover
             return self.project.job_dir(self._job.job_name, str(self._job.run_id))
+
+        return None
 
     def context(self) -> ELBContext:
         """Create an ELBContext object from the current builder state.
@@ -615,7 +618,7 @@ class ExtractLoadBlocks(BlockSet):
         return self.blocks[1:-1]
 
     @asynccontextmanager
-    async def _start_blocks(self) -> t.AsyncIterator[None]:
+    async def _start_blocks(self) -> AsyncIterator[None]:
         """Start the blocks in the block set.
 
         Yields:

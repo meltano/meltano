@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import enum
 import os
+import sys
 import typing as t
 import uuid
 from contextlib import asynccontextmanager
@@ -20,7 +21,15 @@ from meltano.core.tracking import Tracker
 from meltano.core.utils import EnvVarMissingBehavior, expand_env_vars
 from meltano.core.venv_service import VenvService, VirtualEnv
 
+if sys.version_info < (3, 11):
+    from backports.strenum import StrEnum
+    from typing_extensions import Unpack
+else:
+    from enum import StrEnum
+    from typing import Unpack  # noqa: ICN003
+
 if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
     from pathlib import Path
 
     from sqlalchemy.orm import Session
@@ -30,16 +39,30 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
+    class InvokerInitKwargs(t.TypedDict, total=False):
+        """Keyword arguments for the Invoker constructor."""
+
+        context: t.Any | None
+        output_handlers: dict | None
+        run_dir: Path | None
+        config_dir: Path | None
+        plugin_config_service: PluginConfigService | None
+        plugin_settings_service: PluginSettingsService | None
+
+
 logger = get_logger(__name__)
 
 
-def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN201
+def invoker_factory(
+    project: Project,
+    plugin: ProjectPlugin,
+    **kwargs: Unpack[InvokerInitKwargs],
+) -> PluginInvoker:
     """Instantiate a plugin invoker from a project plugin.
 
     Args:
         project: Meltano project.
         plugin: Plugin instance.
-        args: Invoker constructor positional arguments.
         kwargs: Invoker constructor keyword arguments.
 
     Returns:
@@ -50,7 +73,7 @@ def invoker_factory(project, plugin: ProjectPlugin, *args, **kwargs):  # noqa: A
     if hasattr(plugin, "invoker_class"):
         cls = plugin.invoker_class
 
-    return cls(project, plugin, *args, **kwargs)
+    return cls(project, plugin, **kwargs)
 
 
 class InvokerError(Error):
@@ -120,17 +143,18 @@ class UnknownCommandError(InvokerError):
 class PluginInvoker:
     """This class handles the invocation of a `ProjectPlugin` instance."""
 
-    class StdioSource(str, enum.Enum):
+    class StdioSource(StrEnum):
         """Describes the available unix style std io sources."""
 
-        STDIN = "stdin"
-        STDOUT = "stdout"
-        STDERR = "stderr"
+        STDIN = enum.auto()
+        STDOUT = enum.auto()
+        STDERR = enum.auto()
 
     def __init__(
         self,
         project: Project,
         plugin: ProjectPlugin,
+        *,
         context: t.Any | None = None,  # noqa: ANN401
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
@@ -155,6 +179,7 @@ class PluginInvoker:
         self.plugin = plugin
         self.context = context
         self.output_handlers = output_handlers
+        self.venv_service: VenvService | None
 
         if plugin.pip_url:
             self.venv_service = VenvService(
@@ -178,10 +203,10 @@ class PluginInvoker:
         )
 
         self._prepared = False
-        self.plugin_config = {}
-        self.plugin_config_processed = {}
-        self.plugin_config_extras = {}
-        self.plugin_config_env = {}
+        self.plugin_config: dict = {}
+        self.plugin_config_processed: dict = {}
+        self.plugin_config_extras: dict = {}
+        self.plugin_config_env: dict[str, str] = {}
 
     @property
     def capabilities(self):  # noqa: ANN201
@@ -412,14 +437,32 @@ class PluginInvoker:
         return {}
 
     @asynccontextmanager
-    async def _invoke(
+    async def _invoke(  # (overly complex annotation)
         self,
         *args: str,
         require_preparation: bool = True,
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
         **kwargs,  # noqa: ANN003
-    ) -> t.Generator[list[str], dict[str, t.Any], dict[str, t.Any]]:
+    ) -> AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]], None]:
+        """Invoke a command.
+
+        Args:
+            args: Positional arguments.
+            require_preparation: Whether to fail if the invoker is not "prepared", i.e.
+                if the plugin config has not been loaded.
+            env: Environment variables to pass to the subprocess.
+            command: Plugin command name, if any.
+            kwargs: Keyword arguments to pass to the subprocess constructor.
+
+        Yields:
+            Tuple of command arguments, subprocess call options, and environment dict.
+
+        Raises:
+            InvokerNotPreparedError: If the plugin config has not been loaded and
+                `require_preparation` is True.
+            ExecutableNotFoundError: If the executable is not found.
+        """
         env = env or {}
 
         if require_preparation and not self._prepared:
@@ -517,7 +560,7 @@ class PluginInvoker:
             return self.files[file_id].read_text()
         except ExecutableNotFoundError as err:  # . Allow "useless" except.
             # Unwrap FileNotFoundError
-            raise err.__cause__ from None
+            raise err.__cause__ from None  # type: ignore[misc]
 
     def add_output_handler(self, src: str, handler: SubprocessOutputWriter) -> None:
         """Append an output handler for a given stdio stream.

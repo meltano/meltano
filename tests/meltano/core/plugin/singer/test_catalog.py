@@ -684,7 +684,7 @@ CATALOG_PROPERTIES = {
 }
 
 
-@pytest.fixture()
+@pytest.fixture
 def select_all_executor():
     return SelectExecutor(["*.*"])
 
@@ -829,7 +829,7 @@ class TestCatalogRule:
 
 
 class TestLegacyCatalogSelectVisitor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self):
         return json.loads(LEGACY_CATALOG)
 
@@ -878,7 +878,7 @@ class TestLegacyCatalogSelectVisitor:
 
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1109,7 +1109,7 @@ class TestSelectionType:
 
 
 class TestMetadataExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1171,7 +1171,7 @@ class TestMetadataExecutor:
 
 
 class TestSchemaExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self, request):
         return json.loads(globals()[request.param])
 
@@ -1242,7 +1242,7 @@ class TestSchemaExecutor:
 
 
 class TestListExecutor:
-    @pytest.fixture()
+    @pytest.fixture
     def catalog(self):
         return json.loads(CATALOG)
 

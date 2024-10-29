@@ -51,7 +51,7 @@ def encode_if_on_windows(string: str) -> str:
 
 
 class TestLocalFilesystemStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, function_scoped_test_dir):
         if on_windows():
             yield WindowsFilesystemStateStoreManager(
@@ -64,7 +64,7 @@ class TestLocalFilesystemStateStoreManager:
                 lock_timeout_seconds=10,
             )
 
-    @pytest.fixture()
+    @pytest.fixture
     def state_path(
         self,
         function_scoped_test_dir,
@@ -153,8 +153,9 @@ class TestLocalFilesystemStateStoreManager:
         timeout = subject.lock_timeout_seconds
 
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
-        with time_machine.travel(initial_dt) as frozen_datetime, subject.acquire_lock(
-            state_id,
+        with (
+            time_machine.travel(initial_dt) as frozen_datetime,
+            subject.acquire_lock(state_id),
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
@@ -292,7 +293,7 @@ class TestLocalFilesystemStateStoreManager:
 
 
 class TestAZStorageStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -303,7 +304,7 @@ class TestAZStorageStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "meltano.core.state_store.azure.BlobServiceClient",
@@ -392,7 +393,7 @@ class TestS3StateStoreManager:
             with Stubber(mock_client.return_value) as stubber:
                 yield stubber
 
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -633,7 +634,7 @@ class TestS3StateStoreManager:
 
 
 class TestGCSStateStoreManager:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(
         self,
         function_scoped_test_dir,  # noqa: ARG002
@@ -644,7 +645,7 @@ class TestGCSStateStoreManager:
             lock_timeout_seconds=10,
         )
 
-    @pytest.fixture()
+    @pytest.fixture
     def mock_client(self):
         with patch(
             "google.cloud.storage.Client",

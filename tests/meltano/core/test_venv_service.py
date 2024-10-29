@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import platform
 import re
 import subprocess
@@ -33,15 +32,18 @@ async def _check_venv_created_with_python_for_plugin(
     plugin: ProjectPlugin,
     python: str | None,
 ) -> None:
-    with mock.patch(
-        "meltano.core.venv_service._resolve_python_path",
-    ) as venv_mock, mock.patch("meltano.core.venv_service.VenvService.install"):
+    with (
+        mock.patch(
+            "meltano.core.venv_service._resolve_python_path",
+        ) as venv_mock,
+        mock.patch("meltano.core.venv_service.VenvService.install"),
+    ):
         await install_pip_plugin(project=project, plugin=plugin)
         venv_mock.assert_called_once_with(python)
 
 
 class TestVenvService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
 
@@ -68,7 +70,7 @@ class TestVenvService:
             run_dir.exists()
         ), "Expected all files in the run dir to be removed, but not the dir itself"
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_clean_install(self, subject: VenvService) -> None:
         if platform.system() == "Windows":
@@ -124,7 +126,7 @@ class TestVenvService:
         assert subject.pip_log_path.is_file()
         assert subject.pip_log_path.stat().st_size > 0
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: VenvService) -> None:
         if platform.system() == "Windows":
@@ -148,7 +150,7 @@ class TestVenvService:
         )
         assert re.search(r"example\s+0\.1\.0", str(run.stdout))
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_requires_clean_install(self, subject: VenvService) -> None:
         # Make sure the venv exists already
@@ -156,7 +158,7 @@ class TestVenvService:
 
         if platform.system() != "Windows":
             python_path = subject.exec_path("python")
-            original_link_target = os.readlink(python_path)
+            original_link_target = python_path.readlink()
             try:
                 # Simulate the deletion of the underlying Python executable by
                 # making its symlink point to a file that does not exist
@@ -232,9 +234,12 @@ class TestVirtualEnv:
             assert subject.lib_dir == subject.root / lib_dir
 
     def test_unknown_platform(self, project: Project) -> None:
-        with mock.patch("platform.system", return_value="commodore64"), pytest.raises(
-            MeltanoError,
-            match="(?i)Platform 'commodore64'.*?not supported.",
+        with (
+            mock.patch("platform.system", return_value="commodore64"),
+            pytest.raises(
+                MeltanoError,
+                match="(?i)Platform 'commodore64'.*?not supported.",
+            ),
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
 
@@ -248,18 +253,24 @@ class TestVirtualEnv:
             == sys.executable
         )
 
-        with mock.patch(
-            "shutil.which",
-            return_value="/usr/bin/test-python-executable",
-        ), mock.patch("os.access", return_value=True):
+        with (
+            mock.patch(
+                "shutil.which",
+                return_value="/usr/bin/test-python-executable",
+            ),
+            mock.patch("os.access", return_value=True),
+        ):
             assert (
                 VirtualEnv(root, python="test-python-executable").python_path
                 == "/usr/bin/test-python-executable"
             )
 
-        with mock.patch("os.path.exists", return_value=True), mock.patch(
-            "os.access",
-            return_value=True,
+        with (
+            mock.patch("os.path.exists", return_value=True),
+            mock.patch(
+                "os.access",
+                return_value=True,
+            ),
         ):
             path_str = "/usr/bin/test-python-executable"
             venv = VirtualEnv(root, python=path_str)
@@ -268,15 +279,16 @@ class TestVirtualEnv:
             venv = VirtualEnv(root, python=Path(path_str))
             assert venv.python_path == str(Path(path_str).resolve())
 
-        with mock.patch(
-            "shutil.which",
-            return_value="/usr/bin/test-python-executable",
-        ), mock.patch(
-            "os.access",
-            return_value=False,
-        ), pytest.raises(
-            MeltanoError,
-            match="'/usr/bin/test-python-executable' is not executable",
+        with (
+            mock.patch(
+                "shutil.which",
+                return_value="/usr/bin/test-python-executable",
+            ),
+            mock.patch("os.access", return_value=False),
+            pytest.raises(
+                MeltanoError,
+                match="'/usr/bin/test-python-executable' is not executable",
+            ),
         ):
             VirtualEnv(root, python="test-python-executable")
 
@@ -294,7 +306,7 @@ class TestVirtualEnv:
 
 
 class TestUvVenvService:
-    @pytest.fixture()
+    @pytest.fixture
     def subject(self, project):
         find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
@@ -327,7 +339,7 @@ class TestUvVenvService:
         with pytest.raises(MeltanoError, match="Could not find the 'uv' executable"):
             find_uv()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
     async def test_install(self, subject: UvVenvService) -> None:
         # Make sure the venv exists already
@@ -354,11 +366,14 @@ class TestUvVenvService:
         process = mock.Mock(spec=Process)
         process.stderr = "Some error"
 
-        with mock.patch(
-            "meltano.core.venv_service.UvVenvService.install_pip_args",
-            side_effect=AsyncSubprocessError("Something went wrong", process),
-        ), pytest.raises(
-            AsyncSubprocessError,
-            match="Failed to install plugin 'name'",
+        with (
+            mock.patch(
+                "meltano.core.venv_service.UvVenvService.install_pip_args",
+                side_effect=AsyncSubprocessError("Something went wrong", process),
+            ),
+            pytest.raises(
+                AsyncSubprocessError,
+                match="Failed to install plugin 'name'",
+            ),
         ):
             await subject.install(["cowsay"])

@@ -44,7 +44,7 @@ class TestSuperset:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.UTILITIES, "superset")
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     @pytest.mark.filterwarnings(
         "ignore:Unknown setting 'SUPERSET_WEBSERVER_PORT':RuntimeWarning",
     )
@@ -87,12 +87,13 @@ class TestSuperset:
                 return original_exec(cmd, *popen_args, **kwargs)
             return handle_mock
 
-        with mock.patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            side_effect=popen_mock,
-        ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure",
+        with (
+            mock.patch.object(
+                asyncio,
+                "create_subprocess_exec",
+                side_effect=popen_mock,
+            ) as popen,
+            mock.patch("meltano.core.plugin_invoker.PluginConfigService.configure"),
         ):
             invoker: SupersetInvoker = plugin_invoker_factory(subject)
             # This ends up calling the hooks
@@ -153,7 +154,7 @@ class TestSuperset:
 
             assert not run_dir.joinpath("superset_config.py").exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: SupersetInvoker = plugin_invoker_factory(subject)
 

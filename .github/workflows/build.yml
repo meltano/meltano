@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@v4.2.2
 
     - name: Install Poetry
       env:
@@ -28,9 +28,9 @@ jobs:
         poetry --version
 
     - name: Set up Python
-      uses: actions/setup-python@v5.2.0
+      uses: actions/setup-python@v5.3.0
       with:
-        python-version: 3.9
+        python-version: 3.12
         architecture: x64
         cache: 'poetry'
 
@@ -73,7 +73,7 @@ jobs:
     environment: publishing
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.1.7
+      uses: actions/checkout@v4.2.2
 
     - name: Download artifacts
       uses: actions/download-artifact@v4
@@ -97,4 +97,4 @@ jobs:
 
     - name: Publish
       if: ${{ github.event.release }}
-      uses: pypa/gh-action-pypi-publish@v1.10.2
+      uses: pypa/gh-action-pypi-publish@v1.10.3

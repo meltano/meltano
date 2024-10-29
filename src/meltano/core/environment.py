@@ -13,6 +13,9 @@ from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
 
+if t.TYPE_CHECKING:
+    from collections.abc import Iterable
+
 TEnv = t.TypeVar("TEnv", bound="Environment")
 
 
@@ -100,7 +103,7 @@ class EnvironmentPluginConfig(PluginRef):
 
     def get_orphan_settings(
         self,
-        existing: t.Iterable[SettingDefinition],
+        existing: Iterable[SettingDefinition],
     ) -> list[SettingDefinition]:
         """Get orphan settings for this plugin.
 
@@ -185,7 +188,7 @@ class Environment(NameEq, Canonical):
         self.state_id_suffix = state_id_suffix
 
     @classmethod
-    def find(cls: type[TEnv], objects: t.Iterable[TEnv], name: str) -> TEnv:
+    def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
         """Lookup an environment by name from an iterable.
 
         Args:

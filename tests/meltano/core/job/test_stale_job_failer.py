@@ -9,7 +9,7 @@ from meltano.core.job.stale_job_failer import fail_stale_jobs
 
 
 class TestStaleJobFailer:
-    @pytest.fixture()
+    @pytest.fixture
     def live_job(self, session):
         job = Job(job_name="test")
         job.start()
@@ -17,7 +17,7 @@ class TestStaleJobFailer:
 
         return job
 
-    @pytest.fixture()
+    @pytest.fixture
     def stale_job(self, session):
         job = Job(job_name="test")
         job.start()
@@ -26,7 +26,7 @@ class TestStaleJobFailer:
 
         return job
 
-    @pytest.fixture()
+    @pytest.fixture
     def other_stale_job(self, session):
         job = Job(job_name="other")
         job.start()
@@ -35,7 +35,7 @@ class TestStaleJobFailer:
 
         return job
 
-    @pytest.fixture()
+    @pytest.fixture
     def complete_job(self, session):
         job = Job(job_name="other")
         job.start()

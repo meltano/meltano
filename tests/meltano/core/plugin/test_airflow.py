@@ -24,7 +24,7 @@ class TestAirflow:
         with mock.patch.object(PluginInstallService, "install_plugin"):
             return project_add_service.add(PluginType.ORCHESTRATORS, "airflow")
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_before_configure(
         self,
         subject,
@@ -66,13 +66,16 @@ class TestAirflow:
                 return original_exec(cmd, *popen_args, **kwargs)
             return handle_mock
 
-        with mock.patch.object(
-            asyncio,
-            "create_subprocess_exec",
-            side_effect=popen_mock,
-        ) as popen, mock.patch(
-            "meltano.core.plugin_invoker.PluginConfigService.configure",
-        ) as configure:
+        with (
+            mock.patch.object(
+                asyncio,
+                "create_subprocess_exec",
+                side_effect=popen_mock,
+            ) as popen,
+            mock.patch(
+                "meltano.core.plugin_invoker.PluginConfigService.configure",
+            ) as configure,
+        ):
             invoker: AirflowInvoker = plugin_invoker_factory(subject)
             # This ends up calling subject.before_configure
             async with invoker.prepared(session):
@@ -98,7 +101,7 @@ class TestAirflow:
 
             assert not run_dir.joinpath("airflow.cfg").exists()
 
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_before_cleanup(self, subject, plugin_invoker_factory) -> None:
         invoker: AirflowInvoker = plugin_invoker_factory(subject)
 

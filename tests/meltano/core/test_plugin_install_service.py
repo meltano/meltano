@@ -15,6 +15,7 @@ from meltano.core.plugin_install_service import (
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 
@@ -54,7 +55,7 @@ class TestPluginInstallService:
         project.refresh()
         return PluginInstallService(project, **request.param)
 
-    @pytest.fixture()
+    @pytest.fixture
     def tap(self, project_add_service):
         try:
             return project_add_service.add(
@@ -65,7 +66,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_tap(self, project_add_service, tap):
         try:
             return project_add_service.add(
@@ -76,7 +77,7 @@ class TestPluginInstallService:
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
 
-    @pytest.fixture()
+    @pytest.fixture
     def inherited_inherited_tap(self, project_add_service, inherited_tap):
         try:
             return project_add_service.add(
@@ -86,6 +87,48 @@ class TestPluginInstallService:
             )
         except PluginAlreadyAddedException as err:  # pragma: no cover
             return err.plugin
+
+    @pytest.fixture
+    def mapper(self, project_add_service):
+        try:
+            return project_add_service.add(
+                PluginType.MAPPERS,
+                "mapper-mock",
+                variant="meltano",
+                mappings=[
+                    {
+                        "name": "mock-mapping-0",
+                        "config": {
+                            "transformations": [
+                                {
+                                    "field_id": "author_email",
+                                    "tap_stream_name": "commits",
+                                    "type": "MASK-HIDDEN",
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        "name": "mock-mapping-1",
+                        "config": {
+                            "transformations": [
+                                {
+                                    "field_id": "given_name",
+                                    "tap_stream_name": "users",
+                                    "type": "lowercase",
+                                },
+                            ],
+                        },
+                    },
+                ],
+            )
+        except PluginAlreadyAddedException as err:  # pragma: no cover
+            return err.plugin
+
+    @pytest.fixture
+    def mapping(self, project: Project, mapper: ProjectPlugin):
+        name: str = mapper.extra_config["_mappings"][0]["name"]
+        return project.plugins.find_plugin(name)
 
     def test_default_init_should_not_fail(self, subject) -> None:
         assert subject
@@ -106,7 +149,7 @@ class TestPluginInstallService:
             "target-csv",
         ]
 
-    @pytest.mark.slow()
+    @pytest.mark.slow
     async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
         assert len(all_plugins) == 3
@@ -221,3 +264,32 @@ class TestPluginInstallService:
         assert (
             state.skipped
         ), "Expected plugin with missing env var in pip URL to not be installed"
+
+    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @pytest.mark.usefixtures("reset_project_context")
+    async def test_auto_install_mapper_by_mapping(
+        self,
+        subject: PluginInstallService,
+        mapper,
+        mapping,
+    ) -> None:
+        state = await subject.install_plugin_async(
+            mapping,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert not state.skipped, "Expected mapper defining mapping to be installed"
+
+        state = await subject.install_plugin_async(
+            mapper,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert state.skipped, "Expected mapper to not be installed"
+
+        state = await subject.install_plugin_async(
+            mapping,
+            reason=PluginInstallReason.AUTO,
+        )
+
+        assert state.skipped, "Expected mapper defining mapping to not be installed"

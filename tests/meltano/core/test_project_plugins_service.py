@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-@pytest.fixture()
+@pytest.fixture
 def modified_lockfile(project: Project):
     lockfile_path = project.plugin_lock_path(
         PluginType.EXTRACTORS,
@@ -124,8 +124,9 @@ class TestProjectPluginsService:
         project: Project,
         tap: ProjectPlugin,
     ) -> None:
-        with project.plugins.use_preferred_source(DefinitionSource.NONE), pytest.raises(
-            PluginDefinitionNotFoundError,
+        with (
+            project.plugins.use_preferred_source(DefinitionSource.NONE),
+            pytest.raises(PluginDefinitionNotFoundError),
         ):
             project.plugins.get_parent(tap)
 

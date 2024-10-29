@@ -9,7 +9,7 @@ import os
 import re
 import shutil
 import typing as t
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 from base64 import b64decode, b64encode
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
@@ -23,7 +23,6 @@ from smart_open import open
 
 from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
-from meltano.core.utils import remove_suffix
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -82,6 +81,15 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``.
+
+        Returns:
+            The default transport params for filesystem-based backends.
+        """
+        return {}
+
     def uri_with_path(self, path: str) -> str:
         """Build uri with the given path included.
 
@@ -91,7 +99,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Returns:
             Full URI with path included
         """
-        return self.join_path(remove_suffix(self.uri, (self.state_dir)), path)
+        return self.join_path(self.uri.removesuffix(self.state_dir), path)
 
     @contextmanager
     def get_reader(self, path: str) -> Iterator[TextIOWrapper]:
@@ -106,7 +114,10 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         if self.client:
             with open(
                 self.uri_with_path(path),
-                transport_params={"client": self.client},
+                transport_params={
+                    "client": self.client,
+                    **self.extra_transport_params,
+                },
             ) as reader:
                 yield reader
         else:
@@ -125,22 +136,25 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Yields:
             A TextIOWrapper to read the file/blob.
         """
+        transport_params = {"client": self.client} if self.client else {}
+        transport_params.update(self.extra_transport_params)
         try:
             with open(
                 self.uri_with_path(path),
                 "w+",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
         except NotImplementedError:
             with open(
                 self.uri_with_path(path),
                 "w",
-                transport_params={"client": self.client} if self.client else {},
+                transport_params=transport_params,
             ) as writer:
                 yield writer
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def client(self):  # noqa: ANN201
         """Get a client for performing fs operations.
 
@@ -148,7 +162,8 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
         ...
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def state_dir(self) -> str:
         """Get the path (either filepath or prefix) that state should be stored at."""
         ...
@@ -558,7 +573,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         Returns:
             Full URI with path included
         """
-        return self.join_path(remove_suffix(self.uri, self.prefix), path)
+        return self.join_path(self.uri.removesuffix(self.prefix), path)
 
     @abstractmethod
     def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
