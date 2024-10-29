@@ -71,7 +71,10 @@ class StateStoreManager(ABC):
         ...
 
     def clear_all(self) -> None:
-        """Clear all states."""
+        """Clear all states.
+
+        Override this method if the store supports bulk deletion.
+        """
         for state_id in self.get_state_ids("*"):
             self.clear(state_id)
 

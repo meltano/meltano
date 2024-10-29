@@ -14,6 +14,8 @@ from meltano.core.utils import merge
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from meltano.core.state_service import StateService
+
 unconventional_state_ids = [
     "unconventional",
     "dev:tap-and-target",
@@ -281,15 +283,15 @@ class TestCliState:
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
 
-    def test_clear_all(self, state_service, cli_runner, state_ids) -> None:
+    def test_clear_all(self, state_service: StateService, cli_runner) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            assert len(state_service.list_state()) > 0
             result = cli_runner.invoke(
-                cli, ["state", "clear", "--force", "--clear-all"]
+                cli,
+                ["state", "clear", "--force", "--clear-all"],
             )
             assert_cli_runner(result)
-            for state_id in state_ids:
-                job_state = state_service.get_state(state_id)
-                assert (not job_state) or (not job_state.get("singer_state"))
+            assert len(state_service.list_state()) == 0
 
     def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
