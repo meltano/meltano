@@ -309,10 +309,11 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
-@prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
+@prompt_for_confirmation(prompt="This will clear state for the job(s). Continue?")
 @click.argument("state-id", required=False)
 @click.option(
-    "--clear-all",
+    "--all",
+    "clear_all",
     is_flag=True,
     required=False,
     help="Helps clear all states. Use with --force flag to skip confirmation.",

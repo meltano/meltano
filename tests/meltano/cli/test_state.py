@@ -288,7 +288,7 @@ class TestCliState:
             assert len(state_service.list_state()) > 0
             result = cli_runner.invoke(
                 cli,
-                ["state", "clear", "--force", "--clear-all"],
+                ["state", "clear", "--force", "--all"],
             )
             assert_cli_runner(result)
             assert len(state_service.list_state()) == 0
