@@ -320,13 +320,16 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 @pass_project(migrate=True)
 @click.pass_context
 def clear_state(
-    ctx: click.Context, project: Project, state_id: str, clear_all: bool
+    ctx: click.Context,
+    project: Project,
+    state_id: str,
+    clear_all: bool,  # noqa: FBT001
 ) -> None:
     """Clear state."""
-    if bool(state_id) == clear_all:  # Case where neither or both have been provided
-        raise click.UsageError(
-            "Either a state ID or --clear-all flag must be provided. Not both."
-        )  # pragma: no cover
+    # Case where neither or both have been provided
+    if bool(state_id) == clear_all:  # pragma: no cover
+        msg = "Either a state ID or --clear-all flag must be provided, not both"
+        raise click.UsageError(msg)
     if state_id:
         state_service: StateService = (
             state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
