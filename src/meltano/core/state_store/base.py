@@ -69,10 +69,10 @@ class StateStoreManager(ABC):
         """
         ...
 
-    @abstractmethod
-    def clear_all(self):  # noqa: ANN201
+    def clear_all(self) -> None:
         """Clear all states."""
-        ...
+        for state_id in self.get_state_ids("*"):
+            self.clear(state_id)
 
     @abstractmethod
     def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
