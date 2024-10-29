@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import platform
+import re
 import typing as t
 
 import mock
@@ -13,6 +14,8 @@ from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
     from pathlib import Path
+
+    from click.testing import CliRunner
 
     from meltano.core.state_service import StateService
 
@@ -283,7 +286,11 @@ class TestCliState:
                 job_state = state_service.get_state(state_id)
                 assert (not job_state) or (not job_state.get("singer_state"))
 
-    def test_clear_all(self, state_service: StateService, cli_runner) -> None:
+    def test_clear_all(
+        self,
+        state_service: StateService,
+        cli_runner: CliRunner,
+    ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             assert len(state_service.list_state()) > 0
             result = cli_runner.invoke(
@@ -291,6 +298,8 @@ class TestCliState:
                 ["state", "clear", "--force", "--all"],
             )
             assert_cli_runner(result)
+            pattern = r"[1-9] state\(s\) were successfully cleared"
+            assert re.search(pattern, result.stderr) is not None
             assert len(state_service.list_state()) == 0
 
     def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:

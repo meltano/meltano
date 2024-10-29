@@ -338,4 +338,6 @@ def clear_state(
         state_service.clear_state(state_id)
     if clear_all:
         state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
-        state_service.clear_all_states()
+        count = state_service.clear_all_states()
+        msg = f"{count} state(s) were successfully cleared"
+        logger.info(msg)
