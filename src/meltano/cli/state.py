@@ -316,7 +316,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
     "clear_all",
     is_flag=True,
     required=False,
-    help="Helps clear all states. Use with --force flag to skip confirmation.",
+    help="Clear all states IDs.",
 )
 @pass_project(migrate=True)
 @click.pass_context
