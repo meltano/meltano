@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cached_property
 
@@ -97,6 +98,21 @@ class S3StateStoreManager(CloudStateStoreManager):
             and "NoSuchKey" in err.args[0]
             or (isinstance(err, KeyError) and "ActualObjectSize" in err.args[0])
         )
+
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``.
+
+        Returns:
+            A dictionary of extra transport params.
+        """
+        return {
+            "client_kwargs": {
+                "S3.Client.create_multipart_upload": {
+                    "ContentType": "application/json",
+                },
+            },
+        }
 
     @cached_property
     def client(self) -> S3Client:

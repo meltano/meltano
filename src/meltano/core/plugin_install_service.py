@@ -669,7 +669,7 @@ async def install_pip_plugin(
 
         await service.install(
             pip_install_args=("--ignore-requires-python", *pip_install_args)
-            if force
+            if force and backend == "virtualenv"
             else pip_install_args,
             clean=clean,
             env={
