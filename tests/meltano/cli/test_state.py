@@ -302,6 +302,27 @@ class TestCliState:
             assert re.search(pattern, result.stderr) is not None
             assert len(state_service.list_state()) == 0
 
+    @pytest.mark.parametrize(
+        "args",
+        (
+            pytest.param(("my-state-id", "--all"), id="both"),
+            pytest.param((), id="neither"),
+        ),
+    )
+    def test_clear_all_conflict_error(
+        self,
+        state_service: StateService,
+        cli_runner: CliRunner,
+        args: list[str],
+    ) -> None:
+        with mock.patch("meltano.cli.state.StateService", return_value=state_service):
+            assert len(state_service.list_state()) > 0
+            result = cli_runner.invoke(cli, ["state", "clear", "--force", *args])
+            assert result.exit_code == 2
+
+            message = "A state ID or the --all flag must be provided, but not both"
+            assert message in result.stderr
+
     def test_clear_prompt(self, state_service, cli_runner, state_ids) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             for state_id in state_ids:

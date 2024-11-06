@@ -328,7 +328,7 @@ def clear_state(
 ) -> None:
     """Clear state."""
     # Case where neither or both have been provided
-    if bool(state_id) == clear_all:  # pragma: no cover
+    if bool(state_id) == clear_all:
         msg = "A state ID or the --all flag must be provided, but not both"
         raise click.UsageError(msg)
     if state_id:
