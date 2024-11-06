@@ -324,4 +324,4 @@ class BlockParser:  # noqa: D101
                 raise BlockSetValidationError(
                     f"Expected {PluginType.MAPPERS} or {PluginType.LOADERS}.",  # noqa: EM102
                 )
-        raise BlockSetValidationError("Found no end in block set!")  # noqa: EM101
+        raise BlockSetValidationError("Loader missing in block set!")  # noqa: EM101

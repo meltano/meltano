@@ -70,6 +70,20 @@ class StateStoreManager(ABC):
         """
         ...
 
+    def clear_all(self) -> int:
+        """Clear all states.
+
+        Override this method if the store supports bulk deletion.
+
+        Returns:
+            The number of states cleared from the store.
+        """
+        count = 0
+        for state_id in self.get_state_ids("*"):
+            self.clear(state_id)
+            count += 1
+        return count
+
     @abstractmethod
     def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
         """Get all state_ids available in this state store manager.
