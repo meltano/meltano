@@ -193,6 +193,10 @@ class StateService:
         """
         self.state_store_manager.clear(state_id)
 
+    def clear_all_states(self) -> int:
+        """Clear all states."""
+        return self.state_store_manager.clear_all()
+
     def merge_state(self, state_id_src: str, state_id_dst: str) -> None:
         """Merge state from state_id_src into state_id_dst.
 
