@@ -323,7 +323,7 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 def clear_state(
     ctx: click.Context,
     project: Project,
-    state_id: str,
+    state_id: str | None,
     clear_all: bool,  # noqa: FBT001
 ) -> None:
     """Clear state."""
