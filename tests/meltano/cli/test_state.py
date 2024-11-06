@@ -313,7 +313,7 @@ class TestCliState:
         self,
         state_service: StateService,
         cli_runner: CliRunner,
-        args: list[str],
+        args: tuple[str, ...],
     ) -> None:
         with mock.patch("meltano.cli.state.StateService", return_value=state_service):
             assert len(state_service.list_state()) > 0
