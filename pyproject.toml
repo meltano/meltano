@@ -223,7 +223,6 @@ module = [
   # Meltano Core submodules
   "meltano.core.behavior.*",
   "meltano.core.block.*",
-  "meltano.core.job.*",
   "meltano.core.plugin.airflow",
   "meltano.core.plugin.base",
   "meltano.core.plugin.command",

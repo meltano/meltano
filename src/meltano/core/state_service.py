@@ -135,7 +135,7 @@ class StateService:
         state_to_add_to = self._get_or_create_job(job)
         state_to_add_to.payload = json.loads(new_state)
         state_to_add_to.payload_flags = payload_flags
-        state_to_add_to.save(self.session)
+        state_to_add_to.save(self.session)  # type: ignore[arg-type]
         logger.debug(
             f"Added to state {state_to_add_to.job_name} state payload {new_state_dict}",  # noqa: G004
         )
