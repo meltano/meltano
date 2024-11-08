@@ -65,10 +65,10 @@ class MeltanoState:
         return cls.from_json(state_id=state_id, json_str=file_obj.read())
 
     def json(self) -> str:
-        """Get the json representation of this JobState.
+        """Get the json representation of this MeltanoState.
 
         Returns:
-            json representation of this JobState
+            json representation of this MeltanoState
         """
         return json.dumps(
             {"completed": self.completed_state, "partial": self.partial_state},
