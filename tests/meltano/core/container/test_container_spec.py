@@ -32,7 +32,7 @@ class TestContainerService:
                                 "8000": [
                                     {
                                         "HostPort": "8080",
-                                        "HostIP": "0.0.0.0",  # noqa: S104v
+                                        "HostIP": "0.0.0.0",  # noqa: S104
                                     },
                                 ],
                             },

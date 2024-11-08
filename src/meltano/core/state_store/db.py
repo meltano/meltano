@@ -90,6 +90,16 @@ class DBStateStoreManager(StateStoreManager):
             self.session.delete(job_state)
             self.session.commit()
 
+    def clear_all(self) -> int:
+        """Clear all states.
+
+        Returns:
+            The number of states cleared from the store.
+        """
+        count = self.session.query(JobState).delete()
+        self.session.commit()
+        return count
+
     def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
         """Get all state_ids available in this state store manager.
 

@@ -297,6 +297,23 @@ class TestLocalFilesystemStateStoreManager:
             subject.clear(state_id)
             assert not os.path.exists(os.path.dirname(filepath))
 
+    def test_clear_all(
+        self,
+        subject: LocalFilesystemStateStoreManager,
+        state_path: str,
+        state_ids_with_expected_states,
+    ):
+        for state_id, expected_state in state_ids_with_expected_states:
+            state_dir = os.path.join(state_path, encode_if_on_windows(state_id))
+            Path(state_dir).mkdir(parents=True)
+            with open(os.path.join(state_dir, "state.json"), "w+") as state_file:
+                json.dump(expected_state, state_file)
+
+        initial_count = len(state_ids_with_expected_states)
+        assert len(os.listdir(state_path)) == initial_count
+        assert subject.clear_all() == initial_count
+        assert len(os.listdir(state_path)) == 0
+
 
 class TestAZStorageStateStoreManager:
     @pytest.fixture
