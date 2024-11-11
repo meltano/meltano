@@ -326,13 +326,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.35.54"
-description = "Type annotations for boto3 1.35.54 generated with mypy-boto3-builder 8.1.4"
+version = "1.35.57"
+description = "Type annotations for boto3 1.35.57 generated with mypy-boto3-builder 8.2.1"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.35.54-py3-none-any.whl", hash = "sha256:17519739590614d50a4bfb82d10e02a9bf324ab87e90d54ecddf68044ba219b7"},
-    {file = "boto3_stubs-1.35.54.tar.gz", hash = "sha256:ecf6cce737abc9bc212d48238021ff4aa3fb20ed887ecdee72a750bd329c902e"},
+    {file = "boto3_stubs-1.35.57-py3-none-any.whl", hash = "sha256:380e742ebd956694b3c7e49e2ff8b748ffcef8c4b09d05b2f9c71cf103a425c7"},
+    {file = "boto3_stubs-1.35.57.tar.gz", hash = "sha256:014b7493fd2dcf7d2e5d685c7186a6e2fb4020713a299dfdf0dd15a3990d2c1b"},
 ]
 
 [package.dependencies]
@@ -390,7 +390,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.35.0,<1.36.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.35.0,<1.36.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.35.0,<1.36.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.35.0,<1.36.0)"]
-boto3 = ["boto3 (==1.35.54)", "botocore (==1.35.54)"]
+boto3 = ["boto3 (==1.35.57)", "botocore (==1.35.57)"]
 braket = ["mypy-boto3-braket (>=1.35.0,<1.36.0)"]
 budgets = ["mypy-boto3-budgets (>=1.35.0,<1.36.0)"]
 ce = ["mypy-boto3-ce (>=1.35.0,<1.36.0)"]
@@ -1938,13 +1938,13 @@ test = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "moto"
-version = "5.0.19"
+version = "5.0.20"
 description = ""
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "moto-5.0.19-py2.py3-none-any.whl", hash = "sha256:b9c4911549f5cbb2db0b8d0c7adb27b332300a3ecdc90422777538760e026963"},
-    {file = "moto-5.0.19.tar.gz", hash = "sha256:e6c6e1558f65c01fe1b3b5cc7ee35b474167fe3600326990f54601d75a7ea639"},
+    {file = "moto-5.0.20-py2.py3-none-any.whl", hash = "sha256:b6df0041255acb973f2adcb31e3dee1379770ece0253520d4d15986d22aa06cf"},
+    {file = "moto-5.0.20.tar.gz", hash = "sha256:24b1319cc66f81f40817a57ac80602a5f1862669bdd621f0d96ab989a6578255"},
 ]
 
 [package.dependencies]
@@ -4358,4 +4358,4 @@ uv = ["uv"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.14"
-content-hash = "1d8c85ecd7a9e8423dc65c46271646037c100f07d6f5839497e5b6080472a20f"
+content-hash = "f263774bef524c2aae739a24f38090d2c53c591acbbd0f56542168fa51f61aa9"
