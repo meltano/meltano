@@ -446,9 +446,6 @@
               "oneOf": [
                 {
                   "type": "object",
-                  "required": [
-                    "args"
-                  ],
                   "properties": {
                     "annotations": {
                       "$ref": "#/$defs/annotations"

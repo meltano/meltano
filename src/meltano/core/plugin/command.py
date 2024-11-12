@@ -33,9 +33,14 @@ class UndefinedEnvVarError(Error):
 class Command(Canonical):
     """This class represents stored command arguments for plugins."""
 
+    args: str
+    description: str | None
+    executable: str | None
+    container_spec: ContainerSpec | None
+
     def __init__(
         self,
-        args: str,
+        args: str = "",
         description: str | None = None,
         executable: str | None = None,
         container_spec: dict | None = None,
@@ -53,10 +58,9 @@ class Command(Canonical):
             description=description,
             executable=executable,
         )
-        if container_spec is not None:
-            self.container_spec = ContainerSpec(**container_spec)
-        else:
-            self.container_spec = None
+        self.container_spec = (
+            ContainerSpec(**container_spec) if container_spec else None
+        )
 
     def expanded_args(self, name, env):  # noqa: ANN001, ANN201
         """Replace any env var arguments with their values.
