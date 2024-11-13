@@ -207,7 +207,7 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
     last_successful_run = entry.last_successful_run(session)
     last_successful_run_ended_at = (
         last_successful_run.ended_at.isoformat()
-        if last_successful_run.ended_at
+        if last_successful_run and last_successful_run.ended_at
         else None
     )
 

@@ -5,7 +5,7 @@ labels:
   - kind/Bug
   - flow::triage
   - valuestream/Meltano
-type: Bug
+type: Fix
 assignees:
   - edgarrmondragon
 

@@ -16,6 +16,8 @@ from meltano.core.state_service import SINGER_STATE_KEY, StateService
 from . import PluginType, SingerPlugin
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin_invoker import PluginInvoker
@@ -103,7 +105,7 @@ class SingerTarget(SingerPlugin):
         SettingDefinition(name="_dialect", value="$MELTANO_LOADER_NAMESPACE"),
     ]
 
-    def exec_args(self, plugin_invoker):  # noqa: ANN001, ANN201
+    def exec_args(self, plugin_invoker: PluginInvoker) -> list[str | Path]:
         """Get command-line args to pass to the plugin.
 
         Args:
@@ -115,7 +117,7 @@ class SingerTarget(SingerPlugin):
         return ["--config", plugin_invoker.files["config"]]
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Get config files for this target.
 
         Returns:
@@ -124,7 +126,7 @@ class SingerTarget(SingerPlugin):
         return {"config": f"target.{self.instance_uuid}.config.json"}
 
     @property
-    def output_files(self):  # noqa: ANN201
+    def output_files(self) -> dict[str, str]:
         """Get output files for this target.
 
         Returns:
