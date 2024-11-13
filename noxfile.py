@@ -45,8 +45,9 @@ python_versions = (
     "3.10",
     "3.11",
     "3.12",
+    "3.13",
 )
-main_python_version = "3.12"
+main_python_version = "3.13"
 pytest_deps = (
     "backoff",
     "colorama",  # colored output in Windows

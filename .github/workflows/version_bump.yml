@@ -26,6 +26,7 @@ on:
 
 jobs:
   create_release_branch_pr:
+    name: Create Release Pull Request
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -41,8 +42,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5.3.0
       with:
-        python-version: "3.12"
-        architecture: x64
+        python-version: "3.x"
 
     - name: Bump version
       id: cz-bump
