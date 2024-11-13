@@ -140,7 +140,7 @@ jobs:
         --health-interval 10s
         --health-timeout 5s
         --health-retries 5
-        postgres:11
+        postgres:13
 
     - name: Start MSSQL Container
       if: always() && (matrix.backend-db == 'mssql')
@@ -265,11 +265,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Set up Python 3.12
+    - name: Set up Python
       uses: actions/setup-python@v5.3.0
       with:
-        python-version: '3.12'
-        architecture: x64
+        python-version: 3.x
         # Nox uses pip, so we cache with pip
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
@@ -320,11 +319,10 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Setup Python 3.12
+    - name: Setup Python
       uses: actions/setup-python@v5.3.0
       with:
-        python-version: '3.12'
-        architecture: x64
+        python-version: 3.x
         # Nox uses pip, so we cache with pip
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
