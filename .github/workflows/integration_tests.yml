@@ -55,7 +55,7 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Setup Python 3.12
+    - name: Setup Python
       uses: actions/setup-python@v5.3.0
       with:
         python-version: '3.12'
@@ -86,7 +86,7 @@ jobs:
         --health-interval 10s
         --health-timeout 5s
         --health-retries 5
-        postgres:11
+        postgres:13
 
     - name: Run integration tests
       run: |
