@@ -25,7 +25,7 @@ from meltano.core.job_state import JobState
 from meltano.core.state_store.base import StateStoreManager
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator, Iterable, Iterator
     from io import TextIOWrapper
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -40,7 +40,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 
     delimiter = "/"
 
-    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs):  # noqa: ANN003
+    def __init__(self, uri: str, lock_timeout_seconds: int, **kwargs: t.Any) -> None:
         """Initialize the BaseFilesystemStateStoreManager.
 
         Args:
@@ -155,7 +155,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
 
     @property
     @abstractmethod
-    def client(self):  # noqa: ANN201
+    def client(self) -> t.Any:  # noqa: ANN401
         """Get a client for performing fs operations.
 
         Used for cloud backends, particularly in deleting and listing blobs.
@@ -261,7 +261,11 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         """
 
     @contextmanager
-    def acquire_lock(self, state_id: str, retry_seconds: int = 1) -> Iterator[None]:
+    def acquire_lock(
+        self,
+        state_id: str,
+        retry_seconds: int = 1,
+    ) -> Generator[None, None, None]:
         """Context manager for locking state_id during reads and writes.
 
         Args:
@@ -284,7 +288,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             self.delete(lock_path)
 
     @abstractmethod
-    def get_state_ids(self, pattern: str | None = None) -> list[str]:
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -350,7 +354,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                 writer.write(state_to_write.json())
 
     @abstractmethod
-    def delete(self, file_or_dir_path: str):  # noqa: ANN201
+    def delete(self, file_or_dir_path: str) -> None:
         """Delete the file/blob/directory/prefix at the given path.
 
         Args:
@@ -373,7 +377,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
 
     label: str = "Local Filesystem"
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+    def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -435,7 +439,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         """
         Path(self.get_state_dir(state_id)).mkdir(parents=True, exist_ok=True)
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -489,7 +493,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
     label: str = "Local Windows Filesystem"
     delimiter = "\\"
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003
+    def __init__(self, **kwargs: t.Any) -> None:
         """Initialize the LocalFilesystemStateStoreManager.
 
         Args:
@@ -516,7 +520,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             else self.join_path(self.state_dir, state_id)
         )
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> set[str]:
         """Get list of state_ids stored in the backend.
 
         Args:
@@ -545,7 +549,7 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
 class CloudStateStoreManager(BaseFilesystemStateStoreManager):
     """Base class for cloud storage state store managers."""
 
-    def __init__(self, prefix: str | None = None, **kwargs):  # noqa: ANN003
+    def __init__(self, prefix: str | None = None, **kwargs: t.Any) -> None:
         """Initialize the CloudStateStoreManager.
 
         Args:
@@ -597,7 +601,7 @@ class CloudStateStoreManager(BaseFilesystemStateStoreManager):
         """
         ...
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> list[str]:
         """Get list of state_ids stored in the backend.
 
         Args:

@@ -29,7 +29,7 @@ class MeltanoFile(Canonical):
         environments: list[dict] | None = None,
         jobs: list[dict] | None = None,
         env: dict[str, str] | None = None,
-        **extras,  # noqa: ANN003
+        **extras: t.Any,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 

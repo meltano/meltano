@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from collections.abc import Iterator
 from contextlib import contextmanager
 from functools import cached_property
 
@@ -13,7 +12,7 @@ from meltano.core.state_store.filesystem import (
 )
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
     from mypy_boto3_s3 import S3Client
 
@@ -36,7 +35,7 @@ class MissingBoto3Error(Exception):
 
 
 @contextmanager
-def requires_boto3():  # noqa: ANN201
+def requires_boto3() -> Generator[None, None, None]:
     """Raise MissingBoto3Error if boto3 is required but missing in context.
 
     Raises:
@@ -62,7 +61,7 @@ class S3StateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         endpoint_url: str | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -154,7 +153,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             Delete={"Objects": [{"Key": file_path}]},
         )
 
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.
 
         Args:

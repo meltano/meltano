@@ -362,7 +362,7 @@ class Job(SystemModel):
         """Update last_heartbeat_at for this job in the db."""
         self.last_heartbeat_at = datetime.now(timezone.utc)
 
-    async def _heartbeater(self, session) -> None:  # noqa: ANN001
+    async def _heartbeater(self, session: Session) -> None:
         """Heartbeat to the db every second.
 
         Args:

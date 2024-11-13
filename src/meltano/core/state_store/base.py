@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import typing as t
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
+
     from meltano.core.job_state import JobState
 
 
@@ -24,7 +27,7 @@ class StateIDLockedError(Exception):
 class StateStoreManager(ABC):
     """Base state store manager."""
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003, B027
+    def __init__(self, **kwargs: t.Any) -> None:  # noqa: B027
         """Initialize state store manager.
 
         Args:
@@ -38,7 +41,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def set(self, state: JobState):  # noqa: ANN201
+    def set(self, state: JobState) -> None:
         """Set the job state for the given state_id.
 
         Args:
@@ -50,7 +53,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get(self, state_id) -> JobState | None:  # noqa: ANN001
+    def get(self, state_id: str) -> JobState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -62,7 +65,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def clear(self, state_id):  # noqa: ANN001, ANN201
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -85,7 +88,7 @@ class StateStoreManager(ABC):
         return count
 
     @abstractmethod
-    def get_state_ids(self, pattern=None):  # noqa: ANN001, ANN201
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -94,10 +97,17 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def acquire_lock(self, state_id):  # noqa: ANN001, ANN201
+    @contextmanager
+    def acquire_lock(
+        self,
+        state_id: str,
+        *,
+        retry_seconds: int,
+    ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 
         Args:
             state_id: the state_id to lock
+            retry_seconds: the number of seconds to wait before retrying
         """
         ...

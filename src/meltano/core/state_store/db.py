@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+from contextlib import contextmanager
 
 from sqlalchemy import select
 
@@ -11,6 +12,8 @@ from meltano.core.state_store.base import StateStoreManager
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator, Iterator
+
     from sqlalchemy.orm import Session
 
 
@@ -19,7 +22,7 @@ class DBStateStoreManager(StateStoreManager):
 
     label = "Database"
 
-    def __init__(self, session: Session, **kwargs):  # noqa: ANN003
+    def __init__(self, session: Session, **kwargs: t.Any):
         """Initialize the DBStateStoreManager.
 
         Args:
@@ -60,7 +63,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id):  # noqa: ANN001, ANN201
+    def get(self, state_id: str) -> JobState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -73,7 +76,7 @@ class DBStateStoreManager(StateStoreManager):
             self.session.query(JobState).filter(JobState.state_id == state_id).first()
         )
 
-    def clear(self, state_id) -> None:  # noqa: ANN001
+    def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
 
         Args:
@@ -95,7 +98,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.commit()
         return count
 
-    def get_state_ids(self, pattern: str | None = None):  # noqa: ANN201
+    def get_state_ids(self, pattern: str | None = None) -> Iterator[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -116,7 +119,13 @@ class DBStateStoreManager(StateStoreManager):
             for record in self.session.execute(select(JobState.state_id)).all()
         )
 
-    def acquire_lock(self, state_id) -> None:  # noqa: ANN001
+    @contextmanager
+    def acquire_lock(
+        self,
+        state_id: str,  # noqa: ARG002
+        *,
+        retry_seconds: int = 1,  # noqa: ARG002
+    ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
@@ -124,9 +133,11 @@ class DBStateStoreManager(StateStoreManager):
 
         Args:
             state_id: the state_id to lock
+            retry_seconds: the number of seconds to wait before retrying
         """
+        yield
 
-    def release_lock(self, state_id) -> None:  # noqa: ANN001
+    def release_lock(self, state_id: str) -> None:
         """Release the lock for the given job's state.
 
         For DBStateStoreManager, the db manages transactions.
