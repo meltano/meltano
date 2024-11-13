@@ -28,6 +28,7 @@ body:
       label: Python Version
       description: Version of Python you are using
       options:
+        - "3.13"
         - "3.12"
         - "3.11"
         - "3.10"

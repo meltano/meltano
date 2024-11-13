@@ -322,7 +322,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5.3.0
       with:
-        python-version: 3.x
+        python-version: "3.13"
         # Nox uses pip, so we cache with pip
         cache: 'pip'
         cache-dependency-path: 'poetry.lock'
