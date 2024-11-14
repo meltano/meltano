@@ -150,7 +150,7 @@ class TestCliUpgrade:
                 "The `meltano` package could not be upgraded automatically"
                 in result.stdout
             )
-            assert "it is installed inside a Nox test session" in result.stdout
+            assert "it is installed inside a Nox session" in result.stdout
             assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")

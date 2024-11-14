@@ -60,9 +60,9 @@ def _check_docker_installation() -> None:
 
 
 def _check_in_nox_session() -> None:
-    if os.getenv("NOX_CURRENT_SESSION") == "tests":  # pragma: no branch
+    if os.getenv("NOX_CURRENT_SESSION"):  # pragma: no branch
         raise AutomaticPackageUpgradeError(
-            reason="it is installed inside a Nox test session",
+            reason="it is installed inside a Nox session",
             instructions="",
         )
 
