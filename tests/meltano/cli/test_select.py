@@ -56,6 +56,7 @@ class TestCliSelect:
                 "users": {
                     SelectedNode(key="id", selection=SelectionType.SELECTED),
                     SelectedNode(key="name", selection=SelectionType.EXCLUDED),
+                    SelectedNode(key="secret", selection=SelectionType.UNSUPPORTED),
                 },
             }
             return result
@@ -81,3 +82,4 @@ class TestCliSelect:
 
         assert "[selected   ] users.id" in result.stdout
         assert "[excluded   ] users.name" in result.stdout
+        assert "[unsupported] users.secret" in result.stdout
