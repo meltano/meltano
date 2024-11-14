@@ -31,6 +31,8 @@ def selection_color(selection) -> str | None:  # noqa: ANN001
         return "bright_white"
     if selection is SelectionType.EXCLUDED:
         return "red"
+    if selection is SelectionType.UNSUPPORTED:
+        return "black"
     return None
 
 
