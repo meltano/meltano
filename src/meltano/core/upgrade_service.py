@@ -35,7 +35,7 @@ def _get_pep610_data() -> dict[str, t.Any] | None:
 
 def _check_editable_installation(*, force: bool) -> None:
     if (pep610_data := _get_pep610_data()) is None:
-        return None
+        return
     url: str | None = pep610_data.get("url")
     dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
     if (  # pragma: no branch
