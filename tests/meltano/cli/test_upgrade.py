@@ -81,18 +81,33 @@ class TestCliUpgrade:
         assert "Your Meltano project has been upgraded!" in result.stdout
 
     @pytest.mark.usefixtures("project")
-    def test_upgrade_package(self, cli_runner: CliRunner) -> None:
+    def test_upgrade_package(
+        self,
+        cli_runner: CliRunner,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         if platform.system() == "Windows":
             pytest.xfail(
                 "Fails on Windows: https://github.com/meltano/meltano/issues/3444",
             )
-        # If an editable install was used, test that it cannot be upgraded automatically
-        with mock.patch("importlib.metadata.distribution") as mock_dist:
-            mock_dist.return_value.read_text.return_value = json.dumps(
+
+        dist_path = tmp_path / "meltano"
+        dist_path.mkdir()
+        dist_path.joinpath("direct_url.json").write_text(
+            json.dumps(
                 {
                     "dir_info": {"editable": True},
-                    "url": "file:///Users/user/Code/meltano/meltano",
+                    "url": f"{dist_path.as_uri()}",
                 },
+            ),
+        )
+
+        # An editable should not be upgraded automatically
+        with monkeypatch.context() as m:
+            m.setattr(
+                "meltano.core.upgrade_service.distribution",
+                lambda _: PathDistribution(dist_path),
             )
             result = cli_runner.invoke(cli, ["upgrade", "package"])
             assert_cli_runner(result)
@@ -101,6 +116,41 @@ class TestCliUpgrade:
                 "The `meltano` package could not be upgraded automatically"
                 in result.stdout
             )
+            assert "it is installed from source" in result.stdout
+            assert "run `meltano upgrade --skip-package`" not in result.stdout
+
+        # A Docker install should not be upgraded automatically
+        with monkeypatch.context(), mock.patch("pathlib.Path.exists") as mock_exists:
+            m.setattr(
+                "meltano.core.upgrade_service.distribution",
+                lambda _: PathDistribution(tmp_path / "not-a-package"),
+            )
+            mock_exists.return_value = True
+            result = cli_runner.invoke(cli, ["upgrade", "package"])
+            assert_cli_runner(result)
+
+            assert (
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
+            )
+            assert "it is installed inside Docker" in result.stdout
+            assert "run `meltano upgrade --skip-package`" not in result.stdout
+
+        # Meltano installed in a Nox test session should not be upgraded automatically
+        with monkeypatch.context():
+            m.setattr(
+                "meltano.core.upgrade_service.distribution",
+                lambda _: PathDistribution(tmp_path / "not-a-package"),
+            )
+            m.setenv("NOX_CURRENT_SESSION", "tests")
+            result = cli_runner.invoke(cli, ["upgrade", "package"])
+            assert_cli_runner(result)
+
+            assert (
+                "The `meltano` package could not be upgraded automatically"
+                in result.stdout
+            )
+            assert "it is installed inside a Nox test session" in result.stdout
             assert "run `meltano upgrade --skip-package`" not in result.stdout
 
     @pytest.mark.order(before="test_upgrade_files_glob_path")

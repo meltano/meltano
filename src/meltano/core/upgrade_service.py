@@ -37,7 +37,9 @@ def _check_editable_installation(*, force: bool) -> None:
     if pep610_data := _get_pep610_data():
         url: str | None = pep610_data.get("url")
         dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
-        if url and dir_info and dir_info.get("editable", False) and not force:
+        if (  # pragma: no branch
+            url and dir_info and dir_info.get("editable", False) and not force
+        ):
             meltano_dir = url.removeprefix("file://")
             raise AutomaticPackageUpgradeError(
                 reason="it is installed from source",
@@ -58,7 +60,7 @@ def _check_docker_installation() -> None:
 
 
 def _check_in_nox_session() -> None:
-    if os.getenv("NOX_CURRENT_SESSION") == "tests":
+    if os.getenv("NOX_CURRENT_SESSION") == "tests":  # pragma: no branch
         raise AutomaticPackageUpgradeError(
             reason="it is installed inside a Nox test session",
             instructions="",
