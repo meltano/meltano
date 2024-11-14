@@ -34,17 +34,18 @@ def _get_pep610_data() -> dict[str, t.Any] | None:
 
 
 def _check_editable_installation(*, force: bool) -> None:
-    if pep610_data := _get_pep610_data():
-        url: str | None = pep610_data.get("url")
-        dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
-        if (  # pragma: no branch
-            url and dir_info and dir_info.get("editable", False) and not force
-        ):
-            meltano_dir = url.removeprefix("file://")
-            raise AutomaticPackageUpgradeError(
-                reason="it is installed from source",
-                instructions=f"navigate to `{meltano_dir}` and run `git pull`",
-            )
+    if (pep610_data := _get_pep610_data()) is None:
+        return None
+    url: str | None = pep610_data.get("url")
+    dir_info: dict[str, t.Any] = pep610_data.get("dir_info", {})
+    if (  # pragma: no branch
+        url and dir_info and dir_info.get("editable", False) and not force
+    ):
+        meltano_dir = url.removeprefix("file://")
+        raise AutomaticPackageUpgradeError(
+            reason="it is installed from source",
+            instructions=f"navigate to `{meltano_dir}` and run `git pull`",
+        )
 
 
 def _check_docker_installation() -> None:
