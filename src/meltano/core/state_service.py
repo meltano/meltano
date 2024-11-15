@@ -21,6 +21,8 @@ from meltano.core.state_store import state_store_manager_from_project_settings
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.core.state_store.base import StateStoreManager
+
 logger = structlog.getLogger(__name__)
 
 
@@ -43,9 +45,9 @@ class StateService:
         """
         self.project = project or Project.find()
         self.session = session
-        self._state_store_manager = None
+        self._state_store_manager: StateStoreManager | None = None
 
-    def list_state(self, state_id_pattern: str | None = None):  # noqa: ANN201
+    def list_state(self, state_id_pattern: str | None = None) -> dict:
         """List all state found in the db.
 
         Args:
@@ -84,7 +86,7 @@ class StateService:
         raise TypeError("job must be of type Job or of type str")  # noqa: EM101
 
     @property
-    def state_store_manager(self):  # noqa: ANN201
+    def state_store_manager(self) -> StateStoreManager:
         """Initialize and return the correct StateStoreManager.
 
         Returns:
@@ -150,7 +152,7 @@ class StateService:
         )
         self.state_store_manager.set(job_state)
 
-    def get_state(self, state_id: str):  # noqa: ANN201
+    def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.
 
         Args:

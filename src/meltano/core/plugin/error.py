@@ -10,7 +10,7 @@ from . import PluginRef
 class PluginNotFoundError(Exception):
     """Base exception when a plugin could not be found."""
 
-    def __init__(self, plugin_or_name) -> None:  # noqa: ANN001, D107
+    def __init__(self, plugin_or_name: PluginRef | str) -> None:  # noqa: D107
         if isinstance(plugin_or_name, PluginRef):
             self.plugin_type = plugin_or_name.type.descriptor
             self.plugin_name = plugin_or_name.name
@@ -28,7 +28,7 @@ class PluginNotFoundError(Exception):
 class PluginParentNotFoundError(Exception):
     """Base exception when a plugin's parent could not be found."""
 
-    def __init__(self, plugin, parent_not_found_error) -> None:  # noqa: ANN001
+    def __init__(self, plugin: PluginRef, parent_not_found_error: Exception) -> None:
         """Initialize exception for when plugin's parent could not be found."""
         self.plugin = plugin
         self.parent_not_found_error = parent_not_found_error
@@ -65,7 +65,7 @@ class PluginLacksCapabilityError(Exception):
 class InvalidPluginDefinitionError(Exception):
     """Base exception when a plugin definition is invalid."""
 
-    def __init__(self, definition=None) -> None:  # noqa: ANN001
+    def __init__(self, definition: dict | None = None) -> None:
         """Construct a new "InvalidPluginDefinitionError instance.
 
         Args:

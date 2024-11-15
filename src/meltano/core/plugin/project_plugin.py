@@ -17,6 +17,7 @@ from meltano.core.utils import flatten, uniques_in
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from meltano.core.plugin.base import BasePlugin
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -203,7 +204,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             )
 
     @property
-    def parent(self) -> ProjectPlugin | None:
+    def parent(self) -> ProjectPlugin | BasePlugin | None:
         """Plugins parent.
 
         Returns:
@@ -212,7 +213,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self._parent
 
     @parent.setter
-    def parent(self, new_parent) -> None:  # noqa: ANN001
+    def parent(self, new_parent: ProjectPlugin | BasePlugin) -> None:
         ancestor = new_parent
         while isinstance(ancestor, self.__class__):
             if ancestor == self:
