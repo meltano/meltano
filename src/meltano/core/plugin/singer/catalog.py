@@ -310,9 +310,10 @@ class SelectionType(StrEnum):
     SELECTED = auto()
     EXCLUDED = auto()
     AUTOMATIC = auto()
+    UNSUPPORTED = auto()
 
     def __bool__(self) -> bool:  # noqa: D105
-        return self is not self.__class__.EXCLUDED
+        return self not in {self.__class__.EXCLUDED, self.__class__.UNSUPPORTED}
 
     def __add__(self, other: SelectionType) -> SelectionType:  # type: ignore[override] # noqa: D105
         if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
@@ -320,6 +321,9 @@ class SelectionType(StrEnum):
 
         if self is SelectionType.AUTOMATIC or other is SelectionType.AUTOMATIC:
             return SelectionType.AUTOMATIC
+
+        if self is SelectionType.UNSUPPORTED or other is SelectionType.UNSUPPORTED:
+            return SelectionType.UNSUPPORTED
 
         return SelectionType.SELECTED
 
@@ -636,6 +640,8 @@ class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
 
         if metadata.get("inclusion") == "automatic":
             return SelectionType.AUTOMATIC
+        if metadata.get("inclusion") == "unsupported":
+            return SelectionType.UNSUPPORTED
         if metadata.get("selected") is True or (
             metadata.get("selected") is None
             and metadata.get("selected-by-default", False)
