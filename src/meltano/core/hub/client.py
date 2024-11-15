@@ -156,7 +156,7 @@ class MeltanoHubService(PluginRepository):
         return hub_api_root or f"{hub_url}/meltano/api/v1"
 
     @property
-    def hub_url_auth(self):  # noqa: ANN201
+    def hub_url_auth(self) -> str:
         """Return the `hub_url_auth` setting.
 
         Returns:

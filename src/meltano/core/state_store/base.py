@@ -6,10 +6,12 @@ import dataclasses
 import json
 import typing as t
 from abc import ABC, abstractmethod
+from contextlib import contextmanager
 
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
+    from collections.abc import Generator, Iterable
     from io import TextIOWrapper
 
 
@@ -166,7 +168,7 @@ class StateStoreManager(ABC):
         return count
 
     @abstractmethod
-    def get_state_ids(self, pattern: str | None = None) -> t.Iterable[str]:
+    def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
         """Get all state_ids available in this state store manager.
 
         Args:
@@ -175,10 +177,17 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def acquire_lock(self, state_id: str):  # noqa: ANN201
+    @contextmanager
+    def acquire_lock(
+        self,
+        state_id: str,
+        *,
+        retry_seconds: int,
+    ) -> Generator[None, None, None]:
         """Acquire a naive lock for the given job's state.
 
         Args:
             state_id: the state_id to lock
+            retry_seconds: the number of seconds to wait before retrying
         """
         ...

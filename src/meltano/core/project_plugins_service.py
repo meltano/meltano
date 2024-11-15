@@ -19,6 +19,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Generator
 
     from meltano.core.environment import EnvironmentPluginConfig
+    from meltano.core.plugin.base import BasePlugin
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -119,7 +120,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self._prefer_source = DefinitionSource.LOCAL
 
     @cached_property
-    def current_plugins(self):  # noqa: ANN201
+    def current_plugins(self) -> dict[PluginType, list[ProjectPlugin]]:
         """Return the current plugins.
 
         Returns:
@@ -128,7 +129,9 @@ class ProjectPluginsService:  # (too many methods, attributes)
         return self.project.config_service.current_meltano_yml.plugins
 
     @contextmanager
-    def update_plugins(self):  # noqa: ANN201
+    def update_plugins(
+        self,
+    ) -> Generator[dict[PluginType, list[ProjectPlugin]], None, None]:
         """Update the current plugins.
 
         Yields:
@@ -137,7 +140,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin):  # noqa: ANN201
+    def add_to_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Add plugin to `meltano.yml`.
 
         Args:
@@ -169,7 +172,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugin
 
-    def remove_from_file(self, plugin: ProjectPlugin):  # noqa: ANN201
+    def remove_from_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Remove plugin from `meltano.yml`.
 
         Args:
@@ -205,8 +208,8 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self,
         plugin_name: str,
         plugin_type: PluginType | None = None,
-        invokable=None,  # noqa: ANN001
-        configurable=None,  # noqa: ANN001
+        invokable: bool | None = None,
+        configurable: bool | None = None,
     ) -> ProjectPlugin:
         """Find a plugin.
 
@@ -252,13 +255,19 @@ class ProjectPluginsService:  # (too many methods, attributes)
             PluginRef(plugin_type, plugin_name) if plugin_type else plugin_name,
         )
 
-    def _find_mapping(self, plugin_name: str, plugin: ProjectPlugin) -> ProjectPlugin:
+    def _find_mapping(
+        self,
+        plugin_name: str,
+        plugin: ProjectPlugin,
+    ) -> ProjectPlugin | None:
         mapping_name = plugin.extra_config.get("_mapping_name")
-        if mapping_name == plugin_name:  # noqa: RET503
+        if mapping_name == plugin_name:
             all_mappings = self.find_plugins_by_mapping_name(mapping_name)
             if len(all_mappings) > 1:
                 raise AmbiguousMappingName(mapping_name)
             return self.ensure_parent(plugin)
+
+        return None
 
     def find_plugin_by_namespace(
         self,
@@ -343,7 +352,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         self,
         plugin_type: PluginType,
         *,
-        ensure_parent=True,  # noqa: ANN001
+        ensure_parent: bool = True,
     ) -> list[ProjectPlugin]:
         """Return plugins of specified type.
 
@@ -362,7 +371,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
         return plugins
 
-    def plugins_by_type(self, *, ensure_parent=True):  # noqa: ANN001, ANN201
+    def plugins_by_type(
+        self,
+        *,
+        ensure_parent: bool = True,
+    ) -> dict[PluginType, list[ProjectPlugin]]:
         """Return plugins grouped by type.
 
         Args:
@@ -379,7 +392,11 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin_type in PluginType
         }
 
-    def plugins(self, *, ensure_parent=True) -> Generator[ProjectPlugin, None, None]:  # noqa: ANN001
+    def plugins(
+        self,
+        *,
+        ensure_parent: bool = True,
+    ) -> Generator[ProjectPlugin, None, None]:
         """Return all plugins.
 
         Args:
@@ -394,7 +411,12 @@ class ProjectPluginsService:  # (too many methods, attributes)
             for plugin in plugins
         )
 
-    def update_plugin(self, plugin: ProjectPlugin, *, keep_config: bool = False):  # noqa: ANN201
+    def update_plugin(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        keep_config: bool = False,
+    ) -> tuple[ProjectPlugin, ProjectPlugin]:
         """Update a plugin.
 
         Args:
@@ -476,7 +498,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def find_parent(
         self,
         plugin: ProjectPlugin,
-    ) -> tuple[ProjectPlugin, DefinitionSource]:
+    ) -> tuple[ProjectPlugin | BasePlugin, DefinitionSource]:
         """Find the parent plugin of a plugin.
 
         Args:
@@ -488,7 +510,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
         Raises:
             PluginDefinitionNotFoundError: If the parent plugin is not found.
         """
-        error = None
+        error: Exception | None = None
         if (
             plugin.inherit_from
             and not plugin.is_variant_set
@@ -529,7 +551,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             self._prefer_source,
         ) from error
 
-    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def get_parent(self, plugin: ProjectPlugin) -> ProjectPlugin | BasePlugin:
         """Get plugin's parent plugin.
 
         Args:
@@ -579,7 +601,10 @@ class ProjectPluginsService:  # (too many methods, attributes)
         raise PluginNotFoundError("No Plugin of type Transformer found.")  # noqa: EM101
 
     @contextmanager
-    def use_preferred_source(self, source: DefinitionSource) -> None:
+    def use_preferred_source(
+        self,
+        source: DefinitionSource,
+    ) -> Generator[None, None, None]:
         """Prefer a source of definition.
 
         Args:
