@@ -149,7 +149,7 @@ class StateService:
         )
         completed_state = new_state_dict if payload_flags == Payload.STATE else {}
         job_state = MeltanoState(
-            state_id=state_to_add_to.job_name,  # type: ignore[arg-type]
+            state_id=state_to_add_to.job_name,
             partial_state=partial_state,
             completed_state=completed_state,
         )
