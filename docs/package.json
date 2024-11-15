@@ -1,7 +1,7 @@
 {
   "name": "docs.meltano.com",
   "license": "MIT",
-  "version": "3.6.0b2",
+  "version": "3.6.0b3",
   "description": "https://meltano.com",
   "private": true,
   "scripts": {
@@ -37,7 +37,7 @@
     "swiper": "^11.1.14"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.6.0",
+    "@docusaurus/module-type-aliases": "3.6.1",
     "docusaurus-plugin-sass": "^0.2.5",
     "eslint": "^9.14.0",
     "eslint-config-wesbos": "^4.3.2",
