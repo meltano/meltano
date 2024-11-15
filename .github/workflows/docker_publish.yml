@@ -1,4 +1,4 @@
-name: Docker Publish
+name: Docker Build, Scan, and Publish
 
 # This workflow will build and publish all public Docker images to the configured registry.
 # Set the input `dry_run` to `false` to skip pushing images to the registry.
@@ -21,6 +21,20 @@ on:
         options:
           - ghcr.io
           - docker.io
+  push:
+    branches: [main]
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/docker_publish.yml
+    - docker/meltano/Dockerfile
+    - pyproject.toml
+  pull_request:
+    branches: [main]
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/docker_publish.yml
+    - docker/meltano/Dockerfile
+    - pyproject.toml
 
 jobs:
   build_meltano_image:
