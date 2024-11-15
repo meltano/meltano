@@ -59,17 +59,26 @@ def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
 class TaskSets(NameEq, Canonical):
     """A named entity that holds one or more tasks that can be executed by Meltano."""
 
-    def __init__(self, name: str, tasks: list[str] | list[list[str]]):
+    def __init__(
+        self,
+        name: str,
+        tasks: list[str] | list[list[str]],
+        *,
+        force: bool = False,
+    ):
         """Initialize a `TaskSets`.
 
         Args:
             name: The name of the job.
             tasks: The tasks that associated with this job.
+            force: Force a new run even if a pipeline with the same State ID is already
+                present. Same as `meltano run --force`.
         """
         super().__init__()
 
         self.name = name
         self.tasks = tasks
+        self.force = force
 
     @t.overload
     def _as_args(self) -> list[str]: ...
@@ -137,7 +146,12 @@ class TaskSets(NameEq, Canonical):
         return self._as_args(preserve_top_level=True)
 
 
-def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
+def tasks_from_yaml_str(
+    name: str,
+    yaml_str: str,
+    *,
+    force: bool = False,
+) -> TaskSets:
     """Create a TaskSets from a yaml string.
 
     The resulting object is validated against the `TASKS_JSON_SCHEMA`.
@@ -145,6 +159,7 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     Args:
         name: The name of the job.
         yaml_str: The yaml string.
+        force: Whether to force the job to run. Same as `meltano run --force`.
 
     Returns:
         The TaskSets.
@@ -174,4 +189,4 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
     if isinstance(tasks, str):
         tasks = [tasks]
 
-    return TaskSets(name=name, tasks=tasks)
+    return TaskSets(name=name, tasks=tasks, force=force)
