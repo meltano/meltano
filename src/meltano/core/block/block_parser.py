@@ -117,7 +117,8 @@ class BlockParser:  # noqa: D101
 
         task_sets_service: TaskSetsService = TaskSetsService(project)
 
-        blocks = self._expand_jobs(blocks, task_sets_service)
+        blocks, force = self._expand_jobs(blocks, task_sets_service)
+        self._force = self._force or force
 
         for idx, name in enumerate(blocks):
             try:
@@ -161,7 +162,11 @@ class BlockParser:  # noqa: D101
         """
         return self._plugins
 
-    def _expand_jobs(self, blocks: list[str], task_sets: TaskSetsService) -> list[str]:
+    def _expand_jobs(
+        self,
+        blocks: list[str],
+        task_sets: TaskSetsService,
+    ) -> tuple[list[str], bool]:
         """Expand any jobs present in a list of blocks into their raw block names.
 
         Example:
@@ -173,20 +178,28 @@ class BlockParser:  # noqa: D101
             task_sets: TaskSetsService to use.
 
         Returns:
-            List of block names with jobs expanded.
+            Tuple with a ist of block names with jobs expanded, and an optional
+            --force flag.
         """
         expanded_blocks: list[str] = []
+        force = True
         for name in blocks:
             if task_sets.exists(name):
+                ts = task_sets.get(name)
                 self.log.debug(
                     "expanding job to tasks",
                     job_name=name,
-                    tasks=task_sets.get(name).flat_args,
+                    tasks=ts.flat_args,
                 )
-                expanded_blocks.extend(task_sets.get(name).flat_args)
+                expanded_blocks.extend(ts.flat_args)
+
+                # NOTE: Only enforce the force flag if all jobs are forced.
+                #       If any job is not forced, the entire run should not be
+                #       forced.
+                force = ts.force and force
             else:
                 expanded_blocks.append(name)
-        return expanded_blocks
+        return expanded_blocks, force
 
     def find_blocks(
         self,

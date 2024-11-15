@@ -1054,6 +1054,11 @@
             "gitlab-to-jsonl"
           ]
         },
+        "force": {
+          "type": "boolean",
+          "description": "Force a new run even if a pipeline with the same State ID is already present.",
+          "default": false
+        },
         "tasks": {
           "oneOf": [
             {
