@@ -21,6 +21,20 @@ on:
         options:
           - ghcr.io
           - docker.io
+  push:
+    branches: [main]
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/docker_publish.yml
+    - docker/meltano/Dockerfile
+    - pyproject.toml
+  pull_request:
+    branches: [main]
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/docker_publish.yml
+    - docker/meltano/Dockerfile
+    - pyproject.toml
 
 jobs:
   build_meltano_image:
