@@ -113,7 +113,7 @@ def cli(
         project = Project.find()
         setup_logging(project)
         logger.debug(
-            "meltano %s, Python %s, %s",
+            "Meltano %s, Python %s, %s",
             __version__,
             platform.python_version(),
             platform.system(),
