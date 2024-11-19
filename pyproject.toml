@@ -92,11 +92,11 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.57"}
+boto3-stubs = {extras = ["essential"], version = "1.35.64"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
-moto = "^5.0.20"
+moto = "^5.0.21"
 mypy = "^1.13.0"
 pre-commit = "^4.0.1"
 pytest = "^8.3.3"
