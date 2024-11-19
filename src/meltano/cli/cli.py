@@ -112,7 +112,13 @@ def cli(
     try:
         project = Project.find()
         setup_logging(project)
-        logger.debug("meltano %s, %s", __version__, platform.system())
+        logger.debug(
+            "Meltano %s, Python %s, %s (%s)",
+            __version__,
+            platform.python_version(),
+            platform.system(),
+            platform.machine(),
+        )
         if project.readonly:
             logger.debug("Project is read-only.")
 
