@@ -525,6 +525,11 @@ class ExtractLoadBlocks(BlockSet):
         """
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
+        if self.context.force:
+            logger.warning(
+                "Force option is enabled, ignoring stale job check.",
+            )
+
         if not self.context.force and (
             existing := JobFinder(job.job_name).latest_running(
                 self.context.session,

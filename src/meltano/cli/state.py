@@ -134,7 +134,7 @@ def list_state(ctx: click.Context, pattern: str | None) -> None:
         for state_id, state in states.items():
             if state:
                 try:
-                    state_service.validate_state(json.dumps(state))
+                    state_service.validate_state(state)
                 except (InvalidJobStateError, json.decoder.JSONDecodeError):
                     click.secho(state_id, fg="red")
                 else:
