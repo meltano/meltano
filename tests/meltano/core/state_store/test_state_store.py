@@ -11,13 +11,13 @@ from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
 
-from meltano.core import job_state
 from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
     AZStorageStateStoreManager,
     DBStateStoreManager,
     GCSStateStoreManager,
     LocalFilesystemStateStoreManager,
+    MeltanoState,
     S3StateStoreManager,
     StateBackend,
     state_store_manager_from_project_settings,
@@ -211,7 +211,7 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store, S3StateStoreManager)
 
         state_id = "test_state_id"
-        state = job_state.JobState(state_id=state_id, completed_state={"key": "value"})
+        state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
         with moto.mock_aws():
             monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
@@ -242,7 +242,7 @@ class TestS3StateBackend:
         assert isinstance(s3_state_store, S3StateStoreManager)
 
         state_id = "test_state_id"
-        state = job_state.JobState(state_id=state_id, completed_state={"key": "value"})
+        state = MeltanoState(state_id=state_id, completed_state={"key": "value"})
 
         with moto.mock_aws():
             monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
@@ -254,7 +254,7 @@ class TestS3StateBackend:
             state_key = f"{prefix}/{state_id}/state.json"
             response = s3_state_store.client.get_object(Bucket=bucket, Key=state_key)
             assert (
-                job_state.JobState.from_file(
+                MeltanoState.from_file(
                     state_id=state_id,
                     file_obj=response["Body"],
                 )

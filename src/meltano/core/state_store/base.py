@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import dataclasses
+import json
 import typing as t
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 
+from meltano.core.utils import merge
+
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
-
-    from meltano.core.job_state import JobState
+    from io import TextIOWrapper
 
 
 class UnsupportedStateBackendURIError(Exception):
@@ -22,6 +25,83 @@ class MissingStateBackendSettingsError(Exception):
 
 class StateIDLockedError(Exception):
     """A job attempted to acquire a lock on an already-locked state ID."""
+
+
+@dataclasses.dataclass
+class MeltanoState:
+    """State object."""
+
+    state_id: str
+    partial_state: dict[str, t.Any] | None = None
+    completed_state: dict[str, t.Any] | None = None
+
+    @classmethod
+    def from_json(cls, state_id: str, json_str: str) -> MeltanoState:
+        """Create MeltanoState from json representation.
+
+        Args:
+            state_id: the state ID of the job to create MeltanoState for.
+            json_str: the json representation of state to use.
+
+        Returns:
+            MeltanoState representing args.
+        """
+        state_dict = json.loads(json_str)
+        return cls(
+            state_id=state_id,
+            completed_state=state_dict.get("completed", {}),
+            partial_state=state_dict.get("partial", {}),
+        )
+
+    @classmethod
+    def from_file(cls, state_id: str, file_obj: TextIOWrapper) -> MeltanoState:
+        """Create MeltanoState from a file-like object containing state json.
+
+        Args:
+            state_id: the state_id for the MeltanoState
+            file_obj: the file-like object containing state json.
+
+        Returns:
+            MeltanoState
+        """
+        return cls.from_json(state_id=state_id, json_str=file_obj.read())
+
+    def json(self) -> str:
+        """Get the json representation of this MeltanoState.
+
+        Returns:
+            json representation of this MeltanoState
+        """
+        return json.dumps(
+            {"completed": self.completed_state, "partial": self.partial_state},
+        )
+
+    def json_merged(self) -> str:
+        """Return the json representation of partial state merged onto complete state.
+
+        Returns:
+            json representation of partial state merged onto complete state.
+        """
+        return json.dumps(merge(self.partial_state, self.completed_state))
+
+    def merge_partial(self, state: MeltanoState) -> None:
+        """Merge provided partial state onto this MeltanoState.
+
+        Args:
+            state: the partial state to merge onto this state.
+        """
+        self.partial_state = merge(
+            state.partial_state,
+            self.partial_state,
+        )
+
+    def is_complete(self) -> bool:
+        """Check if this MeltanoState is complete.
+
+        Returns:
+            True if complete, else False
+        """
+        return bool(self.completed_state)
 
 
 class StateStoreManager(ABC):
@@ -41,7 +121,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def set(self, state: JobState) -> None:
+    def set(self, state: MeltanoState) -> None:
         """Set the job state for the given state_id.
 
         Args:
@@ -53,7 +133,7 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def get(self, state_id: str) -> JobState | None:
+    def get(self, state_id: str) -> MeltanoState | None:
         """Get the job state for the given state_id.
 
         Args:
