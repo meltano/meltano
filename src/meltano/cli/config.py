@@ -343,6 +343,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
     type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
+@click.confirmation_option()
 @click.pass_context
 @_use_meltano_env
 def reset(ctx, store) -> None:  # noqa: ANN001
