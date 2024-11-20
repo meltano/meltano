@@ -122,6 +122,11 @@ meltano = "meltano.cli:main"
 [tool.pytest.ini_options]
 addopts = "--cov=meltano --cov=tests --doctest-modules --durations=10 --order-scope=module -ra -n auto --dist=loadfile"
 asyncio_mode = "auto"
+filterwarnings = [
+  "error",
+  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
+  "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
+]
 log_cli = 1
 log_cli_format = "%(message)s"
 log_cli_level = "CRITICAL"
