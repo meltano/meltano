@@ -650,7 +650,7 @@ These settings can be used to modify the behavior of [`meltano el`](/reference/c
 ### `elt.buffer_size`
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_ELT_BUFFER_SIZE`
-- Default: `10485760` (10MiB in bytes)
+- Default: `104857600` (100MiB in bytes)
 
 Size (in bytes) of the buffer between extractor and loader (Singer tap and target) that stores
 [messages](https://hub.meltano.com/singer/spec#messages)
@@ -661,7 +661,7 @@ at which point the extractor will be blocked until the loader has worked through
 of the buffer size available again for new extractor output.
 
 The length of a single line of extractor output is limited to half the buffer size.
-With a default buffer size of 10MiB, the maximum message size would therefore be 5MiB.
+With a default buffer size of 100MiB, the maximum message size would therefore be 50MiB.
 
 #### How to use
 
