@@ -20,6 +20,7 @@ import yaml
 
 from meltano import schemas
 from meltano.core.manifest.jsonschema import meltano_config_env_locations
+from meltano.core.plugin.base import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_lock_service import PluginLock
 from meltano.core.utils import (
@@ -36,7 +37,6 @@ if t.TYPE_CHECKING:
     from collections.abc import Iterable, MutableMapping
     from pathlib import Path
 
-    from meltano.core.plugin.base import PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -386,7 +386,7 @@ class Manifest:
         # `meltano.yml` or in manifest files. For more details, refer to:
         # https://gitlab.com/meltano/meltano/-/merge_requests/2481#note_832478775
         with suppress(KeyError):
-            del plugins["mappings"]
+            del plugins[PluginType.MAPPINGS]
 
         # NOTE: `self._merge_plugin_lockfiles` restructures the plugins into a
         #       map from plugin types to maps of plugin IDs to their values.

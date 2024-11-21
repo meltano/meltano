@@ -473,7 +473,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
             else:
                 environment.config.plugins[plugin.type][p_idx] = plugin
 
-    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def _get_parent_from_hub(self, plugin: ProjectPlugin) -> BasePlugin:
         """Get the parent plugin from the hub.
 
         Args:

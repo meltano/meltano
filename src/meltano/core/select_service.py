@@ -12,7 +12,7 @@ from meltano.core.plugin_invoker import invoker_factory
 if t.TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
-    from meltano.core.plugin.base import PluginRef
+    from meltano.core.environment import EnvironmentPluginConfig
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -92,7 +92,7 @@ class SelectService:  # noqa: D101
         remove: bool = False,
     ) -> None:
         """Update plugins' select patterns."""
-        plugin: PluginRef
+        plugin: ProjectPlugin | EnvironmentPluginConfig
 
         if self.project.environment is None:
             plugin = self.extractor
@@ -114,10 +114,12 @@ class SelectService:  # noqa: D101
             patterns.append(this_pattern)
         plugin.extras["select"] = patterns
 
+        # TODO: This should probably be refactored to narrow the type of plugin that is
+        #       being updated.
         if self.project.environment is None:
-            self.project.plugins.update_plugin(plugin)
+            self.project.plugins.update_plugin(plugin)  # type: ignore[arg-type]
         else:
-            self.project.plugins.update_environment_plugin(plugin)
+            self.project.plugins.update_environment_plugin(plugin)  # type: ignore[arg-type]
 
     @staticmethod
     def _get_pattern_string(
