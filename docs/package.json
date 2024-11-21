@@ -35,7 +35,7 @@
     "prism-react-renderer": "^2.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "swiper": "^11.1.14"
+    "swiper": "^11.1.15"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.6.1",
