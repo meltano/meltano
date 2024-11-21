@@ -13,7 +13,7 @@ from structlog.stdlib import get_logger
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
