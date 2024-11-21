@@ -14,9 +14,12 @@ import typing as t
 import structlog
 
 from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import SINGER_STATE_KEY, JobState
+from meltano.core.job_state import SINGER_STATE_KEY
 from meltano.core.project import Project
-from meltano.core.state_store import state_store_manager_from_project_settings
+from meltano.core.state_store import (
+    MeltanoState,
+    state_store_manager_from_project_settings,
+)
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -145,7 +148,7 @@ class StateService:
             new_state_dict if payload_flags == Payload.INCOMPLETE_STATE else {}
         )
         completed_state = new_state_dict if payload_flags == Payload.STATE else {}
-        job_state = JobState(
+        job_state = MeltanoState(
             state_id=state_to_add_to.job_name,
             partial_state=partial_state,
             completed_state=completed_state,

@@ -115,7 +115,7 @@ class Job(SystemModel):
     __tablename__ = "runs"
 
     id: Mapped[IntPK]
-    job_name: Mapped[t.Optional[str]]  # noqa: UP007
+    job_name: Mapped[str]
     run_id: Mapped[GUIDType]
     _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP007
     started_at: Mapped[datetime] = mapped_column(DateTimeUTC)

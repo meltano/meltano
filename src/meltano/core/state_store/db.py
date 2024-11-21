@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from sqlalchemy import select
 
 from meltano.core.job_state import JobState
-from meltano.core.state_store.base import StateStoreManager
+from meltano.core.state_store.base import MeltanoState, StateStoreManager
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
@@ -32,7 +32,7 @@ class DBStateStoreManager(StateStoreManager):
         super().__init__(**kwargs)
         self.session = session
 
-    def set(self, state: JobState) -> None:
+    def set(self, state: MeltanoState) -> None:
         """Set the job state for the given state_id.
 
         Args:
@@ -63,7 +63,7 @@ class DBStateStoreManager(StateStoreManager):
         self.session.add(new_job_state)
         self.session.commit()
 
-    def get(self, state_id: str) -> JobState | None:
+    def get(self, state_id: str) -> MeltanoState | None:
         """Get the job state for the given state_id.
 
         Args:
@@ -72,9 +72,14 @@ class DBStateStoreManager(StateStoreManager):
         Returns:
             The current state for the given job
         """
-        return (
-            self.session.query(JobState).filter(JobState.state_id == state_id).first()
-        )
+        if job_state := self.session.get(JobState, state_id):
+            return MeltanoState(
+                state_id=state_id,
+                partial_state=job_state.partial_state,
+                completed_state=job_state.completed_state,
+            )
+
+        return None
 
     def clear(self, state_id: str) -> None:
         """Clear state for the given state_id.
