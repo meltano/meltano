@@ -92,34 +92,40 @@ class SelectService:  # noqa: D101
         remove: bool = False,
     ) -> None:
         """Update plugins' select patterns."""
-        plugin: ProjectPlugin | EnvironmentPluginConfig
-
-        if self.project.environment is None:
-            plugin = self.extractor
-        else:
-            plugin = self.project.environment.get_plugin_config(
-                self.extractor.type,
-                self.extractor.name,
-            )
-
         this_pattern = self._get_pattern_string(
             entities_filter,
             attributes_filter,
             exclude,
         )
+
+        plugin: ProjectPlugin | EnvironmentPluginConfig
+        if self.project.environment is None:
+            plugin = self.extractor
+            self._update_plugin_select(plugin, this_pattern, remove=remove)
+            self.project.plugins.update_plugin(plugin)
+        else:
+            plugin = self.project.environment.get_plugin_config(
+                self.extractor.type,
+                self.extractor.name,
+            )
+            self._update_plugin_select(plugin, this_pattern, remove=remove)
+            self.project.plugins.update_environment_plugin(plugin)
+
+    def _update_plugin_select(
+        self,
+        plugin: ProjectPlugin | EnvironmentPluginConfig,
+        pattern: str,
+        *,
+        remove: bool = False,
+    ) -> None:
+        """Update the plugin's select patterns."""
         patterns = plugin.extras.get("select", [])
         if remove:
-            patterns.remove(this_pattern)
+            patterns.remove(pattern)
         else:
-            patterns.append(this_pattern)
-        plugin.extras["select"] = patterns
+            patterns.append(pattern)
 
-        # TODO: This should probably be refactored to narrow the type of plugin that is
-        #       being updated.
-        if self.project.environment is None:
-            self.project.plugins.update_plugin(plugin)  # type: ignore[arg-type]
-        else:
-            self.project.plugins.update_environment_plugin(plugin)  # type: ignore[arg-type]
+        plugin.extras["select"] = patterns
 
     @staticmethod
     def _get_pattern_string(
