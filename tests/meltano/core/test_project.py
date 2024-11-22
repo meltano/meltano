@@ -96,9 +96,9 @@ class TestProject:
         assert Project.find() is project
 
     def test_find_threadsafe(self, project, concurrency) -> None:
-        workers = ThreadPool(concurrency["threads"])
-        projects = workers.map(Project.find, range(concurrency["cases"]))
-        assert all(x is project for x in projects)
+        with ThreadPool(concurrency["threads"]) as workers:
+            projects = workers.map(Project.find, range(concurrency["cases"]))
+            assert all(x is project for x in projects)
 
     @pytest.mark.concurrent
     def test_meltano_concurrency(self, project, concurrency) -> None:
