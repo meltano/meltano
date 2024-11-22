@@ -389,31 +389,31 @@ class TestTracker:
                 self.send_response(200, "OK")
                 self.end_headers()
 
-        server = server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler)
-        server_thread = Thread(
-            target=server.serve_forever,
-            kwargs={"poll_interval": 0.1},
-        )
+        with server_lib.HTTPServer(("localhost", 0), HTTPRequestHandler) as server:
+            server_thread = Thread(
+                target=server.serve_forever,
+                kwargs={"poll_interval": 0.1},
+            )
 
-        project.settings.set(
-            "snowplow.collector_endpoints",
-            f'["http://localhost:{server.server_port}"]',
-        )
+            project.settings.set(
+                "snowplow.collector_endpoints",
+                f'["http://localhost:{server.server_port}"]',
+            )
 
-        tracker = Tracker(project)
-        assert len(tracker.snowplow_tracker.emitters) == 1
-        tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
+            tracker = Tracker(project)
+            assert len(tracker.snowplow_tracker.emitters) == 1
+            tracker.snowplow_tracker.emitters[0].on_failure = mock.MagicMock()
 
-        server_thread.start()
-        tracker.track_command_event(CliEvent.started)
-        tracker.snowplow_tracker.flush()
-        server.shutdown()
-        server_thread.join()
+            server_thread.start()
+            tracker.track_command_event(CliEvent.started)
+            tracker.snowplow_tracker.flush()
+            server.shutdown()
+            server_thread.join()
 
-        timeout_occurred = (
-            tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
-        )
-        assert timeout_occurred is timeout_should_occur
+            timeout_occurred = (
+                tracker.snowplow_tracker.emitters[0].on_failure.call_count == 1
+            )
+            assert timeout_occurred is timeout_should_occur
 
     def test_project_context_send_anonymous_usage_stats_source(
         self,
