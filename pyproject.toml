@@ -122,6 +122,7 @@ meltano = "meltano.cli:main"
 [tool.pytest.ini_options]
 addopts = "--cov=meltano --cov=tests --doctest-modules --durations=10 --order-scope=module -ra -n auto --dist=loadfile"
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
   "error",
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
