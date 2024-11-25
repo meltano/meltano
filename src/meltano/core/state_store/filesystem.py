@@ -18,8 +18,8 @@ from pathlib import Path
 from time import sleep
 from urllib.parse import urlparse
 
+import smart_open
 import structlog
-from smart_open import open
 
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
 
@@ -111,7 +111,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             A TextIOWrapper to read the file/blob.
         """
         if self.client:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
                 transport_params={
                     "client": self.client,
@@ -120,7 +120,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             ) as reader:
                 yield reader
         else:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
             ) as reader:
                 yield reader
@@ -138,14 +138,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         transport_params = {"client": self.client} if self.client else {}
         transport_params.update(self.extra_transport_params)
         try:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
                 "w+",
                 transport_params=transport_params,
             ) as writer:
                 yield writer
         except NotImplementedError:
-            with open(
+            with smart_open.open(
                 self.uri_with_path(path),
                 "w",
                 transport_params=transport_params,
