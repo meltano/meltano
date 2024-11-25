@@ -38,7 +38,7 @@
     "swiper": "^11.1.15"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.6.1",
+    "@docusaurus/module-type-aliases": "3.6.3",
     "docusaurus-plugin-sass": "^0.2.5",
     "eslint": "^9.15.0",
     "eslint-config-wesbos": "^4.3.2",
