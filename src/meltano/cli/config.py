@@ -35,6 +35,7 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.settings_service import SettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -187,6 +188,8 @@ def config(
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
+
+    settings: SettingsService
     try:
         if plugin:
             settings = PluginSettingsService(project, plugin)

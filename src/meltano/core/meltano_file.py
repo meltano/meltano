@@ -21,6 +21,8 @@ VERSION = 1
 class MeltanoFile(Canonical):
     """Data and loading methods for meltano.yml files."""
 
+    version: int
+
     def __init__(
         self,
         version: int = VERSION,
