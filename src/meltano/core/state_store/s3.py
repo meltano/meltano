@@ -92,10 +92,8 @@ class S3StateStoreManager(CloudStateStoreManager):
         Returns:
             True if error represents file not being found, else False
         """
-        return (
-            isinstance(err, OSError)
-            and "NoSuchKey" in err.args[0]
-            or (isinstance(err, KeyError) and "ActualObjectSize" in err.args[0])
+        return (isinstance(err, OSError) and "NoSuchKey" in err.args[0]) or (
+            isinstance(err, KeyError) and "ActualObjectSize" in err.args[0]
         )
 
     @property

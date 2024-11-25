@@ -5,7 +5,7 @@ from __future__ import annotations
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects.mssql import DATETIME2
-from sqlalchemy.engine import Connection  # noqa: TCH002
+from sqlalchemy.engine import Connection  # noqa: TC002
 
 
 def get_dialect_name() -> str:

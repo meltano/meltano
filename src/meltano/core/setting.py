@@ -5,7 +5,7 @@ import typing as t
 from sqlalchemy import types
 from sqlalchemy.orm import Mapped, mapped_column
 
-from meltano.core.sqlalchemy import StrPK  # noqa: TCH001
+from meltano.core.sqlalchemy import StrPK  # noqa: TC001
 
 from .models import SystemModel
 

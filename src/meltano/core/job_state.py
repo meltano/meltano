@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, Session, mapped_column
 
 from meltano.core.job import JobFinder, Payload
 from meltano.core.models import SystemModel
-from meltano.core.sqlalchemy import StateType  # noqa: TCH001
+from meltano.core.sqlalchemy import StateType  # noqa: TC001
 from meltano.core.utils import merge
 
 SINGER_STATE_KEY = "singer_state"
