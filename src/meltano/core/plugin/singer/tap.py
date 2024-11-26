@@ -384,10 +384,8 @@ class SingerTap(SingerPlugin):
 
         use_catalog_cache = True
         if (
-            elt_context
-            and elt_context.refresh_catalog
-            or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]
-        ):
+            elt_context and elt_context.refresh_catalog
+        ) or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]:
             use_catalog_cache = False
 
         if catalog_path.exists() and use_catalog_cache:
