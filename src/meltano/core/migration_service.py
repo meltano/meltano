@@ -7,14 +7,12 @@ import typing as t
 
 import click
 import structlog
-from alembic import command
-from alembic.config import Config
-from alembic.runtime.migration import MigrationContext
-from alembic.script import ScriptDirectory
 
 from meltano.migrations import LOCK_PATH, MIGRATION_DIR
 
 if t.TYPE_CHECKING:
+    from alembic.runtime.migration import MigrationContext
+    from alembic.script import ScriptDirectory
     from sqlalchemy.engine import Engine
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -75,6 +73,11 @@ class MigrationService:
         Raises:
             MigrationError: If the upgrade fails.
         """
+        from alembic import command
+        from alembic.config import Config
+        from alembic.runtime.migration import MigrationContext
+        from alembic.script import ScriptDirectory
+
         with self.engine.begin() as conn:
             cfg = Config()
 

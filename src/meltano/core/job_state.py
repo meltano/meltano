@@ -13,7 +13,6 @@ from meltano.core.sqlalchemy import StateType  # noqa: TC001
 from meltano.core.utils import merge
 
 SINGER_STATE_KEY = "singer_state"
-STATE_ID_COMPONENT_DELIMITER = ":"
 
 
 class JobState(SystemModel):
