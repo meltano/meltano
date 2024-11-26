@@ -32,7 +32,7 @@ updates:
     commit-message:
       prefix: "ci: "
   - package-ecosystem: pip
-    versioning-strategy: increase
+    versioning-strategy: increase-if-necessary
     directory: "/"
     schedule:
       interval: weekly
