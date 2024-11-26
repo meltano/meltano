@@ -5,6 +5,9 @@ layout: getting_started
 sidebar_position: 5
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 Welcome! If you're ready to get started with Meltano and [run an EL[T] pipeline](#run-a-data-integration-el-pipeline)
 with a [data source](#add-an-extractor-to-pull-data-from-a-source) and [destination](#add-a-loader-to-send-data-to-a-destination) of your choosing, you've come to the right place!
 
@@ -24,45 +27,82 @@ _To learn more about the different installation methods, refer to the [Installat
 
 You will need to be running Linux, macOS, or Windows, and have [Python](https://www.python.org/) 3.9, 3.10, 3.11, 3.12 or 3.13 installed. We recommend installing Meltano into a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) inside the directory that will hold your [Meltano projects](/concepts/project).
 
-1.  Create and navigate to a directory to hold your Meltano projects:
+<Tabs>
+  <TabItem value="linux-macos" label="Linux & macOS" default>
+
+1. Create and navigate to a directory to hold your Meltano projects:
 
     ```bash
     mkdir meltano-projects
     cd meltano-projects
     ```
 
-1.  Install the [pipx](https://pypa.github.io/pipx/) package manager:
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
 
     ```bash
-    #For Windows (PowerShell): New-Alias Python3 Python
     python3 -m pip install --user pipx
     python3 -m pipx ensurepath
-    #For Windows (PowerShell): Open up a new powershell instance to load your new path variables
     source ~/.bashrc
     ```
 
-:::info
-
-<p>For Windows, instead of source ~/.bashrc, you'll want to open a new PowerShell instance.</p>
-:::
-
-1.  Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
+1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
 
     ```bash
     pipx install meltano
     ```
 
-    If you have multiple versions of Python installed, you can use a specific one with the `--python` arugment:
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` argument:
 
     ```bash
     pipx install meltano --python <path to desired Python executable>
     ```
 
-1.  Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
+1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
 
     ```bash
     meltano --version
     ```
+
+  </TabItem>
+  <TabItem value="windows" label="Windows">
+
+1. Create and navigate to a directory to hold your Meltano projects:
+
+    ```powershell
+    mkdir meltano-projects
+    cd meltano-projects
+    ```
+
+1. Install the [pipx](https://pypa.github.io/pipx/) package manager:
+
+    ```powershell
+    New-Alias Python3 Python
+    python3 -m pip install --user pipx
+    python3 -m pipx ensurepath
+    ```
+
+    Open a new PowerShell instance to load your new path variables.
+
+1. Install the [`meltano` package from the Python Package Index (PyPI)](https://pypi.org/project/meltano/):
+
+    ```powershell
+    pipx install meltano
+    ```
+
+    If you have multiple versions of Python installed, you can use a specific one with the `--python` argument:
+
+    ```powershell
+    pipx install meltano --python <path to desired Python executable>
+    ```
+
+1. Optionally, verify that the [`meltano` CLI](/reference/command-line-interface) is now available by viewing the version:
+
+    ```powershell
+    meltano --version
+    ```
+
+  </TabItem>
+</Tabs>
 
 If anything's not performing as expected, refer to the ["Local Installation" section](/guide/installation-guide#local-installation) of the [Installation guide](/guide/installation-guide) for more details.
 
