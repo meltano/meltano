@@ -61,7 +61,8 @@ class PluginLock:
         locked_def = StandalonePlugin.from_variant(self.variant, self.definition)
 
         with self.path.open("w") as lockfile:
-            lockfile.write(json.dumps(locked_def.canonical(), indent=2) + "\n")
+            json.dump(locked_def.canonical(), lockfile, indent=2)
+            lockfile.write("\n")
 
     def load(
         self,
