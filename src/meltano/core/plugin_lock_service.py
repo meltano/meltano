@@ -62,6 +62,7 @@ class PluginLock:
 
         with self.path.open("w") as lockfile:
             json.dump(locked_def.canonical(), lockfile, indent=2)
+            lockfile.write("\n")
 
     def load(
         self,
