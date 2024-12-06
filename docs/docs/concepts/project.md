@@ -395,14 +395,17 @@ Meltano's CLI utilizes the following tables:
 
 ### Support for other database types
 
-Meltano currently supports the following databases as backends for state and configuration:
+Meltano is currently tested with the following databases as backends for state and configuration:
 
-- SQLite (supported out of the box)
-- PostgreSQL (requires the [`postgres` or `psycopg2` Python extra](/guide/advanced-topics#installing-optional-components))
-- MS SQL Server (requires the [`mssql` Python extra](/guide/advanced-topics#installing-optional-components)
+| Database      | Supported Versions                      | Extra Requirement                                                                 |
+| :------------ | :-------------------------------------- | :-------------------------------------------------------------------------------- |
+| SQLite        | Version `3.25.0` or higher is required. | None                                                                              |
+| PostgreSQL    | Version `13` or higher is required.     | [`postgres` or `psycopg2`](/guide/advanced-topics#installing-optional-components) |
+| MS SQL Server | Version `2019` or higher is required.   | [`mssql`](/guide/advanced-topics#installing-optional-components)                  |
 
-Support for other databases is planned:
+Support for other databases has been requested and is being tracked in the following issues:
 
 - [MySQL](https://github.com/meltano/meltano/issues/6529)
+- [Snowflake](https://github.com/meltano/meltano/issues/8761)
 
 If you would like to see support for a specific database, please [open an issue](https://github.com/meltano/meltano/issues/new?assignees=meltano%2Fengineering&labels=kind%2FFeature%2Cvaluestream%2FMeltano&template=feature.yml&title=feature%3A+%3Ctitle%3E)

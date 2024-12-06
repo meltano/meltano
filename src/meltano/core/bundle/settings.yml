@@ -32,7 +32,7 @@ settings:
 - name: hub_url_auth
 - name: elt.buffer_size
   kind: integer
-  value: 10485760 # 10 MiB
+  value: 104_857_600 # 100 MiB
 - name: python
 - name: auto_install
   kind: boolean

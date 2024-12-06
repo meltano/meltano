@@ -5,7 +5,7 @@ labels:
   - kind/Bug
   - flow::triage
   - valuestream/Meltano
-type: Bug
+type: Fix
 assignees:
   - edgarrmondragon
 
@@ -19,7 +19,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.6.0b2"
+      placeholder: "3.6.0b4"
     validations:
       required: true
   - type: dropdown
@@ -28,6 +28,7 @@ body:
       label: Python Version
       description: Version of Python you are using
       options:
+        - "3.13"
         - "3.12"
         - "3.11"
         - "3.10"

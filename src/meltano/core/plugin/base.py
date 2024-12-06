@@ -532,7 +532,7 @@ class BasePlugin(HookObject):
         self._plugin_def = plugin_def
         self._variant = variant
 
-    def __eq__(self, other: BasePlugin):  # noqa: ANN204
+    def __eq__(self, other: BasePlugin) -> bool:
         """Compare two plugins.
 
         Args:
@@ -732,7 +732,7 @@ class BasePlugin(HookObject):
         return []
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -741,7 +741,7 @@ class BasePlugin(HookObject):
         return {}
 
     @property
-    def output_files(self):  # noqa: ANN201
+    def output_files(self) -> dict[str, str]:
         """Return a list of stubbed files created for this plugin.
 
         Returns:
@@ -749,7 +749,7 @@ class BasePlugin(HookObject):
         """
         return {}
 
-    def process_config(self, config):  # noqa: ANN001, ANN201
+    def process_config(self, config: dict) -> dict:
         """Process the config for this plugin.
 
         Args:

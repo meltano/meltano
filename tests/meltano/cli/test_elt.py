@@ -780,8 +780,8 @@ class TestCliEltScratchpadOne:
                         None,
                         (
                             "The extractor generated a message exceeding the "
-                            "message size limit of 5.0MiB (half the buffer "
-                            "size of 10.0MiB)."
+                            "message size limit of 50.0MiB (half the buffer "
+                            "size of 100.0MiB)."
                         ),
                         "error",
                     ),

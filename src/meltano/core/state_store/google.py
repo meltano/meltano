@@ -9,7 +9,7 @@ from functools import cached_property
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator
 
 GOOGLE_INSTALLED = True
 
@@ -32,7 +32,7 @@ class MissingGoogleError(Exception):
 
 
 @contextmanager
-def requires_gcs():  # noqa: ANN201
+def requires_gcs() -> Generator[None, None, None]:
     """Raise MissingGoogleError if gcs is required but missing in context.
 
     Raises:
@@ -56,7 +56,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         application_credentials: str | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ):
         """Initialize the BaseFilesystemStateStoreManager.
 
@@ -121,7 +121,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             else:
                 raise e
 
-    def list_all_files(self, *, with_prefix: bool = True) -> Iterator[str]:
+    def list_all_files(self, *, with_prefix: bool = True) -> Generator[str, None, None]:
         """List all files in the backend.
 
         Args:

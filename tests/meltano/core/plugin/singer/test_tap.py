@@ -22,6 +22,12 @@ from meltano.core.plugin.singer.catalog import (
 )
 from meltano.core.state_service import InvalidJobStateError, StateService
 
+if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_invoker import PluginInvoker
+
 
 class CatalogFixture:
     empty_stream: t.ClassVar[CatalogDict] = {"streams": []}
@@ -53,13 +59,18 @@ class TestSingerTap:
 
     @pytest.mark.order(0)
     @pytest.mark.asyncio
-    async def test_exec_args(self, subject, session, plugin_invoker_factory) -> None:
+    async def test_exec_args(
+        self,
+        subject,
+        session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+    ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
             # when `catalog` has data
-            invoker.files["catalog"].open("w").write("...")
+            invoker.files["catalog"].write_text("...")
             assert subject.exec_args(invoker) == [
                 "--config",
                 invoker.files["config"],
@@ -68,7 +79,7 @@ class TestSingerTap:
             ]
 
             # when `state` has data
-            invoker.files["state"].open("w").write("...")
+            invoker.files["state"].write_text("...")
             assert subject.exec_args(invoker) == [
                 "--config",
                 invoker.files["config"],
@@ -104,7 +115,7 @@ class TestSingerTap:
             .context()
         )
 
-        invoker = plugin_invoker_factory(subject, context=elt_context)
+        invoker: PluginInvoker = plugin_invoker_factory(subject, context=elt_context)
         state_service = StateService(session=session)
 
         @contextmanager
@@ -127,7 +138,7 @@ class TestSingerTap:
 
             if state:
                 assert invoker.files["state"].exists()
-                assert json.load(invoker.files["state"].open()) == state
+                assert json.loads(invoker.files["state"].read_text()) == state
             else:
                 assert not invoker.files["state"].exists()
 
@@ -215,7 +226,7 @@ class TestSingerTap:
     async def test_discover_catalog(
         self,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
         monkeypatch,
     ) -> None:
@@ -226,7 +237,7 @@ class TestSingerTap:
 
         def mock_discovery(*args, **kwargs):  # noqa: ARG001
             future = asyncio.Future()
-            future.set_result(catalog_path.open("w").write('{"discovered": true}'))
+            future.set_result(catalog_path.write_text('{"discovered": true}'))
             return future
 
         async with invoker.prepared(session):
@@ -326,7 +337,7 @@ class TestSingerTap:
     async def test_apply_select(
         self,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
         monkeypatch,
     ) -> None:
@@ -335,7 +346,7 @@ class TestSingerTap:
         catalog_path = invoker.files["catalog"]
 
         def reset_catalog() -> None:
-            catalog_path.open("w").write('{"rules": []}')
+            catalog_path.write_text('{"rules": []}')
 
         def assert_rules(*rules) -> None:
             with catalog_path.open() as catalog_file:
@@ -413,7 +424,7 @@ class TestSingerTap:
     async def test_apply_catalog_rules(
         self,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
         monkeypatch,
     ) -> None:
@@ -423,7 +434,7 @@ class TestSingerTap:
         catalog_cache_key_path = invoker.files["catalog_cache_key"]
 
         def reset_catalog() -> None:
-            catalog_path.open("w").write('{"rules": []}')
+            catalog_path.write_text('{"rules": []}')
 
         def assert_rules(*rules) -> None:
             with catalog_path.open() as catalog_file:
@@ -583,7 +594,7 @@ class TestSingerTap:
     async def test_apply_catalog_rules_select_filter(
         self,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
         monkeypatch,
     ) -> None:
@@ -712,12 +723,12 @@ class TestSingerTap:
     async def test_apply_catalog_rules_invalid(
         self,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
-            invoker.files["catalog"].open("w").write("this is invalid json")
+            invoker.files["catalog"].write_text("this is invalid json")
 
             with pytest.raises(PluginExecutionError, match=r"invalid"):
                 subject.apply_catalog_rules(invoker, [])
@@ -794,7 +805,7 @@ class TestSingerTap:
     @pytest.mark.usefixtures("session", "elt_context_builder")
     async def test_run_discovery(
         self,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject,
     ) -> None:
         process_mock = mock.Mock()

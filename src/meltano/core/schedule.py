@@ -12,6 +12,8 @@ from meltano.core.job import JobFinder as StateJobFinder
 if t.TYPE_CHECKING:
     import datetime
 
+    from sqlalchemy.orm import Session
+
 CRON_INTERVALS: dict[str, str | None] = {
     "@once": None,
     "@manual": None,
@@ -124,7 +126,7 @@ class Schedule(NameEq, Canonical):
             f"--state-id={self.name}",
         ]
 
-    def last_successful_run(self, session) -> StateJob:  # noqa: ANN001
+    def last_successful_run(self, session: Session) -> StateJob | None:
         """Return the last successful run for this schedule.
 
         Args:

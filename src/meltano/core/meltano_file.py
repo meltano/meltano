@@ -21,6 +21,8 @@ VERSION = 1
 class MeltanoFile(Canonical):
     """Data and loading methods for meltano.yml files."""
 
+    version: int
+
     def __init__(
         self,
         version: int = VERSION,
@@ -29,7 +31,7 @@ class MeltanoFile(Canonical):
         environments: list[dict] | None = None,
         jobs: list[dict] | None = None,
         env: dict[str, str] | None = None,
-        **extras,  # noqa: ANN003
+        **extras: t.Any,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 

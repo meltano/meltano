@@ -109,7 +109,7 @@ def _debug_logging_handler(
         )
 
 
-def config_metadata_rules(config):  # noqa: ANN001, ANN201
+def config_metadata_rules(config: dict[str, t.Any]) -> list[MetadataRule]:
     """Get metadata rules from config.
 
     Args:
@@ -118,9 +118,9 @@ def config_metadata_rules(config):  # noqa: ANN001, ANN201
     Returns:
         a list of MetadataRule
     """
-    flat_config = flatten(config, "dot")
+    flat_config: dict[str, t.Any] = flatten(config, "dot")
 
-    rules = []
+    rules: list[MetadataRule] = []
     for key, value in flat_config.items():
         # <tap_stream_id>.<key>
         # <tap_stream_id>.<prop>.<key>
@@ -141,7 +141,7 @@ def config_metadata_rules(config):  # noqa: ANN001, ANN201
     return rules
 
 
-def config_schema_rules(config):  # noqa: ANN001, ANN201
+def config_schema_rules(config: dict[str, t.Any]) -> list[SchemaRule]:
     """Get schema rules from config.
 
     Args:
@@ -384,10 +384,8 @@ class SingerTap(SingerPlugin):
 
         use_catalog_cache = True
         if (
-            elt_context
-            and elt_context.refresh_catalog
-            or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]
-        ):
+            elt_context and elt_context.refresh_catalog
+        ) or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]:
             use_catalog_cache = False
 
         if catalog_path.exists() and use_catalog_cache:

@@ -1041,7 +1041,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
                     "breadcrumb": ["properties", "a"],
                     "metadata": {"inclusion": "unsupported"},
                 },
-                SelectionType.EXCLUDED,
+                SelectionType.UNSUPPORTED,
             ),
             (
                 {
@@ -1101,6 +1101,7 @@ class TestSelectionType:
         assert st.AUTOMATIC + st.EXCLUDED == st.EXCLUDED
         assert st.SELECTED + st.AUTOMATIC == st.AUTOMATIC
         assert st.SELECTED + st.SELECTED == st.SELECTED
+        assert st.UNSUPPORTED + st.UNSUPPORTED == st.UNSUPPORTED
 
     def test_selection_type_repr(self) -> None:
         assert f"{SelectionType.EXCLUDED}" == "excluded"

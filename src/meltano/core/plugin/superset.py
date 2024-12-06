@@ -16,13 +16,16 @@ from meltano.core.setting_definition import SettingDefinition
 
 from . import BasePlugin, PluginType
 
+if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
 logger = structlog.getLogger(__name__)
 
 
 class SupersetInvoker(PluginInvoker):
     """Invoker that prepares env for Superset."""
 
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Environment variables for Superset.
 
         Returns:
@@ -49,7 +52,7 @@ class Superset(BasePlugin):
     ]
 
     @property
-    def config_files(self):  # noqa: ANN201
+    def config_files(self) -> dict[str, str]:
         """Return the configuration files required by the plugin.
 
         Returns:
@@ -61,7 +64,7 @@ class Superset(BasePlugin):
     async def before_configure(
         self,
         invoker: SupersetInvoker,
-        session,  # noqa: ANN001, ARG002
+        session: Session,  # noqa: ARG002
     ) -> None:
         """Write plugin configuration to superset_config.py.
 

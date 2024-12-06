@@ -35,6 +35,7 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.settings_service import SettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -187,6 +188,8 @@ def config(
 
     _, Session = project_engine(project)  # noqa: N806
     session = Session()
+
+    settings: SettingsService
     try:
         if plugin:
             settings = PluginSettingsService(project, plugin)
@@ -343,6 +346,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
     type=click.Choice(_get_store_choices()),
     default=SettingValueStore.AUTO,
 )
+@click.confirmation_option()
 @click.pass_context
 @_use_meltano_env
 def reset(ctx, store) -> None:  # noqa: ANN001

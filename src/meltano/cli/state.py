@@ -134,7 +134,7 @@ def list_state(ctx: click.Context, pattern: str | None) -> None:
         for state_id, state in states.items():
             if state:
                 try:
-                    state_service.validate_state(json.dumps(state))
+                    state_service.validate_state(state)
                 except (InvalidJobStateError, json.decoder.JSONDecodeError):
                     click.secho(state_id, fg="red")
                 else:
@@ -309,13 +309,35 @@ def get_state(ctx: click.Context, project: Project, state_id: str) -> None:
 
 
 @meltano_state.command(cls=InstrumentedCmd, name="clear")
-@prompt_for_confirmation(prompt="This will clear state for the job. Continue?")
-@click.argument("state-id")
+@prompt_for_confirmation(prompt="This will clear state for the job(s). Continue?")
+@click.argument("state-id", required=False)
+@click.option(
+    "--all",
+    "clear_all",
+    is_flag=True,
+    required=False,
+    help="Clear all states IDs.",
+)
 @pass_project(migrate=True)
 @click.pass_context
-def clear_state(ctx: click.Context, project: Project, state_id: str) -> None:
+def clear_state(
+    ctx: click.Context,
+    project: Project,
+    state_id: str | None,
+    clear_all: bool,  # noqa: FBT001
+) -> None:
     """Clear state."""
-    state_service: StateService = (
-        state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
-    )
-    state_service.clear_state(state_id)
+    # Case where neither or both have been provided
+    if bool(state_id) == clear_all:
+        msg = "A state ID or the --all flag must be provided, but not both"
+        raise click.UsageError(msg)
+    if state_id:
+        state_service: StateService = (
+            state_service_from_state_id(project, state_id) or ctx.obj[STATE_SERVICE_KEY]
+        )
+        state_service.clear_state(state_id)
+    if clear_all:
+        state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+        count = state_service.clear_all_states()
+        msg = f"{count} state(s) were successfully cleared"
+        logger.info(msg)

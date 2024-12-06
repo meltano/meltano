@@ -11,13 +11,15 @@ from meltano.core.plugin import BasePlugin
 from meltano.core.utils import nest_object
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
 
 
 class SingerPlugin(BasePlugin):  # noqa: D101
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
         """Initialize a `SingerPlugin`.
 
         Args:
@@ -30,7 +32,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         # errors from Canonical.
         self._instance_uuid: str | None = None
 
-    def process_config(self, flat_config) -> dict:  # noqa: ANN001, D102
+    def process_config(self, flat_config: dict) -> dict:  # noqa: D102
         non_null_config = {k: v for k, v in flat_config.items() if v is not None}
         processed_config = nest_object(non_null_config)
         # Result at this point will contain duplicate entries for nested config
@@ -51,7 +53,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ANN001, ARG002
+        session: Session,  # noqa: ARG002
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
@@ -62,7 +64,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 
     @hook("before_cleanup")
-    async def before_cleanup(self, invoker) -> None:  # noqa: ANN001
+    async def before_cleanup(self, invoker: PluginInvoker) -> None:
         """Delete configuration file."""
         config_path = invoker.files["config"]
         config_path.unlink()

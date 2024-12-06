@@ -99,7 +99,7 @@ class Project(Versioned):
             os.getenv(PROJECT_SYS_DIR_ROOT_ENV, self.root / ".meltano"),
         ).resolve()
 
-    def refresh(self, **kwargs) -> None:  # noqa: ANN003
+    def refresh(self, **kwargs: t.Any) -> None:
         """Refresh the project instance to reflect external changes.
 
         This should be called whenever env vars change, project files change,
@@ -128,7 +128,7 @@ class Project(Versioned):
         self.__dict__.update(cls(**kwargs).__dict__)
 
     @cached_property
-    def config_service(self):  # noqa: ANN201
+    def config_service(self) -> ConfigService:
         """Get the project config service.
 
         Returns:
@@ -146,7 +146,7 @@ class Project(Versioned):
         return ProjectFiles(root=self.root, meltano_file_path=self.meltanofile)
 
     @cached_property
-    def settings(self):  # noqa: ANN201
+    def settings(self) -> ProjectSettingsService:
         """Get the project settings.
 
         Returns:
@@ -155,7 +155,7 @@ class Project(Versioned):
         return ProjectSettingsService(self)
 
     @cached_property
-    def plugins(self):  # noqa: ANN201
+    def plugins(self) -> ProjectPluginsService:
         """Get the project plugins.
 
         Returns:
@@ -164,7 +164,7 @@ class Project(Versioned):
         return ProjectPluginsService(self)
 
     @cached_property
-    def hub_service(self):  # noqa: ANN201
+    def hub_service(self) -> MeltanoHubService:
         """Get the Meltano Hub service.
 
         Returns:
@@ -173,11 +173,11 @@ class Project(Versioned):
         return MeltanoHubService(self)
 
     @cached_property
-    def _meltano_interprocess_lock(self):  # noqa: ANN202
+    def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
         return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
     @property
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, str]:
         """Get environment variables for this project.
 
         Returns:
@@ -250,7 +250,7 @@ class Project(Versioned):
         cls._default = None
 
     @property
-    def file_version(self):  # noqa: ANN201
+    def file_version(self) -> int:
         """Get the version of Meltano found in this project's meltano.yml.
 
         Returns:
@@ -260,7 +260,12 @@ class Project(Versioned):
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
-    def find(cls, project_root: Path | str | None = None, *, activate=True):  # noqa: ANN001, ANN206
+    def find(
+        cls,
+        project_root: Path | str | None = None,
+        *,
+        activate: bool = True,
+    ) -> Project:
         """Find a Project.
 
         Args:
@@ -408,7 +413,7 @@ class Project(Versioned):
             self.refresh(environment=None)
 
     @contextmanager
-    def dotenv_update(self):  # noqa: ANN201
+    def dotenv_update(self) -> Generator[Path, None, None]:
         """Raise error if project is readonly.
 
         Used in context where .env files would be updated.
@@ -504,7 +509,12 @@ class Project(Versioned):
         return self.meltano_dir("logs", *joinpaths, make_dirs=make_dirs)
 
     @makedirs
-    def job_dir(self, state_id, *joinpaths: StrPath, make_dirs: bool = True) -> Path:  # noqa: ANN001
+    def job_dir(
+        self,
+        state_id: str,
+        *joinpaths: StrPath,
+        make_dirs: bool = True,
+    ) -> Path:
         """Path to the `elt` directory in `.meltano/run`.
 
         Args:
@@ -525,7 +535,7 @@ class Project(Versioned):
     @makedirs
     def job_logs_dir(
         self,
-        state_id,  # noqa: ANN001
+        state_id: str,
         *joinpaths: StrPath,
         make_dirs: bool = True,
     ) -> Path:
@@ -584,14 +594,14 @@ class Project(Versioned):
         return self.root_dir("plugins", *joinpaths)
 
     @makedirs
-    def plugin_lock_path(  # noqa: ANN201
+    def plugin_lock_path(
         self,
         plugin_type: str,
         plugin_name: str,
         *,
         variant_name: str | None = None,
         make_dirs: bool = True,
-    ):
+    ) -> Path:
         """Path to the project lock file.
 
         Args:
@@ -614,7 +624,7 @@ class Project(Versioned):
             make_dirs=make_dirs,
         )
 
-    def __eq__(self, other):  # noqa: ANN001, ANN204
+    def __eq__(self, other: object) -> bool:
         """Project equivalence check.
 
         Args:
@@ -625,7 +635,7 @@ class Project(Versioned):
         """
         return self.root == getattr(other, "root", object())
 
-    def __hash__(self):  # noqa: ANN204
+    def __hash__(self) -> int:
         """Project hash.
 
         Returns:

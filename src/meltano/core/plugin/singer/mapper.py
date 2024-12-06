@@ -15,6 +15,8 @@ from . import PluginType, SingerPlugin
 if t.TYPE_CHECKING:
     from pathlib import Path
 
+    from sqlalchemy.orm import Session
+
     from meltano.core.plugin_invoker import PluginInvoker
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -53,7 +55,7 @@ class SingerMapper(SingerPlugin):
     async def before_configure(
         self,
         invoker: PluginInvoker,
-        session,  # noqa: ANN001, ARG002
+        session: Session,  # noqa: ARG002
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]

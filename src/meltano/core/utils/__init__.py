@@ -170,7 +170,14 @@ def are_similar_types(left, right):  # noqa: ANN001, ANN201, D103
     return isinstance(left, type(right)) or isinstance(right, type(left))
 
 
-def nest(d: dict, path: str, value=None, maxsplit=-1, *, force=False):  # noqa: ANN001, ANN201
+def nest(
+    d: dict[str, t.Any],
+    path: str,
+    value: t.Any = None,  # noqa: ANN401
+    maxsplit: int = -1,
+    *,
+    force: bool = False,
+) -> dict[str, dict[str, t.Any]]:
     """Create a hierarchical dictionary path and return the leaf dict.
 
     Args:

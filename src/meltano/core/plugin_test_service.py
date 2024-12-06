@@ -105,7 +105,10 @@ class ExtractorTestService(PluginTestService):
         returncode = await process.wait()
         logger.debug("Process return code: %s", returncode)
 
-        return (
-            record_message_received,
-            last_line if returncode else "No RECORD or BATCH message received",
+        user_message = (
+            "No RECORD or BATCH message received. "
+            "Verify that at least one stream is selected using "
+            f"'meltano select {self.plugin_invoker.plugin.name} --list'."
         )
+
+        return (record_message_received, last_line if returncode else user_message)

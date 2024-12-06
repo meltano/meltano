@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import importlib.resources
 
 import pytest
 
@@ -24,4 +24,4 @@ def docker_compose_file() -> str:
     Returns:
         The absolute path to the `docker-compose.yml` file used by `pytest-docker`.
     """
-    return str(Path(__file__).parent.resolve() / "docker-compose.yml")
+    return str(importlib.resources.files(__package__) / "docker-compose.yml")
