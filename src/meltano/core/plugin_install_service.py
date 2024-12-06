@@ -511,6 +511,7 @@ def get_pip_install_args(
         project: Meltano Project.
         plugin: `ProjectPlugin` to get pip install arguments for.
         env: Optional environment variables to use when expanding the pip install args.
+        requirements_file: Optional requirements file to install dependencies from.
         if_missing: The behaviour flow to follow when a environment variable is not
             present when expanding the pip URL
 
@@ -681,6 +682,11 @@ async def install_pip_plugin(
 
 @contextmanager
 def temp_file(path: Path) -> t.Generator[io.TextIOWrapper, None, None]:
+    """Context manager for a temporary file.
+
+    Args:
+       path: Path to create the temporary file at
+    """
     if path.exists():
         msg = f"Cannot create temp file at {path}"
         raise FileExistsError(msg)
