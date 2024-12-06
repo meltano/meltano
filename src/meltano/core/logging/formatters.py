@@ -7,6 +7,7 @@ import typing as t
 
 import click
 import structlog
+import structlog.typing
 from rich.console import Console
 from rich.traceback import Traceback, install
 
@@ -103,7 +104,10 @@ def rich_exception_formatter_factory(
     return _traceback
 
 
-def _process_formatter(*processors: Processor) -> structlog.stdlib.ProcessorFormatter:
+def _process_formatter(
+    *processors: Processor,
+    **kwargs: t.Any,
+) -> structlog.stdlib.ProcessorFormatter:
     """Use _process_formatter to configure a structlog.stdlib.ProcessFormatter.
 
     It will automatically add log level and timestamp fields to any log entries
@@ -112,6 +116,8 @@ def _process_formatter(*processors: Processor) -> structlog.stdlib.ProcessorForm
     Args:
         *processors: One or more structlog message processors such as
             `structlog.dev.ConsoleRenderer`.
+        **kwargs: Additional keyword arguments to pass to the logging.Formatter
+            constructor.
 
     Returns:
         A log record formatter.
@@ -119,6 +125,7 @@ def _process_formatter(*processors: Processor) -> structlog.stdlib.ProcessorForm
     return structlog.stdlib.ProcessorFormatter(
         processors=processors,
         foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+        **kwargs,
     )
 
 
@@ -209,4 +216,59 @@ def json_formatter(
         *_processors_from_kwargs(**features),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.processors.JSONRenderer(),
+    )
+
+
+def _event_renderer(
+    logger: structlog.typing.WrappedLogger,  # noqa: ARG001
+    name: str,  # noqa: ARG001
+    event_dict: structlog.typing.EventDict,
+) -> str | bytes:
+    """Render an event dictionary as a string.
+
+    Args:
+        logger: The logger instance.
+        name: The logger name.
+        event_dict: The event dictionary.
+
+    Returns:
+        The rendered event dictionary.
+    """
+    return event_dict["event"]
+
+
+def simple_formatter(
+    *,
+    fmt: str | None = None,
+    datefmt: str | None = None,
+    style: str = "%",
+    validate: bool = True,
+    **features: Unpack[LoggingFeatures],
+) -> structlog.stdlib.ProcessorFormatter:
+    """Create a logging formatter that renders lines in a simple format.
+
+    Args:
+        fmt: The format string.
+        datefmt: The date format string.
+        style: The format style.
+        validate: Whether to validate the format string.
+        features: Logging features to enable.
+
+    Returns:
+        A configured simple formatter.
+    """
+    return _process_formatter(
+        *_processors_from_kwargs(**features),
+        structlog.stdlib.filter_by_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        _event_renderer,
+        fmt=fmt,
+        datefmt=datefmt,
+        style=style,
+        validate=validate,
     )
