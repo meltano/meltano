@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from .formatters import console_log_formatter, json_formatter, key_value_formatter
+from .formatters import (
+    console_log_formatter,
+    json_formatter,
+    key_value_formatter,
+    simple_formatter,
+)
 from .job_logging_service import (
     JobLoggingService,
     MissingJobLogException,
@@ -23,4 +28,5 @@ __all__ = [
     "json_formatter",
     "key_value_formatter",
     "setup_logging",
+    "simple_formatter",
 ]
