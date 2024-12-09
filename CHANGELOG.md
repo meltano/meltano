@@ -3,6 +3,63 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.6.0 (2024-12-09)
+
+### ✨ New
+
+- [#8944](https://github.com/meltano/meltano/issues/8944) Suggest verifying stream selection after `meltano config ... test` fails
+- [#8917](https://github.com/meltano/meltano/issues/8917) Bumped the default `elt.buffer_size` to 100 MiB
+- [#8913](https://github.com/meltano/meltano/issues/8913) Include the Python version and machine type in system debug log message
+- [#8894](https://github.com/meltano/meltano/issues/8894) Fields marked as `unsupported` in the catalog are now marked as such in the output of `meltano select --list --all`
+- [#8889](https://github.com/meltano/meltano/issues/8889) The `args` attribute of plugin commands is now optional
+- [#8786](https://github.com/meltano/meltano/issues/8786) Added an `--all` flag to `meltano state clear` to delete all state IDs -- _**Thanks @fauzxan!**_
+- [#8735](https://github.com/meltano/meltano/issues/8735) Add Content-Type to S3 state file uploads
+- [#8844](https://github.com/meltano/meltano/issues/8844) Support an environment variable for the `--full-refresh` flag -- _**Thanks @MutuT2!**_
+- [#8618](https://github.com/meltano/meltano/issues/8618) Python 3.13 is now supported
+- [#8737](https://github.com/meltano/meltano/issues/8737) Added `exceptions` to the log message when using the JSON formatter
+- [#8626](https://github.com/meltano/meltano/issues/8626) Added a `--run-id` option to `meltano el[t]`
+- [#8494](https://github.com/meltano/meltano/issues/8494) Added a `callsite_parameters` argument to the builtin log formatters, which adds source path, line number and function name fields to the emitted log
+
+### 🐛 Fixes
+
+- [#8949](https://github.com/meltano/meltano/issues/8949) Add newline at the end of plugin lock files
+- [#8914](https://github.com/meltano/meltano/issues/8914) Ask for confirmation in `meltano config ... reset`
+- [#8869](https://github.com/meltano/meltano/issues/8869) Adding User friendly loader error when the loader is missing from the Meltano run. -- _**Thanks @NishitSingh2023!**_
+- [#8852](https://github.com/meltano/meltano/issues/8852) Using the `--force` flag of `meltano install` no longer causes plugin installation to crash when using the `uv` venv backend
+- [#8828](https://github.com/meltano/meltano/issues/8828) Show the correct value in the "Current value is still" warning for `meltano config set` -- _**Thanks @ReubenFrankel!**_
+- [#8815](https://github.com/meltano/meltano/issues/8815) A mapper is now auto-installed when one of its mappings is used in a command -- _**Thanks @ReubenFrankel!**_
+
+### ⚙️ Under the Hood
+
+- [#8851](https://github.com/meltano/meltano/issues/8851) Decoupled the `JobState` ORM model of the system db from state store implementations
+- [#8898](https://github.com/meltano/meltano/issues/8898) Use `importlib.resources` to read package files and use `importlib.metadata` to detect "editable" installations (via PEP 610)
+- [#8830](https://github.com/meltano/meltano/issues/8830) Dropped support for EOL Python 3.8
+
+### 📚 Documentation Improvements
+
+- [#8950](https://github.com/meltano/meltano/issues/8950) Document Git requirement and add `uv` section
+- [#8937](https://github.com/meltano/meltano/issues/8937) Use tabs for code blocks with OS-specific instructions in Getting Started guide
+- [#8934](https://github.com/meltano/meltano/issues/8934) Document a logging example to log at DEBUG level but excluding extractor/loader stdout
+- [#8909](https://github.com/meltano/meltano/issues/8909) Update part1.mdx
+- [#8829](https://github.com/meltano/meltano/issues/8829) Update Azure state backend connection documentation for DefaultAzureCredential -- _**Thanks @acarter24!**_
+- [#8809](https://github.com/meltano/meltano/issues/8809) Bumped Docusaurus to 3.1, fixed broken links and started printing warnings on broken anchors
+- [#8752](https://github.com/meltano/meltano/issues/8752) Added 2024-Q3 changelog
+- [#8808](https://github.com/meltano/meltano/issues/8808) Fixed broken anchor links in settings page
+
+### 📦 Packaging changes
+
+- [#8956](https://github.com/meltano/meltano/issues/8956) Bump the runtime-dependencies group with 3 updates
+- [#8947](https://github.com/meltano/meltano/issues/8947) Bump the runtime-dependencies group with 3 updates
+- [#8943](https://github.com/meltano/meltano/issues/8943) Bump the runtime-dependencies group with 2 updates
+- [#8931](https://github.com/meltano/meltano/issues/8931) Bump the runtime-dependencies group with 6 updates
+- [#8907](https://github.com/meltano/meltano/issues/8907) Bump the runtime-dependencies group with 4 updates
+- [#8910](https://github.com/meltano/meltano/issues/8910) Bump aiohttp from 3.10.10 to 3.10.11
+- [#8883](https://github.com/meltano/meltano/issues/8883) Bump the runtime-dependencies group with 4 updates
+- [#8873](https://github.com/meltano/meltano/issues/8873) Bump the runtime-dependencies group with 4 updates
+- [#8860](https://github.com/meltano/meltano/issues/8860) Bump the runtime-dependencies group with 3 updates
+- [#8849](https://github.com/meltano/meltano/issues/8849) Bump the runtime-dependencies group with 2 updates
+- [#8841](https://github.com/meltano/meltano/issues/8841) Bump boto3 from 1.35.41 to 1.35.42 in the runtime-dependencies group
+
 ## v3.5.4 (2024-09-25)
 
 ### 🐛 Fixes
