@@ -25,9 +25,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#8949](https://github.com/meltano/meltano/issues/8949) Add newline at the end of plugin lock files
 - [#8914](https://github.com/meltano/meltano/issues/8914) Ask for confirmation in `meltano config ... reset`
 - [#8869](https://github.com/meltano/meltano/issues/8869) Adding User friendly loader error when the loader is missing from the Meltano run. -- _**Thanks @NishitSingh2023!**_
-- [#8852](https://github.com/meltano/meltano/issues/8852) Using the `--force` flag of `meltano install` no longer causes plugin installation to crash
+- [#8852](https://github.com/meltano/meltano/issues/8852) Using the `--force` flag of `meltano install` no longer causes plugin installation to crash when using the `uv` venv backend
 - [#8828](https://github.com/meltano/meltano/issues/8828) Show the correct value in the "Current value is still" warning for `meltano config set` -- _**Thanks @ReubenFrankel!**_
-- [#8815](https://github.com/meltano/meltano/issues/8815) A mapper is now auto-installed when one its mappings is used in a command -- _**Thanks @ReubenFrankel!**_
+- [#8815](https://github.com/meltano/meltano/issues/8815) A mapper is now auto-installed when one of its mappings is used in a command -- _**Thanks @ReubenFrankel!**_
 
 ### ⚙️ Under the Hood
 
@@ -56,7 +56,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#8910](https://github.com/meltano/meltano/issues/8910) Bump aiohttp from 3.10.10 to 3.10.11
 - [#8883](https://github.com/meltano/meltano/issues/8883) Bump the runtime-dependencies group with 4 updates
 - [#8873](https://github.com/meltano/meltano/issues/8873) Bump the runtime-dependencies group with 4 updates
-- [#8865](https://github.com/meltano/meltano/issues/8865) Pin `croniter` to 3.0.4
 - [#8860](https://github.com/meltano/meltano/issues/8860) Bump the runtime-dependencies group with 3 updates
 - [#8849](https://github.com/meltano/meltano/issues/8849) Bump the runtime-dependencies group with 2 updates
 - [#8841](https://github.com/meltano/meltano/issues/8841) Bump boto3 from 1.35.41 to 1.35.42 in the runtime-dependencies group
