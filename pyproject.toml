@@ -93,7 +93,7 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.72"}
+boto3-stubs = {extras = ["essential"], version = "1.35.76"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
@@ -111,7 +111,7 @@ pytest-xdist = "^3.6"
 requests-mock = "^1.12.1"
 setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
 time-machine = "^2.15.0"
-types-croniter = "==4.0.0.20241030"
+types-croniter = "==5.0.1.20241205"
 types-jsonschema = "^4.23.0.20240813"
 types-psutil = "^6.1.0.20241102"
 types-pyyaml = "^6.0.12.20240917"
