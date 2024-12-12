@@ -237,7 +237,7 @@ def _event_renderer(
     return event_dict["event"]
 
 
-def simple_formatter(
+def plain_formatter(
     *,
     fmt: str | None = None,
     datefmt: str | None = None,

@@ -6,7 +6,7 @@ from .formatters import (
     console_log_formatter,
     json_formatter,
     key_value_formatter,
-    simple_formatter,
+    plain_formatter,
 )
 from .job_logging_service import (
     JobLoggingService,
@@ -27,6 +27,6 @@ __all__ = [
     "console_log_formatter",
     "json_formatter",
     "key_value_formatter",
+    "plain_formatter",
     "setup_logging",
-    "simple_formatter",
 ]

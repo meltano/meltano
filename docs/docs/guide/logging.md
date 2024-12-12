@@ -26,6 +26,7 @@ A few key points to note:
    - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
+   - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
 2. Different loggers can use different handlers and log at different log levels.
 3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
 

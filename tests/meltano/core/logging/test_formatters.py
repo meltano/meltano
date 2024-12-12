@@ -150,15 +150,15 @@ class TestLogFormatters:
 
         assert "exception" not in message_dict
 
-    def test_simple_formatter(self, record) -> None:
-        formatter = formatters.simple_formatter(fmt="%(levelname)s %(name)s")
+    def test_plain_formatter(self, record) -> None:
+        formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
         formatter.logger = logging.getLogger("test")  # noqa: TID251
         formatter.logger.setLevel(logging.INFO)
         output = formatter.format(record)
         assert output == "INFO test"
 
-    def test_simple_formatter_drop_event(self, record) -> None:
-        formatter = formatters.simple_formatter(fmt="%(levelname)s %(name)s")
+    def test_plain_formatter_drop_event(self, record) -> None:
+        formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
         formatter.logger = logging.getLogger("test")  # noqa: TID251
         formatter.logger.setLevel(logging.WARNING)
 
