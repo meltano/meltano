@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import platform
-from datetime import datetime, timezone
+import typing as t
+from datetime import date, datetime, timezone
 
 import mock
 import pytest
@@ -17,6 +18,9 @@ from meltano.core.schedule_service import (
     ScheduleNotFoundError,
     SettingMissingError,
 )
+
+if t.TYPE_CHECKING:
+    from meltano.core.schedule_service import ScheduleService
 
 
 @pytest.fixture(scope="session")
@@ -167,14 +171,14 @@ class TestScheduleService:
 
     def test_schedule_start_date(
         self,
-        subject,
+        subject: ScheduleService,
         session,
         tap,
         target,
         plugin_settings_service_factory,
     ) -> None:
         # curry the `add_elt` method to remove some arguments
-        def add_elt(name, start_date):
+        def add_elt(name: str, start_date: str | date | datetime | None) -> Schedule:
             return subject.add_elt(
                 session,
                 name,
@@ -196,6 +200,22 @@ class TestScheduleService:
         plugin_settings_service.set("start_date", mock_date, session=session)
         schedule = add_elt("with_default_start_date", None)
         assert schedule.start_date == mock_date
+
+        # plugin start_date parsed as datetime.date is coerced to datetime.datetime
+        with mock.patch(
+            "meltano.core.schedule_service.PluginSettingsService.get",
+            return_value=mock_date.date(),
+        ):
+            schedule = add_elt("with_date_start_date", None)
+            assert schedule.start_date == mock_date.replace(tzinfo=None)
+
+        # plugin start_date is a datetime.datetime instance
+        with mock.patch(
+            "meltano.core.schedule_service.PluginSettingsService.get",
+            return_value=mock_date,
+        ):
+            schedule = add_elt("with_datetime_start_date", None)
+            assert schedule.start_date == mock_date
 
         # or default to `utcnow()` if the plugin exposes no config
         with mock.patch(
