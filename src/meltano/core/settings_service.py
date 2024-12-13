@@ -531,7 +531,12 @@ class SettingsService(metaclass=ABCMeta):
         value, _ = self.set_with_metadata(*args, **kwargs)
         return value
 
-    def unset(self, path: list[str], store=SettingValueStore.AUTO, **kwargs):  # noqa: ANN001, ANN003, ANN201
+    def unset(
+        self,
+        path: list[str] | str,
+        store: SettingValueStore = SettingValueStore.AUTO,
+        **kwargs: t.Any,
+    ) -> dict:
         """Unset a setting.
 
         Args:

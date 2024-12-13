@@ -35,7 +35,7 @@ def selection_color(selection: SelectionType) -> str | None:
     if selection is SelectionType.UNSUPPORTED:
         return "black"
 
-    return None  # pragma: no cover
+    return None  # type: ignore[unreachable]  # pragma: no cover
 
 
 def selection_mark(selection) -> str:  # noqa: ANN001

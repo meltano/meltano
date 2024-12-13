@@ -39,7 +39,7 @@ class ValidationOutcome(StrEnum):
         Returns:
             The string name of a color for this outcome.
         """
-        return "green" if self == self.SUCCESS else "red"
+        return "green" if self == ValidationOutcome.SUCCESS else "red"
 
     @classmethod
     def from_exit_code(cls, exit_code: int):  # noqa: ANN206

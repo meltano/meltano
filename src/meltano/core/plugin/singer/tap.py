@@ -685,7 +685,7 @@ class SingerTap(SingerPlugin):
         stream_dict = {
             stream.get("tap_stream_id"): stream
             for stream in catalog.get("streams", [])
-            if isinstance(stream, dict)
+            if isinstance(stream, dict)  # type: ignore[redundant-expr]
         }
 
         def is_not_star(x):  # noqa: ANN001, ANN202

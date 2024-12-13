@@ -198,7 +198,7 @@ class ScheduleService:
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting
-        if isinstance(start_date, date):
+        if isinstance(start_date, date) and not isinstance(start_date, datetime):
             return coerce_datetime(start_date)
 
         if isinstance(start_date, datetime):

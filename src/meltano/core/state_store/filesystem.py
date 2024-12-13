@@ -235,7 +235,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                     float(reader.read()),
                     tz=timezone.utc,
                 )
-                if locked_at and locked_at < (
+                if locked_at < (
                     datetime.now(timezone.utc)
                     - timedelta(
                         seconds=self.lock_timeout_seconds,
