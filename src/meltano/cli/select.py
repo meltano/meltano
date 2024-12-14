@@ -23,7 +23,7 @@ if t.TYPE_CHECKING:
 install, no_install, only_install = get_install_options(include_only_install=True)
 
 
-def selection_color(selection: SelectionType) -> str | None:
+def selection_color(selection: SelectionType) -> str:
     """Return the appropriate colour for given SelectionType."""
     # TODO: Use a match statement when we drop Python 3.9 support
     if selection is SelectionType.SELECTED:
@@ -35,7 +35,7 @@ def selection_color(selection: SelectionType) -> str | None:
     if selection is SelectionType.UNSUPPORTED:
         return "black"
 
-    return None  # type: ignore[unreachable]  # pragma: no cover
+    t.assert_never(selection)
 
 
 def selection_mark(selection) -> str:  # noqa: ANN001
