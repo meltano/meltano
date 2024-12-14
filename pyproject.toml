@@ -187,6 +187,7 @@ source = [
 [tool.coverage.report]
 exclude_also = [
   '''if (t\.)?TYPE_CHECKING:''',
+  '''(t\.)?assert_never''',
   "\\.\\.\\.",
 ]
 precision = 2
