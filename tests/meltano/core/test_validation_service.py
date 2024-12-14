@@ -6,7 +6,7 @@ import pytest
 from mock import Mock
 
 from meltano.core.plugin import PluginType
-from meltano.core.validation_service import ValidationsRunner
+from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -57,3 +57,13 @@ class TestValidationsRunner:
 
         collected["dbt"].select_all()
         assert collected["dbt"].tests_selection["test"]
+
+    def test_validation_outcome(self):
+        assert ValidationOutcome.from_exit_code(0) == ValidationOutcome.SUCCESS
+        assert ValidationOutcome.from_exit_code(1) == ValidationOutcome.FAILURE
+
+        outcome = ValidationOutcome.SUCCESS
+        assert outcome.color == "green"
+
+        outcome = ValidationOutcome.FAILURE
+        assert outcome.color == "red"

@@ -121,7 +121,18 @@ types-requests = "^2.31.0"
 meltano = "meltano.cli:main"
 
 [tool.pytest.ini_options]
-addopts = "--cov=meltano --cov=tests --doctest-modules --durations=10 --order-scope=module -ra -n auto --dist=loadfile"
+addopts = [
+  "--cov=meltano",
+  "--cov=tests",
+  "--doctest-modules",
+  "--durations=10",
+  "--order-scope=module",
+  "-ra",
+  "-n=auto",
+  "--dist=loadfile",
+  "--strict-config",
+  "--strict-markers",
+]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "class"
 filterwarnings = [
@@ -143,9 +154,11 @@ markers = [
   "concurrent: test requires true concurrency",
   "slow: slow test",
 ]
+minversion = "8"
 testpaths = [
   "tests/",
 ]
+xfail_strict = true
 
 [tool.coverage.run]
 branch = true
@@ -174,6 +187,7 @@ source = [
 [tool.coverage.report]
 exclude_also = [
   '''if (t\.)?TYPE_CHECKING:''',
+  '''(t\.)?assert_never''',
   "\\.\\.\\.",
 ]
 precision = 2
@@ -194,6 +208,7 @@ version_files = [
 ]
 
 [tool.mypy]
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 incremental = false # Disabled until https://github.com/python/mypy/issues/12664 is resolved
 files = [
   "src/meltano/",
@@ -201,6 +216,7 @@ files = [
 exclude = [
   "src/meltano/migrations/",
 ]
+warn_unreachable = true
 warn_unused_configs = true
 warn_unused_ignores = true
 
@@ -256,10 +272,7 @@ target-version = "py39"
 
 [tool.ruff.lint]
 ignore = [
-  "ANN101", # Missing type annotation for `self` in method
-  "ANN102", # Missing type annotation for `cls` in class method
   "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "PT004",  # Add leading underscore to fixtures that do not return anything
   "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
   "S310",   # Allow `urllib.open`
   "S603",   # Allow `subprocess.run(..., shell=False)`
@@ -299,7 +312,7 @@ select = [
   "SIM",  # flake8-simplify
   "T10",  # flake8-debugger
   "T20",  # flake8-print
-  "TCH",  # flake8-type-checking
+  "TC",   # flake8-type-checking
   "TID",  # flake8-tidy-imports
   "UP",   # pyupgrade
   "W",    # pycodestyle (warning)
@@ -323,7 +336,7 @@ unfixable = [
     "D103",
     "D415",
     "INP001",
-    "TCH003",
+    "TC003",
     "TID251",
     "UP007",
 ]

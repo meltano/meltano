@@ -240,7 +240,7 @@ def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
         "\nDefault: no settings\n",
     )
 
-    settings = None
+    settings: list | None = None
     while settings is None:  # allows lambda in loop
         settings_input = click.prompt(
             click.style("(settings)", fg="blue"),

@@ -33,7 +33,7 @@ class BookmarkWriter:
 
     def __init__(
         self,
-        job: Job,
+        job: Job | None,
         session: Session,
         payload_flag: int = Payload.STATE,
         state_service: StateService | None = None,
@@ -138,7 +138,7 @@ class SingerTarget(SingerPlugin):
     async def setup_bookmark_writer_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: list[str],
+        exec_args: list[str] | None,
     ) -> None:
         """Before invoke hook to trigger setting up the bookmark writer for this target.
 
@@ -146,8 +146,7 @@ class SingerTarget(SingerPlugin):
             plugin_invoker: The invocation handler of the plugin instance.
             exec_args: List of subcommand/args that we where invoked with.
         """
-        if exec_args is None:
-            exec_args = []
+        exec_args = exec_args or []
 
         if "--discover" in exec_args or "--help" in exec_args:
             return

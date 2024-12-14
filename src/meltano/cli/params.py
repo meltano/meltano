@@ -53,12 +53,11 @@ def _install_plugins_fn(
     return install_plugins
 
 
-async def _install_plugins_and_exit(*args, **kwargs) -> bool:  # noqa: ANN002, ANN003
+async def _install_plugins_and_exit(*args: t.Any, **kwargs: t.Any) -> t.NoReturn:
     kwargs.pop("reason", None)
     await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
     context = click.get_current_context()
     context.exit(code=0)
-    return True  # pragma: no cover
 
 
 def database_uri_option(func):  # noqa: ANN001, ANN201

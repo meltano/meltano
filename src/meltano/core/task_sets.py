@@ -142,7 +142,7 @@ def tasks_from_yaml_str(name: str, yaml_str: str) -> TaskSets:
         InvalidTasksError: If the yaml string failed to parse or failed to
             validate against the `TASKS_JSON_SCHEMA`.
     """
-    tasks = []
+    tasks: list[str] | str = []
     try:
         tasks = yaml.safe_load(yaml_str)
     except yaml.parser.ParserError as yerr:

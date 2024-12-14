@@ -390,7 +390,7 @@ def set_(
     value: t.Any,  # noqa: ANN401
     store: str,
     interactive: bool,
-    from_file: t.TextIO,
+    from_file: t.TextIO | None,
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
     if len(setting_name) == 1:
@@ -402,7 +402,7 @@ def set_(
         interaction.configure_all()
         ctx.exit()
 
-    if from_file:
+    if from_file is not None:
         setting_name += (value,)
         value = from_file.read().strip()
 

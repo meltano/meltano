@@ -36,7 +36,13 @@ path_type = click.Path(file_okay=False, path_type=Path)
     is_flag=True,
 )
 @database_uri_option
-def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool) -> None:  # noqa: ANN001
+def init(
+    ctx: click.Context,
+    project_directory: Path | None,
+    *,
+    no_usage_stats: bool,
+    force: bool,
+) -> None:
     """Create a new Meltano project.
 
     \b
@@ -57,7 +63,7 @@ def init(ctx, project_directory: Path, *, no_usage_stats: bool, force: bool) -> 
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
-    init_service = ProjectInitService(project_directory)
+    init_service = ProjectInitService(project_directory)  # type: ignore[arg-type]
 
     project = init_service.init(force=force)
     init_service.echo_instructions(project)
