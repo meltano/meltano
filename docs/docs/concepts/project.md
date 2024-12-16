@@ -397,11 +397,11 @@ Meltano's CLI utilizes the following tables:
 
 Meltano is currently tested with the following databases as backends for state and configuration:
 
-| Database      | Supported Versions                      | Extra Requirement                                                                 |
-| :------------ | :-------------------------------------- | :-------------------------------------------------------------------------------- |
-| SQLite        | Version `3.25.0` or higher is required. | None                                                                              |
-| PostgreSQL    | Version `13` or higher is required.     | [`postgres` or `psycopg2`](/guide/advanced-topics#installing-optional-components) |
-| MS SQL Server | Version `2019` or higher is required.   | [`mssql`](/guide/advanced-topics#installing-optional-components)                  |
+| Database      | Supported Versions                      | Extra Requirement                                                                 | Example URL                                                     |
+| :------------ | :-------------------------------------- | :-------------------------------------------------------------------------------- | :-------------------------------------------------------------- |
+| SQLite        | Version `3.25.0` or higher is required. | None                                                                              | `sqlite:///$MELTANO_SYS_DIR_ROOT/meltano.db` (default)          |
+| PostgreSQL    | Version `13` or higher is required.     | [`postgres` or `psycopg2`](/guide/advanced-topics#installing-optional-components) | `postgresql+psycopg://<user>:<password>@<host>:<port>/<dbname>` |
+| MS SQL Server | Version `2019` or higher is required.   | [`mssql`](/guide/advanced-topics#installing-optional-components)                  | `mssql+pymssql://<user>:<password@<freetds_name>/?charset=utf8` |
 
 Support for other databases has been requested and is being tracked in the following issues:
 
