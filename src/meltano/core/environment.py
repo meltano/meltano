@@ -7,7 +7,7 @@ import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition

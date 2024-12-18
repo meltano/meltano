@@ -6,6 +6,7 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import (
     CloudStateStoreManager,
     InvalidStateBackendConfigurationException,
@@ -47,6 +48,30 @@ def requires_boto3() -> Generator[None, None, None]:
     if not BOTO_INSTALLED:
         raise MissingBoto3Error
     yield
+
+
+AWS_ACCESS_KEY_ID = SettingDefinition(
+    name="state_backend.s3.aws_access_key_id",
+    label="AWS Access Key ID",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+AWS_SECRET_ACCESS_KEY = SettingDefinition(
+    name="state_backend.s3.aws_secret_access_key",
+    label="AWS Secret Access Key",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+ENDPOINT_URL = SettingDefinition(
+    name="state_backend.s3.endpoint_url",
+    label="Endpoint URL",
+    kind=SettingKind.STRING,
+    env_specific=True,
+)
 
 
 class S3StateStoreManager(CloudStateStoreManager):

@@ -17,7 +17,6 @@ from meltano.core.error import MeltanoError
 from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
 from meltano.core.project_plugins_service import PluginType
 from meltano.core.state_service import StateService
-from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
     from sqlalchemy.engine import Engine
@@ -193,6 +192,8 @@ class UpgradeService:
 
         See: https://github.com/meltano/meltano/issues/7938
         """
+        from meltano.core.state_store.filesystem import CloudStateStoreManager
+
         state_service = StateService(project=self.project)
         manager = state_service.state_store_manager
         if isinstance(manager, CloudStateStoreManager):
