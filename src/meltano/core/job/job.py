@@ -178,6 +178,17 @@ class Job(SystemModel):
         """
         return self.state is State.RUNNING
 
+    def valid_intil(self) -> datetime:
+        """Return the datetime when this job goes stale.
+
+        Returns:
+            datetime when this job goes stale
+        """
+        if self.last_heartbeat_at:
+            return self.last_heartbeat_at + timedelta(minutes=HEARTBEAT_VALID_MINUTES)
+
+        return self.started_at + timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
+
     def is_stale(self) -> bool:
         """Return whether Job has gone stale.
 
@@ -192,14 +203,7 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        if self.last_heartbeat_at:
-            timestamp = self.last_heartbeat_at
-            valid_for = timedelta(minutes=HEARTBEAT_VALID_MINUTES)
-        else:
-            timestamp = self.started_at
-            valid_for = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS)
-
-        return datetime.now(timezone.utc) - timestamp > valid_for
+        return datetime.now(timezone.utc) > self.valid_intil()
 
     def has_error(self) -> bool:
         """Return whether a job has failed.
