@@ -277,7 +277,6 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = [
-  "meltano.cli.add",
   "meltano.cli.install",
   "meltano.cli.interactive.*",
   "meltano.cli.invoke",

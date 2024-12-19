@@ -32,7 +32,11 @@ if t.TYPE_CHECKING:
 install, no_install = get_install_options(include_only_install=False)
 
 
-def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
+def _load_yaml_from_ref(
+    ctx: click.Context,
+    param: click.Parameter,
+    value: str | None,
+) -> dict | None:
     if not value:
         return None
 
@@ -46,7 +50,7 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
             content = Path(value).read_text()
 
     except (ValueError, FileNotFoundError, IsADirectoryError) as e:
-        raise click.BadParameter(e) from e
+        raise click.BadParameter(e.args[0], ctx=ctx, param=param) from e
 
     return yaml.load(content) or {}
 
@@ -118,7 +122,7 @@ async def add(
     ctx,  # noqa: ANN001
     project: Project,
     plugin_type: str,
-    plugin_name: str,
+    plugin_name: tuple[str, ...],
     install_plugins: InstallPlugins,
     inherit_from: str | None = None,
     variant: str | None = None,
@@ -142,7 +146,7 @@ async def add(
         # is equivalent to:
         # `add <type> <name> --inherit-from <inherit-from>``
         inherit_from = plugin_names[0]
-        plugin_names = [as_name]
+        plugin_names = (as_name,)
 
     if flags["custom"] and plugin_type in {
         PluginType.TRANSFORMS,
