@@ -6,6 +6,7 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
@@ -44,6 +45,15 @@ def requires_gcs() -> Generator[None, None, None]:
     if not GOOGLE_INSTALLED:
         raise MissingGoogleError
     yield
+
+
+APPLICATION_CREDENTIALS = SettingDefinition(
+    name="state_backend.gcs.application_credentials",
+    label="Application Credentials",
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
 
 
 class GCSStateStoreManager(CloudStateStoreManager):
