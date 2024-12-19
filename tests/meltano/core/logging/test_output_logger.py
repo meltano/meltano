@@ -7,6 +7,7 @@ import sys
 import tempfile
 import typing as t
 
+import anyio
 import mock
 import pytest
 import structlog
@@ -220,8 +221,8 @@ class TestOutputLogger:
             logging.warning("warning")  # noqa: TID251
             logging.error("error")  # noqa: TID251
 
-        with open(subject.file) as logf:  # noqa: PTH123
-            log_file_contents = [json.loads(line) for line in logf.readlines()]
+        async with await anyio.open_file(subject.file) as logf:
+            log_file_contents = [json.loads(line) for line in await logf.readlines()]
 
         assert_lines(
             log_file_contents,

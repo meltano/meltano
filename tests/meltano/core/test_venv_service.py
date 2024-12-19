@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import platform
 import re
-import subprocess
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -88,20 +88,31 @@ class TestVenvService:
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
 
         # ensure that the package is installed
-        run = subprocess.run(
-            [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
-            check=True,
-            capture_output=True,
+        proc = await asyncio.create_subprocess_exec(
+            str(venv_dir.joinpath("bin/python")),
+            "-m",
+            "pip",
+            "list",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-        assert re.search(r"example\s+0\.1\.0", str(run.stdout))
+        stdout, _ = await proc.communicate()
+        assert proc.returncode == 0
+        assert re.search(r"example\s+0\.1\.0", str(stdout))
 
         # ensure that pip is the latest version
-        run = subprocess.run(
-            [venv_dir.joinpath("bin/python"), "-m", "pip", "list", "--outdated"],
-            check=True,
-            capture_output=True,
+        proc = await asyncio.create_subprocess_exec(
+            str(venv_dir.joinpath("bin/python")),
+            "-m",
+            "pip",
+            "list",
+            "--outdated",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-        for line in str(run.stdout).splitlines():
+        stdout, _ = await proc.communicate()
+        assert proc.returncode == 0
+        for line in str(stdout).splitlines():
             assert not line.startswith("pip ")
 
         assert subject.exec_path("some_exe").parts[-6:] == (
@@ -143,12 +154,17 @@ class TestVenvService:
         await subject.install(["example"])
 
         # ensure that the package is installed
-        run = subprocess.run(
-            [venv_dir.joinpath("bin/python"), "-m", "pip", "list"],
-            check=True,
-            capture_output=True,
+        proc = await asyncio.create_subprocess_exec(
+            str(venv_dir.joinpath("bin/python")),
+            "-m",
+            "pip",
+            "list",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-        assert re.search(r"example\s+0\.1\.0", str(run.stdout))
+        stdout, _ = await proc.communicate()
+        assert proc.returncode == 0
+        assert re.search(r"example\s+0\.1\.0", str(stdout))
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -349,18 +365,17 @@ class TestUvVenvService:
         await subject.uninstall_package("cowsay")
         await subject.install(["cowsay"])
 
-        run = subprocess.run(
-            [
-                subject.uv,
-                "pip",
-                "list",
-                "--python",
-                str(subject.exec_path("python")),
-            ],
-            check=True,
-            capture_output=True,
+        process = await asyncio.create_subprocess_exec(
+            subject.uv,
+            "pip",
+            "list",
+            "--python",
+            str(subject.exec_path("python")),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
-        assert "cowsay" in str(run.stdout)
+        stdout, _ = await process.communicate()
+        assert "cowsay" in stdout.decode()
 
     async def test_handle_installation_error(self, subject: UvVenvService) -> None:
         process = mock.Mock(spec=Process)
