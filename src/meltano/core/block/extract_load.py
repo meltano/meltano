@@ -535,11 +535,14 @@ class ExtractLoadBlocks(BlockSet):
                 self.context.session,
             )
         ):
-            raise RunnerError(
-                f"Another '{job.job_name}' pipeline is already running "  # noqa: EM102
-                f"which started at {existing.started_at}. To ignore this "
-                "check use the '--force' option.",
+            msg = (
+                f"Another '{job.job_name}' pipeline is already running "
+                f"which started at {existing.started_at}. "
+                f"Wait until {existing.valid_intil()} when the job will be "
+                "automatically cancelled if stale, or ignore this check using the "
+                "'--force' option."
             )
+            raise RunnerError(msg)
 
         with closing(self.context.session) as session:
             async with job.run(session):
