@@ -243,11 +243,16 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-14 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-15 }}" >> ${GITHUB_STEP_SUMMARY}
-        # echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-17 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-18 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-19 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-20 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-21 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-22 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-23 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-24 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-25 }}" >> ${GITHUB_STEP_SUMMARY}
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
 
