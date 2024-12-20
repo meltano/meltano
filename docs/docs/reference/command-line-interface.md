@@ -20,6 +20,7 @@ The following CLI options are available for the top-level `meltano` command:
 ### Log Configurations
 
 - [`--log-config`](/reference/settings#clilog_config) - Path to a logging configuration file. See [Logging](/guide/logging) for more information.
+- [`--log-format`](/reference/settings#clilog_format) - Shortcut for setting the log format instead of using `--log-config`. See the CLI output for available options.
 - [`--log-level`](/reference/settings#clilog_level) - Set the log level for the command. Valid values are `debug`, `info`, `warning`, `error`, and `critical`.
 
 ### No Color

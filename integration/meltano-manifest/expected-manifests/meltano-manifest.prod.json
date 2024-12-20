@@ -26,6 +26,7 @@
     "HUB_METRICS_S3_PATH": "s3://prod-meltano-bucket-01/hub_metrics/",
     "MELTANO_AUTO_INSTALL": "true",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
+    "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",
     "MELTANO_DATABASE_MAX_RETRIES": "3",
     "MELTANO_DATABASE_RETRY_TIMEOUT": "5",
