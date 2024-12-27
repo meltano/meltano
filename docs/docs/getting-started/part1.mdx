@@ -196,7 +196,7 @@ The GitHub tap requires [configuration](/guide/configuration) before it can star
 meltano config tap-github set --interactive
 ```
 
-2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["sbalnojan/meltano-lightdash"]`), start_date, and your auth_token.
+2. Follow the prompts to step through all available settings, the ones you'll need to fill out are repositories (formatted like `["meltano/meltano"]`), start_date, and your auth_token.
 
 <br />
 
@@ -240,7 +240,7 @@ This will add the configuration to your [`meltano.yml` project file](/concepts/p
         config:
           start_date: '2024-01-01'
           repositories:
-          - sbalnojan/meltano-lightdash
+          - meltano/meltano
 ```
 
 It will also add your secret auth token to the file `.env`:
