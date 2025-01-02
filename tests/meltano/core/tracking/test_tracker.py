@@ -443,15 +443,25 @@ class TestTracker:
         monkeypatch: pytest.MonkeyPatch,
         log: pytest_structlog.StructuredLogCapture,
     ) -> None:
-        endpoints = """
-            [
-                "notvalid:8080",
-                "https://valid.endpoint:8080",
-                "file://bad.scheme",
-                "https://other.endpoint/path/to/collector"
-            ]
-        """
-        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
+        endpoints = [
+            "notvalid:8080",
+            "https://valid.endpoint:8080",
+            "file://bad.scheme",
+            "https://other.endpoint/path/to/collector",
+        ]
+
+        # Mock project.settings.get("snowplow.collector_endpoints")
+        def _mock_get(name: str, *, redacted: bool = False):  # noqa: ARG001
+            if name == "snowplow.collector_endpoints":
+                return endpoints
+            if name == "disable_tracking":
+                return False
+            if name == "cli.log_level":
+                return "info"
+
+            return None
+
+        monkeypatch.setattr(project.settings, "get", _mock_get)
 
         tracker = Tracker(project)
 
