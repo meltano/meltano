@@ -84,9 +84,9 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
 def cli(
     ctx: click.Context,
     *,
-    log_level: str,
-    log_format: str,
-    log_config: str,
+    log_level: str | None,
+    log_format: str | None,
+    log_config: str | None,
     environment: str,
     no_environment: bool,
     cwd: Path | None,
