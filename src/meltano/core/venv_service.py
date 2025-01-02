@@ -73,8 +73,6 @@ def find_uv() -> str:
     Raises:
         MeltanoError: The `uv` executable could not be found.
     """
-    logger.warning("The uv backend is experimental")
-
     with contextlib.suppress(ImportError, FileNotFoundError):
         from uv import find_uv_bin
 
