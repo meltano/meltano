@@ -26,7 +26,13 @@ class TestCliInit:
 
         files = (
             project.root.joinpath(file).resolve()
-            for file in ("meltano.yml", "README.md", ".gitignore", "requirements.txt")
+            for file in (
+                "meltano.yml",
+                "README.md",
+                ".gitignore",
+                "requirements.txt",
+                "logging/singer_sdk.yaml",
+            )
         )
 
         meltano_dirs = (
