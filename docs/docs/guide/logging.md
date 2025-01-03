@@ -7,7 +7,13 @@ sidebar_position: 19
 
 ## Logging
 
-Logging in meltano can be controlled via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
+A quick way to change the log format of the command line output is [the `--log-format` global option](/reference/settings/#clilog_format). For example:
+
+```bash
+meltano --log-format=json run my-job
+```
+
+Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
 
 By default, meltano will look for this in a `logging.yaml` file in the project root. However, you can override this by
 setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
@@ -29,6 +35,7 @@ A few key points to note:
    - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
 2. Different loggers can use different handlers and log at different log levels.
 3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
+4. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
 
 Here's an annotated example of a logging.yaml file:
 
