@@ -60,6 +60,8 @@ jobs:
 
     - name: Get Meltano version
       id: get-meltano-version
+      env:
+        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
         pipx install poetry
         poetry version
