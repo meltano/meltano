@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import typing as t
 
+import anyio
 import pytest
 
 from meltano.core.plugin import PluginType
@@ -85,8 +86,8 @@ class TestSingerMapper:
         async with invoker.prepared(session):
             config_path = invoker.files["config"]
 
-            with config_path.open() as config_file:
-                config = json.load(config_file)
+            async with await anyio.open_file(config_path, "r") as config_file:
+                config = json.loads(await config_file.read())
 
             assert config == {
                 "transformations": [
