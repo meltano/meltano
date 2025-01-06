@@ -25,6 +25,7 @@ from meltano.cli.utils import CliError
 from meltano.core.error import EmptyMeltanoFileException, MeltanoError
 from meltano.core.logging.utils import setup_logging
 from meltano.core.project import PROJECT_ENVIRONMENT_ENV, PROJECT_READONLY_ENV, Project
+from meltano.core.project_settings_service import ProjectSettingsService
 
 if t.TYPE_CHECKING:
     from fixtures.cli import MeltanoCliRunner
@@ -329,6 +330,43 @@ class TestCli:
                 cwd=tmp_path,
             ).stderr
         )
+
+    @pytest.mark.parametrize(
+        ("option_name", "setting_name", "value"),
+        (
+            pytest.param(
+                "--log-level",
+                "cli.log_level",
+                "warning",
+                id="log-level-warning",
+            ),
+            pytest.param(
+                "--log-config",
+                "cli.log_config",
+                "path/to/logging.yml",
+                id="log-config-path",
+            ),
+            pytest.param(
+                "--log-format",
+                "cli.log_format",
+                "json",
+                id="log-format-json",
+            ),
+        ),
+    )
+    def test_project_settings_overrides(
+        self,
+        cli_runner: MeltanoCliRunner,
+        option_name: str,
+        setting_name: str,
+        value: str,
+    ) -> None:
+        # Mock `ProjectSettingsService.config_override` to avoid side effects
+        # for other tests
+        with mock.patch.object(ProjectSettingsService, "config_override", {}):
+            result = cli_runner.invoke(cli, [option_name, value, "dragon"])
+            assert result.exit_code == 0, result.exception
+            assert ProjectSettingsService.config_override[setting_name] == value
 
 
 def _get_dummy_logging_config(*, colors=True):
