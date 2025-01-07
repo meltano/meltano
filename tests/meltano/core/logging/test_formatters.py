@@ -150,6 +150,17 @@ class TestLogFormatters:
 
         assert "exception" not in message_dict
 
+    def test_json_formatter_locals(self, record_with_exception) -> None:
+        formatter = formatters.json_formatter(show_locals=True)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "locals" in message_dict["exception"][0]["frames"][0]
+
+        formatter = formatters.json_formatter(show_locals=False)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "locals" not in message_dict["exception"][0]["frames"][0]
+
     def test_plain_formatter(self, record) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
         formatter.logger = logging.getLogger("test")  # noqa: TID251

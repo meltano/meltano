@@ -64,6 +64,7 @@ formatters:
     (): meltano.core.logging.json_formatter
     callsite_parameters: true # adds `pathname`, `lineno`, and `func_name` to each log entry
     dict_tracebacks: false # removes the `exception` object that is added to each log entry
+    show_locals: True # enables local variable logging in tracebacks
 
 handlers:
   console: # log to the console (stderr) using structured_colored formatter, logging everything at DEBUG level and up

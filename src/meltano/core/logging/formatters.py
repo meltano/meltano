@@ -39,6 +39,12 @@ LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
 class LoggingFeatures(t.TypedDict, total=False):
     """Logging features that can be enabled in a formatter."""
 
+    show_locals: bool
+    """Whether to show local variables in the traceback.
+
+    https://www.structlog.org/en/stable/api.html#structlog.processors.Traceback.
+    """
+
     callsite_parameters: bool
     """Enable filename, line number, and function name in log entries.
 
@@ -65,7 +71,10 @@ def _processors_from_kwargs(
         )
 
     if features.get("dict_tracebacks", False):
-        yield structlog.processors.dict_tracebacks
+        show_locals = features.get("show_locals", False)
+        yield structlog.processors.ExceptionRenderer(
+            structlog.tracebacks.ExceptionDictTransformer(show_locals=show_locals),
+        )
 
 
 def rich_exception_formatter_factory(
@@ -132,14 +141,12 @@ def _process_formatter(
 def console_log_formatter(
     *,
     colors: bool = False,
-    show_locals: bool = False,
     **features: Unpack[LoggingFeatures],
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
     Args:
         colors: Add color to output.
-        show_locals: Whether to show local variables in the traceback.
         features: Logging features to enable.
 
     Returns:
@@ -150,14 +157,15 @@ def console_log_formatter(
     if colors:
         exception_formatter = rich_exception_formatter_factory(
             color_system="truecolor",
-            show_locals=show_locals,
+            show_locals=features.get("show_locals", False),
         )
     else:
         exception_formatter = rich_exception_formatter_factory(
             no_color=True,
-            show_locals=show_locals,
+            show_locals=features.get("show_locals", False),
         )
 
+    features.pop("dict_tracebacks", None)
     return _process_formatter(
         *_processors_from_kwargs(**features),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
@@ -189,6 +197,7 @@ def key_value_formatter(
     Returns:
         A configured key=value formatter.
     """
+    features.pop("dict_tracebacks", None)
     return _process_formatter(
         *_processors_from_kwargs(**features),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
