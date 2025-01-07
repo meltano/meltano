@@ -127,6 +127,13 @@ class TestLogFormatters:
         formatter = formatters.key_value_formatter()
         output = formatter.format(record)
         assert "event='test' level='info'" in output
+        assert "pathname='/path/to/my_module.py'" not in output
+
+        formatter = formatters.key_value_formatter(callsite_parameters=True)
+        output = formatter.format(record)
+        assert "pathname='/path/to/my_module.py'" in output
+        assert "lineno=1" in output
+        assert "func_name='my_func'" in output
 
     def test_json_formatter_callsite_parameters(self, record):
         formatter = formatters.json_formatter(callsite_parameters=True)
