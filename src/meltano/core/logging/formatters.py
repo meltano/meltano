@@ -39,12 +39,6 @@ LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
 class LoggingFeatures(t.TypedDict, total=False):
     """Logging features that can be enabled in a formatter."""
 
-    show_locals: bool
-    """Whether to show local variables in the traceback.
-
-    https://www.structlog.org/en/stable/api.html#structlog.processors.Traceback.
-    """
-
     callsite_parameters: bool
     """Enable filename, line number, and function name in log entries.
 
@@ -53,7 +47,14 @@ class LoggingFeatures(t.TypedDict, total=False):
 
     dict_tracebacks: bool
     """Enable tracebacks dictionaries in log entries.
+
     https://www.structlog.org/en/stable/api.html#structlog.processors.dict_tracebacks.
+    """
+
+    show_locals: bool
+    """Whether to show local variables in the traceback.
+
+    https://www.structlog.org/en/stable/api.html#module-structlog.tracebacks.
     """
 
 
@@ -141,13 +142,15 @@ def _process_formatter(
 def console_log_formatter(
     *,
     colors: bool = False,
-    **features: Unpack[LoggingFeatures],
+    callsite_parameters: bool = False,
+    show_locals: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
     Args:
         colors: Add color to output.
-        features: Logging features to enable.
+        callsite_parameters: Whether to include callsite parameters in the output.
+        show_locals: Whether to show local variables in the traceback.
 
     Returns:
         A configured console log formatter.
@@ -157,17 +160,16 @@ def console_log_formatter(
     if colors:
         exception_formatter = rich_exception_formatter_factory(
             color_system="truecolor",
-            show_locals=features.get("show_locals", False),
+            show_locals=show_locals,
         )
     else:
         exception_formatter = rich_exception_formatter_factory(
             no_color=True,
-            show_locals=features.get("show_locals", False),
+            show_locals=show_locals,
         )
 
-    features.pop("dict_tracebacks", None)
     return _process_formatter(
-        *_processors_from_kwargs(**features),
+        *_processors_from_kwargs(callsite_parameters=callsite_parameters),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.dev.ConsoleRenderer(
             colors=colors,
@@ -181,7 +183,7 @@ def key_value_formatter(
     sort_keys: bool = False,
     key_order: Sequence[str] | None = None,
     drop_missing: bool = False,
-    **features: Unpack[LoggingFeatures],
+    callsite_parameters: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in key=value format.
 
@@ -192,14 +194,13 @@ def key_value_formatter(
             *sort_keys* and the dict class.
         drop_missing: When True, extra keys in *key_order* will be dropped
             rather than rendered as None.
-        features: Logging features to enable.
+        callsite_parameters: Whether to include callsite parameters in the output.
 
     Returns:
         A configured key=value formatter.
     """
-    features.pop("dict_tracebacks", None)
     return _process_formatter(
-        *_processors_from_kwargs(**features),
+        *_processors_from_kwargs(callsite_parameters=callsite_parameters),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.processors.KeyValueRenderer(
             sort_keys=sort_keys,
@@ -210,19 +211,27 @@ def key_value_formatter(
 
 
 def json_formatter(
-    **features: Unpack[LoggingFeatures],
+    *,
+    callsite_parameters: bool = False,
+    dict_tracebacks: bool = True,
+    show_locals: bool = False,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in JSON format.
 
     Args:
-        features: Logging features to enable.
+        callsite_parameters: Whether to include callsite parameters in the JSON output.
+        dict_tracebacks: Whether to include tracebacks in the JSON output.
+        show_locals: Whether to include local variables in the traceback.
 
     Returns:
         A configured JSON formatter.
     """
-    features.setdefault("dict_tracebacks", True)
     return _process_formatter(
-        *_processors_from_kwargs(**features),
+        *_processors_from_kwargs(
+            callsite_parameters=callsite_parameters,
+            dict_tracebacks=dict_tracebacks,
+            show_locals=show_locals,
+        ),
         structlog.stdlib.ProcessorFormatter.remove_processors_meta,
         structlog.processors.JSONRenderer(),
     )
@@ -252,7 +261,6 @@ def plain_formatter(
     datefmt: str | None = None,
     style: str = "%",
     validate: bool = True,
-    **features: Unpack[LoggingFeatures],
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter that renders lines in a simple format.
 
@@ -267,7 +275,6 @@ def plain_formatter(
         A configured simple formatter.
     """
     return _process_formatter(
-        *_processors_from_kwargs(**features),
         structlog.stdlib.filter_by_level,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
