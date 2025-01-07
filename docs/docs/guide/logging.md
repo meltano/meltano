@@ -48,22 +48,23 @@ formatters:
     format: "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
   structured_colored:
     (): meltano.core.logging.console_log_formatter
-    colors: True
+    colors: true
   structured_plain_no_locals: # log format for structured plain text logs without colored output and without local variables
     (): meltano.core.logging.console_log_formatter
-    colors: False # also disables `rich` traceback formatting
-    show_locals: False # disables local variable logging in tracebacks (which be very verbose and leak sensitive data)
+    colors: false # also disables `rich` traceback formatting
+    show_locals: false # disables local variable logging in tracebacks (which be very verbose and leak sensitive data)
   structured_locals: # log format for structured plain text logs WITH local variables
     (): meltano.core.logging.console_log_formatter
-    colors: True # also enables traceback formatting with `rich`
-    show_locals: True # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    colors: true # also enables traceback formatting with `rich`
+    show_locals: true # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
-    sort_keys: False
+    sort_keys: false
   json: # log format for json formatted logs
     (): meltano.core.logging.json_formatter
     callsite_parameters: true # adds `pathname`, `lineno`, and `func_name` to each log entry
     dict_tracebacks: false # removes the `exception` object that is added to each log entry
+    show_locals: true # enables local variable logging in tracebacks
 
 handlers:
   console: # log to the console (stderr) using structured_colored formatter, logging everything at DEBUG level and up

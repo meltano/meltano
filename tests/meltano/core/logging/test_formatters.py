@@ -123,6 +123,18 @@ class TestLogFormatters:
         assert "locals" in output
         assert "my_var = 'my_value'" in output
 
+    def test_key_value_formatter(self, record):
+        formatter = formatters.key_value_formatter()
+        output = formatter.format(record)
+        assert "event='test' level='info'" in output
+        assert "pathname='/path/to/my_module.py'" not in output
+
+        formatter = formatters.key_value_formatter(callsite_parameters=True)
+        output = formatter.format(record)
+        assert "pathname='/path/to/my_module.py'" in output
+        assert "lineno=1" in output
+        assert "func_name='my_func'" in output
+
     def test_json_formatter_callsite_parameters(self, record):
         formatter = formatters.json_formatter(callsite_parameters=True)
         output = formatter.format(record)
@@ -149,6 +161,17 @@ class TestLogFormatters:
         message_dict = json.loads(output)
 
         assert "exception" not in message_dict
+
+    def test_json_formatter_locals(self, record_with_exception) -> None:
+        formatter = formatters.json_formatter(show_locals=True)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "locals" in message_dict["exception"][0]["frames"][0]
+
+        formatter = formatters.json_formatter(show_locals=False)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "locals" not in message_dict["exception"][0]["frames"][0]
 
     def test_plain_formatter(self, record) -> None:
         formatter = formatters.plain_formatter(fmt="%(levelname)s %(name)s")
