@@ -123,6 +123,11 @@ class TestLogFormatters:
         assert "locals" in output
         assert "my_var = 'my_value'" in output
 
+    def test_key_value_formatter(self, record):
+        formatter = formatters.key_value_formatter()
+        output = formatter.format(record)
+        assert "event='test' level='info'" in output
+
     def test_json_formatter_callsite_parameters(self, record):
         formatter = formatters.json_formatter(callsite_parameters=True)
         output = formatter.format(record)
