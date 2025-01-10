@@ -219,6 +219,7 @@ def setup_logging(
     logging_config.dictConfig(config)
     structlog.configure(
         processors=[
+            structlog.contextvars.merge_contextvars,
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             TIMESTAMPER,
