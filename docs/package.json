@@ -40,9 +40,9 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.7.0",
     "docusaurus-plugin-sass": "^0.2.6",
-    "eslint": "^9.17.0",
+    "eslint": "^9.18.0",
     "eslint-config-wesbos": "^4.3.2",
-    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react": "^7.37.4",
     "postcss-import": "^16.1.0",
     "prettier": "^3.4.2",
     "sass": "^1.83.1",
