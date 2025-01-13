@@ -1,5 +1,5 @@
 nox==2024.10.9
 nox-poetry==1.0.3
 pip==24.3.1
-poetry==2.0.0
-poetry-plugin-export==1.8.0
+poetry==2.0.1
+poetry-plugin-export==1.9.0
