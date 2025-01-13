@@ -144,7 +144,7 @@ id,first_name,last_name,email,ip_address
 ```yaml
 plugins
   mapper:
-    - name: meltano-map-transformer
+  - name: meltano-map-transformer
     variant: meltano
     pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
     mappings:
@@ -162,9 +162,9 @@ plugins
 
 After running `meltano run tap-csv lower target-sqlite` the result would be:
 
-| count_t | email              | first_name | id  | last_name | \_\_loaded_at              |
-| ------- | ------------------ | ---------- | --- | --------- | -------------------------- |
-| 0       | EBOOK0@TWITTER.COM | ethe       | 1   | book      | 2023-03-17 16:57:19.095880 |
+| count\_t | email              | first\_name | id  | last\_name | \_\_loaded\_at             |
+| -------- | ------------------ | ----------- | --- | ---------- | -------------------------- |
+| 0        | EBOOK0@TWITTER.COM | ethe        | 1   | book       | 2023-03-17 16:57:19.095880 |
 
 To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/meltano-map-transform/tree/main/examples).
 
