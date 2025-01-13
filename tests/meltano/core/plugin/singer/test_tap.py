@@ -8,6 +8,7 @@ import sys
 import typing as t
 from contextlib import contextmanager, suppress
 
+import anyio
 import pytest
 from mock import AsyncMock, mock
 
@@ -27,6 +28,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project_add_service import ProjectAddService
 
 
 class CatalogFixture:
@@ -54,14 +56,14 @@ class CatalogFixture:
 
 class TestSingerTap:
     @pytest.fixture(scope="class")
-    def subject(self, project_add_service):
+    def subject(self, project_add_service: ProjectAddService) -> SingerTap:
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     @pytest.mark.order(0)
     @pytest.mark.asyncio
     async def test_exec_args(
         self,
-        subject,
+        subject: SingerTap,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
     ) -> None:
@@ -90,7 +92,12 @@ class TestSingerTap:
             ]
 
     @pytest.mark.asyncio
-    async def test_cleanup(self, subject, session, plugin_invoker_factory) -> None:
+    async def test_cleanup(
+        self,
+        subject: SingerTap,
+        session,
+        plugin_invoker_factory,
+    ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             assert invoker.files["config"].exists()
@@ -100,7 +107,7 @@ class TestSingerTap:
     @pytest.mark.asyncio
     async def test_look_up_state(
         self,
-        subject,
+        subject: SingerTap,
         project,
         session,
         plugin_invoker_factory,
@@ -227,7 +234,7 @@ class TestSingerTap:
         self,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -260,7 +267,7 @@ class TestSingerTap:
                 assert not catalog_cache_key_path.exists()
 
                 # Apply catalog rules to store the cache key
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
                 assert catalog_cache_key_path.exists()
 
                 # If the cache key hasn't changed, discovery isn't invoked again
@@ -281,7 +288,7 @@ class TestSingerTap:
                 assert not catalog_cache_key_path.exists()
 
                 # Apply catalog rules to store the cache key again
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
                 assert catalog_cache_key_path.exists()
 
         monkeypatch.setitem(
@@ -313,7 +320,7 @@ class TestSingerTap:
         project,
         session,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -338,7 +345,7 @@ class TestSingerTap:
         self,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -370,7 +377,7 @@ class TestSingerTap:
             reset_catalog()
 
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
 
             # When `select` isn't set in meltano.yml or the plugin def, select all
             assert_rules(
@@ -390,7 +397,7 @@ class TestSingerTap:
             )
             invoker.settings_service._setting_defs = None
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
 
             # When `select` is set in the plugin definition, use the selection
             assert_rules(
@@ -410,7 +417,7 @@ class TestSingerTap:
             )
 
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
 
             # `select` set in meltano.yml takes precedence over the plugin definition
             assert_rules(
@@ -425,7 +432,7 @@ class TestSingerTap:
         self,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -507,7 +514,7 @@ class TestSingerTap:
             monkeypatch.setattr(invoker.plugin, "config", config)
 
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
 
@@ -570,7 +577,7 @@ class TestSingerTap:
             monkeypatch.setitem(config_override, "_catalog", "custom_catalog.json")
 
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker)
+                await subject.apply_catalog_rules(invoker)
 
                 cache_key = invoker.plugin.catalog_cache_key(invoker)
 
@@ -595,7 +602,7 @@ class TestSingerTap:
         self,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -639,14 +646,14 @@ class TestSingerTap:
         async def selected_properties():
             catalog_path = invoker.files["catalog"]
 
-            with catalog_path.open("w") as catalog_file:
-                json.dump(base_catalog, catalog_file)
+            async with await anyio.open_file(catalog_path, "w") as catalog_file:
+                await catalog_file.write(json.dumps(base_catalog))
 
             async with invoker.prepared(session):
-                subject.apply_catalog_rules(invoker, [])
+                await subject.apply_catalog_rules(invoker, [])
 
-            with catalog_path.open() as catalog_file:
-                catalog = json.load(catalog_file)
+            async with await anyio.open_file(catalog_path, "r") as catalog_file:
+                catalog = json.loads(await catalog_file.read())
 
             lister = ListSelectedExecutor()
             lister.visit(catalog)
@@ -724,21 +731,21 @@ class TestSingerTap:
         self,
         session,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
         async with invoker.prepared(session):
             invoker.files["catalog"].write_text("this is invalid json")
 
             with pytest.raises(PluginExecutionError, match=r"invalid"):
-                subject.apply_catalog_rules(invoker, [])
+                await subject.apply_catalog_rules(invoker, [])
 
     @pytest.mark.asyncio
     async def test_catalog_cache_key(
         self,
         session,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
         monkeypatch,
     ) -> None:
         invoker = plugin_invoker_factory(subject)
@@ -806,14 +813,14 @@ class TestSingerTap:
     async def test_run_discovery(
         self,
         plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
-        subject,
+        subject: SingerTap,
     ) -> None:
         process_mock = mock.Mock()
         process_mock.name = subject.name
         process_mock.wait = AsyncMock(return_value=0)
         process_mock.returncode = 0
-        process_mock.sterr.at_eof.side_effect = (
-            True  # no output so return eof immediately
+        process_mock.stderr.at_eof.side_effect = (
+            True,  # no output so return eof immediately
         )
 
         # First check needs to be false so loop starts read, after 1 line,
@@ -829,8 +836,8 @@ class TestSingerTap:
         await subject.run_discovery(invoker, catalog_path)
         assert invoke_async.call_args[0] == ("--discover",)
 
-        with catalog_path.open("r") as catalog_file:
-            resp = json.load(catalog_file)
+        async with await anyio.open_file(catalog_path, "r") as catalog_file:
+            resp = json.loads(await catalog_file.read())
             assert resp["discovered"]
 
     @pytest.mark.asyncio
@@ -838,7 +845,7 @@ class TestSingerTap:
     async def test_run_discovery_failure(
         self,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
     ) -> None:
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -863,7 +870,7 @@ class TestSingerTap:
     async def test_run_discovery_stderr_output(
         self,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
     ) -> None:
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -929,7 +936,7 @@ class TestSingerTap:
     async def test_run_discovery_handle_io_exceptions(
         self,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
     ) -> None:
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -954,7 +961,7 @@ class TestSingerTap:
     async def test_run_discovery_utf8_output(
         self,
         plugin_invoker_factory,
-        subject,
+        subject: SingerTap,
     ) -> None:
         process_mock = mock.Mock()
         process_mock.name = subject.name
@@ -1081,7 +1088,7 @@ class TestSingerTap:
         _A quirk seems to be that if this test is invoked on its own, the
         output is captured in the fixture `pytest.capsys`, however if pytest
         runs globally then the output is captured in `pytest.caplog`. Not sure
-        why, hoping this message finds a developer more knowledgable than I._
+        why, hoping this message finds a developer more knowledgeable than I._
 
         For now, I'm adding up the output of both capsys & caplog and testing
         expected messages are captured somewhere. As in, both of these would

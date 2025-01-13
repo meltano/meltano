@@ -4,6 +4,7 @@ import json
 import typing as t
 from uuid import uuid4
 
+import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
@@ -57,9 +58,9 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     ) -> None:
         """Create configuration file."""
         config_path = invoker.files["config"]
-        with config_path.open("w") as config_file:
+        async with await anyio.open_file(config_path, "w") as config_file:
             config = invoker.plugin_config_processed
-            json.dump(config, config_file, indent=2)
+            await config_file.write(json.dumps(config, indent=2))
 
         logger.debug(f"Created configuration at {config_path}")  # noqa: G004
 

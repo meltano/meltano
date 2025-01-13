@@ -42,7 +42,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = structlog.getLogger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 async def _stream_redirect(
@@ -531,9 +531,9 @@ class SingerTap(SingerPlugin):
             return
 
         with suppress(PluginLacksCapabilityError):
-            self.apply_catalog_rules(plugin_invoker, exec_args)
+            await self.apply_catalog_rules(plugin_invoker, exec_args)
 
-    def apply_catalog_rules(
+    async def apply_catalog_rules(
         self,
         plugin_invoker: PluginInvoker,
         exec_args: tuple[str, ...] = (),  # noqa: ARG002
@@ -583,8 +583,8 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
 
         try:
-            with catalog_path.open() as catalog_file:
-                catalog = json.load(catalog_file)
+            async with await anyio.open_file(catalog_path) as catalog_file:
+                catalog = json.loads(await catalog_file.read())
 
             if schema_rules:
                 SchemaExecutor(schema_rules).visit(catalog)  # type: ignore[attr-defined]
@@ -593,8 +593,8 @@ class SingerTap(SingerPlugin):
                 self.warn_property_not_found(metadata_rules, catalog)
                 MetadataExecutor(metadata_rules).visit(catalog)  # type: ignore[attr-defined]
 
-            with catalog_path.open("w") as catalog_f:
-                json.dump(catalog, catalog_f, indent=2)
+            async with await anyio.open_file(catalog_path, "w") as catalog_f:
+                await catalog_f.write(json.dumps(catalog, indent=2))
 
             if cache_key := self.catalog_cache_key(plugin_invoker):
                 catalog_cache_key_path.write_text(cache_key)
