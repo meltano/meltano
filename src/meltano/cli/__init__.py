@@ -25,7 +25,7 @@ from meltano.cli import (
     run,
     schedule,
     schema,
-    select,
+    select_entities,
     state,
     upgrade,
     validate,
@@ -55,7 +55,7 @@ cli.add_command(lock.lock)
 cli.add_command(remove.remove)
 cli.add_command(schedule.schedule)
 cli.add_command(schema.schema)
-cli.add_command(select.select)
+cli.add_command(select_entities.select)
 cli.add_command(state.meltano_state)
 cli.add_command(upgrade.upgrade)
 cli.add_command(run.run)

@@ -15,7 +15,7 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
-from meltano.core.block.parser import BlockParser, validate_block_sets
+from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
 from meltano.core.task_sets_service import (
     JobAlreadyExistsError,
