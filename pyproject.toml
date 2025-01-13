@@ -94,7 +94,7 @@ uv = ["uv"]
 
 [tool.poetry.group.dev.dependencies]
 backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = "1.35.92"}
+boto3-stubs = {extras = ["essential"], version = "1.35.97"}
 colorama = "^0.4.4"
 coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
 mock = "^5.0.2"
