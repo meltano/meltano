@@ -13,6 +13,7 @@ import mock
 import pytest
 from snowplow_tracker import Emitter, SelfDescribing
 
+from meltano.core.logging import setup_logging
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
@@ -453,6 +454,7 @@ class TestTracker:
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
 
+        setup_logging(project, log_level="warning")
         tracker = Tracker(project)
 
         try:
