@@ -108,6 +108,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
 
     @property
     def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``."""
         return {
             "blob_properties": {
                 "content_type": "application/json",
