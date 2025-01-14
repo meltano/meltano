@@ -66,9 +66,9 @@ class TestVenvService:
 
         assert not file.exists()
         assert not sub_dir.exists()
-        assert (
-            run_dir.exists()
-        ), "Expected all files in the run dir to be removed, but not the dir itself"
+        assert run_dir.exists(), (
+            "Expected all files in the run dir to be removed, but not the dir itself"
+        )
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")

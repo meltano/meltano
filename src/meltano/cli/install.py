@@ -9,7 +9,7 @@ import structlog
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.block.parser import BlockParser
+from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
 from meltano.core.schedule_service import ScheduleService
