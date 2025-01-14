@@ -123,7 +123,7 @@ class Job(SystemModel):
         DateTimeUTC,
     )
     ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
-    payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))  # type: ignore[arg-type]
+    payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
     trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
         default=current_trigger,
