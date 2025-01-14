@@ -6,6 +6,8 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+import structlog.stdlib
+
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
@@ -19,6 +21,8 @@ try:
     import google.cloud.storage  # type: ignore[import-untyped]
 except ImportError:
     GOOGLE_INSTALLED = False
+
+logger = structlog.stdlib.get_logger(__name__)
 
 
 class MissingGoogleError(Exception):
@@ -102,6 +106,14 @@ class GCSStateStoreManager(CloudStateStoreManager):
             # Use default authentication in environment
             return google.cloud.storage.Client()
 
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        return {
+            "blob_properties": {
+                "content_type": "application/json",
+            },
+        }
+
     def delete(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
@@ -117,7 +129,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             blob.delete()
         except Exception as e:
             if self.is_file_not_found_error(e):
-                ...
+                logger.debug("File not found at '%s'", file_path)
             else:
                 raise e
 
