@@ -176,3 +176,12 @@ class TestSettingDefinition:
     ) -> None:
         assert setting_definition.sensitive is sensitive
         assert setting_definition.kind is kind
+
+    def test_is_deprecated(self) -> None:
+        setting_definition = SettingDefinition(
+            name="test_setting",
+            kind=SettingKind.STRING,
+            deprecated=True,
+        )
+
+        assert setting_definition.is_deprecated
