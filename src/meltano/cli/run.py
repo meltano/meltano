@@ -14,8 +14,8 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.blockset import BlockSet
-from meltano.core.block.parser import BlockParser, validate_block_sets
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.logging.utils import change_console_log_level
 from meltano.core.plugin_install_service import PluginInstallReason

@@ -16,7 +16,7 @@ import structlog
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
-from meltano.core.block.parser import BlockParser
+from meltano.core.block.block_parser import BlockParser
 from meltano.core.db import project_engine
 from meltano.core.job import Payload
 from meltano.core.state_service import InvalidJobStateError, StateService

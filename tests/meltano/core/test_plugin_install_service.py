@@ -221,9 +221,9 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            state.skipped
-        ), "Expected plugin with venv and matching fingerprint to not be installed"
+        assert state.skipped, (
+            "Expected plugin with venv and matching fingerprint to not be installed"
+        )
 
         state = await subject.install_plugin_async(
             inherited_plugin,
@@ -251,9 +251,9 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            not state.skipped
-        ), "Expected plugin with venv and non-matching fingerprint to be installed"
+        assert not state.skipped, (
+            "Expected plugin with venv and non-matching fingerprint to be installed"
+        )
 
         plugin.pip_url = "$MISSING_ENV_VAR"
         state = await subject.install_plugin_async(
@@ -261,9 +261,9 @@ class TestPluginInstallService:
             reason=PluginInstallReason.AUTO,
         )
 
-        assert (
-            state.skipped
-        ), "Expected plugin with missing env var in pip URL to not be installed"
+        assert state.skipped, (
+            "Expected plugin with missing env var in pip URL to not be installed"
+        )
 
     @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")

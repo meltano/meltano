@@ -319,7 +319,7 @@ async def _run_el_command(
     job = Job(
         job_name=state_id
         or (
-            f'{datetime.now(timezone.utc).strftime("%Y-%m-%dT%H%M%S")}'
+            f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%S')}"
             f"--{extractor}--{loader}"
         ),
         run_id=run_id,

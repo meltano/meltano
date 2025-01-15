@@ -118,7 +118,7 @@ class TestSuperset:
                 config_keys = dir(config_module)
                 assert "SQLALCHEMY_DATABASE_URI" in config_keys
                 assert (
-                    f'sqlite:///{project.plugin_dir(subject, "superset.db")}'
+                    f"sqlite:///{project.plugin_dir(subject, 'superset.db')}"
                     == config_module.SQLALCHEMY_DATABASE_URI
                 )
                 assert "SECRET_KEY" in config_keys
