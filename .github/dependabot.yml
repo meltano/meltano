@@ -32,7 +32,7 @@ updates:
     commit-message:
       prefix: "ci: "
   - package-ecosystem: pip
-    versioning-strategy: increase-if-necessary
+    versioning-strategy: lockfile-only
     directory: "/"
     schedule:
       interval: weekly
@@ -50,7 +50,7 @@ updates:
         - "minor"
         - "patch"
     commit-message:
-      prefix: "packaging(deps): "
+      prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
   - package-ecosystem: npm
     versioning-strategy: increase
