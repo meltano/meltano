@@ -45,7 +45,7 @@
     "eslint-plugin-react": "^7.37.4",
     "postcss-import": "^16.1.0",
     "prettier": "^3.4.2",
-    "sass": "^1.83.1",
+    "sass": "^1.83.4",
     "tailwindcss": "^3.4.17"
   },
   "browserslist": {
