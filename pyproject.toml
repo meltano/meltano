@@ -75,7 +75,7 @@ setuptools = {version = "^75.6.0", python = ">=3.12"}
 smart-open = "^7.0.5"
 snowplow-tracker = "^1.0.4"
 sqlalchemy = "^2.0.35"
-structlog = "^24.4.0"
+structlog = "^25.1.0"
 typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
