@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import subprocess
 import typing as t
 import uuid
@@ -11,8 +12,11 @@ from time import sleep
 
 import mock
 import pytest
+import structlog
 from snowplow_tracker import Emitter, SelfDescribing
 
+from meltano.core.logging import setup_logging
+from meltano.core.project import Project
 from meltano.core.tracking.contexts.cli import CliEvent
 from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
@@ -22,11 +26,11 @@ from meltano.core.utils import hash_sha256
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
 
     import pytest_structlog
 
     from fixtures.docker import SnowplowMicro
-    from meltano.core.project import Project
 
 
 def load_analytics_json(project: Project) -> dict[str, t.Any]:
@@ -439,21 +443,41 @@ class TestTracker:
     @pytest.mark.order(1)
     def test_get_snowplow_tracker_invalid_endpoint(
         self,
-        project: Project,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
         log: pytest_structlog.StructuredLogCapture,
     ) -> None:
-        endpoints = """
-            [
-                "notvalid:8080",
-                "https://valid.endpoint:8080",
-                "file://bad.scheme",
-                "https://other.endpoint/path/to/collector"
-            ]
-        """
-        monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
+        monkeypatch.delenv("MELTANO_CLI_LOG_CONFIG", raising=False)
+        monkeypatch.delenv("MELTANO_CLI_LOG_LEVEL", raising=False)
+        monkeypatch.delenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", raising=False)
+        # Set up a new project just for this test
+        endpoints = [
+            "notvalid:8080",
+            "https://valid.endpoint:8080",
+            "file://bad.scheme",
+            "https://other.endpoint/path/to/collector",
+        ]
+        meltano_yml = {
+            "project_id": "test-project",
+            "disable_tracking": True,
+            "cli": {
+                "log_level": "warning",
+            },
+            "snowplow": {
+                "collector_endpoints": endpoints,
+            },
+        }
+        tmp_path.joinpath("meltano.yml").write_text(json.dumps(meltano_yml))
+        project = Project(tmp_path)
+        setup_logging(project=project)
 
         tracker = Tracker(project)
+
+        assert project.settings.get("cli.log_level") == "warning"
+        assert project.settings.get("snowplow.collector_endpoints") == endpoints
+
+        logger = structlog.stdlib.get_logger("meltano.core.tracking.tracker")
+        assert logger.isEnabledFor(logging.WARNING)
 
         try:
             assert log.events[0]["level"] == "warning"
