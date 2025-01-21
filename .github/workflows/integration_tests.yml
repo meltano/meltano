@@ -6,6 +6,7 @@ on:
       - src/**
       - integration/example-library/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/integration_tests.yml
       - .github/workflows/resources/constraints.txt
@@ -15,6 +16,7 @@ on:
       - src/**
       - integration/example-library/**
       - noxfile.py
+      - poetry.lock
       - pyproject.toml
       - .github/workflows/integration_tests.yml
       - .github/workflows/resources/constraints.txt
