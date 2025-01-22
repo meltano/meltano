@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.0 (2025-01-22)
+
+### ✨ New
+
+- [#9018](https://github.com/meltano/meltano/issues/9018) Add descriptions to Meltano's internal settings
+- [#8975](https://github.com/meltano/meltano/issues/8975) Added a `--log-format` option as a shorcut to quickly change the format of logs
+- [#8991](https://github.com/meltano/meltano/issues/8991) Uv venv backend is no longer experimental
+- [#8951](https://github.com/meltano/meltano/issues/8951) Add a simple log formatter that only contains the event by default
+
+### 🐛 Fixes
+
+- [#9035](https://github.com/meltano/meltano/issues/9035) Limit boto3 to < 1.36 to fix incompatibility with Minio (S3-compatible state backend)
+- [#9003](https://github.com/meltano/meltano/issues/9003) Disable local variables by default in JSON logs
+- [#8973](https://github.com/meltano/meltano/issues/8973) Print the time when the job will go stale if no more heartbeats are sent
+
+### ⚙️ Under the Hood
+
+- [#9000](https://github.com/meltano/meltano/issues/9000) Use `anyio` to open `pathlib.Path` instances
+- [#8972](https://github.com/meltano/meltano/issues/8972) Enable Ruff `ASYNC` rules, open files with `anyio` and run subprocess with `asyncio.create_subprocess_exec` in async contexts
+
+### 📚 Documentation Improvements
+
+- [#9011](https://github.com/meltano/meltano/issues/9011) Fixed small indent issue in mapper YAML example
+- [#8992](https://github.com/meltano/meltano/issues/8992) Added 2024-Q4 changelog
+- [#8983](https://github.com/meltano/meltano/issues/8983) Use a different repo in part 1 of Getting Started guide -- _**Thanks @martinburch!**_
+- [#8969](https://github.com/meltano/meltano/issues/8969) Document `database_uri` examples for supported backends
+- [#8961](https://github.com/meltano/meltano/issues/8961) Change to code theme that does not italicize keywords or variables -- _**Thanks @ReubenFrankel!**_
+
+### 📦 Packaging changes
+
+- [#9032](https://github.com/meltano/meltano/issues/9032) Bump structlog from 24.4.0 to 25.1.0
+- [#8980](https://github.com/meltano/meltano/issues/8980) Bump croniter from 5.0.1 to 6.0.0
+- [#8979](https://github.com/meltano/meltano/issues/8979) Bump the runtime-dependencies group with 6 updates
+- [#8981](https://github.com/meltano/meltano/issues/8981) Bump jinja2 from 3.1.4 to 3.1.5
+- [#8968](https://github.com/meltano/meltano/issues/8968) Bump the runtime-dependencies group with 2 updates
+
 ## v3.6.0 (2024-12-09)
 
 ### ✨ New
