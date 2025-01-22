@@ -125,7 +125,11 @@ class Tracker:  # - too many (public) methods
         emitters: list[Emitter] = []
         for endpoint in endpoints:
             if not check_url(endpoint):
-                logger.warning("invalid_snowplow_endpoint", endpoint=endpoint)
+                warn(
+                    f"Invalid Snowplow endpoint: {endpoint}",
+                    UserWarning,
+                    stacklevel=2,
+                )
                 continue
             parsed_url = urlparse(endpoint)
             emitters.append(
