@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import sys
 import typing as t
@@ -97,6 +98,7 @@ class TestLogFormatters:
         assert "pathname='/path/to/my_module.py'" in output
         assert "lineno=1" in output
         assert "func_name='my_func'" in output
+        assert f"process={os.getpid()}" in output
 
     def test_json_formatter_callsite_parameters(self, record):
         formatter = formatters.json_formatter(callsite_parameters=True)
@@ -105,6 +107,7 @@ class TestLogFormatters:
         assert message_dict["pathname"] == "/path/to/my_module.py"
         assert message_dict["lineno"] == 1
         assert message_dict["func_name"] == "my_func"
+        assert message_dict["process"] == os.getpid()
 
     def test_json_formatter_exception(self, record_with_exception) -> None:
         formatter = formatters.json_formatter()
