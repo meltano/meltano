@@ -68,6 +68,7 @@ def _processors_from_kwargs(
                 structlog.processors.CallsiteParameter.PATHNAME,
                 structlog.processors.CallsiteParameter.LINENO,
                 structlog.processors.CallsiteParameter.FUNC_NAME,
+                structlog.processors.CallsiteParameter.PROCESS,
             ),
         )
 

@@ -62,7 +62,7 @@ formatters:
     sort_keys: false
   json: # log format for json formatted logs
     (): meltano.core.logging.json_formatter
-    callsite_parameters: true # adds `pathname`, `lineno`, and `func_name` to each log entry
+    callsite_parameters: true # adds `pathname`, `lineno`, `func_name` and `process` to each log entry
     dict_tracebacks: false # removes the `exception` object that is added to each log entry
     show_locals: true # enables local variable logging in tracebacks
 

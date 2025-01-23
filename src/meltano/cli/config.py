@@ -246,7 +246,7 @@ def config(
         "environment variables, and current values."
     ),
 )
-@click.option("--extras", is_flag=True)
+@click.option("--extras", is_flag=True, help="List only plugin extras.")
 @click.pass_context
 def list_settings(ctx: click.Context, *, extras: bool) -> None:
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
