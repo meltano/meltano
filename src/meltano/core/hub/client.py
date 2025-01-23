@@ -11,7 +11,6 @@ from requests.adapters import HTTPAdapter
 from structlog.stdlib import get_logger
 from urllib3 import Retry
 
-import meltano
 from meltano.core.hub.schema import IndexedPlugin, VariantRef
 from meltano.core.plugin import (
     BasePlugin,
@@ -114,7 +113,7 @@ class MeltanoHubService(PluginRepository):
         self.session.headers.update(
             {
                 "Accept": "application/json",
-                "User-Agent": f"Meltano/{meltano.__version__}",
+                "User-Agent": project.user_agent,
             },
         )
 

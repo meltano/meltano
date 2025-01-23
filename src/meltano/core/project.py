@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import errno
+import importlib.metadata
 import os
 import sys
 import threading
@@ -51,6 +52,7 @@ PROJECT_ROOT_ENV = "MELTANO_PROJECT_ROOT"
 PROJECT_ENVIRONMENT_ENV = "MELTANO_ENVIRONMENT"
 PROJECT_READONLY_ENV = "MELTANO_PROJECT_READONLY"
 PROJECT_SYS_DIR_ROOT_ENV = "MELTANO_SYS_DIR_ROOT"
+MELTANO_USER_AGENT_ENV = "MELTANO_USER_AGENT"
 
 
 def walk_parent_directories() -> Generator[Path, None, None]:
@@ -176,6 +178,15 @@ class Project(Versioned):
     def _meltano_interprocess_lock(self) -> fasteners.InterProcessLock:
         return fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
 
+    @cached_property
+    def user_agent(self) -> str:
+        """Get the user agent for this project.
+
+        Returns:
+            the user agent string for this project
+        """
+        return f"Meltano/{importlib.metadata.version('meltano')}"
+
     @property
     def env(self) -> dict[str, str]:
         """Get environment variables for this project.
@@ -188,6 +199,7 @@ class Project(Versioned):
             PROJECT_ROOT_ENV: str(self.root),
             PROJECT_ENVIRONMENT_ENV: environment_name,
             PROJECT_SYS_DIR_ROOT_ENV: str(self.sys_dir_root),
+            MELTANO_USER_AGENT_ENV: self.user_agent,
         }
 
     @classmethod
