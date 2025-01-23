@@ -23,8 +23,6 @@ from meltano.core.utils import hash_sha256
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
-    import pytest_structlog
-
     from fixtures.docker import SnowplowMicro
     from meltano.core.project import Project
 
@@ -441,7 +439,6 @@ class TestTracker:
         self,
         project: Project,
         monkeypatch: pytest.MonkeyPatch,
-        log: pytest_structlog.StructuredLogCapture,
     ) -> None:
         endpoints = """
             [
@@ -453,33 +450,27 @@ class TestTracker:
         """
         monkeypatch.setenv("MELTANO_SNOWPLOW_COLLECTOR_ENDPOINTS", endpoints)
 
-        tracker = Tracker(project)
+        with pytest.warns(
+            (UserWarning, UserWarning),
+            match="Invalid Snowplow endpoint",
+        ) as warnings:
+            tracker = Tracker(project)
 
-        try:
-            assert log.events[0]["level"] == "warning"
-            assert log.events[0]["event"] == "invalid_snowplow_endpoint"
-            assert log.events[0]["endpoint"] == "notvalid:8080"
+        assert warnings[0].message.args[0] == "Invalid Snowplow endpoint: notvalid:8080"
+        assert (
+            warnings[1].message.args[0]
+            == "Invalid Snowplow endpoint: file://bad.scheme"
+        )
 
-            assert log.events[1]["level"] == "warning"
-            assert log.events[1]["event"] == "invalid_snowplow_endpoint"
-            assert log.events[1]["endpoint"] == "file://bad.scheme"
+        assert len(tracker.snowplow_tracker.emitters) == 2
 
-            assert len(tracker.snowplow_tracker.emitters) == 2
+        emitter = tracker.snowplow_tracker.emitters[0]
+        assert isinstance(emitter, Emitter)
+        assert emitter.endpoint.startswith("https://valid.endpoint:8080/")
 
-            emitter = tracker.snowplow_tracker.emitters[0]
-            assert isinstance(emitter, Emitter)
-            assert emitter.endpoint.startswith(
-                "https://valid.endpoint:8080/",
-            )
-
-            emitter = tracker.snowplow_tracker.emitters[1]
-            assert isinstance(emitter, Emitter)
-            assert emitter.endpoint.startswith(
-                "https://other.endpoint/path/to/collector/",
-            )
-        finally:
-            # Remove the seemingly valid emitters to prevent a logging error on exit.
-            tracker.snowplow_tracker.emitters = []
+        emitter = tracker.snowplow_tracker.emitters[1]
+        assert isinstance(emitter, Emitter)
+        assert emitter.endpoint.startswith("https://other.endpoint/path/to/collector/")
 
     def test_client_id_from_env_var(
         self,
