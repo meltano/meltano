@@ -43,7 +43,6 @@
     "eslint": "^9.19.0",
     "eslint-config-wesbos": "^4.3.2",
     "eslint-plugin-react": "^7.37.4",
-    "postcss-import": "^16.1.0",
     "prettier": "^3.4.2",
     "sass": "^1.83.4",
     "tailwindcss": "^4.0.0",
