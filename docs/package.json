@@ -46,7 +46,8 @@
     "postcss-import": "^16.1.0",
     "prettier": "^3.4.2",
     "sass": "^1.83.4",
-    "tailwindcss": "^4.0.0"
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.0"
   },
   "browserslist": {
     "production": [
