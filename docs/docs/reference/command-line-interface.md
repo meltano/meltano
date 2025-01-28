@@ -120,23 +120,23 @@ meltano add --from-ref <ref> <type> <name>
 
 # For example:
 # URL
-meltano add extractor tap-spotify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-spotify/matatika.yml
+meltano add extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
 
 # Absolute local path
-meltano add extractor tap-spotify --from-ref /path/to/my/meltano/project/tap-spotify--matatika.yml
+meltano add extractor tap-shopify --from-ref /path/to/my/meltano/project/tap-shopify--matatika.yml
 
 # Relative local path
-meltano add extractor tap-spotify --from-ref tap-spotify--matatika.yml
+meltano add extractor tap-shopify --from-ref tap-shopify--matatika.yml
 
 # The plugin name specified in the command is superseded by the value in the
 # plugin definition file - using the same name is just a formality
-meltano add extractor this-will-be-ignored --from-ref tap-spotify--matatika.yml
+meltano add extractor this-will-be-ignored --from-ref tap-shopify--matatika.yml
 
 # The above also applies to the plugin variant, if provided
-meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-spotify--matatika.yml
+meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-shopify--matatika.yml
 
 # Once added, the custom plugin definition can be updated with the `--update` option
-meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
+meltano add --update extractor tap-shopify --from-ref tap-shopify--matatika.yml
 ```
 
 Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
@@ -152,10 +152,10 @@ meltano add --update <type> <name>
 
 # For example:
 # Update from Meltano Hub
-meltano add --update extractor tap-spotify
+meltano add --update extractor tap-shopify
 
 # Update from ref
-meltano add --update extractor tap-spotify --from-ref tap-spotify--matatika.yml
+meltano add --update extractor tap-shopify --from-ref tap-shopify--matatika.yml
 ```
 
 This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
@@ -166,7 +166,7 @@ By default, `meltano add` will attempt to install the plugin after adding it. Us
 meltano add <type> <name> --no-install
 
 # For example:
-meltano add extractor tap-spotify --no-install
+meltano add extractor tap-shopify --no-install
 ```
 
 By default, plugins that use Python use the version of Python that was used to run Meltano. This behavior can be overridden using the `python` attribute, which can be set [for all plugins](/reference/settings#project-python), or on a [per-plugin basis](/reference/settings#plugin-python).
