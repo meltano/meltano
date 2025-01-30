@@ -60,6 +60,8 @@ jobs:
         - { id: '23', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '24', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '25', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
+        - { id: '91', python-version: '3.13', os: ubuntu-latest, backend-db: sqlite, markers: 'concurrent' }
+        - { id: '92', python-version: '3.13', os: windows-2022,  backend-db: sqlite, markers: 'concurrent' }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -89,11 +91,13 @@ jobs:
       pytest-results-row-23: ${{ steps.append-results.outputs.pytest-results-row-23 }}
       pytest-results-row-24: ${{ steps.append-results.outputs.pytest-results-row-24 }}
       pytest-results-row-25: ${{ steps.append-results.outputs.pytest-results-row-25 }}
+      pytest-results-row-91: ${{ steps.append-results.outputs.pytest-results-row-91 }}
+      pytest-results-row-92: ${{ steps.append-results.outputs.pytest-results-row-92 }}
 
-    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }})"
+    name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }}) (${{ matrix.markers || 'not concurrent' }})"
     runs-on: ${{ matrix.os }}
     env:
-      PYTEST_MARKERS: not concurrent
+      PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
       FORCE_COLOR: 1
       NOXFORCEPYTHON: ${{ matrix.python-version }}
 
@@ -255,6 +259,7 @@ jobs:
         echo "${{ needs.tests.outputs.pytest-results-row-23 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-24 }}" >> ${GITHUB_STEP_SUMMARY}
         echo "${{ needs.tests.outputs.pytest-results-row-25 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-91 }}" >> ${GITHUB_STEP_SUMMARY}
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
 
