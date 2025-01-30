@@ -2,7 +2,9 @@ meltano.yml: |
   version: 1
   default_environment: dev
   project_id: 00000000-0000-0000-0000-000000000000
-  env: {}
+  env:
+    # Set the logging configuration for the Singer SDK
+    SINGER_SDK_LOG_CONFIG: logging/singer_sdk.yaml
   environments:
   - name: dev
     env: {}
@@ -10,6 +12,23 @@ meltano.yml: |
     env: {}
   - name: prod
     env: {}
+logging/singer_sdk.yaml: |
+  # Logging configuration plugins based on the Singer SDK
+  # https://sdk.meltano.com/en/latest/implementation/logging.html
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    default:
+      format: "%(message)s"
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: default
+      stream: ext://sys.stderr
+      level: DEBUG
+  root:
+    level: INFO
+    handlers: [ console ]
 README.md: ""
 requirements.txt: ""
 output/.gitignore: |
