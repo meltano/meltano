@@ -15,13 +15,7 @@ if __name__ == "__main__":
 
 ## Create a Local Venv That Your Debugger Can Use
 
-If you're using Poetry you need to create a venv in your custom tap directory so that your IDE can pick it up when debugging.
-
-If you have already installed poetry this will involve removing the existing poetry virtual environment. Running the command below and finally reinstalling poetry.
-
-```bash
-poetry config virtualenvs.in-project true
-```
+If you're using uv, a virtual environment will be automatically created in the tap directory so that your IDE can pick it up when debugging.
 
 ## What to put in VSCode launch.json
 
