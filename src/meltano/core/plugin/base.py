@@ -713,19 +713,33 @@ class BasePlugin(HookObject):
         """
         return True
 
-    def exec_args(  # noqa: D417
+    def exec_args(
         self,
         plugin_invoker: PluginInvoker,  # noqa: ARG002
     ) -> list[str | Path]:
         """Return the arguments to pass to the plugin runner.
 
         Args:
-            files: The files to pass to the plugin runner.
+            plugin_invoker: The plugin invoker running this plugin.
 
         Returns:
             The arguments to pass to the plugin runner.
         """
         return []
+
+    def exec_env(
+        self,
+        plugin_invoker: PluginInvoker,  # noqa: ARG002
+    ) -> dict[str, str]:
+        """Return the environment variables to pass to the plugin runner.
+
+        Args:
+            plugin_invoker: The plugin invoker running this plugin.
+
+        Returns:
+            The environment variables to pass to the plugin runner.
+        """
+        return {}
 
     @property
     def config_files(self) -> dict[str, str]:
