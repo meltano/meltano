@@ -12,7 +12,7 @@ plugins:
   loaders:
   - name: target-postgres
     variant: transferwise
-    pip_url: pipelinewise-target-postgres
+    pip_url: git+https://github.com/transferwise/pipelinewise.git#subdirectory=singer-connectors/target-postgres
   utilities:
   - name: dbt-postgres
     variant: dbt-labs
