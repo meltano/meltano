@@ -13,7 +13,7 @@ meltano install
 ## Run the pipeline
 
 ```shell
-ANIMAL_GROUP=birds meltano invoke tap-smoke-test
-ANIMAL_GROUP=reptiles meltano invoke tap-smoke-test
-ANIMAL_GROUP=mammals meltano invoke tap-smoke-test
+ANIMAL_GROUP=birds meltano run tap-smoke-test target-csv
+ANIMAL_GROUP=reptiles meltano run tap-smoke-test target-csv
+ANIMAL_GROUP=mammals meltano run tap-smoke-test target-csv
 ```
