@@ -127,7 +127,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.8.0
+      uses: docker/setup-buildx-action@v3.9.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
