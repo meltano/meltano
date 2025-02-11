@@ -74,7 +74,7 @@ jobs:
     - name: Install Dependencies
       run: |
         poetry env use "${{ matrix.python || '3.12' }}"
-        poetry install --extras "s3" --extras "uv"
+        poetry install --extras "s3"
 
     - name: Start Postgres Container
       if: always() && (matrix.needs_postgres == true)

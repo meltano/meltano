@@ -73,20 +73,9 @@ def find_uv() -> str:
     Raises:
         MeltanoError: The `uv` executable could not be found.
     """
-    with contextlib.suppress(ImportError, FileNotFoundError):
-        from uv import find_uv_bin
+    from uv import find_uv_bin
 
-        return find_uv_bin()
-
-    # Fall back to PATH.
-    uv = shutil.which("uv")
-
-    if not uv:
-        error = "Could not find the 'uv' executable"
-        instruction = "Please install 'meltano[uv]' or install 'uv' globally."
-        raise MeltanoError(error, instruction)
-
-    return uv
+    return find_uv_bin()
 
 
 def _resolve_python_path(python: Path | str | None) -> str:
