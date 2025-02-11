@@ -1,7 +1,9 @@
 from __future__ import annotations  # noqa: D100
 
 import json
+import logging
 import typing as t
+from textwrap import dedent
 from uuid import uuid4
 
 import anyio
@@ -50,6 +52,22 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         _pop_non_leaf_keys(processed_config)
         return processed_config
 
+    def exec_env(self, plugin_invoker: PluginInvoker) -> dict[str, str]:
+        """Get the environment variables for this tap.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+
+        Returns:
+            the environment variables for this tap
+        """
+        return {
+            "SINGER_SDK_LOG_CONFIG": str(plugin_invoker.files["singer_sdk_logging"]),
+            "LOGGING_CONF_FILE": str(
+                plugin_invoker.files["pipelinewise_singer_logging"]
+            ),
+        }
+
     @hook("before_configure")
     async def before_configure(
         self,
@@ -70,6 +88,84 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         config_path = invoker.files["config"]
         config_path.unlink()
         logger.debug(f"Deleted configuration at {config_path}")  # noqa: G004
+
+    @hook("before_invoke")
+    async def setup_logging_hook(
+        self,
+        plugin_invoker: PluginInvoker,
+        exec_args: tuple[str, ...] = (),
+    ) -> None:
+        """Set up logging before invoking tap.
+
+        Args:
+            plugin_invoker: the plugin invoker running
+            exec_args: the args being passed to the tap
+
+        Returns:
+            None
+        """
+        if exec_args:
+            return
+
+        singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
+        pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
+
+        log_level = logging.getLevelName(logger.getEffectiveLevel())
+
+        # https://sdk.meltano.com/en/v0.44.3/implementation/logging.html
+        async with await anyio.open_file(singer_sdk_logging, mode="w") as f:
+            await f.write(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "disable_existing_loggers": False,
+                        "formatters": {
+                            "default": {
+                                "format": "%(message)s",
+                            },
+                        },
+                        "handlers": {
+                            "console": {
+                                "class": "logging.StreamHandler",
+                                "formatter": "default",
+                                "stream": "ext://sys.stderr",
+                                "level": log_level,
+                            },
+                        },
+                        "root": {
+                            "handlers": ["console"],
+                        },
+                    },
+                    indent=2,
+                ),
+            )
+
+        # https://github.com/transferwise/pipelinewise-singer-python/blob/da64a10cdbcad48ab373d4dab3d9e6dd6f58556b/singer/logger.py#L9C9-L9C26
+        async with await anyio.open_file(pipelinewise_logging, mode="w") as f:
+            await f.write(
+                dedent(f"""\
+                [loggers]
+                keys=root
+
+                [handlers]
+                keys=console
+
+                [formatters]
+                keys=default
+
+                [logger_root]
+                handlers=console
+
+                [handler_console]
+                class=StreamHandler
+                level={log_level}
+                formatter=default
+                args=(sys.stderr,)
+
+                [formatter_default]
+                format=%(message)s
+                """),
+            )
 
     @property
     def instance_uuid(self) -> str:
