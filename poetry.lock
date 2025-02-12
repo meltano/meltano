@@ -4080,7 +4080,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 name = "uv"
 version = "0.5.29"
 description = "An extremely fast Python package and project manager, written in Rust."
-optional = true
+optional = false
 python-versions = ">=3.8"
 files = [
     {file = "uv-0.5.29-py3-none-linux_armv6l.whl", hash = "sha256:9f5fc05f3848e16a90fc9cebe2897d3d4de42f8cf2ec312b4efef45a520d54e9"},
@@ -4354,9 +4354,8 @@ mssql = ["pymssql"]
 postgres = ["psycopg"]
 psycopg2 = ["psycopg2-binary"]
 s3 = ["boto3"]
-uv = ["uv"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.14"
-content-hash = "957feb79c551fdfcf9231f49abc6eb0745c8e99ce6dd13f8fbdf92240a0849b5"
+content-hash = "5b847c6c119608630170f50a366e92b7916cf5faae3d4a9a9ddced327dfba53f"

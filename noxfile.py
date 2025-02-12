@@ -103,7 +103,7 @@ def pytest_meltano(session: Session) -> None:
         session: Nox session.
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
-    extras = ["azure", "gcs", "s3", "uv"]
+    extras = ["azure", "gcs", "s3"]
 
     if backend_db == "mssql":
         extras.append("mssql")
@@ -163,7 +163,7 @@ def mypy(session: Session) -> None:
         session: Nox session.
     """
     session.install(
-        ".[mssql,azure,gcs,s3,uv]",
+        ".[mssql,azure,gcs,s3]",
         "boto3-stubs[essential]",
         "mypy",
         "types-croniter",
