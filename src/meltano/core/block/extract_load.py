@@ -8,6 +8,7 @@ import typing as t
 from contextlib import asynccontextmanager, closing
 
 import structlog
+import structlog.contextvars
 
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
@@ -653,14 +654,16 @@ class ExtractLoadBlocks(BlockSet):
         Raises:
             BlockSetValidationError: if consumer does not have an upstream producer.
         """
+        run_id = str(self.context.job.run_id) if self.context.job else None
+        job_name = self.context.job.job_name if self.context.job else None
+        structlog.contextvars.bind_contextvars(run_id=run_id, job_name=job_name)
+
         for idx, block in enumerate(self.blocks):
             logger_base = logger.bind(
                 consumer=block.consumer,
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
-                run_id=str(self.context.job.run_id) if self.context.job else None,
-                job_name=self.context.job.job_name if self.context.job else None,
             )
             if logger.isEnabledFor(logging.DEBUG):
                 block.stdout_link(
