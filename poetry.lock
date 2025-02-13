@@ -1018,21 +1018,21 @@ files = [
 
 [[package]]
 name = "check-jsonschema"
-version = "0.30.0"
+version = "0.31.1"
 description = "A jsonschema CLI and pre-commit hook"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "check_jsonschema-0.30.0-py3-none-any.whl", hash = "sha256:c7fb2de2017ab81a85b08c7332d6f074b0565d41d068de25a6e42a8a6a0b723d"},
-    {file = "check_jsonschema-0.30.0.tar.gz", hash = "sha256:c912ef9cf204c17d2e9d832b9088040f1c0c3f178ebda9805a56e5f35b29f5f2"},
+    {file = "check_jsonschema-0.31.1-py3-none-any.whl", hash = "sha256:d7c451f22855c362343ba1774b75360f9ff910badcc04a97bdd91d77bc124839"},
+    {file = "check_jsonschema-0.31.1.tar.gz", hash = "sha256:32138447bd55fb97791b3eee8441aa8ea0af993ce6b2ca295e91ad39dada20de"},
 ]
 
 [package.dependencies]
 click = ">=8,<9"
 jsonschema = ">=4.18.0,<5.0"
-regress = ">=0.4.0"
+regress = ">=2024.11.1"
 requests = "<3.0"
-"ruamel.yaml" = "0.18.6"
+"ruamel.yaml" = ">=0.18.10,<0.19.0"
 tomli = {version = ">=2.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
@@ -3435,13 +3435,13 @@ pyasn1 = ">=0.1.3"
 
 [[package]]
 name = "ruamel-yaml"
-version = "0.18.6"
+version = "0.18.10"
 description = "ruamel.yaml is a YAML parser/emitter that supports roundtrip preservation of comments, seq/map flow style, and map key order"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "ruamel.yaml-0.18.6-py3-none-any.whl", hash = "sha256:57b53ba33def16c4f3d807c0ccbc00f8a6081827e81ba2491691b76882d0c636"},
-    {file = "ruamel.yaml-0.18.6.tar.gz", hash = "sha256:8b27e6a217e786c6fbe5634d8f3f11bc63e0f80f6a5890f28863d9c45aac311b"},
+    {file = "ruamel.yaml-0.18.10-py3-none-any.whl", hash = "sha256:30f22513ab2301b3d2b577adc121c6471f28734d3d9728581245f1e76468b4f1"},
+    {file = "ruamel.yaml-0.18.10.tar.gz", hash = "sha256:20c86ab29ac2153f80a428e1254a8adf686d3383df04490514ca3b79a362db58"},
 ]
 
 [package.dependencies]
@@ -4358,4 +4358,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.14"
-content-hash = "5b847c6c119608630170f50a366e92b7916cf5faae3d4a9a9ddced327dfba53f"
+content-hash = "ad7898111c60cbbd7ee299a8f56dd70b321ad150a2ebffbb31c3f204634e9e75"
