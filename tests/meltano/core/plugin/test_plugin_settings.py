@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import typing as t
 from datetime import datetime, timezone
 
@@ -593,6 +594,7 @@ class TestPluginSettingsService:
             "multiple": "$A ${B} $C",
             "info": "$MELTANO_EXTRACTOR_NAME",
             "password": "foo$r$6$bar",
+            "user_agent": "$MELTANO_USER_AGENT",
             "_extra": "$TAP_MOCK_MULTIPLE",
             "_extra_generic": "$MELTANO_EXTRACT_FOO",
         }
@@ -608,6 +610,7 @@ class TestPluginSettingsService:
         assert config["missing"] is None
         assert config["multiple"] == "rock paper scissors"
         assert config["info"] == "tap-mock"
+        assert re.match(r"Meltano/\d+\.\d+\.\d+\S*", config["user_agent"])
 
         # Only `$ALL_CAPS` env vars are supported
         assert config["password"] == yml_config["password"]
