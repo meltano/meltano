@@ -61,7 +61,7 @@ google-cloud-storage = {version = ">=1.31.0", optional = true}
 jinja2 = "^3.1.4"
 jsonschema = "^4.23"
 packaging = "^24.2"
-psutil = "^6.0.0"
+psutil = "^7.0.0"
 psycopg = {version = "^3.2.3", extras = ["binary"], optional = true}
 psycopg2-binary = {version="^2.9.9", optional=true}
 pymssql = {version = "^2.3.2", optional = true}
@@ -80,7 +80,7 @@ typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
 urllib3 = "<2"
-uv = ">=0.1.24,<0.6"
+uv = ">=0.1.24,<0.7"
 virtualenv = "^20.26.6"
 
 [tool.poetry.extras]
