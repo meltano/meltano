@@ -88,7 +88,7 @@ This enables reuse of configuration common to multiple environments while making
 
 An Environment can define an `env` mapping that will be injected into the plugin(s) environment at runtime.
 Only project-set environment variables referenced in the env mapping will be expanded appropriately.
-That is, `MELTANO_PROJECT_ROOT`, `MELTANO_SYS_DIR_ROOT` and `MELTANO_ENVIRONMENT`.
+That is, `MELTANO_PROJECT_ROOT`, `MELTANO_SYS_DIR_ROOT`, `MELTANO_ENVIRONMENT` and `MELTANO_USER_AGENT`.
 
 In the below example, the `$MELTANO_PROJECT_ROOT/path/to/a/file.json` value will properly read the `$MELTANO_PROJECT_ROOT`
 environment variable and inject the full value as `$MY_ENV_VAR` into the environment.
