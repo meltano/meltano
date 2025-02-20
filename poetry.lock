@@ -334,13 +334,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.36.21"
-description = "Type annotations for boto3 1.36.21 generated with mypy-boto3-builder 8.9.1"
+version = "1.36.24"
+description = "Type annotations for boto3 1.36.24 generated with mypy-boto3-builder 8.9.2"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.36.21-py3-none-any.whl", hash = "sha256:37803a04d55dc14e99e1aabdbdfc1612d92d55f1fdf2b8efc3f7ccc5b5514a09"},
-    {file = "boto3_stubs-1.36.21.tar.gz", hash = "sha256:0cb41bcc60490c8f2f6916d246839b0017184ffff31f65fc2e9205beceaf53ba"},
+    {file = "boto3_stubs-1.36.24-py3-none-any.whl", hash = "sha256:4c589bd740d479127020501c75fbfcd6cb4d279811c3b4893c17471d644062b5"},
+    {file = "boto3_stubs-1.36.24.tar.gz", hash = "sha256:2d480a15096433e8e4a1293e209168e24f30e63975fba04906546a9932395758"},
 ]
 
 [package.dependencies]
@@ -403,7 +403,7 @@ bedrock-data-automation-runtime = ["mypy-boto3-bedrock-data-automation-runtime (
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.36.0,<1.37.0)"]
 billing = ["mypy-boto3-billing (>=1.36.0,<1.37.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.36.0,<1.37.0)"]
-boto3 = ["boto3 (==1.36.21)"]
+boto3 = ["boto3 (==1.36.24)"]
 braket = ["mypy-boto3-braket (>=1.36.0,<1.37.0)"]
 budgets = ["mypy-boto3-budgets (>=1.36.0,<1.37.0)"]
 ce = ["mypy-boto3-ce (>=1.36.0,<1.37.0)"]
@@ -3964,13 +3964,13 @@ referencing = "*"
 
 [[package]]
 name = "types-psutil"
-version = "6.1.0.20241221"
+version = "7.0.0.20250218"
 description = "Typing stubs for psutil"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "types_psutil-6.1.0.20241221-py3-none-any.whl", hash = "sha256:8498dbe13285a9ba7d4b2fa934c569cc380efc74e3dacdb34ae16d2cdf389ec3"},
-    {file = "types_psutil-6.1.0.20241221.tar.gz", hash = "sha256:600f5a36bd5e0eb8887f0e3f3ff2cf154d90690ad8123c8a707bba4ab94d3185"},
+    {file = "types_psutil-7.0.0.20250218-py3-none-any.whl", hash = "sha256:1447a30c282aafefcf8941ece854e1100eee7b0296a9d9be9977292f0269b121"},
+    {file = "types_psutil-7.0.0.20250218.tar.gz", hash = "sha256:1e642cdafe837b240295b23b1cbd4691d80b08a07d29932143cbbae30eb0db9c"},
 ]
 
 [[package]]
@@ -4357,4 +4357,4 @@ s3 = ["boto3"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.14"
-content-hash = "444d4c9ea928cf4e61634d5338ce48ee19dd0f0e5d7b6236c356e6403acba005"
+content-hash = "2cc23807d10d0cbde8c7d7d31c4e2bd4a87bbb19dca78e3c038471cda4305253"

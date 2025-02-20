@@ -113,7 +113,7 @@ setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource inten
 time-machine = "^2.15.0"
 types-croniter = "==5.0.1.20241205"
 types-jsonschema = "^4.23.0.20240813"
-types-psutil = "^6.1.0.20241102"
+types-psutil = "^7.0.0.20250218"
 types-pyyaml = "^6.0.12.20240917"
 types-requests = "^2.31.0"
 
