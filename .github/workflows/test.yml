@@ -138,15 +138,7 @@ jobs:
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg3')
       run: >
-        docker run -d
-        -p "5432:5432"
-        -e "POSTGRES_PASSWORD=postgres"
-        --name postgres
-        --health-cmd "pg_isready -d postgres -U postgres"
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-        postgres:13
+        docker compose -f .github/workflows/resources/docker-compose.postgres.yaml up -d --wait --quiet-pull
 
     - name: Start MSSQL Container
       if: always() && (matrix.backend-db == 'mssql')
