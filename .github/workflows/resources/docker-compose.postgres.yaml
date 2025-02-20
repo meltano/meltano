@@ -1,5 +1,7 @@
 services:
   postgres:
+    # NOTE: Support for PostgreSQL 13 ends on Nov 2025, bump to 14 after that
+    # https://endoflife.date/postgresql
     image: postgres:13
     container_name: postgres
     ports:
