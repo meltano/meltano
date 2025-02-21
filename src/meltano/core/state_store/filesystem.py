@@ -110,20 +110,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Yields:
             A TextIOWrapper to read the file/blob.
         """
-        if self.client:
-            with smart_open.open(
-                self.uri_with_path(path),
-                transport_params={
-                    "client": self.client,
-                    **self.extra_transport_params,
-                },
-            ) as reader:
-                yield reader
-        else:
-            with smart_open.open(
-                self.uri_with_path(path),
-            ) as reader:
-                yield reader
+        transport_params = {"client": self.client} if self.client else {}
+        transport_params.update(self.extra_transport_params)
+        with smart_open.open(
+            self.uri_with_path(path),
+            "r",
+            transport_params=transport_params,
+        ) as reader:
+            yield reader
 
     @contextmanager
     def get_writer(self, path: str) -> Iterator[TextIOWrapper]:
