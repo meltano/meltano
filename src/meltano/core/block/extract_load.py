@@ -345,7 +345,7 @@ class ExtractLoadBlocks(BlockSet):
     def __init__(
         self,
         context: ELBContext,
-        blocks: tuple[IOBlock, ...],
+        blocks: t.Sequence[IOBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
