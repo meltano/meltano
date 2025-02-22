@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+import typing as t
+from collections.abc import Generator, Iterable
 
 import structlog
 import yaml
@@ -45,7 +46,7 @@ class InvalidTasksError(Exception):
         super().__init__(f"Job '{name}' has invalid tasks. {message}")
 
 
-def _flat_split(items):  # noqa: ANN001, ANN202
+def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
     for el in items:
         if isinstance(el, Iterable) and not isinstance(el, str):
             yield from _flat_split(el)
@@ -69,6 +70,16 @@ class TaskSets(NameEq, Canonical):
 
         self.name = name
         self.tasks = tasks
+
+    @t.overload
+    def _as_args(self) -> list[str]: ...
+
+    @t.overload
+    def _as_args(
+        self,
+        *,
+        preserve_top_level: bool = True,
+    ) -> list[list[str]]: ...
 
     def _as_args(
         self,
@@ -96,7 +107,7 @@ class TaskSets(NameEq, Canonical):
         return flattened
 
     @property
-    def flat_args(self) -> list[str] | list[list[str]]:
+    def flat_args(self) -> list[str]:
         """Convert job's tasks to a single invocable representations.
 
         For passing as a cli argument or as block names.
