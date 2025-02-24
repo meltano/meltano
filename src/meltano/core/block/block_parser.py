@@ -24,6 +24,7 @@ if t.TYPE_CHECKING:
     import structlog
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.project import Project
 
 
 def is_command_block(plugin: ProjectPlugin) -> bool:
@@ -56,7 +57,7 @@ def validate_block_sets(
         True if all blocks are valid, False otherwise.
     """
     for idx, blk in enumerate(blocks):
-        if blk == BlockSet:
+        if isinstance(blk, BlockSet):
             log.debug("validating ExtractLoadBlock.", set_number=idx)
             try:
                 blk.validate_set()
@@ -70,7 +71,7 @@ class BlockParser:  # noqa: D101
     def __init__(
         self,
         log: structlog.BoundLogger,
-        project,  # noqa: ANN001
+        project: Project,
         blocks: list[str],
         *,
         full_refresh: bool | None = False,
@@ -248,7 +249,7 @@ class BlockParser:  # noqa: D101
 
         builder = (
             ELBContextBuilder(self.project)
-            .with_force(force=self._force)
+            .with_force(force=self._force)  # type: ignore[arg-type]
             .with_full_refresh(full_refresh=self._full_refresh)
             .with_refresh_catalog(refresh_catalog=self._refresh_catalog)
             .with_no_state_update(no_state_update=self._no_state_update)

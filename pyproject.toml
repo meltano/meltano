@@ -244,7 +244,12 @@ module = [
   "meltano.core.transform_add_service",
   # Meltano Core submodules
   "meltano.core.behavior.*",
-  "meltano.core.block.*",
+  "meltano.core.block.blockset",
+  "meltano.core.block.extract_load",
+  "meltano.core.block.future_utils",
+  "meltano.core.block.ioblock",
+  "meltano.core.block.plugin_command",
+  "meltano.core.block.singer",
   "meltano.core.plugin.base",
   "meltano.core.plugin.dbt.*",
   "meltano.core.plugin.meltano_file",
