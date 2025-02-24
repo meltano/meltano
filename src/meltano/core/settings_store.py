@@ -930,8 +930,8 @@ class DbStoreManager(SettingsStoreManager):
     def __init__(
         self,
         *args,  # noqa: ANN002
-        session: Session,
         bulk: bool = False,
+        session: Session | None = None,
         **kwargs,  # noqa: ANN003
     ):
         """Initialise DbStoreManager.
@@ -980,6 +980,7 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A tuple the got value and an empty dictionary.
         """
+        assert self.session is not None  # noqa: S101
         try:
             if self.bulk:
                 value = self.all_settings[name]
@@ -1014,6 +1015,7 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        assert self.session is not None  # noqa: S101
         setting = Setting(
             namespace=self.namespace,
             name=name,
@@ -1044,6 +1046,7 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        assert self.session is not None  # noqa: S101
         self.session.query(Setting).filter_by(
             namespace=self.namespace,
             name=name,
@@ -1061,6 +1064,7 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        assert self.session is not None  # noqa: S101
         self.session.query(Setting).filter_by(namespace=self.namespace).delete()
         self.session.commit()
 
@@ -1084,6 +1088,7 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A dictionary of Setting models.
         """  # noqa: E501
+        assert self.session is not None  # noqa: S101
         if self._all_settings is None:
             self._all_settings = {
                 setting.name: setting.value
