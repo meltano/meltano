@@ -11,8 +11,9 @@ sidebar_class_name: hidden
 In order to contribute to Meltano, you will need the following:
 
 1. [Python 3.9+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
-2. [Node 18+](https://nodejs.org/)
-3. [Yarn](https://yarnpkg.com/)
+2. [uv](https://docs.astral.sh/uv/). Optional, but installation is highly recommended for managing third-party Python-based tools.
+3. [Node 18+](https://nodejs.org/)
+4. [Yarn](https://yarnpkg.com/)
 
 ## Setting Up Your Environment
 
@@ -23,17 +24,19 @@ git clone git@github.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
-# Install the Poetry tool for managing dependencies and packaging
-pip3 install poetry
+# Install the, Nox, Poetry and pre-commit tools
+uv tool install --with nox-poetry nox
+uv tool install poetry
+uv tool install pre-commit
 
 # Install all the dependencies
 poetry install
 
 # Install the pre-commit hook
-poetry run pre-commit install --install-hooks
+pre-commit install --install-hooks
 
 # Obtain a shell in the poetry created virtual environment
-poetry shell
+source $(poetry env info --path)/bin/activate
 ```
 
 Meltano is now installed and available at `meltano`, as long as you remain in your virtual environment that you access
