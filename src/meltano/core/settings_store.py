@@ -943,10 +943,18 @@ class DbStoreManager(SettingsStoreManager):
             kwargs: Keyword arguments to pass to parent class.
         """
         super().__init__(*args, **kwargs)
-        self.session = session
+        self._session = session
         self.ensure_supported()
         self.bulk = bulk
         self._all_settings: dict[str, str | None] | None = None
+
+    @property
+    def session(self) -> Session:
+        """Database session."""
+        if not self._session:
+            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
+
+        return self._session
 
     def ensure_supported(
         self,
@@ -960,8 +968,7 @@ class DbStoreManager(SettingsStoreManager):
         Raises:
             StoreNotSupportedError: if database session is not provided.
         """
-        if not self.session:
-            raise StoreNotSupportedError("No database session provided")  # noqa: EM101
+        self.session  # noqa: B018
 
     def get(
         self,
@@ -980,7 +987,6 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A tuple the got value and an empty dictionary.
         """
-        assert self.session is not None  # noqa: S101
         try:
             if self.bulk:
                 value = self.all_settings[name]
@@ -1015,7 +1021,6 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
-        assert self.session is not None  # noqa: S101
         setting = Setting(
             namespace=self.namespace,
             name=name,
@@ -1046,7 +1051,6 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
-        assert self.session is not None  # noqa: S101
         self.session.query(Setting).filter_by(
             namespace=self.namespace,
             name=name,
@@ -1064,7 +1068,6 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
-        assert self.session is not None  # noqa: S101
         self.session.query(Setting).filter_by(namespace=self.namespace).delete()
         self.session.commit()
 
@@ -1088,7 +1091,6 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A dictionary of Setting models.
         """  # noqa: E501
-        assert self.session is not None  # noqa: S101
         if self._all_settings is None:
             self._all_settings = {
                 setting.name: setting.value
