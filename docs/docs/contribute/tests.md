@@ -12,6 +12,20 @@ Meltano uses [Pytest](https://docs.pytest.org/) as our primary test framework fo
 
 We recommend you familiarize yourself with [Pytest fixtures](https://docs.pytest.org/en/latest/explanation/fixtures.html), [Pytest parametrization](https://docs.pytest.org/en/latest/how-to/parametrize.html), and [`unittest.mock`](https://docs.python.org/dev/library/unittest.mock.html).
 
+### Running Pytest
+
+To run Pytest, you can use the following command:
+
+```bash
+nox -rs pytest -p 3.11
+```
+
+Or, if you want to run a specific test file, for example:
+
+```bash
+nox -rs pytest -p 3.11 -- tests/meltano/core/test_task_sets.py
+```
+
 ### Pytest Best Practices
 
 When possible, ensure Pytest is reporting no errors, failures, warnings, xpasses (i.e. tests that we expected would fail passing instead), or unexpected skips. Additionally, the execution time should be consistent and short. Consider gating a test behind an optional `slow` or similar Pytest marker if it is slow or resource-hungry.
