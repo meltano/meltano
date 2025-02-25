@@ -58,6 +58,7 @@ croniter = "^6.0.0"
 fasteners = "^0.19"
 flatten-dict = "^0"
 google-cloud-storage = {version = ">=1.31.0", optional = true}
+importlib-metadata = { version = ">=5", python = "<3.12" }
 jinja2 = "^3.1.4"
 jsonschema = "^4.23"
 packaging = "^24.2"
@@ -119,6 +120,26 @@ types-requests = "^2.31.0"
 
 [tool.poetry.scripts]
 meltano = "meltano.cli:main"
+
+[tool.poetry.plugins."meltano.settings"]
+# AWS S3 state backend settings
+s3_aws_access_key_id = "meltano.core.state_store.s3:AWS_ACCESS_KEY_ID"
+s3_aws_secret_access_key = "meltano.core.state_store.s3:AWS_SECRET_ACCESS_KEY"
+s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
+# Azure state backend settings
+azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
+azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
+# Google Cloud Storage state backend settings
+google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"
+
+[tool.poetry.plugins."meltano.state_backends"]
+# These keys should match the expected scheme for URIs of
+# the given type. E.g., filesystem state backends have a
+# file://<path>/<to>/<state directory> URI
+azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
+file = "meltano.core.state_store.filesystem:LocalFilesystemStateStoreManager"
+gs = "meltano.core.state_store.google:GCSStateStoreManager"
+s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [tool.pytest.ini_options]
 addopts = [
