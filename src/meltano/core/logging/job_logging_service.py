@@ -10,6 +10,7 @@ from meltano.core.utils import makedirs, slugify
 
 if t.TYPE_CHECKING:
     from pathlib import Path
+    from uuid import UUID
 
     from meltano.core.project import Project
 
@@ -46,7 +47,7 @@ class JobLoggingService:  # noqa: D101
     def generate_log_name(
         self,
         state_id: str,
-        run_id: str,
+        run_id: str | UUID,
         file_name: str = "elt.log",
     ) -> Path:
         """Generate an internal etl log path and name.
