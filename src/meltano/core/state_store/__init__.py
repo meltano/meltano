@@ -74,7 +74,7 @@ class StateBackend:
         """
         return [
             *(x.value for x in BuiltinStateBackendEnum),
-            *(ep.name for ep in cls.addon.installed)
+            *(ep.name for ep in cls.addon.installed),
         ]
 
     @property
