@@ -259,7 +259,6 @@ module = [
   "meltano.core.models",
   "meltano.core.project_files",
   "meltano.core.project_settings_service",
-  "meltano.core.settings_store",
   "meltano.core.sqlalchemy",
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
