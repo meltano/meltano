@@ -19,7 +19,7 @@ repos:
         language: python
         pass_filenames: false
         additional_dependencies:
-          - "poetry==1.8.4"
+          - "poetry==2.1.1"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
