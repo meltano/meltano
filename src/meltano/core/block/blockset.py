@@ -33,7 +33,7 @@ class BlockSet(t.Generic[_T], metaclass=ABCMeta):
     interface.
     """
 
-    blocks: tuple[_T, ...]
+    blocks: t.Sequence[_T]
 
     @abstractmethod
     async def run(self) -> None:

@@ -34,5 +34,5 @@ class TestInvokerCommand:
         cmd.start = start_mock
 
         await cmd._start()
-        assert len(cmd.start.call_args[0]) == 1
-        assert cmd.start.call_args[0][0] == ["--foo", "--bar"]
+        assert len(cmd.start.call_args) == 2
+        assert cmd.start.call_args[0] == ("--foo", "--bar")
