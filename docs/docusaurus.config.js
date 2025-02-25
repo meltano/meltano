@@ -206,7 +206,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ['yaml', 'json', 'bash'],
+        additionalLanguages: ['yaml', 'json', 'bash', 'toml'],
       },
       docs: {
         sidebar: {

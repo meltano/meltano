@@ -21,9 +21,9 @@ from meltano.core.block.extract_load import (
 )
 from meltano.core.block.ioblock import IOBlock
 from meltano.core.block.singer import SingerBlock
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.environment import Environment
 from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
