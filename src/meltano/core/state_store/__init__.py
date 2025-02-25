@@ -72,7 +72,10 @@ class StateBackend:
         Returns:
             List of available state backends.
         """
-        return list(BuiltinStateBackendEnum) + [ep.name for ep in cls.addon.installed]
+        return [
+            *(x.value for x in BuiltinStateBackendEnum),
+            *(ep.name for ep in cls.addon.installed)
+        ]
 
     @property
     def _builtin_managers(
