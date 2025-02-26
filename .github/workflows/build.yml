@@ -2,6 +2,8 @@ name: Build and Publish to PyPI
 
 on:
   push:
+  release:
+    types: [published]
 
 permissions:
   contents: write  # Needed to upload artifacts to the release
@@ -32,7 +34,7 @@ jobs:
         cache: 'poetry'
 
     - name: Check version
-      if: startsWith(github.ref, 'refs/tags/')
+      if: github.event_name == 'release' && github.event.action == 'published'
       run: |
         version=$(poetry version | awk '{print $2}')
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
@@ -48,7 +50,7 @@ jobs:
         poetry run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: startsWith(github.ref, 'refs/tags/')
+      if: github.event_name == 'release' && github.event.action == 'published'
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
@@ -58,7 +60,7 @@ jobs:
 
   pypi_release:
     name: Publish to PyPI
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
     runs-on: ubuntu-latest
     environment:
