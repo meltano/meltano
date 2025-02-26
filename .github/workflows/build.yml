@@ -1,10 +1,7 @@
 name: Build and Publish to PyPI
 
 on:
-  workflow_dispatch:
-    inputs: {}
-  release:
-    types: [published]
+  push:
 
 permissions:
   contents: write  # Needed to upload artifacts to the release
@@ -14,7 +11,8 @@ jobs:
   build:
     name: Build artifacts
     runs-on: ubuntu-latest
-    environment: publishing
+    outputs:
+      version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
     - name: Check out the repository
@@ -34,7 +32,7 @@ jobs:
         cache: 'poetry'
 
     - name: Check version
-      if: ${{ github.event.release }}
+      if: startsWith(github.ref, 'refs/tags/')
       run: |
         version=$(poetry version | awk '{print $2}')
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
@@ -50,26 +48,23 @@ jobs:
         poetry run scripts/alembic_freeze.py
 
     - name: Release Marker
-      if: ${{ github.event.release }}
+      if: startsWith(github.ref, 'refs/tags/')
       # The release marker differentiates installations 'in the wild' versus internal dev builds and tests
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      run: |
-        poetry build --format sdist
-        poetry run pip wheel --no-deps . --wheel-dir dist/
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-artifacts
-        path: 'dist/*'
+      uses: hynek/build-and-inspect-python-package@v2
+      id: baipp
 
   pypi_release:
     name: Publish to PyPI
+    if: startsWith(github.ref, 'refs/tags/')
     needs: [build]
     runs-on: ubuntu-latest
-    environment: publishing
+    environment:
+      name: publishing
+      url: https://pypi.org/project/meltano/${{ needs.build.outputs.version }}
+
     steps:
     - name: Check out the repository
       uses: actions/checkout@v4.2.2
@@ -77,15 +72,10 @@ jobs:
     - name: Download artifacts
       uses: actions/download-artifact@v4
       with:
-        name: python-artifacts
-        path: dist/
-
-    - name: Verify artifacts
-      run: |
-        ls dist/
+        name: Packages
+        path: dist
 
     - name: Upload wheel to release
-      if: ${{ github.event.release }}
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -95,5 +85,4 @@ jobs:
         file_glob: true
 
     - name: Publish
-      if: ${{ github.event.release }}
       uses: pypa/gh-action-pypi-publish@v1.12.4

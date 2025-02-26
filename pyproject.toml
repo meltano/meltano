@@ -405,3 +405,8 @@ convention = "google"
 "logging.log".msg = "Create a logger with `structlog.stdlib.get_logger`"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
+
+[tool.check-wheel-contents]
+ignore = [
+    "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
+]
