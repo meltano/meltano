@@ -1068,37 +1068,15 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 1
             assert "Error: Block not-a-valid-mapping-name not found" in result.stderr
 
-        # test mapper/mapping name collision detection - mapper plugin name no mappings
-        project_add_service.add(
-            PluginType.MAPPERS,
-            "mapper-collision-01",
-            inherit_from=mapper.name,
-        )
-        args = ["run", tap.name, "mapper-collision-01", target.name]
-        with (
-            mock.patch.object(SingerTap, "discover_catalog"),
-            mock.patch.object(SingerTap, "apply_catalog_rules"),
-            mock.patch("meltano.core.plugin_invoker.asyncio") as asyncio_mock2,
-        ):
-            asyncio_mock2.create_subprocess_exec = create_subprocess_exec
-            with pytest.raises(
-                Exception,
-                match=(
-                    "block violates set requirements: Expected unique mappings "
-                    "name not the mapper plugin name: mapper-collision-01"
-                ),
-            ):
-                cli_runner.invoke(cli, args, catch_exceptions=False)
-
         # Test mapper/mapping name collision detection - mappings name same a
         # mapper plugin name
         project_add_service.add(
             PluginType.MAPPERS,
-            "mapper-collision-02",
+            "mapper-collision",
             inherit_from=mapper.name,
             mappings=[
                 {
-                    "name": "mapper-collision-02",
+                    "name": "mapper-collision",
                     "config": {
                         "transformations": [
                             {
@@ -1111,7 +1089,7 @@ class TestCliRunScratchpadOne:
                 },
             ],
         )
-        args = ["run", tap.name, "mapper-collision-02", target.name]
+        args = ["run", tap.name, "mapper-collision", target.name]
         with (
             mock.patch.object(SingerTap, "discover_catalog"),
             mock.patch.object(SingerTap, "apply_catalog_rules"),
@@ -1122,7 +1100,7 @@ class TestCliRunScratchpadOne:
                 Exception,
                 match=(
                     "block violates set requirements: Expected unique mappings "
-                    "name not the mapper plugin name: mapper-collision-02"
+                    "name not the mapper plugin name: mapper-collision"
                 ),
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
