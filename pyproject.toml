@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "meltano"
-version = "3.7.0a3"
+version = "3.7.0a4"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -222,7 +222,7 @@ name = "cz_version_bump"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
-version = "3.7.0a3"
+version = "3.7.0a4"
 version_files = [
   "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
@@ -405,3 +405,8 @@ convention = "google"
 "logging.log".msg = "Create a logger with `structlog.stdlib.get_logger`"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
+
+[tool.check-wheel-contents]
+ignore = [
+    "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
+]
