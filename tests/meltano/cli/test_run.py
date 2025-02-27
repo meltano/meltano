@@ -1097,10 +1097,9 @@ class TestCliRunScratchpadOne:
         ):
             asyncio_mock2.create_subprocess_exec = create_subprocess_exec
             with pytest.raises(
-                Exception,
+                AmbiguousMappingName,
                 match=(
-                    "block violates set requirements: Expected unique mappings "
-                    "name not the mapper plugin name: mapper-collision"
+                    "Ambiguous mapping name mapper-collision, found multiple matches."
                 ),
             ):
                 cli_runner.invoke(cli, args, catch_exceptions=False)
