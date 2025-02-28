@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 import sys
 import typing as t
+from unittest import mock
 
 import moto
 import pytest
@@ -11,6 +12,7 @@ from azure.storage.blob import BlobServiceClient
 from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
+from google.auth.credentials import AnonymousCredentials
 from google.cloud.exceptions import NotFound
 from google.cloud.storage import Blob
 
@@ -184,7 +186,16 @@ class TestGCSStateBackend:
         def _other_error(*args, **kwargs):  # noqa: ARG001
             raise RuntimeError("Something went wrong")  # noqa: EM101
 
-        with monkeypatch.context() as m:
+        # Mock default credentials
+        mock_credentials = AnonymousCredentials()
+
+        with (
+            mock.patch(
+                "google.auth.default",
+                return_value=(mock_credentials, "mock-project"),
+            ),
+            monkeypatch.context() as m,
+        ):
             m.setattr(Blob, "delete", _not_found)
             manager.delete(file_path)
 
