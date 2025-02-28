@@ -1,0 +1,15 @@
+services:
+  postgres:
+    # NOTE: Support for PostgreSQL 13 ends on Nov 2025, bump to 14 after that
+    # https://endoflife.date/postgresql
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+        POSTGRES_PASSWORD: postgres
+    healthcheck:
+        test: ["CMD", "pg_isready", "-d", "postgres", "-U", "postgres"]
+        interval: 10s
+        timeout: 5s
+        retries: 5

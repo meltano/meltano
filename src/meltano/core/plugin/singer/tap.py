@@ -240,6 +240,8 @@ class SingerTap(SingerPlugin):
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
+            "singer_sdk_logging": "tap.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "tap.pipelinewise_logging.conf",
         }
 
     @property

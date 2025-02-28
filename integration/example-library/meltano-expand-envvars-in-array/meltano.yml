@@ -25,3 +25,9 @@ plugins:
       streams:
       - stream_name: $ANIMAL_GROUP
         input_filename: $MELTANO_PROJECT_ROOT/data/$ANIMAL_GROUP.jsonl
+  loaders:
+  - name: target-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/target-csv.git
+    config:
+      destination_path: $MELTANO_PROJECT_ROOT/output/

@@ -1,0 +1,7 @@
+extend = "../../pyproject.toml"
+
+[lint]
+extend-ignore = [
+    "ANN",   # type annotations
+    "T201",  # print function
+]

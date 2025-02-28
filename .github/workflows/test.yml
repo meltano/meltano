@@ -50,18 +50,18 @@ jobs:
         - { id: '14', python-version: '3.12', os: ubuntu-latest, backend-db: mssql }
         - { id: '15', python-version: '3.13', os: ubuntu-latest, backend-db: mssql }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
-        - { id: '16', python-version: '3.9',  os: windows-2022,  backend-db: sqlite }
-        - { id: '17', python-version: '3.10', os: windows-2022,  backend-db: sqlite }
-        - { id: '18', python-version: '3.11', os: windows-2022,  backend-db: sqlite }
-        - { id: '19', python-version: '3.12', os: windows-2022,  backend-db: sqlite }
-        - { id: '20', python-version: '3.13', os: windows-2022,  backend-db: sqlite }
+        - { id: '16', python-version: '3.9',  os: windows-2025,  backend-db: sqlite }
+        - { id: '17', python-version: '3.10', os: windows-2025,  backend-db: sqlite }
+        - { id: '18', python-version: '3.11', os: windows-2025,  backend-db: sqlite }
+        - { id: '19', python-version: '3.12', os: windows-2025,  backend-db: sqlite }
+        - { id: '20', python-version: '3.13', os: windows-2025,  backend-db: sqlite }
         - { id: '21', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '22', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '23', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '24', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '25', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
         - { id: '91', python-version: '3.13', os: ubuntu-latest, backend-db: sqlite, markers: 'concurrent' }
-        - { id: '92', python-version: '3.13', os: windows-2022,  backend-db: sqlite, markers: 'concurrent' }
+        - { id: '92', python-version: '3.13', os: windows-2025,  backend-db: sqlite, markers: 'concurrent' }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
@@ -127,7 +127,7 @@ jobs:
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.8.0
+      uses: docker/setup-buildx-action@v3.9.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
@@ -138,15 +138,7 @@ jobs:
     - name: Start Postgres Container
       if: always() && (matrix.backend-db == 'postgresql' || matrix.backend-db == 'postgresql_psycopg3')
       run: >
-        docker run -d
-        -p "5432:5432"
-        -e "POSTGRES_PASSWORD=postgres"
-        --name postgres
-        --health-cmd "pg_isready -d postgres -U postgres"
-        --health-interval 10s
-        --health-timeout 5s
-        --health-retries 5
-        postgres:13
+        docker compose -f .github/workflows/resources/docker-compose.postgres.yaml up -d --wait --quiet-pull
 
     - name: Start MSSQL Container
       if: always() && (matrix.backend-db == 'mssql')

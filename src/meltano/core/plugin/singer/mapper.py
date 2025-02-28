@@ -49,7 +49,11 @@ class SingerMapper(SingerPlugin):
     @property
     def config_files(self) -> dict[str, str]:
         """Return the configuration files required by the plugin."""
-        return {"config": f"mapper.{self.instance_uuid}.config.json"}
+        return {
+            "config": f"mapper.{self.instance_uuid}.config.json",
+            "singer_sdk_logging": "mapper.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "mapper.pipelinewise_logging.conf",
+        }
 
     @hook("before_configure")
     async def before_configure(

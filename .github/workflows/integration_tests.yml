@@ -33,7 +33,7 @@ jobs:
       matrix:
         include:
         - { integration_test: "meltano-basics", needs_postgres: false}
-        - { integration_test: "meltano-run", needs_postgres: true}
+        - { integration_test: "meltano-run", needs_postgres: true, python: "3.10"}
         - { integration_test: "meltano-objects", needs_postgres: false}
         - { integration_test: "meltano-migrations", needs_postgres: false}
         - { integration_test: "meltano-state-s3", needs_postgres: false}
@@ -60,7 +60,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: '3.12'
+        python-version: ${{ matrix.python || '3.12' }}
         architecture: x64
         cache: 'poetry'
 
@@ -73,7 +73,7 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        poetry env use "3.12"
+        poetry env use "${{ matrix.python || '3.12' }}"
         poetry install --extras "s3"
 
     - name: Start Postgres Container
@@ -92,5 +92,5 @@ jobs:
 
     - name: Run integration tests
       run: |
-        poetry env use "3.12"
+        poetry env use "${{ matrix.python || '3.12' }}"
         poetry run bash integration/validate.sh ${{ matrix.integration_test }}

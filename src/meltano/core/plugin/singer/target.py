@@ -123,7 +123,11 @@ class SingerTarget(SingerPlugin):
         Returns:
             The config_files for this target.
         """
-        return {"config": f"target.{self.instance_uuid}.config.json"}
+        return {
+            "config": f"target.{self.instance_uuid}.config.json",
+            "singer_sdk_logging": "target.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "target.pipelinewise_logging.conf",
+        }
 
     @property
     def output_files(self) -> dict[str, str]:
