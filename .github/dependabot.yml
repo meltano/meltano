@@ -1,4 +1,5 @@
 version: 2
+enable-beta-ecosystems: true
 updates:
   - package-ecosystem: pip
     directory: "/.github/workflows"
@@ -50,7 +51,7 @@ updates:
         - "minor"
         - "patch"
     commit-message:
-      prefix: "packaging(deps): "
+      prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
   - package-ecosystem: npm
     versioning-strategy: increase
@@ -73,3 +74,10 @@ updates:
     commit-message:
       prefix: "chore(deps): "
       prefix-development: "chore(deps-dev): "
+  - package-ecosystem: "docker-compose"
+    directory: "tests/fixtures/docker/"
+    schedule:
+      interval: "monthly"
+      time: "12:00"
+      timezone: "Etc/UTC"
+    reviewers: ["meltano/engineering"]

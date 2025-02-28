@@ -9,11 +9,11 @@ from contextlib import asynccontextmanager, closing
 
 import structlog
 
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -345,7 +345,7 @@ class ExtractLoadBlocks(BlockSet):
     def __init__(
         self,
         context: ELBContext,
-        blocks: tuple[IOBlock, ...],
+        blocks: t.Sequence[IOBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 

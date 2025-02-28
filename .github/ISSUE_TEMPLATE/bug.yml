@@ -19,7 +19,7 @@ body:
     attributes:
       label: Meltano Version
       description: Version of Meltano you are using
-      placeholder: "3.6.0"
+      placeholder: "3.7.0a4"
     validations:
       required: true
   - type: dropdown
@@ -65,13 +65,21 @@ body:
     validations:
       required: true
   - type: textarea
-    id: failing-code
+    id: meltano-yml
     attributes:
       label: Code
-      description: Paste the failing code and traceback, if applicable
-      render: python
+      description: Paste the contents of your `meltano.yml` file, omitting any sensitive information
+      render: yaml
+      placeholder: |
+        venv:
+          backend: ...
+        plugins:
+          extractors:
+          - name: tap-my-extractor
+            variant: my-variant
+            pip_url: ...
     validations:
-      required: false
+      required: true
   - type: input
     id: slack_or_linen
     attributes:

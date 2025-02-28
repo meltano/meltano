@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import shutil
+import sys
 import typing as t
+from unittest import mock
 
 import moto
 import pytest
@@ -10,28 +12,65 @@ from azure.storage.blob import BlobServiceClient
 from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
+from google.auth.credentials import AnonymousCredentials
+from google.cloud.exceptions import NotFound
+from google.cloud.storage import Blob
 
+from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
-    AZStorageStateStoreManager,
+    BuiltinStateBackendEnum,
     DBStateStoreManager,
-    GCSStateStoreManager,
-    LocalFilesystemStateStoreManager,
     MeltanoState,
-    S3StateStoreManager,
     StateBackend,
     state_store_manager_from_project_settings,
 )
+from meltano.core.state_store.azure import AZStorageStateStoreManager
+from meltano.core.state_store.filesystem import _LocalFilesystemStateStoreManager
+from meltano.core.state_store.google import GCSStateStoreManager
+from meltano.core.state_store.s3 import S3StateStoreManager
 
 if t.TYPE_CHECKING:
     from pathlib import Path
 
     from meltano.core.project import Project
 
+if sys.version_info >= (3, 12):
+    from importlib.metadata import EntryPoint, EntryPoints
+else:
+    from importlib_metadata import EntryPoint, EntryPoints
+
+
+def test_unknown_state_backend_scheme(project: Project):
+    project.settings.set(["state_backend", "uri"], "unknown://")
+    with pytest.raises(ValueError, match="No state backend found for scheme"):
+        state_store_manager_from_project_settings(project.settings)
+
+
+def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPatch):
+    project.settings.set(["state_backend", "uri"], "custom://")
+
+    entry_points = EntryPoints(
+        (
+            EntryPoint(
+                value="fixtures.state_backends:DummyStateStoreManager",
+                name="custom",
+                group="meltano.state_backends",
+            ),
+        ),
+    )
+
+    with monkeypatch.context() as m:
+        m.setattr(StateBackend.addon, "installed", entry_points)
+        assert "custom" in StateBackend.backends()
+
+        state_store = state_store_manager_from_project_settings(project.settings)
+        assert isinstance(state_store, DummyStateStoreManager)
+
 
 class TestSystemDBStateBackend:
     def test_manager_from_settings(self, project: Project) -> None:
-        project.settings.set(["state_backend", "uri"], StateBackend.SYSTEMDB)
+        project.settings.set(["state_backend", "uri"], BuiltinStateBackendEnum.SYSTEMDB)
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(db_state_store, DBStateStoreManager)
@@ -49,7 +88,7 @@ class TestLocalFilesystemStateBackend:
     def test_manager_from_settings(self, project: Project, state_path: str) -> None:
         project.settings.set(["state_backend", "uri"], f"file://{state_path}")
         file_state_store = state_store_manager_from_project_settings(project.settings)
-        assert isinstance(file_state_store, LocalFilesystemStateStoreManager)
+        assert isinstance(file_state_store, _LocalFilesystemStateStoreManager)
         assert file_state_store.state_dir == state_path
 
 
@@ -121,6 +160,11 @@ class TestAzureStateBackend:
 
 
 class TestGCSStateBackend:
+    @pytest.fixture
+    def manager(self, project: Project) -> GCSStateStoreManager:
+        project.settings.set(["state_backend", "uri"], "gs://my-bucket")
+        return state_store_manager_from_project_settings(project.settings)
+
     def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
@@ -128,6 +172,53 @@ class TestGCSStateBackend:
         assert isinstance(gs_state_store, GCSStateStoreManager)
         assert gs_state_store.bucket == "some_container"
         assert gs_state_store.prefix == "/some/path"
+
+    def test_delete_error(
+        self,
+        manager: GCSStateStoreManager,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        file_path = "some/path"
+
+        def _not_found(*args, **kwargs):  # noqa: ARG001
+            raise NotFound("No such object: ...")  # noqa: EM101
+
+        def _other_error(*args, **kwargs):  # noqa: ARG001
+            raise RuntimeError("Something went wrong")  # noqa: EM101
+
+        # Mock default credentials
+        mock_credentials = AnonymousCredentials()
+
+        with (
+            mock.patch(
+                "google.auth.default",
+                return_value=(mock_credentials, "mock-project"),
+            ),
+            monkeypatch.context() as m,
+        ):
+            m.setattr(Blob, "delete", _not_found)
+            manager.delete(file_path)
+
+            m.setattr(Blob, "delete", _other_error)
+            with pytest.raises(RuntimeError, match="Something went wrong"):
+                manager.delete(file_path)
+
+    @pytest.mark.parametrize(
+        ("components", "result"),
+        (
+            pytest.param(["a", "b", "c"], "a/b/c"),
+            pytest.param(["a", "b", "c", ""], "a/b/c"),
+            pytest.param(["a", "b", "", "c"], "a/b/c"),
+            pytest.param(["", "a", "b", "c"], "a/b/c"),
+        ),
+    )
+    def test_join_path(
+        self,
+        manager: GCSStateStoreManager,
+        components: list[str],
+        result: str,
+    ) -> None:
+        assert manager.join_path(*components) == result
 
 
 class TestS3StateBackend:

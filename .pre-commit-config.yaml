@@ -38,7 +38,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.0
+    rev: 0.31.2
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -47,10 +47,10 @@ repos:
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
-      - id: check-jsonschema
-        name: validate 'discovery.yml' with jsonschema
-        files: ^src/meltano/core/bundle/discovery.yml$
-        args: ["--schemafile", "src/meltano/schemas/discovery.schema.json"]
+      - id: check-compose-spec
+      - id: check-dependabot
+      - id: check-github-actions
+      - id: check-github-workflows
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
@@ -74,7 +74,7 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.1
+    rev: v0.9.7
     hooks:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]

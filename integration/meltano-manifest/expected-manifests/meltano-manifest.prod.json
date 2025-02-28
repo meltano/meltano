@@ -2387,7 +2387,7 @@
         ],
         "name": "meltano-map-transformer",
         "namespace": "meltano_map_transformer",
-        "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+        "pip_url": "meltano-map-transform",
         "plugin_type": "mappers",
         "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
         "settings": [

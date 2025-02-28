@@ -363,14 +363,14 @@ class SettingsService(metaclass=ABCMeta):
         )
         if expand_env_vars and metadata.get("expandable", False):
             metadata["expandable"] = False
-            expanded_value = do_expand_env_vars(
+            expanded_value = do_expand_env_vars(  # type: ignore[type-var]
                 value,
                 env=expandable_env,
-                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),
+                if_missing=EnvVarMissingBehavior(int(strict_env_var_mode)),  # type: ignore[arg-type]
             )
             # https://github.com/meltano/meltano/issues/7189#issuecomment-1396112167
             if value and not expanded_value:  # The whole string was missing env vars
-                expanded_value = None  # type: ignore[assignment]
+                expanded_value = None
 
             if expanded_value != value:
                 metadata["expanded"] = True

@@ -46,6 +46,14 @@ schedules:
     SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
 ```
 
+## Run a schedule manually
+
+You can run a schedule manually using the `meltano schedule run` command:
+
+```bash
+meltano schedule run daily-gitlab-load
+```
+
 ## Installing Airflow
 
 While you can use Meltano's CLI define pipeline schedules,

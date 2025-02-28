@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import glob
 import os
+import platform
 import re
 import shutil
 import typing as t
@@ -67,7 +68,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             lambda comp1, comp2: f"{comp1}{comp2}"
             if (comp1.endswith(self.delimiter) or comp2.startswith(self.delimiter))
             else f"{comp1}{self.delimiter}{comp2}",
-            components,
+            filter(None, components),
         )
 
     @staticmethod
@@ -365,7 +366,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             self.delete(self.get_state_path(state_id))
 
 
-class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
+class _LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
     """State backend for local filesystem."""
 
     label: str = "Local Filesystem"
@@ -480,7 +481,7 @@ class LocalFilesystemStateStoreManager(BaseFilesystemStateStoreManager):
         shutil.rmtree(self.get_state_dir(state_id))
 
 
-class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
+class _WindowsFilesystemStateStoreManager(_LocalFilesystemStateStoreManager):
     """State backend for local Windows filesystem."""
 
     label: str = "Local Windows Filesystem"
@@ -537,6 +538,14 @@ class WindowsFilesystemStateStoreManager(LocalFilesystemStateStoreManager):
             if pattern_re is None or pattern_re.match(state_id):
                 state_ids.add(state_id)
         return state_ids
+
+
+LocalFilesystemStateStoreManager: type[BaseFilesystemStateStoreManager]
+
+if "Windows" in platform.system():
+    LocalFilesystemStateStoreManager = _WindowsFilesystemStateStoreManager
+else:
+    LocalFilesystemStateStoreManager = _LocalFilesystemStateStoreManager
 
 
 class CloudStateStoreManager(BaseFilesystemStateStoreManager):
