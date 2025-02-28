@@ -156,6 +156,11 @@ class TestAzureStateBackend:
 
 
 class TestGCSStateBackend:
+    @pytest.fixture
+    def manager(self, project: Project) -> GCSStateStoreManager:
+        project.settings.set(["state_backend", "uri"], "gs://my-bucket")
+        return state_store_manager_from_project_settings(project.settings)
+
     def test_manager_from_settings(self, project: Project) -> None:
         # GCS
         project.settings.set(["state_backend", "uri"], "gs://some_container/some/path")
@@ -163,6 +168,23 @@ class TestGCSStateBackend:
         assert isinstance(gs_state_store, GCSStateStoreManager)
         assert gs_state_store.bucket == "some_container"
         assert gs_state_store.prefix == "/some/path"
+
+    @pytest.mark.parametrize(
+        ("components", "result"),
+        (
+            pytest.param(["a", "b", "c"], "a/b/c"),
+            pytest.param(["a", "b", "c", ""], "a/b/c"),
+            pytest.param(["a", "b", "", "c"], "a/b/c"),
+            pytest.param(["", "a", "b", "c"], "a/b/c"),
+        ),
+    )
+    def test_join_path(
+        self,
+        manager: GCSStateStoreManager,
+        components: list[str],
+        result: str,
+    ) -> None:
+        assert manager.join_path(*components) == result
 
 
 class TestS3StateBackend:
