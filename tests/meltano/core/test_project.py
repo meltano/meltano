@@ -11,6 +11,7 @@ import pytest
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.error import ProjectNotFound
 from meltano.core.project import PROJECT_ROOT_ENV, Project
+from meltano.core.utils import IncompatibleMeltanoVersionError, get_meltano_version
 
 
 @pytest.fixture
@@ -149,7 +150,33 @@ class TestIncompatibleProject:
         with project.meltano_update() as meltano:
             meltano["version"] -= 1
 
+    @pytest.fixture
+    def increase_requires_meltano(self, project):
+        with project.meltano_update() as meltano:
+            meltano["requires_meltano"] = "==999.0.0"
+        yield
+        with project.meltano_update() as meltano:
+            meltano["requires_meltano"] = None
+
+    @pytest.fixture
+    def set_compatible_meltano(self, project):
+        with project.meltano_update() as meltano:
+            current = get_meltano_version()
+            meltano["requires_meltano"] = f"=={current}"
+        yield
+        with project.meltano_update() as meltano:
+            meltano["requires_meltano"] = None
+
     @pytest.mark.usefixtures("increase_version")
     def test_incompatible(self, project) -> None:
         with pytest.raises(IncompatibleVersionError):
             Project.activate(project)
+
+    @pytest.mark.usefixtures("increase_requires_meltano")
+    def test_incompatible_requires_meltano(self, project) -> None:
+        with pytest.raises(IncompatibleMeltanoVersionError):
+            Project.activate(project)
+
+    @pytest.mark.usefixtures("set_compatible_meltano")
+    def test_compatible_requires_meltano(self, project) -> None:
+        Project.activate(project)
