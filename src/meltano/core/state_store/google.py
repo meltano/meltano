@@ -6,11 +6,15 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+import structlog.stdlib
+
 from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+logger = structlog.stdlib.get_logger(__name__)
 
 GOOGLE_INSTALLED = True
 
@@ -130,7 +134,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             blob.delete()
         except Exception as e:
             if self.is_file_not_found_error(e):
-                ...
+                logger.debug("File not found: %s", file_path, exc_info=e)
             else:
                 raise e
 
