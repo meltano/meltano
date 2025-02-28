@@ -68,7 +68,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
             lambda comp1, comp2: f"{comp1}{comp2}"
             if (comp1.endswith(self.delimiter) or comp2.startswith(self.delimiter))
             else f"{comp1}{self.delimiter}{comp2}",
-            components,
+            filter(None, components),
         )
 
     @staticmethod
