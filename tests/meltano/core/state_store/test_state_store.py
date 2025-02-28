@@ -11,6 +11,8 @@ from azure.storage.blob import BlobServiceClient
 from azure.storage.blob._shared.authentication import (
     SharedKeyCredentialPolicy,
 )
+from google.cloud.exceptions import NotFound
+from google.cloud.storage import Blob
 
 from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
@@ -168,6 +170,27 @@ class TestGCSStateBackend:
         assert isinstance(gs_state_store, GCSStateStoreManager)
         assert gs_state_store.bucket == "some_container"
         assert gs_state_store.prefix == "/some/path"
+
+    def test_delete_error(
+        self,
+        manager: GCSStateStoreManager,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        file_path = "some/path"
+
+        def _not_found(*args, **kwargs):  # noqa: ARG001
+            raise NotFound("No such object: ...")  # noqa: EM101
+
+        def _other_error(*args, **kwargs):  # noqa: ARG001
+            raise RuntimeError("Something went wrong")  # noqa: EM101
+
+        with monkeypatch.context() as m:
+            m.setattr(Blob, "delete", _not_found)
+            manager.delete(file_path)
+
+            m.setattr(Blob, "delete", _other_error)
+            with pytest.raises(RuntimeError, match="Something went wrong"):
+                manager.delete(file_path)
 
     @pytest.mark.parametrize(
         ("components", "result"),
