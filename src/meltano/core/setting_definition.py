@@ -11,8 +11,6 @@ from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from functools import cached_property
 
-import dateparser
-
 from meltano.core import utils
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -24,7 +22,7 @@ else:
     from enum import StrEnum
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from ruamel.yaml import Node, Representer, ScalarNode
 
@@ -32,6 +30,7 @@ VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
     "upcase_string": lambda vlu: vlu.upper(),
     "stringify": lambda vlu: vlu if isinstance(vlu, str) else json.dumps(vlu),
+    "parse_date": utils.parse_date,
 }
 
 
@@ -175,6 +174,7 @@ class SettingDefinition(NameEq, Canonical):
     kind: SettingKind | None
     hidden: bool
     sensitive: bool
+    value_post_processor: str | Callable | None
     _custom: bool
 
     def __init__(
@@ -198,7 +198,7 @@ class SettingDefinition(NameEq, Canonical):
         sensitive: bool | None = None,
         custom: bool = False,
         value_processor=None,  # noqa: ANN001
-        value_post_processor=None,  # noqa: ANN001
+        value_post_processor: str | Callable | None = None,
         **attrs,  # noqa: ANN003
     ):
         """Instantiate new SettingDefinition.
@@ -471,9 +471,9 @@ class SettingDefinition(NameEq, Canonical):
         Raises:
             ValueError: If value is not of the expected type.
         """
-        if isinstance(value, (date, datetime)):
-            value = value.isoformat()
-        elif isinstance(value, str):
+        value = value.isoformat() if isinstance(value, (date, datetime)) else value
+
+        if isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:
                 return utils.truthy(value)
             if self.kind == SettingKind.INTEGER:
@@ -486,10 +486,6 @@ class SettingDefinition(NameEq, Canonical):
                 value = list(
                     self._parse_value(value, "array", Sequence),  # type: ignore[type-abstract]
                 )
-            elif self.kind == SettingKind.DATE_ISO8601 and (
-                _parsed := dateparser.parse(value)
-            ):
-                value = _parsed.isoformat()
 
         if (
             value is not None
