@@ -82,6 +82,7 @@ class TestSettingDefinition:
         )
 
         assert setting_definition.post_process_value(None) is None
+        assert setting_definition.post_process_value("not a date") == "not a date"
         assert (
             setting_definition.post_process_value("2021-01-01T00:00:00+00:00")
             == "2021-01-01T00:00:00+00:00"
