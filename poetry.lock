@@ -4098,6 +4098,17 @@ files = [
 ]
 
 [[package]]
+name = "types-dateparser"
+version = "1.2.0.20250208"
+description = "Typing stubs for dateparser"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "types_dateparser-1.2.0.20250208-py3-none-any.whl", hash = "sha256:bfe9d2f36fca22900797bfdd240e3175d885b9541237447ddd7161ea1be2ff77"},
+    {file = "types_dateparser-1.2.0.20250208.tar.gz", hash = "sha256:11ad024b43a655bcab564f21b172a117e6a09d0fc2e8a8131f52e5b68a59a2a6"},
+]
+
+[[package]]
 name = "types-jsonschema"
 version = "4.23.0.20241208"
 description = "Typing stubs for jsonschema"
