@@ -11,6 +11,8 @@ from collections.abc import Mapping, Sequence
 from datetime import date, datetime
 from functools import cached_property
 
+import dateparser
+
 from meltano.core import utils
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
@@ -469,9 +471,9 @@ class SettingDefinition(NameEq, Canonical):
         Raises:
             ValueError: If value is not of the expected type.
         """
-        value = value.isoformat() if isinstance(value, (date, datetime)) else value
-
-        if isinstance(value, str):
+        if isinstance(value, (date, datetime)):
+            value = value.isoformat()
+        elif isinstance(value, str):
             if self.kind == SettingKind.BOOLEAN:
                 return utils.truthy(value)
             if self.kind == SettingKind.INTEGER:
@@ -484,6 +486,10 @@ class SettingDefinition(NameEq, Canonical):
                 value = list(
                     self._parse_value(value, "array", Sequence),  # type: ignore[type-abstract]
                 )
+            elif self.kind == SettingKind.DATE_ISO8601 and (
+                _parsed := dateparser.parse(value)
+            ):
+                value = _parsed.isoformat()
 
         if (
             value is not None
