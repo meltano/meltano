@@ -31,6 +31,7 @@ concurrency:
 
 env:
   FORCE_COLOR: "1"
+  UV_PYTHON_DOWNLOADS: "never"
 
 jobs:
   tests:
