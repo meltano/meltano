@@ -10,34 +10,25 @@
 from __future__ import annotations
 
 import os
-import sys
-import typing as t
 from pathlib import Path
 from random import randint
 
-if t.TYPE_CHECKING:
-    from nox import Session
-
-try:
-    from nox_poetry import session as nox_session
-except ImportError:
-    raise SystemExit(
-        "Nox failed to import the 'nox-poetry' package. Please install it "  # noqa: EM102
-        f"using the following command: {sys.executable} -m pip install nox-poetry",
-    ) from None
+import nox
 
 # NOTE: The module docstring above is printed when `nox -l` is run.
 
-# Dependencies for tests and type checking are defined in `pyproject.toml`, and
-# locked in `poetry.lock`. The various Nox sessions defined here install the
-# subset of them they require.
+# Dependencies for tests and type checking are defined in `pyproject.toml`,
+# locked in `uv.lock` and exported to `requirements/requirements.txt`.
+# The various Nox sessions defined here install the subset of them they require.
 
-# We use `nox-poetry` to ensure the version installed is consistent with
-# `poetry.lock`. The single source of truth for our Python test and type checking
+# We use `requirements/requirements.txt` to ensure the version installed is consistent
+# with `uv.lock`. The single source of truth for our Python test and type checking
 # dependencies is `pyproject.toml`. Other linting and checks are performed by
 # `pre-commit`, where each check specifies its own dependencies. There should be
 # no duplicated dependencies between `pyproject.toml` and
 # `.pre-commit-config.yaml`.
+
+nox.options.default_venv_backend = "uv|venv"
 
 root_path = Path(__file__).parent
 python_versions = (
@@ -66,7 +57,7 @@ pytest_deps = (
 )
 
 
-def _run_pytest(session: Session) -> None:
+def _run_pytest(session: nox.Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311
     args = session.posargs or ("tests/",)
     try:
@@ -91,12 +82,12 @@ def _run_pytest(session: Session) -> None:
             session.notify("coverage", posargs=[])
 
 
-@nox_session(
+@nox.session(
     name="pytest",
     python=python_versions,
     tags=("test", "pytest"),
 )
-def pytest_meltano(session: Session) -> None:
+def pytest_meltano(session: nox.Session) -> None:
     """Run pytest to test Meltano.
 
     Args:
@@ -115,12 +106,14 @@ def pytest_meltano(session: Session) -> None:
     session.install(
         f".[{','.join(extras)}]",
         *pytest_deps,
+        "-c",
+        "requirements/requirements.txt",
     )
     _run_pytest(session)
 
 
-@nox_session(python=main_python_version)
-def coverage(session: Session) -> None:
+@nox.session(python=main_python_version)
+def coverage(session: nox.Session) -> None:
     """Combine and report previously generated coverage data.
 
     Args:
@@ -128,7 +121,7 @@ def coverage(session: Session) -> None:
     """
     args = session.posargs or ("report",)
 
-    session.install("coverage[toml]")
+    session.install("coverage[toml]", "-c", "requirements/requirements.txt")
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -136,27 +129,27 @@ def coverage(session: Session) -> None:
     session.run("coverage", *args)
 
 
-@nox_session(
+@nox.session(
     name="pre-commit",
     python=main_python_version,
     tags=("lint",),
 )
-def pre_commit(session: Session) -> None:
+def pre_commit(session: nox.Session) -> None:
     """Run pre-commit linting and auto-fixes.
 
     Args:
         session: Nox session.
     """
     args = session.posargs or ("run", "--all-files")
-    session.install("pre-commit")
+    session.install("pre-commit", "-c", "requirements/requirements.txt")
     session.run("pre-commit", *args)
 
 
-@nox_session(
+@nox.session(
     python=main_python_version,
     tags=("lint",),
 )
-def mypy(session: Session) -> None:
+def mypy(session: nox.Session) -> None:
     """Run mypy type checking.
 
     Args:
@@ -171,5 +164,7 @@ def mypy(session: Session) -> None:
         "types-psutil",
         "types-PyYAML",
         "types-requests",
+        "-c",
+        "requirements/requirements.txt",
     )
     session.run("mypy", *session.posargs)

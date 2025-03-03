@@ -6,8 +6,8 @@ on:
       - src/**
       - tests/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
@@ -17,8 +17,8 @@ on:
       - src/**
       - tests/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
@@ -28,6 +28,9 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
 
 jobs:
   tests:
@@ -98,30 +101,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
-      FORCE_COLOR: 1
       NOXFORCEPYTHON: ${{ matrix.python-version }}
 
     steps:
     - name: Check out the repository
       uses: actions/checkout@v4.2.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
-
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5.4.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
         check-latest: true
         allow-prereleases: true
 
@@ -149,12 +139,16 @@ jobs:
       run: |
         docker ps -a
 
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: ">=0.6"
+
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Run pytest
       env:
@@ -262,22 +256,10 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v4.2.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
-
     - name: Set up Python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: "3.13"
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        python-version: "3.x"
 
     - name: Download coverage data
       uses: actions/download-artifact@v4
@@ -285,12 +267,16 @@ jobs:
         pattern: coverage-data-*
         merge-multiple: true
 
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: ">=0.6"
+
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Combine coverage data and display human readable report
       run: |
@@ -311,36 +297,26 @@ jobs:
   mypy:
     name: "Static type checking"
     runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
 
     steps:
     - name: Check out the repository
       uses: actions/checkout@v4.2.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
-
     - name: Setup Python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: "3.13"
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        python-version: "3.x"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: ">=0.6"
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Run mypy
       run: |
