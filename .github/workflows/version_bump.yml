@@ -46,7 +46,7 @@ jobs:
 
     - name: Bump version
       id: cz-bump
-      uses: commitizen-tools/commitizen-action@0.23.1
+      uses: commitizen-tools/commitizen-action@0.24.0
       with:
         increment: ${{ github.event.inputs.bump != 'auto' && github.event.inputs.bump || '' }}
         prerelease: ${{ github.event.inputs.prerelease != 'none' && github.event.inputs.prerelease || '' }}
