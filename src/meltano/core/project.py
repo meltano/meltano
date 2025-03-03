@@ -654,3 +654,11 @@ class Project(Versioned):
             Project hash.
         """
         return self.root.__hash__()
+
+    def __repr__(self) -> str:
+        """Project representation.
+
+        Returns:
+            Project representation.
+        """
+        return f"Project({self.root!r})"
