@@ -42,6 +42,7 @@ dependencies = [
     "jinja2>=3.1.4,<4",
     "jsonschema~=4.23",
     "packaging~=24.2",
+    "pip~=25.0.1",
     "psutil>=7.0.0,<8",
     "python-dotenv>=1.0.1,<2",
     "pyyaml>=6.0.2,<7",

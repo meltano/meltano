@@ -61,6 +61,7 @@ mypy-boto3-sqs==1.37.0
 mypy-extensions==1.0.0
 nodeenv==1.9.1
 packaging==24.2
+pip==25.0.1
 platformdirs==4.3.6
 pluggy==1.5.0
 pre-commit==4.1.0
