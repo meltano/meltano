@@ -16,6 +16,8 @@ class IncompatibleVersionError(Exception):
 class Versioned(ABC):
     """Mixin to represent something that must be compatible with a certain version."""
 
+    __version__: int
+
     @property
     @abstractmethod
     def file_version(self) -> int:  # noqa: D102
