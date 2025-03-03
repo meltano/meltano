@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from meltano.core.setting_definition import SettingDefinition, SettingKind
@@ -71,6 +73,24 @@ class TestSettingDefinition:
         assert setting_definition.cast_value(None) is None
         with pytest.raises(ValueError, match="is not a valid choice"):
             setting_definition.cast_value("def")
+
+    def test_post_process_parse_date(self) -> None:
+        setting_definition: SettingDefinition = SettingDefinition(
+            name="test_setting",
+            kind=SettingKind.DATE_ISO8601,
+            value_post_processor="parse_date",
+        )
+
+        assert setting_definition.post_process_value(None) is None
+        assert setting_definition.post_process_value("not a date") == "not a date"
+        assert (
+            setting_definition.post_process_value("2021-01-01T00:00:00+00:00")
+            == "2021-01-01T00:00:00+00:00"
+        )
+        assert re.match(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00",
+            setting_definition.post_process_value("3 days ago, UTC"),
+        )
 
     @pytest.mark.parametrize(
         ("setting_definition", "sensitive", "kind"),

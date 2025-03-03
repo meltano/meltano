@@ -22,7 +22,7 @@ else:
     from enum import StrEnum
 
 if t.TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
 
     from ruamel.yaml import Node, Representer, ScalarNode
 
@@ -30,6 +30,7 @@ VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
     "upcase_string": lambda vlu: vlu.upper(),
     "stringify": lambda vlu: vlu if isinstance(vlu, str) else json.dumps(vlu),
+    "parse_date": utils.parse_date,
 }
 
 
@@ -173,6 +174,7 @@ class SettingDefinition(NameEq, Canonical):
     kind: SettingKind | None
     hidden: bool
     sensitive: bool
+    value_post_processor: str | Callable | None
     _custom: bool
 
     def __init__(
@@ -196,7 +198,7 @@ class SettingDefinition(NameEq, Canonical):
         sensitive: bool | None = None,
         custom: bool = False,
         value_processor=None,  # noqa: ANN001
-        value_post_processor=None,  # noqa: ANN001
+        value_post_processor: str | Callable | None = None,
         **attrs,  # noqa: ANN003
     ):
         """Instantiate new SettingDefinition.
