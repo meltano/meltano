@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import {translate} from '@docusaurus/Translate';
+import { translate } from '@docusaurus/Translate';
 import IconWordWrap from '@theme/Icon/WordWrap';
 import styles from './styles.module.css';
 // eslint-disable-next-line react/prop-types
-export default function WordWrapButton({className, onClick, isEnabled}) {
+export default function WordWrapButton({ className, onClick, isEnabled }) {
   const title = translate({
     id: 'theme.CodeBlock.wordWrapToggle',
     message: 'Toggle word wrap',
@@ -21,7 +21,8 @@ export default function WordWrapButton({className, onClick, isEnabled}) {
         isEnabled && styles.wordWrapButtonEnabled,
       )}
       aria-label={title}
-      title={title}>
+      title={title}
+    >
       <IconWordWrap className={styles.wordWrapButtonIcon} aria-hidden="true" />
     </button>
   );

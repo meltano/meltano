@@ -7,8 +7,8 @@ redirect_from:
 sidebar_position: 2
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
 where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
@@ -86,7 +86,14 @@ To learn how to add a custom plugin to your project using a [custom plugin defin
 
 :::caution
 
-  <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">contributing its description</a> to <a href="https://github.com/meltano/hub/issues/new">Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
+<p>
+  Once you've got the plugin working in your project, please consider{" "}
+  <a href="/contribute/plugins#discoverable-plugins">
+    contributing its description
+  </a>{" "}
+  to <a href="https://github.com/meltano/hub/issues/new">Meltano Hub</a> to make
+  it discoverable and supported out of the box for new users!
+</p>
 :::
 
 ## Plugin Inheritance
@@ -110,7 +117,10 @@ Later invocations of the plugin will use this file to determine the settings, in
 
 :::info
 
-  <p>Note that <a href="#custom-plugins">custom</a> and <a href="#plugin-inheritance">inherited</a> plugins do not get a lock file.</p>
+<p>
+  Note that <a href="#custom-plugins">custom</a> and{" "}
+  <a href="#plugin-inheritance">inherited</a> plugins do not get a lock file.
+</p>
 :::
 
 ## Types
@@ -183,8 +193,8 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  catalog: extract/tap-gitlab.catalog.json
+  - name: tap-gitlab
+    catalog: extract/tap-gitlab.catalog.json
 ```
 
   </TabItem>
@@ -238,8 +248,8 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  load_schema: gitlab_data
+  - name: tap-gitlab
+    load_schema: gitlab_data
 ```
 
   </TabItem>
@@ -297,13 +307,13 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-postgres
-  metadata:
-    some_stream_id:
-      replication-method: INCREMENTAL
-      replication-key: created_at
-      created_at:
-        is-replication-key: true
+  - name: tap-postgres
+    metadata:
+      some_stream_id:
+        replication-method: INCREMENTAL
+        replication-key: created_at
+        created_at:
+          is-replication-key: true
 ```
 
   </TabItem>
@@ -375,12 +385,12 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-postgres
-  schema:
-    some_stream_id:
-      created_at:
-        type: ["string", "null"]
-        format: date-time
+  - name: tap-postgres
+    schema:
+      some_stream_id:
+        created_at:
+          type: ["string", "null"]
+          format: date-time
 ```
 
   </TabItem>
@@ -439,10 +449,10 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  select:
-  - project_members.*
-  - commits.*
+  - name: tap-gitlab
+    select:
+      - project_members.*
+      - commits.*
 ```
 
   </TabItem>
@@ -474,19 +484,17 @@ export TAP_GITLAB__SELECT='["project_members.*", "commits.*"]'
   </TabItem>
 </Tabs>
 
-
 If the extractor uses a dot character within stream names, you can escape it with a backslash (`\`). For example, if the extractor has a stream named `animals.data`, you can select fields using the following configuration:
-
 
 <Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
 
 ```yaml
 extractors:
-- name: tap-smoke-test
-  select:
-  - "animals\\.data.id"     # Use double backslash to escape the dot in quoted strings
-  - animals\.data.verified  # Use single backslash to escape the dot in unquoted strings
+  - name: tap-smoke-test
+    select:
+      - "animals\\.data.id" # Use double backslash to escape the dot in quoted strings
+      - animals\.data.verified # Use single backslash to escape the dot in unquoted strings
 ```
 
   </TabItem>
@@ -508,7 +516,6 @@ export TAP_SMOKE_TEST__SELECT='["animals\\.data.id","animals\\.data.verified"]'
 
   </TabItem>
 </Tabs>
-
 
 #### <a name="select-filter-extra"></a>`select_filter` extra
 
@@ -540,12 +547,12 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  select:
-  - project_members.*
-  - commits.*
-  select_filter:
-  - commits
+  - name: tap-gitlab
+    select:
+      - project_members.*
+      - commits.*
+    select_filter:
+      - commits
 ```
 
   </TabItem>
@@ -605,8 +612,8 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  state: extract/tap-gitlab.state.json
+  - name: tap-gitlab
+    state: extract/tap-gitlab.state.json
 ```
 
   </TabItem>
@@ -655,8 +662,8 @@ Manage this extra:
 
 ```yaml
 extractors:
-- name: tap-gitlab
-  use_cached_catalog: false
+  - name: tap-gitlab
+    use_cached_catalog: false
 ```
 
   </TabItem>
@@ -720,8 +727,8 @@ Manage this extra:
 
 ```yaml
 loaders:
-- name: target-example-db
-  dialect: example-db
+  - name: target-example-db
+    dialect: example-db
 ```
 
   </TabItem>
@@ -751,8 +758,16 @@ export TARGET_EXAMPLE_DB__DIALECT=example-db
 
 :::caution
 
-  <p> Transform plugins are being deprecated in favor of calling dbt packages directly.</p>
-  <p> The transform plugin type is still supported for now but will eventually be phased out.</p>
+<p>
+  {" "}
+  Transform plugins are being deprecated in favor of calling dbt packages
+  directly.
+</p>
+<p>
+  {" "}
+  The transform plugin type is still supported for now but will eventually be
+  phased out.
+</p>
 :::
 
 Transforms are [dbt packages](https://docs.getdbt.com/docs/building-a-dbt-project/package-management) containing [dbt models](https://docs.getdbt.com/docs/building-a-dbt-project/building-models),
@@ -795,9 +810,9 @@ Manage this extra:
 
 ```yaml
 transforms:
-- name: dbt-facebook-ads
-  namespace: tap_facebook
-  package_name: facebook_ads
+  - name: dbt-facebook-ads
+    namespace: tap_facebook
+    package_name: facebook_ads
 ```
 
   </TabItem>
@@ -882,8 +897,16 @@ export TAP_GITLAB__VARS='{"schema": "{{ env_var(''DBT_SOURCE_SCHEMA'') }}"}'
 
 :::caution
 
-  <p> Orchestrator plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
-  <p> The orchestrator plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
+<p>
+  {" "}
+  Orchestrator plugins are transitioning over to being called Utilities. The new
+  approach is to group all non-EL plugins under the `utility` plugin type.{" "}
+</p>
+<p>
+  {" "}
+  The orchestrator plugin type is still supported for now but will eventually be
+  phased out as utilities take over.
+</p>
 :::
 
 Orchestrators are [pip packages](https://pip.pypa.io/en/stable/) responsible for [orchestrating](/guide/orchestration) a project's [scheduled pipelines](/reference/command-line-interface#schedule).
@@ -897,8 +920,16 @@ its related [file bundle](#file-bundles) will automatically be added as well.
 
 :::caution
 
-  <p> Transformers plugins are transitioning over to being called Utilities. The new approach is to group all non-EL plugins under the `utility` plugin type. </p>
-  <p> The transformer plugin type is still supported for now but will eventually be phased out as utilities take over.</p>
+<p>
+  {" "}
+  Transformers plugins are transitioning over to being called Utilities. The new
+  approach is to group all non-EL plugins under the `utility` plugin type.{" "}
+</p>
+<p>
+  {" "}
+  The transformer plugin type is still supported for now but will eventually be
+  phased out as utilities take over.
+</p>
 :::
 
 Transformers are [pip packages](https://pip.pypa.io/en/stable/) used by [`meltano run`](/reference/command-line-interface#run) as part of [data transformation](/guide/transformation).
@@ -937,21 +968,20 @@ Manage this extra:
 
 ```yaml
 files:
-- name: dbt
-  update:
-    transform/dbt_project.yml: false
-    profiles/*.yml: true
+  - name: dbt
+    update:
+      transform/dbt_project.yml: false
+      profiles/*.yml: true
 ```
 
 :::info
 
-  <p>If a file path starts with a <code>%2A</code>, it must be wrapped in quotes to be considered valid YAML. For example, using <code>%2A.yml</code> to match all <code>.yml</code> files:</p>
-<pre>
-files:
-- name: dbt
-  update:
-    '*.yml': true
-</pre>
+<p>
+  If a file path starts with a <code>%2A</code>, it must be wrapped in quotes to
+  be considered valid YAML. For example, using <code>%2A.yml</code> to match all{" "}
+  <code>.yml</code> files:
+</p>
+<pre>files: - name: dbt update: '*.yml': true</pre>
 :::
 
   </TabItem>
@@ -1052,21 +1082,21 @@ mappers:
     pip_url: pipelinewise-transform-field
     executable: transform-field
     mappings:
-    - name: hide-gitlab-secrets
-      config:
-        transformations:
-          - field_id: "author_email"
-            tap_stream_name: "commits"
-            type: "MASK-HIDDEN"
-          - field_id: "committer_email"
-            tap_stream_name: "commits"
-            type: "MASK-HIDDEN"
-    - name: null-created-at
-      config:
-        transformations:
-          - field_id: "created_at"
-            tap_stream_name: "accounts"
-            type: "SET-NULL"
+      - name: hide-gitlab-secrets
+        config:
+          transformations:
+            - field_id: "author_email"
+              tap_stream_name: "commits"
+              type: "MASK-HIDDEN"
+            - field_id: "committer_email"
+              tap_stream_name: "commits"
+              type: "MASK-HIDDEN"
+      - name: null-created-at
+        config:
+          transformations:
+            - field_id: "created_at"
+              tap_stream_name: "accounts"
+              type: "SET-NULL"
 ```
 
 You can then invoke the mappings by name:

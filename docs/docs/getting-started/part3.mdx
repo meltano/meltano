@@ -5,7 +5,7 @@ layout: doc
 sidebar_position: 5
 ---
 
-import Termy from '@site/src/utils/Termy'
+import Termy from "@site/src/utils/Termy";
 
 Let’s learn by example.
 
@@ -15,13 +15,18 @@ That means, in this part we're going to unleash dbt [(data build tool)](https://
 Don't worry, you don't need to know anything about dbt, this tutorial is self-contained. You do not need to install dbt yourself, it works as a Meltano plugin.
 
 Of course you can choose any other processing tool like:
+
 - a jupyter notebook
 - or plain Python
 
 to process your data.
 
 :::tip
-<p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
+
+<p>
+  If you're having trouble throughout this tutorial, you can always head over to
+  the <a href="https://meltano.com/slack">Slack channel</a> to get help.
+</p>
 :::
 
 ## Select more source data
@@ -112,13 +117,22 @@ dbt initialized                dbt_ext_type=postgres dbt_profiles_dir=PosixPath(
 <br />
 
 :::tip
-<p>Installing dbt-postgres may <a href="https://github.com/dbt-labs/dbt-postgres/issues/96">require building <code>psycopg2</code> from source</a>. An easy workaround is to constrain <code>dbt-postgres</code> in the plugin's <code>pip_url</code> in your <code>meltano.yml</code> file:</p>
+
+<p>
+  Installing dbt-postgres may{" "}
+  <a href="https://github.com/dbt-labs/dbt-postgres/issues/96">
+    require building <code>psycopg2</code> from source
+  </a>
+  . An easy workaround is to constrain <code>dbt-postgres</code> in the plugin's{" "}
+  <code>pip_url</code> in your <code>meltano.yml</code> file:
+</p>
 
 ```yaml
-  utilities:
+utilities:
   - name: dbt-postgres
     pip_url: dbt-core dbt-postgres<1.8 meltano-dbt-ext~=0.3.0
 ```
+
 :::
 
 You can verify that this worked by viewing that the `transform` directory is newly populated with dbt configuration files.
@@ -147,7 +161,8 @@ $ meltano config dbt-postgres set schema analytics
 </Termy>
 
 <br />
-The result of your configuration will look like this in your meltano.yml, remember that sensitive configurations are in your .env file:
+The result of your configuration will look like this in your meltano.yml,
+remember that sensitive configurations are in your .env file:
 
 ```yaml
   utilities:
@@ -175,8 +190,8 @@ Add a file called `transform/models/tap_github/source.yml` into this directory w
 config-version: 2
 version: 2
 sources:
-  - name: tap_github     # the name we want to reference this source by
-    schema: tap_github   # the schema the raw data was loaded into
+  - name: tap_github # the name we want to reference this source by
+    schema: tap_github # the schema the raw data was loaded into
     tables:
       - name: commits
 ```
@@ -240,18 +255,25 @@ Extension executing `dbt run`...
 20:45:15  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 #
 ```
+
 </Termy>
 
 <br />
 
 :::tip
-<p>If you encounter an error related to dbt not being to clean files outside of the project directory, you can add the following to your <code>meltano.yml</code> file:</p>
+
+<p>
+  If you encounter an error related to dbt not being to clean files outside of
+  the project directory, you can add the following to your{" "}
+  <code>meltano.yml</code> file:
+</p>
 
 ```yaml
 version: 1
 env:
   DBT_CLEAN_PROJECT_FILES_ONLY: "false"
 ```
+
 :::
 
 You can check the data inside the database using your favourite SQL editor. There should now be a table inside the `analytics` schema called `authors` populated with data.
@@ -318,4 +340,5 @@ info     ] 12:43:21                       cmd_type=command name=dbt-postgres std
 There we have it, a complete data pipeline.
 
 <script src="/js/termynal.js"></script>
+
 <script src="/js/termy_custom.js"></script>

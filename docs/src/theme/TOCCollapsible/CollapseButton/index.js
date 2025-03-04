@@ -12,7 +12,7 @@ export default function TOCCollapsibleCollapseButton({ collapsed, ...props }) {
         styles.tocCollapsibleButton,
         !collapsed && styles.tocCollapsibleButtonExpanded,
         // eslint-disable-next-line react/prop-types
-        props.className
+        props.className,
       )}
     >
       <svg

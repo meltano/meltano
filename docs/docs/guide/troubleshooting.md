@@ -3,8 +3,8 @@ title: Troubleshooting
 description: Learn what you can do if you need to troubleshoot
 layout: doc
 redirect_from:
- - /reference/ui
- - /guide/ui/
+  - /reference/ui
+  - /guide/ui/
 sidebar_position: 25
 ---
 

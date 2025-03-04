@@ -49,25 +49,25 @@ This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  # highlight-start
-  - name: tap-gitlab
-    variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+    # highlight-start
+    - name: tap-gitlab
+      variant: meltano
+      pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
   # highlight-end
   loaders:
-  # highlight-start
-  - name: target-postgres
-    variant: datamill-co
-    pip_url: singer-target-postgres
+    # highlight-start
+    - name: target-postgres
+      variant: datamill-co
+      pip_url: singer-target-postgres
   # highlight-end
   utilities:
-  # highlight-start
-  - name: dbt-snowflake
-    variant: dbt-labs
-  # highlight-end
-  # highlight-start
-  - name: airflow
-    variant: apache
+    # highlight-start
+    - name: dbt-snowflake
+      variant: dbt-labs
+    # highlight-end
+    # highlight-start
+    - name: airflow
+      variant: apache
   # highlight-end
 ```
 
@@ -103,10 +103,10 @@ As you might expect, this will be reflected in the `variant` and `pip_url` prope
 ```yaml title="meltano.yml"
 plugins:
   loaders:
-  - name: target-postgres
-  # highlight-start
-    variant: transferwise
-    pip_url: pipelinewise-target-postgres
+    - name: target-postgres
+      # highlight-start
+      variant: transferwise
+      pip_url: pipelinewise-target-postgres
   # highlight-end
 ```
 
@@ -138,11 +138,11 @@ The corresponding [inheriting plugin definition](/concepts/project#inheriting-pl
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-postgres--billing
-    # highlight-next-line
-    inherit_from: tap-postgres
-    variant: transferwise
-    pip_url: pipelinewise-tap-postgres
+    - name: tap-postgres--billing
+      # highlight-next-line
+      inherit_from: tap-postgres
+      variant: transferwise
+      pip_url: pipelinewise-tap-postgres
 ```
 
 Note that the `variant` and `pip_url` properties were populated automatically by `meltano add` as described above.
@@ -165,21 +165,21 @@ the resulting [inheriting plugin definitions](/concepts/project#inheriting-plugi
 ```yaml title="meltano.yml"
 plugins:
   loaders:
-  - name: target-snowflake
-    variant: datamill-co
-    pip_url: target-snowflake
-  # highlight-start
-  - name: target-snowflake--transferwise
-    inherit_from: target-snowflake
-    variant: transferwise
-  # highlight-end
-    pip_url: pipelinewise-target-snowflake
-  # highlight-start
-  - name: target-snowflake--meltano
-    inherit_from: target-snowflake
-    variant: meltano
-  # highlight-end
-    pip_url: git+https://gitlab.com/meltano/target-snowflake.git
+    - name: target-snowflake
+      variant: datamill-co
+      pip_url: target-snowflake
+    # highlight-start
+    - name: target-snowflake--transferwise
+      inherit_from: target-snowflake
+      variant: transferwise
+      # highlight-end
+      pip_url: pipelinewise-target-snowflake
+    # highlight-start
+    - name: target-snowflake--meltano
+      inherit_from: target-snowflake
+      variant: meltano
+      # highlight-end
+      pip_url: git+https://gitlab.com/meltano/target-snowflake.git
 ```
 
 Note that the `--variant` option and `variant` property are crucial here:
@@ -305,19 +305,19 @@ This will add a [custom plugin definition](/concepts/project#custom-plugin-defin
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  # highlight-start
-  - name: tap-covid-19
-    namespace: tap_covid_19
-    pip_url: tap-covid-19
-    executable: tap-covid-19
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings:
-    - name: api_token
-    - name: user_agent
-    - name: start_date
+    # highlight-start
+    - name: tap-covid-19
+      namespace: tap_covid_19
+      pip_url: tap-covid-19
+      executable: tap-covid-19
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_token
+        - name: user_agent
+        - name: start_date
   # highlight-end
 ```
 
@@ -350,16 +350,16 @@ The corresponding [inheriting plugin definitions](/concepts/project#inheriting-p
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-google-analytics
-    variant: meltano
-    pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
-  # highlight-start
-  - name: tap-ga--client-foo
-    inherit_from: tap-google-analytics
-  - name: tap-ga--client-bar
-    inherit_from: tap-google-analytics
-  - name: tap-ga--client-foo--project-baz
-    inherit_from: tap-ga--client-foo
+    - name: tap-google-analytics
+      variant: meltano
+      pip_url: git+https://gitlab.com/meltano/tap-google-analytics.git
+    # highlight-start
+    - name: tap-ga--client-foo
+      inherit_from: tap-google-analytics
+    - name: tap-ga--client-bar
+      inherit_from: tap-google-analytics
+    - name: tap-ga--client-foo--project-baz
+      inherit_from: tap-ga--client-foo
   # highlight-end
 ```
 
@@ -372,7 +372,6 @@ You can update a plugin in your project using the `--update` option. Updating a 
 
 - Update the plugin lock file (the same as [`meltano lock --update`](/reference/command-line-interface#lock) would)
 - Update the plugin entry in the `meltano.yml`, without overwriting any user-defined [config](/concepts/project#plugin-configuration) or [extras](/guide/configuration#plugin-extras)
-
 
 ```bash
 meltano add --update <type> <name>
@@ -508,12 +507,12 @@ If you've forked a plugin's repository and made changes to it, you can update yo
    ```yaml title="meltano.yml"
    plugins:
      extractors:
-     - name: tap-gitlab
-       variant: meltano
-       # highlight-start
-       pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
-       # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
-       # highlight-end
+       - name: tap-gitlab
+         variant: meltano
+         # highlight-start
+         pip_url: git+https://gitlab.com/meltano/tap-gitlab.git
+         # pip_url: git+https://gitlab.com/meltano/tap-gitlab.git@ref-name
+         # highlight-end
    ```
 
    If your plugin source is stored in a private repository, you have two options:

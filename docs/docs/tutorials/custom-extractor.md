@@ -28,8 +28,8 @@ The following steps will demonstrate how to implement a custom extractor to extr
 There a few prerequisites that you need before continuing. The [first step](#1-installing-dependencies) details how you can install these dependencies.
 
 1. [Python3](https://www.python.org/downloads/) for running Python-based scripts
-3. [uv] for dependency management in your custom extractor
-4. [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) for installing the template repository
+2. [uv] for dependency management in your custom extractor
+3. [Cookiecutter](https://cookiecutter.readthedocs.io/en/stable/README.html) for installing the template repository
 
 ## 1. Installing the Dependencies
 
@@ -318,11 +318,11 @@ Alternatively, you can create a [plugin definition](/concepts/project#custom-plu
 <details>
   <summary><code>tap-jsonplaceholder.yml</code></summary>
 
-  ```yml
-  name: tap-jsonplaceholder
-  namespace: tap_jsonplaceholder
-  pip_url: -e ../tap-jsonplaceholder
-  ```
+```yml
+name: tap-jsonplaceholder
+namespace: tap_jsonplaceholder
+pip_url: -e ../tap-jsonplaceholder
+```
 
 </details>
 
@@ -331,10 +331,12 @@ meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
 ```
 
 :::info
+
   <p>The plugin name must be present in the YAML file to constitute a valid plugin definition - supplying it as a command argument is a no-op in this case</p>
 :::
 
 As you develop your custom extractor, it is possible that its settings will change:
+
 - New functionality is added, requiring new setting(s)
 - Existing functionality is modified, requiring setting(s) to be renamed
 - Existing functionality is removed, requiring setting(s) to be removed
@@ -396,14 +398,14 @@ plugins:
       config:
         # Configured values:
         username: me@example.com
-        start_date: '2024-01-01'
+        start_date: "2024-01-01"
       settings:
         - name: username
         - name: password
           sensitive: true
         - name: start_date
           # Default value for the plugin:
-          value: '2010-01-01T00:00:00Z'
+          value: "2010-01-01T00:00:00Z"
   loaders:
     # your loaders here:
     - name: target-jsonl
@@ -487,7 +489,6 @@ your tap directly to PyPI.
 
    - `--trusted-publishing=automatic` to publish as a Trusted Publisher, from GitHub Actions, or
    - `--token=<token>` to publish using a PyPI API token
-
 
 ### Test a `pip` install
 

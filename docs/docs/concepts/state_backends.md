@@ -31,6 +31,7 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 If the base Meltano distribution is already installed in your environment, install the relevant extra and `pip` will install only the missing requirements.
 
 :::info
+
 <p>
 State backends are only available in Meltano version 2.10+. If you are using an earlier version, you'll need to upgrade your project via <a href="/reference/command-line-interface#upgrade"> <code>meltano upgrade</code></a> before you using the state backends feature.
 </p>
@@ -48,7 +49,7 @@ It can be changed by running `meltano config meltano set state_backend.uri <URI 
 
 ```yaml
 state_backend:
-    uri: <URI for desired state backend>
+  uri: <URI for desired state backend>
 ```
 
 ### Local File System
@@ -127,10 +128,10 @@ If AWS credentials are not found via any of the methods described above, Meltano
 
 Meltano supports service-specific endpoint URLs via:
 
-* The `endpoint_url` setting in the shared AWS config file.
-* The `AWS_ENDPOINT_URL` environment variable.
-* The `AWS_ENDPOINT_URL_S3` environment variable.
-* The Meltano [`state_backend.s3.endpoint_url`](/reference/settings#state_backends3endpoint_url) setting.
+- The `endpoint_url` setting in the shared AWS config file.
+- The `AWS_ENDPOINT_URL` environment variable.
+- The `AWS_ENDPOINT_URL_S3` environment variable.
+- The Meltano [`state_backend.s3.endpoint_url`](/reference/settings#state_backends3endpoint_url) setting.
 
 :::info
 The `AWS_IGNORE_CONFIGURED_ENDPOINT_URLS` environment variable won't have any effect if `state_backend.s3.endpoint_url` is not null.

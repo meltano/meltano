@@ -4,21 +4,21 @@ function Separator() {
   return <span className="footer__link-separator">·</span>;
 }
 // eslint-disable-next-line react/prop-types
-function SimpleLinkItem({item}) {
+function SimpleLinkItem({ item }) {
   // eslint-disable-next-line react/prop-types
   return item.html ? (
     <span
       className="footer__link-item"
       // Developer provided the HTML, so assume it's safe.
       // eslint-disable-next-line react/prop-types
-      dangerouslySetInnerHTML={{__html: item.html}}
+      dangerouslySetInnerHTML={{ __html: item.html }}
     />
   ) : (
     <LinkItem item={item} />
   );
 }
 // eslint-disable-next-line react/prop-types
-export default function FooterLinksSimple({links}) {
+export default function FooterLinksSimple({ links }) {
   return (
     <div className="footer__links text--center">
       <div className="footer__links">

@@ -51,17 +51,17 @@ Starting with Meltano [`2.0`](/guide/v2-migration), you can override the propert
 ```yaml
 plugins:
   extractors:
-  - name: tap-example
-    variant: meltanolabs
-    capabilities:  # This will override the capabilities declared in the lockfile
-    - state
-    - discover
-    - catalog
-    settings:  # These will be appended to the settings declared in the lockfile
-    - name: my-new-setting
-      kind: object
-      value:
-        key: value
+    - name: tap-example
+      variant: meltanolabs
+      capabilities: # This will override the capabilities declared in the lockfile
+        - state
+        - discover
+        - catalog
+      settings: # These will be appended to the settings declared in the lockfile
+        - name: my-new-setting
+          kind: object
+          value:
+            key: value
 ```
 
 All overrides replace the values stored in the [lockfile](/concepts/plugins#lock-artifacts), except for `settings`, which extend the base definitions. If there is a collision on name, then the setting is taken from the override definition in `meltano.yml` and used at runtime, while the token setting definition in the lockfile is discarded.
@@ -86,37 +86,37 @@ env:
   MY_ENV_VAR: top_level_env_var
 plugins:
   extractors:
-  - name: tap-google-analytics
-    variant: meltano
-    env:
-      # root level plugin env
-      MY_ENV_VAR: plugin_level_env_var
+    - name: tap-google-analytics
+      variant: meltano
+      env:
+        # root level plugin env
+        MY_ENV_VAR: plugin_level_env_var
   loaders:
-  - name: target-postgres
-    variant: transferwise
-    pip_url: pipelinewise-target-postgres
+    - name: target-postgres
+      variant: transferwise
+      pip_url: pipelinewise-target-postgres
 environments:
-- name: dev
-  env:
-    # environment level env
-    MY_ENV_VAR: environment_level_env_var
-  config:
-    plugins:
-      extractors:
-        - name: tap-google-analytics
-          variant: meltano
-          env:
-            # environment level plugin env
-            MY_ENV_VAR: environment_level_plugin_env_var
+  - name: dev
+    env:
+      # environment level env
+      MY_ENV_VAR: environment_level_env_var
+    config:
+      plugins:
+        extractors:
+          - name: tap-google-analytics
+            variant: meltano
+            env:
+              # environment level plugin env
+              MY_ENV_VAR: environment_level_plugin_env_var
 schedules:
-- name: daily-google-analytics-load
-  interval: '@daily'
-  extractor: tap-google-analytics
-  loader: target-postgres
-  transform: skip
-  start_date: 2024-08-24 00:00:00
-  env:
-    SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
+  - name: daily-google-analytics-load
+    interval: "@daily"
+    extractor: tap-google-analytics
+    loader: target-postgres
+    transform: skip
+    start_date: 2024-08-24 00:00:00
+    env:
+      SCHEDULE_SPECIFIC_ENV_VAR: schedule_specific_value
 ```
 
 Environment levels within `meltano.yml` resolve in order of precedence (within a plugins context):
@@ -171,8 +171,8 @@ The following example illustrates how values are expanded:
 env:
   # Level 2: top-level `env:`
   # Inherits from terminal context
-  LEVEL_NUM: "2"                  #  '2'
-  STACKED: "${STACKED}2"          # '12'
+  LEVEL_NUM: "2" #  '2'
+  STACKED: "${STACKED}2" # '12'
 plugins:
   extractors:
     - name: tap-foobar
@@ -180,15 +180,15 @@ plugins:
         # Level 4: plugin-level `env:`
         # Inherits from a environment-level `env:` if an environment is active
         # Inherits directly from top-level `env:` if no environment is active
-        LEVEL_NUM: "4"            #    '4'
-        STACKED: "${STACKED}4"    # '1234'
+        LEVEL_NUM: "4" #    '4'
+        STACKED: "${STACKED}4" # '1234'
 environments:
   - name: prod
     env:
       # Level 3: environment-level `env:`
       # Inherits from top-level `env:`
-      LEVEL_NUM: "3"              #   '3'
-      STACKED: "${STACKED}3"      # '123'
+      LEVEL_NUM: "3" #   '3'
+      STACKED: "${STACKED}3" # '123'
     config:
       plugins:
         extractors:
@@ -196,9 +196,8 @@ environments:
             env:
               # Level 5: environment-level plugin `env:`
               # Inherits from (global) plugin-level `env:`
-              LEVEL_NUM: "5"          #     '5'
-              STACKED: "${STACKED}5"  # '12345'
-
+              LEVEL_NUM: "5" #     '5'
+              STACKED: "${STACKED}5" # '12345'
 ```
 
 Note that the resolution and inheritance behavior of environment variables set via `env` keys in your `meltano.yml` differ from the [resolution and inheritance behavior of `config` or `settings` keys](/guide/configuration#configuration-layers).
@@ -256,19 +255,19 @@ For example, the following defines a `my_custom_username` setting with aliases `
 ---
 plugins:
   extractors:
-  - name: my-custom-tap
-    namespace: my_custom_tap
-    pip_url: git+https://github.com/my-organization/my-custom-tap.git
-    executable: my-custom-tap
-    capabilities:
-    - discover
-    - catalog
-    settings:
-    - name: password
-      kind: string
-      sensitive: true
-    - name: my_custom_tap_username
-      aliases: [custom_tap_username, username]
+    - name: my-custom-tap
+      namespace: my_custom_tap
+      pip_url: git+https://github.com/my-organization/my-custom-tap.git
+      executable: my-custom-tap
+      capabilities:
+        - discover
+        - catalog
+      settings:
+        - name: password
+          kind: string
+          sensitive: true
+        - name: my_custom_tap_username
+          aliases: [custom_tap_username, username]
 ```
 
 Within a given configuration layer, a setting can be set via only a single name, whether that name is its canonical name or one of its aliases.
@@ -350,23 +349,25 @@ these variables can be referenced using standard variable expansion syntax, i.e.
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    simple_setting: $MELTANO_EXTRACTOR_NAME
-    multiple_words: $MELTANO_EXTRACTOR_NAMESPACE foo
-    part_of_a_path: $MELTANO_PROJECT_ROOT/example.txt
-    inside_a_word: ${MELTANO_EXTRACTOR_NAMESPACE}_foo
+  - name: tap-example
+    config:
+      simple_setting: $MELTANO_EXTRACTOR_NAME
+      multiple_words: $MELTANO_EXTRACTOR_NAMESPACE foo
+      part_of_a_path: $MELTANO_PROJECT_ROOT/example.txt
+      inside_a_word: ${MELTANO_EXTRACTOR_NAMESPACE}_foo
 ```
 
 :::tip
+
 <p>Values with a <code>%5C</code> character that are not intended to be expanded should be escaped with a backslash (<code>%24</code>), e.g. <code>%5C%24VAR</code>:</p>
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    special_character_setting: MY_$VAR
+  - name: tap-example
+    config:
+      special_character_setting: MY_$VAR
 ```
+
 :::
 
 ### Accessing from plugins
@@ -379,9 +380,9 @@ Within a [Meltano environment](/concepts/environments) environment variables can
 
 ```yml
 environments:
-- name: dev
-  env:
-    AN_ENVIRONMENT_VARIABLE: dev
+  - name: dev
+    env:
+      AN_ENVIRONMENT_VARIABLE: dev
 ```
 
 Any plugins run in that Meltano environment will then have the provided environment variables populated into the plugin's environment.
@@ -395,22 +396,22 @@ that use the same package but still have their own configuration:
 ```yml
 plugins:
   extractors:
-  - name: tap-google-analytics
-    variant: meltano
-    config:
-      key_file_location: client_secrets.json
-      start_date: "2020-10-01T00:00:00Z"
-  - name: tap-ga--view-foo
-    inherit_from: tap-google-analytics
-    config:
-      # `key_file_location` and `start_date` are inherited
-      view_id: 123456
-  - name: tap-ga--view-bar
-    inherit_from: tap-google-analytics
-    config:
-      # `key_file_location` is inherited
-      start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
-      view_id: 789012
+    - name: tap-google-analytics
+      variant: meltano
+      config:
+        key_file_location: client_secrets.json
+        start_date: "2020-10-01T00:00:00Z"
+    - name: tap-ga--view-foo
+      inherit_from: tap-google-analytics
+      config:
+        # `key_file_location` and `start_date` are inherited
+        view_id: 123456
+    - name: tap-ga--view-bar
+      inherit_from: tap-google-analytics
+      config:
+        # `key_file_location` is inherited
+        start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
+        view_id: 789012
 ```
 
 In this example, `tap-ga--view-foo` and `tap-ga--view-bar` are separate plugins that
@@ -426,18 +427,18 @@ they can [directly inherit](/guide/plugin-management#explicit-inheritance) from 
 ```yml
 plugins:
   extractors:
-  - name: tap-postgres--billing
-    inherit_from: tap-postgres
-    config:
-      host: one.postgres.example.com
-      user: billing_user
-      dbname: billing_db
-  - name: tap-postgres--events
-    inherit_from: tap-postgres
-    config:
-      host: two.postgres.example.com
-      user: events_user
-      dbname: events_db
+    - name: tap-postgres--billing
+      inherit_from: tap-postgres
+      config:
+        host: one.postgres.example.com
+        user: billing_user
+        dbname: billing_db
+    - name: tap-postgres--events
+      inherit_from: tap-postgres
+      config:
+        host: two.postgres.example.com
+        user: events_user
+        dbname: events_db
 ```
 
 To configure `tap-postgres`'s `password` setting, you would typically set the `TAP_POSTGRES_PASSWORD` [environment variable](#configuring-settings),
@@ -467,10 +468,10 @@ meltano config tap-example set custom_setting value
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    known_setting: value
-    custom_setting: value
+  - name: tap-example
+    config:
+      known_setting: value
+      custom_setting: value
 ```
 
 As long as the custom setting exists in `meltano.yml`, it will behave and can be interacted with just like any regular (known) setting. It will show up in `meltano config <plugin> list` and `meltano config <plugin>`, and the value that will be passed on to the plugin can be [overridden using an environment variable](/guide/configuration#configuring-settings):
@@ -506,12 +507,12 @@ The values of these extras are stored in your [`meltano.yml` project file](/conc
 
 ```yaml
 extractors:
-- name: tap-example
-  config:
-    # Configuration goes here!
-    example_setting: value
-  # Extras go here!
-  example_extra: value
+  - name: tap-example
+    config:
+      # Configuration goes here!
+      example_setting: value
+    # Extras go here!
+    example_extra: value
 ```
 
 These extras can be thought of and interacted with as a special kind of setting,

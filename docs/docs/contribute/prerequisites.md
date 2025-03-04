@@ -63,6 +63,7 @@ This means that you're ready to start Meltano CLI development.
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 export MELTANO_SEND_ANONYMOUS_USAGE_STATS=False
 ```
+
 :::
 
 ## System Database

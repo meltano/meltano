@@ -25,7 +25,7 @@ export default function TOC({ className, ...props }) {
       className={clsx(
         styles.tableOfContents,
         'thin-scrollbar pb-16',
-        className
+        className,
       )}
     >
       <TOCItems

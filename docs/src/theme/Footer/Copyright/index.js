@@ -24,28 +24,32 @@ export default function FooterCopyright({ copyright }) {
         <a
           href="https://github.com/meltano/meltano"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <GithubLogo title="Github Logo" className={styles.footerSocIcon} />
         </a>
         <a
           href="https://meltano.com/slack"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <SlackLogo title="Slack Logo" className={styles.footerSocIcon} />
         </a>
         <a
           href="https://twitter.com/meltanodata"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <TwitterLogo title="Twitter Logo" className={styles.footerSocIcon} />
         </a>
         <a
           href="https://www.linkedin.com/company/meltano/"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <LinkedinLogo
             title="Linkedin Logo"
@@ -69,14 +73,16 @@ export default function FooterCopyright({ copyright }) {
         <a
           href="https://www.youtube.com/meltano"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <YoutubeLogo title="Youtube Logo" className={styles.footerSocIcon} />
         </a>
         <a
           href="https://www.crunchbase.com/organization/meltano"
           className="opacity-50"
-          target="_blank" rel="noreferrer"
+          target="_blank"
+          rel="noreferrer"
         >
           <CrunchbaseLogo
             title="Crunchbase Logo"

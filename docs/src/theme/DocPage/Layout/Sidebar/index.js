@@ -32,7 +32,7 @@ export default function DocPageLayoutSidebar({
       className={clsx(
         ThemeClassNames.docs.docSidebarContainer,
         styles.docSidebarContainer,
-        hiddenSidebarContainer && styles.docSidebarContainerHidden
+        hiddenSidebarContainer && styles.docSidebarContainerHidden,
       )}
       onTransitionEnd={(e) => {
         if (!e.currentTarget.classList.contains(styles.docSidebarContainer)) {
@@ -44,7 +44,7 @@ export default function DocPageLayoutSidebar({
         <div
           className={clsx(
             styles.sidebarViewport,
-            hiddenSidebar && styles.sidebarViewportHidden
+            hiddenSidebar && styles.sidebarViewportHidden,
           )}
         >
           <DocSidebar

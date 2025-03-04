@@ -5,11 +5,12 @@ layout: doc
 sidebar_position: 3
 ---
 
-import Termy from '@site/src/utils/Termy'
+import Termy from "@site/src/utils/Termy";
 
 Let’s learn by example.
 
 Throughout this tutorial, we’ll walk you through one of many applications of Meltano. All of them are about:
+
 - connecting to data
 - processing it
 - and finally storing it in some permanent storage or pushing it to another component
@@ -39,7 +40,11 @@ This tutorial is written using meltano >= v3.0.0.
 If you don't have a GitHub account to follow along, you could either exchange the commands for a different tap, like GitLab or PostgreSQL, or you can create a free GitHub account. You will also need a [personal access token to your GitHub account](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
 
 :::tip
-<p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
+
+<p>
+  If you're having trouble throughout this tutorial, you can always head over to
+  the <a href="https://meltano.com/slack">Slack channel</a> to get help.
+</p>
 :::
 
 ## Create Your Meltano Project
@@ -98,9 +103,9 @@ version: 1
 default_environment: dev
 project_id: <unique-GUID>
 environments:
-- name: dev
-- name: staging
-- name: prod
+  - name: dev
+  - name: staging
+  - name: prod
 ```
 
 1. Navigate to the newly created project directory:
@@ -234,12 +239,12 @@ $
 This will add the configuration to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yml
-  plugins:
-    extractors:
-      - name: tap-github
-        config:
-          start_date: '2024-01-01'
-          repositories:
+plugins:
+  extractors:
+    - name: tap-github
+      config:
+        start_date: "2024-01-01"
+        repositories:
           - meltano/meltano
 ```
 
@@ -335,24 +340,23 @@ This will add the [selection rules](/concepts/plugins#select-extra) to your [`me
 version: 1
 default_environment: dev
 environments:
-- name: dev
-- name: staging
-- name: prod
+  - name: dev
+  - name: staging
+  - name: prod
 project_id: YOUR_ID
 plugins:
   extractors:
-  - name: tap-github
-    variant: meltanolabs
-    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
-    config:
-      start_date: '2024-01-01'
-      repositories:
-      - sbalnojan/meltano-lightdash
-    select:
-    - commits.url
-    - commits.sha
-    - commits.commit_timestamp
-
+    - name: tap-github
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-github.git
+      config:
+        start_date: "2024-01-01"
+        repositories:
+          - sbalnojan/meltano-lightdash
+      select:
+        - commits.url
+        - commits.sha
+        - commits.commit_timestamp
 ```
 
 1. Run [`meltano select --list`](/reference/command-line-interface#select) to double-check your selection:

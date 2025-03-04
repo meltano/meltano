@@ -39,9 +39,9 @@ These can then be added to your Meltano project by configuring a custom `pip_url
 
 ```yaml
 utilities:
-- name: superset
-  variant: apache
-  pip_url: apache-superset==1.5.0 snowflake-sqlalchemy
+  - name: superset
+    variant: apache
+    pip_url: apache-superset==1.5.0 snowflake-sqlalchemy
 ```
 
 3. Re-install the plugin:

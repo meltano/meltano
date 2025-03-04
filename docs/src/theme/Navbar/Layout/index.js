@@ -44,7 +44,7 @@ export default function NavbarLayout({ children }) {
           'navbar--dark': style === 'dark',
           'navbar--primary': style === 'primary',
           'navbar-sidebar--show': mobileSidebar.shown,
-        }
+        },
       )}
     >
       {children}

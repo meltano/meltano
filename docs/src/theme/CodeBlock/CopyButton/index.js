@@ -1,13 +1,13 @@
-import React, {useCallback, useState, useRef, useEffect} from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 // @ts-expect-error: TODO, we need to make theme-classic have type: module
 import copy from 'copy-text-to-clipboard';
-import {translate} from '@docusaurus/Translate';
+import { translate } from '@docusaurus/Translate';
 import IconCopy from '@theme/Icon/Copy';
 import IconSuccess from '@theme/Icon/Success';
 import styles from './styles.module.css';
 // eslint-disable-next-line react/prop-types
-export default function CopyButton({code, className}) {
+export default function CopyButton({ code, className }) {
   const [isCopied, setIsCopied] = useState(false);
   const copyTimeout = useRef(undefined);
   const handleCopyCode = useCallback(() => {
@@ -45,7 +45,8 @@ export default function CopyButton({code, className}) {
         styles.copyButton,
         isCopied && styles.copyButtonCopied,
       )}
-      onClick={handleCopyCode}>
+      onClick={handleCopyCode}
+    >
       <span className={styles.copyButtonIcons} aria-hidden="true">
         <IconCopy className={styles.copyButtonIcon} />
         <IconSuccess className={styles.copyButtonSuccessIcon} />

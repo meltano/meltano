@@ -5,14 +5,18 @@ layout: doc
 sidebar_position: 4
 ---
 
-import Termy from '@site/src/utils/Termy'
+import Termy from "@site/src/utils/Termy";
 
 Let’s learn by example.
 
-In  [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
+In [part 1](/getting-started/part1), we extracted data from GitHub and are now ready to load the data into a PostgreSQL database.
 
 :::tip
-<p>If you're having trouble throughout this tutorial, you can always head over to the <a href="https://meltano.com/slack">Slack channel</a> to get help.</p>
+
+<p>
+  If you're having trouble throughout this tutorial, you can always head over to
+  the <a href="https://meltano.com/slack">Slack channel</a> to get help.
+</p>
 :::
 
 ## Getting your target ready
@@ -39,12 +43,9 @@ $ docker container ls
 </Termy>
 
 <br />
-The container will need a few seconds to initialize. You can test the connection with your favorite SQL tool using connection data:
-- host: localhost
-- port: 5432
-- database: postgres
-- user: meltano
-- password: password
+The container will need a few seconds to initialize. You can test the connection
+with your favorite SQL tool using connection data: - host: localhost - port:
+5432 - database: postgres - user: meltano - password: password
 
 ## Add the postgres loader
 
@@ -125,7 +126,8 @@ To learn more about loader 'target-postgres' and its settings, visit https://hub
 </Termy>
 
 <br />
-Fill in the details for these four attributes, and set add_record_metadata to True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
+Fill in the details for these four attributes, and set add_record_metadata to
+True by using the `meltano config target-postgres set ATTRIBUTE VALUE` command:
 
  <Termy>
 
@@ -221,4 +223,5 @@ The postgres database should now have a schema `tap_github` with the table `comm
 Next, head over to [Part 3 to add data processing to your pipeline](/getting-started/part3).
 
 <script src="/js/termynal.js"></script>
+
 <script src="/js/termy_custom.js"></script>

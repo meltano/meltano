@@ -88,19 +88,19 @@ meltano select tap-gitlab --exclude "*" "*_url"
 This will add the [selection rules](/concepts/plugins#select-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yaml title="meltano.yml"
-        extractors:
-          - name: tap-gitlab
-            config:
-              projects: meltano/meltano meltano/tap-gitlab
-              start_date: "2024-03-01T00:00:00Z"
-            select:
-              - commits.id
-              - commits.project_id
-              - commits.created_at
-              - commits.author_name
-              - commits.message
-              - tags.*
-              - "!*.*_url"
+extractors:
+  - name: tap-gitlab
+    config:
+      projects: meltano/meltano meltano/tap-gitlab
+      start_date: "2024-03-01T00:00:00Z"
+    select:
+      - commits.id
+      - commits.project_id
+      - commits.created_at
+      - commits.author_name
+      - commits.message
+      - tags.*
+      - "!*.*_url"
 ```
 
 ### Setting metadata
@@ -129,18 +129,18 @@ meltano config tap-postgres set _metadata '*_full' replication-method FULL_TABLE
 This will add the [metadata rules](/concepts/plugins#metadata-extra) to your [`meltano.yml` project file](/concepts/project#plugin-configuration):
 
 ```yaml title="meltano.yml"
-        extractors:
-          - name: tap-postgres
-            metadata:
-              some_entity_id:
-                replication-method: INCREMENTAL
-                replication-key: id
-              other_entity:
-                replication-method: FULL_TABLE
-              "*":
-                replication-method: INCREMENTAL
-              "*_full":
-                replication-method: FULL_TABLE
+extractors:
+  - name: tap-postgres
+    metadata:
+      some_entity_id:
+        replication-method: INCREMENTAL
+        replication-key: id
+      other_entity:
+        replication-method: FULL_TABLE
+      "*":
+        replication-method: INCREMENTAL
+      "*_full":
+        replication-method: FULL_TABLE
 ```
 
 ### Overriding schemas
@@ -263,16 +263,16 @@ If you're using the `elt` syntax with [`meltano schedule`](/reference/command-li
 
 ```yaml title="meltano.yml"
 schedules:
-- name: foo-to-bar
-  extractor: tap-foo
-  loader: target-bar
-  transform: skip
-  interval: '@hourly'
-  # highlight-start
-  env:
-    TAP_FOO_BAR: bar
-    TAP_FOO_BAZ: baz
-  # highlight-end
+  - name: foo-to-bar
+    extractor: tap-foo
+    loader: target-bar
+    transform: skip
+    interval: "@hourly"
+    # highlight-start
+    env:
+      TAP_FOO_BAR: bar
+      TAP_FOO_BAZ: baz
+    # highlight-end
 ```
 
 Different runners and execution/orchestration platforms will have their own way of specifying environment variables along with a command invocation.

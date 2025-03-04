@@ -14,7 +14,7 @@ export default function DocPageLayoutMain({
     <main
       className={clsx(
         styles.docMainContainer,
-        (hiddenSidebarContainer || !sidebar) && styles.docMainContainerEnhanced
+        (hiddenSidebarContainer || !sidebar) && styles.docMainContainerEnhanced,
       )}
     >
       <DocBreadcrumbs />
@@ -22,7 +22,7 @@ export default function DocPageLayoutMain({
         className={clsx(
           'padding-bottom--lg',
           styles.docItemWrapper,
-          hiddenSidebarContainer && styles.docItemWrapperEnhanced
+          hiddenSidebarContainer && styles.docItemWrapperEnhanced,
         )}
       >
         {children}

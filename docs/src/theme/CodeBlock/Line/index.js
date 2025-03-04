@@ -21,10 +21,7 @@ export default function CodeBlockLine({
 
   const lineProps = getLineProps({
     line,
-    className: clsx(
-      classNames,
-      showLineNumbers && styles.codeLine
-    ),
+    className: clsx(classNames, showLineNumbers && styles.codeLine),
   });
   // eslint-disable-next-line react/prop-types
   const lineTokens = line.map((token, key) => (

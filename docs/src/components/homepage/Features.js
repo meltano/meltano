@@ -9,8 +9,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/tutorial.svg').default,
     description: (
       <>
-        Get started with Meltano and run data pipelines with a source
-        and destination of your choosing.
+        Get started with Meltano and run data pipelines with a source and
+        destination of your choosing.
       </>
     ),
     link: {
@@ -23,7 +23,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/book-open.svg').default,
     description: (
       <>
-        Dive into how Meltano works and how to use it to build your data-powered applications.
+        Dive into how Meltano works and how to use it to build your data-powered
+        applications.
       </>
     ),
     link: {
@@ -36,7 +37,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/hub.svg').default,
     description: (
       <>
-        Explore the library of 600+ connectors and tools within the Meltano ecosystem.
+        Explore the library of 600+ connectors and tools within the Meltano
+        ecosystem.
       </>
     ),
     link: {
@@ -50,7 +52,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/sdk.svg').default,
     description: (
       <>
-        Build your own Meltano connector to move data from any source to any destination.
+        Build your own Meltano connector to move data from any source to any
+        destination.
       </>
     ),
     link: {
@@ -64,7 +67,8 @@ const FeatureList = [
     Svg: require('@site/static/img/homepage/rocket.svg').default,
     description: (
       <>
-        Explore many of the connectors built with the Meltano SDK in their home on GitHub: Meltano Labs.
+        Explore many of the connectors built with the Meltano SDK in their home
+        on GitHub: Meltano Labs.
       </>
     ),
     link: {

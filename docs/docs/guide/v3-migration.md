@@ -55,6 +55,7 @@ meltano lock --all
 4. (Optional) Remove the `ff.plugin_locks_required` feature flag after upgrading to Meltano v3, since it has no effect in Meltano v3.
 
 :::tip
+
 <p>For <a href="/guide/plugin-management/#custom-plugins">custom plugins</a>, you might need to add a <code>namespace</code> to the plugin definition.</p>
 :::
 

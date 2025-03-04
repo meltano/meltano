@@ -5,13 +5,21 @@ layout: doc
 sidebar_position: 2
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 This document will get you up and running with Meltano in-depth. There is also a [short install guide for first-time Meltano users](/getting-started/installation).
 
 :::tip
-<p><strong>Short on time, or just curious what the fuss is about?</strong> Watch the <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">"0 to DataOps" speedrun</a> to get a sense of the Meltano experience in just a few minutes!</p>
+
+<p>
+  <strong>Short on time, or just curious what the fuss is about?</strong> Watch
+  the{" "}
+  <a href="https://www.youtube.com/watch?v=sL3RvXZOTvE">
+    "0 to DataOps" speedrun
+  </a>{" "}
+  to get a sense of the Meltano experience in just a few minutes!
+</p>
 :::
 
 ## Local Installation
@@ -20,13 +28,21 @@ In the section below, we will install Meltano locally on your system, so that yo
 
 :::caution
 
-  <p>Please note that Windows is not fully supported yet so some features like the ELT command may not work yet.
-  See the GitHub [Windows Label](https://github.com/meltano/meltano/labels/Windows) for more information.</p>
+<p>
+  Please note that Windows is not fully supported yet so some features like the
+  ELT command may not work yet. See the GitHub [Windows
+  Label](https://github.com/meltano/meltano/labels/Windows) for more
+  information.
+</p>
 
-  <br/>
+<br />
 
-  <p>If you'd like all of Meltano's features to work, you can install Meltano inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about).
-  You may also try [installing Meltano on Docker](#installing-on-docker).</p>
+<p>
+  If you'd like all of Meltano's features to work, you can install Meltano
+  inside the [Windows Subsystem for Linux
+  (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try
+  [installing Meltano on Docker](#installing-on-docker).
+</p>
 :::
 
 ### Requirements
@@ -37,7 +53,13 @@ Before you install Meltano, make sure you have the following requirements instal
 
 :::info
 
-  <p>You may refer to <a href="https://realpython.com/installing-python/">https://realpython.com/installing-python/</a> for platform specific installation instructions.</p>
+<p>
+  You may refer to{" "}
+  <a href="https://realpython.com/installing-python/">
+    https://realpython.com/installing-python/
+  </a>{" "}
+  for platform specific installation instructions.
+</p>
 :::
 
 Use the following command to check that you have a supported Python version installed:
@@ -56,34 +78,38 @@ Currently Python 3.9, 3.10, 3.11, 3.12 and 3.13 are supported. Some plugins do n
 <Tabs className="meltano-tabs">
   <TabItem className="meltano-tab-content" value="unix" label="Unix" default>
 
-  ```bash
-  # install pipx and ensure it is on the path
-  python3 -m pip install --user pipx
-  python3 -m pipx ensurepath
-  # Be sure pipx is available on your path
-  source ~/.bashrc
-  ```
+```bash
+# install pipx and ensure it is on the path
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+# Be sure pipx is available on your path
+source ~/.bashrc
+```
 
   </TabItem>
 
   <TabItem className="meltano-tab-content" value="windows" label="Windows">
 
-  ```powershell
-  # install pipx and ensure it is on the path
-  python3 -m pip install --user pipx
-  python3 -m pipx ensurepath
-  # Be sure pipx is available on your path
-  RefreshEnv
-  ```
+```powershell
+# install pipx and ensure it is on the path
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+# Be sure pipx is available on your path
+RefreshEnv
+```
+
   </TabItem>
 </Tabs>
 
 :::info
 
-  <p>Why use pipx and virtual environments?</p>
-  <p>Your local environment may use a different version of Python or other dependencies that are
-difficult to manage. The pipx installer automatically creates a virtual environment and provides a
-"clean" isolated space without version conflicts or other compatibility issues.</p>
+<p>Why use pipx and virtual environments?</p>
+<p>
+  Your local environment may use a different version of Python or other
+  dependencies that are difficult to manage. The pipx installer automatically
+  creates a virtual environment and provides a "clean" isolated space without
+  version conflicts or other compatibility issues.
+</p>
 :::
 
 ### Install Meltano
@@ -191,7 +217,11 @@ Note that wherever you are asked to run the `meltano` command, you will want to 
 
 :::info
 
-  <p>Are you having installation or deployment problems? We are here to help you. Check out <a href="/#get-help">Getting Help</a> on the different ways to get in touch with us.</p>
+<p>
+  Are you having installation or deployment problems? We are here to help you.
+  Check out <a href="/#get-help">Getting Help</a> on the different ways to get
+  in touch with us.
+</p>
 :::
 
 ## Upgrading Meltano Version

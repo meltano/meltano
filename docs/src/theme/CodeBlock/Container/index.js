@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import {ThemeClassNames, usePrismTheme} from '@docusaurus/theme-common';
-import {getPrismCssVariables} from '@docusaurus/theme-common/internal';
+import { ThemeClassNames, usePrismTheme } from '@docusaurus/theme-common';
+import { getPrismCssVariables } from '@docusaurus/theme-common/internal';
 import styles from './styles.module.css';
 // eslint-disable-next-line react/prop-types
-export default function CodeBlockContainer({as: As, ...props}) {
+export default function CodeBlockContainer({ as: As, ...props }) {
   const prismTheme = usePrismTheme();
   const prismCssVariables = getPrismCssVariables(prismTheme);
   return (

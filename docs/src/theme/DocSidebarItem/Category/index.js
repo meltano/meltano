@@ -62,7 +62,7 @@ function CollapseButton({ categoryLabel, onClick }) {
           description:
             'The ARIA label to toggle the collapsible sidebar category',
         },
-        { label: categoryLabel }
+        { label: categoryLabel },
       )}
       type="button"
       className="clean-btn menu__caret"
@@ -131,7 +131,7 @@ export default function DocSidebarItemCategory({
         {
           'menu__list-item--collapsed': collapsed,
         },
-        className
+        className,
       )}
     >
       <div
@@ -162,7 +162,9 @@ export default function DocSidebarItemCategory({
           }
           aria-current={isCurrentPage ? 'page' : undefined}
           aria-expanded={collapsible ? !collapsed : undefined}
-          href={collapsible ? hrefWithSSRFallback ?? '#' : hrefWithSSRFallback}
+          href={
+            collapsible ? (hrefWithSSRFallback ?? '#') : hrefWithSSRFallback
+          }
           {...props}
         >
           {/* eslint-disable-next-line react/prop-types */}

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { translate } from '@docusaurus/Translate';
 import { prefersReducedMotion } from '@docusaurus/theme-common';
@@ -43,7 +42,7 @@ export default function SidebarArrow({
         })}
         className={clsx(
           hiddenSidebarContainer && styles.collapsed,
-          styles.collapseSidebarButton
+          styles.collapseSidebarButton,
         )}
         onClick={toggleSidebar}
       >
@@ -57,7 +56,7 @@ export default function SidebarArrow({
             styles.collapseSidebarButtonIcon,
             position === 'left'
               ? styles.collapseSidebarButtonIconLeft
-              : styles.collapseSidebarButtonIconRight
+              : styles.collapseSidebarButtonIconRight,
           )}
         >
           <rect

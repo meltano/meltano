@@ -88,13 +88,13 @@ A few example configurations using inline stream maps are:
 This example shows the SDK based meltanolabs variant of tap-github configured to lowercase all repo names in the issues stream.
 
 ```yaml
-  - name: tap-github
-    variant: meltanolabs
-    pip_url: meltanolabs-tap-github
-    config:
-      stream_maps:
-        issues:
-          repo: record['repo'].lower()
+- name: tap-github
+  variant: meltanolabs
+  pip_url: meltanolabs-tap-github
+  config:
+    stream_maps:
+      issues:
+        repo: record['repo'].lower()
 ```
 
 For more details and examples refer to the [SDK documentation](https://sdk.meltano.com/en/latest/stream_maps.html).
@@ -162,9 +162,9 @@ plugins
 
 After running `meltano run tap-csv lower target-sqlite` the result would be:
 
-| count\_t | email              | first\_name | id  | last\_name | \_\_loaded\_at             |
-| -------- | ------------------ | ----------- | --- | ---------- | -------------------------- |
-| 0        | EBOOK0@TWITTER.COM | ethe        | 1   | book       | 2023-03-17 16:57:19.095880 |
+| count_t | email              | first_name | id  | last_name | \_\_loaded_at              |
+| ------- | ------------------ | ---------- | --- | --------- | -------------------------- |
+| 0       | EBOOK0@TWITTER.COM | ethe       | 1   | book      | 2023-03-17 16:57:19.095880 |
 
 To see more examples check out the [plugin repo](https://github.com/MeltanoLabs/meltano-map-transform/tree/main/examples).
 

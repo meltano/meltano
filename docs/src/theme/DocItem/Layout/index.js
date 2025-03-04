@@ -40,7 +40,7 @@ export default function DocItemLayout({ children }) {
         <div
           className={clsx(
             'col !px-0 lg:!pr-4',
-            !hiddenSidebarContainer && styles.docItemCol
+            !hiddenSidebarContainer && styles.docItemCol,
           )}
         >
           <DocVersionBanner />
@@ -58,7 +58,7 @@ export default function DocItemLayout({ children }) {
             className={clsx(
               'col col--3 flex justify-end',
               styles.tocContainer,
-              hiddenSidebarContainer && styles.tocHiddenContainer
+              hiddenSidebarContainer && styles.tocHiddenContainer,
             )}
           >
             <SidebarArrow
@@ -70,7 +70,7 @@ export default function DocItemLayout({ children }) {
             <div
               className={clsx(
                 styles.tocWrapper,
-                hiddenSidebarContainer && styles.tocHidden
+                hiddenSidebarContainer && styles.tocHidden,
               )}
             >
               {docTOC.desktop}

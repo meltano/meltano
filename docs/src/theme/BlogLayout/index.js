@@ -15,7 +15,7 @@ export default function BlogLayout(props) {
       <div
         className={clsx(
           styles.changelogHeader,
-          'relative w-full bg-black text-white flex flex-col items-center py-16 md:py-24'
+          'relative w-full bg-black text-white flex flex-col items-center py-16 md:py-24',
         )}
       >
         <img
@@ -26,7 +26,10 @@ export default function BlogLayout(props) {
         <h1 className="text-4xl md:text-6xl font-bold mb-10 lg:mt-10">
           Changelog
         </h1>
-        <a href="https://meltano.com/lp/meltastic-newsletter/" className="btn main-btn">
+        <a
+          href="https://meltano.com/lp/meltastic-newsletter/"
+          className="btn main-btn"
+        >
           Subscribe to Updates
         </a>
       </div>

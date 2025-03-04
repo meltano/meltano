@@ -4,6 +4,7 @@ description: If you want to know why you should use Meltano, here's a quick over
 layout: doc
 sidebar_position: 1
 ---
+
 ## Meltano the Data Integration Engine for ELT?
 
 While Meltano is a declarative data integration engine, made for building data-powered features fast, one of the use cases has always been to use Meltano as an ELT platform.

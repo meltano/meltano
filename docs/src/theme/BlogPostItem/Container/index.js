@@ -18,7 +18,7 @@ export default function BlogPostItemContainer({ children, className }) {
       <div
         className={clsx(
           'w-full md:w-24 h-16 flex flex-col px-2 py-3 margin-bottom--xl text-center shrink-0',
-          styles.date
+          styles.date,
         )}
       >
         <span className={styles.month}>{dateArray[0]}</span>

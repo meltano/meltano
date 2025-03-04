@@ -30,18 +30,17 @@ Via the yaml file: add the follow code block inside your `meltano.yml` (ignore t
 ```yaml
 plugins:
   utilities: # meltano invoke jupyter will start up the lab...
-  - name: jupyterlab
-    namespace: jupyterlab
-    pip_url: jupyterlab
-    executable: jupyter
-    commands:
-      launch_ip0: #important for Mac users running Meltano inside Docker.
-        args: lab --ip=0.0.0.0
-        description: Start lab server, on any ip range for Mac users inside docker.
-      launch:
-        args: lab
-        description: Start lab server
-
+    - name: jupyterlab
+      namespace: jupyterlab
+      pip_url: jupyterlab
+      executable: jupyter
+      commands:
+        launch_ip0: #important for Mac users running Meltano inside Docker.
+          args: lab --ip=0.0.0.0
+          description: Start lab server, on any ip range for Mac users inside docker.
+        launch:
+          args: lab
+          description: Start lab server
 ```
 
 Run `meltano install` to ensure the correctness of your yaml file. Then run `meltano invoke jupyterlab:launch` to launch the GUI.
@@ -60,19 +59,18 @@ To add additional Python libraries, extend the meltano.yml definition by space-s
 
 ```yaml
 plugins:
- utilities: # meltano invoke jupyter will start up the lab...
- - name: jupyterlab
-   namespace: jupyterlab
-   pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary
-   executable: jupyter
-   commands:
-     launch_ip0: #important for Mac users running Meltano inside Docker.
-       args: lab --ip=0.0.0.0
-       description: Start lab server, on any ip range for Mac users inside docker.
-     launch:
-       args: lab
-       description: Start lab server
-
+  utilities: # meltano invoke jupyter will start up the lab...
+    - name: jupyterlab
+      namespace: jupyterlab
+      pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary
+      executable: jupyter
+      commands:
+        launch_ip0: #important for Mac users running Meltano inside Docker.
+          args: lab --ip=0.0.0.0
+          description: Start lab server, on any ip range for Mac users inside docker.
+        launch:
+          args: lab
+          description: Start lab server
 ```
 
 ### 3. _Optional: Expore database connection variables into the environment_
@@ -83,9 +81,9 @@ To connect to datasources across different plugins it is useful to expose the co
 version: 1
 default_environment: dev
 environments:
-- name: dev
-  config:
-  env:
+  - name: dev
+    config:
+    env:
       PG_HOST: postgres
       PG_PORT: "5432"
       PG_DB: demo
@@ -119,20 +117,20 @@ Jupyter and jupyterlab both offer "nbconvert" as default option to execute noteb
 If you want to use "nbconvert" you will want to add a command to the plugin, replace "notebook/sql_magic.ipynb" with your notebook path:
 
 ```yaml
-  - name: jupyterlab
-    namespace: jupyterlab
-    pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary papermill
-    executable: jupyter
-    commands:
-      launch_ip0:
-        args: lab --ip=0.0.0.0
-        description: Start lab server, on any ip range for Mac users inside docker.
-      launch:
-        args: lab
-        description: Start lab server
-      execute:
-        args: nbconvert --to notebook --execute notebook/sql_magic.ipynb
-        description: Start lab server
+- name: jupyterlab
+  namespace: jupyterlab
+  pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary papermill
+  executable: jupyter
+  commands:
+    launch_ip0:
+      args: lab --ip=0.0.0.0
+      description: Start lab server, on any ip range for Mac users inside docker.
+    launch:
+      args: lab
+      description: Start lab server
+    execute:
+      args: nbconvert --to notebook --execute notebook/sql_magic.ipynb
+      description: Start lab server
 ```
 
 You can then execute with `meltano invoke jupyterlab:execute`
@@ -140,13 +138,13 @@ You can then execute with `meltano invoke jupyterlab:execute`
 If you want to use papermill, the easiest option is to use [plugin inheritance](https://docs.meltano.com/concepts/project#inheriting-plugin-definitions) to reuse the venvs created for each plugin. That way, you will not need to install jupyterlabs and all the dependencies twice. Here's an example yaml block:
 
 ```yaml
-  - name: papermill
-    inherit_from: jupyterlab
-    executable: papermill
-    commands:
-      execute:
-        args: notebook/sql_magic.ipynb output/output.ipynb -p price_1 1000
-        description: Start lab server, on any ip range for Mac users inside docker.
+- name: papermill
+  inherit_from: jupyterlab
+  executable: papermill
+  commands:
+    execute:
+      args: notebook/sql_magic.ipynb output/output.ipynb -p price_1 1000
+      description: Start lab server, on any ip range for Mac users inside docker.
 ```
 
 You will need to adapt the "args" to your notebook path, output path and parameters. The example notebook here has one cell with a defined parameter "price_1" which we are able to override from the outside. For details, refer to the (pleasently short) [documentation from papermill](https://papermill.readthedocs.io/en/latest/usage-parameterize.html), it's a simple process.
@@ -158,28 +156,28 @@ Putting it all together, you will end up with a meltano.yml like this:
 ```yaml
 plugins:
   utilities: # meltano invoke jupyter will start up the lab...
-  - name: jupyterlab
-    namespace: jupyterlab
-    pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary papermill
-    executable: jupyter
-    commands:
-      launch_ip0:
-        args: lab --ip=0.0.0.0
-        description: Start lab server, on any ip range for Mac users inside docker.
-      launch:
-        args: lab
-        description: Start lab server
-      execute:
-        args: nbconvert --to notebook --execute notebook/sql_magic.ipynb
-        description: Start lab server
+    - name: jupyterlab
+      namespace: jupyterlab
+      pip_url: jupyterlab pandas matplotlib sqlalchemy psycopg2-binary papermill
+      executable: jupyter
+      commands:
+        launch_ip0:
+          args: lab --ip=0.0.0.0
+          description: Start lab server, on any ip range for Mac users inside docker.
+        launch:
+          args: lab
+          description: Start lab server
+        execute:
+          args: nbconvert --to notebook --execute notebook/sql_magic.ipynb
+          description: Start lab server
 
-  - name: papermill
-    inherit_from: jupyterlab
-    executable: papermill
-    commands:
-      execute:
-        args: notebook/sql_magic.ipynb output/output.ipynb -p price_1 1000
-        description: Start lab server, on any ip range for Mac users inside docker.
+    - name: papermill
+      inherit_from: jupyterlab
+      executable: papermill
+      commands:
+        execute:
+          args: notebook/sql_magic.ipynb output/output.ipynb -p price_1 1000
+          description: Start lab server, on any ip range for Mac users inside docker.
 ```
 
 Then execute `meltano invoke papermill:execute` to run your notebook and possibly include it in your meltano pipeline.

@@ -79,7 +79,6 @@ meltano state copy my-custom-id tap-gitlab-to-target-postgres
 
 Then you can create a job and execute it using `meltano run`:
 
-
 ```shell
 meltano job add my-new-job --task="tap-gitlab target-postgres"
 meltano run my-new-job

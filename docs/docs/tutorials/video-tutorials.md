@@ -3,8 +3,8 @@ title: Video Tutorials & Demos
 description: Learn advanced Meltano projects taught in an Office Hour or Demo Day session via YouTube.
 layout: doc
 ---
-Below is a list video tutorials & demos on specific Meltano-related topics. Most lessons are part of a longer YouTube video. If that is the case, the link below will guide you to the correct time period.
 
+Below is a list video tutorials & demos on specific Meltano-related topics. Most lessons are part of a longer YouTube video. If that is the case, the link below will guide you to the correct time period.
 
 - **[DemoDay - Combining Meltano & Lightdash](https://youtu.be/NZZyBnEOGOI?list=PLO0YrxtDbWAuLRElrtwFI5PwlAEMUi0AD&t=937)** - Using Meltano as EL and T tool together with Lightdash, a leightweight BI tool that integrates well with dbt.
 - **[DemoDay - Meltano Mappers](https://www.youtube.com/watch?v=41RGHQ49U_M&t=99s)** - An introduction to mappers and in particular to both, the two default mappers transferwise and meltano-map-transformer.

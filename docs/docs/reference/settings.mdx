@@ -5,8 +5,8 @@ layout: doc
 sidebar_position: 2
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 Meltano supports a number of settings that allow you to fine tune its behavior, which are documented here.
 To quickly find the setting you're looking for, use the Table of Contents in the sidebar.
@@ -44,13 +44,13 @@ Example:
 ```yaml
 plugins:
   extractors:
-  - name: tap-gitlab
-    variant: meltanolabs
-    python: /path/to/python3.10
+    - name: tap-gitlab
+      variant: meltanolabs
+      python: /path/to/python3.10
   loaders:
-  - name: target-postgres
-    variant: meltanolabs
-    python: python3.10 # if it's in your $PATH
+    - name: target-postgres
+      variant: meltanolabs
+      python: python3.10 # if it's in your $PATH
 ```
 
 ## Your Meltano project
@@ -234,6 +234,7 @@ Some systems may come with an older version by default. You can run <code>sqlite
 #### How to use
 
 ###### PostgreSQL
+
 <Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
@@ -258,8 +259,8 @@ meltano run --database-uri=postgresql+psycopg://<username>:<password>@<host>:<po
   </TabItem>
 </Tabs>
 
-
 ###### SQL Server (MSSQL)
+
 <Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
 
@@ -371,7 +372,6 @@ Specifically, this prevents [adding plugins](/reference/command-line-interface#a
 Note that [`meltano config <plugin> set`](/reference/command-line-interface#config) can still be used to store configuration in the [system database](/concepts/project#system-database), but that settings that are already [set in the environment](/guide/configuration#configuring-settings) or `meltano.yml` take precedence and cannot be overridden.
 
 #### How to use
-
 
 <Tabs className="meltano-tabs" queryString="meltano-tabs">
   <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
@@ -489,6 +489,7 @@ export MELTANO_HUB_URL_AUTH=false
 Whether to automatically install any required plugins on command invocation. A plugin will be auto-installed when its virtual environment does not already exist or `pip_url` is changed.
 
 Auto-install pertains to the following commands:
+
 - [`meltano add`](/reference/command-line-interface#add)
 - [`meltano config <plugin> test`](/reference/command-line-interface#config)
 - [`meltano select --list`](/reference/command-line-interface#select)
@@ -1000,9 +1001,11 @@ MELTANO_VENV_BACKEND=uv meltano install --clean
 </Tabs>
 
 :::info
-  <p>
-  After you switch to a different virtual environment backend, it's recommended to reinstall all plugins with `meltano install --clean`.
-  </p>
+
+<p>
+  After you switch to a different virtual environment backend, it's recommended
+  to reinstall all plugins with `meltano install --clean`.
+</p>
 :::
 
 ## Snowplow Tracking

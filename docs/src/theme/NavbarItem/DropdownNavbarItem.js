@@ -1,11 +1,14 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
 import {
   isRegexpStringMatch,
   useCollapsible,
   Collapsible,
 } from '@docusaurus/theme-common';
-import {isSamePath, useLocalPathname} from '@docusaurus/theme-common/internal';
+import {
+  isSamePath,
+  useLocalPathname,
+} from '@docusaurus/theme-common/internal';
 import NavbarNavLink from '@theme/NavbarItem/NavbarNavLink';
 import NavbarItem from '@theme/NavbarItem';
 function isItemActive(item, localPathname) {
@@ -58,7 +61,8 @@ function DropdownNavbarItemDesktop({
       className={clsx('navbar__item', 'dropdown', 'dropdown--hoverable', {
         'dropdown--right': position === 'right',
         'dropdown--show': showDropdown,
-      })}>
+      })}
+    >
       <NavbarNavLink
         aria-haspopup="true"
         aria-expanded={showDropdown}
@@ -74,7 +78,8 @@ function DropdownNavbarItemDesktop({
             e.preventDefault();
             setShowDropdown(!showDropdown);
           }
-        }}>
+        }}
+      >
         {/* eslint-disable-next-line react/prop-types */}
         {props.children ?? props.label}
       </NavbarNavLink>
@@ -105,7 +110,7 @@ function DropdownNavbarItemMobile({
 }) {
   const localPathname = useLocalPathname();
   const containsActive = containsActiveItems(items, localPathname);
-  const {collapsed, toggleCollapsed, setCollapsed} = useCollapsible({
+  const { collapsed, toggleCollapsed, setCollapsed } = useCollapsible({
     initialState: () => !containsActive,
   });
   // Expand/collapse if any item active after a navigation
@@ -118,7 +123,8 @@ function DropdownNavbarItemMobile({
     <li
       className={clsx('menu__list-item', {
         'menu__list-item--collapsed': collapsed,
-      })}>
+      })}
+    >
       <NavbarNavLink
         role="button"
         className={clsx(
@@ -129,7 +135,8 @@ function DropdownNavbarItemMobile({
         onClick={(e) => {
           e.preventDefault();
           toggleCollapsed();
-        }}>
+        }}
+      >
         {/* eslint-disable-next-line react/prop-types */}
         {props.children ?? props.label}
       </NavbarNavLink>
@@ -150,7 +157,7 @@ function DropdownNavbarItemMobile({
   );
 }
 // eslint-disable-next-line react/prop-types
-export default function DropdownNavbarItem({mobile = false, ...props}) {
+export default function DropdownNavbarItem({ mobile = false, ...props }) {
   const Comp = mobile ? DropdownNavbarItemMobile : DropdownNavbarItemDesktop;
   return <Comp {...props} />;
 }

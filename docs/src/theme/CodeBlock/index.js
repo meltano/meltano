@@ -1,4 +1,4 @@
-import React, {isValidElement} from 'react';
+import React, { isValidElement } from 'react';
 import useIsBrowser from '@docusaurus/useIsBrowser';
 import ElementContent from '@theme/CodeBlock/Content/Element';
 import StringContent from '@theme/CodeBlock/Content/String';
@@ -16,7 +16,7 @@ function maybeStringifyChildren(children) {
   return Array.isArray(children) ? children.join('') : children;
 }
 // eslint-disable-next-line react/prop-types
-export default function CodeBlock({children: rawChildren, ...props}) {
+export default function CodeBlock({ children: rawChildren, ...props }) {
   // The Prism theme on SSR is always the default theme but the site theme can
   // be in a different mode. React hydration doesn't update DOM styles that come
   // from SSR. Hence force a re-render after mounting to apply the current

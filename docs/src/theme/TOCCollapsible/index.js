@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import {useCollapsible, Collapsible} from '@docusaurus/theme-common';
+import { useCollapsible, Collapsible } from '@docusaurus/theme-common';
 import TOCItems from '@theme/TOCItems';
 import CollapseButton from '@theme/TOCCollapsible/CollapseButton';
 import styles from './styles.module.css';
@@ -14,7 +14,7 @@ export default function TOCCollapsible({
   // eslint-disable-next-line react/prop-types
   maxHeadingLevel,
 }) {
-  const {collapsed, toggleCollapsed} = useCollapsible({
+  const { collapsed, toggleCollapsed } = useCollapsible({
     initialState: true,
   });
   return (
@@ -23,12 +23,14 @@ export default function TOCCollapsible({
         styles.tocCollapsible,
         !collapsed && styles.tocCollapsibleExpanded,
         className,
-      )}>
+      )}
+    >
       <CollapseButton collapsed={collapsed} onClick={toggleCollapsed} />
       <Collapsible
         lazy
         className={styles.tocCollapsibleContent}
-        collapsed={collapsed}>
+        collapsed={collapsed}
+      >
         <TOCItems
           toc={toc}
           minHeadingLevel={minHeadingLevel}

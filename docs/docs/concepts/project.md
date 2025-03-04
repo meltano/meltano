@@ -72,13 +72,13 @@ A plugin defined with an `inherit_from` property inherits its [base plugin descr
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-postgres          # Shadows discoverable `tap-postgres` (see below)
-  - name: tap-postgres--billing
-    # highlight-next-line
-    inherit_from: tap-postgres  # Inherits from project's `tap-postgres`
-  - name: tap-bigquery--events
-    # highlight-next-line
-    inherit_from: tap-bigquery  # Inherits from discoverable `tap-bigquery`
+    - name: tap-postgres # Shadows discoverable `tap-postgres` (see below)
+    - name: tap-postgres--billing
+      # highlight-next-line
+      inherit_from: tap-postgres # Inherits from project's `tap-postgres`
+    - name: tap-bigquery--events
+      # highlight-next-line
+      inherit_from: tap-bigquery # Inherits from discoverable `tap-bigquery`
 ```
 
 When inheriting from another plugin in your project, its [configuration](/guide/configuration) is also inherited as if the values were defaults, which can then be overridden as appropriate:
@@ -86,26 +86,26 @@ When inheriting from another plugin in your project, its [configuration](/guide/
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-google-analytics
-    variant: meltano
-    config:
-      key_file_location: client_secrets.json
-      start_date: '2020-10-01T00:00:00Z'
-  - name: tap-ga--view-foo
-    inherit_from: tap-google-analytics
-    # highlight-start
-    config:
-      # `key_file_location` and `start_date` are inherited
-      view_id: 123456
-    # highlight-end
-  - name: tap-ga--view-bar
-    inherit_from: tap-google-analytics
-    # highlight-start
-    config:
-      # `key_file_location` is inherited
-      start_date: '2020-12-01T00:00:00Z' # `start_date` is overridden
-      view_id: 789012
-    # highlight-end
+    - name: tap-google-analytics
+      variant: meltano
+      config:
+        key_file_location: client_secrets.json
+        start_date: "2020-10-01T00:00:00Z"
+    - name: tap-ga--view-foo
+      inherit_from: tap-google-analytics
+      # highlight-start
+      config:
+        # `key_file_location` and `start_date` are inherited
+        view_id: 123456
+      # highlight-end
+    - name: tap-ga--view-bar
+      inherit_from: tap-google-analytics
+      # highlight-start
+      config:
+        # `key_file_location` is inherited
+        start_date: "2020-12-01T00:00:00Z" # `start_date` is overridden
+        view_id: 789012
+      # highlight-end
 ```
 
 Note that the presence of a [`variant` property](#variants) causes only discoverable plugins to be considered
@@ -115,16 +115,16 @@ since only these can have multiple [variants](/concepts/plugins#variants):
 ```yaml title="meltano.yml"
 plugins:
   loaders:
-  - name: target-snowflake          # Shadows discoverable `target-snowflake` (see below)
-    variant: datamill-co            # using variant `datamill-co`
-  - name: target-snowflake--derived
-    # highlight-next-line
-    inherit_from: target-snowflake  # Inherits from project's `target-snowflake`
-  - name: target-snowflake--transferwise
-    # highlight-start
-    inherit_from: target-snowflake  # Inherits from discoverable `target-snowflake`
-    variant: transferwise           # using variant `transferwise`
-    # highlight-end
+    - name: target-snowflake # Shadows discoverable `target-snowflake` (see below)
+      variant: datamill-co # using variant `datamill-co`
+    - name: target-snowflake--derived
+      # highlight-next-line
+      inherit_from: target-snowflake # Inherits from project's `target-snowflake`
+    - name: target-snowflake--transferwise
+      # highlight-start
+      inherit_from: target-snowflake # Inherits from discoverable `target-snowflake`
+      variant: transferwise # using variant `transferwise`
+      # highlight-end
 ```
 
 To learn how to add an inheriting plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#plugin-inheritance).
@@ -136,20 +136,20 @@ A plugin defined with a `namespace` property (but no `inherit_from` property) is
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-covid-19
-    # highlight-start
-    namespace: tap_covid_19
-    pip_url: tap-covid-19
-    executable: tap-covid-19
-    capabilities:
-    - catalog
-    - discover
-    - state
-    settings:
-    - name: api_token
-    - name: user_agent
-    - name: start_date
-    # highlight-end
+    - name: tap-covid-19
+      # highlight-start
+      namespace: tap_covid_19
+      pip_url: tap-covid-19
+      executable: tap-covid-19
+      capabilities:
+        - catalog
+        - discover
+        - state
+      settings:
+        - name: api_token
+        - name: user_agent
+        - name: start_date
+      # highlight-end
 ```
 
 To learn how to add a custom plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#custom-plugins).
@@ -161,8 +161,8 @@ A plugin defined without an `inherit_from` or `namespace` property implicitly in
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  # highlight-next-line
-  - name: tap-gitlab
+    # highlight-next-line
+    - name: tap-gitlab
 ```
 
 To learn how to add a discoverable plugin to your project, refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
@@ -175,9 +175,9 @@ the `variant` property can be used to choose a specific one:
 ```yaml title="meltano.yml"
 plugins:
   extractors:
-  - name: tap-gitlab
-    # highlight-next-line
-    variant: meltano
+    - name: tap-gitlab
+      # highlight-next-line
+      variant: meltano
 ```
 
 If no `variant` is specified, the _original_ variant supported by Meltano is used.
@@ -190,14 +190,14 @@ Values for [plugin extras](/guide/configuration#plugin-extras) are stored among 
 
 ```yaml
 extractors:
-- name: tap-example
-  # highlight-start
-  config:
-    # Configuration goes here!
-    example_setting: value
-  # Extras go here!
-  example_extra: value
-  # highlight-end
+  - name: tap-example
+    # highlight-start
+    config:
+      # Configuration goes here!
+      example_setting: value
+    # Extras go here!
+    example_extra: value
+    # highlight-end
 ```
 
 #### Plugin commands
@@ -206,12 +206,12 @@ Plugin [commands](/reference/command-line-interface#commands) are defined by the
 
 ```yaml
 utilities:
-- name: dbt-snowflake
-  variant: dbt-labs
-  commands:
-    my_models:
-      args: run --select +my_model_name
-      description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
+  - name: dbt-snowflake
+    variant: dbt-labs
+    commands:
+      my_models:
+        args: run --select +my_model_name
+        description: Run dbt, selecting model `my_model_name` and all upstream models. Read more about the dbt node selection syntax at https://docs.getdbt.com/reference/node-selection/syntax
 ```
 
 Commands can optionally specify some documentation displayed when [listing commands](/reference/command-line-interface#commands). They can also optionally specify an alternative executable from the default one for the plugin.
@@ -283,14 +283,14 @@ Alternatively, you can provide a `name`, `extractor`, `loader`, `transform`, and
 
 ```yaml
 schedules:
-- name: foo-to-bar
-  job: tap-foo-to-target-bat
-  interval: "@hourly"
-  # highlight-start
-  env:
-    TAP_FOO_BAR: bar
-    TAP_FOO_BAZ: baz
-  # highlight-end
+  - name: foo-to-bar
+    job: tap-foo-to-target-bat
+    interval: "@hourly"
+    # highlight-start
+    env:
+      TAP_FOO_BAR: bar
+      TAP_FOO_BAZ: baz
+    # highlight-end
 ```
 
 To learn more about pipeline schedules and orchestration, refer to the [Orchestration guide](/guide/orchestration).
@@ -318,10 +318,9 @@ To better integrate with software other than the core Meltano library and CLI, `
 
 ```yaml
 annotations:
-  arbitrary-third-party-tool: {
-    # Configuration for the third party tool
-  }
+  arbitrary-third-party-tool: {}
   # etc.
+# Configuration for the third party tool
 ```
 
 The core Meltano library and CLI never access the `annotations` field. To access it, one must read `meltano.yml`. Nothing within an `annotations` field should be thought of as part of Meltano's own configuration - it is merely extra data that Meltano permits within its configuration files.

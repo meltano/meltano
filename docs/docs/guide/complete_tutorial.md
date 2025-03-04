@@ -100,9 +100,9 @@ _To learn more about Meltano projects, refer to the [Projects concept doc](/conc
    default_environment: dev
    project_id: <random UUID>
    environments:
-   - name: dev
-   - name: staging
-   - name: prod
+     - name: dev
+     - name: staging
+     - name: prod
    ```
 
    The `meltano.yml` file does not define any [plugins](/concepts/project#plugins), or [pipeline schedules](/concepts/project#schedules) yet, but does include 3 [environments](/concepts/environments) that you can use if you wish.
@@ -192,9 +192,9 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
     ```yml
     plugins:
       extractors:
-      - name: tap-gitlab
-        variant: meltanolabs
-        pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
+        - name: tap-gitlab
+          variant: meltanolabs
+          pip_url: git+https://github.com/MeltanoLabs/tap-gitlab.git
     ```
 
     Also note that if you're using Meltano version >=2.0 you will see a `plugins/extractors/tap-gitlab--meltanolabs.lock` file added to your project.
@@ -281,25 +281,25 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer tap before without Meltano, you may have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file">`meltano.yml` project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's `config` key</a>:</p>
 
-  ```yaml title="meltano.yml"
-    extractors:
-    - name: tap-example
-      config: {
-        "setting": "value",
-        "another_setting": true
-      }
+````yaml title="meltano.yml"
+  extractors:
+  - name: tap-example
+    config: {
+      "setting": "value",
+      "another_setting": true
+    }
 
-  <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
+<p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 :::
 
 1. The simplest way to configure a new plugin in Meltano is using `interactive`:
 
-   ```bash
-   meltano config <plugin> set --interactive
+ ```bash
+ meltano config <plugin> set --interactive
 
-   # For example:
-   meltano config tap-gitlab set --interactive
-   ```
+ # For example:
+ meltano config tap-gitlab set --interactive
+````
 
 Follow the prompts to step through all available settings, or select an individual setting to configure.
 
@@ -670,14 +670,11 @@ _To learn more about managing the configuration of your plugins, refer to the [C
   <p>If you've used this Singer target before without Meltano, you may already have a <a href="https://hub.meltano.com/singer/spec#config-files">config file</a>.</p>
   <p>If you'd like to use the same configuration with Meltano, you can skip this section and copy and paste the JSON config object into your <a href="/concepts/project#meltano-yml-project-file"><code>meltano.yml</code> project file</a> under the <a href="/concepts/project#plugin-configuration">plugin's <code>config</code> key</a>:</p>
 
-  ```yaml title="meltano.yml"
-    loaders:
-    - name: target-example
-      config: {
-        "setting": "value",
-        "another_setting": true
-      }
-  ```
+```yaml title="meltano.yml"
+loaders:
+  - name: target-example
+    config: { "setting": "value", "another_setting": true }
+```
 
   <p>Since YAML is a <a href="https://yaml.org/spec/1.2/spec.html#id2759572">superset of JSON</a>, the object should be indented correctly, but formatting does not need to be changed.</p>
 :::

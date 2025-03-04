@@ -2,8 +2,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-ExtraBoldItalic.woff2")
-      format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-ExtraBoldItalic.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-ExtraBoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
@@ -12,7 +12,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-ExtraBold.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-ExtraBold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
@@ -21,7 +22,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-MediumItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-MediumItalic.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-MediumItalic.woff") format("woff");
   font-weight: 500;
   font-style: italic;
@@ -30,7 +32,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-BoldItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-BoldItalic.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-BoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
@@ -39,8 +42,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-SemiBoldItalic.woff2")
-      format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-SemiBoldItalic.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-SemiBoldItalic.woff") format("woff");
   font-weight: 600;
   font-style: italic;
@@ -49,7 +52,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-Regular.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-Regular.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
@@ -58,7 +62,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-Bold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-Bold.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
@@ -67,7 +72,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-Italic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-Italic.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-Italic.woff") format("woff");
   font-weight: normal;
   font-style: italic;
@@ -76,7 +82,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-Medium.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-Medium.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
@@ -85,7 +92,8 @@
 
 @font-face {
   font-family: "Plus Jakarta Sans";
-  src: url("../assets/fonts/PlusJakartaSans-SemiBold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/PlusJakartaSans-SemiBold.woff2") format("woff2"),
     url("../assets/fonts/PlusJakartaSans-SemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
@@ -94,7 +102,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-Regular.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-Regular.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
@@ -103,7 +112,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-MediumItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-MediumItalic.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-MediumItalic.woff") format("woff");
   font-weight: 500;
   font-style: italic;
@@ -112,7 +122,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-BoldItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-BoldItalic.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-BoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
@@ -121,7 +132,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-Bold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-Bold.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
@@ -130,7 +142,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-Medium.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-Medium.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
@@ -139,7 +152,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-Italic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-Italic.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-Italic.woff") format("woff");
   font-weight: normal;
   font-style: italic;
@@ -148,7 +162,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-SemiBold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-SemiBold.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-SemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
@@ -157,7 +172,8 @@
 
 @font-face {
   font-family: "IBM Plex Mono";
-  src: url("../assets/fonts/IBMPlexMono-SemiBoldItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/IBMPlexMono-SemiBoldItalic.woff2") format("woff2"),
     url("../assets/fonts/IBMPlexMono-SemiBoldItalic.woff") format("woff");
   font-weight: 600;
   font-style: italic;
@@ -166,7 +182,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-MediumItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-MediumItalic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-MediumItalic.woff") format("woff");
   font-weight: 500;
   font-style: italic;
@@ -175,7 +192,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-SemiBold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-SemiBold.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-SemiBold.woff") format("woff");
   font-weight: 600;
   font-style: normal;
@@ -184,7 +202,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-Medium.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-Medium.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-Medium.woff") format("woff");
   font-weight: 500;
   font-style: normal;
@@ -193,7 +212,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-Black.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-Black.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-Black.woff") format("woff");
   font-weight: 900;
   font-style: normal;
@@ -202,7 +222,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-Bold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-Bold.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
@@ -211,7 +232,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-SemiBoldItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-SemiBoldItalic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-SemiBoldItalic.woff") format("woff");
   font-weight: 600;
   font-style: italic;
@@ -220,8 +242,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-ExtraBoldItalic.woff2")
-      format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-ExtraBoldItalic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-ExtraBoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
@@ -230,7 +252,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-BoldItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-BoldItalic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-BoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
@@ -239,7 +262,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-Italic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-Italic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-Italic.woff") format("woff");
   font-weight: normal;
   font-style: italic;
@@ -248,7 +272,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-Regular.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-Regular.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
@@ -257,7 +282,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-LightItalic.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-LightItalic.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-LightItalic.woff") format("woff");
   font-weight: 300;
   font-style: italic;
@@ -266,7 +292,8 @@
 
 @font-face {
   font-family: "Hanken Grotesk";
-  src: url("../assets/fonts/HankenGrotesk-ExtraBold.woff2") format("woff2"),
+  src:
+    url("../assets/fonts/HankenGrotesk-ExtraBold.woff2") format("woff2"),
     url("../assets/fonts/HankenGrotesk-ExtraBold.woff") format("woff");
   font-weight: bold;
   font-style: normal;

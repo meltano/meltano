@@ -20,6 +20,12 @@ repos:
         pass_filenames: false
         additional_dependencies:
           - "poetry==1.8.4"
+      - id: eslint
+        name: eslint
+        files: \.[jt]sx?$
+        language: node
+        entry: sh -c 'cd docs && npm run lint:fix'
+        require_serial: true # Stop pre-commit from running this command multiple times in parallel
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -58,20 +64,6 @@ repos:
       - id: shellcheck
         name: shellcheck
         exclude: ^integration/mdsh$
-
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.21.0 # Keep this in sync with the eslint "additional_dependency" below!
-    hooks:
-      - id: eslint
-        files: \.[jt]sx?$
-        args: ['--fix', '--config=docs/eslint.config.mjs']
-        additional_dependencies:
-          - "eslint@9.21.0" # Keep this in sync with the rev above!
-          - "eslint-config-prettier@10.0.2"
-          - "eslint-plugin-prettier@5.2.3"
-          - "eslint-plugin-react@7.37.4"
-          - "eslint-plugin-vue@9.32.0"
-          - "prettier@3.5.3"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.9.9

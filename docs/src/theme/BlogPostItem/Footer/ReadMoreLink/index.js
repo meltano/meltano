@@ -1,12 +1,13 @@
 import React from 'react';
-import Translate, {translate} from '@docusaurus/Translate';
+import Translate, { translate } from '@docusaurus/Translate';
 import Link from '@docusaurus/Link';
 function ReadMoreLabel() {
   return (
     <b>
       <Translate
         id="theme.blog.post.readMore"
-        description="The label used in blog post item excerpts to link to full blog posts">
+        description="The label used in blog post item excerpts to link to full blog posts"
+      >
         Read More
       </Translate>
     </b>
@@ -14,7 +15,7 @@ function ReadMoreLabel() {
 }
 export default function BlogPostItemFooterReadMoreLink(props) {
   // eslint-disable-next-line react/prop-types
-  const {blogPostTitle, ...linkProps} = props;
+  const { blogPostTitle, ...linkProps } = props;
   return (
     <Link
       aria-label={translate(
@@ -24,9 +25,10 @@ export default function BlogPostItemFooterReadMoreLink(props) {
           description:
             'The ARIA label for the link to full blog posts from excerpts',
         },
-        {title: blogPostTitle},
+        { title: blogPostTitle },
       )}
-      {...linkProps}>
+      {...linkProps}
+    >
       <ReadMoreLabel />
     </Link>
   );

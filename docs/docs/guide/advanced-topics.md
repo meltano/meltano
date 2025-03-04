@@ -66,15 +66,15 @@ To run a python script present at the root of your project, add a custom utility
 
 ```yaml
 utilities:
-- name: my_script_util
-  namespace: my_script_util
-  commands:
-    run_script:
-      executable: python
-      args: my_script.py
-    run_another_script:
-      executable: python
-      args: my_other_script.py
+  - name: my_script_util
+    namespace: my_script_util
+    commands:
+      run_script:
+        executable: python
+        args: my_script.py
+      run_another_script:
+        executable: python
+        args: my_other_script.py
 ```
 
 You add it to your meltano.yml as a utility then you can run it just like any other Meltano [plugin command](/concepts/project#plugin-commands).
@@ -90,15 +90,15 @@ Similarly this can be used to run bash scripts as well:
 
 ```yaml
 utilities:
-- name: my_script_util
-  namespace: my_script_util
-  commands:
-    ls_directory:
-      executable: /bin/bash
-      args: -c ls
-    remove_directory:
-      executable: /bin/bash
-      args: -c "rm -rf target"
+  - name: my_script_util
+    namespace: my_script_util
+    commands:
+      ls_directory:
+        executable: /bin/bash
+        args: -c ls
+      remove_directory:
+        executable: /bin/bash
+        args: -c "rm -rf target"
 ```
 
 ## Airbyte Connector Integration FAQ
@@ -164,30 +164,30 @@ This integration will work with any dockerized Airbyte source, whether it was ma
 To configure your Airbyte connector as a [custom plugin](https://docs.meltano.com/concepts/project#custom-plugin-definitions) in Meltano you can copy the configuration shown below into your meltano.yml file then replace `name`, and the `value` for the airbyte_spec.image to reference your docker image. You can configure your connector without defining all of the settings and their metadata.
 
 ```yaml
- - name: tap-pokeapi # REPLACE THIS WITH YOUR CONNECTOR NAME
-   variant: airbyte
-   executable: tap-airbyte
-   namespace: tap_airbyte
-   pip_url: git+https://github.com/MeltanoLabs/tap-airbyte.git
-   capabilities:
-   - catalog
-   - state
-   - discover
-   - about
-   - stream-maps
-   - schema-flattening
-   settings:
-   - description: Airbyte image to run
-     kind: string
-     label: Airbyte Spec Image
-     name: airbyte_spec.image
-     value: airbyte/source-pokeapi # REPLACE THIS WITH YOUR IMAGE NAME
-   - description: Airbyte image tag
-     kind: string
-     label: Airbyte Spec Tag
-     name: airbyte_spec.tag
-     value: latest
-   - [INSERT OTHER SETTINGS HERE]
+- name: tap-pokeapi # REPLACE THIS WITH YOUR CONNECTOR NAME
+  variant: airbyte
+  executable: tap-airbyte
+  namespace: tap_airbyte
+  pip_url: git+https://github.com/MeltanoLabs/tap-airbyte.git
+  capabilities:
+    - catalog
+    - state
+    - discover
+    - about
+    - stream-maps
+    - schema-flattening
+  settings:
+    - description: Airbyte image to run
+      kind: string
+      label: Airbyte Spec Image
+      name: airbyte_spec.image
+      value: airbyte/source-pokeapi # REPLACE THIS WITH YOUR IMAGE NAME
+    - description: Airbyte image tag
+      kind: string
+      label: Airbyte Spec Tag
+      name: airbyte_spec.tag
+      value: latest
+    - [INSERT OTHER SETTINGS HERE]
 ```
 
 ### What features does this add to Airbyte connectors?
@@ -241,14 +241,21 @@ Submit a bug report in the [airbytehq/airbyte repo](https://github.com/airbytehq
 Airbyte connectors are run inside Docker containers, this means they don’t automatically have access to your local file system. To access local files you can use the `docker_mount` setting. An example of using Airbyte’s tap-file to access a CSV file in a “data” directory within my local meltano project would look like this:
 
 ```yaml
-   config:
-     docker_mounts: [{"source": "/<YOUR_FULL_LOCAL_PATH>/", "target": "/local/", "type": "bind"}]
-     airbyte_spec:
-       image: airbyte/source-file
-     airbyte_config:
-       dataset_name: test_file
-       format: csv
-       url: /local/data/test.csv
+config:
+  docker_mounts:
+    [
+      {
+        "source": "/<YOUR_FULL_LOCAL_PATH>/",
+        "target": "/local/",
+        "type": "bind",
+      },
+    ]
+  airbyte_spec:
+    image: airbyte/source-file
+  airbyte_config:
+    dataset_name: test_file
+    format: csv
+    url: /local/data/test.csv
 ```
 
 ### What is the performance like compared to raw Airbyte sources?

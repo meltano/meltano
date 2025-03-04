@@ -8,7 +8,8 @@
 }
 
 .admonitionHeading {
-  font: var(--ifm-heading-font-weight) var(--ifm-h5-font-size) / var(--ifm-heading-line-height) var(--ifm-heading-font-family);
+  font: var(--ifm-heading-font-weight) var(--ifm-h5-font-size) /
+    var(--ifm-heading-line-height) var(--ifm-heading-font-family);
   text-transform: uppercase;
   margin-bottom: 0.3rem;
 }
@@ -30,6 +31,6 @@
   fill: var(--ifm-alert-foreground-color);
 }
 
-.admonitionContent> :last-child {
+.admonitionContent > :last-child {
   margin-bottom: 0;
 }

@@ -129,7 +129,7 @@ function getAdmonitionConfig(unsafeType) {
     return config;
   }
   console.warn(
-    `No admonition config found for admonition type "${type}". Using Info as fallback.`
+    `No admonition config found for admonition type "${type}". Using Info as fallback.`,
   );
   return AdmonitionConfigs.info;
 }
@@ -139,7 +139,8 @@ function extractMDXAdmonitionTitle(children) {
   const items = React.Children.toArray(children);
   const mdxAdmonitionTitle = items.find(
     (item) =>
-      React.isValidElement(item) && item.props?.mdxType === 'mdxAdmonitionTitle'
+      React.isValidElement(item) &&
+      item.props?.mdxType === 'mdxAdmonitionTitle',
   );
   const rest = <>{items.filter((item) => item !== mdxAdmonitionTitle)}</>;
   return {
@@ -149,7 +150,7 @@ function extractMDXAdmonitionTitle(children) {
 }
 function processAdmonitionProps(props) {
   const { mdxAdmonitionTitle, rest } = extractMDXAdmonitionTitle(
-    props.children
+    props.children,
   );
   return {
     ...props,
@@ -178,7 +179,7 @@ export default function Admonition(props) {
         ThemeClassNames.common.admonitionType(props.type),
         'alert',
         `alert--${typeConfig.infimaClassName}`,
-        styles.admonition
+        styles.admonition,
       )}
     >
       {/* <div className={styles.admonitionHeading}>

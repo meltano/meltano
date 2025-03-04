@@ -1,6 +1,7 @@
 .DocSearch-Button {
   margin: 0;
-  transition: all var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  transition: all var(--ifm-transition-fast)
+    var(--ifm-transition-timing-default);
   height: 39px;
   width: 100%;
   padding: 12px 20px;

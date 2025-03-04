@@ -4,7 +4,7 @@
   margin: 1rem 0;
 }
 
-.tocCollapsibleContent>ul {
+.tocCollapsibleContent > ul {
   border-left: none;
   border-top: 1px solid var(--ifm-color-emphasis-300);
   padding: 0.2rem 0;

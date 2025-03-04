@@ -61,14 +61,14 @@ function Termy({ children, options }) {
           if (promptStart === -1) {
             console.error(
               'Custom prompt found but no end delimiter',
-              string.value
+              string.value,
             );
           }
           const prompt = string.value
             .slice(0, promptStart)
             .replace(customPromptLiteralStart, '');
           let value = string.value.slice(
-            promptStart + promptLiteralStart.length
+            promptStart + promptLiteralStart.length,
           );
           string.type = 'input';
           string.value = value;

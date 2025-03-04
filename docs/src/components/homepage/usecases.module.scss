@@ -117,7 +117,10 @@
   z-index: 1;
   font-size: 15px;
   font-weight: 500;
-  font-family: IBM Plex Mono, Arial, sans-serif;
+  font-family:
+    IBM Plex Mono,
+    Arial,
+    sans-serif;
   padding: 12px 20px;
   transition: all 0.2s ease;
 }
@@ -130,8 +133,12 @@
   border-radius: 4.6px;
   content: "";
   inset: 0;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: add, add;
   -webkit-mask-composite: xor;
   mask-composite: exclude;

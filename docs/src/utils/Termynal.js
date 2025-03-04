@@ -77,7 +77,7 @@ class Termynal {
     this.container.appendChild(finish);
     // Appends dynamically loaded lines to existing line elements.
     this.lines = [...this.container.querySelectorAll(`[${this.pfx}]`)].concat(
-      this.lineData
+      this.lineData,
     );
     for (let line of this.lines) {
       line.style.visibility = 'hidden';

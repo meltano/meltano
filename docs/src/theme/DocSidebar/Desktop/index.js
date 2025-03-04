@@ -15,7 +15,7 @@ function DocSidebarDesktop({ path, sidebar, isHidden }) {
         styles.sidebar,
         'pb-24',
         hideOnScroll && styles.sidebarWithHideableNavbar,
-        isHidden && styles.sidebarHidden
+        isHidden && styles.sidebarHidden,
       )}
     >
       {hideOnScroll && <Logo tabIndex={-1} className={styles.sidebarLogo} />}

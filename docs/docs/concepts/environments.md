@@ -8,7 +8,6 @@ sidebar_position: 3
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-
 As part of Meltano's vision to enable data teams to operate with best practices, **Environments** allows
 you to define custom layers of configuration within your project. That way, You can run the same commands against multiple environments,
 by passing a single environment variable or CLI option.
@@ -56,19 +55,19 @@ environments:
     state_id_suffix: ${CUSTOM_SUFFIX}
 plugins:
   extractors:
-  - name: tap-github
-    variant: meltanolabs
-    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
-    config:
-      start_date: '2024-01-01'
+    - name: tap-github
+      variant: meltanolabs
+      pip_url: git+https://github.com/MeltanoLabs/tap-github.git
+      config:
+        start_date: "2024-01-01"
   loaders:
-  - name: target-snowflake
-    variant: meltanolabs
-    pip_url: meltanolabs-target-snowflake
-    config:
-      account: meltano
-      add_record_metadata: true
-      password: ${SNOWFLAKE_PASSWORD}
+    - name: target-snowflake
+      variant: meltanolabs
+      pip_url: meltanolabs-target-snowflake
+      config:
+        account: meltano
+        add_record_metadata: true
+        password: ${SNOWFLAKE_PASSWORD}
 ```
 
 :::info

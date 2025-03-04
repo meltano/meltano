@@ -5,7 +5,7 @@
   top: calc(var(--ifm-navbar-height) + 1rem);
 }
 
-.tableOfContents>ul>li>a {
+.tableOfContents > ul > li > a {
   font-weight: 700;
 }
 

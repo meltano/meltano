@@ -54,16 +54,12 @@ export default function CodeBlockString({
         blockClassName,
         language &&
           !blockClassName.includes(`language-${language}`) &&
-          `language-${language}`
+          `language-${language}`,
       )}
     >
       {title && <div className={styles.codeBlockTitle}>{title}</div>}
       <div className={styles.codeBlockContent}>
-        <Highlight
-          theme={prismTheme}
-          code={code}
-          language={language ?? 'text'}
-        >
+        <Highlight theme={prismTheme} code={code} language={language ?? 'text'}>
           {({ className, tokens, getLineProps, getTokenProps }) => (
             <pre
               tabIndex={0}
@@ -73,7 +69,7 @@ export default function CodeBlockString({
               <code
                 className={clsx(
                   styles.codeBlockLines,
-                  showLineNumbers && styles.codeBlockLinesWithNumbering
+                  showLineNumbers && styles.codeBlockLinesWithNumbering,
                 )}
               >
                 {tokens.map((line, i) => (

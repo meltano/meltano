@@ -1,12 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
-import {useBaseUrlUtils} from '@docusaurus/useBaseUrl';
+import { useBaseUrlUtils } from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 import styles from './styles.module.css';
 // eslint-disable-next-line react/prop-types
-function LogoImage({logo}) {
-  const {withBaseUrl} = useBaseUrlUtils();
+function LogoImage({ logo }) {
+  const { withBaseUrl } = useBaseUrlUtils();
   const sources = {
     // eslint-disable-next-line react/prop-types
     light: withBaseUrl(logo.src),
@@ -30,7 +30,7 @@ function LogoImage({logo}) {
   );
 }
 // eslint-disable-next-line react/prop-types
-export default function FooterLogo({logo}) {
+export default function FooterLogo({ logo }) {
   // eslint-disable-next-line react/prop-types
   return logo.href ? (
     <Link
@@ -38,7 +38,8 @@ export default function FooterLogo({logo}) {
       href={logo.href}
       className={styles.footerLogoLink}
       // eslint-disable-next-line react/prop-types
-      target={logo.target}>
+      target={logo.target}
+    >
       <LogoImage logo={logo} />
     </Link>
   ) : (

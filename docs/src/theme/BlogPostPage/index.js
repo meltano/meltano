@@ -52,7 +52,7 @@ export default function BlogPostPage(props) {
       <HtmlClassNameProvider
         className={clsx(
           ThemeClassNames.wrapper.blogPages,
-          ThemeClassNames.page.blogPostPage
+          ThemeClassNames.page.blogPostPage,
         )}
       >
         <BlogPostPageMetadata />

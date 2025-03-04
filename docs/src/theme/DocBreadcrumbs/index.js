@@ -64,7 +64,7 @@ export default function DocBreadcrumbs() {
       className={clsx(
         ThemeClassNames.docs.docBreadcrumbs,
         styles.breadcrumbsContainer,
-        'hidden lg:block'
+        'hidden lg:block',
       )}
       aria-label={translate({
         id: 'theme.docs.breadcrumbs.navAriaLabel',

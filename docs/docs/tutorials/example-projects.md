@@ -3,9 +3,11 @@ title: Example Meltano Projects
 description: Learn how others are using Meltano by viewing their production Meltano projects.
 layout: doc
 ---
+
 If you have a production project that you'd like to add please open a [Pull Request](https://github.com/meltano/meltano/edit/main/docs/src/_tutorials/example-projects.md).
 
 We group example projects into three categories:
+
 1. Running in production
 2. Simpler examples usually solving one problem
 3. Complete sandbox projects to play around with

@@ -88,9 +88,9 @@ Array of capabilities that the plugin supports. For example:
 
 ```yaml
 capabilities:
-- catalog
-- discover
-- state
+  - catalog
+  - discover
+  - state
 ```
 
 The full list of defined capabilities is below:
@@ -145,7 +145,7 @@ pip_url: apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/ap
 The maintenance status of the plugin. See the [JSON schema](https://github.com/meltano/hub/blob/main/schemas/plugin_definitions/hub_metadata.schema.json) for the most up-to-date list of maintenance statuses.
 
 ```yaml
-maintenance_status: active  # allowed values: active, beta, development, inactive, deprecated, unknown
+maintenance_status: active # allowed values: active, beta, development, inactive, deprecated, unknown
 ```
 
 ## `domain_url`
@@ -230,8 +230,8 @@ Array of arbitrary keywords associated with the plugin, for search and classific
 
 ```yaml
 keywords:
-- api
-- meltano_sdk
+  - api
+  - meltano_sdk
 ```
 
 ## `requires`
@@ -243,8 +243,8 @@ Example:
 ```yaml
 requires:
   files:
-  - name: files-airflow
-    variant: meltano
+    - name: files-airflow
+      variant: meltano
 ```
 
 ### `requires.<plugin_type>[*].name`
@@ -301,7 +301,7 @@ Example:
         env:
           DBT_PROFILES_DIR: /usr/app/profile/
         volumes:
-        - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
     docs-generate:
       args: docs generate
       container_spec:
@@ -310,7 +310,7 @@ Example:
         env:
           DBT_PROFILES_DIR: /usr/app/profile/
         volumes:
-         - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
     docs-serve:
       args: docs serve
       container_spec:
@@ -319,7 +319,7 @@ Example:
         env:
           DBT_PROFILES_DIR: /usr/app/profile/
         volumes:
-        - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
+          - "$MELTANO_PROJECT_ROOT/transform/:/usr/app/"
         ports:
           "8080": "8080/tcp"
 ```
@@ -358,31 +358,31 @@ An example definition for Redshift where there are 3 types of authorization avai
 
 ```yaml
 settings_group_validation:
-- - host
-  - port
-  - user
-  - password
-  - dbname
-  - s3_bucket
-  - default_target_schema
-  - aws_profile
-- - host
-  - port
-  - user
-  - password
-  - dbname
-  - s3_bucket
-  - default_target_schema
-  - aws_access_key_id
-  - aws_secret_access_key
-- - host
-  - port
-  - user
-  - password
-  - dbname
-  - s3_bucket
-  - default_target_schema
-  - aws_session_token
+  - - host
+    - port
+    - user
+    - password
+    - dbname
+    - s3_bucket
+    - default_target_schema
+    - aws_profile
+  - - host
+    - port
+    - user
+    - password
+    - dbname
+    - s3_bucket
+    - default_target_schema
+    - aws_access_key_id
+    - aws_secret_access_key
+  - - host
+    - port
+    - user
+    - password
+    - dbname
+    - s3_bucket
+    - default_target_schema
+    - aws_session_token
 ```
 
 ## `settings`
@@ -393,14 +393,14 @@ Example:
 
 ```yaml
 settings:
-- name: core.dags_folder
-  label: DAGs Folder
-  value: $MELTANO_PROJECT_ROOT/orchestrate/dags
-  env: AIRFLOW__CORE__DAGS_FOLDER
-- name: core.plugins_folder
-  label: Plugins Folder
-  value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
-  env: AIRFLOW__CORE__PLUGINS_FOLDER
+  - name: core.dags_folder
+    label: DAGs Folder
+    value: $MELTANO_PROJECT_ROOT/orchestrate/dags
+    env: AIRFLOW__CORE__DAGS_FOLDER
+  - name: core.plugins_folder
+    label: Plugins Folder
+    value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+    env: AIRFLOW__CORE__PLUGINS_FOLDER
 ```
 
 ### `settings[*].name`
@@ -409,7 +409,7 @@ Required. The name of the setting.
 
 ```yaml
 settings:
-- name: setting_name
+  - name: setting_name
 ```
 
 ### `settings[*].aliases`
@@ -418,10 +418,10 @@ Optional. An array of aliases for the setting.
 
 ```yaml
 settings:
-- name: setting_name
-  aliases:
-  - setting_name_alias
-  - setting_name_alias_2
+  - name: setting_name
+    aliases:
+      - setting_name_alias
+      - setting_name_alias_2
 ```
 
 ### `settings[*].description`
@@ -430,9 +430,9 @@ Optional. Use to provide inline contextual help for the setting.
 
 ```yaml
 settings:
-- name: setting_name
-  description: |
-    This is a setting description.
+  - name: setting_name
+    description: |
+      This is a setting description.
 ```
 
 ### `settings[*].documentation`
@@ -441,8 +441,8 @@ Optional. Use to provide a link to external supplemental documentation for the s
 
 ```yaml
 settings:
-- name: setting_name
-  documentation: https://docs.meltano.com/reference/configuration#setting_name
+  - name: setting_name
+    documentation: https://docs.meltano.com/reference/configuration#setting_name
 ```
 
 ### `settings[*].env`
@@ -450,12 +450,13 @@ settings:
 Use to delegate to an environment variable for overriding this setting's value.
 
 ### `settings[*].hidden`
+
 Optional. Use to hide a setting.
 
 ```yaml
 settings:
-- name: setting_name
-  hidden: true
+  - name: setting_name
+    hidden: true
 ```
 
 ### `settings[*].kind`
@@ -464,19 +465,20 @@ Optional. Use for a first-class input control. Default is `string`, others are `
 
 ```yaml
 settings:
-- name: setting_name
-  kind: integer
+  - name: setting_name
+    kind: integer
 ```
 
 ```yaml
 settings:
-- name: setting_name
-  env: SOME_API_KEY
+  - name: setting_name
+    env: SOME_API_KEY
 ```
 
 <br/>
 
 :::caution
+
   <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden</code></a>.</p>
   <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive</code></a>.</p>
 :::
@@ -487,8 +489,8 @@ Optional. Human-friendly text display of the setting name.
 
 ```yaml
 settings:
-- name: setting_name
-  label: Setting Name
+  - name: setting_name
+    label: Setting Name
 ```
 
 ### `settings[*].placeholder`
@@ -496,13 +498,14 @@ settings:
 Optional. Use to set the input's placeholder default.
 
 ### `settings[*].sensitive`
+
 Optional. Use to mark a setting as sensitive (e.g. a password, token or code).
 
 ```yaml
 settings:
-- name: setting_name
-  kind: string
-  sensitive: true
+  - name: setting_name
+    kind: string
+    sensitive: true
 ```
 
 ### `settings[*].tooltip`
@@ -511,8 +514,8 @@ Optional. Use to provide a tooltip for the setting when rendered within a UI tha
 
 ```yaml
 settings:
-- name: setting_name
-  tooltip: Here is some more info...
+  - name: setting_name
+    tooltip: Here is some more info...
 ```
 
 ### `settings[*].value`
@@ -521,8 +524,8 @@ Optional. Use to set a default value for the setting
 
 ```yaml
 settings:
-- name: setting_name
-  value: default_value
+  - name: setting_name
+    value: default_value
 ```
 
 ## `env`

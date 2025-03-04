@@ -27,7 +27,7 @@ export default function NavbarMobileSidebarHeader() {
     <div
       className={clsx(
         'navbar-sidebar__brand absolute',
-        styles.closeButtonWrapper
+        styles.closeButtonWrapper,
       )}
     >
       <CloseButton />

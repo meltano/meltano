@@ -1,8 +1,8 @@
-import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {DocSearchButton, useDocSearchKeyboardEvents} from '@docsearch/react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { DocSearchButton, useDocSearchKeyboardEvents } from '@docsearch/react';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
-import {useHistory} from '@docusaurus/router';
+import { useHistory } from '@docusaurus/router';
 import {
   isRegexpStringMatch,
   useSearchLinkCreator,
@@ -13,16 +13,16 @@ import {
 } from '@docusaurus/theme-search-algolia/client';
 import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import {createPortal} from 'react-dom';
+import { createPortal } from 'react-dom';
 import translations from '@theme/SearchTranslations';
 let DocSearchModal = null;
 // eslint-disable-next-line react/prop-types
-function Hit({hit, children}) {
+function Hit({ hit, children }) {
   // eslint-disable-next-line react/prop-types
   return <Link to={hit.url}>{children}</Link>;
 }
 // eslint-disable-next-line react/prop-types
-function ResultsFooter({state, onClose}) {
+function ResultsFooter({ state, onClose }) {
   const createSearchLink = useSearchLinkCreator();
   return (
     // eslint-disable-next-line react/prop-types
@@ -30,7 +30,8 @@ function ResultsFooter({state, onClose}) {
       <Translate
         id="theme.SearchBar.seeAll"
         // eslint-disable-next-line react/prop-types
-        values={{count: state.context.nbHits}}>
+        values={{ count: state.context.nbHits }}
+      >
         {'See all {count} results'}
       </Translate>
     </Link>
@@ -41,8 +42,8 @@ function mergeFacetFilters(f1, f2) {
   return [...normalize(f1), ...normalize(f2)];
 }
 // eslint-disable-next-line react/prop-types
-function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
-  const {siteMetadata} = useDocusaurusContext();
+function DocSearch({ contextualSearch, externalUrlRegex, ...props }) {
+  const { siteMetadata } = useDocusaurusContext();
   const processSearchResultUrl = useSearchResultUrlProcessor();
   const contextualSearchFacetFilters = useAlgoliaContextualFacetFilters();
   // eslint-disable-next-line react/prop-types
@@ -71,7 +72,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
       import('@docsearch/react/modal'),
       import('@docsearch/react/style'),
       import('./styles.css'),
-    ]).then(([{DocSearchModal: Modal}]) => {
+    ]).then(([{ DocSearchModal: Modal }]) => {
       DocSearchModal = Modal;
     });
   }, []);
@@ -99,7 +100,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
     [importDocSearchModalIfNeeded, setIsOpen, setInitialQuery],
   );
   const navigator = useRef({
-    navigate({itemUrl}) {
+    navigate({ itemUrl }) {
       // Algolia results could contain URL's from other domains which cannot
       // be served through history and should navigate with window.location
       if (isRegexpStringMatch(externalUrlRegex, itemUrl)) {
@@ -113,7 +114,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
     // eslint-disable-next-line react/prop-types
     props.transformItems
       ? // Custom transformItems
-      // eslint-disable-next-line react/prop-types
+    // eslint-disable-next-line react/prop-types
       props.transformItems(items)
       : // Default transformItems
       items.map((item) => ({
@@ -124,8 +125,7 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
   const resultsFooterComponent = useMemo(
     () =>
       // eslint-disable-next-line react/display-name
-      (footerProps) =>
-        <ResultsFooter {...footerProps} onClose={onClose} />,
+      (footerProps) => <ResultsFooter {...footerProps} onClose={onClose} />,
     [onClose],
   );
   const transformSearchClient = useCallback(
@@ -195,6 +195,6 @@ function DocSearch({contextualSearch, externalUrlRegex, ...props}) {
   );
 }
 export default function SearchBar() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return <DocSearch {...siteConfig.themeConfig.algolia} />;
 }

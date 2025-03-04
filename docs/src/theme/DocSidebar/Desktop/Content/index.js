@@ -17,7 +17,7 @@ function useShowAnnouncementBar() {
         setShowAnnouncementBar(scrollY === 0);
       }
     },
-    [isActive]
+    [isActive],
   );
   return isActive && showAnnouncementBar;
 }
@@ -35,7 +35,7 @@ export default function DocSidebarDesktopContent({ path, sidebar, className }) {
         'menu thin-scrollbar',
         styles.menu,
         showAnnouncementBar && styles.menuWithAnnouncementBar,
-        className
+        className,
       )}
     >
       <ul className={clsx(ThemeClassNames.docs.docSidebarMenu, 'menu__list')}>
