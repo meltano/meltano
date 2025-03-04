@@ -64,14 +64,14 @@ repos:
     hooks:
       - id: eslint
         files: \.[jt]sx?$
-        args: ['--fix', '--config=docs/.eslintrc.json']
+        args: ['--fix', '--config=docs/eslint.config.mjs']
         additional_dependencies:
-          - "eslint@8.55.0" # Keep this in sync with the rev above!
-          - "eslint-config-prettier@8.8.0"
-          - "eslint-plugin-prettier@5.0.0"
-          - "eslint-plugin-react@7.33.0"
-          - "eslint-plugin-vue@9.15.1"
-          - "prettier@3.0.0"
+          - "eslint@9.21.0" # Keep this in sync with the rev above!
+          - "eslint-config-prettier@10.0.2"
+          - "eslint-plugin-prettier@5.2.3"
+          - "eslint-plugin-react@7.37.4"
+          - "eslint-plugin-vue@9.32.0"
+          - "prettier@3.5.3"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.9.9

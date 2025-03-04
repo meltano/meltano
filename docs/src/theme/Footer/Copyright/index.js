@@ -18,7 +18,6 @@ export default function FooterCopyright({ copyright }) {
       <div
         className="footer__copyright opacity-50 order-2 sm:order-1 text-left"
         // Developer provided the HTML, so assume it's safe.
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: copyright }}
       />
       <div className="footer-soc-wrapper flex justify-between gap-3 order-1 sm:order-2 mb-10 sm:mb-0">

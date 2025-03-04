@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 import React, { useState, useCallback } from 'react';
 import { translate } from '@docusaurus/Translate';
 import { prefersReducedMotion } from '@docusaurus/theme-common';
