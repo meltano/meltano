@@ -1,6 +1,7 @@
 [tool.poetry]
 name = "meltano"
 version = "3.7.0a4"
+requires-poetry = ">=2.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = ["Meltano <hello@meltano.com>"]
 license = "MIT"
@@ -8,6 +9,7 @@ readme = "README.md"
 repository = "https://github.com/meltano/meltano"
 classifiers = [
   "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -31,6 +33,9 @@ keywords = [
 ]
 documentation = "https://docs.meltano.com"
 homepage = "https://meltano.com"
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.9,<2"
 
 [tool.poetry.urls]
 "Changelog" = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
@@ -80,7 +85,7 @@ structlog = "^25.1.0"
 typing-extensions = "^4.12.2"
 tzlocal = "^5.2"
 # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
-urllib3 = "<2"
+urllib3 = { version = "<2", python = "<3.10" }
 uv = ">=0.1.24,<0.7"
 virtualenv = "^20.26.6"
 
