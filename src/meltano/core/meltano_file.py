@@ -22,6 +22,12 @@ class MeltanoFile(Canonical):
     """Data and loading methods for meltano.yml files."""
 
     version: int
+    requires_meltano: str | None
+    plugins: dict[PluginType, list[ProjectPlugin]]
+    schedules: list[Schedule]
+    environments: list[Environment]
+    jobs: list[TaskSets]
+    env: dict[str, str]
 
     def __init__(
         self,
@@ -31,12 +37,15 @@ class MeltanoFile(Canonical):
         environments: list[dict] | None = None,
         jobs: list[dict] | None = None,
         env: dict[str, str] | None = None,
+        *,
+        requires_meltano: str | None = None,
         **extras: t.Any,
     ):
         """Construct a new MeltanoFile object from meltano.yml file.
 
         Args:
             version: The meltano.yml version, currently always 1.
+            requires_meltano: The version of Meltano required by this project.
             plugins: Plugin configuration for this project.
             schedules: Schedule configuration for this project.
             environments: Environment configuration for this project.
@@ -52,6 +61,7 @@ class MeltanoFile(Canonical):
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
+            requires_meltano=requires_meltano,
             env=env or {},
         )
 
