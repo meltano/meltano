@@ -23,6 +23,7 @@ from meltano.core.error import (
 )
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.settings_service import FeatureFlags
+from meltano.core.settings_store import SettingValueStore
 from meltano.core.utils import (
     EnvironmentVariableNotSetError,
     EnvVarMissingBehavior,
@@ -624,9 +625,16 @@ async def install_pip_plugin(
         ValueError: If the venv backend is not supported.
     """
     pip_install_args = get_pip_install_args(project, plugin, env=env)
-    backend = project.settings.get("venv.backend")
+    backend, meta = project.settings.get_with_metadata("venv.backend")
 
     if backend == "virtualenv":
+        if meta["source"] == SettingValueStore.DEFAULT:
+            logger.warning(
+                "The default value for `venv.backend` will change to 'uv' in the "
+                "future. "
+                "Please set it explicitly if you want to keep using 'virtualenv'."
+            )
+
         service = VenvService(
             project=project,
             python=plugin.python,
