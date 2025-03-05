@@ -50,6 +50,8 @@ if t.TYPE_CHECKING:
 
 logger = structlog.stdlib.get_logger(__name__)
 
+_HAS_WARNED_FUTURE_DEFAULT = False
+
 
 class PluginInstallReason(StrEnum):
     """Plugin install reason enum."""
@@ -624,16 +626,22 @@ async def install_pip_plugin(
     Raises:
         ValueError: If the venv backend is not supported.
     """
+    global _HAS_WARNED_FUTURE_DEFAULT
+
     pip_install_args = get_pip_install_args(project, plugin, env=env)
     backend, meta = project.settings.get_with_metadata("venv.backend")
 
     if backend == "virtualenv":
-        if meta["source"] == SettingValueStore.DEFAULT:
+        if (
+            meta["source"] == SettingValueStore.DEFAULT
+            and not _HAS_WARNED_FUTURE_DEFAULT
+        ):
             logger.warning(
                 "The default value for `venv.backend` will change to 'uv' in the "
                 "future. "
                 "Please set it explicitly if you want to keep using 'virtualenv'."
             )
+            _HAS_WARNED_FUTURE_DEFAULT = True
 
         service = VenvService(
             project=project,
