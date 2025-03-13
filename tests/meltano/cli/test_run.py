@@ -16,7 +16,6 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.project_plugins_service import (
-    AmbiguousMappingName,
     PluginAlreadyAddedException,
 )
 
