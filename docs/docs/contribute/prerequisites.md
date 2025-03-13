@@ -11,7 +11,7 @@ sidebar_class_name: hidden
 In order to contribute to Meltano, you will need the following:
 
 1. [Python 3.9+](https://www.python.org/downloads/). For more details about Python requirements, refer to the ["Requirements" section](/getting-started/installation#requirements) of the Installation instructions, that also apply here.
-2. [uv](https://docs.astral.sh/uv/). Optional, but installation is highly recommended for managing third-party Python-based tools.
+2. [uv](https://docs.astral.sh/uv/)
 3. [Node 18+](https://nodejs.org/)
 4. [Yarn](https://yarnpkg.com/)
 
