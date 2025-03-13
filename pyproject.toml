@@ -6,6 +6,9 @@ authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.14"
 readme = "README.md"
 license = "MIT"
+license-files = [
+  "LICENSE",
+]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "License :: OSI Approved :: MIT License",
