@@ -6,68 +6,68 @@ authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.14"
 readme = "README.md"
 license = "MIT"
-keywords = [
-    "Meltano",
-    "ELT",
-    "Data integration",
-    "singer-io",
-    "dbt",
-]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+keywords = [
+  "Meltano",
+  "ELT",
+  "Data integration",
+  "singer-io",
+  "dbt",
 ]
 dependencies = [
-    "aiodocker>=0.24.0,<0.25",
-    "alembic>=1.14.0,<2",
-    "anyio>=4.4.0,<5",
-    "atomicwrites>=1.2.1,<2",
-    "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
-    "check-jsonschema>=0.31.0,<0.32",
-    "click~=8.1",
-    "click-default-group>=1.2.4,<2",
-    "click-didyoumean>=0.3.1,<0.4",
-    "croniter>=6.0.0,<7",
-    "fasteners>=0.19,<0.20",
-    "flatten-dict>=0,<1",
-    "importlib-metadata>=5 ; python_version < '3.12'",
-    "jinja2>=3.1.4,<4",
-    "jsonschema~=4.23",
-    "packaging~=24.2",
-    "pip~=25.0.1",
-    "psutil>=7.0.0,<8",
-    "python-dotenv>=1.0.1,<2",
-    "pyyaml>=6.0.2,<7",
-    "requests>=2.32.3,<3",
-    "rich>=13.9.4,<14",
-    "ruamel.yaml>=0.18.6,<0.19",
-    "setuptools>=76.0.0,<77 ; python_version >= '3.12'",
-    "smart-open>=7.0.5,<8",
-    "snowplow-tracker>=1.0.4,<2",
-    "sqlalchemy>=2.0.35,<3",
-    "structlog>=25.1.0,<26",
-    "typing-extensions>=4.12.2,<5",
-    "tzlocal~=5.2",
-    # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
-    "urllib3<2 ; python_version < '3.10'",
-    "uv>=0.1.24,<0.7",
-    "virtualenv>=20.26.6,<21",
+  "aiodocker>=0.24.0,<0.25",
+  "alembic>=1.14.0,<2",
+  "anyio>=4.4.0,<5",
+  "atomicwrites>=1.2.1,<2",
+  "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
+  "check-jsonschema>=0.31.0,<0.32",
+  "click~=8.1",
+  "click-default-group>=1.2.4,<2",
+  "click-didyoumean>=0.3.1,<0.4",
+  "croniter>=6.0.0,<7",
+  "fasteners>=0.19,<0.20",
+  "flatten-dict>=0,<1",
+  "importlib-metadata>=5 ; python_version < '3.12'",
+  "jinja2>=3.1.4,<4",
+  "jsonschema~=4.23",
+  "packaging~=24.2",
+  "pip~=25.0.1",
+  "psutil>=7.0.0,<8",
+  "python-dotenv>=1.0.1,<2",
+  "pyyaml>=6.0.2,<7",
+  "requests>=2.32.3,<3",
+  "rich>=13.9.4,<14",
+  "ruamel.yaml>=0.18.6,<0.19",
+  "setuptools>=76.0.0,<77 ; python_version >= '3.12'",
+  "smart-open>=7.0.5,<8",
+  "snowplow-tracker>=1.0.4,<2",
+  "sqlalchemy>=2.0.35,<3",
+  "structlog>=25.1.0,<26",
+  "typing-extensions>=4.12.2,<5",
+  "tzlocal~=5.2",
+  # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
+  "urllib3<2 ; python_version < '3.10'",
+  "uv>=0.1.24,<0.7",
+  "virtualenv>=20.26.6,<21",
 ]
 
 [project.optional-dependencies]
 azure = [
-    "azure-storage-blob>=12.24.0,<13",
-    "azure-common>=1.1.28,<2",
-    "azure-core>=1.32.0,<2",
-    "azure-identity>=1.19.0,<2",
+  "azure-storage-blob>=12.24.0,<13",
+  "azure-common>=1.1.28,<2",
+  "azure-core>=1.32.0,<2",
+  "azure-identity>=1.19.0,<2",
 ]
 gcs = ["google-cloud-storage>=1.31.0"]
 mssql = ["pymssql>=2.3.2,<3"]
@@ -110,36 +110,36 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 dev = [
-    "backoff>=2.1.2,<3",
-    "boto3-stubs[essential]>=1.35,<1.38",
-    "colorama>=0.4.4,<0.5",
-    "coverage[toml]>=7.3.2,!=7.3.3",
-    "mock>=5.0.2,<6",
-    "moto>=5.0.21,<6",
-    "mypy>=1.13.0,<2",
-    "pre-commit>=4.0.1,<5",
-    "pytest>=8.3.3,<9",
-    "pytest-asyncio>=0.25.0,<0.26",
-    "pytest-cov>=6.0.0,<7",
-    "pytest-docker~=3.1",
-    "pytest-order~=1.3",
-    "pytest-randomly~=3.16",
-    "pytest-structlog~=1.1",
-    "pytest-xdist~=3.6",
-    "requests-mock>=1.12.1,<2",
-    "setproctitle~=1.3",  # Used by pytest-xdist to aid with handling resource intensive processes.
-    "time-machine>=2.15.0,<3",
-    "types-croniter==5.0.1.20241205",
-    "types-jsonschema>=4.23.0.20240813,<5",
-    "types-psutil>=7.0.0.20250218,<8",
-    "types-pyyaml>=6.0.12.20240917,<7",
-    "types-requests>=2.31.0,<3",
+  "backoff>=2.1.2,<3",
+  "boto3-stubs[essential]>=1.35,<1.38",
+  "colorama>=0.4.4,<0.5",
+  "coverage[toml]>=7.3.2,!=7.3.3",
+  "mock>=5.0.2,<6",
+  "moto>=5.0.21,<6",
+  "mypy>=1.13.0,<2",
+  "pre-commit>=4.0.1,<5",
+  "pytest>=8.3.3,<9",
+  "pytest-asyncio>=0.25.0,<0.26",
+  "pytest-cov>=6.0.0,<7",
+  "pytest-docker~=3.1",
+  "pytest-order~=1.3",
+  "pytest-randomly~=3.16",
+  "pytest-structlog~=1.1",
+  "pytest-xdist~=3.6",
+  "requests-mock>=1.12.1,<2",
+  "setproctitle~=1.3",  # Used by pytest-xdist to aid with handling resource intensive processes.
+  "time-machine>=2.15.0,<3",
+  "types-croniter==5.0.1.20241205",
+  "types-jsonschema>=4.23.0.20240813,<5",
+  "types-psutil>=7.0.0.20250218,<8",
+  "types-pyyaml>=6.0.12.20240917,<7",
+  "types-requests>=2.31.0,<3",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "src",
-    "tests",
+  "src",
+  "tests",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -368,12 +368,12 @@ unfixable = [
   "INP",  # Don't require __init__.py files in tests directories
 ]
 "src/meltano/migrations/versions/*" = [
-    "D103",
-    "D415",
-    "INP001",
-    "TC003",
-    "TID251",
-    "UP007",
+  "D103",
+  "D415",
+  "INP001",
+  "TC003",
+  "TID251",
+  "UP007",
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -415,5 +415,5 @@ convention = "google"
 
 [tool.check-wheel-contents]
 ignore = [
-    "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
+  "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
 ]
