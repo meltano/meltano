@@ -514,10 +514,12 @@ class SettingDefinition(NameEq, Canonical):
             setting definition.
         """
         processor = self.value_post_processor
-        if value is not None and processor:
-            if isinstance(processor, str):
+        if value is not None:
+            if processor and isinstance(processor, str):
                 processor = VALUE_PROCESSORS[processor]
-            value = processor(value)
+                value = processor(value)
+            elif self.kind == SettingKind.DATE_ISO8601:
+                value = utils.parse_date(value)
 
         return value
 

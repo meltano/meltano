@@ -74,19 +74,31 @@ class TestSettingDefinition:
         with pytest.raises(ValueError, match="is not a valid choice"):
             setting_definition.cast_value("def")
 
-    def test_post_process_parse_date(self) -> None:
-        setting_definition: SettingDefinition = SettingDefinition(
-            name="test_setting",
-            kind=SettingKind.DATE_ISO8601,
-            value_post_processor="parse_date",
-        )
-
+    @pytest.mark.parametrize(
+        ("setting_definition"),
+        (
+            pytest.param(
+                SettingDefinition(name="test_setting", kind=SettingKind.DATE_ISO8601),
+                id="date_iso8601",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    name="test_setting",
+                    kind=SettingKind.STRING,
+                    value_post_processor="parse_date",
+                ),
+                id="string_parse_date",
+            ),
+        ),
+    )
+    def test_post_process_parse_date(
+        self,
+        setting_definition: SettingDefinition,
+    ) -> None:
+        date_value = "2021-01-01T00:00:00+00:00"
         assert setting_definition.post_process_value(None) is None
         assert setting_definition.post_process_value("not a date") == "not a date"
-        assert (
-            setting_definition.post_process_value("2021-01-01T00:00:00+00:00")
-            == "2021-01-01T00:00:00+00:00"
-        )
+        assert setting_definition.post_process_value(date_value) == date_value
         assert re.match(
             r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00",
             setting_definition.post_process_value("3 days ago, UTC"),
