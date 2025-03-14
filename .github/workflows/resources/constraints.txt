@@ -1,5 +1,1 @@
 nox==2025.2.9
-nox-poetry==1.2.0
-pip==25.0.1
-poetry==2.1.1
-poetry-plugin-export==1.9.0

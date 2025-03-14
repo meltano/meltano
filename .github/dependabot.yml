@@ -32,7 +32,7 @@ updates:
           - "*"
     commit-message:
       prefix: "ci: "
-  - package-ecosystem: pip
+  - package-ecosystem: uv
     versioning-strategy: increase-if-necessary
     directory: "/"
     schedule:

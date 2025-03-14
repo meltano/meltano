@@ -474,11 +474,13 @@ settings:
   env: SOME_API_KEY
 ```
 
-<br/>
-
 :::caution
-  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden</code></a>.</p>
-  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive</code></a>.</p>
+  <p><code>kind: hidden</code> is deprecated in favour of <a href="#settingshidden"><code>hidden: true</code></a>.</p>
+  <p><code>kind: password</code> is deprecated in favour of <a href="#settingssensitive"><code>sensitive: true</code></a>.</p>
+:::
+
+:::tip
+  <p>Starting with Meltano v3.7, settings of kind `date_iso8601` can have relative date values, like `3 days ago`, `yesterday`, `last week`, etc.</p>
 :::
 
 ### `settings[*].label`
