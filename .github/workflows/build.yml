@@ -20,34 +20,31 @@ jobs:
     - name: Check out the repository
       uses: actions/checkout@v4.2.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: ">=0.6"
 
     - name: Set up Python
       uses: actions/setup-python@v5.4.0
       with:
         python-version: 3.x
-        cache: 'poetry'
 
     - name: Check version
       if: github.event_name == 'release' && github.event.action == 'published'
       run: |
-        version=$(poetry version | awk '{print $2}')
+        version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and poetry version ('v$version') do not match!"; exit 1; fi;
+        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
 
-    - name: Poetry install
+    - name: uv install
       # Required to run `alembic_freeze.py`
       run: |
-        poetry install
+        uv sync
 
     - name: Freeze DB
       run: |
-        poetry run scripts/alembic_freeze.py
+        uv run scripts/alembic_freeze.py
 
     - name: Release Marker
       if: github.event_name == 'release' && github.event.action == 'published'
