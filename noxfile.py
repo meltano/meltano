@@ -18,11 +18,10 @@ import nox
 # NOTE: The module docstring above is printed when `nox -l` is run.
 
 # Dependencies for tests and type checking are defined in `pyproject.toml`,
-# locked in `uv.lock` and exported to `requirements/requirements.txt`.
+# locked in `uv.lock`.
 # The various Nox sessions defined here install the subset of them they require.
 
-# We use `requirements/requirements.txt` to ensure the version installed is consistent
-# with `uv.lock`. The single source of truth for our Python test and type checking
+# The single source of truth for our Python test and type checking
 # dependencies is `pyproject.toml`. Other linting and checks are performed by
 # `pre-commit`, where each check specifies its own dependencies. There should be
 # no duplicated dependencies between `pyproject.toml` and
