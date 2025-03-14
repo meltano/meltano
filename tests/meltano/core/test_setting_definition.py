@@ -5,6 +5,7 @@ import re
 import pytest
 
 from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.utils import parse_date
 
 
 class TestSettingDefinition:
@@ -88,6 +89,14 @@ class TestSettingDefinition:
                     value_post_processor="parse_date",
                 ),
                 id="string_parse_date",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    name="test_setting",
+                    kind=SettingKind.STRING,
+                    value_post_processor=parse_date,
+                ),
+                id="string_parse_date_callable",
             ),
         ),
     )
