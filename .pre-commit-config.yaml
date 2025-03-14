@@ -6,21 +6,10 @@ ci:
   autofix_prs: true
   autoupdate_commit_msg: "chore: pre-commit autoupdate"
   autoupdate_schedule: weekly
+  skip:
+    - uv-lock
 
 repos:
-  - repo: local
-    hooks:
-      - id: check-poetry-lock
-        # `pre-commit autoupdate` will update to older Poetry versions, so we
-        # use a local hook to avoid that bug:
-        # https://github.com/meltano/meltano/pull/7238#issuecomment-1409434351
-        name: check that `poetry.lock` conforms to `pyproject.toml`
-        entry: sh -c 'find . -type f -name poetry.lock -print0 | xargs -0 -n 1 -P 0 sh -c 'cd "$(dirname "$1")" && echo "$(pwd)/poetry.lock" && poetry lock --check' _ {} \;'
-        language: python
-        pass_filenames: false
-        additional_dependencies:
-          - "poetry==2.1.1"
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -33,6 +22,7 @@ repos:
       - id: pretty-format-json
         args: ["--autofix", "--indent=2", "--no-sort-keys"]
       - id: check-added-large-files
+        exclude: ^uv\.lock$
       - id: check-merge-conflict
       - id: check-toml
       - id: debug-statements
@@ -79,3 +69,8 @@ repos:
     - id: ruff
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.6.6
+    hooks:
+      - id: uv-lock
