@@ -480,7 +480,7 @@ settings:
 :::
 
 :::tip
-  <p>Starting with Meltano v3.7, settings of kind `date_iso8601` can be relative dates, like `3 days ago`, `yesterday`, `last week`, etc.</p>
+  <p>Starting with Meltano v3.7, settings of kind `date_iso8601` can have relative date values, like `3 days ago`, `yesterday`, `last week`, etc.</p>
 :::
 
 ### `settings[*].label`
