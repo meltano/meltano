@@ -1276,6 +1276,9 @@ s3 = [
 ]
 
 [package.dev-dependencies]
+coverage = [
+    { name = "coverage", extra = ["toml"] },
+]
 dev = [
     { name = "backoff" },
     { name = "boto3-stubs", extra = ["essential"] },
@@ -1284,7 +1287,6 @@ dev = [
     { name = "mock" },
     { name = "moto" },
     { name = "mypy" },
-    { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -1296,6 +1298,37 @@ dev = [
     { name = "requests-mock" },
     { name = "setproctitle" },
     { name = "time-machine" },
+    { name = "types-croniter" },
+    { name = "types-jsonschema" },
+    { name = "types-psutil" },
+    { name = "types-pyyaml" },
+    { name = "types-requests", version = "2.31.0.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "types-requests", version = "2.32.0.20250306", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+pre-commit = [
+    { name = "pre-commit" },
+]
+testing = [
+    { name = "backoff" },
+    { name = "colorama" },
+    { name = "coverage", extra = ["toml"] },
+    { name = "mock" },
+    { name = "moto" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "pytest-docker" },
+    { name = "pytest-order" },
+    { name = "pytest-randomly" },
+    { name = "pytest-structlog" },
+    { name = "pytest-xdist" },
+    { name = "requests-mock" },
+    { name = "setproctitle" },
+    { name = "time-machine" },
+]
+typing = [
+    { name = "boto3-stubs", extra = ["essential"] },
+    { name = "mypy" },
     { name = "types-croniter" },
     { name = "types-jsonschema" },
     { name = "types-psutil" },
@@ -1352,15 +1385,15 @@ requires-dist = [
 provides-extras = ["azure", "gcs", "mssql", "postgres", "psycopg2", "s3"]
 
 [package.metadata.requires-dev]
+coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.6.12" }]
 dev = [
     { name = "backoff", specifier = ">=2.1.2,<3" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.38" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
-    { name = "coverage", extras = ["toml"], specifier = ">=7.3.2,!=7.3.3" },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.6.12" },
     { name = "mock", specifier = ">=5.0.2,<6" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.13.0,<2" },
-    { name = "pre-commit", specifier = ">=4.0.1,<5" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
     { name = "pytest-asyncio", specifier = ">=0.25.0,<0.26" },
     { name = "pytest-cov", specifier = ">=6.0.0,<7" },
@@ -1372,6 +1405,34 @@ dev = [
     { name = "requests-mock", specifier = ">=1.12.1,<2" },
     { name = "setproctitle", specifier = "~=1.3" },
     { name = "time-machine", specifier = ">=2.15.0,<3" },
+    { name = "types-croniter", specifier = "==5.0.1.20241205" },
+    { name = "types-jsonschema", specifier = ">=4.23.0.20240813,<5" },
+    { name = "types-psutil", specifier = ">=7.0.0.20250218,<8" },
+    { name = "types-pyyaml", specifier = ">=6.0.12.20240917,<7" },
+    { name = "types-requests", specifier = ">=2.31.0,<3" },
+]
+pre-commit = [{ name = "pre-commit", specifier = ">=4.0.1,<5" }]
+testing = [
+    { name = "backoff", specifier = ">=2.1.2,<3" },
+    { name = "colorama", specifier = ">=0.4.4,<0.5" },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.6.12" },
+    { name = "mock", specifier = ">=5.0.2,<6" },
+    { name = "moto", specifier = ">=5.0.21,<6" },
+    { name = "pytest", specifier = ">=8.3.3,<9" },
+    { name = "pytest-asyncio", specifier = ">=0.25.0,<0.26" },
+    { name = "pytest-cov", specifier = ">=6.0.0,<7" },
+    { name = "pytest-docker", specifier = "~=3.1" },
+    { name = "pytest-order", specifier = "~=1.3" },
+    { name = "pytest-randomly", specifier = "~=3.16" },
+    { name = "pytest-structlog", specifier = "~=1.1" },
+    { name = "pytest-xdist", specifier = "~=3.6" },
+    { name = "requests-mock", specifier = ">=1.12.1,<2" },
+    { name = "setproctitle", specifier = "~=1.3" },
+    { name = "time-machine", specifier = ">=2.15.0,<3" },
+]
+typing = [
+    { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.38" },
+    { name = "mypy", specifier = ">=1.13.0,<2" },
     { name = "types-croniter", specifier = "==5.0.1.20241205" },
     { name = "types-jsonschema", specifier = ">=4.23.0.20240813,<5" },
     { name = "types-psutil", specifier = ">=7.0.0.20250218,<8" },

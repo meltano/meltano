@@ -74,10 +74,3 @@ repos:
     rev: 0.6.6
     hooks:
       - id: uv-lock
-      - id: uv-export
-        name: Export requirements
-        args:
-        - "--no-emit-project"
-        - "--no-hashes"
-        - "--output-file"
-        - "requirements/requirements.txt"

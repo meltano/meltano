@@ -28,7 +28,7 @@ import nox
 # no duplicated dependencies between `pyproject.toml` and
 # `.pre-commit-config.yaml`.
 
-nox.options.default_venv_backend = "uv|venv"
+nox.options.default_venv_backend = "uv"
 
 root_path = Path(__file__).parent
 python_versions = (
@@ -39,22 +39,6 @@ python_versions = (
     "3.13",
 )
 main_python_version = "3.13"
-pytest_deps = (
-    "backoff",
-    "colorama",  # colored output in Windows
-    "mock",
-    "moto",
-    "pytest",
-    "pytest-asyncio",
-    "pytest-cov",
-    "pytest-docker",
-    "pytest-order",
-    "pytest-randomly",
-    "pytest-structlog",
-    "pytest-xdist",
-    "requests-mock",
-    "time-machine",
-)
 
 
 def _run_pytest(session: nox.Session) -> None:
@@ -103,11 +87,13 @@ def pytest_meltano(session: nox.Session) -> None:
     elif backend_db == "postgresql_psycopg3":
         extras.append("postgres")
 
-    session.install(
-        f".[{','.join(extras)}]",
-        *pytest_deps,
-        "-c",
-        "requirements/requirements.txt",
+    session.run_install(
+        "uv",
+        "sync",
+        "--frozen",
+        "--group=testing",
+        *(f"--extra={extra}" for extra in extras),
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     _run_pytest(session)
 
@@ -121,7 +107,13 @@ def coverage(session: nox.Session) -> None:
     """
     args = session.posargs or ("report",)
 
-    session.install("coverage[toml]", "-c", "requirements/requirements.txt")
+    session.run_install(
+        "uv",
+        "sync",
+        "--frozen",
+        "--group=coverage",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
 
     if not session.posargs and any(Path().glob(".coverage.*")):
         session.run("coverage", "combine")
@@ -141,7 +133,13 @@ def pre_commit(session: nox.Session) -> None:
         session: Nox session.
     """
     args = session.posargs or ("run", "--all-files")
-    session.install("pre-commit", "-c", "requirements/requirements.txt")
+    session.run_install(
+        "uv",
+        "sync",
+        "--frozen",
+        "--group=pre-commit",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
+    )
     session.run("pre-commit", *args)
 
 
@@ -155,16 +153,15 @@ def mypy(session: nox.Session) -> None:
     Args:
         session: Nox session.
     """
-    session.install(
-        ".[mssql,azure,gcs,s3]",
-        "boto3-stubs[essential]",
-        "mypy",
-        "types-croniter",
-        "types-jsonschema",
-        "types-psutil",
-        "types-PyYAML",
-        "types-requests",
-        "-c",
-        "requirements/requirements.txt",
+    session.run_install(
+        "uv",
+        "sync",
+        "--frozen",
+        "--group=typing",
+        "--extra=mssql",
+        "--extra=azure",
+        "--extra=gcs",
+        "--extra=s3",
+        env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     session.run("mypy", *session.posargs)
