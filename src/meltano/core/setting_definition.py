@@ -515,8 +515,10 @@ class SettingDefinition(NameEq, Canonical):
         """
         processor = self.value_post_processor
         if value is not None:
-            if processor and isinstance(processor, str):
+            if isinstance(processor, str):
                 processor = VALUE_PROCESSORS[processor]
+                value = processor(value)
+            elif processor is not None:
                 value = processor(value)
             elif self.kind == SettingKind.DATE_ISO8601:
                 value = utils.parse_date(value)
