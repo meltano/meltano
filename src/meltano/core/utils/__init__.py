@@ -613,7 +613,7 @@ def human_size(num, suffix="B") -> str:  # noqa: ANN001
     Returns:
         File size in human-readable format
     """
-    magnitude = int(math.floor(math.log(num, 1024)))
+    magnitude = math.floor(math.log(num, 1024))
     val = num / math.pow(1024, magnitude)
 
     if magnitude == 0:
