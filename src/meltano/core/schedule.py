@@ -120,8 +120,8 @@ class Schedule(NameEq, Canonical):
         if self.job:
             raise NotImplementedError
         return [
-            t.cast(str, self.extractor),
-            t.cast(str, self.loader),
+            t.cast("str", self.extractor),
+            t.cast("str", self.loader),
             f"--transform={self.transform}",
             f"--state-id={self.name}",
         ]
