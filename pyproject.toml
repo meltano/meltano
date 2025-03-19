@@ -187,7 +187,7 @@ filterwarnings = [
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
 ]
-log_cli = 1
+log_cli = true
 log_cli_format = "%(message)s"
 log_cli_level = "CRITICAL"
 log_file = "pytest.log"
