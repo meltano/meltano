@@ -183,7 +183,7 @@ filterwarnings = [
   "error",
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
-  "ignore: Parsing dates involving a day of month without a year specified is ambiguious:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
+  "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
 ]
