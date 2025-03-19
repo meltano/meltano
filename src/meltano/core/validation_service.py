@@ -139,9 +139,7 @@ class ValidationsRunner(metaclass=ABCMeta):
         return {
             plugin.name: cls(
                 invoker=invoker_factory(project, plugin),
-                tests_selection={
-                    test_name: select_all for test_name in plugin.test_commands
-                },
+                tests_selection=dict.fromkeys(plugin.test_commands, select_all),
             )
             for plugin in project.plugins.plugins()
             if plugin.type is not PluginType.FILES

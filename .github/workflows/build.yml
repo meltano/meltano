@@ -18,36 +18,33 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
+    - name: Setup uv
+      uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
+      with:
+        version: ">=0.6"
 
     - name: Set up Python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
       with:
         python-version: 3.x
-        cache: 'poetry'
 
     - name: Check version
       if: github.event_name == 'release' && github.event.action == 'published'
       run: |
-        version=$(poetry version | awk '{print $2}')
+        version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)
         tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
-        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and poetry version ('v$version') do not match!"; exit 1; fi;
+        if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
 
-    - name: Poetry install
+    - name: uv install
       # Required to run `alembic_freeze.py`
       run: |
-        poetry install
+        uv sync
 
     - name: Freeze DB
       run: |
-        poetry run scripts/alembic_freeze.py
+        uv run scripts/alembic_freeze.py
 
     - name: Release Marker
       if: github.event_name == 'release' && github.event.action == 'published'
@@ -55,7 +52,7 @@ jobs:
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      uses: hynek/build-and-inspect-python-package@v2
+      uses: hynek/build-and-inspect-python-package@b5076c307dc91924a82ad150cdd1533b444d3310 # v2.12.0
       id: baipp
 
   pypi_release:
@@ -69,16 +66,16 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Download artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
       with:
         name: Packages
         path: dist
 
     - name: Upload wheel to release
-      uses: svenstaro/upload-release-action@v2
+      uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # 2.9.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: dist/*.whl
@@ -87,4 +84,4 @@ jobs:
         file_glob: true
 
     - name: Publish
-      uses: pypa/gh-action-pypi-publish@v1.12.4
+      uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc # v1.12.4

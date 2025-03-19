@@ -56,17 +56,17 @@ jobs:
         echo "dry_run=${{ format('{0}', github.event.inputs.dry_run) || env.DEFAULT_DRY_RUN }}" >> $GITHUB_ENV
         echo "registry=${{ github.event.inputs.registry || env.DEFAULT_REGISTRY }}" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
+      with:
+        version: ">=0.6"
 
     - name: Get Meltano version
       id: get-meltano-version
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install poetry
-        poetry version
-        poetry version --short
-        echo "release-version=$(poetry version --short)" >> $GITHUB_OUTPUT
+        echo "release-version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)" >> $GITHUB_OUTPUT
 
     - name: Generate tags
       id: generate-tags

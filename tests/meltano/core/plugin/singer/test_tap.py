@@ -1095,8 +1095,8 @@ class TestSingerTap:
         work.
 
         ```
-        poetry run pytest
-        poetry run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
+        uv run pytest
+        uv run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
         ```
         """  # noqa: D212, E501
         rules = select_metadata_rules([rule_pattern])

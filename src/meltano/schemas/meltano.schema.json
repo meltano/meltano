@@ -888,9 +888,23 @@
           ]
         },
         "value_post_processor": {
-          "description": "Use with `kind: object` to post-process the keys in a particular way.",
-          "enum": [
-            "stringify"
+          "oneOf": [
+            {
+              "const": "nest_object",
+              "description": "Convert a flat object with period-delimited keys to a nested object"
+            },
+            {
+              "const": "upcase_string",
+              "description": "Convert the setting value to uppercase"
+            },
+            {
+              "const": "stringify",
+              "description": "Convert the JSON object to a string"
+            },
+            {
+              "const": "parse_date",
+              "description": "Parse the setting value as a date"
+            }
           ]
         },
         "oauth": {
