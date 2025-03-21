@@ -146,6 +146,7 @@ class TestJob:
         assert not job.is_stale()
 
         # Jobs started more than 25 hours ago without a heartbeat are stale
+        job.last_heartbeat_at = None
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
         job.started_at = datetime.now(timezone.utc) - offset
         assert job.is_stale()
@@ -172,6 +173,7 @@ class TestJob:
 
         # Fails a stale job without a heartbeat
         job.start()
+        job.last_heartbeat_at = None
         offset = timedelta(hours=HEARTBEATLESS_JOB_VALID_HOURS + 1)
         job.started_at = datetime.now(timezone.utc) - offset
 
