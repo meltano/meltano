@@ -53,6 +53,9 @@ def _run_pytest(session: nox.Session) -> None:
                 "NOX_CURRENT_SESSION": "tests",
             },
         )
+        if session.python not in {"3.9", "3.10", "3.11"}:
+            session.env["COVERAGE_CORE"] = "sysmon"
+
         session.run(
             "pytest",
             "--cov=meltano",
