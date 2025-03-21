@@ -186,7 +186,6 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
-  "ignore:sys.monitoring isn't available:coverage.exceptions.CoverageWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"

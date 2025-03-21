@@ -52,6 +52,7 @@ def _run_pytest(session: nox.Session) -> None:
                     root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
                 "NOX_CURRENT_SESSION": "tests",
+                "PYTHONWARNINGS": "ignore::coverage.exceptions.CoverageWarning",
             },
         )
         session.run(
