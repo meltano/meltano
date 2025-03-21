@@ -46,15 +46,16 @@ def _run_pytest(session: nox.Session) -> None:
     try:
         session.env.update(
             {
-                "COVERAGE_CORE": "sysmon",
                 "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
                 "COVERAGE_FILE": str(
                     root_path / f".coverage.{random_seed:010}.{session.name}",
                 ),
                 "NOX_CURRENT_SESSION": "tests",
-                "PYTHONWARNINGS": "ignore::coverage.exceptions.CoverageWarning",
             },
         )
+        if session.python not in {"3.9", "3.10", "3.11"}:
+            session.env["COVERAGE_CORE"] = "sysmon"
+
         session.run(
             "pytest",
             "--cov=meltano",
