@@ -90,6 +90,7 @@ def pytest_meltano(session: nox.Session) -> None:
         "uv",
         "sync",
         "--frozen",
+        "--no-dev",
         "--group=testing",
         *(f"--extra={extra}" for extra in extras),
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
@@ -110,6 +111,7 @@ def coverage(session: nox.Session) -> None:
         "uv",
         "sync",
         "--frozen",
+        "--no-dev",
         "--group=coverage",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
@@ -136,6 +138,7 @@ def pre_commit(session: nox.Session) -> None:
         "uv",
         "sync",
         "--frozen",
+        "--no-dev",
         "--group=pre-commit",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
@@ -156,6 +159,7 @@ def mypy(session: nox.Session) -> None:
         "uv",
         "sync",
         "--frozen",
+        "--no-dev",
         "--group=typing",
         "--extra=mssql",
         "--extra=azure",
