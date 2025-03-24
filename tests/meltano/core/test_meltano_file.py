@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 import pytest
 
 from meltano.core.meltano_file import MeltanoFile
@@ -62,3 +64,18 @@ class TestMeltanoFile:
             == test_config["mappings"][1]["name"]
         )
         assert plugins[1].config == test_config["mappings"][1]["config"]
+
+    def test_load_env(self) -> None:
+        meltano_file = MeltanoFile(
+            version=1,
+            env={
+                "FOO": 1,
+                "BAR": datetime.datetime(2025, 5, 20, tzinfo=datetime.timezone.utc),
+            },
+            plugins={},
+            schedules=[],
+            environments=[],
+            jobs=[],
+        )
+        assert meltano_file.env["FOO"] == "1"
+        assert meltano_file.env["BAR"] == "2025-05-20 00:00:00+00:00"
