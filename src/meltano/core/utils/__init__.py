@@ -22,6 +22,7 @@ from functools import reduce
 from operator import setitem
 from pathlib import Path
 
+import dateparser
 import flatten_dict
 import structlog
 from requests.auth import HTTPBasicAuth
@@ -612,7 +613,7 @@ def human_size(num, suffix="B") -> str:  # noqa: ANN001
     Returns:
         File size in human-readable format
     """
-    magnitude = int(math.floor(math.log(num, 1024)))
+    magnitude = math.floor(math.log(num, 1024))
     val = num / math.pow(1024, magnitude)
 
     if magnitude == 0:
@@ -881,3 +882,21 @@ def sanitize_filename(filename: str) -> str:
         _sanitize_filename_transformations,
         filename,
     )
+
+
+def parse_date(date_string: str) -> str:
+    """Parse a relative date string into a datetime object.
+
+    Args:
+        date_string: A relative date string that can be parsed by `dateparser`.
+
+    Returns:
+        The datetime object corresponding to the parsed date string.
+    """
+    if _parsed := dateparser.parse(
+        date_string,
+        settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},
+    ):
+        return _parsed.isoformat()
+
+    return date_string

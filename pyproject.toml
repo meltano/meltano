@@ -1,13 +1,17 @@
-[tool.poetry]
+[project]
 name = "meltano"
-version = "3.7.0a4"
+version = "3.7.0rc1"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
-authors = ["Meltano <hello@meltano.com>"]
-license = "MIT"
+authors = [{ name = "Meltano", email = "hello@meltano.com" }]
+requires-python = ">=3.9,<3.14"
 readme = "README.md"
-repository = "https://github.com/meltano/meltano"
+license = "MIT"
+license-files = [
+  "LICENSE",
+]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
@@ -17,11 +21,6 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
-packages = [
-  { include = "meltano", from = "src", format = "wheel" },
-  { include = "src", format = "sdist" },
-  { include = "tests", format = "sdist"},
-]
 keywords = [
   "Meltano",
   "ELT",
@@ -29,99 +28,71 @@ keywords = [
   "singer-io",
   "dbt",
 ]
-documentation = "https://docs.meltano.com"
-homepage = "https://meltano.com"
+dependencies = [
+  "aiodocker>=0.24.0,<0.25",
+  "alembic>=1.14.0,<2",
+  "anyio>=4.4.0,<5",
+  "atomicwrites>=1.2.1,<2",
+  "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
+  "check-jsonschema>=0.31.0,<0.32",
+  "click~=8.1",
+  "click-default-group>=1.2.4,<2",
+  "click-didyoumean>=0.3.1,<0.4",
+  "croniter>=6.0.0,<7",
+  "dateparser>=1.2.1",
+  "fasteners>=0.19,<0.20",
+  "flatten-dict>=0,<1",
+  "importlib-metadata>=5 ; python_version < '3.12'",
+  "jinja2>=3.1.4,<4",
+  "jsonschema~=4.23",
+  "packaging~=24.2",
+  "pip~=25.0.1",
+  "psutil>=7.0.0,<8",
+  "python-dotenv>=1.0.1,<2",
+  "pyyaml>=6.0.2,<7",
+  "requests>=2.32.3,<3",
+  "rich>=13.9.4,<14",
+  "ruamel.yaml>=0.18.6,<0.19",
+  "setuptools>=76.0.0,<77 ; python_version >= '3.12'",
+  "smart-open>=7.0.5,<8",
+  "snowplow-tracker>=1.0.4,<2",
+  "sqlalchemy>=2.0.35,<3",
+  "structlog>=25.1.0,<26",
+  "typing-extensions>=4.12.2,<5",
+  "tzlocal~=5.2",
+  # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
+  "urllib3<2 ; python_version < '3.10'",
+  "uv>=0.1.24,<0.7",
+  "virtualenv>=20.26.6,<21",
+]
 
-[tool.poetry.urls]
-"Changelog" = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
+[project.optional-dependencies]
+azure = [
+  "azure-storage-blob>=12.24.0,<13",
+  "azure-common>=1.1.28,<2",
+  "azure-core>=1.32.0,<2",
+  "azure-identity>=1.19.0,<2",
+]
+gcs = ["google-cloud-storage>=1.31.0"]
+mssql = ["pymssql>=2.3.2,<3"]
+postgres = ["psycopg[binary]>=3.2.3,<4"]
+psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
+s3 = ["boto3>=1.35,<1.38"]
+
+[project.urls]
+Homepage = "https://meltano.com"
+Repository = "https://github.com/meltano/meltano"
+Documentation = "https://docs.meltano.com"
+Changelog = "https://github.com/meltano/meltano/blob/main/CHANGELOG.md"
 "Issue Tracker" = "https://github.com/meltano/meltano/issues"
-"Slack" = "https://meltano.com/slack"
-"Twitter" = "https://twitter.com/meltanodata/"
-"Youtube" = "https://www.youtube.com/meltano"
+Slack = "https://meltano.com/slack"
+Twitter = "https://twitter.com/meltanodata/"
+Youtube = "https://www.youtube.com/meltano"
 
-[tool.poetry.dependencies]
-aiodocker = "^0.24.0"
-alembic = "^1.14.0"
-anyio = "^4.4.0"
-atomicwrites = "^1.2.1"
-azure-common = {version = "^1.1.28", optional = true}
-azure-core = {version = "^1.32.0", optional = true}
-azure-identity = {version = "^1.19.0", optional = true}
-azure-storage-blob = {version = "^12.24.0", optional = true}
-backports-strenum = {version = "^1.3.1", python = "<3.11"}
-boto3 = {version = ">=1.35,<1.37", optional = true}
-check-jsonschema = "^0.31.0"
-click = "^8.1"
-click-default-group = "^1.2.4"
-click-didyoumean = "^0.3.1"
-croniter = "^6.0.0"
-fasteners = "^0.19"
-flatten-dict = "^0"
-google-cloud-storage = {version = ">=1.31.0", optional = true}
-importlib-metadata = { version = ">=5", python = "<3.12" }
-jinja2 = "^3.1.4"
-jsonschema = "^4.23"
-packaging = "^24.2"
-psutil = "^7.0.0"
-psycopg = {version = "^3.2.3", extras = ["binary"], optional = true}
-psycopg2-binary = {version="^2.9.9", optional=true}
-pymssql = {version = "^2.3.2", optional = true}
-python = ">=3.9,<3.14"
-python-dotenv = "^1.0.1"
-pyyaml = "^6.0.2"
-requests = "^2.32.3"
-rich = "^13.9.4"
-"ruamel.yaml" = ">=0.18.6,<0.19"
-setuptools = {version = "^75.6.0", python = ">=3.12"}
-smart-open = "^7.0.5"
-snowplow-tracker = "^1.0.4"
-sqlalchemy = "^2.0.35"
-structlog = "^25.1.0"
-typing-extensions = "^4.12.2"
-tzlocal = "^5.2"
-# Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
-urllib3 = "<2"
-uv = ">=0.1.24,<0.7"
-virtualenv = "^20.26.6"
-
-[tool.poetry.extras]
-azure = ["azure-storage-blob", "azure-common", "azure-core", "azure-identity"]
-gcs = ["google-cloud-storage"]
-mssql = ["pymssql"]
-postgres = ["psycopg"]
-psycopg2 = ["psycopg2-binary"]
-s3 = ["boto3"]
-
-[tool.poetry.group.dev.dependencies]
-backoff = "^2.1.2"
-boto3-stubs = {extras = ["essential"], version = ">=1.35,<1.37"}
-colorama = "^0.4.4"
-coverage = {extras = ["toml"], version = ">=7.3.2,!=7.3.3"}
-mock = "^5.0.2"
-moto = "^5.0.21"
-mypy = "^1.13.0"
-pre-commit = "^4.0.1"
-pytest = "^8.3.3"
-pytest-asyncio = "^0.25.0"
-pytest-cov = "^6.0.0"
-pytest-docker = "^3.1"
-pytest-order = "^1.3"
-pytest-randomly = "^3.16"
-pytest-structlog = "^1.1"
-pytest-xdist = "^3.6"
-requests-mock = "^1.12.1"
-setproctitle = "^1.3" # Used by pytest-xdist to aid with handling resource intensive processes.
-time-machine = "^2.15.0"
-types-croniter = "==5.0.1.20241205"
-types-jsonschema = "^4.23.0.20240813"
-types-psutil = "^7.0.0.20250218"
-types-pyyaml = "^6.0.12.20240917"
-types-requests = "^2.31.0"
-
-[tool.poetry.scripts]
+[project.scripts]
 meltano = "meltano.cli:main"
 
-[tool.poetry.plugins."meltano.settings"]
+[project.entry-points."meltano.settings"]
 # AWS S3 state backend settings
 s3_aws_access_key_id = "meltano.core.state_store.s3:AWS_ACCESS_KEY_ID"
 s3_aws_secret_access_key = "meltano.core.state_store.s3:AWS_SECRET_ACCESS_KEY"
@@ -132,7 +103,7 @@ azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
 # Google Cloud Storage state backend settings
 google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"
 
-[tool.poetry.plugins."meltano.state_backends"]
+[project.entry-points."meltano.state_backends"]
 # These keys should match the expected scheme for URIs of
 # the given type. E.g., filesystem state backends have a
 # file://<path>/<to>/<state directory> URI
@@ -140,6 +111,58 @@ azure = "meltano.core.state_store.azure:AZStorageStateStoreManager"
 file = "meltano.core.state_store.filesystem:LocalFilesystemStateStoreManager"
 gs = "meltano.core.state_store.google:GCSStateStoreManager"
 s3 = "meltano.core.state_store.s3:S3StateStoreManager"
+
+[dependency-groups]
+coverage = [
+  "coverage[toml]>=7.6.12",
+]
+dev = [
+  { include-group = "testing" },
+  { include-group = "typing" },
+]
+pre-commit = [
+  "pre-commit>=4.0.1,<5",
+]
+testing = [
+  { include-group = "coverage" },
+  "backoff>=2.1.2,<3",
+  "colorama>=0.4.4,<0.5",
+  "mock>=5.0.2,<6",
+  "moto>=5.0.21,<6",
+  "pytest>=8.3.3,<9",
+  "pytest-asyncio>=0.25.0,<0.26",
+  "pytest-cov>=6.0.0,<7",
+  "pytest-docker~=3.1",
+  "pytest-order~=1.3",
+  "pytest-randomly~=3.16",
+  "pytest-structlog~=1.1",
+  "pytest-xdist~=3.6",
+  "requests-mock>=1.12.1,<2",
+  "setproctitle~=1.3",  # Used by pytest-xdist to aid with handling resource intensive processes.
+  "time-machine>=2.15.0,<3",
+]
+typing = [
+  "boto3-stubs[essential]>=1.35,<1.38",
+  "mypy>=1.13.0,<2",
+  "types-croniter==5.0.1.20241205",
+  "types-dateparser>=1.2.0.20250208",
+  "types-jsonschema>=4.23.0.20240813,<5",
+  "types-psutil>=7.0.0.20250218,<8",
+  "types-pyyaml>=6.0.12.20240917,<7",
+  "types-requests>=2.31.0,<3",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src",
+  "tests",
+]
+
+[tool.hatch.build.targets.wheel]
+include = ["src/meltano"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/meltano" = "meltano"
 
 [tool.pytest.ini_options]
 addopts = [
@@ -160,10 +183,11 @@ filterwarnings = [
   "error",
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:time_machine.*",  # https://github.com/adamchainz/time-machine/issues/445
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
+  "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
 ]
-log_cli = 1
+log_cli = true
 log_cli_format = "%(message)s"
 log_cli_level = "CRITICAL"
 log_file = "pytest.log"
@@ -219,12 +243,11 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
+version_provider = "pep621"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
-version = "3.7.0a4"
 version_files = [
-  "pyproject.toml:^version =",
   "src/meltano/__init__.py:^__version__ =",
   'docs/package.json:^  "version":',
   ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
@@ -290,12 +313,11 @@ module = [
 ]
 
 [build-system]
-requires = ["poetry-core==2.1.1"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling==1.27.0"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
 
 [tool.ruff.lint]
 ignore = [
@@ -361,12 +383,12 @@ unfixable = [
   "INP",  # Don't require __init__.py files in tests directories
 ]
 "src/meltano/migrations/versions/*" = [
-    "D103",
-    "D415",
-    "INP001",
-    "TC003",
-    "TID251",
-    "UP007",
+  "D103",
+  "D415",
+  "INP001",
+  "TC003",
+  "TID251",
+  "UP007",
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -408,5 +430,5 @@ convention = "google"
 
 [tool.check-wheel-contents]
 ignore = [
-    "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
+  "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
 ]

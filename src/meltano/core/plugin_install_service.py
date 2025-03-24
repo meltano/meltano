@@ -652,5 +652,6 @@ async def install_pip_plugin(
         env={
             **os.environ,
             **project.dotenv_env,
+            **project.meltano.env,
         },
     )

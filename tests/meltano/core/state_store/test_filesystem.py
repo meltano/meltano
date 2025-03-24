@@ -310,9 +310,9 @@ class TestLocalFilesystemStateStoreManager:
                 json.dump(expected_state, state_file)
 
         initial_count = len(state_ids_with_expected_states)
-        assert len(os.listdir(state_path)) == initial_count
+        assert len(list(Path(state_path).iterdir())) == initial_count
         assert subject.clear_all() == initial_count
-        assert len(os.listdir(state_path)) == 0
+        assert len(list(Path(state_path).iterdir())) == 0
 
 
 class TestAZStorageStateStoreManager:
