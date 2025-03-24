@@ -434,7 +434,7 @@ class SingerTap(SingerPlugin):
             if isinstance(err, json.JSONDecodeError):
                 logger.error(
                     "Invalid JSON: %s [...]",
-                    err.doc[err.pos : err.pos + 10],
+                    err.doc[max(err.pos - 9, 0) : err.pos + 10]
                 )
 
             raise PluginExecutionError(
