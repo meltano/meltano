@@ -84,7 +84,8 @@ class ContainerSpec(Canonical):
             port_bindings[container_port].append(
                 {
                     "HostPort": host_port,
-                    "HostIP": "0.0.0.0",  # noqa: S104. Binding to all interfaces is OK.
+                    # Binding to all interfaces is okay
+                    "HostIP": "0.0.0.0",  # noqa: S104
                 },
             )
 

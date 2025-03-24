@@ -704,7 +704,7 @@ class SettingsService(metaclass=ABCMeta):
                 allowed = self.get(f"{FEATURE_FLAG_PREFIX}.{feature}") or False
 
         try:
-            yield t.cast(bool, allowed)
+            yield t.cast("bool", allowed)
         finally:
             if raise_error and not allowed:
                 raise FeatureNotAllowedException(feature)

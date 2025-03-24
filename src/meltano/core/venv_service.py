@@ -194,7 +194,7 @@ class VirtualEnv:
         if self.python_path == sys.executable:
             return sys.version_info[:3]
         return t.cast(
-            tuple[int, int, int],
+            "tuple[int, int, int]",
             tuple(
                 int(x)
                 for x in subprocess.run(
@@ -426,7 +426,7 @@ class VenvService:
         logger.debug(f"Creating virtual environment for '{self.namespace}/{self.name}'")  # noqa: G004
 
         async def extract_stderr(proc: Process):  # noqa: ANN202
-            return (await t.cast(asyncio.StreamReader, proc.stdout).read()).decode(
+            return (await t.cast("asyncio.StreamReader", proc.stdout).read()).decode(
                 "utf-8",
                 errors="replace",
             )

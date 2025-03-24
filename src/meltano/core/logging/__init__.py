@@ -1,4 +1,4 @@
-"""Logging and log related utilities."""  # noqa: A005
+"""Logging and log related utilities."""
 
 from __future__ import annotations
 
