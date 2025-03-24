@@ -243,7 +243,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version_provider = "pep610"
+version_provider = "pep621"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
