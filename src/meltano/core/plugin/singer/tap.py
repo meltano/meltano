@@ -429,15 +429,14 @@ class SingerTap(SingerPlugin):
             async with await anyio.open_file(catalog_path) as catalog_file:
                 catalog = json.loads(await catalog_file.read())
                 Draft4Validator.check_schema(catalog)
-        except json.JSONDecodeError as err:
-            catalog_path.unlink()
-            errmsg = (
-                "Catalog discovery failed: invalid JSON in catalog file: "
-                f"{err.doc.splitlines()[0][err.pos : err.pos + 25]}"
-            )
-            raise PluginExecutionError(errmsg) from err
         except Exception as err:
             catalog_path.unlink()
+            if isinstance(err, json.JSONDecodeError):
+                logger.error(
+                    "Invalid JSON: %s [...]",
+                    err.doc[err.pos : err.pos + 10],
+                )
+
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
             ) from err
