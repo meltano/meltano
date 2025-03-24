@@ -212,6 +212,9 @@ concurrency = [
   "multiprocessing",
   "thread",
 ]
+disable_warnings = [
+  "no-sysmon",
+]
 parallel = true
 relative_files = true  # This allows coverage to be measured in Windows
 sigterm = true
