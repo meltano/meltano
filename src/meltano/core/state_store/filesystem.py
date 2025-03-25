@@ -305,14 +305,14 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Reading state from {self.label}")  # noqa: G004
+        logger.info("Reading state from %s", self.label)
         with self.acquire_lock(state_id):
             try:
                 with self.get_reader(self.get_state_path(state_id)) as reader:
                     return MeltanoState.from_file(state_id, reader)
             except Exception as e:
                 if self.is_file_not_found_error(e):
-                    logger.info(f"No state found for {state_id}.")  # noqa: G004
+                    logger.info("No state found for {%s.", state_id)
                     return None
                 raise e
 
@@ -325,27 +325,9 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
         Raises:
             Exception: if error not indicating file is not found is thrown
         """
-        logger.info(f"Writing state to {self.label}")  # noqa: G004
-        filepath = self.get_state_path(state.state_id)
-        with self.acquire_lock(state.state_id):
-            if state.is_complete():
-                state_to_write = state
-            else:
-                try:
-                    with self.get_reader(filepath) as current_state_reader:
-                        current_state = MeltanoState.from_file(
-                            state.state_id,
-                            current_state_reader,
-                        )
-                        current_state.merge_partial(state)
-                        state_to_write = current_state
-                except Exception as e:
-                    if self.is_file_not_found_error(e):
-                        state_to_write = state
-                    else:
-                        raise e
-            with self.get_writer(filepath) as writer:
-                writer.write(state_to_write.json())
+        logger.info("Writing state to %s", self.label)
+        with self.get_writer(self.get_state_path(state.state_id)) as writer:
+            writer.write(state.json())
 
     @abstractmethod
     def delete(self, file_or_dir_path: str) -> None:

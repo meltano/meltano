@@ -114,6 +114,23 @@ class StateStoreManager(ABC):
             kwargs: additional keyword arguments
         """
 
+    @t.final
+    def update(self, state: MeltanoState) -> None:
+        """Update state for the given `state_id`.
+
+        If the provided state is partial, it will be merged with the existing state.
+
+        Args:
+            state: the state to set.
+        """
+        state_to_write = state
+        with self.acquire_lock(state.state_id):
+            if not state.is_complete() and (current_state := self.get(state.state_id)):
+                current_state.merge_partial(state)
+                state_to_write = state
+
+            self.set(state_to_write)
+
     @property
     @abstractmethod
     def label(self) -> str:

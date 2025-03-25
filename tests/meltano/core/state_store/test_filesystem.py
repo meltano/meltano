@@ -198,14 +198,14 @@ class TestLocalFilesystemStateStoreManager:
                 json.dumps(expected_state),
             )
 
-    def test_set(
+    def test_update(
         self,
         subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
-            subject.set(
+            subject.update(
                 MeltanoState.from_json(
                     state_id,
                     json.dumps({"completed": expected_state}),
@@ -220,7 +220,7 @@ class TestLocalFilesystemStateStoreManager:
                     json.dumps({"completed": expected_state}),
                 ) == MeltanoState.from_file(state_id, state_file)
 
-    def test_set_partial_state(
+    def test_update_partial_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
         state_path: str,
@@ -240,7 +240,7 @@ class TestLocalFilesystemStateStoreManager:
 
         for state_id, expected_state in state_ids_with_expected_states:
             _seed_state(state_id, expected_state)
-            subject.set(
+            subject.update(
                 MeltanoState.from_json(
                     state_id,
                     json.dumps({"partial": expected_state}),
@@ -479,7 +479,7 @@ class TestS3StateStoreManager:
             store_manager.client.create_bucket(Bucket=store_manager.bucket)
             store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
 
-    def test_set_fail_object_in_glacier(
+    def test_update_fail_object_in_glacier(
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -499,13 +499,18 @@ class TestS3StateStoreManager:
                 StorageClass="GLACIER",
             )
             with pytest.raises(OSError, match="unable to access") as exc_info:
-                store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
+                store_manager.update(
+                    MeltanoState(
+                        state_id=state_id,
+                        completed_state={},
+                    )
+                )
 
             exc = exc_info.value
             assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
             assert exc.__cause__.response["Error"]["Code"] == "InvalidObjectState"
 
-    def test_set_fail_bucket_does_not_exist(
+    def test_update_fail_bucket_does_not_exist(
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -517,7 +522,12 @@ class TestS3StateStoreManager:
                 lock_timeout_seconds=10,
             )
             with pytest.raises(botocore.exceptions.ClientError) as exc_info:
-                store_manager.set(MeltanoState(state_id="state-id", completed_state={}))
+                store_manager.update(
+                    MeltanoState(
+                        state_id="state-id",
+                        completed_state={},
+                    )
+                )
 
             assert exc_info.value.response["Error"]["Code"] == "NoSuchBucket"
 
