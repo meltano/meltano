@@ -127,7 +127,7 @@ class StateStoreManager(ABC):
         with self.acquire_lock(state.state_id, retry_seconds=1):
             if not state.is_complete() and (current_state := self.get(state.state_id)):
                 current_state.merge_partial(state)
-                state_to_write = state
+                state_to_write = current_state
 
             self.set(state_to_write)
 

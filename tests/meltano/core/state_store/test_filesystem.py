@@ -229,20 +229,12 @@ class TestLocalFilesystemStateStoreManager:
     def test_update_partial_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
-        state_path: str,
         state_ids_with_expected_states,
     ) -> None:
-        def _get_state_path(state_id: str) -> str:
-            return os.path.join(
-                state_path,
-                encode_if_on_windows(state_id),
-                "state.json",
-            )
-
         def _seed_state(state_id: str, state: dict) -> None:
-            state_file = Path(_get_state_path(state_id))
+            state_file = Path(subject.get_state_path(state_id))
             state_file.parent.mkdir(parents=True, exist_ok=True)
-            state_file.write_text(json.dumps({"partial": state}))
+            state_file.write_text(json.dumps({"completed": state}))
 
         for state_id, expected_state in state_ids_with_expected_states:
             _seed_state(state_id, expected_state)
@@ -253,10 +245,15 @@ class TestLocalFilesystemStateStoreManager:
                 ),
             )
         for state_id, expected_state in state_ids_with_expected_states:
-            with open(_get_state_path(state_id)) as state_file:
+            with open(subject.get_state_path(state_id)) as state_file:
                 assert MeltanoState.from_json(
                     state_id,
-                    json.dumps({"partial": expected_state}),
+                    json.dumps(
+                        {
+                            "partial": expected_state,
+                            "completed": expected_state,
+                        }
+                    ),
                 ) == MeltanoState.from_file(state_id, state_file)
 
     def test_delete(
