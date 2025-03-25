@@ -36,7 +36,7 @@ class MeltanoFile(Canonical):
         schedules: list[dict] | None = None,
         environments: list[dict] | None = None,
         jobs: list[dict] | None = None,
-        env: dict[str, str] | None = None,
+        env: dict | None = None,
         *,
         requires_meltano: str | None = None,
         **extras: t.Any,
@@ -61,8 +61,8 @@ class MeltanoFile(Canonical):
             schedules=self.load_schedules(schedules or []),
             environments=self.load_environments(environments or []),
             jobs=self.load_job_tasks(jobs or []),
+            env=self.load_env(env or {}),
             requires_meltano=requires_meltano,
-            env=env or {},
         )
 
     def load_plugins(self, plugins: dict[str, dict]) -> Canonical:
@@ -131,6 +131,21 @@ class MeltanoFile(Canonical):
             A list of `Job` objects.
         """
         return [TaskSets.parse(obj) for obj in jobs]
+
+    @staticmethod
+    def load_env(env: dict) -> dict[str, str | None]:
+        """Parse `EnvVars` objects from python objects.
+
+        Args:
+            env: Dictionary of environment variables.
+
+        Returns:
+            A new `EnvVars` object.
+        """
+        return {
+            str(key): str(value) if value is not None else None
+            for key, value in env.items()
+        }
 
     @staticmethod
     def get_plugins_for_mappings(mapper_config: dict) -> list[ProjectPlugin]:

@@ -46,6 +46,7 @@ def _run_pytest(session: nox.Session) -> None:
     try:
         session.env.update(
             {
+                "COVERAGE_CORE": "sysmon",
                 "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
                 "COVERAGE_FILE": str(
                     root_path / f".coverage.{random_seed:010}.{session.name}",
@@ -53,8 +54,6 @@ def _run_pytest(session: nox.Session) -> None:
                 "NOX_CURRENT_SESSION": "tests",
             },
         )
-        if session.python not in {"3.9", "3.10", "3.11"}:
-            session.env["COVERAGE_CORE"] = "sysmon"
 
         session.run(
             "pytest",
