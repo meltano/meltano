@@ -183,6 +183,8 @@ class StateStoreManager(ABC):
     def clear_all(self) -> int:
         """Clear all states.
 
+        Override this method if the store supports bulk deletion.
+
         Returns:
             The number of states cleared from the store.
         """
