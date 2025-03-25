@@ -124,12 +124,22 @@ class StateStoreManager(ABC):
             state: the state to set.
         """
         state_to_write = state
-        with self.acquire_lock(state.state_id):
+        with self.acquire_lock(state.state_id, retry_seconds=1):
             if not state.is_complete() and (current_state := self.get(state.state_id)):
                 current_state.merge_partial(state)
                 state_to_write = state
 
             self.set(state_to_write)
+
+    @t.final
+    def clear(self, state_id: str) -> None:
+        """Delete the job state for the given state_id.
+
+        Args:
+            state_id: the state_id to delete.
+        """
+        with self.acquire_lock(state_id, retry_seconds=1):
+            self.delete(state_id)
 
     @property
     @abstractmethod
@@ -162,8 +172,8 @@ class StateStoreManager(ABC):
         ...
 
     @abstractmethod
-    def clear(self, state_id: str) -> None:
-        """Clear state for the given state_id.
+    def delete(self, state_id: str) -> None:
+        """Delete state for the given state_id.
 
         Args:
             state_id: the state_id to clear state for
@@ -172,8 +182,6 @@ class StateStoreManager(ABC):
 
     def clear_all(self) -> int:
         """Clear all states.
-
-        Override this method if the store supports bulk deletion.
 
         Returns:
             The number of states cleared from the store.

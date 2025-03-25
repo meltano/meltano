@@ -145,7 +145,7 @@ class TestLocalFilesystemStateStoreManager:
         state_path,
     ) -> None:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
-        with subject.acquire_lock("acquire_lock"):
+        with subject.acquire_lock("acquire_lock", retry_seconds=1):
             assert os.path.exists(os.path.join(dir_path, "lock"))
 
     def test_lock_timeout(self, subject: _LocalFilesystemStateStoreManager) -> None:
@@ -155,7 +155,7 @@ class TestLocalFilesystemStateStoreManager:
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
         with (
             time_machine.travel(initial_dt) as frozen_datetime,
-            subject.acquire_lock(state_id),
+            subject.acquire_lock(state_id, retry_seconds=1),
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
@@ -267,17 +267,17 @@ class TestLocalFilesystemStateStoreManager:
         with open(filepath, "w+") as state_file:
             json.dump(expected_state, state_file)
         assert os.path.exists(filepath)
-        subject.delete(filepath)
+        subject.delete_file(filepath)
         assert not os.path.exists(filepath)
 
         # Delete directories
         assert os.path.exists(state_dir)
-        subject.delete(state_dir)
+        subject.delete_file(state_dir)
         assert not os.path.exists(state_dir)
 
         # Swallows FileNotFoundError
-        subject.delete(filepath)
-        subject.delete(state_dir)
+        subject.delete_file(filepath)
+        subject.delete_file(state_dir)
 
     def test_clear(
         self,
@@ -386,10 +386,10 @@ class TestAZStorageStateStoreManager:
         assert subject.state_dir == "state"
 
     @pytest.mark.usefixtures("mock_client")
-    def test_delete(self, subject) -> None:
+    def test_delete(self, subject: AZStorageStateStoreManager) -> None:
         mock_blob_client = MagicMock()
         subject.client.get_blob_client.return_value = mock_blob_client
-        subject.delete("some_path")
+        subject.delete_file("some_path")
         mock_blob_client.delete_blob.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
@@ -565,7 +565,7 @@ class TestS3StateStoreManager:
                     "Delete": {"Objects": [{"Key": "/state/test_delete"}]},
                 },
             )
-            subject.delete("/state/test_delete")
+            subject.delete_file("/state/test_delete")
 
     def test_get_state_ids(self, subject: S3StateStoreManager) -> None:
         response = {
@@ -736,7 +736,7 @@ class TestGCSStateStoreManager:
         mock_bucket = MagicMock()
         mock_bucket.blob.return_value = mock_blob
         subject.client.bucket.return_value = mock_bucket
-        subject.delete("some_path")
+        subject.delete_file("some_path")
         mock_blob.delete.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
