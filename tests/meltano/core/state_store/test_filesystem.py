@@ -198,6 +198,12 @@ class TestLocalFilesystemStateStoreManager:
                 json.dumps(expected_state),
             )
 
+    def test_get_nonexistent_state(
+        self,
+        subject: _LocalFilesystemStateStoreManager,
+    ) -> None:
+        assert subject.get("nonexistent") is None
+
     def test_update(
         self,
         subject: _LocalFilesystemStateStoreManager,
