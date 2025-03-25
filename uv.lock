@@ -1403,7 +1403,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.35,<3" },
     { name = "structlog", specifier = ">=25.1.0,<26" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
-    { name = "tzlocal", specifier = "~=5.2" },
+    { name = "tzlocal", specifier = "~=5.3" },
     { name = "urllib3", marker = "python_full_version < '3.10'", specifier = "<2" },
     { name = "uv", specifier = ">=0.1.24,<0.7" },
     { name = "virtualenv", specifier = ">=20.26.6,<21" },

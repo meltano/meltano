@@ -59,7 +59,7 @@ dependencies = [
   "sqlalchemy>=2.0.35,<3",
   "structlog>=25.1.0,<26",
   "typing-extensions>=4.12.2,<5",
-  "tzlocal~=5.2",
+  "tzlocal~=5.3",
   # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
   "urllib3<2 ; python_version < '3.10'",
   "uv>=0.1.24,<0.7",
