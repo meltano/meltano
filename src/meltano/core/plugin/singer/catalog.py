@@ -24,7 +24,7 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 Node = dict[str, t.Any]
-T = t.TypeVar("T", bound="CatalogRule")
+T = t.TypeVar("T", bound="_CatalogRuleProtocol")
 
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
