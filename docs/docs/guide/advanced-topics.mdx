@@ -5,12 +5,33 @@ layout: doc
 sidebar_position: 10
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 ## Installing Optional Components
 
 Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras).
 
-* Example install via `uv` as a tool: `uv tool install --from meltano\[postgres\] meltano`
-* Example install via `uv` as a package `uv add meltano\[postgres\]`
+<Tabs className="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="uv" label="uv" default>
+
+  For example, to install Meltano with the `postgres` component, you can use the following command:
+
+  ```
+  uv tool install --from "meltano[postgres]" meltano
+  ```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="pipx" label="pipx">
+
+  For example, to install Meltano with the `postgres` component, you can use the following command:
+
+  ```
+  pipx install "meltano[postgres]"
+  ```
+
+  </TabItem>
+</Tabs>
 
 ### System Database
 
