@@ -9,6 +9,9 @@ sidebar_position: 10
 
 Most of Meltano's features are available without installing any additional packages. However, some niche or environment-specific features require the installation of [Python extras](https://peps.python.org/pep-0508/#extras).
 
+* Example install via `uv` as a tool: `uv tool install --from meltano\[postgres\] meltano`
+* Example install via `uv` as a package `uv add meltano\[postgres\]`
+
 ### System Database
 
 The following extras add support for different [system database](/concepts/project/#system-database) types, which function as the default [state backend](/concepts/state_backends):
@@ -16,6 +19,8 @@ The following extras add support for different [system database](/concepts/proje
 - `mssql` - Microsoft SQL Server.
 - `psycopg2` - PostgreSQL. It uses the legacy `psycopg2` driver.
 - `postgres` - PostgreSQL. It uses the modern `psycopg` driver.
+
+To use these system databases, Meltano must be installed with the matching [optional component](#installing-optional-components)
 
 ### State backends
 
