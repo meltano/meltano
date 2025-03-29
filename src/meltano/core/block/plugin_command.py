@@ -29,7 +29,11 @@ logger = structlog.getLogger(__name__)
 class PluginCommandBlock(metaclass=ABCMeta):
     """Basic PluginCommand interface specification."""
 
-    string_id: str
+    @property
+    @abstractmethod
+    def string_id(self) -> str:
+        """String identifier for this block."""
+        raise NotImplementedError
 
     @property
     @abstractmethod
@@ -60,11 +64,11 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         self,
         name: str,
         log: SubprocessOutputWriter,
-        block_ctx: dict,
+        block_ctx: PluginContext,
         project: Project,
         plugin_invoker: PluginInvoker,
         command: str | None,
-        command_args: tuple[str],
+        command_args: t.Sequence[str] | None,
     ):
         """Configure and return a wrapped plugin invoker.
 
@@ -107,7 +111,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         return self._command
 
     @property
-    def command_args(self) -> str | None:
+    def command_args(self) -> t.Sequence[str] | None:
         """Get the command args to use when invoking the plugin.
 
         Returns:
@@ -116,7 +120,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         return self._command_args
 
     async def _start(self) -> None:
-        invoke_args = (self.command_args,) if self.command_args else ()
+        invoke_args = self.command_args or ()
         await self.start(*invoke_args)
 
     async def run(self) -> None:
@@ -139,7 +143,7 @@ class InvokerCommand(InvokerBase, PluginCommandBlock):
         finally:
             self.context.session.close()
         if exitcode := self.process_future.result():
-            command = self.command or self.command_args[0]
+            command = self.command or self.command_args[0]  # type: ignore[index]
             raise RunnerError(
                 f"`{self.name} {command}` failed with exit code: {exitcode}",  # noqa: EM102
             )
@@ -149,7 +153,7 @@ def plugin_command_invoker(
     plugin: ProjectPlugin,
     project: Project,
     command: str | None,
-    command_args: list[str] | None = None,
+    command_args: t.Sequence[str] | None = None,
     run_dir: Path | None = None,
 ) -> InvokerCommand:
     """Make an InvokerCommand from a plugin.

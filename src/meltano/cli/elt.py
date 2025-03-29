@@ -427,12 +427,12 @@ async def dump_file(context_builder, dumpable) -> None:  # noqa: ANN001
 async def _run_job(
     tracker,  # noqa: ANN001
     project,  # noqa: ANN001
-    job,  # noqa: ANN001
+    job: Job,
     session,  # noqa: ANN001
     context_builder,  # noqa: ANN001
     install_plugins: InstallPlugins,
     *,
-    force=False,  # noqa: ANN001
+    force: bool = False,
 ) -> None:
     fail_stale_jobs(session, job.job_name)
 
