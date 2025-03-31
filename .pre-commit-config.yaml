@@ -28,7 +28,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.3
+    rev: 0.32.1
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
@@ -50,7 +50,7 @@ repos:
         exclude: ^integration/mdsh$
 
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.55.0 # Keep this in sync with the eslint "additional_dependency" below!
+    rev: v9.23.0 # Keep this in sync with the eslint "additional_dependency" below!
     hooks:
       - id: eslint
         files: \.[jt]sx?$
@@ -71,6 +71,6 @@ repos:
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.9
+    rev: 0.6.11
     hooks:
       - id: uv-lock
