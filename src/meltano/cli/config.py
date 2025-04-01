@@ -483,6 +483,7 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     )
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
+    safe: bool = ctx.obj["safe"]
 
     path = list(setting_name)
     try:
@@ -498,7 +499,11 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
         fg="green",
     )
 
-    current_value, current_metadata = settings.get_with_metadata(name, session=session)
+    current_value, current_metadata = settings.get_with_metadata(
+        name,
+        session=session,
+        redacted=safe,
+    )
     if (source := current_metadata["source"]) is not SettingValueStore.DEFAULT:
         click.secho(
             f"Current value is now: {current_value!r} "
