@@ -36,6 +36,18 @@ logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+REGEX_ISO8601 = (
+    r"^(\d{4})-"
+    r"(0[1-9]|1[0-2])-"
+    r"(0[1-9]|[12]\d|3[01])"
+    r"(?:[ T]"
+    r"([01]\d|2[0-3]):"
+    r"([0-5]\d):"
+    r"([0-5]\d)"
+    r"(?:\.(\d+))?"
+    r")?"
+    r"(Z|[+-](?:0\d|1[0-2]):(?:00|30))?$"
+)
 
 
 class NotFound(Exception):
@@ -893,6 +905,9 @@ def parse_date(date_string: str) -> str:
     Returns:
         The datetime object corresponding to the parsed date string.
     """
+    if re.match(REGEX_ISO8601, date_string):
+        return date_string
+
     if _parsed := dateparser.parse(
         date_string,
         settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},

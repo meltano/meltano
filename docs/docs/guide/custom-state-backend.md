@@ -9,6 +9,7 @@ To create a custom state backend for Meltano, you need to implement the `StateSt
 
 ```python
 # my_state_manager/backend.py
+from contextlib import contextmanager
 from urllib.parse import urlparse
 
 from meltano.core.error import MeltanoError
@@ -80,6 +81,13 @@ class MyStateManager(StateStoreManager):
 
     def get_state_ids(self) -> list[str]:
         # Implement the logic to retrieve the list of state IDs from your custom backend
+
+    @contextmanager
+    def acquire_lock(self, state_id: str, *, retry_seconds: int = 1):
+        # Implement the logic to acquire a lock for the given state ID
+        # This method should be a context manager that acquires the lock
+        # and releases it when the context exits.
+        yield
 ```
 
 To let Meltano know about your custom state manager, you need to add the following configuration to your `pyproject.toml`:

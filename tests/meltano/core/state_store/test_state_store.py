@@ -197,11 +197,11 @@ class TestGCSStateBackend:
             monkeypatch.context() as m,
         ):
             m.setattr(Blob, "delete", _not_found)
-            manager.delete(file_path)
+            manager.delete_file(file_path)
 
             m.setattr(Blob, "delete", _other_error)
             with pytest.raises(RuntimeError, match="Something went wrong"):
-                manager.delete(file_path)
+                manager.delete_file(file_path)
 
     @pytest.mark.parametrize(
         ("components", "result"),
