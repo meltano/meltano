@@ -145,7 +145,7 @@ class TestLocalFilesystemStateStoreManager:
         state_path,
     ) -> None:
         dir_path = os.path.join(state_path, encode_if_on_windows("acquire_lock"))
-        with subject.acquire_lock("acquire_lock"):
+        with subject.acquire_lock("acquire_lock", retry_seconds=1):
             assert os.path.exists(os.path.join(dir_path, "lock"))
 
     def test_lock_timeout(self, subject: _LocalFilesystemStateStoreManager) -> None:
@@ -155,7 +155,7 @@ class TestLocalFilesystemStateStoreManager:
         initial_dt = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
         with (
             time_machine.travel(initial_dt) as frozen_datetime,
-            subject.acquire_lock(state_id),
+            subject.acquire_lock(state_id, retry_seconds=1),
         ):
             frozen_datetime.shift(datetime.timedelta(seconds=timeout / 2))
             assert subject.is_locked(state_id)
@@ -198,14 +198,20 @@ class TestLocalFilesystemStateStoreManager:
                 json.dumps(expected_state),
             )
 
-    def test_set(
+    def test_get_nonexistent_state(
+        self,
+        subject: _LocalFilesystemStateStoreManager,
+    ) -> None:
+        assert subject.get("nonexistent") is None
+
+    def test_update(
         self,
         subject: _LocalFilesystemStateStoreManager,
         state_path,
         state_ids_with_expected_states,
     ) -> None:
         for state_id, expected_state in state_ids_with_expected_states:
-            subject.set(
+            subject.update(
                 MeltanoState.from_json(
                     state_id,
                     json.dumps({"completed": expected_state}),
@@ -220,37 +226,34 @@ class TestLocalFilesystemStateStoreManager:
                     json.dumps({"completed": expected_state}),
                 ) == MeltanoState.from_file(state_id, state_file)
 
-    def test_set_partial_state(
+    def test_update_partial_state(
         self,
         subject: _LocalFilesystemStateStoreManager,
-        state_path: str,
         state_ids_with_expected_states,
     ) -> None:
-        def _get_state_path(state_id: str) -> str:
-            return os.path.join(
-                state_path,
-                encode_if_on_windows(state_id),
-                "state.json",
-            )
-
         def _seed_state(state_id: str, state: dict) -> None:
-            state_file = Path(_get_state_path(state_id))
+            state_file = Path(subject.get_state_path(state_id))
             state_file.parent.mkdir(parents=True, exist_ok=True)
-            state_file.write_text(json.dumps({"partial": state}))
+            state_file.write_text(json.dumps({"completed": state}))
 
         for state_id, expected_state in state_ids_with_expected_states:
             _seed_state(state_id, expected_state)
-            subject.set(
+            subject.update(
                 MeltanoState.from_json(
                     state_id,
                     json.dumps({"partial": expected_state}),
                 ),
             )
         for state_id, expected_state in state_ids_with_expected_states:
-            with open(_get_state_path(state_id)) as state_file:
+            with open(subject.get_state_path(state_id)) as state_file:
                 assert MeltanoState.from_json(
                     state_id,
-                    json.dumps({"partial": expected_state}),
+                    json.dumps(
+                        {
+                            "partial": expected_state,
+                            "completed": expected_state,
+                        }
+                    ),
                 ) == MeltanoState.from_file(state_id, state_file)
 
     def test_delete(
@@ -267,17 +270,17 @@ class TestLocalFilesystemStateStoreManager:
         with open(filepath, "w+") as state_file:
             json.dump(expected_state, state_file)
         assert os.path.exists(filepath)
-        subject.delete(filepath)
+        subject.delete_file(filepath)
         assert not os.path.exists(filepath)
 
         # Delete directories
         assert os.path.exists(state_dir)
-        subject.delete(state_dir)
+        subject.delete_file(state_dir)
         assert not os.path.exists(state_dir)
 
         # Swallows FileNotFoundError
-        subject.delete(filepath)
-        subject.delete(state_dir)
+        subject.delete_file(filepath)
+        subject.delete_file(state_dir)
 
     def test_clear(
         self,
@@ -310,9 +313,9 @@ class TestLocalFilesystemStateStoreManager:
                 json.dump(expected_state, state_file)
 
         initial_count = len(state_ids_with_expected_states)
-        assert len(os.listdir(state_path)) == initial_count
+        assert len(list(Path(state_path).iterdir())) == initial_count
         assert subject.clear_all() == initial_count
-        assert len(os.listdir(state_path)) == 0
+        assert len(list(Path(state_path).iterdir())) == 0
 
 
 class TestAZStorageStateStoreManager:
@@ -386,10 +389,10 @@ class TestAZStorageStateStoreManager:
         assert subject.state_dir == "state"
 
     @pytest.mark.usefixtures("mock_client")
-    def test_delete(self, subject) -> None:
+    def test_delete(self, subject: AZStorageStateStoreManager) -> None:
         mock_blob_client = MagicMock()
         subject.client.get_blob_client.return_value = mock_blob_client
-        subject.delete("some_path")
+        subject.delete_file("some_path")
         mock_blob_client.delete_blob.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")
@@ -479,7 +482,7 @@ class TestS3StateStoreManager:
             store_manager.client.create_bucket(Bucket=store_manager.bucket)
             store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
 
-    def test_set_fail_object_in_glacier(
+    def test_update_fail_object_in_glacier(
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -499,13 +502,18 @@ class TestS3StateStoreManager:
                 StorageClass="GLACIER",
             )
             with pytest.raises(OSError, match="unable to access") as exc_info:
-                store_manager.set(MeltanoState(state_id=state_id, completed_state={}))
+                store_manager.update(
+                    MeltanoState(
+                        state_id=state_id,
+                        completed_state={},
+                    )
+                )
 
             exc = exc_info.value
             assert isinstance(exc.__cause__, botocore.exceptions.ClientError)
             assert exc.__cause__.response["Error"]["Code"] == "InvalidObjectState"
 
-    def test_set_fail_bucket_does_not_exist(
+    def test_update_fail_bucket_does_not_exist(
         self,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -517,7 +525,12 @@ class TestS3StateStoreManager:
                 lock_timeout_seconds=10,
             )
             with pytest.raises(botocore.exceptions.ClientError) as exc_info:
-                store_manager.set(MeltanoState(state_id="state-id", completed_state={}))
+                store_manager.update(
+                    MeltanoState(
+                        state_id="state-id",
+                        completed_state={},
+                    )
+                )
 
             assert exc_info.value.response["Error"]["Code"] == "NoSuchBucket"
 
@@ -555,7 +568,7 @@ class TestS3StateStoreManager:
                     "Delete": {"Objects": [{"Key": "/state/test_delete"}]},
                 },
             )
-            subject.delete("/state/test_delete")
+            subject.delete_file("/state/test_delete")
 
     def test_get_state_ids(self, subject: S3StateStoreManager) -> None:
         response = {
@@ -726,7 +739,7 @@ class TestGCSStateStoreManager:
         mock_bucket = MagicMock()
         mock_bucket.blob.return_value = mock_blob
         subject.client.bucket.return_value = mock_bucket
-        subject.delete("some_path")
+        subject.delete_file("some_path")
         mock_blob.delete.assert_called_once()
 
     @pytest.mark.usefixtures("mock_client")

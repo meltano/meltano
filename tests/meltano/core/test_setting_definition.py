@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from meltano.core.setting_definition import SettingDefinition, SettingKind
+from meltano.core.utils import REGEX_ISO8601, parse_date
 
 
 class TestSettingDefinition:
@@ -71,6 +74,53 @@ class TestSettingDefinition:
         assert setting_definition.cast_value(None) is None
         with pytest.raises(ValueError, match="is not a valid choice"):
             setting_definition.cast_value("def")
+
+    @pytest.mark.parametrize(
+        ("setting_definition"),
+        (
+            pytest.param(
+                SettingDefinition(name="test_setting", kind=SettingKind.DATE_ISO8601),
+                id="date_iso8601",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    name="test_setting",
+                    kind=SettingKind.STRING,
+                    value_post_processor="parse_date",
+                ),
+                id="string_parse_date",
+            ),
+            pytest.param(
+                SettingDefinition(
+                    name="test_setting",
+                    kind=SettingKind.STRING,
+                    value_post_processor=parse_date,
+                ),
+                id="string_parse_date_callable",
+            ),
+        ),
+    )
+    def test_post_process_parse_date(
+        self,
+        setting_definition: SettingDefinition,
+    ) -> None:
+        post_process = setting_definition.post_process_value
+        assert post_process(None) is None
+        assert post_process("not a date") == "not a date"
+
+        datetime_with_offset = "2021-01-01T00:00:00+00:00"
+        assert post_process(datetime_with_offset) == datetime_with_offset
+
+        datetime_with_z = "2021-01-01T00:00:00Z"
+        assert post_process(datetime_with_z) == datetime_with_z
+
+        datetime_with_space = "2021-01-01 00:00:00"
+        assert post_process(datetime_with_space) == datetime_with_space
+
+        date_only = "2021-01-01"
+        assert post_process(date_only) == date_only
+
+        assert re.match(REGEX_ISO8601, post_process("3 days ago, UTC"))
 
     @pytest.mark.parametrize(
         ("setting_definition", "sensitive", "kind"),

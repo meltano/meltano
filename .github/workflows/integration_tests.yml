@@ -6,8 +6,8 @@ on:
       - src/**
       - integration/example-library/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/integration_tests.yml
       - .github/workflows/resources/constraints.txt
   push:
@@ -16,8 +16,8 @@ on:
       - src/**
       - integration/example-library/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/integration_tests.yml
       - .github/workflows/resources/constraints.txt
   workflow_dispatch:
@@ -48,33 +48,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
-
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        poetry --version
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Setup Python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+      id: setup-python
       with:
         python-version: ${{ matrix.python || '3.12' }}
         architecture: x64
-        cache: 'poetry'
 
-    - name: Upgrade pip
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pip install pip
-        pip --version
+    - name: Setup uv
+      uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      with:
+        version: ">=0.6"
 
     - name: Install Dependencies
+      env:
+        UV_PYTHON: ${{ steps.setup-python.outputs.python-path }}
       run: |
-        poetry env use "${{ matrix.python || '3.12' }}"
-        poetry install --extras "s3"
+        uv sync --extra "s3"
 
     - name: Start Postgres Container
       if: always() && (matrix.needs_postgres == true)
@@ -92,5 +84,4 @@ jobs:
 
     - name: Run integration tests
       run: |
-        poetry env use "${{ matrix.python || '3.12' }}"
-        poetry run bash integration/validate.sh ${{ matrix.integration_test }}
+        uv run bash integration/validate.sh ${{ matrix.integration_test }}

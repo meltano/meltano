@@ -34,7 +34,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/tap-gitlab.git",
                                 },
                                 {
                                     "name": "tap-gitlab--child-1",
@@ -45,7 +45,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "target-csv",
                                     "namespace": "target_csv",
-                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                    "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
                                 },
                             ],
                         },
@@ -182,7 +182,7 @@ class TestPluginInstallService:
                                 {
                                     "name": "tap-gitlab",
                                     "namespace": "tap_gitlab",
-                                    "pip_url": "'tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git' python-json-logger",  # noqa: E501
+                                    "pip_url": "'tap-gitlab @ git+https://github.com/MeltanoLabs/tap-gitlab.git' python-json-logger",  # noqa: E501
                                 },
                             ],
                         },
@@ -192,7 +192,7 @@ class TestPluginInstallService:
         project.refresh()
         plugin = next(project.plugins.plugins())
         assert get_pip_install_args(project, plugin) == [
-            "tap-gitlab @ git+https://gitlab.com/meltano/tap-gitlab.git",
+            "tap-gitlab @ git+https://github.com/MeltanoLabs/tap-gitlab.git",
             "python-json-logger",
         ]
 

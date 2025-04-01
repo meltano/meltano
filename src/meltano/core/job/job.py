@@ -300,6 +300,7 @@ class Job(SystemModel):
     def start(self) -> None:
         """Mark the job has having started."""
         self.started_at = datetime.now(timezone.utc)
+        self._heartbeat()
         self.transit(State.RUNNING)
 
     def fail(self, error: t.Any | None = None) -> None:  # noqa: ANN401

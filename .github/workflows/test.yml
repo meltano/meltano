@@ -6,8 +6,8 @@ on:
       - src/**
       - tests/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
@@ -17,8 +17,8 @@ on:
       - src/**
       - tests/**
       - noxfile.py
-      - poetry.lock
       - pyproject.toml
+      - uv.lock
       - .github/workflows/test.yml
       - .github/workflows/resources/constraints.txt
       - .github/workflows/resources/docker-compose.mssql.yaml
@@ -28,6 +28,10 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+  UV_PYTHON_DOWNLOADS: "never"
 
 jobs:
   tests:
@@ -98,40 +102,27 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
-      FORCE_COLOR: 1
       NOXFORCEPYTHON: ${{ matrix.python-version }}
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
-
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
       with:
         python-version: ${{ matrix.python-version }}
         architecture: x64
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
         check-latest: true
         allow-prereleases: true
 
     - name: Set up Docker Buildx
       if: always() && (matrix.backend-db == 'mssql')
-      uses: docker/setup-buildx-action@v3.9.0
+      uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
 
     - name: Get Docker
       if: always() && (matrix.backend-db == 'mssql')
-      uses: actions-hub/docker/cli@v1.0.3
+      uses: actions-hub/docker/cli@f5fdbfc3f9d2a9265ead8962c1314108a7b7ec5d # v1.0.3
       env:
         SKIP_LOGIN: true
 
@@ -149,12 +140,16 @@ jobs:
       run: |
         docker ps -a
 
+    - name: Setup uv
+      uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      with:
+        version: ">=0.6"
+
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Run pytest
       env:
@@ -203,7 +198,7 @@ jobs:
 
     - name: Upload coverage data
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         include-hidden-files: true
         name: coverage-data-${{ matrix.id }}
@@ -211,7 +206,7 @@ jobs:
 
     - name: Upload test logs
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: test-logs-${{ matrix.id }}
         path: pytest.log
@@ -260,37 +255,29 @@ jobs:
     needs: tests
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
-
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Set up Python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
       with:
-        python-version: "3.13"
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        python-version: "3.x"
 
     - name: Download coverage data
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       with:
         pattern: coverage-data-*
         merge-multiple: true
 
+    - name: Setup uv
+      uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      with:
+        version: ">=0.6"
+
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Combine coverage data and display human readable report
       run: |
@@ -306,41 +293,31 @@ jobs:
         fail_ci_if_error: true
         files: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
-      uses: codecov/codecov-action@v5.3.1
+      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
 
   mypy:
     name: "Static type checking"
     runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v4.2.2
-
-    - name: Install Poetry
-      env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-      run: |
-        pipx install poetry
-        pipx inject poetry poetry-plugin-export
-        poetry --version
-        poetry self show plugins
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Setup Python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
       with:
-        python-version: "3.13"
-        # Nox uses pip, so we cache with pip
-        cache: 'pip'
-        cache-dependency-path: 'poetry.lock'
+        python-version: "3.x"
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      with:
+        version: ">=0.6"
 
     - name: Install Nox
       env:
-        PIP_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+        UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
       run: |
-        pipx install nox
-        pipx inject nox nox-poetry
+        uv tool install nox
 
     - name: Run mypy
       run: |

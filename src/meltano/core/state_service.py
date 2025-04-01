@@ -153,7 +153,7 @@ class StateService:
             partial_state=partial_state,
             completed_state=completed_state,
         )
-        self.state_store_manager.set(job_state)
+        self.state_store_manager.update(job_state)
 
     def get_state(self, state_id: str) -> dict:
         """Get state for the given state_id.
