@@ -148,7 +148,7 @@ class AZStorageStateStoreManager(CloudStateStoreManager):
                 "Read https://learn.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string for more information.",  # noqa: E501
             )
 
-    def delete(self, file_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:

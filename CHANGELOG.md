@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.1 (2025-03-26)
+
+### 🐛 Fixes
+
+- [#9173](https://github.com/meltano/meltano/issues/9173) Avoid parsing valid ISO 8601 strings
+
+### 📦 Packaging changes
+
+- [#9171](https://github.com/meltano/meltano/issues/9171) Bump `tzlocal` to 5.3
+
+## v3.7.0 (2025-03-25)
+
+### ✨ New
+
+- [#9158](https://github.com/meltano/meltano/issues/9158) Pass project `env` to installation environment
+- [#9119](https://github.com/meltano/meltano/issues/9119) Parse relative dates in plugin config
+- [#9019](https://github.com/meltano/meltano/issues/9019) Set `application/json` as the content type for blobs uploaded with the GCS state backend
+- [#8367](https://github.com/meltano/meltano/issues/8367) Support state backend and setting add-ons
+- [#9047](https://github.com/meltano/meltano/issues/9047) Added a default Meltano User-Agent env var that plugins can refer to in config
+- [#9077](https://github.com/meltano/meltano/issues/9077) Pass a default logging configuration for Pipelinewise and Singer SDK extractors, loaders and mappers
+- [#9046](https://github.com/meltano/meltano/issues/9046) The `process` key containing the process ID for a Meltano invocation is now added to logs when `callsite_parameters: true` is used
+- [#9018](https://github.com/meltano/meltano/issues/9018) Add descriptions to Meltano's internal settings
+- [#8975](https://github.com/meltano/meltano/issues/8975) Added a `--log-format` option as a shorcut to quickly change the format of logs
+- [#8991](https://github.com/meltano/meltano/issues/8991) Uv venv backend is no longer experimental
+- [#8951](https://github.com/meltano/meltano/issues/8951) Add a simple log formatter that only contains the event by default
+
+### 🐛 Fixes
+
+- [#9162](https://github.com/meltano/meltano/issues/9162) Stringify YAML values from top-level `env` key of `meltano.yml`
+- [#9153](https://github.com/meltano/meltano/issues/9153) Display catalog file contents when it cannot be parsed as valid JSON
+- [#9148](https://github.com/meltano/meltano/issues/9148) Send first heartbeat when initializing job
+- [#9117](https://github.com/meltano/meltano/issues/9117) Avoid prepending a slash to state file path in Cloud state backends
+- [#9045](https://github.com/meltano/meltano/issues/9045) Added help to `--extras` option of `meltano config ... list`
+- [#9035](https://github.com/meltano/meltano/issues/9035) Limit boto3 to < 1.36 to fix incompatibility with Minio (S3-compatible state backend)
+- [#9003](https://github.com/meltano/meltano/issues/9003) Disable local variables by default in JSON logs
+- [#8973](https://github.com/meltano/meltano/issues/8973) Print the time when the job will go stale if no more heartbeats are sent
+
+### ⚙️ Under the Hood
+
+- [#9165](https://github.com/meltano/meltano/issues/9165) Refactor base state backend so that a lock is always acquired when supported
+- [#9000](https://github.com/meltano/meltano/issues/9000) Use `anyio` to open `pathlib.Path` instances
+- [#8972](https://github.com/meltano/meltano/issues/8972) Enable Ruff `ASYNC` rules, open files with `anyio` and run subprocess with `asyncio.create_subprocess_exec` in async contexts
+
+### 📚 Documentation Improvements
+
+- [#9116](https://github.com/meltano/meltano/issues/9116) Mention `meltano schedule run` whenever we discuss `meltano schedule`
+- [#9115](https://github.com/meltano/meltano/issues/9115) Document common `metadata` keys
+- [#9109](https://github.com/meltano/meltano/issues/9109) Updated the contributing guide
+- [#9084](https://github.com/meltano/meltano/issues/9084) Use `meltano-map-transform` PyPI distribution in examples
+- [#9069](https://github.com/meltano/meltano/issues/9069) Update plugin development guide to use uv
+- [#9055](https://github.com/meltano/meltano/issues/9055) Update CLI examples to use `tap-shopify`
+- [#9048](https://github.com/meltano/meltano/issues/9048) Document `plain` option of `cli.log_format`
+- [#9011](https://github.com/meltano/meltano/issues/9011) Fixed small indent issue in mapper YAML example
+- [#8992](https://github.com/meltano/meltano/issues/8992) Added 2024-Q4 changelog
+- [#8983](https://github.com/meltano/meltano/issues/8983) Use a different repo in part 1 of Getting Started guide -- _**Thanks @martinburch!**_
+- [#8969](https://github.com/meltano/meltano/issues/8969) Document `database_uri` examples for supported backends
+- [#8961](https://github.com/meltano/meltano/issues/8961) Change to code theme that does not italicize keywords or variables -- _**Thanks @ReubenFrankel!**_
+
+### 📦 Packaging changes
+
+- [#9139](https://github.com/meltano/meltano/issues/9139) Switch to uv 🚀
+- [#9092](https://github.com/meltano/meltano/issues/9092) Bump psutil from 6.1.1 to 7.0.0
+- [#9089](https://github.com/meltano/meltano/issues/9089) Bump `check-jsonschema` and `ruamel.yaml`
+- [#9088](https://github.com/meltano/meltano/issues/9088) Always install `uv` with Meltano
+- [#9032](https://github.com/meltano/meltano/issues/9032) Bump structlog from 24.4.0 to 25.1.0
+- [#8980](https://github.com/meltano/meltano/issues/8980) Bump croniter from 5.0.1 to 6.0.0
+- [#8979](https://github.com/meltano/meltano/issues/8979) Bump the runtime-dependencies group with 6 updates
+- [#8981](https://github.com/meltano/meltano/issues/8981) Bump jinja2 from 3.1.4 to 3.1.5
+- [#8968](https://github.com/meltano/meltano/issues/8968) Bump the runtime-dependencies group with 2 updates
+
 ## v3.6.0 (2024-12-09)
 
 ### ✨ New

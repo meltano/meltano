@@ -1345,6 +1345,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "cbrammer",
+      "name": "cbrammer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218004?v=4",
+      "profile": "https://github.com/cbrammer",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -128,7 +128,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             },
         }
 
-    def delete(self, file_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:

@@ -168,7 +168,7 @@ class S3StateStoreManager(CloudStateStoreManager):
             session = boto3.Session()
             return session.client("s3")
 
-    def delete(self, file_path: str) -> None:
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
