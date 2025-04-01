@@ -1,12 +1,16 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import mock
 import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+
+if t.TYPE_CHECKING:
+    from tests.fixtures.cli import MeltanoCliRunner
 
 
 class TestCliJob:
@@ -96,6 +100,23 @@ class TestCliJob:
             )
             assert res.exit_code == 1
             assert "Failed to parse yaml" in str(res.exception)
+
+    @pytest.mark.usefixtures("session", "tap", "target")
+    def test_job_add_invalid(self, cli_runner: MeltanoCliRunner) -> None:
+        """Add a job with an invalid EL block should raise an error."""
+        res = cli_runner.invoke(
+            cli,
+            [
+                "job",
+                "add",
+                "job-mock-bad-el",
+                "--tasks",
+                '["target-mock tap-mock"]',
+            ],
+            catch_exceptions=True,
+        )
+        assert res.exit_code == 1
+        assert "Job 'job-mock-bad-el' has invalid task" in str(res.exception)
 
     @pytest.mark.usefixtures("session", "project")
     def test_job_set(self, cli_runner, task_sets_service) -> None:

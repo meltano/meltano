@@ -6,7 +6,7 @@
   "label": "Meltano Map Transformer",
   "docs": "https://hub.meltano.com/mappers/meltano-map-transformer--meltano",
   "repo": "https://github.com/MeltanoLabs/meltano-map-transform",
-  "pip_url": "git+https://github.com/MeltanoLabs/meltano-map-transform.git",
+  "pip_url": "meltano-map-transform",
   "executable": "meltano-map-transform",
   "description": "A map transformer which implements the Stream Maps capability from Meltano's tap and target SDK.",
   "logo_url": "https://hub.meltano.com/assets/logos/mappers/meltano.png",

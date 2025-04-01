@@ -22,6 +22,7 @@ from functools import reduce
 from operator import setitem
 from pathlib import Path
 
+import dateparser
 import flatten_dict
 import structlog
 from requests.auth import HTTPBasicAuth
@@ -35,6 +36,18 @@ logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+REGEX_ISO8601 = (
+    r"^(\d{4})-"
+    r"(0[1-9]|1[0-2])-"
+    r"(0[1-9]|[12]\d|3[01])"
+    r"(?:[ T]"
+    r"([01]\d|2[0-3]):"
+    r"([0-5]\d):"
+    r"([0-5]\d)"
+    r"(?:\.(\d+))?"
+    r")?"
+    r"(Z|[+-](?:0\d|1[0-2]):(?:00|30))?$"
+)
 
 
 class NotFound(Exception):
@@ -612,7 +625,7 @@ def human_size(num, suffix="B") -> str:  # noqa: ANN001
     Returns:
         File size in human-readable format
     """
-    magnitude = int(math.floor(math.log(num, 1024)))
+    magnitude = math.floor(math.log(num, 1024))
     val = num / math.pow(1024, magnitude)
 
     if magnitude == 0:
@@ -881,3 +894,24 @@ def sanitize_filename(filename: str) -> str:
         _sanitize_filename_transformations,
         filename,
     )
+
+
+def parse_date(date_string: str) -> str:
+    """Parse a relative date string into a datetime object.
+
+    Args:
+        date_string: A relative date string that can be parsed by `dateparser`.
+
+    Returns:
+        The datetime object corresponding to the parsed date string.
+    """
+    if re.match(REGEX_ISO8601, date_string):
+        return date_string
+
+    if _parsed := dateparser.parse(
+        date_string,
+        settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},
+    ):
+        return _parsed.isoformat()
+
+    return date_string

@@ -6,10 +6,15 @@ import typing as t
 from contextlib import contextmanager
 from functools import cached_property
 
+import structlog.stdlib
+
+from meltano.core.setting_definition import SettingDefinition, SettingKind
 from meltano.core.state_store.filesystem import CloudStateStoreManager
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+logger = structlog.stdlib.get_logger(__name__)
 
 GOOGLE_INSTALLED = True
 
@@ -44,6 +49,18 @@ def requires_gcs() -> Generator[None, None, None]:
     if not GOOGLE_INSTALLED:
         raise MissingGoogleError
     yield
+
+
+APPLICATION_CREDENTIALS = SettingDefinition(
+    name="state_backend.gcs.application_credentials",
+    label="Application Credentials",
+    description=(
+        "Path to the credential file to use in authenticating to Google Cloud Storage"
+    ),
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
 
 
 class GCSStateStoreManager(CloudStateStoreManager):
@@ -102,7 +119,16 @@ class GCSStateStoreManager(CloudStateStoreManager):
             # Use default authentication in environment
             return google.cloud.storage.Client()
 
-    def delete(self, file_path: str) -> None:
+    @property
+    def extra_transport_params(self) -> dict[str, t.Any]:
+        """Extra transport params for ``smart_open.open``."""
+        return {
+            "blob_properties": {
+                "content_type": "application/json",
+            },
+        }
+
+    def delete_file(self, file_path: str) -> None:
         """Delete the file/blob at the given path.
 
         Args:
@@ -117,7 +143,7 @@ class GCSStateStoreManager(CloudStateStoreManager):
             blob.delete()
         except Exception as e:
             if self.is_file_not_found_error(e):
-                ...
+                logger.debug("File not found: %s", file_path, exc_info=e)
             else:
                 raise e
 

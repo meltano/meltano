@@ -193,12 +193,12 @@ class Manifest:
             deep_merge(
                 yaml.load(
                     self._meltano_file,
-                    t.cast(type[yaml.SafeLoader], YamlNoTimestampSafeLoader),  # noqa: S506
+                    t.cast("type[yaml.SafeLoader]", YamlNoTimestampSafeLoader),  # noqa: S506
                 ),
                 *(
                     yaml.load(
                         x.read_text(),
-                        t.cast(type[yaml.SafeLoader], YamlNoTimestampSafeLoader),  # noqa: S506
+                        t.cast("type[yaml.SafeLoader]", YamlNoTimestampSafeLoader),  # noqa: S506
                     )
                     for x in self.project.project_files.include_paths
                 ),
@@ -219,7 +219,7 @@ class Manifest:
         manifest: dict[str, t.Any],
     ) -> None:
         locked_plugins = t.cast(
-            dict[str, list[Mapping[str, t.Any]]],
+            "dict[str, list[Mapping[str, t.Any]]]",
             {
                 plugin_type.value: [
                     PluginLock(self.project, plugin).load(create=True, loader=json.load)

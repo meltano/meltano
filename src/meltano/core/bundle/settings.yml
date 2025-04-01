@@ -68,34 +68,6 @@ settings:
   env_specific: true
   description: Number of seconds that a Meltano should wait if trying to access or modify state for a state ID that is locked
 
-## Azure state backend
-- name: state_backend.azure.connection_string
-  sensitive: true
-  env_specific: true
-  description: Connection string for the Azure Blob Storage account
-- name: state_backend.azure.storage_account_url
-  env_specific: true
-  description: URL for the Azure Blob Storage account
-
-## AWS S3 state backend
-- name: state_backend.s3.aws_access_key_id
-  sensitive: true
-  env_specific: true
-  description: AWS access key ID
-- name: state_backend.s3.aws_secret_access_key
-  sensitive: true
-  env_specific: true
-  description: AWS secret access key
-- name: state_backend.s3.endpoint_url
-  env_specific: true
-  description: URL for the AWS S3 or S3-compatible storage service
-
-## GCS state backend
-- name: state_backend.gcs.application_credentials
-  sensitive: true
-  env_specific: true
-  description: Path to the credential file to use in authenticating to Google Cloud Storage
-
 # CLI
 - name: cli.log_level
   kind: options

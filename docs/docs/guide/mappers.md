@@ -90,7 +90,7 @@ This example shows the SDK based meltanolabs variant of tap-github configured to
 ```yaml
   - name: tap-github
     variant: meltanolabs
-    pip_url: git+https://github.com/MeltanoLabs/tap-github.git
+    pip_url: meltanolabs-tap-github
     config:
       stream_maps:
         issues:
@@ -146,7 +146,7 @@ plugins
   mapper:
   - name: meltano-map-transformer
     variant: meltano
-    pip_url: git+https://github.com/MeltanoLabs/meltano-map-transform.git
+    pip_url: meltano-map-transform
     mappings:
     - name: lower
       config:

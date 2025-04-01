@@ -871,6 +871,12 @@ schedules:
    meltano schedule list
    ```
 
+1. Run the schedule manually to confirm it works as expected:
+
+   ```bash
+   meltano schedule run
+   ```
+
 1. Add the [Apache Airflow](https://airflow.apache.org/) utility to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
 
    ```bash

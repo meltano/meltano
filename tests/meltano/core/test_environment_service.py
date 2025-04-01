@@ -4,6 +4,7 @@ import platform
 
 import pytest
 
+from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.environment import (
     Environment,
     EnvironmentNameContainsStateIdDelimiterError,
@@ -12,7 +13,6 @@ from meltano.core.environment_service import (
     EnvironmentAlreadyExistsError,
     EnvironmentService,
 )
-from meltano.core.job_state import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.utils import NotFound
 
 

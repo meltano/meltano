@@ -240,6 +240,8 @@ class SingerTap(SingerPlugin):
             "catalog": "tap.properties.json",
             "catalog_cache_key": "tap.properties.cache_key",
             "state": "state.json",
+            "singer_sdk_logging": "tap.singer_sdk_logging.json",
+            "pipelinewise_singer_logging": "tap.pipelinewise_logging.conf",
         }
 
     @property
@@ -429,6 +431,12 @@ class SingerTap(SingerPlugin):
                 Draft4Validator.check_schema(catalog)
         except Exception as err:
             catalog_path.unlink()
+            if isinstance(err, json.JSONDecodeError):
+                logger.error(
+                    "Invalid JSON: %s [...]",
+                    err.doc[max(err.pos - 9, 0) : err.pos + 10],
+                )
+
             raise PluginExecutionError(
                 f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
             ) from err

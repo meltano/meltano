@@ -400,6 +400,7 @@ class PluginInvoker:
             )
 
         env = {
+            **self.plugin.exec_env(self),
             **expanded_project_env,
             **self.project.dotenv_env,
             **self.settings_service.env,

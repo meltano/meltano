@@ -314,6 +314,28 @@ class TestSingerTap:
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
+        def _set_invalid_catalog(*args, **kwargs):  # noqa: ARG001
+            future = asyncio.Future()
+            future.set_result(catalog_path.write_text('Not JSON {"discovered": true}'))
+            return future
+
+        async with invoker.prepared(session):
+            with mock.patch.object(
+                SingerTap,
+                "run_discovery",
+                side_effect=_set_invalid_catalog,
+            ):
+                with pytest.raises(
+                    PluginExecutionError,
+                    match="Catalog discovery failed",
+                ) as exc_info:
+                    await subject.discover_catalog(invoker)
+
+                cause = exc_info.value.__cause__
+                assert isinstance(cause, json.JSONDecodeError)
+                assert cause.doc == 'Not JSON {"discovered": true}'
+                assert cause.pos == 0
+
     @pytest.mark.asyncio
     async def test_discover_catalog_custom(
         self,
@@ -1095,8 +1117,8 @@ class TestSingerTap:
         work.
 
         ```
-        poetry run pytest
-        poetry run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
+        uv run pytest
+        uv run pytest tests/meltano/core/plugin/singer/test_tap.py::TestSingerTap::test_warn_property_not_found
         ```
         """  # noqa: D212, E501
         rules = select_metadata_rules([rule_pattern])

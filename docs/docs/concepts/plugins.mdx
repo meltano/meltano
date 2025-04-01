@@ -338,6 +338,12 @@ export TAP_POSTGRES__METADATA_SOME_STREAM_ID_REPLICATION_KEY=created_at
   </TabItem>
 </Tabs>
 
+Common metadata keys that can be set include:
+
+- `key-properties`: A list of properties that together uniquely identify a record in the stream. For example, `["id"]`.
+- `replication-key`: The name of a property in the source to use as a bookmark. For example, this will often be an `"updated_at"` field or an auto-incrementing primary key (requires `replication-method`).
+- `replication-method`: The replication method to use for a stream. Either `FULL_TABLE` or `INCREMENTAL`. Some extractors also support `LOG_BASED`, so check the extractor's documentation for details.
+
 #### `schema` extra
 
 - Setting: `_schema`

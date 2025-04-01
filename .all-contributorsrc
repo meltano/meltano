@@ -671,7 +671,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/287363?v=4",
       "profile": "https://github.com/leag",
       "contributions": [
-        "code"
+        "code",
+        "bug"
       ]
     },
     {
@@ -1343,6 +1344,15 @@
       "profile": "https://fauzaan.notion.site/Mohammed-Fauzaan-bf3d69914e844873827d5d7a6c9d0760",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "cbrammer",
+      "name": "cbrammer",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218004?v=4",
+      "profile": "https://github.com/cbrammer",
+      "contributions": [
+        "doc"
       ]
     }
   ],

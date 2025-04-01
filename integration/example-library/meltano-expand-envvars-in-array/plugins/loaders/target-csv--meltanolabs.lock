@@ -1,0 +1,164 @@
+{
+  "plugin_type": "loaders",
+  "name": "target-csv",
+  "namespace": "target_csv",
+  "variant": "meltanolabs",
+  "label": "Comma Separated Values (CSV)",
+  "docs": "https://hub.meltano.com/loaders/target-csv--meltanolabs",
+  "repo": "https://github.com/MeltanoLabs/target-csv",
+  "pip_url": "git+https://github.com/MeltanoLabs/target-csv.git",
+  "executable": "target-csv",
+  "description": "CSV loader",
+  "logo_url": "https://hub.meltano.com/assets/logos/loaders/csv.png",
+  "capabilities": [
+    "about",
+    "schema-flattening",
+    "stream-maps"
+  ],
+  "settings_group_validation": [
+    []
+  ],
+  "settings": [
+    {
+      "name": "add_record_metadata",
+      "kind": "boolean",
+      "label": "Add Record Metadata",
+      "description": "Whether to add metadata fields to records."
+    },
+    {
+      "name": "batch_size_rows",
+      "kind": "integer",
+      "label": "Batch Size Rows",
+      "description": "Maximum number of rows in each batch."
+    },
+    {
+      "name": "datestamp_format",
+      "kind": "string",
+      "value": "%Y-%m-%d",
+      "label": "Datestamp Format",
+      "description": "A python format string to use when outputting the `{datestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
+    },
+    {
+      "name": "destination_path",
+      "kind": "string",
+      "label": "Destination Path",
+      "description": "Filesystem path where to store output files. Alias for `output_path` to be compatible with the `hotgluexyz` variant."
+    },
+    {
+      "name": "escape_character",
+      "kind": "string",
+      "label": "Escape Character",
+      "description": "The character to use for escaping special characters."
+    },
+    {
+      "name": "faker_config.locale",
+      "kind": "array",
+      "label": "Faker Locale",
+      "description": "One or more LCID locale strings to produce localized output for: https://faker.readthedocs.io/en/master/#localization"
+    },
+    {
+      "name": "faker_config.seed",
+      "kind": "string",
+      "label": "Faker Seed",
+      "description": "Value to seed the Faker generator for deterministic output: https://faker.readthedocs.io/en/master/#seeding-the-generator"
+    },
+    {
+      "name": "file_naming_scheme",
+      "kind": "string",
+      "value": "{stream_name}.csv",
+      "label": "File Naming Scheme",
+      "description": "The scheme with which output files will be named. Naming scheme may leverage any of the following substitutions: \n\n- `{stream_name}`- `{datestamp}`- `{timestamp}`"
+    },
+    {
+      "name": "flattening_enabled",
+      "kind": "boolean",
+      "label": "Enable Schema Flattening",
+      "description": "'True' to enable schema flattening and automatically expand nested properties."
+    },
+    {
+      "name": "flattening_max_depth",
+      "kind": "integer",
+      "label": "Max Flattening Depth",
+      "description": "The max depth to flatten schemas."
+    },
+    {
+      "name": "load_method",
+      "kind": "options",
+      "value": "append-only",
+      "label": "Load Method",
+      "description": "The method to use when loading data into the destination. `append-only` will always write all input records whether that records already exists or not. `upsert` will update existing records and insert new records. `overwrite` will delete all existing records and insert all input records.",
+      "options": [
+        {
+          "label": "Append Only",
+          "value": "append-only"
+        },
+        {
+          "label": "Upsert",
+          "value": "upsert"
+        },
+        {
+          "label": "Overwrite",
+          "value": "overwrite"
+        }
+      ]
+    },
+    {
+      "name": "output_path",
+      "kind": "string",
+      "label": "Output Path",
+      "description": "Filesystem path where to store output files. By default, the current working directory will be used."
+    },
+    {
+      "name": "output_path_prefix",
+      "kind": "string",
+      "label": "Output Path Prefix",
+      "description": "DEPRECATED. Filesystem path where to store output files."
+    },
+    {
+      "name": "overwrite_behavior",
+      "kind": "string",
+      "value": "replace_file",
+      "label": "Overwrite Behavior",
+      "description": "Determines the overwrite behavior if destination file already exists. Must be one of the following string values: \n\n- `append_records` (default) - append records at the insertion point\n- `replace_file` - replace entire file using `default_CSV_template`\n"
+    },
+    {
+      "name": "record_sort_property_name",
+      "kind": "string",
+      "label": "Record Sort Property Name",
+      "description": "A property in the record which will be used as a sort key.\n\nIf this property is omitted, records will not be sorted."
+    },
+    {
+      "name": "stream_map_config",
+      "kind": "object",
+      "label": "User Stream Map Configuration",
+      "description": "User-defined config values to be used within map expressions."
+    },
+    {
+      "name": "stream_maps",
+      "kind": "object",
+      "label": "Stream Maps",
+      "description": "Allows inline stream transformations and aliasing. For more information see: https://sdk.meltano.com/en/latest/stream_maps.html"
+    },
+    {
+      "name": "timestamp_format",
+      "kind": "string",
+      "value": "%Y-%m-%d.T%H%M%S",
+      "label": "Timestamp Format",
+      "description": "A python format string to use when outputting the `{timestamp}` string. For reference, see: https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes"
+    },
+    {
+      "name": "timestamp_timezone",
+      "kind": "string",
+      "value": "UTC",
+      "label": "Timestamp Timezone",
+      "description": "The timezone code or name to use when generating `{timestamp}` and `{datestamp}`. Defaults to 'UTC'. For a list of possible values, please see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+    },
+    {
+      "name": "validate_records",
+      "kind": "boolean",
+      "value": true,
+      "label": "Validate Records",
+      "description": "Whether to validate the schema of the incoming streams."
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 services:
   mssql:
+    # NOTE: Support for MSSQL 2019 ends on Jan 2030, so we're good for now
+    # https://endoflife.date/mssqlserver
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: mssql
     ports:
