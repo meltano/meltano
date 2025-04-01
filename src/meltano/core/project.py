@@ -368,7 +368,7 @@ class Project(Versioned):
             yield meltano_config
             try:
                 self.project_files.update(meltano_config.canonical())  # type: ignore[arg-type]
-            except Exception as err:
+            except Exception as err:  # pragma: no cover
                 logger.critical("Could not update meltano.yml: %s", err)
                 raise
 
