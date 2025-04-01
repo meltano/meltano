@@ -23,13 +23,16 @@ from meltano.core.utils import expand_env_vars as do_expand_env_vars
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
+    from typing_extensions import Required
 else:
     from enum import StrEnum
+    from typing import Required  # noqa: ICN003
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
 
     from meltano.core.project import Project
+    from meltano.core.setting_definition import EnvVar
     from meltano.core.settings_store import SettingsStoreManager
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -78,6 +81,29 @@ class FeatureNotAllowedException(Exception):
             string representation of the error
         """
         return f"{self.feature} not enabled."
+
+
+class GetMetadata(t.TypedDict, total=False):
+    """Metadata dictionary for SettingsService.get_with_metadata."""
+
+    name: Required[str]
+    source: Required[SettingValueStore]
+    setting: Required[SettingDefinition | None]
+
+    # Type-casting values
+    cast_value: t.Any
+    uncast_value: t.Any
+
+    # Expandable values
+    expandable: bool
+    expanded: bool
+    unexpanded_value: t.Any
+
+    # Sensitive data
+    redacted: bool
+
+    # Environment metadata
+    env_var: str
 
 
 class SettingsService(metaclass=ABCMeta):
@@ -299,7 +325,7 @@ class SettingsService(metaclass=ABCMeta):
 
         return env
 
-    def get_with_metadata(  # noqa: ANN201
+    def get_with_metadata(
         self,
         name: str,
         *,
@@ -310,7 +336,7 @@ class SettingsService(metaclass=ABCMeta):
         expand_env_vars: bool = True,
         redacted_value: str = REDACTED_VALUE,
         **kwargs,  # noqa: ANN003
-    ):
+    ) -> tuple[t.Any, GetMetadata]:
         """Get a setting with associated metadata.
 
         Args:
@@ -334,7 +360,7 @@ class SettingsService(metaclass=ABCMeta):
 
         self.log(f"Getting setting '{name}'")
 
-        metadata: dict[str, t.Any] = {
+        metadata: GetMetadata = {
             "name": name,
             "source": source,
             "setting": setting_def,
@@ -636,12 +662,12 @@ class SettingsService(metaclass=ABCMeta):
 
     # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
-    def setting_env_vars(  # noqa: ANN201
+    def setting_env_vars(
         self,
-        setting_def,  # noqa: ANN001
+        setting_def: SettingDefinition,
         *,
-        for_writing=False,  # noqa: ANN001, ARG002
-    ):
+        for_writing: bool = False,  # noqa: ARG002
+    ) -> list[EnvVar]:
         """Get environment variables for the given setting definition.
 
         Args:

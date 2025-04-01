@@ -31,10 +31,36 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
-    from meltano.core.settings_service import SettingsService
+    from meltano.core.setting_definition import EnvVar
+    from meltano.core.settings_service import GetMetadata, SettingsService
 
 
 logger = structlog.stdlib.get_logger(__name__)
+
+
+class StoredSettingMetadata(t.TypedDict, total=False):
+    """Metadata for a stored setting."""
+
+    source: SettingValueStore
+
+    # Type-casting values
+    uncast_value: t.Any
+
+    # Expandable values
+    expandable: bool
+
+    # meltano.yml metadata
+    key: str
+
+    # Inheritance metadata
+    inherited_source: SettingValueStore
+
+    # Environment metadata
+    env_var: str
+
+    # Auto store metadata
+    auto_store: SettingValueStore
+    overwritable: bool
 
 
 class ConflictingSettingValueException(Exception):
@@ -96,9 +122,9 @@ class StoreNotSupportedError(MeltanoError):
 
 def cast_setting_value(
     value: t.Any,  # noqa: ANN401
-    metadata: dict[str, t.Any],
+    metadata: StoredSettingMetadata,
     setting_def: SettingDefinition | None,
-) -> tuple[t.Any, dict[str, t.Any]]:
+) -> tuple[t.Any, StoredSettingMetadata]:
     """Cast a setting value according to its setting definition.
 
     Args:
@@ -251,7 +277,7 @@ class SettingsStoreManager(ABC):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Abstract get method.
 
         Args:
@@ -343,7 +369,7 @@ class ConfigOverrideStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
         *,
         cast_value: bool = False,  # noqa: ARG002
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the .env file.
 
         Args:
@@ -376,7 +402,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the .env file.
 
         Args:
@@ -398,7 +424,9 @@ class BaseEnvStoreManager(SettingsStoreManager):
             reason = "Can not retrieve unknown setting from environment variables"
             raise StoreNotSupportedError(reason)
 
-        vals_with_metadata = []
+        value: t.Any | None
+        vals_with_metadata: list[tuple[t.Any | None, StoredSettingMetadata]] = []
+
         for env_var in self.setting_env_vars(setting_def):
             with suppress(KeyError):
                 value = env_var.get(self.env)
@@ -419,7 +447,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
             else (value, metadata)
         )
 
-    def setting_env_vars(self, *args, **kwargs) -> dict:  # noqa: ANN002, ANN003
+    def setting_env_vars(self, *args, **kwargs) -> list[EnvVar]:  # noqa: ANN002, ANN003
         """Return setting environment variables.
 
         Args:
@@ -452,7 +480,7 @@ class EnvStoreManager(BaseEnvStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the .env file.
 
         Args:
@@ -520,7 +548,7 @@ class DotEnvStoreManager(BaseEnvStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the .env file.
 
         Args:
@@ -685,7 +713,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the system database.
 
         Args:
@@ -702,7 +730,7 @@ class MeltanoYmlStoreManager(SettingsStoreManager):
         """
         keys = [setting_def.name, *setting_def.aliases] if setting_def else [name]
         flat_config = self.flat_config
-        vals_with_metadata = []
+        vals_with_metadata: list[tuple[t.Any | None, StoredSettingMetadata]] = []
         for key in keys:
             try:
                 value = flat_config[key]
@@ -976,7 +1004,7 @@ class DbStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,  # noqa: ARG002
         *,
         cast_value: bool = False,  # noqa: ARG002
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get value by name from the system database.
 
         Args:
@@ -1132,7 +1160,7 @@ class InheritedStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,  # noqa: ARG002
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1184,7 +1212,7 @@ class InheritedStoreManager(SettingsStoreManager):
             )
         return self._config_with_metadata  # type: ignore[return-value]
 
-    def get_with_metadata(self, name: str) -> tuple[str, dict]:
+    def get_with_metadata(self, name: str) -> tuple[str, GetMetadata]:
         """Return inherited config and metadata for the named setting.
 
         Args:
@@ -1211,7 +1239,7 @@ class DefaultStoreManager(SettingsStoreManager):
         setting_def: SettingDefinition | None = None,
         *,
         cast_value: bool = False,  # noqa: ARG002
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1223,7 +1251,7 @@ class DefaultStoreManager(SettingsStoreManager):
             A tuple containing the got value and accompanying metadata dictionary.
         """
         value = None
-        metadata: dict = {}
+        metadata: StoredSettingMetadata = {}
         if setting_def:
             value = setting_def.value
             if value is not None:
@@ -1384,7 +1412,7 @@ class AutoStoreManager(SettingsStoreManager):
         *,
         cast_value: bool = False,
         **kwargs,  # noqa: ANN003
-    ) -> tuple[str | None, dict]:
+    ) -> tuple[str | None, StoredSettingMetadata]:
         """Get a Setting value by name and SettingDefinition.
 
         Args:
@@ -1399,7 +1427,7 @@ class AutoStoreManager(SettingsStoreManager):
         """
         setting_def = setting_def or self.find_setting(name)
 
-        metadata: dict = {}
+        metadata: StoredSettingMetadata = {}
         value = None
         found_source = None
 
@@ -1424,11 +1452,16 @@ class AutoStoreManager(SettingsStoreManager):
             if value is not None:
                 break
 
+        # found_source should never be None beyond this point
+        if found_source is None:  # pragma: no cover
+            msg = f"Failed to find a setting source for {name!r}"
+            raise RuntimeError(msg)
+
         metadata["source"] = found_source
 
         if auto_store := self.auto_store(name, setting_def=setting_def):
             metadata["auto_store"] = auto_store
-            metadata["overwritable"] = auto_store.can_overwrite(found_source)  # type: ignore[arg-type]
+            metadata["overwritable"] = auto_store.can_overwrite(found_source)
 
         return (
             cast_setting_value(value, metadata, setting_def)
