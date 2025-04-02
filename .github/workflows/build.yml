@@ -3,12 +3,6 @@ name: Build and publish Meltano
 on:
   push:
   workflow_dispatch:
-    inputs:
-      publish_docker_images:
-        description: 'Publish Docker images, even if not as part of a release'
-        required: true
-        default: false
-        type: boolean
   schedule:
   # Weekly on Sunday at 04:45 UTC
   - cron: '45 4 * * 0'
@@ -80,9 +74,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        registry:
-        - ghcr.io
-        - docker.io
         python-version:
         - "3.9"
         - "3.10"
@@ -91,6 +82,12 @@ jobs:
         - "3.13"
 
     steps:
+    - name: Set the workflow inputs
+      id: set-inputs
+      # This step makes it so that the same workflow inputs can be accessed
+      # regardless of what event triggered it.
+      run: |
+        echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Setup uv
       uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
@@ -105,7 +102,7 @@ jobs:
         -v ${{ needs.build.outputs.version }}
         -p ${{ matrix.python-version }}
         -d ${{ env.DEFAULT_PYTHON }}
-        -r ${{ matrix.registry }}
+        -r ${{ steps.set-inputs.outputs.registry }}
         > tags
 
     - name: Assemble image tags
@@ -121,11 +118,11 @@ jobs:
     - name: Set registry username and password
       id: user-and-pass
       run: |
-        if [[ "${{ matrix.registry }}" == "ghcr.io" ]]; then
+        if [[ "${{ steps.set-inputs.outputs.registry }}" == "ghcr.io" ]]; then
           echo "username=${{ github.actor }}" >> $GITHUB_OUTPUT
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
-        if [[ "${{ matrix.registry }}" == "docker.io" ]]; then
+        if [[ "${{ steps.set-inputs.outputs.registry }}" == "docker.io" ]]; then
           echo "username=meltano" >> $GITHUB_OUTPUT
           echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
@@ -133,10 +130,14 @@ jobs:
     - name: Build, scan, then conditionally push the Docker image for a given Python version
       uses: ./.github/actions/docker-build-scan-push
       with:
-        push: ${{ ( github.event_name == 'workflow_dispatch' && github.event.inputs.publish_docker_images == 'true' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
+        # Push to the container registry if
+        # - The trigger is a push to the main branch
+        # - The trigger is a workflow dispatch
+        # - The trigger is a release and the action is 'published'
+        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
         token: ${{ secrets.GITHUB_TOKEN }}
         tags: ${{ env.IMAGE_TAGS }}
-        registry: ${{ matrix.registry }}
+        registry: ${{ steps.set-inputs.outputs.registry }}
         username: ${{ steps.user-and-pass.outputs.username }}
         password: ${{ steps.user-and-pass.outputs.password }}
         python-version: ${{ matrix.python-version }}
