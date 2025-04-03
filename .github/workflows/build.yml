@@ -16,6 +16,10 @@ on:
   release:
     types: [published]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 permissions:
   contents: write  # Needed to upload artifacts to the release
   id-token: write  # Needed for OIDC PyPI publishing
