@@ -1,4 +1,4 @@
-name: Build and publish Meltano
+name: Build
 
 on:
   push:
@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   build:
-    name: Build artifacts
+    name: Wheel and sdist
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.baipp.outputs.package_version }}
@@ -67,7 +67,7 @@ jobs:
       id: baipp
 
   build_docker:
-    name: Build Meltano Docker image
+    name: Docker Images
     runs-on: ubuntu-latest
     needs: build
     permissions:
