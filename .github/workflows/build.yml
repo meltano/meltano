@@ -2,6 +2,13 @@ name: Build and publish Meltano
 
 on:
   push:
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/build.yml
+    - docker/meltano/Dockerfile
+    - src/**
+    - scripts/**
+    - pyproject.toml
   workflow_dispatch:
   schedule:
   # Weekly on Sunday at 04:45 UTC
