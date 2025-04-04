@@ -1,8 +1,6 @@
-ARG PYTHON_VERSION
+ARG PYTHON_VERSION="3.9"
 
 FROM python:${PYTHON_VERSION}-slim
-
-ARG MELTANO_VERSION
 
 # Meltano project directory - this is where you should mount your Meltano project
 ARG WORKDIR="/project"
@@ -20,8 +18,11 @@ WORKDIR "${WORKDIR}"
 RUN python -m venv /venv
 ENV PATH="/venv/bin:${PATH}"
 
+# Copy directory with build artifacts
+COPY dist/ dist/
+
 # Installing the application the same way our users do when using PyPI
 RUN pip install --upgrade pip wheel && \
-    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3]==${MELTANO_VERSION}"
+    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(pwd)/$(ls dist/meltano-*.whl)"
 
 ENTRYPOINT ["meltano"]
