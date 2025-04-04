@@ -1363,6 +1363,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "rafalkrupinski",
+      "name": "Rafal Krupinski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3732079?v=4",
+      "profile": "https://github.com/rafalkrupinski",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
