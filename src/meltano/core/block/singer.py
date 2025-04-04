@@ -57,13 +57,31 @@ class InvokerBase:
         self.invoker: PluginInvoker = plugin_invoker
         self._command: str | None = command
 
-        self.outputs = []
-        self.err_outputs = []
+        self.outputs: list[SubprocessOutputWriter] = []
+        self.err_outputs: list[SubprocessOutputWriter] = []
 
         self.process_handle: Process | None = None
         self._process_future: asyncio.Task | None = None
         self._stdout_future: asyncio.Task | None = None
         self._stderr_future: asyncio.Task | None = None
+
+    @property
+    def producer(self) -> bool:
+        """Whether this block is a producer.
+
+        Returns:
+            True if the block is a producer, False otherwise.
+        """
+        return False
+
+    @property
+    def consumer(self) -> bool:
+        """Whether this block is a consumer.
+
+        Returns:
+            True if the block is a consumer, False otherwise.
+        """
+        return False
 
     @property
     def command(self) -> str | None:
@@ -206,8 +224,8 @@ class InvokerBase:
     async def close_stdin(self) -> None:
         """Close the underlying process stdin if the block is a consumer."""
         if self.consumer:
-            self.process_handle.stdin.close()
-            await self.process_handle.stdin.wait_closed()
+            self.process_handle.stdin.close()  # type: ignore[union-attr]
+            await self.process_handle.stdin.wait_closed()  # type: ignore[union-attr]
 
     def stdout_link(self, dst: SubprocessOutputWriter) -> None:
         """Use stdout_link to instruct block to link/write stdout content to dst.
