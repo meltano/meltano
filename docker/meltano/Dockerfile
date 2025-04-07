@@ -18,11 +18,9 @@ WORKDIR "${WORKDIR}"
 RUN python -m venv /venv
 ENV PATH="/venv/bin:${PATH}"
 
-# Copy directory with build artifacts
-COPY dist/ dist/
-
 # Installing the application the same way our users do when using PyPI
-RUN pip install --upgrade pip wheel && \
-    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(pwd)/$(ls dist/meltano-*.whl)"
+RUN --mount=type=bind,source=dist,target=/tmp/meltano-dist \
+    pip install --upgrade pip wheel && \
+    pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
 
 ENTRYPOINT ["meltano"]
