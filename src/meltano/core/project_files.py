@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
 import typing as t
+from contextlib import contextmanager
 from copy import copy
 
 import structlog
-from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
@@ -33,6 +35,14 @@ MULTI_FILE_KEYS = {
     "environments",
     "jobs",
 }
+
+
+@contextmanager
+def _atomic_write(file_path: PathLike) -> t.Generator[t.BinaryIO, None, None]:
+    """Use os.replace to atomically overwrite a file."""
+    with tempfile.NamedTemporaryFile(delete_on_close=False) as temp_file:
+        yield temp_file
+        os.replace(temp_file.name, file_path)  # noqa: PTH105
 
 
 class InvalidIncludePathError(Exception):
@@ -366,5 +376,5 @@ class ProjectFiles:
             original_schedules.copy_attributes(schedules)
 
     def _write_file(self, file_path: PathLike, contents: Mapping) -> None:
-        with atomic_write(file_path, overwrite=True) as fl:
+        with _atomic_write(file_path) as fl:
             yaml.dump(contents, fl)
