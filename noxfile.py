@@ -27,16 +27,18 @@ import nox
 # no duplicated dependencies between `pyproject.toml` and
 # `.pre-commit-config.yaml`.
 
+nox.needs_version = ">=2025.2.9"
 nox.options.default_venv_backend = "uv"
+nox.options.sessions = [
+    "mypy",
+    "pre-commit",
+    "pytest",
+]
 
 root_path = Path(__file__).parent
-python_versions = (
-    "3.9",
-    "3.10",
-    "3.11",
-    "3.12",
-    "3.13",
-)
+pyproject = nox.project.load_toml()
+python_versions = nox.project.python_versions(pyproject)
+
 main_python_version = "3.13"
 
 
