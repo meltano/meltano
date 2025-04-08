@@ -1304,7 +1304,6 @@ name = "meltano"
 version = "3.7.8"
 source = { editable = "." }
 dependencies = [
-    { name = "aiodocker" },
     { name = "alembic" },
     { name = "anyio" },
     { name = "atomicwrites" },
@@ -1345,6 +1344,9 @@ azure = [
     { name = "azure-core" },
     { name = "azure-identity" },
     { name = "azure-storage-blob" },
+]
+containers = [
+    { name = "aiodocker" },
 ]
 gcs = [
     { name = "google-cloud-storage" },
@@ -1426,7 +1428,7 @@ typing = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiodocker", specifier = ">=0.24.0,<0.25" },
+    { name = "aiodocker", marker = "extra == 'containers'", specifier = ">=0.24.0,<0.25" },
     { name = "alembic", specifier = ">=1.14.0,<2" },
     { name = "anyio", specifier = ">=4.4.0,<5" },
     { name = "atomicwrites", specifier = ">=1.2.1,<2" },
@@ -1468,7 +1470,7 @@ requires-dist = [
     { name = "uv", specifier = ">=0.1.24,<0.8" },
     { name = "virtualenv", specifier = ">=20.26.6,<21" },
 ]
-provides-extras = ["azure", "gcs", "mssql", "postgres", "psycopg2", "s3"]
+provides-extras = ["azure", "containers", "gcs", "mssql", "postgres", "psycopg2", "s3"]
 
 [package.metadata.requires-dev]
 coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.8" }]
