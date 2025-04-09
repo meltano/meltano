@@ -13,8 +13,8 @@ import typing as t
 
 import structlog
 
-from meltano.core.job import Job, Payload, State
-from meltano.core.job_state import SINGER_STATE_KEY
+from meltano.core.constants import SINGER_STATE_KEY
+from meltano.core.enums import Payload
 from meltano.core.project import Project
 from meltano.core.state_store import (
     MeltanoState,
@@ -24,6 +24,7 @@ from meltano.core.state_store import (
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.core.job import Job
     from meltano.core.state_store.base import StateStoreManager
 
 logger = structlog.getLogger(__name__)
@@ -76,6 +77,8 @@ class StateService:
         Returns:
             A new job with given state_id, or the given Job
         """
+        from meltano.core.job import Job, State
+
         if isinstance(job, str):
             now = datetime.datetime.now(datetime.timezone.utc)
             return Job(

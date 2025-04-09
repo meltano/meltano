@@ -7,7 +7,6 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import click
-import requests
 
 from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
@@ -17,12 +16,8 @@ from meltano.cli.utils import (
     add_required_plugins,
     check_dependencies_met,
 )
-from meltano.core.plugin import PluginRef, PluginType
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+from meltano.core.enums import PluginType
 from meltano.core.utils import run_async
-from meltano.core.yaml import yaml
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -33,6 +28,10 @@ install, no_install = get_install_options(include_only_install=False)
 
 
 def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
+    import requests
+
+    from meltano.core.yaml import yaml
+
     if not value:
         return None
 
@@ -132,6 +131,11 @@ async def add(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#add
     """  # noqa: D301
+    from meltano.core.plugin import PluginRef
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.project_add_service import ProjectAddService
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     tracker: Tracker = ctx.obj["tracker"]
 
     plugin_type = PluginType.from_cli_argument(plugin_type)

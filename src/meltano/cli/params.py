@@ -10,10 +10,6 @@ from collections.abc import Callable, Coroutine
 import click
 
 from meltano.cli.utils import AutoInstallBehavior, CliError
-from meltano.core.db import project_engine
-from meltano.core.migration_service import MigrationError
-from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import async_noop
 
 if t.TYPE_CHECKING:
@@ -30,6 +26,8 @@ def _install_plugins_fn(
     _param,
     value: AutoInstallBehavior | None,
 ) -> InstallPlugins:
+    from meltano.core.plugin_install_service import install_plugins
+
     if value is None:
         project: Project | None = ctx.obj["project"]
         auto_install = project and project.settings.get("auto_install")
@@ -54,6 +52,8 @@ def _install_plugins_fn(
 
 
 async def _install_plugins_and_exit(*args: t.Any, **kwargs: t.Any) -> t.NoReturn:
+    from meltano.core.plugin_install_service import PluginInstallReason, install_plugins
+
     kwargs.pop("reason", None)
     await install_plugins(*args, **kwargs, reason=PluginInstallReason.INSTALL)
     context = click.get_current_context()
@@ -69,6 +69,8 @@ def database_uri_option(func):  # noqa: ANN001, ANN201
 
     @click.option("--database-uri", help="System database URI.")
     def decorate(*args, database_uri=None, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN202
+        from meltano.core.project_settings_service import ProjectSettingsService
+
         if database_uri:
             ProjectSettingsService.config_override["database_uri"] = database_uri
 
@@ -141,6 +143,8 @@ class pass_project:  # noqa: N801
 
         @database_uri_option
         def decorate(*args, **kwargs) -> None:  # noqa: ANN002, ANN003
+            from meltano.core.db import project_engine
+
             ctx = click.get_current_context()
 
             project = ctx.obj["project"]
@@ -154,7 +158,10 @@ class pass_project:  # noqa: N801
             engine, _ = project_engine(project, default=True)
 
             if self.migrate:
-                from meltano.core.migration_service import MigrationService
+                from meltano.core.migration_service import (
+                    MigrationError,
+                    MigrationService,
+                )
 
                 try:
                     migration_service = MigrationService(engine)

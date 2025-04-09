@@ -10,13 +10,13 @@ import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from enum import IntFlag as EnumIntFlag
 
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column
 
+from meltano.core.enums import Payload  # noqa: TC001
 from meltano.core.error import Error
 from meltano.core.models import SystemModel
 from meltano.core.sqlalchemy import (
@@ -94,13 +94,6 @@ def current_trigger() -> str | None:
         The trigger for currently running job
     """
     return os.getenv("MELTANO_JOB_TRIGGER")
-
-
-class Payload(EnumIntFlag):
-    """Flag indicating whether a Job has state in its payload field."""
-
-    STATE = 1
-    INCOMPLETE_STATE = 2
 
 
 class Job(SystemModel):

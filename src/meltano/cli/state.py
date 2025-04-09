@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import typing as t
 from datetime import datetime as dt
@@ -12,21 +13,20 @@ from operator import xor
 from pathlib import Path
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, InstrumentedCmd, InstrumentedGroup
-from meltano.core.block.block_parser import BlockParser
-from meltano.core.db import project_engine
-from meltano.core.job import Payload
-from meltano.core.state_service import InvalidJobStateError, StateService
+from meltano.core.enums import Payload
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.state_service import StateService
 
 STATE_SERVICE_KEY = "state_service"
 
-logger = structlog.getLogger(__name__)
+# logger = structlog.getLogger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class MutuallyExclusiveOptionsError(Exception):
@@ -70,6 +70,8 @@ prompt_for_confirmation = partial(
 
 def state_service_from_state_id(project: Project, state_id: str) -> StateService | None:
     """Instantiate by parsing a state_id."""
+    from meltano.core.block.block_parser import BlockParser
+
     state_id_re = re.compile(
         r"^(?P<env>.+):(?P<tap>.+)-to-(?P<target>.+?)(?:\:(?P<suffix>.+))?(?<=[^\:])$",
     )
@@ -116,6 +118,9 @@ def meltano_state(project: Project, ctx: click.Context) -> None:
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#state
     """  # noqa: D301
+    from meltano.core.db import project_engine
+    from meltano.core.state_service import StateService
+
     _, sessionmaker = project_engine(project)
     session = sessionmaker(future=True)
     ctx.obj[STATE_SERVICE_KEY] = StateService(project, session)
@@ -129,6 +134,8 @@ def list_state(ctx: click.Context, pattern: str | None) -> None:
 
     Optionally pass a glob-style pattern to filter state_ids by.
     """
+    from meltano.core.state_service import InvalidJobStateError
+
     state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
     if states := state_service.list_state(pattern):
         for state_id, state in states.items():

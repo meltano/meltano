@@ -9,7 +9,6 @@ from abc import ABCMeta, abstractmethod
 import structlog
 
 from meltano.core.block.singer import InvokerBase
-from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
 from meltano.core.logging import OutputLogger
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -165,6 +164,8 @@ def plugin_command_invoker(
     Returns:
         InvokerCommand
     """
+    from meltano.core.db import project_engine
+
     stderr_log = logger.bind(
         stdio="stderr",
         cmd_type="command",

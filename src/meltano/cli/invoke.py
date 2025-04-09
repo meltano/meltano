@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 import sys
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -15,26 +16,20 @@ from meltano.cli.utils import (
     PartialInstrumentedCmd,
     propagate_stop_signals,
 )
-from meltano.core.db import project_engine
 from meltano.core.error import AsyncSubprocessError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin_invoker import (
-    PluginInvoker,
-    UnknownCommandError,
-    invoker_factory,
-)
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import sessionmaker
 
+    from meltano.core.plugin_invoker import PluginInvoker
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -99,6 +94,11 @@ async def invoke(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#invoke
     """  # noqa: D301
+    from meltano.core.db import project_engine
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.plugin_invoker import invoker_factory
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     tracker: Tracker = ctx.obj["tracker"]
 
     try:
@@ -165,6 +165,8 @@ async def _invoke(  # noqa: ANN202
     containers: bool,
     print_var: list | None = None,
 ):
+    from meltano.core.plugin_invoker import UnknownCommandError
+
     if command_name is not None:
         command = invoker.find_command(command_name)
 

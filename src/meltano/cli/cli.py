@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import platform
 import sys
@@ -9,22 +10,23 @@ import typing as t
 from pathlib import Path
 
 import click
-import structlog
 
+# import structlog
 from meltano import (
     __version__,
 )
 from meltano.cli.utils import InstrumentedGroup
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from meltano.core.constants import LEVELS
+from meltano.core.enums import LogFormat
 from meltano.core.error import EmptyMeltanoFileException, ProjectNotFound
-from meltano.core.logging import LEVELS, LogFormat, setup_logging
-from meltano.core.project import PROJECT_ENVIRONMENT_ENV, Project
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import Tracker
-from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import get_no_color_flag
 
-logger = structlog.stdlib.get_logger(__name__)
+if t.TYPE_CHECKING:
+    from meltano.core.project import Project
+
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class NoWindowsGlobbingGroup(InstrumentedGroup):
@@ -96,6 +98,12 @@ def cli(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface
     """  # noqa: D301, D415
+    from meltano.core.logging import setup_logging
+    from meltano.core.project import Project
+    from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.tracking import Tracker
+    from meltano.core.tracking.contexts import CliContext
+
     ctx.ensure_object(dict)
 
     if log_level:
@@ -184,6 +192,8 @@ def detect_selected_environment(  # noqa: D417
     Returns:
         The selected environment, and whether it is the default environment.
     """
+    from meltano.core.project import PROJECT_ENVIRONMENT_ENV
+
     environment = cli_environment or os.environ.get(
         PROJECT_ENVIRONMENT_ENV,
         project.dotenv_env.get(PROJECT_ENVIRONMENT_ENV, None),

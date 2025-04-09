@@ -6,6 +6,7 @@ import typing as t
 
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.constants import CRON_INTERVALS
 from meltano.core.job import Job as StateJob
 from meltano.core.job import JobFinder as StateJobFinder
 
@@ -13,17 +14,6 @@ if t.TYPE_CHECKING:
     import datetime
 
     from sqlalchemy.orm import Session
-
-CRON_INTERVALS: dict[str, str | None] = {
-    "@once": None,
-    "@manual": None,
-    "@none": None,
-    "@hourly": "0 * * * *",
-    "@daily": "0 0 * * *",
-    "@weekly": "0 0 * * 0",
-    "@monthly": "0 0 1 * *",
-    "@yearly": "0 0 1 1 *",
-}
 
 
 class Schedule(NameEq, Canonical):

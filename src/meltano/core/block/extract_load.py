@@ -10,16 +10,12 @@ from contextlib import asynccontextmanager, closing
 import structlog
 
 from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
-from meltano.core.db import project_engine
 from meltano.core.elt_context import PluginContext
-from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import PluginInvoker, invoker_factory
 from meltano.core.runner import RunnerError
-from meltano.core.state_service import StateService
 
 from .blockset import BlockSet, BlockSetValidationError
 from .future_utils import first_failed_future, handle_producer_line_length_limit_error
@@ -32,8 +28,10 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.job import Job
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.state_service import StateService
 
     from .ioblock import IOBlock
 
@@ -118,6 +116,8 @@ class ELBContextBuilder:
         Args:
             project: The meltano project for the context.
         """
+        from meltano.core.db import project_engine
+
         self.project = project
 
         _, session_maker = project_engine(project)
@@ -353,6 +353,8 @@ class ExtractLoadBlocks(BlockSet):
             context: the elt context to use for this elt run.
             blocks: the IOBlocks that should be used for this elt run.
         """
+        from meltano.core.job import Job
+
         self.context = context
         self.blocks = blocks
 
@@ -403,6 +405,8 @@ class ExtractLoadBlocks(BlockSet):
         Raises:
             BlockSetHasNoStateError: if no Block in this BlockSet has state capability
         """
+        from meltano.core.state_service import StateService
+
         if not self._state_service:
             if self.has_state():
                 self._state_service = StateService(
@@ -523,6 +527,9 @@ class ExtractLoadBlocks(BlockSet):
             RunnerError: if failures are encountered during execution or if the
                 underlying pipeline/job is already running.
         """
+        from meltano.core.job import JobFinder
+        from meltano.core.job.stale_job_failer import fail_stale_jobs
+
         job = self.context.job
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import signal
 import sys
@@ -9,23 +10,16 @@ import typing as t
 from contextlib import contextmanager
 from enum import Enum, auto
 
+# import structlog
 import click
-import structlog
 from click_default_group import DefaultGroup
 from click_didyoumean import DYMGroup
 
+from meltano.core.enums import PluginAddedReason
 from meltano.core.error import MeltanoConfigurationError
-from meltano.core.logging import setup_logging
-from meltano.core.plugin.base import PluginDefinition, PluginType
-from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
-from meltano.core.project_add_service import (
-    PluginAddedReason,
-    PluginAlreadyAddedException,
-    ProjectAddService,
-)
+
+# from meltano.core.logging import setup_logging
 from meltano.core.setting_definition import SettingKind
-from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
@@ -33,14 +27,17 @@ else:
     from enum import StrEnum
 
 if t.TYPE_CHECKING:
-    from meltano.core.plugin.base import PluginRef
+    from meltano.core.plugin.base import PluginRef, PluginType
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
+    from meltano.core.project_add_service import ProjectAddService
     from meltano.core.project_plugins_service import ProjectPluginsService
+    from meltano.core.tracking.contexts import ProjectContext
 
-setup_logging()
+# setup_logging()
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class CliError(Exception):
@@ -71,6 +68,8 @@ def print_added_plugin(
     update: bool = False,
 ) -> None:
     """Print added plugin."""
+    from meltano.core.project_add_service import PluginAddedReason
+
     descriptor = plugin.type.descriptor
     if reason is PluginAddedReason.RELATED:
         descriptor = f"related {descriptor}"
@@ -113,6 +112,8 @@ def print_added_plugin(
 
 
 def _prompt_plugin_namespace(plugin_type, plugin_name):  # noqa: ANN001, ANN202
+    from meltano.core.plugin.base import PluginType
+
     click.secho(
         f"Adding new custom {plugin_type.descriptor} with name '{plugin_name}'...",
         fg="green",
@@ -181,6 +182,8 @@ def _prompt_plugin_executable(pip_url: str | None, plugin_name: str) -> str:
 
 
 def _prompt_plugin_capabilities(plugin_type):  # noqa: ANN001, ANN202
+    from meltano.core.plugin.base import PluginType
+
     if plugin_type != PluginType.EXTRACTORS:
         return []
 
@@ -209,6 +212,8 @@ def _prompt_plugin_capabilities(plugin_type):  # noqa: ANN001, ANN202
 
 
 def _prompt_plugin_settings(plugin_type: PluginType) -> list[dict[str, t.Any]]:
+    from meltano.core.plugin.base import PluginType
+
     if plugin_type not in {
         PluginType.EXTRACTORS,
         PluginType.LOADERS,
@@ -277,6 +282,11 @@ def add_plugin(  # noqa: ANN201
     plugin_yaml=None,  # noqa: ANN001
 ):
     """Add Plugin to given Project."""
+    from meltano.core.plugin.base import PluginDefinition
+    from meltano.core.plugin.error import InvalidPluginDefinitionError
+    from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
+    from meltano.core.project_add_service import PluginAlreadyAddedException
+
     if custom:
         # XXX: For backwards compatibility, the namespace must be prompted for first.
         namespace = _prompt_plugin_namespace(plugin_type, plugin_name)
@@ -393,6 +403,8 @@ def add_required_plugins(  # noqa: ANN201
     lock: bool = True,
 ):
     """Add any Plugins required by the given Plugin."""
+    from meltano.core.project_add_service import PluginAddedReason
+
     added_plugins = []
     for plugin_install in plugins:
         required_plugins = add_service.add_required(
@@ -440,6 +452,9 @@ def check_dependencies_met(  # noqa: D417
         A tuple with dependency check outcome (True/False), and a string
         message with details of the check.
     """
+    from meltano.core.plugin.base import PluginType
+    from meltano.core.plugin.error import PluginNotFoundError
+
     passed = True
     messages = []
 
@@ -476,6 +491,8 @@ def activate_environment(  # noqa: D417
         ctx: The Click context, used to determine the selected environment.
         project: The project for which the environment will be activated.
     """
+    from meltano.core.tracking.contexts import ProjectContext
+
     if ctx.obj.get("selected_environment"):
         project.activate_environment(ctx.obj["selected_environment"])
         # Update the project context being used for telemetry:
@@ -573,6 +590,8 @@ class InstrumentedGroupMixin(InstrumentedCmdMixin):
 
     def invoke(self, ctx: click.Context) -> None:
         """Update the telemetry context and invoke the group."""
+        from meltano.core.tracking.contexts import CliContext
+
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
@@ -599,6 +618,8 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
 
     def invoke(self, ctx: click.Context) -> None:
         """Invoke the requested command firing start and events accordingly."""
+        from meltano.core.tracking.contexts import CliContext, CliEvent
+
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):
@@ -623,6 +644,8 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
 
     def invoke(self, ctx) -> None:  # noqa: ANN001
         """Invoke the requested command firing only a start event."""
+        from meltano.core.tracking.contexts import CliContext, CliEvent
+
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
         if ctx.obj.get("tracker"):

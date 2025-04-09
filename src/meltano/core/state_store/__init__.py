@@ -11,7 +11,6 @@ from structlog.stdlib import get_logger
 from meltano.core.behavior.addon import MeltanoAddon
 from meltano.core.db import project_engine
 from meltano.core.state_store.base import MeltanoState, StateStoreManager
-from meltano.core.state_store.db import DBStateStoreManager
 
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
@@ -106,6 +105,8 @@ def state_store_manager_from_project_settings(
     """
     state_backend_uri: str = settings_service.get("state_backend.uri")
     if state_backend_uri == SYSTEMDB:
+        from meltano.core.state_store.db import DBStateStoreManager
+
         logger.info("Using systemdb state backend")
         return DBStateStoreManager(
             session=session or project_engine(settings_service.project)[1](),

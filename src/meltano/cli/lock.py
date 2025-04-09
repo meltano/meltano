@@ -2,20 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_lock_service import (
-    LockfileAlreadyExistsError,
-    PluginLockService,
-)
-from meltano.core.project_plugins_service import DefinitionSource
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -24,7 +19,8 @@ if t.TYPE_CHECKING:
 
 
 __all__ = ["lock"]
-logger = structlog.get_logger(__name__)
+# logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Lock plugin definitions.")
@@ -57,6 +53,13 @@ def lock(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#lock
     """  # noqa: D301
+    from meltano.core.plugin_lock_service import (
+        LockfileAlreadyExistsError,
+        PluginLockService,
+    )
+    from meltano.core.project_plugins_service import DefinitionSource
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     tracker: Tracker = ctx.obj["tracker"]
 
     lock_service = PluginLockService(project)

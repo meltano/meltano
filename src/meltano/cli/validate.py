@@ -2,21 +2,20 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import sys
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
     InstrumentedCmd,
     propagate_stop_signals,
 )
-from meltano.core.db import project_engine
-from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.utils import run_async
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner
 
@@ -27,7 +26,8 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
 
-logger = structlog.getLogger(__name__)
+# logger = structlog.getLogger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 TEST_LINE_LENGTH = 60
 
@@ -103,6 +103,9 @@ async def test(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#test
     """  # noqa: D301
+    from meltano.core.db import project_engine
+    from meltano.core.plugin_install_service import PluginInstallReason
+
     _, session_maker = project_engine(project)
     session = session_maker()
 

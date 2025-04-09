@@ -7,8 +7,6 @@ import os
 import sys
 import typing as t
 
-import structlog
-
 from meltano.cli import (
     add,
     config,
@@ -35,7 +33,6 @@ from meltano.cli import compile as compile_module
 from meltano.cli.cli import cli
 from meltano.cli.utils import CliError
 from meltano.core.error import MeltanoError, ProjectReadonly
-from meltano.core.logging import setup_logging
 
 if t.TYPE_CHECKING:
     from meltano.core.tracking.tracker import Tracker
@@ -71,10 +68,6 @@ atexit_handler_registered = False
 exit_code_reported = False
 exit_event_tracker: Tracker | None = None
 
-setup_logging()
-
-logger = structlog.stdlib.get_logger(__name__)
-
 troubleshooting_message = """\
 Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to
 join our friendly Slack community.
@@ -99,6 +92,10 @@ def _run_cli() -> None:
     Raises:
         KeyboardInterrupt: if caught.
     """
+    from meltano.core.logging import setup_logging
+
+    setup_logging()
+
     try:
         try:
             cli(obj={"project": None})
@@ -119,9 +116,11 @@ def _run_cli() -> None:
 
 def main() -> None:
     """Entry point for the meltano CLI."""
-    # Mark the current process as executed via the CLI
     logging.captureWarnings(capture=True)
+
+    # Mark the current process as executed via the CLI
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
+
     try:
         _run_cli()
     finally:

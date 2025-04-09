@@ -9,7 +9,6 @@ import click
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedGroup, PartialInstrumentedCmd
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.tracking.contexts import CliEvent
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -38,6 +37,8 @@ def meltano_environment(project: Project, ctx: click.Context) -> None:
 @click.pass_context
 def add(ctx: click.Context, name: str) -> None:
     """Add a new environment."""
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
     try:
@@ -54,6 +55,8 @@ def add(ctx: click.Context, name: str) -> None:
 @click.pass_context
 def remove(ctx: click.Context, name: str) -> None:
     """Remove an environment."""
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
     try:
@@ -69,6 +72,8 @@ def remove(ctx: click.Context, name: str) -> None:
 @click.pass_context
 def list_environments(ctx: click.Context) -> None:
     """List available environments."""
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker = ctx.obj["tracker"]
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
     try:

@@ -5,7 +5,6 @@ from __future__ import annotations
 import ast
 import enum
 import json
-import sys
 import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
@@ -14,17 +13,12 @@ from functools import cached_property
 from meltano.core import utils
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
+from meltano.core.enums import YAMLEnum
 from meltano.core.error import Error
-
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
-    from enum import StrEnum
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
-    from ruamel.yaml import Node, Representer, ScalarNode
 
 VALUE_PROCESSORS = {
     "nest_object": utils.nest_object,
@@ -86,53 +80,6 @@ class SettingMissingError(Error):
             name: Name of missing setting.
         """
         super().__init__(f"Cannot find setting {name}")
-
-
-class YAMLEnum(StrEnum):
-    """Serializable Enum class."""
-
-    @staticmethod
-    def yaml_representer(dumper, obj) -> str:  # noqa: ANN001
-        """Represent as yaml.
-
-        Args:
-            dumper: YAML dumper.
-            obj: Object to dump.
-
-        Returns:
-            Object in yaml string form.
-        """
-        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
-
-    @classmethod
-    def to_yaml(cls, representer: Representer, node: t.Any) -> ScalarNode:  # noqa: ANN401
-        """Represent as yaml.
-
-        Args:
-            representer: YAML representer.
-            node: Object to dump.
-
-        Returns:
-            Object in yaml string form.
-        """
-        return representer.represent_scalar("tag:yaml.org,2002:str", str(node))
-
-    @classmethod
-    def from_yaml(
-        cls,
-        constructor,  # noqa: ANN001, ARG003
-        node: Node,
-    ) -> YAMLEnum:
-        """Construct from yaml.
-
-        Args:
-            constructor: Class constructor.
-            node: YAML node.
-
-        Returns:
-            Object from yaml node.
-        """
-        return cls(node.value)
 
 
 class SettingKind(YAMLEnum):

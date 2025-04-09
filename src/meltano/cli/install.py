@@ -2,18 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, PartialInstrumentedCmd
-from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_install_service import install_plugins
-from meltano.core.schedule_service import ScheduleService
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
@@ -22,7 +19,8 @@ if t.TYPE_CHECKING:
 
 ANY = "-"
 
-logger = structlog.getLogger(__name__)
+# logger = structlog.getLogger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
@@ -78,6 +76,9 @@ async def install(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
+    from meltano.core.plugin_install_service import install_plugins
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     tracker: Tracker = ctx.obj["tracker"]
     try:
         if plugin_type and plugin_type != ANY:
@@ -119,6 +120,9 @@ async def install(
 
 
 def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
+    from meltano.core.block.block_parser import BlockParser
+    from meltano.core.schedule_service import ScheduleService
+
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()

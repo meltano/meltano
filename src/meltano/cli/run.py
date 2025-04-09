@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import (
     InstallPlugins,
     UUIDParamType,
@@ -14,24 +15,19 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
-from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.blockset import BlockSet
-from meltano.core.block.plugin_command import PluginCommandBlock
-from meltano.core.logging.utils import change_console_log_level
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.runner import RunnerError
-from meltano.core.tracking import BlockEvents, Tracker
-from meltano.core.tracking.contexts import CliEvent
-from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
     import uuid
 
+    from meltano.core.block.plugin_command import PluginCommandBlock
     from meltano.core.project import Project
+    from meltano.core.tracking import Tracker
 
-logger = structlog.getLogger(__name__)
+# logger = structlog.getLogger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -139,6 +135,12 @@ async def run(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#run
     """  # noqa: D301, E501
+    from meltano.core.block.block_parser import BlockParser, validate_block_sets
+    from meltano.core.logging.utils import change_console_log_level
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.tracking.contexts import CliEvent
+
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")
         change_console_log_level()
@@ -193,6 +195,10 @@ async def _run_blocks(
     *,
     dry_run: bool,
 ) -> None:
+    from meltano.core.block.plugin_command import PluginCommandBlock
+    from meltano.core.tracking import BlockEvents
+    from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
+
     for idx, blk in enumerate(parsed_blocks):
         blk_name = blk.__class__.__name__
         tracking_ctx = PluginsTrackingContext.from_block(blk)

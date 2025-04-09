@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+import logging
 import sys
 import typing as t
 from abc import ABC, abstractmethod
@@ -12,12 +13,10 @@ from functools import reduce
 from operator import eq
 
 import dotenv
-import sqlalchemy
-import structlog
 
+# import structlog
 from meltano.core.environment import NoActiveEnvironment
 from meltano.core.error import MeltanoError, ProjectReadonly
-from meltano.core.setting import Setting
 from meltano.core.setting_definition import SettingDefinition, SettingMissingError
 from meltano.core.utils import flatten, pop_at_path, set_at_path
 
@@ -34,7 +33,8 @@ if t.TYPE_CHECKING:
     from meltano.core.settings_service import SettingsService
 
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class ConflictingSettingValueException(Exception):
@@ -987,6 +987,10 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A tuple the got value and an empty dictionary.
         """
+        import sqlalchemy
+
+        from meltano.core.setting import Setting
+
         try:
             if self.bulk:
                 value = self.all_settings[name]
@@ -1021,6 +1025,8 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        from meltano.core.setting import Setting
+
         setting = Setting(
             namespace=self.namespace,
             name=name,
@@ -1051,6 +1057,8 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        from meltano.core.setting import Setting
+
         self.session.query(Setting).filter_by(
             namespace=self.namespace,
             name=name,
@@ -1068,6 +1076,8 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             An empty dictionary.
         """
+        from meltano.core.setting import Setting
+
         self.session.query(Setting).filter_by(namespace=self.namespace).delete()
         self.session.commit()
 
@@ -1091,6 +1101,8 @@ class DbStoreManager(SettingsStoreManager):
         Returns:
             A dictionary of Setting models.
         """  # noqa: E501
+        from meltano.core.setting import Setting
+
         if self._all_settings is None:
             self._all_settings = {
                 setting.name: setting.value

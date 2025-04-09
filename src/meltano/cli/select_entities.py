@@ -9,14 +9,11 @@ import click
 
 from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, InstrumentedCmd
-from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.select_service import SelectService
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin.singer.catalog import SelectionType
     from meltano.core.project import Project
 
 
@@ -25,6 +22,8 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
 
 def selection_color(selection: SelectionType) -> str:
     """Return the appropriate colour for given SelectionType."""
+    from meltano.core.plugin.singer.catalog import SelectionType
+
     # TODO: Use a match statement when we drop Python 3.9 support
     if selection is SelectionType.SELECTED:
         return "bright_green"
@@ -46,6 +45,8 @@ def selection_mark(selection) -> str:  # noqa: ANN001
       [selected ]
       [excluded ]
     """
+    from meltano.core.plugin.singer.catalog import SelectionType
+
     colwidth = max(map(len, SelectionType))  # size of the longest mark
     return f"[{selection:<{colwidth}}]"
 
@@ -131,6 +132,8 @@ def update(
     remove: bool = False,
 ) -> None:
     """Update select pattern for a specific extractor."""
+    from meltano.core.select_service import SelectService
+
     select_service = SelectService(project, extractor)
     select_service.update(entities_filter, attributes_filter, exclude, remove=remove)
 
@@ -144,6 +147,11 @@ async def show(
     refresh: bool = False,
 ) -> None:
     """Show selected."""
+    from meltano.core.db import project_engine
+    from meltano.core.plugin.singer.catalog import SelectionType, SelectPattern
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.select_service import SelectService
+
     _, Session = project_engine(project)  # noqa: N806
     select_service = SelectService(project, extractor)
 

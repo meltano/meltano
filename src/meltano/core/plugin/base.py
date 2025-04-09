@@ -2,18 +2,19 @@
 
 from __future__ import annotations
 
-import enum
+import logging
 import re
 import typing as t
 from collections import defaultdict
 
 import yaml
-from structlog.stdlib import get_logger
 
+# from structlog.stdlib import get_logger
 from meltano.core.behavior import NameEq
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.behavior.hookable import HookObject
 from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
+from meltano.core.enums import PluginType
 from meltano.core.plugin.command import Command
 from meltano.core.plugin.requirements import PluginRequirement
 from meltano.core.setting_definition import SettingDefinition, SettingKind, YAMLEnum
@@ -24,7 +25,8 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin_invoker import PluginInvoker
 
-logger = get_logger(__name__)
+# logger = get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class VariantNotFoundError(Exception):
@@ -69,113 +71,6 @@ class PluginRefNameContainsStateIdDelimiterError(Exception):
 
 
 yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
-
-
-class PluginType(YAMLEnum):
-    """The type of a plugin."""
-
-    EXTRACTORS = enum.auto()
-    LOADERS = enum.auto()
-    TRANSFORMS = enum.auto()
-    ORCHESTRATORS = enum.auto()
-    TRANSFORMERS = enum.auto()
-    FILES = enum.auto()
-    UTILITIES = enum.auto()
-    MAPPERS = enum.auto()
-    MAPPINGS = enum.auto()
-
-    @property
-    def descriptor(self) -> str:
-        """Return the descriptor of the plugin type.
-
-        Returns:
-            The descriptor of the plugin type.
-        """
-        return "file bundle" if self is self.__class__.FILES else self.singular
-
-    @property
-    def singular(self) -> str:
-        """Make singular form for `meltano add PLUGIN_TYPE`.
-
-        Returns:
-            The singular form of the plugin type.
-        """
-        return "utility" if self is self.__class__.UTILITIES else self.value[:-1]
-
-    @property
-    def verb(self) -> str:
-        """Make verb form.
-
-        Returns:
-            The verb form of the plugin type.
-        """
-        if self is self.__class__.TRANSFORMS:
-            return self.singular
-        if self is self.__class__.UTILITIES:
-            return "utilize"
-        return "map" if self is self.__class__.MAPPERS else self.value[:-3]
-
-    @property
-    def discoverable(self) -> bool:
-        """Whether this plugin type is discoverable on the Hub.
-
-        Returns:
-            Whether this plugin type is discoverable on the Hub.
-        """
-        return self is not self.__class__.MAPPINGS
-
-    @classmethod
-    def value_exists(cls, value: str) -> bool:
-        """Check if a plugin type exists.
-
-        Args:
-            value: The plugin type to check.
-
-        Returns:
-            True if the plugin type exists, False otherwise.
-        """
-        return value in cls._value2member_map_
-
-    @classmethod
-    def cli_arguments(cls) -> list:
-        """Return the list of plugin types that can be used as CLI arguments.
-
-        Returns:
-            The list of plugin types that can be used as CLI arguments.
-        """
-        return [
-            getattr(plugin_type, plugin_type_name)
-            for plugin_type in cls
-            for plugin_type_name in ("singular", "value")
-        ]
-
-    @classmethod
-    def from_cli_argument(cls, value: str) -> PluginType:
-        """Get the plugin type from a CLI argument.
-
-        Args:
-            value: The CLI argument.
-
-        Returns:
-            The plugin type.
-
-        Raises:
-            ValueError: If the plugin type does not exist.
-        """
-        for plugin_type in cls:
-            if value in {plugin_type.value, plugin_type.singular}:
-                return plugin_type
-
-        raise ValueError(f"{value!r} is not a valid {cls.__name__}")  # noqa: EM102
-
-    @classmethod
-    def plurals(cls) -> list[str]:
-        """Return the list of plugin plural names.
-
-        Returns:
-            The list of plugin plurals.
-        """
-        return [plugin_type.value for plugin_type in cls]
 
 
 class PluginRef(Canonical):

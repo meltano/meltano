@@ -12,8 +12,6 @@ from meltano.cli.params import pass_project
 from meltano.cli.utils import CliError, InstrumentedCmd
 from meltano.core.environment import Environment
 from meltano.core.environment_service import EnvironmentService
-from meltano.core.manifest import Manifest
-from meltano.core.tracking.contexts import CliEvent
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -74,6 +72,9 @@ def compile_command(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#compile
     """  # noqa: D301, E501
+    from meltano.core.manifest import Manifest
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker: Tracker = ctx.obj["tracker"]
 
     try:

@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import asyncio
-import enum
 import logging
 import os
-import sys
 import typing as t
 from logging import config as logging_config
 
 import structlog
 import yaml
 
+from meltano.core.constants import LEVELS
+from meltano.core.enums import LogFormat
 from meltano.core.logging.formatters import (
     LEVELED_TIMESTAMPED_PRE_CHAIN,
     TIMESTAMPER,
@@ -20,36 +20,14 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.utils import get_no_color_flag
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
-    from enum import StrEnum
-
-
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
-LEVELS: dict[str, int] = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warning": logging.WARNING,
-    "error": logging.ERROR,
-    "critical": logging.CRITICAL,
-}
+
 DEFAULT_LEVEL = "info"
 FORMAT = (
     "[%(asctime)s] [%(process)d|%(threadName)10s|%(name)s] [%(levelname)s] %(message)s"
 )
-
-
-class LogFormat(StrEnum):
-    """Log format options."""
-
-    colored = enum.auto()
-    uncolored = enum.auto()
-    json = enum.auto()
-    key_value = enum.auto()
-    plain = enum.auto()
 
 
 def parse_log_level(log_level: str) -> int:

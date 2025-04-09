@@ -9,8 +9,8 @@ from contextlib import asynccontextmanager, nullcontext, suppress
 from datetime import datetime, timezone
 
 import click
-from structlog import stdlib as structlog_stdlib
 
+# from structlog import stdlib as structlog_stdlib
 from meltano.cli.params import (
     InstallPlugins,
     UUIDParamType,
@@ -18,18 +18,9 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
-from meltano.core.db import project_engine
-from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.job import Job, JobFinder
-from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.logging import JobLoggingService, OutputLogger
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin_install_service import PluginInstallReason
 from meltano.core.runner import RunnerError
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.runner.singer import SingerRunner
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
@@ -38,6 +29,9 @@ if t.TYPE_CHECKING:
     import structlog
     from sqlalchemy.orm import Session
 
+    from meltano.core.elt_context import ELTContextBuilder
+    from meltano.core.job import Job
+    from meltano.core.logging import OutputLogger
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -48,7 +42,8 @@ DUMPABLES = {
     "loader-config": (PluginType.LOADERS, "config"),
 }
 
-logger = structlog_stdlib.get_logger(__name__)
+# logger = structlog_stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -299,6 +294,10 @@ async def _run_el_command(
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
+    from meltano.core.db import project_engine
+    from meltano.core.job import Job
+    from meltano.core.tracking.contexts import CliEvent
+
     if platform.system() == "Windows":
         raise CliError(
             "ELT command not supported on Windows. Please use the run command "  # noqa: EM101
@@ -382,6 +381,8 @@ def _elt_context_builder(
     merge_state: bool = False,
     run_id: uuid.UUID | None = None,
 ) -> ELTContextBuilder:
+    from meltano.core.elt_context import ELTContextBuilder
+
     select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
@@ -434,6 +435,10 @@ async def _run_job(
     *,
     force=False,  # noqa: ANN001
 ) -> None:
+    from meltano.core.job import JobFinder
+    from meltano.core.job.stale_job_failer import fail_stale_jobs
+    from meltano.core.logging import JobLoggingService, OutputLogger
+
     fail_stale_jobs(session, job.job_name)
 
     if not force and (existing := JobFinder(job.job_name).latest_running(session)):
@@ -482,6 +487,9 @@ async def _run_elt(
     output_logger: OutputLogger,
     install_plugins: InstallPlugins,
 ) -> None:
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     elt_context = context_builder.context()
     plugins = [elt_context.extractor, elt_context.loader]
 
@@ -529,6 +537,8 @@ async def _run_extract_load(
     output_logger,  # noqa: ANN001
     **kwargs,  # noqa: ANN003
 ) -> None:
+    from meltano.core.runner.singer import SingerRunner
+
     extractor = elt_context.extractor.name
     loader = elt_context.loader.name
 
@@ -597,6 +607,8 @@ async def _run_extract_load(
 
 
 async def _run_transform(log, elt_context, output_logger, **kwargs) -> None:  # noqa: ANN001, ANN003
+    from meltano.core.runner.dbt import DbtRunner
+
     stderr_log = logger.bind(
         run_id=str(elt_context.job.run_id),
         state_id=elt_context.job.job_name,

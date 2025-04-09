@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
+import logging
 import typing as t
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -15,20 +16,15 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
-from meltano.core.block.block_parser import BlockParser, validate_block_sets
-from meltano.core.task_sets import InvalidTasksError, TaskSets, tasks_from_yaml_str
-from meltano.core.task_sets_service import (
-    JobAlreadyExistsError,
-    JobNotFoundError,
-    TaskSetsService,
-)
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.task_sets import TaskSets
+    from meltano.core.task_sets_service import TaskSetsService
     from meltano.core.tracking import Tracker
 
-logger = structlog.getLogger(__name__)
+# logger = structlog.getLogger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 def _list_single_job(  # noqa: D417
@@ -45,6 +41,9 @@ def _list_single_job(  # noqa: D417
         list_format: The format to use.
         job_name: The job name to list.
     """
+    from meltano.core.task_sets_service import JobNotFoundError
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker: Tracker = ctx.obj["tracker"]
     try:
         task_set = task_sets_service.get(job_name)
@@ -74,6 +73,8 @@ def _list_all_jobs(  # noqa: D417
         task_sets_service: The task sets service to use.
         list_format: The format to use.
     """
+    from meltano.core.tracking.contexts import CliEvent
+
     if list_format == "json":
         click.echo(
             json.dumps(
@@ -127,6 +128,8 @@ def job(project, ctx) -> None:  # noqa: ANN001
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#jobs
     """  # noqa: D301, E501
+    from meltano.core.task_sets_service import TaskSetsService
+
     ctx.obj["project"] = project
     ctx.obj["task_sets_service"] = TaskSetsService(project)
 
@@ -182,6 +185,10 @@ def add(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     \tmeltano job add NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job add NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """  # noqa: D301, E501
+    from meltano.core.task_sets import InvalidTasksError, tasks_from_yaml_str
+    from meltano.core.task_sets_service import JobAlreadyExistsError
+    from meltano.core.tracking.contexts import CliEvent
+
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
@@ -241,6 +248,10 @@ def set_cmd(ctx, job_name: str, raw_tasks: str) -> None:  # noqa: ANN001
     \tmeltano job set NAME --tasks '["tap mapper target", "tap2 target2", ...]'
     \tmeltano job set NAME --tasks '[["tap target dbt:run", "tap2 target2", ...], ...]'
     """  # noqa: D301, E501
+    from meltano.core.task_sets import InvalidTasksError, tasks_from_yaml_str
+    from meltano.core.task_sets_service import JobNotFoundError
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker: Tracker = ctx.obj["tracker"]
     project: Project = ctx.obj["project"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
@@ -273,6 +284,8 @@ def remove(ctx, job_name: str) -> None:  # noqa: ANN001
     Usage:
         meltano job remove <job_name>
     """
+    from meltano.core.tracking.contexts import CliEvent
+
     tracker: Tracker = ctx.obj["tracker"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]
     task_sets = task_sets_service.remove(job_name)
@@ -296,6 +309,10 @@ def _validate_tasks(project: Project, task_set: TaskSets, ctx: click.Context) ->
     Raises:
         InvalidTasksError: If the job's tasks are invalid.
     """
+    from meltano.core.block.block_parser import BlockParser, validate_block_sets
+    from meltano.core.task_sets import InvalidTasksError
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     logger.debug("validating job tasks", job=task_set.name, tasks=task_set.tasks)
     tracker: Tracker = ctx.obj["tracker"]
     for task in task_set.flat_args_per_set:

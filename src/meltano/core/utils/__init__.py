@@ -6,6 +6,7 @@ import asyncio
 import collections
 import functools
 import hashlib
+import logging
 import math
 import os
 import platform
@@ -22,17 +23,16 @@ from functools import reduce
 from operator import setitem
 from pathlib import Path
 
-import dateparser
 import flatten_dict
-import structlog
-from requests.auth import HTTPBasicAuth
 
+# import structlog
 from meltano.core.error import MeltanoError
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Coroutine, Iterable, MutableMapping
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
@@ -139,6 +139,8 @@ def slugify(s):  # noqa: ANN001, ANN201
 
 
 def get_basic_auth(user, token):  # noqa: ANN001, ANN201, D103
+    from requests.auth import HTTPBasicAuth
+
     return HTTPBasicAuth(user, token)
 
 
@@ -905,6 +907,8 @@ def parse_date(date_string: str) -> str:
     Returns:
         The datetime object corresponding to the parsed date string.
     """
+    import dateparser
+
     if re.match(REGEX_ISO8601, date_string):
         return date_string
 

@@ -9,12 +9,10 @@ import click
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd, InstrumentedDefaultGroup
-from meltano.core.db import project_engine
-from meltano.core.meltano_invoker import MeltanoInvoker
-from meltano.core.upgrade_service import UpgradeService
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+    from meltano.core.upgrade_service import UpgradeService
 
 
 @click.group(
@@ -37,6 +35,9 @@ def upgrade(ctx: click.Context, project: Project) -> None:
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
+    from meltano.core.db import project_engine
+    from meltano.core.upgrade_service import UpgradeService
+
     engine, _ = project_engine(project)  # (unreachable code)
     upgrade_service = UpgradeService(engine, project)  # (unreachable code)
     ctx.obj["upgrade_service"] = upgrade_service  # (unreachable code)
@@ -79,6 +80,8 @@ def all_(ctx: click.Context, pip_url: str, force: bool, skip_package: bool) -> N
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#upgrade
     """  # noqa: D301
+    from meltano.core.meltano_invoker import MeltanoInvoker
+
     upgrade_service: UpgradeService = ctx.obj["upgrade_service"]
 
     if skip_package:

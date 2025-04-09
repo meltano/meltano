@@ -9,16 +9,12 @@ import click
 from meltano.cli.params import pass_project
 from meltano.cli.utils import InstrumentedCmd
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.plugin_location_remove import (
-    DbRemoveManager,
-    PluginLocationRemoveManager,
-)
-from meltano.core.plugin_remove_service import PluginRemoveService
 
 if t.TYPE_CHECKING:
     from collections.abc import Sequence
 
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+    from meltano.core.plugin_location_remove import PluginLocationRemoveManager
     from meltano.core.project import Project
 
 
@@ -36,6 +32,8 @@ def remove(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#remove
     """  # noqa: D301
+    from meltano.core.plugin.project_plugin import ProjectPlugin
+
     plugins = [
         ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
         for plugin_name in plugin_names
@@ -45,6 +43,8 @@ def remove(
 
 def remove_plugins(project: Project, plugins: Sequence[ProjectPlugin]) -> None:
     """Invoke PluginRemoveService and output CLI removal overview."""
+    from meltano.core.plugin_remove_service import PluginRemoveService
+
     remove_service = PluginRemoveService(project)
 
     num_removed, total = remove_service.remove_plugins(
@@ -71,6 +71,8 @@ def remove_plugin_status_update(plugin: ProjectPlugin) -> None:
 
 def removal_manager_status_update(removal_manager: PluginLocationRemoveManager) -> None:
     """Print remove status message for a plugin location."""
+    from meltano.core.plugin_location_remove import DbRemoveManager
+
     plugin_descriptor = removal_manager.plugin_descriptor
     location = removal_manager.location
     if removal_manager.plugin_error:

@@ -7,7 +7,6 @@ import sys
 import typing as t
 
 import click
-from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -15,15 +14,7 @@ from meltano.cli.utils import (
     InstrumentedDefaultGroup,
     PartialInstrumentedCmd,
 )
-from meltano.core.db import project_engine
-from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule import CRON_INTERVALS
-from meltano.core.schedule_service import (
-    BadCronError,
-    ScheduleAlreadyExistsError,
-    ScheduleService,
-)
-from meltano.core.task_sets_service import TaskSetsService
+from meltano.core.constants import CRON_INTERVALS
 from meltano.core.utils import coerce_datetime
 
 if t.TYPE_CHECKING:
@@ -33,7 +24,9 @@ if t.TYPE_CHECKING:
 
     from meltano.core.project import Project
     from meltano.core.schedule import Schedule
+    from meltano.core.schedule_service import ScheduleService
     from meltano.core.task_sets import TaskSets
+    from meltano.core.task_sets_service import TaskSetsService
 
 
 @click.group(
@@ -50,6 +43,9 @@ def schedule(project, ctx) -> None:  # noqa: ANN001
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#schedule
     """  # noqa: D301
+    from meltano.core.schedule_service import ScheduleService
+    from meltano.core.task_sets_service import TaskSetsService
+
     ctx.obj["project"] = project
     ctx.obj["schedule_service"] = ScheduleService(project)
     ctx.obj["task_sets_service"] = TaskSetsService(project)
@@ -65,6 +61,11 @@ def _add_elt(
     start_date: datetime.datetime | None,
 ) -> None:
     """Add a new legacy elt schedule."""
+    from meltano.core.db import project_engine
+    from meltano.core.schedule_service import (
+        ScheduleAlreadyExistsError,
+    )
+
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
 
@@ -91,6 +92,11 @@ def _add_elt(
 
 def _add_job(ctx, name: str, job: str, interval: str) -> None:  # noqa: ANN001
     """Add a new scheduled job."""
+    from meltano.core.db import project_engine
+    from meltano.core.schedule_service import (
+        ScheduleAlreadyExistsError,
+    )
+
     project: Project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
 
@@ -114,6 +120,10 @@ class CronParam(click.ParamType):
 
     def convert(self, value, *_):  # noqa: ANN001, ANN201
         """Validate and con interval."""
+        from croniter import croniter
+
+        from meltano.core.schedule_service import BadCronError
+
         if value not in CRON_INTERVALS and not croniter.is_valid(value):
             raise BadCronError(value)
 
@@ -239,6 +249,9 @@ def _format_elt_list_output(entry: Schedule, session: Session) -> dict:
 @click.pass_context
 def list_schedules(ctx: click.Context, list_format: str) -> None:
     """List available schedules."""
+    from meltano.core.db import project_engine
+    from meltano.core.job.stale_job_failer import fail_stale_jobs
+
     project = ctx.obj["project"]
     schedule_service: ScheduleService = ctx.obj["schedule_service"]
     task_sets_service: TaskSetsService = ctx.obj["task_sets_service"]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+import logging
 import os
 import sys
 import typing as t
@@ -10,8 +11,7 @@ import warnings
 from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager, suppress
 
-import structlog
-
+# import structlog
 from meltano.core.setting_definition import (
     SettingDefinition,
     SettingKind,
@@ -32,7 +32,8 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.settings_store import SettingsStoreManager
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)\
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 # sentinel value to use to prevent leaking sensitive data

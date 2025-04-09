@@ -2,23 +2,21 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import click
-import structlog
 
+# import structlog
 from meltano.cli.params import database_uri_option
 from meltano.cli.utils import InstrumentedCmd
-from meltano.core.project_init_service import ProjectInitService
-from meltano.core.project_settings_service import ProjectSettingsService
-from meltano.core.tracking import Tracker
-from meltano.core.tracking.contexts import CliContext, CliEvent
 
 EXTRACTORS = "extractors"
 LOADERS = "loaders"
 ALL = "all"
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 path_type = click.Path(file_okay=False, path_type=Path)
 
 
@@ -49,6 +47,11 @@ def init(
     Read more at https://docs.meltano.com/reference/command-line-interface#init
 
     """  # noqa: D301
+    from meltano.core.project_init_service import ProjectInitService
+    from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.tracking import Tracker
+    from meltano.core.tracking.contexts import CliContext, CliEvent
+
     if not project_directory:
         click.echo("We need a project name to get started!")
         project_directory = click.prompt(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import tempfile
 import typing as t
 from functools import wraps
@@ -10,9 +11,8 @@ from pathlib import Path
 
 import click
 import dotenv
-import structlog
 
-from meltano.cli.interactive import InteractiveConfig
+# import structlog
 from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliEnvironmentBehavior,
@@ -20,24 +20,21 @@ from meltano.cli.utils import (
     InstrumentedGroup,
     PartialInstrumentedCmd,
 )
-from meltano.core.db import project_engine
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginNotFoundError
-from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.plugin_install_service import PluginInstallReason
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin_test_service import PluginTestServiceFactory
 from meltano.core.settings_service import SettingValueStore
 from meltano.core.settings_store import StoreNotSupportedError
-from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    # from meltano.core.settings_service import SettingValueStore
+    from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
     from meltano.core.settings_service import SettingsService
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -66,6 +63,8 @@ def _get_store_choices() -> list[SettingValueStore]:
     Returns:
         SettingValueStore.writables(), without meltano_env
     """
+    from meltano.core.settings_service import SettingValueStore
+
     writables = SettingValueStore.writables()
     writables.remove(SettingValueStore.MELTANO_ENVIRONMENT)
     return writables
@@ -87,6 +86,8 @@ def _use_meltano_env(func):  # noqa: ANN001, ANN202
 
     @wraps(func)
     def _wrapper(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202
+        from meltano.core.settings_service import SettingValueStore
+
         store = kwargs.pop("store")
         if store not in {
             SettingValueStore.MELTANO_YML,
@@ -162,6 +163,11 @@ def config(
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#config
     """  # noqa: D301
+    from meltano.core.db import project_engine
+    from meltano.core.plugin.settings_service import PluginSettingsService
+    from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
+
     tracker = ctx.obj["tracker"]
     try:
         ptype = PluginType.from_cli_argument(plugin_type) if plugin_type else None
@@ -250,6 +256,9 @@ def config(
 @click.pass_context
 def list_settings(ctx: click.Context, *, extras: bool) -> None:
     """List all settings for the specified plugin with their names, environment variables, and current values."""  # noqa: E501
+    from meltano.core.settings_service import SettingValueStore
+    from meltano.core.tracking.contexts import CliEvent
+
     settings: ProjectSettingsService | PluginSettingsService = ctx.obj["settings"]
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
@@ -351,6 +360,9 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
 @_use_meltano_env
 def reset(ctx, store) -> None:  # noqa: ANN001
     """Clear the configuration (back to defaults)."""
+    from meltano.core.settings_service import SettingValueStore
+    from meltano.core.tracking.contexts import CliEvent
+
     store = SettingValueStore(store)
 
     settings = ctx.obj["settings"]
@@ -393,6 +405,8 @@ def set_(
     from_file: t.TextIO | None,
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
+    from meltano.cli.interactive import InteractiveConfig
+
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
@@ -422,6 +436,10 @@ async def test(
     install_plugins: InstallPlugins,
 ) -> None:
     """Test the configuration of a plugin."""
+    from meltano.core.plugin_install_service import PluginInstallReason
+    from meltano.core.plugin_test_service import PluginTestServiceFactory
+    from meltano.core.tracking.contexts import CliEvent
+
     invoker = ctx.obj["invoker"]
     tracker = ctx.obj["tracker"]
     if not invoker:
@@ -475,6 +493,8 @@ async def test(
 @_use_meltano_env
 def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     """Unset the configurations' setting called `<name>`."""
+    from meltano.core.tracking.contexts import CliEvent
+
     store = SettingValueStore(store)
 
     settings = t.cast(

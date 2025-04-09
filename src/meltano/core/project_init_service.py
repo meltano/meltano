@@ -10,7 +10,6 @@ from pathlib import Path
 import click
 
 from meltano.core.cli_messages import GREETING
-from meltano.core.db import project_engine
 from meltano.core.plugin.meltano_file import MeltanoFilePlugin
 from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
@@ -151,6 +150,8 @@ class ProjectInitService:
         Raises:
             ProjectInitServiceError: Database initialization failed
         """
+        from meltano.core.db import project_engine
+
         click.secho("Creating system database...", fg="blue", nl=False)
 
         # register the system database connection

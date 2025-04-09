@@ -7,12 +7,14 @@ called before or after given trigger.
 
 from __future__ import annotations
 
+import logging
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 
-import structlog
+# import structlog
 
-logger = structlog.stdlib.get_logger(__name__)
+# logger = structlog.stdlib.get_logger(__name__)
+logger = logging.getLogger(__name__)  # noqa: TID251
 
 
 class hook:  # noqa: N801

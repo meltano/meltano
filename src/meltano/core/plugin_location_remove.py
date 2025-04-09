@@ -7,10 +7,6 @@ import typing as t
 from abc import ABC, abstractmethod
 from enum import Enum
 
-import sqlalchemy
-import sqlalchemy.exc
-
-from meltano.core.db import project_engine
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
 
@@ -88,6 +84,8 @@ class DbRemoveManager(PluginLocationRemoveManager):
             plugin: The plugin to remove.
             project: The Meltano project.
         """
+        from meltano.core.db import project_engine
+
         super().__init__(plugin, "system database")
         self.plugins_settings_service = PluginSettingsService(project, plugin)
         self.session = project_engine(project)[1]
@@ -98,6 +96,9 @@ class DbRemoveManager(PluginLocationRemoveManager):
         Returns:
             The remove status.
         """
+        import sqlalchemy
+        import sqlalchemy.exc
+
         session = self.session()
         try:
             self.plugins_settings_service.reset(
