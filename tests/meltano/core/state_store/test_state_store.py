@@ -19,7 +19,7 @@ from google.cloud.storage import Blob
 from fixtures.state_backends import DummyStateStoreManager
 from meltano.core.error import MeltanoError
 from meltano.core.state_store import (
-    BuiltinStateBackendEnum,
+    SYSTEMDB,
     DBStateStoreManager,
     MeltanoState,
     StateBackend,
@@ -70,7 +70,7 @@ def test_pluggable_state_backend(project: Project, monkeypatch: pytest.MonkeyPat
 
 class TestSystemDBStateBackend:
     def test_manager_from_settings(self, project: Project) -> None:
-        project.settings.set(["state_backend", "uri"], BuiltinStateBackendEnum.SYSTEMDB)
+        project.settings.set(["state_backend", "uri"], SYSTEMDB)
         project.settings.set(["state_backend", "lock_timeout_seconds"], 10)
         db_state_store = state_store_manager_from_project_settings(project.settings)
         assert isinstance(db_state_store, DBStateStoreManager)
