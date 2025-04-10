@@ -120,20 +120,21 @@ class Airflow(BasePlugin):
         """
         # generate the default `airflow.cfg`
         handle = await invoker.invoke_async(
-            "--help",
+            "config",
+            "generate",
             require_preparation=False,
-            stdout=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        exit_code = await handle.wait()
-
-        if exit_code:
+        stdout, stderr = await handle.communicate()
+        if handle.returncode:
             raise AsyncSubprocessError(
-                "Command `airflow --help` failed",  # noqa: EM101
+                "Command `airflow config generate` failed",  # noqa: EM101
                 process=handle,
             )
-
-        # Read and update airflow.cfg
+        config_file_path = invoker.files["config"]
+        with config_file_path.open("wb") as config_file:
+            config_file.write(stdout)
         self.update_config_file(invoker)
 
         # we've changed the configuration here, so we need to call
