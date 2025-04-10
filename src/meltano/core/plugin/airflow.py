@@ -120,7 +120,8 @@ class Airflow(BasePlugin):
         """
         # generate the default `airflow.cfg`
         handle = await invoker.invoke_async(
-            "config", "generate",
+            "config",
+            "generate",
             require_preparation=False,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
