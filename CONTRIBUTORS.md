@@ -190,6 +190,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/rafalkrupinski"><img src="https://avatars.githubusercontent.com/u/3732079?v=4?s=100" width="100px;" alt="Rafal Krupinski"/><br /><sub><b>Rafal Krupinski</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=rafalkrupinski" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DTyvoniuk"><img src="https://avatars.githubusercontent.com/u/92316388?v=4?s=100" width="100px;" alt="DTyvoniuk"/><br /><sub><b>DTyvoniuk</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=DTyvoniuk" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
