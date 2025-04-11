@@ -11,7 +11,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 Meltano takes a modular approach to data engineering in general and EL(T) in particular,
-where your [project](project) and pipelines are composed of plugins of [different types](#types), most notably
+where your [project](/concepts/project) and pipelines are composed of plugins of [different types](#types), most notably
 [**extractors**](#extractors) ([Singer](https://singer.io) taps),
 [**loaders**](#loaders) ([Singer](https://singer.io) targets),
 [**utilities**](#utilities) ([dbt](https://www.getdbt.com) for transformation, [Airflow](https://airflow.apache.org/)/[Dagster](https://dagster.io/)/etc. for orchestration, and much more on [MeltanoHub](https://hub.meltano.com/utilities/)).
@@ -22,7 +22,7 @@ To learn how to manage your project's plugins, refer to the [Plugin Management g
 
 ## Project Plugins
 
-In order to use a given package as a plugin in a [project](project),
+In order to use a given package as a plugin in a [project](/concepts/project),
 assuming it meets the requirements of the [plugin type](#types) in question, Meltano needs to know:
 
 1. where to find the package, typically a [pip package](https://pip.pypa.io/en/stable/) identified by its name on [PyPI](https://pypi.org/), public or private Git repository URL, or local directory path,
@@ -55,7 +55,7 @@ making them supported out of the box.
 
 To find discoverable plugins refer to the lists of [Extractors](https://hub.meltano.com/extractors/), [Loaders](https://hub.meltano.com/loaders/), etc., on [Meltano Hub](https://hub.meltano.com/).
 
-To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](project#shadowing-plugin-definitions) or [inheriting plugin definition](project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
+To learn how to add a discoverable plugin to your project using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) or [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), refer to the [Plugin Management guide](/guide/plugin-management#discoverable-plugins).
 
 ### Variants
 
@@ -161,7 +161,7 @@ Extractors support the following [extras](/guide/configuration#plugin-extras):
 - [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--catalog`
 - Default: None
 
-An extractor's `catalog` [extra](/guide/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](project)) to be provided to the extractor
+An extractor's `catalog` [extra](/guide/configuration#plugin-extras) holds a path to a [catalog file](https://hub.meltano.com/singer/spec#catalog-files) (relative to the [project directory](/concepts/project)) to be provided to the extractor
 when it is run in [sync mode](https://github.com/singer-io/getting-started/blob/master/docs/SYNC_MODE.md) using [`meltano elt`](/reference/command-line-interface#elt) or [`meltano invoke`](/reference/command-line-interface#invoke).
 
 If a catalog path is not set, the catalog will be [generated on the fly](/guide/integration#extractor-catalog-generation)
@@ -588,7 +588,7 @@ export TAP_GITLAB__SELECT_FILTER='["commits","!project_members"]'
 - [`meltano elt`](/reference/command-line-interface#elt) CLI option: `--state`
 - Default: None
 
-An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](project)) to be provided to the extractor
+An extractor's `state` [extra](/guide/configuration#plugin-extras) holds a path to a [state file](https://hub.meltano.com/singer/spec#state-files) (relative to the [project directory](/concepts/project)) to be provided to the extractor
 when it is run as part of a pipeline using [`meltano elt`](/reference/command-line-interface#elt).
 
 If a state path is not set, the state will be [looked up automatically](/guide/integration#incremental-replication-state) based on the ELT run's State ID.
@@ -915,7 +915,7 @@ File bundles are [pip packages](https://pip.pypa.io/en/stable/) bundling files y
 
 When a file bundle is added to your project using [`meltano add`](/reference/command-line-interface#add),
 the bundled files will automatically be added as well.
-The file bundle itself will not be added to your [`meltano.yml` project file](project#meltano-yml-project-file) unless it contains files that are
+The file bundle itself will not be added to your [`meltano.yml` project file](/concepts/project#meltanoyml-project-file) unless it contains files that are
 [managed by the file bundle](#update-extra) and to be updated automatically when [`meltano upgrade`](/reference/command-line-interface#upgrade) is run.
 
 #### `update` extra

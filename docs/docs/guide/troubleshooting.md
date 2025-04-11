@@ -208,7 +208,7 @@ The UI does **not** work with:
 
 If you're using [Airflow](https://hub.meltano.com/utilities/airflow) or [Dagster](https://hub.meltano.com/utilities/dagster) as your orchestrator, the Airflow or Dagster webserver UI should be able to serve as a replacement for many Meltano UI use cases.
 
-If using Airflow as orchestrator, see the ["Airflow orchestrator" section of the "Deployment in Production" guide](/guide/production#airflow-orchestrator) for more details on how to get the webserver running. From the webserver, you can [view all DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#dags-view). You can also access the Meltano logs for a specific task instance by going to the [task instance context menu](https://airflow.apache.org/docs/apache-airflow/1.10.14/ui.html#task-instance-context-menu) and clicking "Log" or "View logs".
+If using Airflow as orchestrator, see the ["Airflow orchestrator" section of the "Deployment in Production" guide](/guide/production#airflow-orchestrator) for more details on how to get the webserver running. From the webserver, you can [view all DAGs](https://airflow.apache.org/docs/apache-airflow/2.10.5/ui.html#dags-view). You can also access the Meltano logs for a specific task instance [in the Audit Log](https://airflow.apache.org/docs/apache-airflow/2.10.5/ui.html#audit-log).
 
 ### No Plugin Settings Defined
 

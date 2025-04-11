@@ -203,6 +203,17 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
                 f"`profiles` in '{name}' {plugin_type.descriptor} definition.",
             )
 
+    def __repr__(self) -> str:
+        """Return a string representation of the project plugin."""
+        return (
+            "ProjectPlugin("
+            f"name={self.name}, "
+            f"type={self.type}, "
+            f"variant={self.variant}, "
+            f"namespace={self.namespace}"
+            ")"
+        )
+
     @property
     def parent(self) -> ProjectPlugin | BasePlugin | None:
         """Plugins parent.
