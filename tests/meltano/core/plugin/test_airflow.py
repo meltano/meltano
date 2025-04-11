@@ -45,7 +45,7 @@ class TestAirflow:
 
         def popen_mock(cmd, *popen_args, **kwargs):
             # generate Airflow config
-            if popen_args[:2] == ("config", "generate"):
+            if popen_args[:3] == ("config", "list", "--defaults"):
                 assert "env" in kwargs
                 assert kwargs["env"]["AIRFLOW_HOME"] == str(run_dir)
 
@@ -91,7 +91,7 @@ class TestAirflow:
                     for _, popen_args, kwargs in popen.mock_calls
                     if popen_args and isinstance(popen_args, tuple)
                 ]
-                assert commands[0][1:3] == ("config", "generate")
+                assert commands[0][1:4] == ("config", "list", "--defaults")
                 assert commands[1][1] == "version"
                 assert commands[2][1] == "db"
                 assert commands[2][2] == "init"
