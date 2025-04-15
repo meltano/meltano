@@ -51,7 +51,7 @@ dependencies = [
   "python-dotenv>=1.0.1,<2",
   "pyyaml>=6.0.2,<7",
   "requests>=2.32.3,<3",
-  "rich>=13.9.4,<14",
+  "rich~=14.0.0",
   "ruamel.yaml>=0.18.6,<0.19",
   "setuptools>=76.0.0,<77 ; python_version >= '3.12'",
   "smart-open>=7.0.5,<8",
