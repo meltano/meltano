@@ -131,22 +131,20 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 class LoggingServer(contextlib.AbstractContextManager):
     """A context manager that starts and stops the logging server."""
 
-    def __init__(self) -> None:
+    def __init__(self, logger_name: str | None = None) -> None:
         """Initialize the logging server."""
         self.tcpserver = LogRecordSocketReceiver()
+        self.tcpserver.logger_name = logger_name
+        self.server_thread = threading.Thread(target=self._start, daemon=True)
+
+    def _start(self) -> None:
+        """Start the logging server."""
+        self.tcpserver.serve_until_stopped()
 
     def __enter__(self) -> None:
         """Start the logging server context manager."""
-        # Start server LogRecordSocketReceiver in a separate thread
-        # 1. create a new instance of LogRecordSocketReceiver
-
-        def start_tcp_server() -> None:
-            logger.info("About to start TCP server...")
-            self.tcpserver.serve_until_stopped()
-
         # 2. start the server in a separate thread
-        tcp_server_thread = threading.Thread(target=start_tcp_server)
-        tcp_server_thread.start()
+        self.server_thread.start()
 
     def __exit__(
         self,
@@ -156,6 +154,7 @@ class LoggingServer(contextlib.AbstractContextManager):
     ) -> None:
         """Stop the logging server."""
         self.tcpserver.abort = 1
+        self.server_thread.join()
 
 
 def main() -> None:
