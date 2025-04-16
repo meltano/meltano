@@ -35,7 +35,7 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
-    from meltano.core.settings_service import SettingsService
+    from meltano.core.settings_service import GetMetadata, SettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -104,7 +104,7 @@ def _use_meltano_env(func):  # noqa: ANN001, ANN202
     return _wrapper
 
 
-def get_label(metadata, source) -> str:  # noqa: ANN001
+def get_label(metadata: GetMetadata, source: SettingValueStore) -> str:
     """Get the label for an environment variable's source.
 
     Args:
