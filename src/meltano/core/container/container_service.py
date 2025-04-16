@@ -49,7 +49,14 @@ class ContainerService:
         Returns:
             Docker container information after execution.
         """
-        import aiodocker
+        try:
+            import aiodocker
+        except ImportError:  # pragma: no cover
+            msg = (
+                "The 'aiodocker' package is required to run containers. "
+                "Please install 'meltano[containers]'"
+            )
+            raise ImportError(msg) from None
 
         async with aiodocker.Docker() as docker:
             if pull:
