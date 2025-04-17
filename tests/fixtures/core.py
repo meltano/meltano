@@ -1632,7 +1632,7 @@ def discovery():
                 "namespace": "airflow",
                 "docs": "https://docs.meltano.com/guide/orchestration",
                 "repo": "https://github.com/apache/airflow",
-                "pip_url": "apache-airflow==2.1.2 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.1.2/constraints-${MELTANO__PYTHON_VERSION}.txt",
+                "pip_url": "apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.10.5/constraints-${MELTANO__PYTHON_VERSION}.txt",
                 "settings": [
                     {
                         "name": "core.dags_folder",

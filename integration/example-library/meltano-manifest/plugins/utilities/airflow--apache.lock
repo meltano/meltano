@@ -6,7 +6,7 @@
   "label": "Airflow",
   "docs": "https://hub.meltano.com/utilities/airflow--apache",
   "repo": "https://github.com/apache/airflow",
-  "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
+  "pip_url": "git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt",
   "executable": "airflow_invoker",
   "logo_url": "https://hub.meltano.com/assets/logos/orchestrators/airflow.png",
   "settings": [

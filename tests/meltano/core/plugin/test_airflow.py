@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import typing as t
 from configparser import ConfigParser
 
@@ -38,26 +39,32 @@ class TestAirflow:
         handle_mock.name = subject.name
         handle_mock.wait = AsyncMock(return_value=0)
         handle_mock.returncode = 0
-        handle_mock.communicate = AsyncMock(return_value=(b"2.0.1", None))
         handle_mock.stdout.at_eof.side_effect = (False, True)
 
         original_exec = asyncio.create_subprocess_exec
 
         def popen_mock(cmd, *popen_args, **kwargs):
-            # first time, it creates the `airflow.cfg`
-            if "--help" in popen_args:
+            # generate Airflow config
+            if popen_args[:3] == ("config", "list", "--defaults"):
                 assert "env" in kwargs
                 assert kwargs["env"]["AIRFLOW_HOME"] == str(run_dir)
 
                 airflow_cfg = ConfigParser()
                 airflow_cfg["core"] = {"dummy": "dummy"}
                 airflow_cfg["webserver"] = {"dummy": "dummy"}
-                with run_dir.joinpath("airflow.cfg").open("w") as cfg:
-                    airflow_cfg.write(cfg)
-            # second time, check version
+
+                writer = io.StringIO()
+                airflow_cfg.write(writer)
+                writer.seek(0)
+
+                handle_mock.communicate = AsyncMock(
+                    return_value=(writer.read().encode(), None)
+                )
+            # check version
             elif "version" in popen_args:
+                handle_mock.communicate = AsyncMock(return_value=(b"2.0.1", None))
                 return handle_mock
-            # third time, it creates the `airflow.db`
+            # create `airflow.db`
             elif {"db", "init"}.issubset(popen_args):
                 assert kwargs["env"]["AIRFLOW_HOME"] == str(run_dir)
 
@@ -84,7 +91,7 @@ class TestAirflow:
                     for _, popen_args, kwargs in popen.mock_calls
                     if popen_args and isinstance(popen_args, tuple)
                 ]
-                assert commands[0][1] == "--help"
+                assert commands[0][1:4] == ("config", "list", "--defaults")
                 assert commands[1][1] == "version"
                 assert commands[2][1] == "db"
                 assert commands[2][2] == "init"

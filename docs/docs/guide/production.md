@@ -178,24 +178,24 @@ a pipeline using [`meltano run`](/reference/command-line-interface#run),
 just like you did locally. Congratulations!
 
 You can run the command using any mechanism capable of running executables,
-whether that's [`cron`](https://hub.meltano.com/utilities/cron/), [Airflow's `BashOperator`](https://airflow.apache.org/docs/apache-airflow/1.10.14/howto/operator/bash.html),
+whether that's [`cron`](https://hub.meltano.com/utilities/cron/), [Airflow's `BashOperator`](https://airflow.apache.org/docs/apache-airflow/2.10.5/howto/operator/bash.html),
 or any of dozens of other orchestration tools.
 
 ### Airflow orchestrator
 
 If you've added Airflow to your Meltano project as an [orchestrator utility](/guide/orchestration),
 you can have it automatically run your project's [scheduled pipelines](/guide/orchestration)
-by starting [its scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html)
+by starting [its scheduler](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/scheduler.html)
 using `meltano invoke airflow scheduler`.
 
-Similarly, you can start [its web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver)
+Similarly, you can start [its web interface](https://airflow.apache.org/docs/apache-airflow/2.10.5/cli-and-env-variables-ref.html#webserver)
 using `meltano invoke airflow webserver`.
 
 However, do take into account Airflow's own
-[Deployment in Production Best Practices](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#deployment-in-production).
+[Deployment in Production Best Practices](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/production-deployment.html).
 Specifically, you will want to configure Airflow to:
 
-- [use the `LocalExecutor`](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#multi-node-cluster)
+- [use the `LocalExecutor`](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/production-deployment.html#multi-node-cluster)
   instead of the `SequentialExecutor` default by setting the `core.executor` setting
   (or `AIRFLOW__CORE__EXECUTOR` environment variable) to `LocalExecutor`:
 
@@ -216,7 +216,7 @@ Specifically, you will want to configure Airflow to:
     </TabItem>
   </Tabs>
 
-- [use a PostgreSQL metadata database](https://airflow.apache.org/docs/apache-airflow/1.10.14/best-practices.html#database-backend)
+- [use a PostgreSQL metadata database](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/production-deployment.html#database-backend)
   instead of the SQLite default ([sounds familiar?](#storing-metadata)) by setting the `core.sql_alchemy_conn` setting
   (or `AIRFLOW__CORE__SQL_ALCHEMY_CONN` environment variable) to a [`postgresql://` URI](https://docs.sqlalchemy.org/en/13/core/engines.html#postgresql):
 

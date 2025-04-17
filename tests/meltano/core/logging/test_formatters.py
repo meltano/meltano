@@ -38,6 +38,13 @@ def exc_info() -> ExcInfo:
 
 
 class TestLogFormatters:
+    """Test the log formatters."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Setup the test."""
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
+
     @pytest.fixture
     def record(self):
         return logging.LogRecord(

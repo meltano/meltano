@@ -889,15 +889,15 @@ schedules:
    plugins:
      utilities:
        - name: airflow
-         pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.8.1 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
+         pip_url: git+https://github.com/meltano/airflow-ext.git@main apache-airflow==2.10.5 --constraint https://raw.githubusercontent.com/apache/airflow/constraints-2.8.1/constraints-no-providers-${MELTANO__PYTHON_VERSION}.txt
    ```
 
    It will also automatically add a
    [`meltano run` DAG generator](https://github.com/meltano/files-airflow/blob/main/bundle/orchestrate/dags/meltano.py)
    to your project's `orchestrate/dags` directory, where Airflow
-   will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) by default.
+   will be configured to look for [DAGs](https://airflow.apache.org/docs/apache-airflow/2.10.5/core-concepts/dags.html) by default.
 
-1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/1.10.14/scheduler.html) using [`meltano invoke`](/reference/command-line-interface#invoke):
+1. Start the [Airflow scheduler](https://airflow.apache.org/docs/apache-airflow/2.10.5/administration-and-deployment/scheduler.html) using [`meltano invoke`](/reference/command-line-interface#invoke):
 
    ```bash
    meltano invoke airflow scheduler
@@ -908,7 +908,7 @@ schedules:
 
    As long as the scheduler is running, your scheduled pipelines will run at the appropriate times.
 
-1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/1.10.14/concepts.html#dags) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/1.10.14/cli-ref.html#webserver):
+1. Optionally, verify that a [DAG](https://airflow.apache.org/docs/apache-airflow/2.10.5/core-concepts/dags.html) was automatically created for each scheduled pipeline by starting the [Airflow web interface](https://airflow.apache.org/docs/apache-airflow/2.10.5/cli-and-env-variables-ref.html#webserver):
 
    ```bash
    meltano invoke airflow webserver
