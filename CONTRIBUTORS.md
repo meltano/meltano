@@ -188,6 +188,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/cbrammer"><img src="https://avatars.githubusercontent.com/u/218004?v=4?s=100" width="100px;" alt="cbrammer"/><br /><sub><b>cbrammer</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=cbrammer" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://tokmakov.biz/"><img src="https://avatars.githubusercontent.com/u/1442948?v=4?s=100" width="100px;" alt="Yegor Tokmakov"/><br /><sub><b>Yegor Tokmakov</b></sub></a><br /><a href="https://github.com/meltano/meltano/issues?q=author%3Ayegortokmakov" title="Bug reports">🐛</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/rafalkrupinski"><img src="https://avatars.githubusercontent.com/u/3732079?v=4?s=100" width="100px;" alt="Rafal Krupinski"/><br /><sub><b>Rafal Krupinski</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=rafalkrupinski" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DTyvoniuk"><img src="https://avatars.githubusercontent.com/u/92316388?v=4?s=100" width="100px;" alt="DTyvoniuk"/><br /><sub><b>DTyvoniuk</b></sub></a><br /><a href="https://github.com/meltano/meltano/commits?author=DTyvoniuk" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
