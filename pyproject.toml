@@ -436,3 +436,6 @@ convention = "google"
 ignore = [
   "W004",  # https://github.com/jwodder/check-wheel-contents/issues/5
 ]
+
+[tool.uv]
+required-version = ">=0.6.15"
