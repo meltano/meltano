@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.3 (2025-04-22)
+
+### 🐛 Fixes
+
+- [#9193](https://github.com/meltano/meltano/issues/9193) Omit warning log messages coming from `urllib3` certificate errors
+- [#9222](https://github.com/meltano/meltano/issues/9222) Make `name` argument of setting definition required
+- [#9210](https://github.com/meltano/meltano/issues/9210) Use `airflow config list --defaults` to generate initial config file
+- [#9208](https://github.com/meltano/meltano/issues/9208) Use `config generate` command to generate `airflow.cfg` configuration file -- _**Thanks @DTyvoniuk!**_
+
+### 📦 Packaging changes
+
+- [#9218](https://github.com/meltano/meltano/issues/9218) Bump supported version of `check-jsonschema`
+- [#9220](https://github.com/meltano/meltano/issues/9220) Bump supported version of `rich`
+
 ## v3.7.2 (2025-04-09)
 
 ### 🐛 Fixes
