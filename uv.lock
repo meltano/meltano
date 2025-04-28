@@ -1263,7 +1263,7 @@ wheels = [
 
 [[package]]
 name = "meltano"
-version = "3.7.3"
+version = "3.7.4"
 source = { editable = "." }
 dependencies = [
     { name = "aiodocker" },
