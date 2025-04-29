@@ -1151,9 +1151,6 @@ class InheritedStoreManager(SettingsStoreManager):
         if not setting_def:
             raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101
 
-        if not self.inherited_settings_service:  # type: ignore[truthy-bool]
-            raise StoreNotSupportedError("Inherited settings service is missing")  # noqa: EM101
-
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:  # type: ignore[redundant-expr]
             return None, {}
@@ -1171,7 +1168,12 @@ class InheritedStoreManager(SettingsStoreManager):
         Returns:
             A SettingsService to inherit configuration from.
         """
-        return self.settings_service.inherited_settings_service  # type: ignore[return-value]
+        service = self.settings_service.inherited_settings_service
+        if service is None:
+            msg = "Inherited settings service is missing"
+            raise StoreNotSupportedError(msg)
+
+        return service
 
     @property
     def config_with_metadata(self) -> dict:

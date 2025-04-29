@@ -81,6 +81,9 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
+_T = t.TypeVar("_T", bound="SettingsService")
+
+
 class SettingsService(metaclass=ABCMeta):
     """Abstract base class for managing settings."""
 
@@ -156,7 +159,7 @@ class SettingsService(metaclass=ABCMeta):
         """Return definitions of supported settings."""
 
     @property
-    def inherited_settings_service(self) -> None:
+    def inherited_settings_service(self: _T) -> _T | None:
         """Return settings service to inherit configuration from."""
         return None
 
