@@ -30,6 +30,7 @@ if t.TYPE_CHECKING:
     from collections.abc import Generator, Iterable
 
     from meltano.core.project import Project
+    from meltano.core.setting_definition import EnvVar
     from meltano.core.settings_store import SettingsStoreManager
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -62,7 +63,7 @@ class FeatureFlags(StrEnum):
 class FeatureNotAllowedException(Exception):
     """A disallowed code path is run."""
 
-    def __init__(self, feature) -> None:  # noqa: ANN001
+    def __init__(self, feature: str) -> None:
         """Instantiate the error.
 
         Args:
@@ -80,6 +81,9 @@ class FeatureNotAllowedException(Exception):
         return f"{self.feature} not enabled."
 
 
+_T = t.TypeVar("_T", bound="SettingsService")
+
+
 class SettingsService(metaclass=ABCMeta):
     """Abstract base class for managing settings."""
 
@@ -91,7 +95,7 @@ class SettingsService(metaclass=ABCMeta):
         project: Project,
         *,
         show_hidden: bool = True,
-        env_override: dict | None = None,
+        env_override: dict[str, t.Any] | None = None,
         config_override: dict | None = None,
     ):
         """Create a new settings service instance.
@@ -104,7 +108,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         self.project = project
         self.show_hidden = show_hidden
-        self.env_override = env_override or {}
+        self.env_override: dict[str, t.Any] = env_override or {}
         self.config_override = config_override or {}
         self._setting_defs: list[SettingDefinition] | None = None
 
@@ -119,7 +123,7 @@ class SettingsService(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def docs_url(self):  # noqa: ANN201
+    def docs_url(self) -> str:
         """Return docs URL.
 
         Returns:
@@ -155,7 +159,7 @@ class SettingsService(metaclass=ABCMeta):
         """Return definitions of supported settings."""
 
     @property
-    def inherited_settings_service(self) -> None:
+    def inherited_settings_service(self: _T) -> _T | None:
         """Return settings service to inherit configuration from."""
         return None
 
@@ -165,7 +169,7 @@ class SettingsService(metaclass=ABCMeta):
         """Return current configuration in `meltano.yml`."""
 
     @abstractmethod
-    def update_meltano_yml_config(self, config):  # noqa: ANN001, ANN201
+    def update_meltano_yml_config(self, config: dict) -> None:
         """Update configuration in `meltano.yml`.
 
         Args:
@@ -181,7 +185,7 @@ class SettingsService(metaclass=ABCMeta):
         """
 
     @property
-    def flat_meltano_yml_config(self):  # noqa: ANN201
+    def flat_meltano_yml_config(self) -> dict:
         """Flatten meltano config.
 
         Returns:
@@ -191,7 +195,7 @@ class SettingsService(metaclass=ABCMeta):
         return flatten(self.meltano_yml_config, "dot")
 
     @property
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, t.Any]:
         """Return the environment as a dict.
 
         Returns:
@@ -199,14 +203,14 @@ class SettingsService(metaclass=ABCMeta):
         """
         return {**os.environ, **self.env_override}
 
-    def config_with_metadata(  # noqa: ANN201
+    def config_with_metadata(
         self,
         prefix: str | None = None,
         extras: bool | None = None,
         source: SettingValueStore = SettingValueStore.AUTO,
         source_manager: SettingsStoreManager | None = None,
-        **kwargs,  # noqa: ANN003
-    ):
+        **kwargs: t.Any,
+    ) -> dict[str, t.Any]:
         """Return all config values with associated metadata.
 
         Args:
@@ -246,7 +250,12 @@ class SettingsService(metaclass=ABCMeta):
 
         return config
 
-    def as_dict(self, *args, process: bool = False, **kwargs) -> dict:  # noqa: ANN002, ANN003
+    def as_dict(
+        self,
+        *args: t.Any,
+        process: bool = False,
+        **kwargs: t.Any,
+    ) -> dict[str, t.Any]:
         """Return settings without associated metadata.
 
         Args:
@@ -272,7 +281,7 @@ class SettingsService(metaclass=ABCMeta):
 
         return config
 
-    def as_env(self, *args, **kwargs) -> dict[str, str]:  # noqa: ANN002, ANN003
+    def as_env(self, *args: t.Any, **kwargs: t.Any) -> dict[str, str]:
         """Return settings as an dictionary of environment variables.
 
         Args:
@@ -299,7 +308,7 @@ class SettingsService(metaclass=ABCMeta):
 
         return env
 
-    def get_with_metadata(  # noqa: ANN201
+    def get_with_metadata(
         self,
         name: str,
         *,
@@ -309,8 +318,8 @@ class SettingsService(metaclass=ABCMeta):
         setting_def: SettingDefinition | None = None,
         expand_env_vars: bool = True,
         redacted_value: str = REDACTED_VALUE,
-        **kwargs,  # noqa: ANN003
-    ):
+        **kwargs: t.Any,
+    ) -> tuple[t.Any, dict[str, t.Any]]:
         """Get a setting with associated metadata.
 
         Args:
@@ -433,7 +442,7 @@ class SettingsService(metaclass=ABCMeta):
 
         return value, metadata
 
-    def get_with_source(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
+    def get_with_source(self, *args: t.Any, **kwargs: t.Any) -> tuple[t.Any, t.Any]:
         """Get a setting value along with its source.
 
         Args:
@@ -446,7 +455,7 @@ class SettingsService(metaclass=ABCMeta):
         value, metadata = self.get_with_metadata(*args, **kwargs)
         return value, metadata["source"]
 
-    def get(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
+    def get(self, *args: t.Any, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Get a setting value.
 
         Args:
@@ -459,15 +468,15 @@ class SettingsService(metaclass=ABCMeta):
         value, _ = self.get_with_source(*args, **kwargs)
         return value
 
-    def set_with_metadata(  # noqa: ANN201
+    def set_with_metadata(
         self,
         path: str | list[str],
-        value,  # noqa: ANN001
-        store=SettingValueStore.AUTO,  # noqa: ANN001
+        value: t.Any,  # noqa: ANN401
+        store: SettingValueStore = SettingValueStore.AUTO,
         *,
         redacted_value: str = REDACTED_VALUE,
-        **kwargs,  # noqa: ANN003
-    ):
+        **kwargs: t.Any,
+    ) -> tuple[t.Any, dict[str, t.Any]]:
         """Set the value and metadata for a setting.
 
         Args:
@@ -494,7 +503,12 @@ class SettingsService(metaclass=ABCMeta):
             warnings.warn(f"Unknown setting {name!r}", RuntimeWarning, stacklevel=2)
             setting_def = None
 
-        metadata = {"name": name, "path": path, "store": store, "setting": setting_def}
+        metadata: dict[str, t.Any] = {
+            "name": name,
+            "path": path,
+            "store": store,
+            "setting": setting_def,
+        }
 
         if value == redacted_value:
             metadata["redacted"] = True
@@ -518,7 +532,7 @@ class SettingsService(metaclass=ABCMeta):
         self.log(f"Set setting {name!r} with metadata: {metadata}")
         return value, metadata
 
-    def set(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN201
+    def set(self, *args: t.Any, **kwargs: t.Any) -> t.Any:  # noqa: ANN401
         """Set the value for a setting.
 
         Args:
@@ -571,7 +585,11 @@ class SettingsService(metaclass=ABCMeta):
         self.log(f"Unset setting {name!r} with metadata: {metadata}")
         return metadata
 
-    def reset(self, store=SettingValueStore.AUTO, **kwargs):  # noqa: ANN001, ANN003, ANN201
+    def reset(
+        self,
+        store: SettingValueStore = SettingValueStore.AUTO,
+        **kwargs: t.Any,
+    ) -> dict:
         """Reset a setting.
 
         Args:
@@ -636,12 +654,12 @@ class SettingsService(metaclass=ABCMeta):
 
     # TODO: The `for_writing` parameter is unused, but referenced elsewhere.
     # Callers should be updated to not use it, and then it should be removed.
-    def setting_env_vars(  # noqa: ANN201
+    def setting_env_vars(
         self,
-        setting_def,  # noqa: ANN001
+        setting_def: SettingDefinition,
         *,
-        for_writing=False,  # noqa: ANN001, ARG002
-    ):
+        for_writing: bool = False,  # noqa: ARG002
+    ) -> list[EnvVar]:
         """Get environment variables for the given setting definition.
 
         Args:
@@ -653,7 +671,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         return setting_def.env_vars(self.env_prefixes)
 
-    def setting_env(self, setting_def):  # noqa: ANN001, ANN201
+    def setting_env(self, setting_def: SettingDefinition) -> str:
         """Get a single environment variable for the given setting definition.
 
         Args:
@@ -664,7 +682,7 @@ class SettingsService(metaclass=ABCMeta):
         """
         return self.setting_env_vars(setting_def)[0].key
 
-    def log(self, message) -> None:  # noqa: ANN001
+    def log(self, message: str) -> None:
         """Log the given message.
 
         Args:

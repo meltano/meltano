@@ -181,7 +181,7 @@ class SettingDefinition(NameEq, Canonical):
     def __init__(
         self,
         *,
-        name: str | None = None,
+        name: str,
         aliases: list[str] | None = None,
         env: str | None = None,
         env_aliases: list[str] | None = None,

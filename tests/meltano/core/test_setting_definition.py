@@ -227,6 +227,13 @@ class TestSettingDefinition:
         assert setting_definition.sensitive is sensitive
         assert setting_definition.kind is kind
 
+    def test_parse_missing_name(self) -> None:
+        with pytest.raises(
+            TypeError,
+            match="missing 1 required keyword-only argument: 'name'",
+        ):
+            SettingDefinition()
+
     def test_is_deprecated(self) -> None:
         setting_definition = SettingDefinition(
             name="test_setting",

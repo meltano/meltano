@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.4 (2025-04-28)
+
+### 📦 Packaging changes
+
+- [#9235](https://github.com/meltano/meltano/issues/9235) Allow installing Meltano with boto 1.38
+
+## v3.7.3 (2025-04-22)
+
+### 🐛 Fixes
+
+- [#9193](https://github.com/meltano/meltano/issues/9193) Omit warning log messages coming from `urllib3` certificate errors
+- [#9222](https://github.com/meltano/meltano/issues/9222) Make `name` argument of setting definition required
+- [#9210](https://github.com/meltano/meltano/issues/9210) Use `airflow config list --defaults` to generate initial config file
+- [#9208](https://github.com/meltano/meltano/issues/9208) Use `config generate` command to generate `airflow.cfg` configuration file -- _**Thanks @DTyvoniuk!**_
+
+### 📦 Packaging changes
+
+- [#9218](https://github.com/meltano/meltano/issues/9218) Bump supported version of `check-jsonschema`
+- [#9220](https://github.com/meltano/meltano/issues/9220) Bump supported version of `rich`
+
+## v3.7.2 (2025-04-09)
+
+### 🐛 Fixes
+
+- [#9200](https://github.com/meltano/meltano/issues/9200) Display a more useful error message if an unknown plugin could be a custom one
+- [#9185](https://github.com/meltano/meltano/issues/9185) Avoid crashing with `KeyError` after a setting is unset
+
+### ⚙️ Under the Hood
+
+- [#9204](https://github.com/meltano/meltano/issues/9204) Remove redundant logic for handling builtin `systemdb` state backend
+- [#9176](https://github.com/meltano/meltano/issues/9176) Refactor `CatalogRule` classes into dataclasses
+
+### 📚 Documentation Improvements
+
+- [#9205](https://github.com/meltano/meltano/issues/9205) Fixed a few broken links in plugin concept page
+- [#9191](https://github.com/meltano/meltano/issues/9191) Drop dbt version pin required by now fixed dbt-labs/dbt-postgres#96 -- _**Thanks @rafalkrupinski!**_
+- [#9179](https://github.com/meltano/meltano/issues/9179) Added installation examples for additional Meltano components and clarify system database requirements -- _**Thanks @cbrammer!**_
+
 ## v3.7.1 (2025-03-26)
 
 ### 🐛 Fixes
