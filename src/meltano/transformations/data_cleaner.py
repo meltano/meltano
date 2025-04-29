@@ -1,8 +1,13 @@
-from typing import List, Dict, Any
+from __future__ import annotations
+
+from typing import Any, Dict, List
+
 from pydantic import BaseModel
+
 
 class CleanConfig(BaseModel):
     required_fields: List[str] = []
+
 
 def clean_data(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     cleaned = []
@@ -14,6 +19,7 @@ def clean_data(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 new_record[new_key] = value
         cleaned.append(new_record)
     return cleaned
+
 
 def validate_data(records: List[Dict[str, Any]], config: CleanConfig) -> bool:
     for record in records:
