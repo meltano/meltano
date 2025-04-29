@@ -34,6 +34,8 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.block.extract_load import ELBContext
+    from meltano.core.elt_context import ELTContext, PluginContext
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin import PluginRef
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -42,7 +44,7 @@ if t.TYPE_CHECKING:
     class InvokerInitKwargs(t.TypedDict, total=False):
         """Keyword arguments for the Invoker constructor."""
 
-        context: t.Any | None
+        context: ELTContext | ELBContext | PluginContext | None
         output_handlers: dict | None
         run_dir: Path | None
         config_dir: Path | None
@@ -155,7 +157,7 @@ class PluginInvoker:
         project: Project,
         plugin: ProjectPlugin,
         *,
-        context: t.Any | None = None,  # noqa: ANN401
+        context: ELTContext | ELBContext | PluginContext | None = None,
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
