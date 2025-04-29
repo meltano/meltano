@@ -447,7 +447,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
             else (value, metadata)
         )
 
-    def setting_env_vars(self, *args, **kwargs) -> list[EnvVar]:  # noqa: ANN002, ANN003
+    def setting_env_vars(self, *args: t.Any, **kwargs: t.Any) -> list[EnvVar]:
         """Return setting environment variables.
 
         Args:
@@ -1152,7 +1152,7 @@ class InheritedStoreManager(SettingsStoreManager):
         super().__init__(settings_service, *args, **kwargs)
         self._kwargs = {**kwargs, "expand_env_vars": False}
         self.bulk = bulk
-        self._config_with_metadata = None
+        self._config_with_metadata: dict | None = None
 
     def get(
         self,
@@ -1210,7 +1210,7 @@ class InheritedStoreManager(SettingsStoreManager):
             self._config_with_metadata = (
                 self.inherited_settings_service.config_with_metadata(**self._kwargs)
             )
-        return self._config_with_metadata  # type: ignore[return-value]
+        return self._config_with_metadata
 
     def get_with_metadata(self, name: str) -> tuple[str, GetMetadata]:
         """Return inherited config and metadata for the named setting.
