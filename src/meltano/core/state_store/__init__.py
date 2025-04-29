@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import enum
-import platform
 import sys
 import typing as t
 from urllib.parse import urlparse
@@ -33,7 +31,6 @@ else:
     from importlib_metadata import EntryPoints, entry_points
 
 __all__ = [
-    "BuiltinStateBackendEnum",
     "DBStateStoreManager",
     "MeltanoState",
     "StateBackend",
@@ -43,11 +40,7 @@ __all__ = [
 
 logger = get_logger(__name__)
 
-
-class BuiltinStateBackendEnum(StrEnum):
-    """State backend."""
-
-    SYSTEMDB = "systemdb"
+SYSTEMDB = "systemdb"
 
 
 class StateBackend:
@@ -73,27 +66,12 @@ class StateBackend:
             List of available state backends.
         """
         return [
-            *(x.value for x in BuiltinStateBackendEnum),
+            SYSTEMDB,
             *(ep.name for ep in cls.addon.installed),
         ]
 
     @property
-    def _builtin_managers(
-        self,
-    ) -> Mapping[str, type[StateStoreManager]]:
-        """Get mapping of StateBackend to associated StateStoreManager.
-
-        Returns:
-            Mapping of StateBackend to associated StateStoreManager.
-        """
-        return {
-            BuiltinStateBackendEnum.SYSTEMDB: DBStateStoreManager,
-        }
-
-    @property
-    def manager(
-        self,
-    ) -> type[StateStoreManager]:
+    def manager(self) -> type[StateStoreManager]:
         """Get the StateStoreManager associated with this StateBackend.
 
         Returns:
@@ -103,24 +81,14 @@ class StateBackend:
             ValueError: If no state backend is found for the scheme.
         """
         try:
-            return self._builtin_managers[self.scheme]
+            manager = self.addon.get(self.scheme)
         except KeyError:
-            logger.info(
-                "No builtin state backend found for scheme '%s'",
-                self.scheme,
-            )
+            msg = f"No state backend found for scheme '{self.scheme}'. "
+            msg += "Available backends: " + ", ".join(self.backends())
+            raise ValueError(msg) from None
 
-        try:
-            return self.addon.get(self.scheme)
-        except KeyError:
-            logger.info(
-                "No state backend plugin found for scheme '%s'",
-                self.scheme,
-            )
-
-        # TODO: This should be a Meltano exception
-        msg = f"No state backend found for scheme '{self.scheme}'"
-        raise ValueError(msg)
+        logger.info("Using %s add-on state backend", manager.__name__)
+        return manager
 
 
 def state_store_manager_from_project_settings(
@@ -137,13 +105,13 @@ def state_store_manager_from_project_settings(
         The relevant StateStoreManager instance.
     """
     state_backend_uri: str = settings_service.get("state_backend.uri")
-    if state_backend_uri == BuiltinStateBackendEnum.SYSTEMDB:
+    if state_backend_uri == SYSTEMDB:
+        logger.info("Using systemdb state backend")
         return DBStateStoreManager(
             session=session or project_engine(settings_service.project)[1](),
         )
 
-    parsed = urlparse(state_backend_uri)
-    scheme = parsed.scheme
+    scheme = urlparse(state_backend_uri).scheme
     # Get backend-specific settings
     # AND top-level state_backend settings
     setting_defs = filter(

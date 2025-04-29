@@ -82,7 +82,7 @@ class PluginDefinitionNotFoundError(MeltanoError):
         else:
             instruction = (
                 "Try running `meltano lock --update --all` to ensure your plugins are "
-                "up to date"
+                "up to date, or add a `namespace` to your plugin if it is a custom one"
             )
 
         super().__init__(reason=reason, instruction=instruction)
