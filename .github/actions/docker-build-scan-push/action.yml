@@ -23,13 +23,11 @@ inputs:
   python-version:
     description: 'The version of Python that will be installed on the image'
     required: true
-  meltano-version:
-    description: 'The version of Meltano that will be installed on the image'
-    required: true
 
 runs:
   using: 'composite'
   steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Set up QEMU
       uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
 
@@ -42,13 +40,19 @@ runs:
       run: |
         echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
 
+    - name: Download artifacts
+      uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+      with:
+        name: Packages
+        path: dist
+
     - name: Build the image for all supported architectures
       uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
       with:
-        context: docker/meltano
+        context: .
+        file: docker/meltano/Dockerfile
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
-          MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64,linux/arm64
         # Can't load multi-arch images; use workaround instead:
@@ -62,10 +66,10 @@ runs:
     - name: Load the amd64 image for scanning
       uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
       with:
-        context: docker/meltano
+        context: .
+        file: docker/meltano/Dockerfile
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
-          MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64
         load: true
@@ -115,10 +119,10 @@ runs:
       if: ${{ inputs.push == 'true' }}
       uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
       with:
-        context: docker/meltano
+        context: .
+        file: docker/meltano/Dockerfile
         build-args: |
           PYTHON_VERSION=${{ inputs.python-version }}
-          MELTANO_VERSION=${{ inputs.meltano-version }}
         tags: ${{ steps.prepare-tags.outputs.tags }}
         platforms: linux/amd64,linux/arm64
         push: true
