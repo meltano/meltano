@@ -1,9 +1,24 @@
-name: Build and Publish to PyPI
+name: Build
 
 on:
   push:
+    paths:
+    - .github/actions/docker-build-scan-push/action.yml
+    - .github/workflows/build.yml
+    - docker/meltano/Dockerfile
+    - src/**
+    - scripts/**
+    - pyproject.toml
+  workflow_dispatch:
+  schedule:
+  # Weekly on Sunday at 04:45 UTC
+  - cron: '45 4 * * 0'
   release:
     types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 permissions:
   contents: write  # Needed to upload artifacts to the release
@@ -11,7 +26,7 @@ permissions:
 
 jobs:
   build:
-    name: Build artifacts
+    name: Wheel and sdist
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.baipp.outputs.package_version }}
@@ -55,10 +70,93 @@ jobs:
       uses: hynek/build-and-inspect-python-package@b5076c307dc91924a82ad150cdd1533b444d3310 # v2.12.0
       id: baipp
 
+  build_docker:
+    name: Docker Images
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      actions: read
+      contents: read
+      packages: write
+      security-events: write
+    env:
+      DEFAULT_PYTHON: "3.13"  # will be used in 'latest' images
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+        - "3.13"
+
+    steps:
+    - name: Set the workflow inputs
+      id: set-inputs
+      # This step makes it so that the same workflow inputs can be accessed
+      # regardless of what event triggered it.
+      run: |
+        echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Setup uv
+      uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
+      with:
+        version: ">=0.6"
+
+    - name: Generate tags
+      id: generate-tags
+      run: >
+        python scripts/generate_docker_tags.py
+        --git-sha ${{ github.sha }}
+        -v ${{ needs.build.outputs.version }}
+        -p ${{ matrix.python-version }}
+        -d ${{ env.DEFAULT_PYTHON }}
+        -r ${{ steps.set-inputs.outputs.registry }}
+        > tags
+
+    - name: Assemble image tags
+      id: assemble-tags
+      run: |
+        echo "If this is not a dry run, the image will be published with the following tags:"
+        cat tags
+
+        echo 'IMAGE_TAGS<<EOF' >> $GITHUB_ENV
+        echo "$(cat tags)" >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Set registry username and password
+      id: user-and-pass
+      run: |
+        if [[ "${{ steps.set-inputs.outputs.registry }}" == "ghcr.io" ]]; then
+          echo "username=${{ github.actor }}" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+        fi
+        if [[ "${{ steps.set-inputs.outputs.registry }}" == "docker.io" ]]; then
+          echo "username=meltano" >> $GITHUB_OUTPUT
+          echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build, scan, then conditionally push the Docker image for a given Python version
+      uses: ./.github/actions/docker-build-scan-push
+      with:
+        # Push to the container registry if
+        # - The trigger is a push to the main branch
+        # - The trigger is a workflow dispatch
+        # - The trigger is a release and the action is 'published'
+        push: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/main' ) || ( github.event_name == 'workflow_dispatch' ) || ( github.event_name == 'release' && github.event.action == 'published' )}}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tags: ${{ env.IMAGE_TAGS }}
+        registry: ${{ steps.set-inputs.outputs.registry }}
+        username: ${{ steps.user-and-pass.outputs.username }}
+        password: ${{ steps.user-and-pass.outputs.password }}
+        python-version: ${{ matrix.python-version }}
+
   pypi_release:
     name: Publish to PyPI
     if: github.event_name == 'release' && github.event.action == 'published'
-    needs: [build]
+    needs: [build, build_docker]
     runs-on: ubuntu-latest
     environment:
       name: publishing
