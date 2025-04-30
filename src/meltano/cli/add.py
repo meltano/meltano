@@ -50,7 +50,7 @@ def _load_yaml_from_ref(
             content = Path(value).read_text()
 
     except (ValueError, FileNotFoundError, IsADirectoryError) as e:
-        raise click.BadParameter(e.args[0], ctx=ctx, param=param) from e
+        raise click.BadParameter(str(e), ctx=ctx, param=param) from e
 
     return yaml.load(content) or {}
 
@@ -119,7 +119,7 @@ def _load_yaml_from_ref(
 @click.pass_context
 @run_async
 async def add(
-    ctx,  # noqa: ANN001
+    ctx: click.Context,
     project: Project,
     plugin_type: str,
     plugin_name: tuple[str, ...],
@@ -129,7 +129,7 @@ async def add(
     as_name: str | None = None,
     plugin_yaml: dict | None = None,
     python: str | None = None,
-    **flags,  # noqa: ANN003
+    **flags: bool,
 ) -> None:
     """Add a plugin to your project.
 
@@ -217,7 +217,7 @@ async def add(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _print_plugins(plugins) -> None:  # noqa: ANN001
+def _print_plugins(plugins: list[ProjectPlugin]) -> None:
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo
