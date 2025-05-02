@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import collections
 import functools
 import hashlib
 import math
@@ -242,7 +241,7 @@ def nest(
     return cursor[tail]
 
 
-def nest_object(flat_object):  # noqa: ANN001, ANN201, D103
+def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -611,7 +610,7 @@ def uniques_in(original: Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(collections.OrderedDict.fromkeys(original))
+    return list(dict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
