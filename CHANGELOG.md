@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.8.0 (2025-05-11)
+
+### 🐛 Fixes
+
+- [#9251](https://github.com/meltano/meltano/issues/9251) Compatibility with click 8.2.x
+
+### ⚙️ Under the Hood
+
+- [#9249](https://github.com/meltano/meltano/issues/9249) Make installation error details an extra context key of the main installation error log
+- [#9242](https://github.com/meltano/meltano/issues/9242) Use dict instead of `OrderedDict`
+
+### 📚 Documentation Improvements
+
+- [#9250](https://github.com/meltano/meltano/issues/9250) Updated `docker compose` commands
+
 ## v3.7.4 (2025-04-28)
 
 ### 📦 Packaging changes
