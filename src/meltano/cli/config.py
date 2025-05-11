@@ -60,7 +60,7 @@ def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     raise ValueError("No click.core.Context provided in *args")  # noqa: EM101
 
 
-def _get_store_choices() -> list[SettingValueStore]:
+def _get_store_choices() -> list[str]:
     """Get a list of valid choices for the --store flag.
 
     Returns:
