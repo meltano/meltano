@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import typing as t
+
 import mock
 import pytest
 
@@ -7,6 +9,9 @@ from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
 from meltano.core.project_add_service import PluginAlreadyAddedException
+
+if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class TestCliRemove:
@@ -17,9 +22,9 @@ class TestCliRemove:
         except PluginAlreadyAddedException as err:
             return err.plugin
 
-    def test_remove(self, project, tap, cli_runner) -> None:
+    def test_remove(self, project, tap: ProjectPlugin, cli_runner) -> None:
         with mock.patch("meltano.cli.remove.remove_plugins") as remove_plugins_mock:
-            result = cli_runner.invoke(cli, ["remove", tap.type, tap.name])
+            result = cli_runner.invoke(cli, ["remove", tap.type.value, tap.name])
             assert_cli_runner(result)
 
             remove_plugins_mock.assert_called_once_with(project, [tap])
