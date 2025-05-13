@@ -74,13 +74,13 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         pip_url: str | None = None,
         python: str | None = None,
         executable: str | None = None,
-        capabilities: list | None = None,
-        settings_group_validation: list | None = None,
+        capabilities: list[str] | None = None,
+        settings_group_validation: list[list[str]] | None = None,
         settings: list | None = None,
-        commands: dict | None = None,
-        requires: dict[PluginType, list] | None = None,
-        config: dict | None = None,
-        default_variant=Variant.ORIGINAL_NAME,  # noqa: ANN001
+        commands: dict[str, Command] | None = None,
+        requires: dict[PluginType, list[PluginRequirement]] | None = None,
+        config: dict[str, t.Any] | None = None,
+        default_variant: str = Variant.ORIGINAL_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):

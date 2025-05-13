@@ -78,7 +78,7 @@ class Project(Versioned):
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
-    _default = None
+    _default: t.ClassVar[Project | None] = None
 
     def __init__(
         self,
