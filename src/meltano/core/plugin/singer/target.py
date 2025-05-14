@@ -35,7 +35,7 @@ class BookmarkWriter:
         self,
         job: Job | None,
         session: Session,
-        payload_flag: int = Payload.STATE,
+        payload_flag: Payload = Payload.STATE,
         state_service: StateService | None = None,
     ):
         """Initialize the `BookmarkWriter`.
@@ -76,7 +76,7 @@ class BookmarkWriter:
 
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
-        job.payload_flags |= self.payload_flag
+        job.payload_flags = Payload(max(self.payload_flag, job.payload_flags))
         try:
             job.save(self.session)
             self.state_service.add_state(
