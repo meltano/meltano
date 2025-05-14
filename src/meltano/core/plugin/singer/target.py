@@ -73,30 +73,31 @@ class BookmarkWriter:
                 "Received state is invalid, incremental state has not been updated",
             )
 
-            # If no state is defined, do not save it. Saving an empty or undefined state could overwrite a valid existing state 
-            # in cases where the incoming state message is incorrect.
-            if new_state:
-                job = self.job
-                job.payload[SINGER_STATE_KEY] = new_state
-                job.payload_flags |= self.payload_flag
-                try:
-                    job.save(self.session)
-                    self.state_service.add_state(
-                        job,
-                        json.dumps(job.payload),
-                        job.payload_flags,
-                    )
-                except Exception:  # pragma: no cover
-                    logger.debug("Failed to persist state", exc_info=True)
-                    logger.warning(
-                        "Unable to persist state, or received state is invalid, "
-                        "incremental state has not been updated",
-                    )
-                else:
-                    logger.info(
-                        f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004
-                    )
-                    logger.debug(f"Incremental state: {new_state}")  # noqa: G004
+        # If no state is defined, do not save it. Saving an empty or undefined state
+        # could overwrite a valid existing state
+        # in cases where the incoming state message is incorrect.
+        if new_state:
+            job = self.job
+            job.payload[SINGER_STATE_KEY] = new_state
+            job.payload_flags |= self.payload_flag
+            try:
+                job.save(self.session)
+                self.state_service.add_state(
+                    job,
+                    json.dumps(job.payload),
+                    job.payload_flags,
+                )
+            except Exception:  # pragma: no cover
+                logger.debug("Failed to persist state", exc_info=True)
+                logger.warning(
+                    "Unable to persist state, or received state is invalid, "
+                    "incremental state has not been updated",
+                )
+            else:
+                logger.info(
+                    f"Incremental state has been updated at {datetime.now(tz=timezone.utc)}.",  # noqa: E501, G004
+                )
+                logger.debug(f"Incremental state: {new_state}")  # noqa: G004
 
 
 class SingerTarget(SingerPlugin):
