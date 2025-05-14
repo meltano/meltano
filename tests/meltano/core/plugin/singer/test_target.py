@@ -19,17 +19,25 @@ if t.TYPE_CHECKING:
 
 class TestBookmarkWriter:
     @pytest.mark.parametrize(
-        ("state_line", "expected_state"),
+        ("state_line", "expected_state", "writer_payload_flag"),
         (
             pytest.param(
                 "test",
                 {"singer_state": {"foo": "bar"}},
+                Payload.STATE,
                 id="invalid_state",
             ),
             pytest.param(
                 '{"qux": "quux"}',
                 {"singer_state": {"qux": "quux"}},
+                Payload.STATE,
                 id="valid_state",
+            ),
+            pytest.param(
+                '{"qux": "quux"}',
+                {"singer_state": {"foo": "bar", "qux": "quux"}},
+                Payload.INCOMPLETE_STATE,
+                id="valid_incomplete_state",
             ),
         ),
     )
@@ -39,6 +47,7 @@ class TestBookmarkWriter:
         session: Session,
         state_line: str,
         expected_state: dict,
+        writer_payload_flag: Payload,
     ) -> None:
         existing_state = {"singer_state": {"foo": "bar"}}
         state_service = StateService(session=session)
@@ -51,6 +60,7 @@ class TestBookmarkWriter:
             job,
             session,
             state_service=state_service,
+            payload_flag=writer_payload_flag,
         )
         writer.writeline(state_line)
 

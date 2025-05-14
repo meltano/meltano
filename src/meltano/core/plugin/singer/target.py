@@ -76,7 +76,7 @@ class BookmarkWriter:
 
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
-        job.payload_flags |= self.payload_flag
+        job.payload_flags = max(self.payload_flag, job.payload_flags)
         try:
             job.save(self.session)
             self.state_service.add_state(
