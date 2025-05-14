@@ -1,3 +1,6 @@
+# chore: Enable type checking in `meltano.core.state_service`
+742d088956a4b2b604d7888fe5235b82decce265
+
 # chore: Add more type annotations to `meltano.core.settings_service`
 1c132427977fa54ff38f8cfa4b84d1b119e01b89
 
