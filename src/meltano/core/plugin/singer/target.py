@@ -72,6 +72,7 @@ class BookmarkWriter:
             logger.warning(
                 "Received state is invalid, incremental state has not been updated",
             )
+            return
 
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
