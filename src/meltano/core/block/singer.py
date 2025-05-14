@@ -193,9 +193,6 @@ class InvokerBase:
         Returns:
             The stdin of the underlying process.
         """
-        if self.consumer and self.process_handle.stdin is None:
-            return None
-
         return self.process_handle.stdin
 
     async def close_stdin(self) -> None:
