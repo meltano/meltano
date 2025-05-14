@@ -19,7 +19,7 @@ from meltano.cli.params import (
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
 from meltano.core.db import project_engine
-from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.elt_context import ELTContext, ELTContextBuilder
 from meltano.core.job import Job, JobFinder
 from meltano.core.job.stale_job_failer import fail_stale_jobs
 from meltano.core.logging import JobLoggingService, OutputLogger
@@ -38,6 +38,7 @@ if t.TYPE_CHECKING:
     import structlog
     from sqlalchemy.orm import Session
 
+    from meltano.core.plugin.base import PluginDefinition
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -406,7 +407,7 @@ def _elt_context_builder(
     )
 
 
-async def dump_file(context_builder, dumpable) -> None:  # noqa: ANN001
+async def dump_file(context_builder: ELTContextBuilder, dumpable: str) -> None:
     """Dump the given dumpable for this pipeline."""
     elt_context = context_builder.context()
 
@@ -425,14 +426,14 @@ async def dump_file(context_builder, dumpable) -> None:  # noqa: ANN001
 
 
 async def _run_job(
-    tracker,  # noqa: ANN001
-    project,  # noqa: ANN001
-    job,  # noqa: ANN001
-    session,  # noqa: ANN001
-    context_builder,  # noqa: ANN001
+    tracker: Tracker,
+    project: Project,
+    job: Job,
+    session: Session,
+    context_builder: ELTContextBuilder,
     install_plugins: InstallPlugins,
     *,
-    force=False,  # noqa: ANN001
+    force: bool = False,
 ) -> None:
     fail_stale_jobs(session, job.job_name)
 
@@ -456,7 +457,9 @@ async def _run_job(
 
 
 @asynccontextmanager
-async def _redirect_output(log, output_logger):  # noqa: ANN001, ANN202
+async def _redirect_output(
+    log: structlog.stdlib.BoundLogger, output_logger: OutputLogger
+) -> t.AsyncGenerator[None, None]:
     meltano_stdout = output_logger.out(
         "meltano",
         log.bind(stdio="stdout", cmd_type="elt"),
@@ -524,17 +527,17 @@ async def _run_elt(
 
 
 async def _run_extract_load(
-    log,  # noqa: ANN001
-    elt_context,  # noqa: ANN001
-    output_logger,  # noqa: ANN001
-    **kwargs,  # noqa: ANN003
+    log: structlog.stdlib.BoundLogger,
+    elt_context: ELTContext,
+    output_logger: OutputLogger,
+    **kwargs: t.Any,
 ) -> None:
-    extractor = elt_context.extractor.name
-    loader = elt_context.loader.name
+    extractor = elt_context.extractor.name  # type: ignore[union-attr]
+    loader = elt_context.loader.name  # type: ignore[union-attr]
 
     stderr_log = logger.bind(
-        run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_name,
+        run_id=str(elt_context.job.run_id),  # type: ignore[union-attr]
+        state_id=elt_context.job.job_name,  # type: ignore[union-attr]
         stdio="stderr",
     )
 
@@ -545,8 +548,8 @@ async def _run_extract_load(
     loader_out_writer_ctxmgr = nullcontext
     if logger.getEffectiveLevel() == logging.DEBUG:
         stdout_log = logger.bind(
-            run_id=str(elt_context.job.run_id),
-            state_id=elt_context.job.job_name,
+            run_id=str(elt_context.job.run_id),  # type: ignore[union-attr]
+            state_id=elt_context.job.job_name,  # type: ignore[union-attr]
             stdio="stdout",
         )
         extractor_out = output_logger.out(
@@ -560,8 +563,8 @@ async def _run_extract_load(
             logging.DEBUG,
         )
 
-        extractor_out_writer_ctxmgr = extractor_out.line_writer
-        loader_out_writer_ctxmgr = loader_out.line_writer
+        extractor_out_writer_ctxmgr = extractor_out.line_writer  # type: ignore[assignment]
+        loader_out_writer_ctxmgr = loader_out.line_writer  # type: ignore[assignment]
 
     log.info(
         "Running extract & load...",
@@ -596,15 +599,23 @@ async def _run_extract_load(
     log.info("Extract & load complete!")
 
 
-async def _run_transform(log, elt_context, output_logger, **kwargs) -> None:  # noqa: ANN001, ANN003
+async def _run_transform(
+    log: structlog.stdlib.BoundLogger,
+    elt_context: ELTContext,
+    output_logger: OutputLogger,
+    **kwargs: t.Any,
+) -> None:
     stderr_log = logger.bind(
-        run_id=str(elt_context.job.run_id),
-        state_id=elt_context.job.job_name,
+        run_id=str(elt_context.job.run_id),  # type: ignore[union-attr]
+        state_id=elt_context.job.job_name,  # type: ignore[union-attr]
         stdio="stderr",
         cmd_type="transformer",
     )
 
-    transformer_log = output_logger.out(elt_context.transformer.name, stderr_log)
+    transformer_log = output_logger.out(
+        elt_context.transformer.name,  # type: ignore[union-attr]
+        stderr_log,
+    )
 
     log.info("Running transformation...")
 
@@ -622,7 +633,7 @@ async def _run_transform(log, elt_context, output_logger, **kwargs) -> None:  # 
     log.info("Transformation complete!")
 
 
-def _find_extractor(project: Project, extractor_name: str):  # noqa: ANN202
+def _find_extractor(project: Project, extractor_name: str) -> PluginDefinition:
     try:
         return project.plugins.locked_definition_service.find_definition(
             PluginType.EXTRACTORS,
@@ -635,10 +646,10 @@ def _find_extractor(project: Project, extractor_name: str):  # noqa: ANN202
         )
 
 
-def _find_transform_for_extractor(  # noqa: ANN202
+def _find_transform_for_extractor(
     project: Project,
     extractor_name: str,
-):
+) -> str | None:
     try:
         # Check if there is a default transform for this extractor
         transform_plugin_def = project.plugins.find_plugin_by_namespace(
