@@ -1,15 +1,60 @@
 from __future__ import annotations
 
+import json
 import typing as t
 
 import pytest
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.singer.target import BookmarkWriter
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.state_service import StateService
 
 if t.TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
     from meltano.core.project_add_service import ProjectAddService
+
+
+class TestBookmarkWriter:
+    @pytest.mark.parametrize(
+        ("state_line", "expected_state"),
+        (
+            pytest.param(
+                "test",
+                {"singer_state": {"foo": "bar"}},
+                id="invalid_state",
+            ),
+            pytest.param(
+                '{"qux": "quux"}',
+                {"singer_state": {"qux": "quux"}},
+                id="valid_state",
+            ),
+        ),
+    )
+    @pytest.mark.asyncio
+    async def test_writeline(
+        self,
+        session: Session,
+        state_line: str,
+        expected_state: dict,
+    ) -> None:
+        existing_state = {"singer_state": {"foo": "bar"}}
+        state_service = StateService(session=session)
+
+        job = Job(job_name="pytest_test_runner", payload=existing_state)
+        job.save(session)
+        state_service.add_state(job, json.dumps(existing_state))
+
+        writer = BookmarkWriter(
+            job,
+            session,
+            state_service=state_service,
+        )
+        writer.writeline(state_line)
+
+        assert state_service.get_state(job.job_name) == expected_state
 
 
 class TestSingerTarget:
