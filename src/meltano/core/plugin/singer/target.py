@@ -73,7 +73,7 @@ class BookmarkWriter:
                 "Received state is invalid, incremental state has not been updated",
             )
 
-            # If no state is defined, do not save it. Saving an empty or undefined state could overwrite a valid existing state 
+            # If no state is defined, do not save it. Saving an empty or undefined state could overwrite a valid existing state
             # in cases where the incoming state message is incorrect.
             if new_state:
                 job = self.job
