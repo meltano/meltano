@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import platform
-import re
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -93,11 +92,11 @@ class TestVenvService:
 
         # ensure that the package is installed
         installed = await subject.list_installed()
-        assert any(re.search(r"example\s+0\.1\.0", dep) for dep in installed)
+        assert any(dep["name"] == "example" for dep in installed)
 
         # ensure that pip is the latest version
         outdated = await subject.list_installed("--outdated")
-        assert not any(dep.startswith("pip ") for dep in outdated)
+        assert not any(dep["name"] == "pip " for dep in outdated)
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
@@ -136,7 +135,7 @@ class TestVenvService:
 
         # ensure that the package is installed
         installed = await subject.list_installed()
-        assert any(re.search(r"example\s+0\.1\.0", dep) for dep in installed)
+        assert any(dep["name"] == "example" for dep in installed)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -318,7 +317,7 @@ class TestUvVenvService(TestVenvService):
         await subject.install(["cowsay"])
 
         installed = await subject.list_installed()
-        assert any(dep.startswith("cowsay") for dep in installed)
+        assert any(dep["name"] == "cowsay" for dep in installed)
 
     async def test_handle_installation_error(self, subject: UvVenvService) -> None:
         process = mock.Mock(spec=Process)
