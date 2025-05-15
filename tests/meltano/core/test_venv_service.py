@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import platform
 import re
 import sys
@@ -43,6 +42,11 @@ async def _check_venv_created_with_python_for_plugin(
 
 
 class TestVenvService:
+    def assert_pip_log_file(self, service: VenvService):
+        assert service.pip_log_path.exists()
+        assert service.pip_log_path.is_file()
+        assert service.pip_log_path.stat().st_size > 0
+
     @pytest.fixture
     def subject(self, project):
         return VenvService(project=project, namespace="namespace", name="name")
@@ -88,32 +92,12 @@ class TestVenvService:
         assert (venv_dir / "bin/python").samefile(venv_dir / "bin/python3")
 
         # ensure that the package is installed
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        assert re.search(r"example\s+0\.1\.0", str(stdout))
+        installed = await subject.list_installed()
+        assert any(re.search(r"example\s+0\.1\.0", dep) for dep in installed)
 
         # ensure that pip is the latest version
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            "--outdated",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        for line in str(stdout).splitlines():
-            assert not line.startswith("pip ")
+        outdated = await subject.list_installed("--outdated")
+        assert not any(dep.startswith("pip ") for dep in outdated)
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
@@ -133,9 +117,7 @@ class TestVenvService:
         )
 
         # ensure that log file was created and is not empty
-        assert subject.pip_log_path.exists()
-        assert subject.pip_log_path.is_file()
-        assert subject.pip_log_path.stat().st_size > 0
+        self.assert_pip_log_file(subject)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -147,24 +129,14 @@ class TestVenvService:
 
         # Make sure the venv exists already
         await subject.install(["example"], clean=True)
-        venv_dir = subject.project.venvs_dir("namespace", "name")
 
         # remove the package, then check that after a regular install the package exists
         await subject.uninstall_package("example")
         await subject.install(["example"])
 
         # ensure that the package is installed
-        proc = await asyncio.create_subprocess_exec(
-            str(venv_dir.joinpath("bin/python")),
-            "-m",
-            "pip",
-            "list",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await proc.communicate()
-        assert proc.returncode == 0
-        assert re.search(r"example\s+0\.1\.0", str(stdout))
+        installed = await subject.list_installed()
+        assert any(re.search(r"example\s+0\.1\.0", dep) for dep in installed)
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -321,7 +293,10 @@ class TestVirtualEnv:
             VirtualEnv(root, python=3.11)
 
 
-class TestUvVenvService:
+class TestUvVenvService(TestVenvService):
+    def assert_pip_log_file(self, service: VenvService):
+        pass
+
     @pytest.fixture
     def subject(self, project):
         find_uv.cache_clear()
@@ -342,17 +317,8 @@ class TestUvVenvService:
         await subject.uninstall_package("cowsay")
         await subject.install(["cowsay"])
 
-        process = await asyncio.create_subprocess_exec(
-            subject.uv,
-            "pip",
-            "list",
-            "--python",
-            str(subject.exec_path("python")),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        stdout, _ = await process.communicate()
-        assert "cowsay" in stdout.decode()
+        installed = await subject.list_installed()
+        assert any(dep.startswith("cowsay") for dep in installed)
 
     async def test_handle_installation_error(self, subject: UvVenvService) -> None:
         process = mock.Mock(spec=Process)

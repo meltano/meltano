@@ -112,7 +112,7 @@ settings:
 
 # venv
 - name: venv.backend
-  value: virtualenv
+  value: uv
   kind: options
   options:
   - label: virtualenv
