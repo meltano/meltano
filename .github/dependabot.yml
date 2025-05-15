@@ -8,7 +8,6 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
     labels: [deps]
     groups:
       default:
@@ -24,7 +23,6 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
     labels: [deps]
     groups:
       actions:
@@ -40,7 +38,6 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
     labels: [deps]
     groups:
       development-dependencies:
@@ -61,7 +58,6 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    reviewers: [meltano/engineering]
     labels: [deps]
     groups:
       development-dependencies:
@@ -80,4 +76,3 @@ updates:
       interval: "monthly"
       time: "12:00"
       timezone: "Etc/UTC"
-    reviewers: ["meltano/engineering"]
