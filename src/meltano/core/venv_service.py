@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import os
 import platform
 import shlex
@@ -608,17 +609,18 @@ class VenvService:
         except AsyncSubprocessError as err:
             raise await self.handle_installation_error(err) from err
 
-    async def list_installed(self, *args: str) -> list[str]:
+    async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
         proc = await exec_async(
             str(self.exec_path("python")),
             "-m",
             "pip",
             "list",
+            "--format=json",
             *args,
         )
         stdout, _ = await proc.communicate()
-        return stdout.decode("utf-8", errors="replace").splitlines()
+        return json.loads(stdout)
 
 
 class UvVenvService(VenvService):
@@ -745,8 +747,10 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "list",
+            "--quiet",
+            "--format=json",
             f"--python={self.exec_path('python')}",
             *args,
         )
         stdout, _ = await proc.communicate()
-        return stdout.decode("utf-8", errors="replace").splitlines()
+        return json.loads(stdout)
