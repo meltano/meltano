@@ -608,6 +608,18 @@ class VenvService:
         except AsyncSubprocessError as err:
             raise await self.handle_installation_error(err) from err
 
+    async def list_installed(self, *args: str) -> list[str]:
+        """List the installed dependencies."""
+        proc = await exec_async(
+            str(self.exec_path("python")),
+            "-m",
+            "pip",
+            "list",
+            *args,
+        )
+        stdout, _ = await proc.communicate()
+        return stdout.decode("utf-8", errors="replace").splitlines()
+
 
 class UvVenvService(VenvService):
     """Manages virtual environments using `uv`."""
@@ -726,3 +738,15 @@ class UvVenvService(VenvService):
             str(self.venv.root),
             extract_stderr=extract_stderr,
         )
+
+    async def list_installed(self, *args: str) -> list[str]:
+        """List the installed dependencies."""
+        proc = await exec_async(
+            self.uv,
+            "pip",
+            "list",
+            f"--python={self.exec_path('python')}",
+            *args,
+        )
+        stdout, _ = await proc.communicate()
+        return stdout.decode("utf-8", errors="replace").splitlines()

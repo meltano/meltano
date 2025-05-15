@@ -196,7 +196,7 @@ class TestPluginInstallService:
             "python-json-logger",
         ]
 
-    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install(
         self,
@@ -265,7 +265,7 @@ class TestPluginInstallService:
             "Expected plugin with missing env var in pip URL to not be installed"
         )
 
-    @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
+    @patch("meltano.core.venv_service.UvVenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
     async def test_auto_install_mapper_by_mapping(
         self,
