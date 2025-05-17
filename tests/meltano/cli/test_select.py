@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import typing as t
 
 import pytest
 
@@ -12,6 +13,10 @@ from meltano.core.plugin.singer.catalog import (
     SelectionType,
 )
 from meltano.core.select_service import SelectService
+
+if t.TYPE_CHECKING:
+    from fixtures.cli import MeltanoCliRunner
+    from meltano.core.plugin.project_plugin import ProjectPlugin
 
 
 class TestCliSelect:
@@ -97,3 +102,63 @@ class TestCliSelect:
         assert "[selected   ] users.id" in result.stdout
         assert "[excluded   ] users.name" in result.stdout
         assert "[unsupported] users.secret" in result.stdout
+
+    @pytest.mark.usefixtures("project")
+    def test_select_list_json(
+        self,
+        cli_runner: MeltanoCliRunner,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        async def mock_list_all(*args, **kwargs):  # noqa: ARG001
+            result = ListSelectedExecutor()
+            result.streams = {
+                SelectedNode(key="users", selection=SelectionType.SELECTED),
+            }
+            result.properties = {
+                "users": {
+                    SelectedNode(key="id", selection=SelectionType.SELECTED),
+                    SelectedNode(key="name", selection=SelectionType.EXCLUDED),
+                    SelectedNode(key="secret", selection=SelectionType.UNSUPPORTED),
+                },
+            }
+            return result
+
+        monkeypatch.setattr(
+            SelectService,
+            "list_all",
+            mock_list_all,
+        )
+
+        # list selection
+        result = cli_runner.invoke(
+            cli,
+            [
+                "--no-environment",
+                "select",
+                tap.name,
+                "--json",
+                "--all",
+            ],
+        )
+        assert_cli_runner(result)
+
+        json_result = json.loads(result.stdout)
+        assert json_result["enabled_patterns"] == []
+        assert json_result["entities"] == [
+            {
+                "stream": "users",
+                "property": "id",
+                "selection": "selected",
+            },
+            {
+                "stream": "users",
+                "property": "name",
+                "selection": "excluded",
+            },
+            {
+                "stream": "users",
+                "property": "secret",
+                "selection": "unsupported",
+            },
+        ]
