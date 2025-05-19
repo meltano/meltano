@@ -143,7 +143,7 @@ id,first_name,last_name,email,ip_address
 
 ```yaml
 plugins
-  mapper:
+  mappers:
   - name: meltano-map-transformer
     variant: meltano
     pip_url: meltano-map-transform
