@@ -142,7 +142,7 @@ id,first_name,last_name,email,ip_address
 ```
 
 ```yaml
-plugins
+plugins:
   mappers:
   - name: meltano-map-transformer
     variant: meltano
