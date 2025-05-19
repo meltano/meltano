@@ -87,7 +87,7 @@ A few example configurations using inline stream maps are:
 
 This example shows the SDK based meltanolabs variant of tap-github configured to lowercase all repo names in the issues stream.
 
-```yaml
+```yaml title="meltano.yml"
   - name: tap-github
     variant: meltanolabs
     pip_url: meltanolabs-tap-github
@@ -141,7 +141,7 @@ id,first_name,last_name,email,ip_address
 1,Ethe,Book,ebook0@twitter.com,67.61.243.220
 ```
 
-```yaml
+```yaml title="meltano.yml"
 plugins:
   mappers:
   - name: meltano-map-transformer
