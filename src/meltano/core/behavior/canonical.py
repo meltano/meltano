@@ -7,7 +7,7 @@ import json
 import typing as t
 from functools import lru_cache
 
-import yaml
+import ruamel.yaml as yaml
 from ruamel.yaml.comments import CommentedMap, CommentedSeq, CommentedSet
 
 if t.TYPE_CHECKING:
