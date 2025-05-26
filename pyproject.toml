@@ -235,9 +235,14 @@ source = [
 
 [tool.coverage.report]
 exclude_also = [
+  # Ignore TYPE_CHECKING blocks
   '''if (t\.)?TYPE_CHECKING:''',
+  # Ignore assert_never type checks
   '''(t\.)?assert_never''',
+  # Ignore ellipsis in abstract methods
   "\\.\\.\\.",
+  # Comments to turn coverage on and off
+  'no cover: start(?s:.)*?no cover: stop',
 ]
 precision = 2
 show_missing = true
