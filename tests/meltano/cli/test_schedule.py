@@ -259,7 +259,7 @@ class TestCliSchedule:
                 ],
             )
             assert res.exit_code == 1
-            assert "Cannot mix --job" in res.output
+            assert "Cannot mix --job" in res.stderr
             assert isinstance(
                 schedule_service.find_schedule(job_schedule.name),
                 JobSchedule,
@@ -270,7 +270,7 @@ class TestCliSchedule:
                 ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 1
-            assert "Cannot mix --job" in res.output
+            assert "Cannot mix --job" in res.stderr
             assert isinstance(
                 schedule_service.find_schedule(elt_schedule.name),
                 ELTSchedule,
