@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import typing as t
 from signal import SIGTERM
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from mock import AsyncMock, Mock, patch
 
 from meltano.core.plugin.error import PluginNotSupportedError
 from meltano.core.plugin_test_service import (

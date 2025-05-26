@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from unittest.mock import AsyncMock
+
 import pytest
-from mock import AsyncMock
 
 from meltano.core.block.plugin_command import plugin_command_invoker
 

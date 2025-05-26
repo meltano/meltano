@@ -4,9 +4,10 @@ import asyncio
 import json
 import re
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.cli import cli
 from meltano.core.block.ioblock import IOBlock

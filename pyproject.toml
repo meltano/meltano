@@ -127,7 +127,6 @@ testing = [
   { include-group = "coverage" },
   "backoff>=2.1.2,<3",
   "colorama>=0.4.4,<0.5",
-  "mock>=5.0.2,<6",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
   "pytest-asyncio>=1",
@@ -323,7 +322,6 @@ line-length = 88
 [tool.ruff.lint]
 ignore = [
   "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
   "S310",   # Allow `urllib.open`
   "S603",   # Allow `subprocess.run(..., shell=False)`
   "COM812", # Handled by the Ruff formatter

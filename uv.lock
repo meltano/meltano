@@ -1373,7 +1373,6 @@ dev = [
     { name = "boto3-stubs", extra = ["essential"] },
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
-    { name = "mock" },
     { name = "moto" },
     { name = "mypy" },
     { name = "pytest" },
@@ -1402,7 +1401,6 @@ testing = [
     { name = "backoff" },
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
-    { name = "mock" },
     { name = "moto" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -1483,7 +1481,6 @@ dev = [
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.39" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.6.12" },
-    { name = "mock", specifier = ">=5.0.2,<6" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.13.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
@@ -1509,7 +1506,6 @@ testing = [
     { name = "backoff", specifier = ">=2.1.2,<3" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.6.12" },
-    { name = "mock", specifier = ">=5.0.2,<6" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
     { name = "pytest-asyncio", specifier = ">=1" },
@@ -1532,15 +1528,6 @@ typing = [
     { name = "types-psutil", specifier = ">=7.0.0.20250218,<8" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20240917,<7" },
     { name = "types-requests", specifier = ">=2.31.0,<3" },
-]
-
-[[package]]
-name = "mock"
-version = "5.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/07/8c/14c2ae915e5f9dca5a22edd68b35be94400719ccfa068a03e0fb63d0f6f6/mock-5.2.0.tar.gz", hash = "sha256:4e460e818629b4b173f32d08bf30d3af8123afbb8e04bb5707a1fd4799e503f0", size = 92796, upload-time = "2025-03-03T12:31:42.911Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/d9/617e6af809bf3a1d468e0d58c3997b1dc219a9a9202e650d30c2fc85d481/mock-5.2.0-py3-none-any.whl", hash = "sha256:7ba87f72ca0e915175596069dbbcc7c75af7b5e9b9bc107ad6349ede0819982f", size = 31617, upload-time = "2025-03-03T12:31:41.518Z" },
 ]
 
 [[package]]

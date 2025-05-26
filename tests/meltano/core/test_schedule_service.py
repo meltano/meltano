@@ -3,8 +3,8 @@ from __future__ import annotations
 import platform
 import typing as t
 from datetime import date, datetime, timezone
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.core.plugin import PluginType
