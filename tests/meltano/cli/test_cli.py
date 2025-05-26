@@ -9,9 +9,9 @@ import typing as t
 import uuid
 from pathlib import Path
 from time import perf_counter_ns
+from unittest import mock
 
 import click
-import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger

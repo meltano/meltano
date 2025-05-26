@@ -7,10 +7,11 @@ import subprocess
 import sys
 import typing as t
 from contextlib import contextmanager, suppress
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import anyio
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
