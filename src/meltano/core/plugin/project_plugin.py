@@ -23,6 +23,14 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
+class PluginInfo(t.TypedDict):
+    """Plugin info dictionary."""
+
+    name: str
+    namespace: str | None
+    variant: str | None
+
+
 class CyclicInheritanceError(Exception):
     """Exception raised when project plugin inherits from itself cyclicly."""
 
@@ -245,7 +253,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self) -> dict[str, str | None]:
+    def info(self) -> PluginInfo:
         """Plugin info dict.
 
         Returns:

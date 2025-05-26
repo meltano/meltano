@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+import json
+import typing as t
 from unittest import mock
 
 import pytest
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
+from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.schedule_service import BadCronError
+from meltano.core.task_sets import TaskSets
 from meltano.core.utils import iso8601_datetime
+
+if t.TYPE_CHECKING:
+    from fixtures.cli import MeltanoCliRunner
+    from meltano.core.schedule_service import ScheduleService
 
 
 class TestCliSchedule:
@@ -251,9 +259,9 @@ class TestCliSchedule:
                 ],
             )
             assert res.exit_code == 1
-            assert (
-                schedule_service.find_schedule(job_schedule.name).loader
-                != "mock-target-renamed"
+            assert isinstance(
+                schedule_service.find_schedule(job_schedule.name),
+                JobSchedule,
             )
 
             res = cli_runner.invoke(
@@ -261,7 +269,39 @@ class TestCliSchedule:
                 ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 1
-            assert (
-                schedule_service.find_schedule(elt_schedule.name).job
-                != "mock-job-renamed"
+            assert isinstance(
+                schedule_service.find_schedule(elt_schedule.name),
+                ELTSchedule,
             )
+
+    def test_schedule_list(
+        self,
+        cli_runner: MeltanoCliRunner,
+        elt_schedule: ELTSchedule,
+        job_schedule: JobSchedule,
+        schedule_service: ScheduleService,
+    ) -> None:
+        class DummyTaskSetsService:
+            def get(self, name: str) -> TaskSets:
+                return TaskSets(name, ["task1", "task2"])
+
+        with (
+            mock.patch(
+                "meltano.cli.schedule.ScheduleService",
+                return_value=schedule_service,
+            ),
+            mock.patch(
+                "meltano.cli.schedule.TaskSetsService",
+                return_value=DummyTaskSetsService(),
+            ),
+        ):
+            res = cli_runner.invoke(cli, ["schedule", "list"])
+            assert res.exit_code == 0
+            assert elt_schedule.name in res.stdout
+            assert job_schedule.name in res.stdout
+
+            res = cli_runner.invoke(cli, ["schedule", "list", "--format", "json"])
+            assert res.exit_code == 0
+            schedules = json.loads(res.stdout)["schedules"]
+            assert schedules["elt"][0]["name"] == elt_schedule.name
+            assert schedules["job"][0]["name"] == job_schedule.name
