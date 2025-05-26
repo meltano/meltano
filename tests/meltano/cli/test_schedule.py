@@ -183,10 +183,10 @@ class TestCliSchedule:
 
     def test_schedule_set(
         self,
-        cli_runner,
-        elt_schedule,
-        job_schedule,
-        schedule_service,
+        cli_runner: MeltanoCliRunner,
+        elt_schedule: ELTSchedule,
+        job_schedule: JobSchedule,
+        schedule_service: ScheduleService,
     ) -> None:
         with mock.patch(
             "meltano.cli.schedule.ScheduleService",
@@ -259,6 +259,7 @@ class TestCliSchedule:
                 ],
             )
             assert res.exit_code == 1
+            assert "Cannot mix --job" in res.output
             assert isinstance(
                 schedule_service.find_schedule(job_schedule.name),
                 JobSchedule,
@@ -269,6 +270,7 @@ class TestCliSchedule:
                 ["schedule", "set", elt_schedule.name, "--job", "mock-job-renamed"],
             )
             assert res.exit_code == 1
+            assert "Cannot mix --job" in res.output
             assert isinstance(
                 schedule_service.find_schedule(elt_schedule.name),
                 ELTSchedule,
