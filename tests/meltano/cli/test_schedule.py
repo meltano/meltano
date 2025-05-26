@@ -297,8 +297,8 @@ class TestCliSchedule:
         ):
             res = cli_runner.invoke(cli, ["schedule", "list"])
             assert res.exit_code == 0
-            assert elt_schedule.name in res.stdout
-            assert job_schedule.name in res.stdout
+            assert f"elt {elt_schedule.name}" in res.stdout
+            assert f"job {job_schedule.name}" in res.stdout
 
             res = cli_runner.invoke(cli, ["schedule", "list", "--format", "json"])
             assert res.exit_code == 0
