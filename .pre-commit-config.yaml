@@ -8,6 +8,8 @@ ci:
   autoupdate_schedule: weekly
   skip:
     - uv-lock
+    - check-github-issue-templates
+    - check-github-issue-config
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -32,11 +34,22 @@ repos:
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
-        files: ^schemas?/.*\.json$
+        files: ^src/meltano/schemas?/.*\.json$
       - id: check-jsonschema
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
+      - id: check-jsonschema
+        alias: check-github-issue-templates
+        name: validate GitHub issue templates
+        files: ^.github/ISSUE_TEMPLATE/.*\.yml$
+        exclude: ^.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
+      - id: check-jsonschema
+        alias: check-github-issue-config
+        name: validate GitHub issue config
+        files: ^.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
       - id: check-compose-spec
       - id: check-dependabot
       - id: check-github-actions
