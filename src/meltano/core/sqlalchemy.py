@@ -36,10 +36,7 @@ class JSONEncodedDict(TypeDecorator):
             value: The value to process.
             dialect: The dialect to use.
         """
-        if value is not None:
-            return json.dumps(value)
-
-        return value
+        return json.dumps(value) if value is not None else value
 
     def process_result_value(
         self,
@@ -52,9 +49,7 @@ class JSONEncodedDict(TypeDecorator):
             value: The value to process.
             dialect: The dialect to use.
         """
-        if value is not None:
-            return json.loads(value)
-        return value
+        return json.loads(value) if value is not None else value
 
 
 class IntFlag(TypeDecorator):  # noqa: D101
