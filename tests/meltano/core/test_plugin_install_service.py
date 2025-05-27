@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import re
 import typing as t
 from unittest.mock import AsyncMock, patch
 
@@ -264,6 +266,50 @@ class TestPluginInstallService:
         assert state.skipped, (
             "Expected plugin with missing env var in pip URL to not be installed"
         )
+
+    def test_plugin_installation_env(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(os, "environ", {"EXTERNAL_VAR": "value"})
+
+        service = PluginInstallService(project)
+        env = service.plugin_installation_env(tap)
+        assert re.match(r"\d+\.\d+", env.pop("MELTANO__PYTHON_VERSION"))
+        assert re.match(r"Meltano/.*", env.pop("MELTANO_USER_AGENT"))
+        assert re.match(r"(/\w+)+", env.pop("MELTANO_PROJECT_ROOT"))
+        assert re.match(r"(/\w+)+", env.pop("MELTANO_SYS_DIR_ROOT"))
+        assert env == {
+            "MELTANO_ENVIRONMENT": "",
+            "MELTANO_EXTRACTOR_NAME": "tap-mock",
+            "MELTANO_EXTRACTOR_NAMESPACE": "tap_mock",
+            "MELTANO_EXTRACTOR_VARIANT": "meltano",
+            "EXTERNAL_VAR": "value",
+            "MELTANO_EXTRACT_HIDDEN": "42",
+            "MELTANO_EXTRACT_LIST": "[]",
+            "MELTANO_EXTRACT_OBJECT": '{"nested": "from_default"}',
+            "MELTANO_EXTRACT_PORT": "5000",
+            "MELTANO_EXTRACT_TEST": "mock",
+            "MELTANO_EXTRACT__LOAD_SCHEMA": "tap_mock",
+            "MELTANO_EXTRACT__METADATA": "{}",
+            "MELTANO_EXTRACT__SCHEMA": "{}",
+            "MELTANO_EXTRACT__SELECT": '["*.*"]',
+            "MELTANO_EXTRACT__SELECT_FILTER": "[]",
+            "MELTANO_EXTRACT__USE_CACHED_CATALOG": "true",
+            "TAP_MOCK_HIDDEN": "42",
+            "TAP_MOCK_LIST": "[]",
+            "TAP_MOCK_OBJECT": '{"nested": "from_default"}',
+            "TAP_MOCK_PORT": "5000",
+            "TAP_MOCK_TEST": "mock",
+            "TAP_MOCK__LOAD_SCHEMA": "tap_mock",
+            "TAP_MOCK__METADATA": "{}",
+            "TAP_MOCK__SCHEMA": "{}",
+            "TAP_MOCK__SELECT": '["*.*"]',
+            "TAP_MOCK__SELECT_FILTER": "[]",
+            "TAP_MOCK__USE_CACHED_CATALOG": "true",
+        }
 
     @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")
