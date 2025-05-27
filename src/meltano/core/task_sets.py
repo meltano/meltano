@@ -59,9 +59,6 @@ def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
 class TaskSets(NameEq, Canonical):
     """A named entity that holds one or more tasks that can be executed by Meltano."""
 
-    name: str
-    tasks: list[str] | list[list[str]]
-
     def __init__(self, name: str, tasks: list[str] | list[list[str]]):
         """Initialize a `TaskSets`.
 
@@ -71,8 +68,8 @@ class TaskSets(NameEq, Canonical):
         """
         super().__init__()
 
-        self.name = name
-        self.tasks = tasks
+        self.name: str = name
+        self.tasks: list[str] | list[list[str]] = tasks
 
     @t.overload
     def _as_args(self) -> list[str]: ...
