@@ -267,6 +267,7 @@ class TestPluginInstallService:
             "Expected plugin with missing env var in pip URL to not be installed"
         )
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_plugin_installation_env(
         self,
         project: Project,
