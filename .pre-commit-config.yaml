@@ -42,13 +42,13 @@ repos:
       - id: check-jsonschema
         alias: check-github-issue-templates
         name: validate GitHub issue templates
-        files: ^.github/ISSUE_TEMPLATE/.*\.yml$
-        exclude: ^.github/ISSUE_TEMPLATE/config\.yml$
+        files: ^\.github/ISSUE_TEMPLATE/.*\.yml$
+        exclude: ^\.github/ISSUE_TEMPLATE/config\.yml$
         args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
       - id: check-jsonschema
         alias: check-github-issue-config
         name: validate GitHub issue config
-        files: ^.github/ISSUE_TEMPLATE/config\.yml$
+        files: ^\.github/ISSUE_TEMPLATE/config\.yml$
         args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
       - id: check-compose-spec
       - id: check-dependabot
