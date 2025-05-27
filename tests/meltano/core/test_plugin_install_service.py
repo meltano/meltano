@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import typing as t
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -280,8 +281,8 @@ class TestPluginInstallService:
         env = service.plugin_installation_env(tap)
         assert re.match(r"\d+\.\d+", env.pop("MELTANO__PYTHON_VERSION"))
         assert re.match(r"Meltano/.*", env.pop("MELTANO_USER_AGENT"))
-        assert re.match(r"(/\w+)+", env.pop("MELTANO_PROJECT_ROOT"))
-        assert re.match(r"(/\w+)+", env.pop("MELTANO_SYS_DIR_ROOT"))
+        assert Path(env.pop("MELTANO_PROJECT_ROOT")).is_dir()
+        assert Path(env.pop("MELTANO_SYS_DIR_ROOT")).is_dir()
         assert env == {
             "MELTANO_ENVIRONMENT": "",
             "MELTANO_EXTRACTOR_NAME": "tap-mock",
