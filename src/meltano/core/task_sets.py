@@ -59,6 +59,9 @@ def _flat_split(items: Iterable | str) -> Generator[str, None, None]:
 class TaskSets(NameEq, Canonical):
     """A named entity that holds one or more tasks that can be executed by Meltano."""
 
+    name: str
+    tasks: list[str] | list[list[str]]
+
     def __init__(self, name: str, tasks: list[str] | list[list[str]]):
         """Initialize a `TaskSets`.
 
@@ -122,7 +125,7 @@ class TaskSets(NameEq, Canonical):
         return self._as_args()
 
     @property
-    def flat_args_per_set(self) -> list[str] | list[list[str]]:
+    def flat_args_per_set(self) -> list[list[str]]:
         """Convert the job's tasks into perk task representations.
 
         Preserves top level list hierarchy.

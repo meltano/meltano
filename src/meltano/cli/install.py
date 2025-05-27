@@ -18,6 +18,7 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -119,7 +120,7 @@ async def install(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
+def _get_schedule_plugins(project: Project, schedule_name: str) -> set[ProjectPlugin]:
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()
