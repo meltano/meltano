@@ -292,7 +292,11 @@ module = [
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   # Meltano Core submodules
-  "meltano.core.behavior.*",
+  "meltano.core.behavior.canonical",
+  "meltano.core.behavior.hookable",
+  "meltano.core.behavior.name_eq",
+  "meltano.core.behavior.versioned",
+  "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
   "meltano.core.block.singer",
