@@ -10,6 +10,7 @@ ci:
     - uv-lock
     - check-github-issue-templates
     - check-github-issue-config
+    - check-github-discussion-templates
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -50,6 +51,11 @@ repos:
         name: validate GitHub issue config
         files: ^\.github/ISSUE_TEMPLATE/config\.yml$
         args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
+      - id: check-jsonschema
+        alias: check-github-discussion-templates
+        name: validate GitHub discussion templates
+        files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
       - id: check-compose-spec
       - id: check-dependabot
       - id: check-github-actions
