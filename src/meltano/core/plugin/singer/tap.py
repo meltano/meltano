@@ -389,6 +389,17 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
         elt_context = plugin_invoker.context
 
+        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
+            custom_catalog_path = plugin_invoker.project.root / custom_catalog_filename
+            try:
+                shutil.copy(custom_catalog_path, catalog_path)
+            except FileNotFoundError as err:
+                msg = f"Could not find catalog file {custom_catalog_path}"
+                raise PluginExecutionError(msg) from err
+
+            logger.info("Using custom catalog in %s", custom_catalog_path)
+            return
+
         use_catalog_cache = True
         if (
             elt_context and elt_context.refresh_catalog
@@ -409,20 +420,7 @@ class SingerTap(SingerPlugin):
         with suppress(FileNotFoundError):
             catalog_cache_key_path.unlink()
 
-        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
-            custom_catalog_path = plugin_invoker.project.root.joinpath(
-                custom_catalog_filename,
-            )
-
-            try:
-                shutil.copy(custom_catalog_path, catalog_path)
-                logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
-            except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find catalog file {custom_catalog_path}",  # noqa: EM102
-                ) from err
-        else:
-            await self.run_discovery(plugin_invoker, catalog_path)
+        await self.run_discovery(plugin_invoker, catalog_path)
 
         # test for the result to be a valid catalog
         try:
