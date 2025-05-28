@@ -16,7 +16,6 @@ from itertools import takewhile
 
 import anyio
 import structlog
-from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
@@ -370,17 +369,14 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(
-        self,
-        plugin_invoker: PluginInvoker,
-    ) -> None:
+    async def _discover_catalog(self, plugin_invoker: PluginInvoker) -> Path:
         """Perform catalog discovery.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
 
         Returns:
-            None
+            Path to the catalog file.
 
         Raises:
             PluginExecutionError: if discovery could not be performed
@@ -398,7 +394,7 @@ class SingerTap(SingerPlugin):
                 raise PluginExecutionError(msg) from err
 
             logger.info("Using custom catalog in %s", custom_catalog_path)
-            return
+            return catalog_path
 
         use_cached_catalog = (
             not (elt_context and elt_context.refresh_catalog)
@@ -412,7 +408,7 @@ class SingerTap(SingerPlugin):
 
                 if cached_key == new_cache_key:
                     logger.debug("Using cached catalog file")
-                    return
+                    return catalog_path
             logger.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
@@ -420,23 +416,34 @@ class SingerTap(SingerPlugin):
             catalog_cache_key_path.unlink()
 
         await self.run_discovery(plugin_invoker, catalog_path)
+        return catalog_path
+
+    async def discover_catalog(self, plugin_invoker: PluginInvoker) -> None:
+        """Perform catalog discovery.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+
+        Returns:
+            None
+        """
+        catalog_path = await self._discover_catalog(plugin_invoker)
 
         # test for the result to be a valid catalog
         try:
             async with await anyio.open_file(catalog_path) as catalog_file:
-                catalog = json.loads(await catalog_file.read())
-                Draft4Validator.check_schema(catalog)
+                json.loads(await catalog_file.read())
         except Exception as err:
             catalog_path.unlink()
+            msg = f"Catalog discovery failed: {err}"
             if isinstance(err, json.JSONDecodeError):
                 logger.error(
                     "Invalid JSON: %s [...]",
                     err.doc[max(err.pos - 9, 0) : err.pos + 10],
                 )
+                msg = "Invalid catalog"
 
-            raise PluginExecutionError(
-                f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
-            ) from err
+            raise PluginExecutionError(msg) from err
 
     async def run_discovery(
         self,
