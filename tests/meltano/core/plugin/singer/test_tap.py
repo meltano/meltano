@@ -29,6 +29,7 @@ if t.TYPE_CHECKING:
 
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project import Project
     from meltano.core.project_add_service import ProjectAddService
 
 
@@ -340,7 +341,7 @@ class TestSingerTap:
     @pytest.mark.asyncio
     async def test_discover_catalog_custom(
         self,
-        project,
+        project: Project,
         session,
         plugin_invoker_factory,
         subject: SingerTap,
@@ -349,14 +350,26 @@ class TestSingerTap:
         invoker = plugin_invoker_factory(subject)
 
         custom_catalog_filename = "custom_catalog.json"
-        custom_catalog_path = project.root.joinpath(custom_catalog_filename)
-        custom_catalog_path.write_text('{"custom": true}')
 
         monkeypatch.setitem(
             invoker.settings_service.config_override,
             "_catalog",
             custom_catalog_filename,
         )
+
+        async with invoker.prepared(session):
+            with pytest.raises(
+                PluginExecutionError,
+                match="Failed to copy catalog file",
+            ) as exc_info:
+                await subject.discover_catalog(invoker)
+
+            cause = exc_info.value.__cause__
+            assert isinstance(cause, OSError)
+            assert cause.strerror == "No such file or directory"
+
+        custom_catalog_path = project.root.joinpath(custom_catalog_filename)
+        custom_catalog_path.write_text('{"custom": true}')
 
         # These files should be ignored if a custom catalog is provided
         invoker.files["catalog"].write_text('{"previous": true}')

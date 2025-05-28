@@ -393,8 +393,8 @@ class SingerTap(SingerPlugin):
             custom_catalog_path = plugin_invoker.project.root / custom_catalog_filename
             try:
                 shutil.copy(custom_catalog_path, catalog_path)
-            except FileNotFoundError as err:
-                msg = f"Could not find catalog file {custom_catalog_path}"
+            except OSError as err:
+                msg = f"Failed to copy catalog file: {err.strerror}"
                 raise PluginExecutionError(msg) from err
 
             logger.info("Using custom catalog in %s", custom_catalog_path)
