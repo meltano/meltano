@@ -10,7 +10,6 @@ body:
 
   - type: markdown
     attributes:
-      label: Information for participants
       value: |
         * All are welcome to join and we record and each session for later reference.
         * Participants must abide by our [Code of Conduct](https://github.com/meltano/meltano/?tab=coc-ov-file).
