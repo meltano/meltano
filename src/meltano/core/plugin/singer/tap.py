@@ -369,8 +369,8 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def _discover_catalog(self, plugin_invoker: PluginInvoker) -> Path:
-        """Perform catalog discovery.
+    async def _get_catalog(self, plugin_invoker: PluginInvoker) -> Path:
+        """Get the user-provided or discovered catalog file.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
@@ -427,7 +427,7 @@ class SingerTap(SingerPlugin):
         Returns:
             None
         """
-        catalog_path = await self._discover_catalog(plugin_invoker)
+        catalog_path = await self._get_catalog(plugin_invoker)
 
         # test for the result to be a valid catalog
         try:
