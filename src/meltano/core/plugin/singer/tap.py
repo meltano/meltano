@@ -400,13 +400,12 @@ class SingerTap(SingerPlugin):
             logger.info("Using custom catalog in %s", custom_catalog_path)
             return
 
-        use_catalog_cache = True
-        if (
-            elt_context and elt_context.refresh_catalog
-        ) or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]:
-            use_catalog_cache = False
+        use_cached_catalog = (
+            not (elt_context and elt_context.refresh_catalog)
+            and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
+        )
 
-        if catalog_path.exists() and use_catalog_cache:
+        if catalog_path.exists() and use_cached_catalog:
             with suppress(FileNotFoundError):
                 cached_key = catalog_cache_key_path.read_text()
                 new_cache_key = self.catalog_cache_key(plugin_invoker)
