@@ -358,10 +358,26 @@ class TestSingerTap:
             custom_catalog_filename,
         )
 
+        # These files should be ignored if a custom catalog is provided
+        invoker.files["catalog"].write_text('{"previous": true}')
+        invoker.files["catalog_cache_key"].touch()
+
         async with invoker.prepared(session):
-            await subject.discover_catalog(invoker)
+            with (
+                mock.patch.object(
+                    SingerTap,
+                    "run_discovery",
+                ) as mocked_run_discovery,
+                mock.patch.object(
+                    SingerTap,
+                    "catalog_cache_key",
+                ) as mocked_catalog_cache_key,
+            ):
+                await subject.discover_catalog(invoker)
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
+        assert not mocked_run_discovery.called
+        assert not mocked_catalog_cache_key.called
 
     @pytest.mark.asyncio
     async def test_apply_select(
