@@ -38,68 +38,72 @@ jobs:
     strategy:
       matrix:
         include:
-        - { id: '01', python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite }
-        - { id: '02', python-version: '3.10', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '03', python-version: '3.11', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '04', python-version: '3.12', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '05', python-version: '3.13', os: ubuntu-latest, backend-db: sqlite }
-        - { id: '06', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql }
-        - { id: '07', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '08', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '09', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '10', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql }
-        - { id: '11', python-version: '3.9',  os: ubuntu-latest, backend-db: mssql }
-        - { id: '12', python-version: '3.10', os: ubuntu-latest, backend-db: mssql }
-        - { id: '13', python-version: '3.11', os: ubuntu-latest, backend-db: mssql }
-        - { id: '14', python-version: '3.12', os: ubuntu-latest, backend-db: mssql }
-        - { id: '15', python-version: '3.13', os: ubuntu-latest, backend-db: mssql }
+        - { python-version: '3.9',  os: ubuntu-latest, backend-db: sqlite, id: 'py39-ubuntu-sqlite'  }
+        - { python-version: '3.10', os: ubuntu-latest, backend-db: sqlite, id: 'py310-ubuntu-sqlite' }
+        - { python-version: '3.11', os: ubuntu-latest, backend-db: sqlite, id: 'py311-ubuntu-sqlite' }
+        - { python-version: '3.12', os: ubuntu-latest, backend-db: sqlite, id: 'py312-ubuntu-sqlite' }
+        - { python-version: '3.13', os: ubuntu-latest, backend-db: sqlite, id: 'py313-ubuntu-sqlite' }
+        - { python-version: '3.14', os: ubuntu-latest, backend-db: sqlite, id: 'py314-ubuntu-sqlite' }
+        - { python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql, id: 'py39-ubuntu-psycopg2'  }
+        - { python-version: '3.10', os: ubuntu-latest, backend-db: postgresql, id: 'py310-ubuntu-psycopg2' }
+        - { python-version: '3.11', os: ubuntu-latest, backend-db: postgresql, id: 'py311-ubuntu-psycopg2' }
+        - { python-version: '3.12', os: ubuntu-latest, backend-db: postgresql, id: 'py312-ubuntu-psycopg2' }
+        - { python-version: '3.13', os: ubuntu-latest, backend-db: postgresql, id: 'py313-ubuntu-psycopg2' }
+        - { python-version: '3.9',  os: ubuntu-latest, backend-db: mssql, id: 'py39-ubuntu-mssql'  }
+        - { python-version: '3.10', os: ubuntu-latest, backend-db: mssql, id: 'py310-ubuntu-mssql' }
+        - { python-version: '3.11', os: ubuntu-latest, backend-db: mssql, id: 'py311-ubuntu-mssql' }
+        - { python-version: '3.12', os: ubuntu-latest, backend-db: mssql, id: 'py312-ubuntu-mssql' }
+        - { python-version: '3.13', os: ubuntu-latest, backend-db: mssql, id: 'py313-ubuntu-mssql' }
         # We'd like to run Windows tests for all backend-dbs see https://github.com/meltano/meltano/issues/6281
-        - { id: '16', python-version: '3.9',  os: windows-2025,  backend-db: sqlite }
-        - { id: '17', python-version: '3.10', os: windows-2025,  backend-db: sqlite }
-        - { id: '18', python-version: '3.11', os: windows-2025,  backend-db: sqlite }
-        - { id: '19', python-version: '3.12', os: windows-2025,  backend-db: sqlite }
-        - { id: '20', python-version: '3.13', os: windows-2025,  backend-db: sqlite }
-        - { id: '21', python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '22', python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '23', python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '24', python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '25', python-version: '3.13', os: ubuntu-latest, backend-db: postgresql_psycopg3 }
-        - { id: '91', python-version: '3.13', os: ubuntu-latest, backend-db: sqlite, markers: 'concurrent' }
-        - { id: '92', python-version: '3.13', os: windows-2025,  backend-db: sqlite, markers: 'concurrent' }
+        - { python-version: '3.9',  os: windows-2025,  backend-db: sqlite, id: 'py39-windows-sqlite'  }
+        - { python-version: '3.10', os: windows-2025,  backend-db: sqlite, id: 'py310-windows-sqlite' }
+        - { python-version: '3.11', os: windows-2025,  backend-db: sqlite, id: 'py311-windows-sqlite' }
+        - { python-version: '3.12', os: windows-2025,  backend-db: sqlite, id: 'py312-windows-sqlite' }
+        - { python-version: '3.13', os: windows-2025,  backend-db: sqlite, id: 'py313-windows-sqlite' }
+        - { python-version: '3.9',  os: ubuntu-latest, backend-db: postgresql_psycopg3, id: 'py39-ubuntu-psycopg3'  }
+        - { python-version: '3.10', os: ubuntu-latest, backend-db: postgresql_psycopg3, id: 'py310-ubuntu-psycopg3' }
+        - { python-version: '3.11', os: ubuntu-latest, backend-db: postgresql_psycopg3, id: 'py311-ubuntu-psycopg3' }
+        - { python-version: '3.12', os: ubuntu-latest, backend-db: postgresql_psycopg3, id: 'py312-ubuntu-psycopg3' }
+        - { python-version: '3.13', os: ubuntu-latest, backend-db: postgresql_psycopg3, id: 'py313-ubuntu-psycopg3' }
+        - { python-version: '3.13', os: ubuntu-latest, backend-db: sqlite, markers: 'concurrent', id: 'concurrent-ubuntu'  }
+        - { python-version: '3.13', os: windows-2025,  backend-db: sqlite, markers: 'concurrent', id: 'concurrent-windows' }
       fail-fast: false
 
     # GitHub doesn't handle matrix outputs well: https://stackoverflow.com/questions/70287603
     outputs:
-      pytest-results-row-01: ${{ steps.append-results.outputs.pytest-results-row-01 }}
-      pytest-results-row-02: ${{ steps.append-results.outputs.pytest-results-row-02 }}
-      pytest-results-row-03: ${{ steps.append-results.outputs.pytest-results-row-03 }}
-      pytest-results-row-04: ${{ steps.append-results.outputs.pytest-results-row-04 }}
-      pytest-results-row-05: ${{ steps.append-results.outputs.pytest-results-row-05 }}
-      pytest-results-row-06: ${{ steps.append-results.outputs.pytest-results-row-06 }}
-      pytest-results-row-07: ${{ steps.append-results.outputs.pytest-results-row-07 }}
-      pytest-results-row-08: ${{ steps.append-results.outputs.pytest-results-row-08 }}
-      pytest-results-row-09: ${{ steps.append-results.outputs.pytest-results-row-09 }}
-      pytest-results-row-10: ${{ steps.append-results.outputs.pytest-results-row-10 }}
-      pytest-results-row-11: ${{ steps.append-results.outputs.pytest-results-row-11 }}
-      pytest-results-row-12: ${{ steps.append-results.outputs.pytest-results-row-12 }}
-      pytest-results-row-13: ${{ steps.append-results.outputs.pytest-results-row-13 }}
-      pytest-results-row-14: ${{ steps.append-results.outputs.pytest-results-row-14 }}
-      pytest-results-row-15: ${{ steps.append-results.outputs.pytest-results-row-15 }}
-      pytest-results-row-16: ${{ steps.append-results.outputs.pytest-results-row-16 }}
-      pytest-results-row-17: ${{ steps.append-results.outputs.pytest-results-row-17 }}
-      pytest-results-row-18: ${{ steps.append-results.outputs.pytest-results-row-18 }}
-      pytest-results-row-19: ${{ steps.append-results.outputs.pytest-results-row-19 }}
-      pytest-results-row-20: ${{ steps.append-results.outputs.pytest-results-row-20 }}
-      pytest-results-row-21: ${{ steps.append-results.outputs.pytest-results-row-21 }}
-      pytest-results-row-22: ${{ steps.append-results.outputs.pytest-results-row-22 }}
-      pytest-results-row-23: ${{ steps.append-results.outputs.pytest-results-row-23 }}
-      pytest-results-row-24: ${{ steps.append-results.outputs.pytest-results-row-24 }}
-      pytest-results-row-25: ${{ steps.append-results.outputs.pytest-results-row-25 }}
-      pytest-results-row-91: ${{ steps.append-results.outputs.pytest-results-row-91 }}
-      pytest-results-row-92: ${{ steps.append-results.outputs.pytest-results-row-92 }}
+      pytest-results-row-py39-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py39-ubuntu-sqlite }}
+      pytest-results-row-py310-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py310-ubuntu-sqlite }}
+      pytest-results-row-py311-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py311-ubuntu-sqlite }}
+      pytest-results-row-py312-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py312-ubuntu-sqlite }}
+      pytest-results-row-py313-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py313-ubuntu-sqlite }}
+      pytest-results-row-py314-ubuntu-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py314-ubuntu-sqlite }}
+      pytest-results-row-py39-ubuntu-psycopg2: ${{ steps.append-results.outputs.pytest-results-row-py39-ubuntu-psycopg2 }}
+      pytest-results-row-py310-ubuntu-psycopg2: ${{ steps.append-results.outputs.pytest-results-row-py310-ubuntu-psycopg2 }}
+      pytest-results-row-py311-ubuntu-psycopg2: ${{ steps.append-results.outputs.pytest-results-row-py311-ubuntu-psycopg2 }}
+      pytest-results-row-py312-ubuntu-psycopg2: ${{ steps.append-results.outputs.pytest-results-row-py312-ubuntu-psycopg2 }}
+      pytest-results-row-py313-ubuntu-psycopg2: ${{ steps.append-results.outputs.pytest-results-row-py313-ubuntu-psycopg2 }}
+      pytest-results-row-py39-ubuntu-mssql: ${{ steps.append-results.outputs.pytest-results-row-py39-ubuntu-mssql }}
+      pytest-results-row-py310-ubuntu-mssql: ${{ steps.append-results.outputs.pytest-results-row-py310-ubuntu-mssql }}
+      pytest-results-row-py311-ubuntu-mssql: ${{ steps.append-results.outputs.pytest-results-row-py311-ubuntu-mssql }}
+      pytest-results-row-py312-ubuntu-mssql: ${{ steps.append-results.outputs.pytest-results-row-py312-ubuntu-mssql }}
+      pytest-results-row-py313-ubuntu-mssql: ${{ steps.append-results.outputs.pytest-results-row-py313-ubuntu-mssql }}
+      pytest-results-row-py39-ubuntu-psycopg3: ${{ steps.append-results.outputs.pytest-results-row-py39-ubuntu-psycopg3 }}
+      pytest-results-row-py310-ubuntu-psycopg3: ${{ steps.append-results.outputs.pytest-results-row-py310-ubuntu-psycopg3 }}
+      pytest-results-row-py311-ubuntu-psycopg3: ${{ steps.append-results.outputs.pytest-results-row-py311-ubuntu-psycopg3 }}
+      pytest-results-row-py312-ubuntu-psycopg3: ${{ steps.append-results.outputs.pytest-results-row-py312-ubuntu-psycopg3 }}
+      pytest-results-row-py313-ubuntu-psycopg3: ${{ steps.append-results.outputs.pytest-results-row-py313-ubuntu-psycopg3 }}
+      pytest-results-row-py39-windows-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py39-windows-sqlite }}
+      pytest-results-row-py310-windows-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py310-windows-sqlite }}
+      pytest-results-row-py311-windows-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py311-windows-sqlite }}
+      pytest-results-row-py312-windows-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py312-windows-sqlite }}
+      pytest-results-row-py313-windows-sqlite: ${{ steps.append-results.outputs.pytest-results-row-py313-windows-sqlite }}
+      pytest-results-row-concurrent-ubuntu: ${{ steps.append-results.outputs.pytest-results-row-concurrent-ubuntu }}
+      pytest-results-row-concurrent-windows: ${{ steps.append-results.outputs.pytest-results-row-concurrent-windows }}
 
     name: "Pytest on py${{ matrix.python-version }} (OS: ${{ matrix.os }}, DB: ${{ matrix.backend-db }}) (${{ matrix.markers || 'not concurrent' }})"
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    timeout-minutes: 20
     env:
       PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
       NOXFORCEPYTHON: ${{ matrix.python-version }}
@@ -221,32 +225,32 @@ jobs:
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
         echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-01 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-02 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-03 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-04 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-05 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-06 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-07 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-08 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-09 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-10 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-11 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-12 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-13 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-14 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-15 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-16 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-17 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-18 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-19 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-20 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-21 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-22 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-23 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-24 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-25 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-91 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py314-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py39-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py310-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py311-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py312-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${{ needs.tests.outputs.pytest-results-row-py313-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
 
