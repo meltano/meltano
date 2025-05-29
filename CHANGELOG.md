@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.7 (2025-05-29)
+
+### 🐛 Fixes
+
+- [#8793](https://github.com/meltano/meltano/issues/8793) Avoid passing plugin configuration to the installation environment
+
+### ⚙️ Under the Hood
+
+- [#9289](https://github.com/meltano/meltano/issues/9289) Avoid checking catalog cache key if user passed a custom catalog
+- [#9280](https://github.com/meltano/meltano/issues/9280) Split job and ELT schedules into separate classes
+- [#9273](https://github.com/meltano/meltano/issues/9273) Use `ruamel.yaml.add_multi_representer` to add YAML representations of internal types
+
+### 📚 Documentation Improvements
+
+- [#9288](https://github.com/meltano/meltano/issues/9288) Remove outdated log messages from CLI examples
+- [#9271](https://github.com/meltano/meltano/issues/9271) Fixed typo `mapper` -> `mappers` in `meltano.yml` inline data mapping example
+
+### 📦 Packaging changes
+
+- [#9290](https://github.com/meltano/meltano/issues/9290) Bump latest supported version of `setuptools` to 80
+
 ## v3.7.6 (2025-05-14)
 
 ### 🐛 Fixes
