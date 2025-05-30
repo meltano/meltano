@@ -68,6 +68,10 @@ def _run_pytest(session: nox.Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
+            "--durations=10",
+            "--order-scope=module",
+            "-n=auto",
+            "--dist=loadfile",
             f"--randomly-seed={random_seed}",
             *args,
         )

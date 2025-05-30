@@ -165,14 +165,8 @@ include = ["src/meltano"]
 
 [tool.pytest.ini_options]
 addopts = [
-  "--cov=meltano",
-  "--cov=tests",
   "--doctest-modules",
-  "--durations=10",
-  "--order-scope=module",
   "-ra",
-  "-n=auto",
-  "--dist=loadfile",
   "--strict-config",
   "--strict-markers",
 ]
