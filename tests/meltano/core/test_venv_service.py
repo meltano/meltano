@@ -19,13 +19,18 @@ if t.TYPE_CHECKING:
     from meltano.core.project import Project
 
 
-def _check_venv_created_with_python(project: Project, python: str | None) -> None:
-    with mock.patch("meltano.core.venv_service._resolve_python_path") as venv_mock:
-        VenvService(project=project)
-        venv_mock.assert_called_once_with(python)
-
-
 class TestVenvService:
+    cls = VenvService
+
+    def _check_venv_created_with_python(
+        self,
+        project: Project,
+        python: str | None,
+    ) -> None:
+        with mock.patch("meltano.core.venv_service._resolve_python_path") as venv_mock:
+            self.cls(project=project)
+            venv_mock.assert_called_once_with(python)
+
     async def _check_venv_created_with_python_for_plugin(
         self,
         project: Project,
@@ -187,9 +192,12 @@ class TestVenvService:
 
     def test_top_level_python_setting(self, project: Project) -> None:
         project.settings.set("python", "test-python-executable-project-level")
-        _check_venv_created_with_python(project, "test-python-executable-project-level")
+        self._check_venv_created_with_python(
+            project,
+            "test-python-executable-project-level",
+        )
         project.settings.unset("python")
-        _check_venv_created_with_python(project, None)
+        self._check_venv_created_with_python(project, None)
 
     async def test_plugin_python_setting(self, project: Project) -> None:
         plugin = ProjectPlugin(
@@ -231,6 +239,8 @@ class TestVenvService:
 
 
 class TestVirtualEnv:
+    cls = VirtualEnv
+
     async def _check_venv_created_with_python_for_plugin(
         self,
         project: Project,
@@ -256,7 +266,7 @@ class TestVirtualEnv:
     )
     def test_cross_platform(self, system: str, lib_dir: str, project: Project) -> None:
         with mock.patch("platform.system", return_value=system):
-            subject = VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            subject = self.cls(project.venvs_dir("pytest", "pytest"))
             assert subject.lib_dir == subject.root / lib_dir
 
     def test_unknown_platform(self, project: Project) -> None:
@@ -267,15 +277,15 @@ class TestVirtualEnv:
                 match="(?i)Platform 'commodore64'.*?not supported.",
             ),
         ):
-            VirtualEnv(project.venvs_dir("pytest", "pytest"))
+            self.cls(project.venvs_dir("pytest", "pytest"))
 
     def test_different_python_versions(self, project: Project) -> None:
         root = project.venvs_dir("pytest", "pytest")
 
         assert (
-            VirtualEnv(root, python=None).python_path
-            == VirtualEnv(root).python_path
-            == VirtualEnv(root, python=sys.executable).python_path
+            self.cls(root, python=None).python_path
+            == self.cls(root).python_path
+            == self.cls(root, python=sys.executable).python_path
             == sys.executable
         )
 
@@ -287,7 +297,7 @@ class TestVirtualEnv:
             mock.patch("os.access", return_value=True),
         ):
             assert (
-                VirtualEnv(root, python="test-python-executable").python_path
+                self.cls(root, python="test-python-executable").python_path
                 == "/usr/bin/test-python-executable"
             )
 
@@ -299,10 +309,10 @@ class TestVirtualEnv:
             ),
         ):
             path_str = "/usr/bin/test-python-executable"
-            venv = VirtualEnv(root, python=path_str)
+            venv = self.cls(root, python=path_str)
             assert venv.python_path == path_str
 
-            venv = VirtualEnv(root, python=Path(path_str))
+            venv = self.cls(root, python=Path(path_str))
             assert venv.python_path == str(Path(path_str).resolve())
 
         with (
@@ -316,19 +326,19 @@ class TestVirtualEnv:
                 match="'/usr/bin/test-python-executable' is not executable",
             ),
         ):
-            VirtualEnv(root, python="test-python-executable")
+            self.cls(root, python="test-python-executable")
 
         with pytest.raises(
             MeltanoError,
             match="Python executable 'test-python-executable' was not found",
         ):
-            VirtualEnv(root, python="test-python-executable")
+            self.cls(root, python="test-python-executable")
 
         with pytest.raises(
             MeltanoError,
             match="not the number 3.11",
         ):
-            VirtualEnv(root, python=3.11)
+            self.cls(root, python=3.11)
 
 
 class TestUvVenvService(TestVenvService):
