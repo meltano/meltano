@@ -25,22 +25,22 @@ def _check_venv_created_with_python(project: Project, python: str | None) -> Non
         venv_mock.assert_called_once_with(python)
 
 
-async def _check_venv_created_with_python_for_plugin(
-    project: Project,
-    plugin: ProjectPlugin,
-    python: str | None,
-) -> None:
-    with (
-        mock.patch(
-            "meltano.core.venv_service._resolve_python_path",
-        ) as venv_mock,
-        mock.patch("meltano.core.venv_service.VenvService.install"),
-    ):
-        await install_pip_plugin(project=project, plugin=plugin)
-        venv_mock.assert_called_once_with(python)
-
-
 class TestVenvService:
+    async def _check_venv_created_with_python_for_plugin(
+        self,
+        project: Project,
+        plugin: ProjectPlugin,
+        python: str | None,
+    ) -> None:
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.VenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with(python)
+
     def assert_pip_log_file(self, service: VenvService):
         assert service.pip_log_path.exists()
         assert service.pip_log_path.is_file()
@@ -72,6 +72,30 @@ class TestVenvService:
         assert run_dir.exists(), (
             "Expected all files in the run dir to be removed, but not the dir itself"
         )
+
+    @pytest.mark.asyncio
+    async def test_create_venv_dir_not_writable(
+        self, project: Project, request: pytest.FixtureRequest
+    ) -> None:
+        plugin_type = "dummy_type"
+        plugin_name = request.node.name
+
+        venv_service = VenvService(
+            project=project,
+            namespace=plugin_type,
+            name=plugin_name,
+        )
+        venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
+        # Don't allow writing to the venv dir
+        venv_dir.chmod(0o555)
+
+        with pytest.raises(
+            AsyncSubprocessError,
+            match="Could not create the virtualenv for",
+        ) as excinfo:
+            await venv_service.create()
+
+        assert "is not write-able" in await excinfo.value.stderr
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
@@ -174,7 +198,7 @@ class TestVenvService:
             python="test-python-executable-plugin-level",
         )
 
-        await _check_venv_created_with_python_for_plugin(
+        await self._check_venv_created_with_python_for_plugin(
             project,
             plugin,
             "test-python-executable-plugin-level",
@@ -184,7 +208,7 @@ class TestVenvService:
         # because the plugin-level setting takes precedence.
         project.settings.set("python", "test-python-executable-project-level")
 
-        await _check_venv_created_with_python_for_plugin(
+        await self._check_venv_created_with_python_for_plugin(
             project,
             plugin,
             "test-python-executable-plugin-level",
@@ -194,7 +218,7 @@ class TestVenvService:
         # setting is unset
         plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
 
-        await _check_venv_created_with_python_for_plugin(
+        await self._check_venv_created_with_python_for_plugin(
             project,
             plugin,
             "test-python-executable-project-level",
@@ -203,10 +227,25 @@ class TestVenvService:
         project.settings.unset("python")
 
         # After both the project-level and plugin-level are unset, it should be None
-        await _check_venv_created_with_python_for_plugin(project, plugin, None)
+        await self._check_venv_created_with_python_for_plugin(project, plugin, None)
 
 
 class TestVirtualEnv:
+    async def _check_venv_created_with_python_for_plugin(
+        self,
+        project: Project,
+        plugin: ProjectPlugin,
+        python: str | None,
+    ) -> None:
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with(python)
+
     @pytest.mark.parametrize(
         ("system", "lib_dir"),
         (
