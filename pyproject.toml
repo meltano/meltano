@@ -142,7 +142,7 @@ testing = [
 ]
 typing = [
   "boto3-stubs[essential]>=1.35,<1.39",
-  "mypy>=1.13.0,<2",
+  "mypy>=1.16.0,<2",
   "types-croniter==5.0.1.20241205",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
