@@ -148,8 +148,8 @@ class SelectPattern(t.NamedTuple):
             negated = True
             pattern = pattern[1:]
 
-        if re.search(UNESCAPED_DOT, pattern):
-            stream, prop = re.split(UNESCAPED_DOT, pattern, maxsplit=1)
+        if UNESCAPED_DOT.search(pattern):
+            stream, prop = UNESCAPED_DOT.split(pattern, maxsplit=1)
         else:
             stream = pattern
             prop = None
@@ -203,6 +203,19 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
                     value=selected,
                 ),
             )
+
+            # If all sub-properties are selected, the parent property is selected too
+            if selected and "*" in props:
+                rules.extend(
+                    MetadataRule(
+                        tap_stream_id=pattern.stream_pattern,
+                        breadcrumb=property_breadcrumb(props[:idx]),
+                        key="selected",
+                        value=selected,
+                    )
+                    for idx, prop in enumerate(props)
+                    if prop == "*" and idx > 0
+                )
 
     return include_rules + exclude_rules
 
