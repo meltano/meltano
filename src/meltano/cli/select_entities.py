@@ -179,7 +179,7 @@ async def show(
 
     if output_format == "json":
         _show_json(
-            select=select_service.current_select,
+            patterns=select_service.current_select,
             list_all=list_all,
             show_all=show_all,
         )
@@ -193,7 +193,7 @@ async def show(
 
 def _show_json(
     *,
-    select: list[str],
+    patterns: list[str],
     list_all: ListSelectedExecutor,
     show_all: bool,
 ) -> None:
@@ -201,7 +201,7 @@ def _show_json(
         "enabled_patterns": [],
         "entities": [],
     }
-    for select_pattern in map(SelectPattern.parse, select):
+    for select_pattern in map(SelectPattern.parse, patterns):
         output["enabled_patterns"].append(select_pattern.raw)
 
     for stream, prop in tuple(
@@ -224,7 +224,7 @@ def _show_json(
 
 def _show_plain(
     *,
-    select: list[str],
+    patterns: list[str],
     list_all: ListSelectedExecutor,
     show_all: bool,
 ) -> None:
@@ -236,7 +236,7 @@ def _show_plain(
     # report
     click.secho("\nEnabled patterns:")
 
-    for select_pattern in map(SelectPattern.parse, select):
+    for select_pattern in map(SelectPattern.parse, patterns):
         color = "red" if select_pattern.negated else "white"
         click.secho(f"\t{select_pattern.raw}", fg=color)
 
