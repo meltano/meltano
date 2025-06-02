@@ -114,7 +114,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
-  "coverage[toml]>=7.6.12",
+  "coverage[toml]>=7.8",
 ]
 dev = [
   { include-group = "testing" },
@@ -180,6 +180,7 @@ filterwarnings = [
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
   "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
+  "ignore::coverage.exceptions.CoverageWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"
