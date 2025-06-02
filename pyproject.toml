@@ -1,9 +1,9 @@
 [project]
 name = "meltano"
-version = "3.7.6"
+version = "3.7.7"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
-requires-python = ">=3.9,<3.14"
+requires-python = ">=3.9,<3.15"
 readme = "README.md"
 license = "MIT"
 license-files = [
@@ -53,7 +53,7 @@ dependencies = [
   "requests>=2.32.3,<3",
   "rich~=14.0.0",
   "ruamel.yaml>=0.18.6,<0.19",
-  "setuptools>=76.0.0,<77 ; python_version >= '3.12'",
+  "setuptools>=76.0.0,<81 ; python_version >= '3.12'",
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
   "sqlalchemy>=2.0.35,<3",
@@ -127,10 +127,9 @@ testing = [
   { include-group = "coverage" },
   "backoff>=2.1.2,<3",
   "colorama>=0.4.4,<0.5",
-  "mock>=5.0.2,<6",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
-  "pytest-asyncio>=0.25.0,<0.26",
+  "pytest-asyncio>=1",
   "pytest-cov>=6.0.0,<7",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
@@ -143,7 +142,7 @@ testing = [
 ]
 typing = [
   "boto3-stubs[essential]>=1.35,<1.39",
-  "mypy>=1.13.0,<2",
+  "mypy>=1.16.0,<2",
   "types-croniter==5.0.1.20241205",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
@@ -166,14 +165,8 @@ include = ["src/meltano"]
 
 [tool.pytest.ini_options]
 addopts = [
-  "--cov=meltano",
-  "--cov=tests",
   "--doctest-modules",
-  "--durations=10",
-  "--order-scope=module",
   "-ra",
-  "-n=auto",
-  "--dist=loadfile",
   "--strict-config",
   "--strict-markers",
 ]
@@ -186,6 +179,7 @@ filterwarnings = [
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
+  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -236,9 +230,14 @@ source = [
 
 [tool.coverage.report]
 exclude_also = [
+  # Ignore TYPE_CHECKING blocks
   '''if (t\.)?TYPE_CHECKING:''',
+  # Ignore assert_never type checks
   '''(t\.)?assert_never''',
+  # Ignore ellipsis in abstract methods
   "\\.\\.\\.",
+  # Comments to turn coverage on and off
+  'no cover: start(?s:.)*?no cover: stop',
 ]
 precision = 2
 show_missing = true
@@ -246,7 +245,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "3.7.6"
+version = "3.7.7"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
@@ -279,9 +278,7 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 ignore_errors = true
 module = [
-  "meltano.cli.install",
   "meltano.cli.interactive.*",
-  "meltano.cli.state",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
   "meltano.core.models",
   "meltano.core.project_files",
@@ -290,7 +287,11 @@ module = [
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   # Meltano Core submodules
-  "meltano.core.behavior.*",
+  "meltano.core.behavior.canonical",
+  "meltano.core.behavior.hookable",
+  "meltano.core.behavior.name_eq",
+  "meltano.core.behavior.versioned",
+  "meltano.core.behavior.visitor",
   "meltano.core.block.extract_load",
   "meltano.core.block.plugin_command",
   "meltano.core.block.singer",
@@ -323,7 +324,6 @@ line-length = 88
 [tool.ruff.lint]
 ignore = [
   "N818",   # Allow Exceptions to have suffix 'Exception' rather than 'Error'
-  "UP026",  # Replace `mock` import with `unittest.mock` - remove once Python 3.7 support is dropped
   "S310",   # Allow `urllib.open`
   "S603",   # Allow `subprocess.run(..., shell=False)`
   "COM812", # Handled by the Ruff formatter

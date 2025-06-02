@@ -9,8 +9,8 @@ import typing as t
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from pathlib import Path
+from unittest import mock
 
-import mock
 import pytest
 import structlog
 

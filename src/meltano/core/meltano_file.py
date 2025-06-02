@@ -9,7 +9,7 @@ from meltano.core.behavior.canonical import Canonical
 from meltano.core.environment import Environment
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.schedule import Schedule
+from meltano.core.schedule import ELTSchedule, JobSchedule, Schedule
 from meltano.core.task_sets import TaskSets
 
 if t.TYPE_CHECKING:
@@ -100,7 +100,13 @@ class MeltanoFile(Canonical):
         Returns:
             List of new Schedule instances.
         """
-        return [Schedule.parse(obj) for obj in schedules]
+        result: list[Schedule] = []
+        for schedule in schedules:
+            if schedule.get("job"):
+                result.append(JobSchedule(**schedule))
+            else:
+                result.append(ELTSchedule(**schedule))
+        return result
 
     @staticmethod
     def load_environments(environments: Iterable[dict]) -> list[Environment]:

@@ -4,8 +4,8 @@ import json
 import platform
 import re
 import typing as t
+from unittest import mock
 
-import mock
 import pytest
 
 from asserts import assert_cli_runner

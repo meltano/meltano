@@ -7,10 +7,10 @@ import tempfile
 import typing as t
 import uuid
 from pathlib import Path
+from unittest import mock
+from unittest.mock import AsyncMock
 
-import mock
 import pytest
-from mock import AsyncMock
 
 from meltano.core.block.blockset import BlockSetValidationError
 from meltano.core.block.extract_load import (

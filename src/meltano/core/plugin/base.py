@@ -7,7 +7,7 @@ import re
 import typing as t
 from collections import defaultdict
 
-import yaml
+import ruamel.yaml as yaml
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior import NameEq

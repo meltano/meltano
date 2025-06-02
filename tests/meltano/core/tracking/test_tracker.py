@@ -8,8 +8,8 @@ from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
 from time import sleep
+from unittest import mock
 
-import mock
 import pytest
 from snowplow_tracker import Emitter, SelfDescribing
 

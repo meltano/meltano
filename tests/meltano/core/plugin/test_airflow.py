@@ -3,9 +3,10 @@ from __future__ import annotations
 import io
 import typing as t
 from configparser import ConfigParser
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallService
