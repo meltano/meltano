@@ -185,7 +185,7 @@ async def show(
         )
     else:
         _show_plain(
-            select=select_service.current_select,
+            patterns=select_service.current_select,
             list_all=list_all,
             show_all=show_all,
         )
