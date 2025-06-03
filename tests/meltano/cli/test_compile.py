@@ -7,8 +7,8 @@ import shutil
 import typing as t
 from pathlib import Path
 from platform import system
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.cli import cli

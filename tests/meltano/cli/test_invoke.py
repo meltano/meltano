@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 import platform
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock, Mock, patch
 
-import mock
 import pytest
-from mock import AsyncMock, Mock, patch
 
 from meltano.cli import cli
 from meltano.core.plugin import PluginType

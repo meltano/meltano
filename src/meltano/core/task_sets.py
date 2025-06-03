@@ -68,8 +68,8 @@ class TaskSets(NameEq, Canonical):
         """
         super().__init__()
 
-        self.name = name
-        self.tasks = tasks
+        self.name: str = name
+        self.tasks: list[str] | list[list[str]] = tasks
 
     @t.overload
     def _as_args(self) -> list[str]: ...
@@ -122,7 +122,7 @@ class TaskSets(NameEq, Canonical):
         return self._as_args()
 
     @property
-    def flat_args_per_set(self) -> list[str] | list[list[str]]:
+    def flat_args_per_set(self) -> list[list[str]]:
         """Convert the job's tasks into perk task representations.
 
         Preserves top level list hierarchy.

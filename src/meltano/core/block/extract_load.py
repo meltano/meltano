@@ -339,13 +339,13 @@ class ELBContextBuilder:
         )
 
 
-class ExtractLoadBlocks(BlockSet):
+class ExtractLoadBlocks(BlockSet[SingerBlock]):
     """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
         self,
         context: ELBContext,
-        blocks: t.Sequence[IOBlock],
+        blocks: t.Sequence[SingerBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
@@ -675,7 +675,7 @@ class ExtractLoadBlocks(BlockSet):
                     logger_base.bind(stdio="stderr"),
                 ),
             )
-            if block.consumer:
+            if block.consumer and block.stdin is not None:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
                         block.stdin,

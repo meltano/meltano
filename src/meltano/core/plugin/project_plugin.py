@@ -23,6 +23,14 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 
+class PluginInfo(t.TypedDict):
+    """Plugin info dictionary."""
+
+    name: str
+    namespace: str | None
+    variant: str | None
+
+
 class CyclicInheritanceError(Exception):
     """Exception raised when project plugin inherits from itself cyclicly."""
 
@@ -74,13 +82,13 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         pip_url: str | None = None,
         python: str | None = None,
         executable: str | None = None,
-        capabilities: list | None = None,
-        settings_group_validation: list | None = None,
+        capabilities: list[str] | None = None,
+        settings_group_validation: list[list[str]] | None = None,
         settings: list | None = None,
-        commands: dict | None = None,
-        requires: dict[PluginType, list] | None = None,
-        config: dict | None = None,
-        default_variant=Variant.ORIGINAL_NAME,  # noqa: ANN001
+        commands: dict[str, Command] | None = None,
+        requires: dict[PluginType, list[PluginRequirement]] | None = None,
+        config: dict[str, t.Any] | None = None,
+        default_variant: str = Variant.ORIGINAL_NAME,
         env: dict[str, str] | None = None,
         **extras,  # noqa: ANN003
     ):
@@ -224,7 +232,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self._parent
 
     @parent.setter
-    def parent(self, new_parent: ProjectPlugin | BasePlugin) -> None:
+    def parent(self, new_parent: ProjectPlugin | BasePlugin | None) -> None:
         ancestor = new_parent
         while isinstance(ancestor, self.__class__):
             if ancestor == self:
@@ -245,7 +253,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self.is_attr_set(self.VARIANT_ATTR)
 
     @property
-    def info(self) -> dict[str, str | None]:
+    def info(self) -> PluginInfo:
         """Plugin info dict.
 
         Returns:

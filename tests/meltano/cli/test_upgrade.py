@@ -5,9 +5,9 @@ import platform
 import shutil
 import typing as t
 from importlib.metadata import PathDistribution
+from unittest import mock
 
 import boto3
-import mock
 import pytest
 from moto import mock_aws
 

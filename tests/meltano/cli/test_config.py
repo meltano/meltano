@@ -4,10 +4,11 @@ import io
 import json
 import typing as t
 from signal import SIGTERM
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import dotenv
 import pytest
-from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
