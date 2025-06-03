@@ -21,3 +21,9 @@ c8a92a48f02ab848426544e16f180f0c2594f194
 
 # chore: Run type checks on `meltano.core.block.singer`
 3842cc8313fae8139e805f8308624bce30f15881
+
+# chore: Enable type checking in `meltano.cli.install`
+dcdd9f09c105baf2f10d3214a730aa3f6c535726
+
+# chore: Enable type checking in `meltano.core.behavior.addon`
+30d70e5462bea855243714614ec2151961cae5e4

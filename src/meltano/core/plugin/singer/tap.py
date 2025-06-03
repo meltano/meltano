@@ -16,7 +16,6 @@ from itertools import takewhile
 
 import anyio
 import structlog
-from jsonschema import Draft4Validator
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
@@ -370,17 +369,14 @@ class SingerTap(SingerPlugin):
         with suppress(PluginLacksCapabilityError):
             await self.discover_catalog(plugin_invoker)
 
-    async def discover_catalog(
-        self,
-        plugin_invoker: PluginInvoker,
-    ) -> None:
-        """Perform catalog discovery.
+    async def _get_catalog(self, plugin_invoker: PluginInvoker) -> Path:
+        """Get the user-provided or discovered catalog file.
 
         Args:
             plugin_invoker: The invocation handler of the plugin instance.
 
         Returns:
-            None
+            Path to the catalog file.
 
         Raises:
             PluginExecutionError: if discovery could not be performed
@@ -389,57 +385,65 @@ class SingerTap(SingerPlugin):
         catalog_cache_key_path = plugin_invoker.files["catalog_cache_key"]
         elt_context = plugin_invoker.context
 
-        use_catalog_cache = True
-        if (
-            elt_context and elt_context.refresh_catalog
-        ) or not plugin_invoker.plugin_config_extras["_use_cached_catalog"]:
-            use_catalog_cache = False
+        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
+            custom_catalog_path = plugin_invoker.project.root / custom_catalog_filename
+            try:
+                shutil.copy(custom_catalog_path, catalog_path)
+            except OSError as err:
+                msg = f"Failed to copy catalog file: {err.strerror}"
+                raise PluginExecutionError(msg) from err
 
-        if catalog_path.exists() and use_catalog_cache:
+            logger.info("Using custom catalog in %s", custom_catalog_path)
+            return catalog_path
+
+        use_cached_catalog = (
+            not (elt_context and elt_context.refresh_catalog)
+            and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
+        )
+
+        if catalog_path.exists() and use_cached_catalog:
             with suppress(FileNotFoundError):
                 cached_key = catalog_cache_key_path.read_text()
                 new_cache_key = self.catalog_cache_key(plugin_invoker)
 
                 if cached_key == new_cache_key:
                     logger.debug("Using cached catalog file")
-                    return
+                    return catalog_path
             logger.debug("Cached catalog is outdated, running discovery...")
 
         # We're gonna generate a new catalog, so delete the cache key.
         with suppress(FileNotFoundError):
             catalog_cache_key_path.unlink()
 
-        if custom_catalog_filename := plugin_invoker.plugin_config_extras["_catalog"]:
-            custom_catalog_path = plugin_invoker.project.root.joinpath(
-                custom_catalog_filename,
-            )
+        await self.run_discovery(plugin_invoker, catalog_path)
+        return catalog_path
 
-            try:
-                shutil.copy(custom_catalog_path, catalog_path)
-                logger.info(f"Found catalog in {custom_catalog_path}")  # noqa: G004
-            except FileNotFoundError as err:
-                raise PluginExecutionError(
-                    f"Could not find catalog file {custom_catalog_path}",  # noqa: EM102
-                ) from err
-        else:
-            await self.run_discovery(plugin_invoker, catalog_path)
+    async def discover_catalog(self, plugin_invoker: PluginInvoker) -> None:
+        """Perform catalog discovery.
+
+        Args:
+            plugin_invoker: The invocation handler of the plugin instance.
+
+        Returns:
+            None
+        """
+        catalog_path = await self._get_catalog(plugin_invoker)
 
         # test for the result to be a valid catalog
         try:
             async with await anyio.open_file(catalog_path) as catalog_file:
-                catalog = json.loads(await catalog_file.read())
-                Draft4Validator.check_schema(catalog)
+                json.loads(await catalog_file.read())
         except Exception as err:
             catalog_path.unlink()
+            msg = f"Catalog discovery failed: {err}"
             if isinstance(err, json.JSONDecodeError):
                 logger.error(
                     "Invalid JSON: %s [...]",
                     err.doc[max(err.pos - 9, 0) : err.pos + 10],
                 )
+                msg = "Invalid catalog"
 
-            raise PluginExecutionError(
-                f"Catalog discovery failed: invalid catalog: {err}",  # noqa: EM102
-            ) from err
+            raise PluginExecutionError(msg) from err
 
     async def run_discovery(
         self,

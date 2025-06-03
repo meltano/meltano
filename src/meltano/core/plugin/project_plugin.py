@@ -232,7 +232,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         return self._parent
 
     @parent.setter
-    def parent(self, new_parent: ProjectPlugin | BasePlugin) -> None:
+    def parent(self, new_parent: ProjectPlugin | BasePlugin | None) -> None:
         ancestor = new_parent
         while isinstance(ancestor, self.__class__):
             if ancestor == self:
