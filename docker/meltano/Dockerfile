@@ -18,7 +18,7 @@ WORKDIR "${WORKDIR}"
 RUN python -m venv /venv
 ENV PATH="/venv/bin:${PATH}"
 
-# Installing the application the same way our users do when using PyPI
+# Installing the application from a pre-built wheel in the dist directory
 RUN --mount=type=bind,source=dist,target=/tmp/meltano-dist \
     pip install --upgrade pip wheel && \
     pip install "meltano[azure,gcs,mssql,postgres,psycopg2,s3] @ file://$(ls /tmp/meltano-dist/meltano-*.whl)"
