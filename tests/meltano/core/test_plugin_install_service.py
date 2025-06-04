@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import os
+import platform
 import re
+import sys
 import typing as t
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -152,6 +154,13 @@ class TestPluginInstallService:
             "target-csv",
         ]
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows" and sys.version_info >= (3, 13),
+        reason=(
+            "The test fails on Windows and Python 3.13+ because of missing wheels. "
+            "See https://github.com/closeio/ciso8601/issues/155."
+        ),
+    )
     @pytest.mark.slow
     async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
