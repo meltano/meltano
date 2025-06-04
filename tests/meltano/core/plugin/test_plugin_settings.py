@@ -25,11 +25,24 @@ from meltano.core.settings_store import (
 from meltano.core.utils import EnvironmentVariableNotSetError
 
 if t.TYPE_CHECKING:
-    from collections.abc import Generator
+    import sys
+    from collections.abc import Callable, Generator
+
+    from sqlalchemy.orm import Session
 
     from meltano.core.environment import Environment
     from meltano.core.plugin.settings_service import PluginSettingsService
     from meltano.core.project import Project
+
+    if sys.version_info < (3, 10):
+        from typing_extensions import TypeAlias
+    else:
+        from typing import TypeAlias  # noqa: ICN003
+
+    PluginSettingsServiceFactory: TypeAlias = Callable[
+        [ProjectPlugin],
+        PluginSettingsService,
+    ]
 
 
 @pytest.mark.order(0)
@@ -204,6 +217,29 @@ class TestPluginSettingsService:
             False,
             SettingValueStore.ENV,
         )
+
+    def test_get_expandable_inherited(
+        self,
+        session: Session,
+        monkeypatch: pytest.MonkeyPatch,
+        plugin_settings_service_factory: PluginSettingsServiceFactory,
+        inherited_tap,
+    ) -> None:
+        """Casting is disabled for expandable strings."""
+        monkeypatch.setenv("PORT", "4444")
+        service = plugin_settings_service_factory(inherited_tap)
+        service.inherited_settings_service.set(
+            "port",
+            "$PORT",
+            store=SettingValueStore.MELTANO_YML,
+            cast=False,
+        )
+        value, metadata = service.get_with_metadata("port", session=session)
+        assert value == 4444
+        assert metadata["source"] is SettingValueStore.INHERITED
+        assert metadata["expanded"]
+        assert metadata["unexpanded_value"] == "$PORT"
+        assert not metadata["expandable"]
 
     def test_definitions(self, subject) -> None:
         subject.show_hidden = False

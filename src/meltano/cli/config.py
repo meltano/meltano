@@ -35,6 +35,7 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.setting_definition import SettingDefinition
     from meltano.core.settings_service import SettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -271,7 +272,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
-        setting_def = config_metadata["setting"]
+        setting_def: SettingDefinition = config_metadata["setting"]
 
         if extras:
             if not setting_def.is_extra:
