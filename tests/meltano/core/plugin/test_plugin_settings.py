@@ -228,15 +228,39 @@ class TestPluginSettingsService:
         """Casting is disabled for expandable strings."""
         monkeypatch.setenv("PORT", "4444")
         service = plugin_settings_service_factory(inherited_tap)
-        service.inherited_settings_service.set(
+        parent = service.inherited_settings_service
+        parent.set(
+            "port",
+            "5555",
+            store=SettingValueStore.MELTANO_YML,
+            cast_value=False,
+        )
+        value, metadata = service.get_with_metadata("port", session=session)
+        assert value == 5555
+        assert metadata["source"] is SettingValueStore.INHERITED
+        assert metadata["uncast_value"] == "5555"
+        assert "unexpanded_value" not in metadata
+        assert not metadata["expandable"]
+
+        parent.set(
             "port",
             "$PORT",
             store=SettingValueStore.MELTANO_YML,
-            cast=False,
+            cast_value=False,
         )
+        value, metadata = parent.get_with_metadata("port", session=session)
+        assert value == 4444
+        assert metadata["source"] is SettingValueStore.MELTANO_YML
+        assert metadata["uncast_value"] == "4444"
+        assert metadata["expanded"]
+        assert metadata["unexpanded_value"] == "$PORT"
+        assert not metadata["expandable"]
+
         value, metadata = service.get_with_metadata("port", session=session)
         assert value == 4444
         assert metadata["source"] is SettingValueStore.INHERITED
+        assert metadata["inherited_source"] is SettingValueStore.MELTANO_YML
+        assert metadata["uncast_value"] == "4444"
         assert metadata["expanded"]
         assert metadata["unexpanded_value"] == "$PORT"
         assert not metadata["expandable"]

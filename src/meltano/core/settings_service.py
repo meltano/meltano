@@ -478,7 +478,7 @@ class SettingsService(metaclass=ABCMeta):
         store: SettingValueStore = SettingValueStore.AUTO,
         *,
         redacted_value: str = REDACTED_VALUE,
-        cast: bool = True,
+        cast_value: bool = True,
         **kwargs: t.Any,
     ) -> tuple[t.Any, dict[str, t.Any]]:
         """Set the value and metadata for a setting.
@@ -488,7 +488,7 @@ class SettingsService(metaclass=ABCMeta):
             value: the value to set the setting to
             store: the store to set the value in
             redacted_value: the value to use when redacting the setting
-            cast: Whether to cast the setting value to its expected type
+            cast_value: Whether to cast the setting value to its expected type
             **kwargs: additional keyword args to pass during
                 `SettingsStoreManager` instantiation
 
@@ -519,7 +519,7 @@ class SettingsService(metaclass=ABCMeta):
             metadata["redacted"] = True
             return None, metadata
 
-        if setting_def and cast:
+        if setting_def and cast_value:
             cast_value = setting_def.cast_value(value)
             if cast_value != value:
                 metadata["uncast_value"] = value
