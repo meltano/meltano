@@ -520,10 +520,10 @@ class SettingsService(metaclass=ABCMeta):
             return None, metadata
 
         if setting_def and cast_value:
-            cast_value = setting_def.cast_value(value)
-            if cast_value != value:
+            new_value = setting_def.cast_value(value)
+            if new_value != value:
                 metadata["uncast_value"] = value
-                value = cast_value
+                value = new_value
 
         metadata.update(
             store.manager(self, **kwargs).set(
