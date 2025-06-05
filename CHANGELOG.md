@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.8.0 (2025-06-05)
+
+### 🐛 Fixes
+
+- [#9300](https://github.com/meltano/meltano/issues/9300) Do not try to cast expandable inherited settings
+
 ## v3.7.7 (2025-05-29)
 
 ### 🐛 Fixes
