@@ -72,7 +72,7 @@ jobs:
 
   build_docker:
     name: Docker Images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: build
     permissions:
       actions: read
