@@ -785,7 +785,7 @@ class TestCliAdd:
             mock.patch(
                 "meltano.core.venv_service._resolve_python_path",
             ) as venv_mock,
-            mock.patch("meltano.core.venv_service.VenvService.install"),
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
         ):
             python = "python3.X"
             assert_cli_runner(
