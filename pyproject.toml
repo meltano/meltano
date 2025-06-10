@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "3.7.7"
+version = "3.7.8"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.15"
@@ -114,7 +114,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
-  "coverage[toml]>=7.6.12",
+  "coverage[toml]>=7.8",
 ]
 dev = [
   { include-group = "testing" },
@@ -180,6 +180,7 @@ filterwarnings = [
   "ignore::pytest.PytestUnraisableExceptionWarning",
   "ignore::pytest.PytestUnhandledThreadExceptionWarning",
   "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
+  "ignore::coverage.exceptions.CoverageWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -245,7 +246,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "3.7.7"
+version = "3.7.8"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true

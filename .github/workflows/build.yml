@@ -6,7 +6,7 @@ on:
     - .github/actions/docker-build-scan-push/action.yml
     - .github/workflows/build.yml
     - docker/meltano/Dockerfile
-    - src/**
+    - src/meltano/migrations/**
     - scripts/**
     - pyproject.toml
   workflow_dispatch:
