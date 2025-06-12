@@ -159,7 +159,7 @@ class TestPluginInstallService:
         and sys.version_info >= (3, 13, 4)
         and sys.version_info < (3, 13, 5),
         reason=(
-            "The test fails on Windows with Python 3.13.4 because of the build "
+            "The test fails on Windows with Python 3.13.4 because the build "
             "is broken and points to a free-threaded binary."
             "See https://github.com/python/cpython/issues/135151."
         ),
