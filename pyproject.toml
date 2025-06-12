@@ -178,9 +178,7 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore::pytest.PytestUnhandledThreadExceptionWarning",
   "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
-  "ignore::coverage.exceptions.CoverageWarning",
 ]
 log_cli = true
 log_cli_format = "%(message)s"
