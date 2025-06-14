@@ -6,8 +6,8 @@ import platform
 import shutil
 import typing as t
 from pathlib import Path
+from unittest import mock
 
-import mock
 import pytest
 import yaml
 
@@ -532,6 +532,15 @@ class TestCliAdd:
                     "--variant",
                     "personal",
                 ],
+                input=os.linesep.join(
+                    [
+                        "tap_custom_variant",  # namespace
+                        "git+https://github.com/meltano/tap-custom-variant.git",  # pip_url  # noqa: E501
+                        os.linesep,  # default executable
+                        os.linesep,  # default capabilities
+                        os.linesep,  # default settings
+                    ]
+                ),
             )
             assert_cli_runner(res)
 
@@ -543,6 +552,11 @@ class TestCliAdd:
             plugin_variant = plugin_def.variants[0]
 
             assert plugin.variant == plugin_variant.name == "personal"
+            assert plugin.namespace == "tap_custom_variant"
+            assert (
+                plugin.pip_url
+                == "git+https://github.com/meltano/tap-custom-variant.git"
+            )
 
     @pytest.mark.parametrize(
         ("plugin_type", "plugin_name", "default_variant", "required_plugin_refs"),

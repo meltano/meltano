@@ -4,9 +4,10 @@ import asyncio
 import json
 import platform
 from dataclasses import dataclass
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
-from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli

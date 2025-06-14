@@ -4,10 +4,11 @@ import io
 import json
 import typing as t
 from signal import SIGTERM
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import dotenv
 import pytest
-from mock import AsyncMock, mock
 
 from asserts import assert_cli_runner
 from meltano.cli import cli
@@ -316,3 +317,38 @@ class TestCliConfigSet:
             {},
         )
         assert tap_config["config"]["test"] == "dev-mock"
+
+
+class TestCliConfigUnset:
+    @pytest.mark.usefixtures("project")
+    def test_config_unset(self, cli_runner, tap) -> None:
+        secure_value = "thisisatest"
+        set_default_result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "set", "secure", secure_value],
+        )
+        assert_cli_runner(set_default_result)
+
+        meltano_yml_value = "thisisatest-meltano-yml"
+        set_meltano_yml_result = cli_runner.invoke(
+            cli,
+            [
+                "config",
+                tap.name,
+                "set",
+                "--store=meltano_yml",
+                "secure",
+                meltano_yml_value,
+            ],
+        )
+        assert_cli_runner(set_meltano_yml_result)
+
+        unset_result = cli_runner.invoke(
+            cli,
+            ["config", tap.name, "unset", "--store=meltano_yml", "secure"],
+        )
+        assert_cli_runner(unset_result)
+        assert (
+            f"Extractor '{tap.name}' setting 'secure' in `meltano.yml` was unset"
+        ) in unset_result.stdout
+        assert "Current value is now: '(redacted)'" in unset_result.stdout

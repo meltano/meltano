@@ -3,13 +3,14 @@ from __future__ import annotations
 import platform
 import typing as t
 from datetime import date, datetime, timezone
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
+from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.schedule_service import (
     BadCronError,
     Schedule,
@@ -36,7 +37,7 @@ def create_elt_schedule():
         }
 
         attrs.update(kwargs)
-        return Schedule(name=name, **attrs)
+        return ELTSchedule(name=name, **attrs)
 
     return make
 
@@ -47,12 +48,11 @@ def create_job_schedule():
         attrs = {
             "job": "job-mock",
             "interval": "@daily",
-            "start_date": None,
             "env": {},
         }
 
         attrs.update(kwargs)
-        return Schedule(name=name, **attrs)
+        return JobSchedule(name=name, **attrs)
 
     return make
 
@@ -319,16 +319,19 @@ class TestScheduleService:
     @pytest.mark.usefixtures("create_elt_schedule")
     def test_find_namespace_schedule_custom_extractor(
         self,
-        subject,
+        subject: ScheduleService,
         custom_tap,
     ) -> None:
-        schedule = Schedule(
+        schedule = ELTSchedule(
             name="tap-custom",
             extractor="tap-custom",
+            loader="target-mock",
+            transform="skip",
             interval="@daily",
         )
         subject.add_schedule(schedule)
         found_schedule = subject.find_namespace_schedule(custom_tap.namespace)
+        assert isinstance(found_schedule, ELTSchedule)
         assert found_schedule.extractor == custom_tap.name
 
     def test_find_namespace_schedule_not_found(self, subject) -> None:

@@ -35,6 +35,7 @@ from meltano.core.utils import run_async
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
     from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.setting_definition import SettingDefinition
     from meltano.core.settings_service import SettingsService
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -60,7 +61,7 @@ def _get_ctx_arg(*args: t.Any) -> click.core.Context:
     raise ValueError("No click.core.Context provided in *args")  # noqa: EM101
 
 
-def _get_store_choices() -> list[SettingValueStore]:
+def _get_store_choices() -> list[str]:
     """Get a list of valid choices for the --store flag.
 
     Returns:
@@ -68,7 +69,7 @@ def _get_store_choices() -> list[SettingValueStore]:
     """
     writables = SettingValueStore.writables()
     writables.remove(SettingValueStore.MELTANO_ENVIRONMENT)
-    return writables
+    return [w.value for w in writables]
 
 
 def _use_meltano_env(func):  # noqa: ANN001, ANN202
@@ -104,16 +105,16 @@ def _use_meltano_env(func):  # noqa: ANN001, ANN202
     return _wrapper
 
 
-def get_label(metadata) -> str:  # noqa: ANN001
+def get_label(metadata, source) -> str:  # noqa: ANN001
     """Get the label for an environment variable's source.
 
     Args:
         metadata: the metadata for the variable
+        source: the source of the variable
 
     Returns:
         string describing the source of the variable's value
     """
-    source = metadata["source"]
     try:
         return f"from the {metadata['env_var']} variable in {source.label}"
     except KeyError:
@@ -271,7 +272,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
     for name, config_metadata in full_config.items():
         value = config_metadata["value"]
         source = config_metadata["source"]
-        setting_def = config_metadata["setting"]
+        setting_def: SettingDefinition = config_metadata["setting"]
 
         if extras:
             if not setting_def.is_extra:
@@ -309,7 +310,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
         elif source is SettingValueStore.INHERITED:
             label = f"inherited from '{settings.plugin.parent.name}'"  # type: ignore[union-attr]
         else:
-            label = f"{get_label(config_metadata)}"
+            label = f"{get_label(config_metadata, source)}"
 
         redacted_with_value = safe and setting_def.is_redacted and value is not None
 
@@ -344,7 +345,7 @@ def list_settings(ctx: click.Context, *, extras: bool) -> None:
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.confirmation_option()
 @click.pass_context
@@ -379,7 +380,7 @@ def reset(ctx, store) -> None:  # noqa: ANN001
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.pass_context
 @_use_meltano_env
@@ -393,6 +394,8 @@ def set_(
     from_file: t.TextIO | None,
 ) -> None:
     """Set the configurations' setting `<name>` to `<value>`."""
+    store = SettingValueStore(store)
+
     if len(setting_name) == 1:
         setting_name = tuple(setting_name[0].split("."))
 
@@ -469,7 +472,7 @@ async def test(
 @click.option(
     "--store",
     type=click.Choice(_get_store_choices()),
-    default=SettingValueStore.AUTO,
+    default=SettingValueStore.AUTO.value,
 )
 @click.pass_context
 @_use_meltano_env
@@ -477,9 +480,13 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
     """Unset the configurations' setting called `<name>`."""
     store = SettingValueStore(store)
 
-    settings = ctx.obj["settings"]
+    settings = t.cast(
+        "ProjectSettingsService | PluginSettingsService",
+        ctx.obj["settings"],
+    )
     session = ctx.obj["session"]
     tracker = ctx.obj["tracker"]
+    safe: bool = ctx.obj["safe"]
 
     path = list(setting_name)
     try:
@@ -495,10 +502,15 @@ def unset(ctx, setting_name, store) -> None:  # noqa: ANN001
         fg="green",
     )
 
-    current_value, source = settings.get_with_source(name, session=session)
-    if source is not SettingValueStore.DEFAULT:
+    current_value, current_metadata = settings.get_with_metadata(
+        name,
+        session=session,
+        redacted=safe,
+    )
+    if (source := current_metadata["source"]) is not SettingValueStore.DEFAULT:
         click.secho(
-            f"Current value is now: {current_value!r} ({get_label(metadata)})",
+            f"Current value is now: {current_value!r} "
+            f"({get_label(current_metadata, source)})",
             fg="yellow",
         )
     tracker.track_command_event(CliEvent.completed)
