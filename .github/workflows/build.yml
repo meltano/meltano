@@ -26,9 +26,10 @@ permissions:
 
 jobs:
   build:
-    name: Wheel and sdist
+    name: Wheel and SDist
     runs-on: ubuntu-latest
     outputs:
+      name: ${{ steps.baipp.outputs.package_name }}
       version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
@@ -160,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: publishing
-      url: https://pypi.org/project/meltano/${{ needs.build.outputs.version }}
+      url: https://pypi.org/project/${{ needs.build.outputs.name }}/${{ needs.build.outputs.version }}
 
     steps:
     - name: Check out the repository
