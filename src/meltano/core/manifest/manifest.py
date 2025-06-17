@@ -254,7 +254,7 @@ class Manifest:
             for k, v in env.items()
         }
 
-    def env_aware_merge_mappings(
+    def env_aware_merge_mappings(  # noqa: RET503
         self,
         data: MutableMapping[str, t.Any],
         key: str,
@@ -274,7 +274,7 @@ class Manifest:
         """
         if key != "env":
             return NotImplemented
-        data[key] = self.sanitize_env_vars(  # noqa: RET503
+        data[key] = self.sanitize_env_vars(
             {
                 **expand_env_vars(
                     data[key],

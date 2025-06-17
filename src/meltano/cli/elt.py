@@ -458,7 +458,8 @@ async def _run_job(
 
 @asynccontextmanager
 async def _redirect_output(
-    log: structlog.stdlib.BoundLogger, output_logger: OutputLogger
+    log: structlog.stdlib.BoundLogger,
+    output_logger: OutputLogger,
 ) -> t.AsyncGenerator[None, None]:
     meltano_stdout = output_logger.out(
         "meltano",
@@ -596,7 +597,7 @@ async def _run_extract_load(
             log.error("Loading failed", code=code, message=message)
         raise
 
-    log.info("Extract & load complete!")
+    log.info("Extract & load complete!")  # type: ignore[unreachable]
 
 
 async def _run_transform(

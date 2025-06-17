@@ -495,5 +495,5 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
             `PluginType.MAPPERS`).
         """
         return self.type is PluginType.MAPPERS and bool(
-            self.extra_config.get("_mapping")
+            self.extra_config.get("_mapping"),
         )

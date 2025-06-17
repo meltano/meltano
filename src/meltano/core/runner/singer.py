@@ -204,29 +204,30 @@ class SingerRunner(Runner):  # noqa: D101
         if target_code:
             raise RunnerError("Loader failed", {PluginType.LOADERS: target_code})  # noqa: EM101
 
-    def dry_run(self, tap: PluginInvoker, target: PluginInvoker) -> None:  # noqa: D102
+    def dry_run(self, tap: PluginInvoker, target: PluginInvoker) -> t.NoReturn:  # noqa: D102
         logger.info("Dry run:")
         logger.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")  # noqa: G004
         logger.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")  # noqa: G004
 
-    async def run(  # noqa: ANN201, D102
+    async def run(  # noqa: D102
         self,
         extractor_log=None,  # noqa: ANN001
         loader_log=None,  # noqa: ANN001
         extractor_out=None,  # noqa: ANN001
         loader_out=None,  # noqa: ANN001
-    ):
+    ) -> t.NoReturn:
         tap = self.context.extractor_invoker()
         target = self.context.loader_invoker()
 
         if self.context.dry_run:
-            return self.dry_run(tap, target)
+            self.dry_run(tap, target)
+            return
 
         async with (
             tap.prepared(self.context.session),
             target.prepared(self.context.session),
         ):
-            await self.invoke(  # noqa: RET503
+            await self.invoke(
                 tap,
                 target,
                 extractor_log=extractor_log,

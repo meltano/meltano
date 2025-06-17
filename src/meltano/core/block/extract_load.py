@@ -103,8 +103,10 @@ class ELBContext:
         Returns:
             The run directory for the current job.
         """
-        if self.job:  # noqa: RET503
+        if self.job:
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
+
+        return None
 
 
 class ELBContextBuilder:
@@ -419,9 +421,10 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):  # noqa: RET503
+        for idx, block in reversed(list(enumerate(self.blocks))):
             if block.requires_input and block.proxy_stderr.done():
                 return idx
+        return None
 
     def upstream_complete(self, index: int) -> bool | None:
         """Return whether blocks upstream from a given block index are already done.
@@ -432,12 +435,14 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):  # noqa: RET503
+        for idx, block in enumerate(self.blocks):
             if idx >= index:
                 return True
             if block.process_future.done():
                 continue
             return False
+
+        return None
 
     async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.

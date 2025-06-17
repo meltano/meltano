@@ -384,11 +384,7 @@ unfixable = [
 ]
 "src/meltano/migrations/versions/*" = [
   "D103",
-  "D415",
   "INP001",
-  "TC003",
-  "TID251",
-  "UP007",
 ]
 
 [tool.ruff.lint.flake8-annotations]
