@@ -96,18 +96,6 @@ class ELBContext:
 
         self.base_output_logger = base_output_logger
 
-    @property
-    def elt_run_dir(self) -> Path | None:
-        """Obtain the run directory for the current job.
-
-        Returns:
-            The run directory for the current job.
-        """
-        if self.job:
-            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
-
-        return None
-
 
 class ELBContextBuilder:
     """Build up ELBContexts for ExtractLoadBlocks."""

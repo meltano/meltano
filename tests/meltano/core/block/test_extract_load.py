@@ -73,17 +73,6 @@ def elb_context(project, session, test_job, output_logger) -> ELBContext:
     return ctx
 
 
-class TestELBContext:
-    def test_elt_run_dir_is_returned(
-        self,
-        project,
-        test_job,
-        elb_context: ELBContext,
-    ) -> None:
-        expected_path = project.job_dir(test_job.job_name, str(test_job.run_id))
-        assert elb_context.elt_run_dir == Path(expected_path)
-
-
 class TestELBContextBuilder:
     @pytest.fixture
     def target_postgres(self, project_add_service):
