@@ -421,10 +421,14 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):
-            if block.requires_input and block.proxy_stderr.done():
-                return idx
-        return None
+        return next(
+            (
+                idx
+                for idx, block in reversed(list(enumerate(self.blocks)))
+                if block.requires_input and block.proxy_stderr.done()
+            ),
+            None,
+        )
 
     def upstream_complete(self, index: int) -> bool | None:
         """Return whether blocks upstream from a given block index are already done.
