@@ -597,7 +597,7 @@ async def _run_extract_load(
             log.error("Loading failed", code=code, message=message)
         raise
 
-    log.info("Extract & load complete!")  # type: ignore[unreachable]
+    log.info("Extract & load complete!")
 
 
 async def _run_transform(
