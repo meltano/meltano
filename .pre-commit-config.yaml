@@ -83,9 +83,9 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.13
+    rev: v0.12.0
     hooks:
-    - id: ruff
+    - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 

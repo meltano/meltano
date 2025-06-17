@@ -150,10 +150,12 @@ class EventMatcher:
         Returns:
             True if the event was found, False otherwise.
         """
-        for line in self.seen_events:  # noqa: RET503
+        for line in self.seen_events:
             matches = line["event"] == event
             if matches:
                 return True
+
+        return False
 
     def find_by_event(self, event: str) -> list[dict] | None:
         """Return the first matching event, that matches the given event.
