@@ -415,7 +415,8 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 raise BlockSetHasNoStateError
         return self._state_service
 
-    def index_last_input_done(self) -> int | None:
+    # TODO: This doesn't seem to be used anywhere. Remove?
+    def index_last_input_done(self) -> int | None:  # pragma: no cover
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
@@ -425,7 +426,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             (
                 idx
                 for idx, block in reversed(list(enumerate(self.blocks)))
-                if block.requires_input and block.proxy_stderr.done()
+                if block.consumer and block.proxy_stderr().done()
             ),
             None,
         )
