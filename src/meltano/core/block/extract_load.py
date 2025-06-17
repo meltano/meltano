@@ -430,7 +430,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             None,
         )
 
-    def upstream_complete(self, index: int) -> bool | None:
+    def upstream_complete(self, index: int) -> bool:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -439,14 +439,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):
-            if idx >= index:
-                return True
-            if block.process_future.done():
-                continue
-            return False
-
-        return None
+        return all(block.process_future.done() for block in self.blocks[:index])
 
     async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.
