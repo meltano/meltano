@@ -124,7 +124,7 @@ def default_config(
         formatter_config = {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.KeyValueRenderer(
-                key_order=["timestamp", "level", "event", "logger"]
+                key_order=["timestamp", "level", "event", "logger"],
             ),
             "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
         }

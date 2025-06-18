@@ -458,7 +458,8 @@ async def _run_job(
 
 @asynccontextmanager
 async def _redirect_output(
-    log: structlog.stdlib.BoundLogger, output_logger: OutputLogger
+    log: structlog.stdlib.BoundLogger,
+    output_logger: OutputLogger,
 ) -> t.AsyncGenerator[None, None]:
     meltano_stdout = output_logger.out(
         "meltano",
