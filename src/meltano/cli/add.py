@@ -66,8 +66,8 @@ class PluginTypeArg(click.Choice):
     def convert(
         self,
         value: str,
-        param: click.Parameter,  # noqa: ARG002
-        ctx: click.Context,  # noqa: ARG002
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
     ) -> PluginType:
         """Convert the value to a PluginType."""
         return PluginType.from_cli_argument(value)
