@@ -8,6 +8,9 @@ ci:
   autoupdate_schedule: weekly
   skip:
     - uv-lock
+    - check-github-issue-templates
+    - check-github-issue-config
+    - check-github-discussion-templates
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -28,15 +31,31 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.3
+    rev: 0.33.0
     hooks:
       - id: check-metaschema
         name: validate JSON schemas against meta schemas
-        files: ^schemas?/.*\.json$
+        files: ^src/meltano/schemas?/.*\.json$
       - id: check-jsonschema
         name: validate 'meltano.yml' with jsonschema
         files: .*/meltano.yml$
         args: ["--schemafile", "src/meltano/schemas/meltano.schema.json"]
+      - id: check-jsonschema
+        alias: check-github-issue-templates
+        name: validate GitHub issue templates
+        files: ^\.github/ISSUE_TEMPLATE/.*\.yml$
+        exclude: ^\.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-forms.json"]
+      - id: check-jsonschema
+        alias: check-github-issue-config
+        name: validate GitHub issue config
+        files: ^\.github/ISSUE_TEMPLATE/config\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-issue-config.json"]
+      - id: check-jsonschema
+        alias: check-github-discussion-templates
+        name: validate GitHub discussion templates
+        files: ^.github/DISCUSSION_TEMPLATE/.*\.yml$
+        args: ["--schemafile", "https://json.schemastore.org/github-discussion.json"]
       - id: check-compose-spec
       - id: check-dependabot
       - id: check-github-actions
@@ -64,13 +83,13 @@ repos:
           - "prettier@3.0.0"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.0
+    rev: v0.12.0
     hooks:
-    - id: ruff
+    - id: ruff-check
       args: [--fix, --exit-non-zero-on-fix, --show-fixes]
     - id: ruff-format
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.6
+    rev: 0.7.13
     hooks:
       - id: uv-lock

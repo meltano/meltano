@@ -7,7 +7,7 @@ import re
 import typing as t
 from collections import defaultdict
 
-import yaml
+import ruamel.yaml as yaml
 from structlog.stdlib import get_logger
 
 from meltano.core.behavior import NameEq
@@ -266,6 +266,7 @@ class Variant(NameEq, Canonical):
     def __init__(
         self,
         name: str | None = None,
+        *,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+from unittest.mock import Mock
 
 import pytest
-from mock import Mock
 
 from meltano.core.db import (
     MeltanoDatabaseCompatibilityError,

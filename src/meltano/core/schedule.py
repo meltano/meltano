@@ -27,63 +27,32 @@ CRON_INTERVALS: dict[str, str | None] = {
 
 
 class Schedule(NameEq, Canonical):
-    """A schedule is an elt command or a job configured to run at a certain interval."""
+    """A base schedule class."""
 
     name: str
-    extractor: str | None
-    loader: str | None
-    transform: str | None
     interval: str | None
-    start_date: datetime.datetime | None
-    job: str | None
     env: dict[str, str]
 
     def __init__(
         self,
         *,
         name: str,
-        extractor: str | None = None,
-        loader: str | None = None,
-        transform: str | None = None,
         interval: str | None,
-        start_date: datetime.datetime | None = None,
-        job: str | None = None,
         env: dict[str, str] | None = None,
     ):
         """Initialize a Schedule.
 
         Args:
             name: The name of the schedule.
-            extractor: The name of the extractor.
-            loader: The name of the loader.
-            transform: The transform statement (eg: skip, only, run)
             interval: The interval of the schedule.
-            start_date: The start date of the schedule.
-            job: The name of the job.
             env: The env for this schedule.
         """
-        if not env:
-            env = {}
-
         super().__init__()
 
         # Attributes will be listed in meltano.yml in this order:
         self.name = name
-
         self.interval = interval
-        self.job = job
-        self.env = env
-
-        if self.job:
-            self.extractor = None
-            self.loader = None
-            self.transform = None
-            self.start_date = None
-        else:
-            self.extractor = extractor
-            self.loader = loader
-            self.transform = transform
-            self.start_date = start_date
+        self.env = env or {}
 
     @property
     def cron_interval(self) -> str | None:
@@ -96,14 +65,38 @@ class Schedule(NameEq, Canonical):
             return CRON_INTERVALS.get(self.interval, self.interval)
         return None
 
-    @property
-    def elt_schedule(self) -> bool:
-        """Return whether this schedule is an elt schedule.
 
-        Returns:
-            True if this schedule is an elt schedule.
+class ELTSchedule(Schedule):
+    """A schedule is an elt command or a job configured to run at a certain interval."""
+
+    extractor: str
+    loader: str
+    transform: str
+    start_date: datetime.datetime | None
+
+    def __init__(
+        self,
+        *,
+        extractor: str,
+        loader: str,
+        transform: str,
+        start_date: datetime.datetime | None = None,
+        **kwargs: t.Any,
+    ):
+        """Initialize a Schedule.
+
+        Args:
+            extractor: The name of the extractor.
+            loader: The name of the loader.
+            transform: The transform statement (eg: skip, only, run)
+            start_date: The start date of the schedule.
+            kwargs: The keyword arguments to initialize the schedule with.
         """
-        return not self.job
+        super().__init__(**kwargs)
+        self.extractor = extractor
+        self.loader = loader
+        self.transform = transform
+        self.start_date = start_date
 
     @property
     def elt_args(self) -> list[str]:
@@ -117,8 +110,6 @@ class Schedule(NameEq, Canonical):
         Raises:
             NotImplementedError: If the schedule is a job.
         """
-        if self.job:
-            raise NotImplementedError
         return [
             t.cast("str", self.extractor),
             t.cast("str", self.loader),
@@ -138,8 +129,20 @@ class Schedule(NameEq, Canonical):
         Raises:
             NotImplementedError: If the schedule is a job.
         """
-        if self.job:
-            raise NotImplementedError(
-                "Can't obtain last successful State(Job) for schedule job.",  # noqa: EM101
-            )
         return StateJobFinder(self.name).latest_success(session)
+
+
+class JobSchedule(Schedule):
+    """A schedule is a job configured to run at a certain interval."""
+
+    job: str
+
+    def __init__(self, *, job: str, **kwargs: t.Any) -> None:
+        """Initialize a Schedule.
+
+        Args:
+            job: The name of the job.
+            kwargs: The keyword arguments to initialize the schedule with.
+        """
+        super().__init__(**kwargs)
+        self.job = job

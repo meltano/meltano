@@ -8,8 +8,8 @@ from contextlib import contextmanager
 from http import server as server_lib
 from threading import Thread
 from time import sleep
+from unittest import mock
 
-import mock
 import pytest
 from snowplow_tracker import Emitter, SelfDescribing
 
@@ -341,8 +341,8 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "project_id",
-            uuid.uuid4(),
-            uuid.uuid4(),
+            from_value=uuid.uuid4(),
+            to_value=uuid.uuid4(),
         )
         assert passed
 

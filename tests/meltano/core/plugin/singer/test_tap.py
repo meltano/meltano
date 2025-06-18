@@ -7,10 +7,11 @@ import subprocess
 import sys
 import typing as t
 from contextlib import contextmanager, suppress
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import anyio
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
@@ -26,8 +27,11 @@ from meltano.core.state_service import InvalidJobStateError, StateService
 if t.TYPE_CHECKING:
     from collections.abc import Callable
 
+    from sqlalchemy.orm import Session
+
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.plugin_invoker import PluginInvoker
+    from meltano.core.project import Project
     from meltano.core.project_add_service import ProjectAddService
 
 
@@ -314,12 +318,34 @@ class TestSingerTap:
                 assert json.loads(catalog_path.read_text()) == {"discovered": True}
                 assert not catalog_cache_key_path.exists()
 
+        def _set_invalid_catalog(*args, **kwargs):  # noqa: ARG001
+            future = asyncio.Future()
+            future.set_result(catalog_path.write_text('Not JSON {"discovered": true}'))
+            return future
+
+        async with invoker.prepared(session):
+            with mock.patch.object(
+                SingerTap,
+                "run_discovery",
+                side_effect=_set_invalid_catalog,
+            ):
+                with pytest.raises(
+                    PluginExecutionError,
+                    match="Invalid catalog",
+                ) as exc_info:
+                    await subject.discover_catalog(invoker)
+
+                cause = exc_info.value.__cause__
+                assert isinstance(cause, json.JSONDecodeError)
+                assert cause.doc == 'Not JSON {"discovered": true}'
+                assert cause.pos == 0
+
     @pytest.mark.asyncio
     async def test_discover_catalog_custom(
         self,
-        project,
+        project: Project,
         session,
-        plugin_invoker_factory,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
         subject: SingerTap,
         monkeypatch,
     ) -> None:
@@ -335,10 +361,91 @@ class TestSingerTap:
             custom_catalog_filename,
         )
 
+        # These files should be ignored if a custom catalog is provided
+        invoker.files["catalog"].write_text('{"previous": true}')
+        invoker.files["catalog_cache_key"].touch()
+
         async with invoker.prepared(session):
-            await subject.discover_catalog(invoker)
+            with (
+                mock.patch.object(
+                    SingerTap,
+                    "run_discovery",
+                ) as mocked_run_discovery,
+                mock.patch.object(
+                    SingerTap,
+                    "catalog_cache_key",
+                ) as mocked_catalog_cache_key,
+            ):
+                await subject.discover_catalog(invoker)
 
         assert invoker.files["catalog"].read_text() == '{"custom": true}'
+        assert not mocked_run_discovery.called
+        assert not mocked_catalog_cache_key.called
+
+    @pytest.mark.asyncio
+    async def test_discover_catalog_custom_missing(
+        self,
+        project: Project,
+        session: Session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        subject: SingerTap,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test using a custom catalog file that doesn't exist."""
+        invoker = plugin_invoker_factory(subject)
+
+        custom_catalog_filename = "custom_catalog.json"
+        custom_catalog_path = project.root.joinpath(custom_catalog_filename)
+        custom_catalog_path.unlink(missing_ok=True)
+
+        monkeypatch.setitem(
+            invoker.settings_service.config_override,
+            "_catalog",
+            custom_catalog_filename,
+        )
+
+        async with invoker.prepared(session):
+            with pytest.raises(
+                PluginExecutionError,
+                match="Failed to copy catalog file",
+            ) as exc_info:
+                await subject.discover_catalog(invoker)
+
+            cause = exc_info.value.__cause__
+            assert isinstance(cause, OSError)
+            assert cause.strerror == "No such file or directory"
+
+    @pytest.mark.asyncio
+    async def test_discover_catalog_custom_invalid(
+        self,
+        project: Project,
+        session: Session,
+        plugin_invoker_factory: Callable[[ProjectPlugin], PluginInvoker],
+        subject: SingerTap,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test using a custom catalog file that is invalid JSON."""
+        invoker = plugin_invoker_factory(subject)
+
+        custom_catalog_filename = "custom_catalog.json"
+        custom_catalog_path = project.root.joinpath(custom_catalog_filename)
+        custom_catalog_path.write_text("Not JSON")
+
+        monkeypatch.setitem(
+            invoker.settings_service.config_override,
+            "_catalog",
+            custom_catalog_filename,
+        )
+
+        async with invoker.prepared(session):
+            with pytest.raises(
+                PluginExecutionError,
+                match="Invalid catalog",
+            ) as exc_info:
+                await subject.discover_catalog(invoker)
+
+            cause = exc_info.value.__cause__
+            assert isinstance(cause, json.JSONDecodeError)
 
     @pytest.mark.asyncio
     async def test_apply_select(
@@ -892,7 +999,7 @@ class TestSingerTap:
                 return_value=False,
             ),
             mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect"
+                "meltano.core.plugin.singer.tap._stream_redirect",
             ) as stream_mock,
         ):
             await subject.run_discovery(invoker, catalog_path)

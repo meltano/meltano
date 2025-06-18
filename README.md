@@ -93,7 +93,7 @@ If you have any questions, want sneak peeks of features or would just like to sa
 Responsible Disclosure Policy
 -----------------------------
 
-Please refer to the [responsible disclosure policy](https://docs.meltano.com/the-project/responsible-disclosure) on our website.
+Please refer to the [responsible disclosure policy](https://docs.meltano.com/contribute/responsible-disclosure) on our website.
 
 License
 -------

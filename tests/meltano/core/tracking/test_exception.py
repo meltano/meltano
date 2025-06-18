@@ -140,9 +140,12 @@ def test_complex_exception_context() -> None:
 
     if sys.version_info < (3, 13):
         pathlib_loc = "pathlib.py"
-    else:
+    elif sys.version_info < (3, 14):
         # https://github.com/python/cpython/pull/118582
         pathlib_loc = "pathlib/_local.py"
+    else:
+        # https://github.com/python/cpython/pull/130748
+        pathlib_loc = "pathlib/__init__.py"
 
     assert cause["traceback"][1]["file"] == f"lib/python{major}.{minor}/{pathlib_loc}"
     assert cause["cause"] is None

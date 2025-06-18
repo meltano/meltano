@@ -9,8 +9,7 @@ import typing as t
 import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
-from enum import Enum
-from enum import IntFlag as EnumIntFlag
+from enum import Enum, IntEnum
 
 from sqlalchemy import literal
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
@@ -96,7 +95,7 @@ def current_trigger() -> str | None:
     return os.getenv("MELTANO_JOB_TRIGGER")
 
 
-class Payload(EnumIntFlag):
+class Payload(IntEnum):
     """Flag indicating whether a Job has state in its payload field."""
 
     STATE = 1
@@ -117,17 +116,13 @@ class Job(SystemModel):
     id: Mapped[IntPK]
     job_name: Mapped[str]
     run_id: Mapped[GUIDType]
-    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP007
+    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP045
     started_at: Mapped[datetime] = mapped_column(DateTimeUTC)
-    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
-        DateTimeUTC,
-    )
-    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP007
+    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
+    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
     payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
-    trigger: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP007
-        default=current_trigger,
-    )
+    trigger: Mapped[t.Optional[str]] = mapped_column(default=current_trigger)  # noqa: UP045
 
     def __init__(self, **kwargs: t.Any) -> None:
         """Construct a Job.
@@ -300,6 +295,7 @@ class Job(SystemModel):
     def start(self) -> None:
         """Mark the job has having started."""
         self.started_at = datetime.now(timezone.utc)
+        self._heartbeat()
         self.transit(State.RUNNING)
 
     def fail(self, error: t.Any | None = None) -> None:  # noqa: ANN401

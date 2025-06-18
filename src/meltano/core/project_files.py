@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from collections import OrderedDict
 from copy import copy
 
 import structlog
@@ -164,7 +163,7 @@ class ProjectFiles:
                 include_paths.remove(self._meltano_file_path)
 
         # Deduplicate entries
-        return list(OrderedDict.fromkeys(include_paths))
+        return list(dict.fromkeys(include_paths))
 
     def _add_to_index(self, key: tuple, include_path: Path) -> None:
         """Add a new key:path to the `_plugin_file_map`.

@@ -6,9 +6,9 @@ import platform
 import sys
 import tempfile
 import typing as t
+from unittest import mock
 
 import anyio
-import mock
 import pytest
 import structlog
 from structlog.testing import LogCapture

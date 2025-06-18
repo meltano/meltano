@@ -9,9 +9,9 @@ import typing as t
 import uuid
 from pathlib import Path
 from time import perf_counter_ns
+from unittest import mock
 
 import click
-import mock
 import pytest
 import yaml
 from structlog.stdlib import get_logger
@@ -516,7 +516,7 @@ class TestCliColors:
         with cli_runner.isolated_filesystem():
             result = cli_runner.invoke(cli, ["dummy"], color=True, env=env)
             assert result.exit_code == 0, result.exception
-            assert result.output.strip() == expected_text
+            assert result.stdout.strip() == expected_text
             assert bool(ANSI_RE.match(result.stderr)) is log_colors_expected
             assert result.exception is None
 

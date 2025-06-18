@@ -94,7 +94,7 @@ def state_service_from_state_id(project: Project, state_id: str) -> StateService
             project.activate_environment(match["env"])
             blocks = [match["tap"], match["target"]]
             parser = BlockParser(logger, project, blocks)
-            return next(parser.find_blocks()).state_service
+            return next(parser.find_blocks()).state_service  # type: ignore[union-attr]
         except Exception:
             logger.warning("No plugins found for provided state_id.")
     # If provided state_id does not match convention (i.e., run via "meltano elt"),
@@ -337,7 +337,7 @@ def clear_state(
         )
         state_service.clear_state(state_id)
     if clear_all:
-        state_service: StateService = ctx.obj[STATE_SERVICE_KEY]
+        state_service = ctx.obj[STATE_SERVICE_KEY]
         count = state_service.clear_all_states()
         msg = f"{count} state(s) were successfully cleared"
         logger.info(msg)

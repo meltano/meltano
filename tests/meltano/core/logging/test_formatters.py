@@ -23,7 +23,8 @@ if t.TYPE_CHECKING:
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 ExcInfo: TypeAlias = t.Union[
-    tuple[type[BaseException], BaseException, TracebackType], tuple[None, None, None]
+    tuple[type[BaseException], BaseException, TracebackType],
+    tuple[None, None, None],
 ]
 
 
@@ -38,6 +39,13 @@ def exc_info() -> ExcInfo:
 
 
 class TestLogFormatters:
+    """Test the log formatters."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Setup the test."""
+        monkeypatch.delenv("FORCE_COLOR", raising=False)
+
     @pytest.fixture
     def record(self):
         return logging.LogRecord(

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import collections
 import functools
 import hashlib
 import math
@@ -36,6 +35,18 @@ logger = structlog.stdlib.get_logger(__name__)
 
 TRUTHY = ("true", "1", "yes", "on")
 REGEX_EMAIL = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+REGEX_ISO8601 = (
+    r"^(\d{4})-"
+    r"(0[1-9]|1[0-2])-"
+    r"(0[1-9]|[12]\d|3[01])"
+    r"(?:[ T]"
+    r"([01]\d|2[0-3]):"
+    r"([0-5]\d):"
+    r"([0-5]\d)"
+    r"(?:\.(\d+))?"
+    r")?"
+    r"(Z|[+-](?:0\d|1[0-2]):(?:00|30))?$"
+)
 
 
 class NotFound(Exception):
@@ -230,7 +241,7 @@ def nest(
     return cursor[tail]
 
 
-def nest_object(flat_object):  # noqa: ANN001, ANN201, D103
+def nest_object(flat_object: dict[str, t.Any]):  # noqa: ANN201, D103
     obj = {}
     for key, value in flat_object.items():
         nest(obj, key, value)
@@ -254,7 +265,7 @@ def to_env_var(*xs: str) -> str:
         >>> to_env_var("foo.bar")
         'FOO_BAR'
     """
-    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
+    return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
 def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201
@@ -599,7 +610,7 @@ def uniques_in(original: Sequence[T]) -> list[T]:
     Returns:
         A list of unique values from the provided sequence in the order they appeared.
     """
-    return list(collections.OrderedDict.fromkeys(original))
+    return list(dict.fromkeys(original))
 
 
 # https://gist.github.com/cbwar/d2dfbc19b140bd599daccbe0fe925597#gistcomment-2845059
@@ -893,6 +904,9 @@ def parse_date(date_string: str) -> str:
     Returns:
         The datetime object corresponding to the parsed date string.
     """
+    if re.match(REGEX_ISO8601, date_string):
+        return date_string
+
     if _parsed := dateparser.parse(
         date_string,
         settings={"RELATIVE_BASE": datetime.now(tz=timezone.utc)},

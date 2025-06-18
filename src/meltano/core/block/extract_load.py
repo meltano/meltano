@@ -96,16 +96,6 @@ class ELBContext:
 
         self.base_output_logger = base_output_logger
 
-    @property
-    def elt_run_dir(self) -> Path | None:
-        """Obtain the run directory for the current job.
-
-        Returns:
-            The run directory for the current job.
-        """
-        if self.job:  # noqa: RET503
-            return self.project.job_dir(self.job.job_name, str(self.job.run_id))
-
 
 class ELBContextBuilder:
     """Build up ELBContexts for ExtractLoadBlocks."""
@@ -339,13 +329,13 @@ class ELBContextBuilder:
         )
 
 
-class ExtractLoadBlocks(BlockSet):
+class ExtractLoadBlocks(BlockSet[SingerBlock]):
     """`BlockSet` that supports basic EL (extract, load) patterns."""
 
     def __init__(
         self,
         context: ELBContext,
-        blocks: t.Sequence[IOBlock],
+        blocks: t.Sequence[SingerBlock],
     ):
         """Initialize a basic BlockSet suitable for executing ELT tasks.
 
@@ -413,17 +403,23 @@ class ExtractLoadBlocks(BlockSet):
                 raise BlockSetHasNoStateError
         return self._state_service
 
-    def index_last_input_done(self) -> int | None:
+    # TODO: This doesn't seem to be used anywhere. Remove?
+    def index_last_input_done(self) -> int | None:  # pragma: no cover
         """Return index of the block furthest from the start that has exited and required input.
 
         Returns:
             The index of the block furthest from the start that has exited and required input.
         """  # noqa: E501
-        for idx, block in reversed(list(enumerate(self.blocks))):  # noqa: RET503
-            if block.requires_input and block.proxy_stderr.done():
-                return idx
+        return next(
+            (
+                idx
+                for idx, block in reversed(list(enumerate(self.blocks)))
+                if block.consumer and block.proxy_stderr().done()
+            ),
+            None,
+        )
 
-    def upstream_complete(self, index: int) -> bool | None:
+    def upstream_complete(self, index: int) -> bool:
         """Return whether blocks upstream from a given block index are already done.
 
         Args:
@@ -432,12 +428,7 @@ class ExtractLoadBlocks(BlockSet):
         Returns:
             True if all upstream blocks are done, False otherwise.
         """
-        for idx, block in enumerate(self.blocks):  # noqa: RET503
-            if idx >= index:
-                return True
-            if block.process_future.done():
-                continue
-            return False
+        return all(block.process_future.done() for block in self.blocks[:index])
 
     async def upstream_stop(self, index) -> None:  # noqa: ANN001
         """Stop all blocks upstream of a given index.
@@ -675,7 +666,7 @@ class ExtractLoadBlocks(BlockSet):
                     logger_base.bind(stdio="stderr"),
                 ),
             )
-            if block.consumer:
+            if block.consumer and block.stdin is not None:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
                         block.stdin,
