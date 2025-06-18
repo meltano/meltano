@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -167,6 +168,13 @@ async def add(
     if plugin_type is None and plugin[0] in PluginType.cli_arguments():
         plugin_type = PluginType.from_cli_argument(plugin[0])
         plugin_names = plugin[1:]
+        warnings.warn(
+            "Passing the plugin type as the first positional argument is deprecated "
+            "and will be removed in Meltano v4. "
+            "Please use the --plugin-type option instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     else:
         plugin_names = plugin
 
