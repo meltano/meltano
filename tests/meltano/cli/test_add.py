@@ -22,6 +22,7 @@ from meltano.core.plugin_install_service import PluginInstallReason
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
+    from fixtures.cli import MeltanoCliRunner
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -926,6 +927,38 @@ class TestCliAdd:
             install_plugin_mock.assert_called_once_with(
                 project,
                 [tap_mock, target_mock, utility_mock],
+                reason=PluginInstallReason.ADD,
+                force=False,
+            )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_explicit_plugin_type(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "--plugin-type",
+                    "extractors",
+                    "tap-mock",
+                ],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock'" in res.stdout
+
+            tap_mock = project.plugins.find_plugin(
+                "tap-mock",
+                plugin_type=PluginType.EXTRACTORS,
+            )
+            assert tap_mock
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap_mock],
                 reason=PluginInstallReason.ADD,
                 force=False,
             )
