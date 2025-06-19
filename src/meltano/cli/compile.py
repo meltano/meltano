@@ -97,7 +97,10 @@ def compile_command(
         )
         project.refresh(environment=environment)
         manifest = Manifest(
-            project=project, path=path, check_schema=lint, redact_secrets=safe
+            project=project,
+            path=path,
+            check_schema=lint,
+            redact_secrets=safe,
         )
         try:
             with path.open("w") as manifest_file:

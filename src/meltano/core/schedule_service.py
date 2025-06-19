@@ -13,13 +13,15 @@ from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.schedule import CRON_INTERVALS, Schedule
+from meltano.core.schedule import CRON_INTERVALS, ELTSchedule, JobSchedule, Schedule
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
 
 if t.TYPE_CHECKING:
     import subprocess
+
+    from sqlalchemy.orm import Session
 
     from meltano.core.project import Project
 
@@ -89,6 +91,9 @@ class BadCronError(MeltanoError):
         super().__init__(reason, instruction)
 
 
+_S = t.TypeVar("_S", bound=Schedule)
+
+
 class ScheduleService:
     """Service for managing schedules."""
 
@@ -103,15 +108,15 @@ class ScheduleService:
 
     def add_elt(
         self,
-        session,  # noqa: ANN001
-        name,  # noqa: ANN001
+        session: Session,
+        name: str,
         extractor: str,
         loader: str,
         transform: str,
         interval: str,
         start_date: datetime | None = None,
-        **env,  # noqa: ANN003
-    ) -> Schedule:
+        **env: str,
+    ) -> ELTSchedule:
         """Add a scheduled legacy elt task.
 
         Args:
@@ -132,7 +137,7 @@ class ScheduleService:
             extractor,
         )
 
-        schedule = Schedule(
+        schedule = ELTSchedule(
             name=name,
             extractor=extractor,
             loader=loader,
@@ -143,7 +148,7 @@ class ScheduleService:
         )
         return self.add_schedule(schedule)
 
-    def add(self, name: str, job: str, interval: str, **env) -> Schedule:  # noqa: ANN003
+    def add(self, name: str, job: str, interval: str, **env: str) -> JobSchedule:
         """Add a scheduled job.
 
         Args:
@@ -156,7 +161,7 @@ class ScheduleService:
             The added schedule.
         """
         return self.add_schedule(
-            Schedule(
+            JobSchedule(
                 name=name,
                 job=job,
                 interval=interval,
@@ -164,7 +169,7 @@ class ScheduleService:
             ),
         )
 
-    def remove(self, name) -> str:  # noqa: ANN001
+    def remove(self, name: str) -> str:
         """Remove a schedule from the project.
 
         Args:
@@ -175,7 +180,7 @@ class ScheduleService:
         """
         return self.remove_schedule(name)
 
-    def default_start_date(self, session, extractor: str) -> datetime:  # noqa: ANN001
+    def default_start_date(self, session: Session, extractor: str) -> datetime:
         """Obtain the default start date for an elt schedule.
 
         Args:
@@ -206,7 +211,7 @@ class ScheduleService:
 
         return iso8601_datetime(start_date) or datetime.now(tz=timezone.utc)
 
-    def add_schedule(self, schedule: Schedule) -> Schedule:
+    def add_schedule(self, schedule: _S) -> _S:
         """Add a schedule to the project.
 
         Args:
@@ -301,7 +306,8 @@ class ScheduleService:
             return next(
                 schedule
                 for schedule in self.schedules()
-                if not schedule.job and schedule.extractor == extractor.name
+                if isinstance(schedule, ELTSchedule)
+                and schedule.extractor == extractor.name
             )
         except (PluginNotFoundError, StopIteration) as err:
             raise ScheduleNotFoundError(namespace) from err
@@ -314,7 +320,7 @@ class ScheduleService:
         """
         return self.project.meltano.schedules.copy()
 
-    def find_schedule(self, name) -> Schedule:  # noqa: ANN001
+    def find_schedule(self, name: str) -> Schedule:
         """Find a schedule by name.
 
         Args:
@@ -334,9 +340,9 @@ class ScheduleService:
     def run(
         self,
         schedule: Schedule,
-        *args,  # noqa: ANN002
+        *args: str,
         env: dict | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ) -> subprocess.CompletedProcess:
         """Run a scheduled elt task or named job.
 
@@ -352,15 +358,21 @@ class ScheduleService:
         if env is None:
             env = {}
 
-        if schedule.job:
+        if isinstance(schedule, JobSchedule):
             return MeltanoInvoker(self.project).invoke(
                 ["run", *args, schedule.job],
                 env={**schedule.env, **env},
                 **kwargs,
             )
 
-        return MeltanoInvoker(self.project).invoke(
-            ["elt", *schedule.elt_args, *args],
-            env={**schedule.env, **env},
-            **kwargs,
-        )
+        if isinstance(schedule, ELTSchedule):
+            return MeltanoInvoker(self.project).invoke(
+                ["elt", *schedule.elt_args, *args],
+                env={**schedule.env, **env},
+                **kwargs,
+            )
+
+        # no cover: start
+        msg = f"Invalid schedule type: {type(schedule)}"
+        raise ValueError(msg)
+        # no cover: stop

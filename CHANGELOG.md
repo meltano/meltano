@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.8 (2025-06-05)
+
+### 🐛 Fixes
+
+- [#9300](https://github.com/meltano/meltano/issues/9300) Do not try to cast expandable inherited settings
+
+## v3.7.7 (2025-05-29)
+
+### 🐛 Fixes
+
+- [#8793](https://github.com/meltano/meltano/issues/8793) Avoid passing plugin configuration to the installation environment
+
+### ⚙️ Under the Hood
+
+- [#9289](https://github.com/meltano/meltano/issues/9289) Avoid checking catalog cache key if user passed a custom catalog
+- [#9280](https://github.com/meltano/meltano/issues/9280) Split job and ELT schedules into separate classes
+- [#9273](https://github.com/meltano/meltano/issues/9273) Use `ruamel.yaml.add_multi_representer` to add YAML representations of internal types
+
+### 📚 Documentation Improvements
+
+- [#9288](https://github.com/meltano/meltano/issues/9288) Remove outdated log messages from CLI examples
+- [#9271](https://github.com/meltano/meltano/issues/9271) Fixed typo `mapper` -> `mappers` in `meltano.yml` inline data mapping example
+
+### 📦 Packaging changes
+
+- [#9290](https://github.com/meltano/meltano/issues/9290) Bump latest supported version of `setuptools` to 80
+
+## v3.7.6 (2025-05-14)
+
+### 🐛 Fixes
+
+- [#9260](https://github.com/meltano/meltano/issues/9260) Fixed state merging for incomplete/interrupted payloads
+- [#9258](https://github.com/meltano/meltano/issues/9258) Avoid writing empty state after an invalid STATE message -- _**Thanks @joaopamaral!**_
+
+## v3.7.5 (2025-05-11)
+
+### 🐛 Fixes
+
+- [#9251](https://github.com/meltano/meltano/issues/9251) Compatibility with click 8.2.x
+
+### ⚙️ Under the Hood
+
+- [#9249](https://github.com/meltano/meltano/issues/9249) Make installation error details an extra context key of the main installation error log
+- [#9242](https://github.com/meltano/meltano/issues/9242) Use dict instead of `OrderedDict`
+
+### 📚 Documentation Improvements
+
+- [#9250](https://github.com/meltano/meltano/issues/9250) Updated `docker compose` commands
+
 ## v3.7.4 (2025-04-28)
 
 ### 📦 Packaging changes

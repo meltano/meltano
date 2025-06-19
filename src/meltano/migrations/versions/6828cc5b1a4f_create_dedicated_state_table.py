@@ -51,7 +51,9 @@ class JobState(SystemModel):
     state_id = Column(types.String, unique=True, primary_key=True, nullable=False)
 
     updated_at = Column(
-        types.TIMESTAMP, server_default=func.now(), onupdate=func.current_timestamp()
+        types.TIMESTAMP,
+        server_default=func.now(),
+        onupdate=func.current_timestamp(),
     )
 
     partial_state = Column(MutableDict.as_mutable(JSONEncodedDict))
@@ -86,7 +88,9 @@ class JobState(SystemModel):
         # completed job. If there are no completed jobs, get the full history of
         # incomplete jobs and use the most recent state emitted per stream
         incomplete_state_jobs = finder.with_payload(
-            session, flags=Payload.INCOMPLETE_STATE, since=incomplete_since
+            session,
+            flags=Payload.INCOMPLETE_STATE,
+            since=incomplete_since,
         )
         for incomplete_state_job in incomplete_state_jobs:
             if "singer_state" in incomplete_state_job.payload:
@@ -138,7 +142,7 @@ class JobFinder:
         return session.query(Job).filter(
             (Job.job_name == self.state_id)
             & (Job.state == State.SUCCESS)
-            & Job.ended_at.isnot(None)
+            & Job.ended_at.isnot(None),
         )
 
     def running(self, session):  # noqa: ANN001, ANN201
@@ -151,7 +155,7 @@ class JobFinder:
             All runnings states for state_id.
         """
         return session.query(Job).filter(
-            (Job.job_name == self.state_id) & (Job.state == State.RUNNING)
+            (Job.job_name == self.state_id) & (Job.state == State.RUNNING),
         )
 
     def latest_success(self, session):  # noqa: ANN001, ANN201
@@ -194,7 +198,7 @@ class JobFinder:
                 (Job.job_name == self.state_id)
                 & (Job.payload_flags != 0)
                 & (Job.payload_flags.op("&")(flags) == flags)
-                & Job.ended_at.isnot(None)
+                & Job.ended_at.isnot(None),
             )
             .order_by(Job.ended_at.asc())
         )
@@ -247,7 +251,7 @@ class JobFinder:
                     Job.last_heartbeat_at.is_(None)
                     & (Job.started_at < last_valid_started_at)
                 )
-            )
+            ),
         )
 
     def stale(self, session):  # noqa: ANN001, ANN201

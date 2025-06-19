@@ -50,7 +50,8 @@ def upgrade() -> None:
         sa.Column("started_at", datetime_type),
         sa.Column("ended_at", datetime_type),
         sa.Column(
-            "payload", MutableDict.as_mutable(JSONEncodedDict(max_string_length))
+            "payload",
+            MutableDict.as_mutable(JSONEncodedDict(max_string_length)),
         ),
         sa.Column("payload_flags", IntFlag, default=0),
     )

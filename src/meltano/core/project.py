@@ -34,16 +34,10 @@ from meltano.core.utils import makedirs, sanitize_filename, truthy
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
+    from meltano.core._types import StrPath
     from meltano.core.meltano_file import MeltanoFile as MeltanoFileTypeHint
     from meltano.core.plugin.base import PluginRef
 
-    if sys.version_info < (3, 10):
-        from typing import TypeAlias  # noqa: ICN003
-    else:
-        from typing_extensions import TypeAlias
-
-
-StrPath: TypeAlias = t.Union[str, os.PathLike]
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -78,7 +72,7 @@ class Project(Versioned):
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
     _meltano_rw_lock = fasteners.ReaderWriterLock()
-    _default = None
+    _default: t.ClassVar[Project | None] = None
 
     def __init__(
         self,

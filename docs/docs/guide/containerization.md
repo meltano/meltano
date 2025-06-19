@@ -82,13 +82,13 @@ you can add the appropriate `docker-compose.prod.yml` file to your project by ad
 ```bash
 # For these examples to work, ensure that
 # Docker Compose has been installed
-docker-compose --version
+docker compose --version
 
 # Add Docker Compose files to your project
 meltano add files files-docker-compose
 
 # Start the `meltano-system-db` service in the background
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 For more details and instructions, refer to [README](https://github.com/meltano/files-docker-compose/blob/main/bundle/README.md) contained in the file bundle.

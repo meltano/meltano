@@ -44,7 +44,7 @@ jobs:
       with:
         python-version: "3.x"
 
-    - uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
+    - uses: astral-sh/setup-uv@f0ec1fc3b38f5e7cd731bb6ce540c5af426746bb # v6.1.0
       with:
         version: ">=0.6.15"
 
@@ -66,7 +66,7 @@ jobs:
 
     - name: Draft Release
       id: draft-release
-      uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
+      uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
       with:
         draft: true
         body_path: ${{ github.event.inputs.prerelease == 'none' && '_changelog_fragment.md' || '' }}

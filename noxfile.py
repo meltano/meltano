@@ -41,6 +41,13 @@ python_versions = nox.project.python_versions(pyproject)
 
 main_python_version = "3.13"
 
+UV_SYNC_COMMAND = (
+    "uv",
+    "sync",
+    "--locked",
+    "--no-dev",
+)
+
 
 def _run_pytest(session: nox.Session) -> None:
     random_seed = randint(0, 2**32 - 1)  # noqa: S311
@@ -61,6 +68,10 @@ def _run_pytest(session: nox.Session) -> None:
             "pytest",
             "--cov=meltano",
             "--cov=tests",
+            "--durations=10",
+            "--order-scope=module",
+            "-n=auto",
+            "--dist=loadfile",
             f"--randomly-seed={random_seed}",
             *args,
         )
@@ -91,10 +102,7 @@ def pytest_meltano(session: nox.Session) -> None:
         extras.append("postgres")
 
     session.run_install(
-        "uv",
-        "sync",
-        "--frozen",
-        "--no-dev",
+        *UV_SYNC_COMMAND,
         "--group=testing",
         *(f"--extra={extra}" for extra in extras),
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
@@ -112,10 +120,7 @@ def coverage(session: nox.Session) -> None:
     args = session.posargs or ("report",)
 
     session.run_install(
-        "uv",
-        "sync",
-        "--frozen",
-        "--no-dev",
+        *UV_SYNC_COMMAND,
         "--group=coverage",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
@@ -139,10 +144,7 @@ def pre_commit(session: nox.Session) -> None:
     """
     args = session.posargs or ("run", "--all-files")
     session.run_install(
-        "uv",
-        "sync",
-        "--frozen",
-        "--no-dev",
+        *UV_SYNC_COMMAND,
         "--group=pre-commit",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
@@ -160,10 +162,7 @@ def mypy(session: nox.Session) -> None:
         session: Nox session.
     """
     session.run_install(
-        "uv",
-        "sync",
-        "--frozen",
-        "--no-dev",
+        *UV_SYNC_COMMAND,
         "--group=typing",
         "--extra=mssql",
         "--extra=azure",
