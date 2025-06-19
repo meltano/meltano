@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import functools
 import os
 import signal
 import typing as t
@@ -102,6 +103,9 @@ class Payload(IntEnum):
     INCOMPLETE_STATE = 2
 
 
+utcnow = functools.partial(datetime.now, timezone.utc)
+
+
 class Job(SystemModel):
     """Model class that represents a `meltano elt` run in the system database.
 
@@ -113,27 +117,25 @@ class Job(SystemModel):
 
     __tablename__ = "runs"
 
-    id: Mapped[IntPK]
+    id: Mapped[IntPK] = mapped_column(init=False)
     job_name: Mapped[str]
-    run_id: Mapped[GUIDType]
-    _state: Mapped[t.Optional[str]] = mapped_column(name="state")  # noqa: UP045
-    started_at: Mapped[datetime] = mapped_column(DateTimeUTC)
-    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
-    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC)  # noqa: UP045
-    payload: Mapped[dict] = mapped_column(MutableDict.as_mutable(JSONEncodedDict))
+    run_id: Mapped[GUIDType] = mapped_column(default_factory=uuid.uuid4)
+    _state: Mapped[t.Optional[str]] = mapped_column(  # noqa: UP045
+        name="state",
+        default=State.IDLE.name,
+    )
+    started_at: Mapped[datetime] = mapped_column(DateTimeUTC, default_factory=utcnow)
+    last_heartbeat_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP045
+        DateTimeUTC,
+        default=None,
+    )
+    ended_at: Mapped[t.Optional[datetime]] = mapped_column(DateTimeUTC, default=None)  # noqa: UP045
+    payload: Mapped[dict] = mapped_column(
+        MutableDict.as_mutable(JSONEncodedDict),
+        default_factory=dict,
+    )
     payload_flags: Mapped[Payload] = mapped_column(IntFlag, default=0)
-    trigger: Mapped[t.Optional[str]] = mapped_column(default=current_trigger)  # noqa: UP045
-
-    def __init__(self, **kwargs: t.Any) -> None:
-        """Construct a Job.
-
-        Args:
-            kwargs: keyword args to override defaults and pass to super
-        """
-        kwargs["_state"] = kwargs.pop("state", State.IDLE).name
-        kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id") or uuid.uuid4()
-        super().__init__(**kwargs)
+    trigger: Mapped[t.Optional[str]] = mapped_column(default_factory=current_trigger)  # noqa: UP045
 
     @hybrid_property
     def state(self) -> State:
@@ -198,7 +200,7 @@ class Job(SystemModel):
         if not self.is_running():
             return False
 
-        return datetime.now(timezone.utc) > self.valid_intil()
+        return utcnow > self.valid_intil()
 
     def has_error(self) -> bool:
         """Return whether a job has failed.
@@ -294,7 +296,7 @@ class Job(SystemModel):
 
     def start(self) -> None:
         """Mark the job has having started."""
-        self.started_at = datetime.now(timezone.utc)
+        self.started_at = utcnow()
         self._heartbeat()
         self.transit(State.RUNNING)
 
@@ -304,14 +306,14 @@ class Job(SystemModel):
         Args:
             error: the error to associate with the job's failure
         """
-        self.ended_at = datetime.now(timezone.utc)
+        self.ended_at = utcnow()
         self.transit(State.FAIL)
         if error:
             self.payload["error"] = str(error)
 
     def success(self) -> None:
         """Mark the job as having succeeded."""
-        self.ended_at = datetime.now(timezone.utc)
+        self.ended_at = utcnow()
         self.transit(State.SUCCESS)
 
     def fail_stale(self) -> bool:
@@ -360,7 +362,7 @@ class Job(SystemModel):
 
     def _heartbeat(self) -> None:
         """Update last_heartbeat_at for this job in the db."""
-        self.last_heartbeat_at = datetime.now(timezone.utc)
+        self.last_heartbeat_at = utcnow()
 
     async def _heartbeater(self, session: Session) -> None:
         """Heartbeat to the db every second.
