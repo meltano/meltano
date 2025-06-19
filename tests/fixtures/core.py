@@ -2254,9 +2254,12 @@ class JobArgs(t.NamedTuple):
 @pytest.fixture
 def job_args() -> JobArgs:
     return JobArgs(
-        complete_job_args={"state": State.SUCCESS, "payload_flags": Payload.STATE},
+        complete_job_args={
+            "job_state": State.SUCCESS,
+            "payload_flags": Payload.STATE,
+        },
         incomplete_job_args={
-            "state": State.FAIL,
+            "job_state": State.FAIL,
             "payload_flags": Payload.INCOMPLETE_STATE,
         },
     )

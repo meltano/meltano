@@ -44,7 +44,7 @@ class JobFactory:
         # Create job in database
         job = Job(
             job_name=job_name,
-            state=state,
+            job_state=state,
             run_id=run_id,
             started_at=now,
         )
@@ -215,7 +215,7 @@ class TestLogsShow:
         """Test error when no logs are found."""
         job = Job(
             job_name="tap-gitlab target-postgres",
-            state=State.SUCCESS,
+            job_state=State.SUCCESS,
             started_at=datetime.now(timezone.utc),
         )
         job.save(session)

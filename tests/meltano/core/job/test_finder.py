@@ -47,7 +47,7 @@ class TestJobFinder:
 
         job = Job(
             job_name="test_state_id",
-            state=state,
+            job_state=state,
             started_at=started_at,
             last_heartbeat_at=last_heartbeat_at,
         )

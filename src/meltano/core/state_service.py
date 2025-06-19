@@ -80,7 +80,7 @@ class StateService:
             now = datetime.datetime.now(datetime.timezone.utc)
             return Job(
                 job_name=job,
-                state=State.STATE_EDIT,
+                job_state=State.STATE_EDIT,
                 started_at=now,
                 ended_at=now,
             )

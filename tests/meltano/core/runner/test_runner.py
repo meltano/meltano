@@ -72,7 +72,7 @@ class TestSingerRunner:
     def subject(self, session, elt_context):
         Job(
             job_name=TEST_STATE_ID,
-            state=State.SUCCESS,
+            initial_state=State.SUCCESS,
             payload_flags=Payload.STATE,
             payload={"singer_state": {"bookmarks": []}},
         ).save(session)

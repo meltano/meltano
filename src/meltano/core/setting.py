@@ -13,16 +13,16 @@ from .models import SystemModel
 class Setting(SystemModel):  # noqa: D101
     __tablename__ = "plugin_settings"
 
-    # represent the mapping to the ENV
-    label: Mapped[t.Optional[str]]  # noqa: UP045
-    description: Mapped[t.Optional[str]] = mapped_column(types.Text)  # noqa: UP045
-
     # represent a materialized path to support
     # a nested configuration.
     name: Mapped[StrPK]
     namespace: Mapped[t.Optional[StrPK]]  # noqa: RUF100, UP007, UP045
     value: Mapped[t.Optional[str]] = mapped_column(types.PickleType)  # noqa: UP045
     enabled: Mapped[bool] = mapped_column(default=False)
+
+    # represent the mapping to the ENV
+    label: Mapped[t.Optional[str]] = mapped_column(default=None)  # noqa: UP045
+    description: Mapped[t.Optional[str]] = mapped_column(types.Text, default=None)  # noqa: UP045
 
     def __repr__(self) -> str:  # noqa: D105
         enabled_marker = "E" if self.enabled else ""

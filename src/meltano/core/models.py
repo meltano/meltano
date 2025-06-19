@@ -6,12 +6,12 @@ import typing as t
 from datetime import datetime
 
 from sqlalchemy import MetaData, types
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
 SystemMetadata = MetaData()
 
 
-class SystemModel(DeclarativeBase):
+class SystemModel(MappedAsDataclass, DeclarativeBase):
     """Base class for all database models."""
 
     metadata = SystemMetadata

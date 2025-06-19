@@ -24,7 +24,7 @@ class TestJob:
     def sample_job(self, payload=None):
         return Job(
             job_name="meltano:sample-elt",
-            state=State.IDLE,
+            job_state=State.IDLE,
             payload=payload or {},
         )
 

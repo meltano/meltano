@@ -30,7 +30,9 @@ class JobState(SystemModel):
     __tablename__ = "state"
     state_id: Mapped[str] = mapped_column(unique=True, primary_key=True)
 
-    updated_at: Mapped[t.Optional[datetime]] = mapped_column(onupdate=datetime.now)  # noqa: UP045
+    updated_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP045
+        onupdate=datetime.now, init=False
+    )
 
     partial_state: Mapped[t.Optional[StateType]]  # noqa: UP045
     completed_state: Mapped[t.Optional[StateType]]  # noqa: UP045
