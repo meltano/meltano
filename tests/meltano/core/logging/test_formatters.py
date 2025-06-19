@@ -23,7 +23,8 @@ if t.TYPE_CHECKING:
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 ExcInfo: TypeAlias = t.Union[
-    tuple[type[BaseException], BaseException, TracebackType], tuple[None, None, None]
+    tuple[type[BaseException], BaseException, TracebackType],
+    tuple[None, None, None],
 ]
 
 

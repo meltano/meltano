@@ -6,7 +6,7 @@ on:
     - .github/actions/docker-build-scan-push/action.yml
     - .github/workflows/build.yml
     - docker/meltano/Dockerfile
-    - src/**
+    - src/meltano/migrations/**
     - scripts/**
     - pyproject.toml
   workflow_dispatch:
@@ -26,9 +26,10 @@ permissions:
 
 jobs:
   build:
-    name: Wheel and sdist
+    name: Wheel and SDist
     runs-on: ubuntu-latest
     outputs:
+      name: ${{ steps.baipp.outputs.package_name }}
       version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
@@ -67,7 +68,7 @@ jobs:
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      uses: hynek/build-and-inspect-python-package@b5076c307dc91924a82ad150cdd1533b444d3310 # v2.12.0
+      uses: hynek/build-and-inspect-python-package@c52c3a4710070b50470d903818a7b25115dcd076 # v2.13.0
       id: baipp
 
   build_docker:
@@ -160,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: publishing
-      url: https://pypi.org/project/meltano/${{ needs.build.outputs.version }}
+      url: https://pypi.org/project/${{ needs.build.outputs.name }}/${{ needs.build.outputs.version }}
 
     steps:
     - name: Check out the repository

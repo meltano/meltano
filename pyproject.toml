@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "3.7.7"
+version = "3.7.8"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.15"
@@ -114,7 +114,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
-  "coverage[toml]>=7.6.12",
+  "coverage[toml]>=7.8",
 ]
 dev = [
   { include-group = "testing" },
@@ -178,7 +178,6 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore::pytest.PytestUnhandledThreadExceptionWarning",
   "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
 ]
 log_cli = true
@@ -245,7 +244,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "3.7.7"
+version = "3.7.8"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
@@ -347,6 +346,7 @@ select = [
   "ICN",   # flake8-import-conventions
   "INP",   # flake8-no-pep420
   "ISC",   # flake8-implicit-str-concat
+  "LOG",   # flake8-logging
   "N",     # pep8-naming
   "PERF",  # Perflint
   "PGH",   # pygrep-hooks
@@ -378,16 +378,13 @@ unfixable = [
 "tests/**" = [
   "ANN",
   "D1",
-  "S101", # Allow 'assert' in tests
-  "INP",  # Don't require __init__.py files in tests directories
+  "S101",    # Allow 'assert' in tests
+  "INP",     # Don't require __init__.py files in tests directories
+  "LOG015",  # Allow `logging.<level>` in tests
 ]
 "src/meltano/migrations/versions/*" = [
   "D103",
-  "D415",
   "INP001",
-  "TC003",
-  "TID251",
-  "UP007",
 ]
 
 [tool.ruff.lint.flake8-annotations]
@@ -415,15 +412,6 @@ convention = "google"
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "logging.getLogger".msg = "Use `structlog.stdlib.get_logger` instead"
-"logging.critical".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.fatal".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.error".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.exception".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.warning".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.warn".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.info".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.debug".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.log".msg = "Create a logger with `structlog.stdlib.get_logger`"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
 

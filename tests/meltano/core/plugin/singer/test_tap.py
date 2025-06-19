@@ -999,7 +999,7 @@ class TestSingerTap:
                 return_value=False,
             ),
             mock.patch(
-                "meltano.core.plugin.singer.tap._stream_redirect"
+                "meltano.core.plugin.singer.tap._stream_redirect",
             ) as stream_mock,
         ):
             await subject.run_discovery(invoker, catalog_path)
