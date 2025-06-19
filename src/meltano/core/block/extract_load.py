@@ -91,7 +91,7 @@ class ELBContext:
         # not yet used but required to satisfy the interface
         self.dry_run = False
         self.state = None
-        self.select_filter = []
+        self.select_filter = []  # type: ignore[var-annotated]
         self.catalog = None
 
         self.base_output_logger = base_output_logger
@@ -113,14 +113,14 @@ class ELBContextBuilder:
         _, session_maker = project_engine(project)
         self.session = session_maker()
 
-        self._job = None
+        self._job: Job | None = None
         self._full_refresh = False
         self._refresh_catalog = False
         self._state_update = True
         self._force = False
-        self._state_id_suffix = None
-        self._env = {}
-        self._blocks = []
+        self._state_id_suffix: str | None = None
+        self._env: dict[str, str] = {}
+        self._blocks: list[SingerBlock] = []
         self._merge_state = False
         self._run_id: uuid.UUID | None = None
 
@@ -346,7 +346,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         self.context = context
         self.blocks = blocks
 
-        self.output_logger = OutputLogger(None)
+        self.output_logger = OutputLogger(None)  # type: ignore[arg-type]
 
         if not self.context.project.environment:
             self.context.job = None
@@ -369,11 +369,10 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             )
             self.output_logger = OutputLogger(log_file)
 
-        self._process_futures = None
-        self._stdout_futures = None
-        self._stderr_futures = None
-        self._errors = []
-        self._state_service = None
+        self._process_futures: list[asyncio.Task] | None = None
+        self._stdout_futures: list[asyncio.Task] | None = None
+        self._stderr_futures: list[asyncio.Task] | None = None
+        self._state_service: StateService | None = None
 
     def has_state(self) -> bool:
         """Check to see if any block in this BlockSet has 'state' capability.
@@ -515,6 +514,9 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 underlying pipeline/job is already running.
         """
         job = self.context.job
+        if not job or not self.context.session:
+            return
+
         fail_stale_jobs(self.context.session, job.job_name)
         if self.context.force:
             logger.warning(
@@ -539,7 +541,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             async with job.run(session):
                 await self.execute()
 
-    async def terminate(self, *, graceful: bool = False) -> None:
+    async def terminate(self, *, graceful: bool = False) -> t.NoReturn:  # type: ignore[misc]
         """Terminate an in flight ExtractLoad execution, potentially disruptive.
 
         Not actually implemented yet.
@@ -590,7 +592,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         return self._stderr_futures
 
     @property
-    def head(self) -> IOBlock:
+    def head(self) -> SingerBlock:
         """Obtain the first block in the block set.
 
         Returns:
@@ -599,7 +601,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         return self.blocks[0]
 
     @property
-    def tail(self) -> IOBlock:
+    def tail(self) -> SingerBlock:
         """Obtain the last block in the block set.
 
         Returns:
@@ -608,7 +610,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
         return self.blocks[-1]
 
     @property
-    def intermediate(self) -> tuple[IOBlock]:
+    def intermediate(self) -> t.Sequence[SingerBlock]:
         """Obtain the intermediate blocks in the set - excluding the first and last block.
 
         Returns:
@@ -668,7 +670,7 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
             if block.consumer and block.stdin is not None:
                 if idx != 0 and self.blocks[idx - 1].producer:
                     self.blocks[idx - 1].stdout_link(
-                        block.stdin,
+                        block.stdin,  # type: ignore[arg-type]
                     )  # link previous blocks stdout with current blocks stdin
                 else:
                     raise BlockSetValidationError(
@@ -691,8 +693,8 @@ class ELBExecutionManager:
         )
         self.line_length_limit = self.stream_buffer_size // 2
 
-        self._producer_code = None
-        self._consumer_code = None
+        self._producer_code: int | None = None
+        self._consumer_code: int | None = None
         self._intermediate_codes: dict[str, int] = {}
 
     async def run(self) -> None:
@@ -731,8 +733,8 @@ class ELBExecutionManager:
 
     async def _wait_for_process_completion(
         self,
-        current_head: IOBlock,
-    ) -> tuple[int, int] | None:
+        current_head: SingerBlock,
+    ) -> None:
         """Wait for the current head block to complete or for an error to occur.
 
         Args:
@@ -748,7 +750,7 @@ class ELBExecutionManager:
         start_idx = self.elb.blocks.index(current_head)
         remaining_blocks = self.elb.blocks[start_idx:]
 
-        if remaining_blocks is None or current_head == self.elb.tail:
+        if remaining_blocks is None or current_head == self.elb.tail:  # type: ignore[redundant-expr]
             return
 
         stdout_futures = [block.proxy_stdout() for block in remaining_blocks]
@@ -764,19 +766,24 @@ class ELBExecutionManager:
         logger.debug("waiting for process completion or exception")
         done = await self.elb.process_wait(output_exception_future, start_idx)
 
-        if output_futures_failed := first_failed_future(
-            output_exception_future,
-            done,
+        if (
+            (
+                output_futures_failed := first_failed_future(
+                    output_exception_future,
+                    done,
+                )
+            )
+            and self.elb.head.proxy_stdout() == output_futures_failed
+            and (exc := output_futures_failed.exception())
         ):
             # Special behavior for a producer stdout handler raising a line
             # length limit error.
-            if self.elb.head.proxy_stdout() == output_futures_failed:
-                handle_producer_line_length_limit_error(
-                    output_futures_failed.exception(),
-                    line_length_limit=self.line_length_limit,
-                    stream_buffer_size=self.stream_buffer_size,
-                )
-            raise output_futures_failed.exception()
+            handle_producer_line_length_limit_error(
+                exc,
+                line_length_limit=self.line_length_limit,
+                stream_buffer_size=self.stream_buffer_size,
+            )
+            raise exc
 
         # If all the output handlers completed without raising an
         # exception, we still need to wait for all the underlying block
@@ -810,10 +817,10 @@ class ELBExecutionManager:
 
     async def _handle_head_completed(
         self,
-        current_head: IOBlock,
+        current_head: SingerBlock,
         start_idx: int,
     ) -> None:
-        next_head: IOBlock = self.elb.blocks[start_idx + 1]
+        next_head = self.elb.blocks[start_idx + 1]
 
         if current_head is self.elb.head:
             self._producer_code = current_head.process_future.result()
@@ -850,8 +857,8 @@ class ELBExecutionManager:
 
 
 def _check_exit_codes(
-    producer_code: int,
-    consumer_code: int,
+    producer_code: int | None,
+    consumer_code: int | None,
     intermediate_codes: dict[str, int],
 ) -> None:
     """Check exit codes for failures, and raise the appropriate RunnerError if needed.
