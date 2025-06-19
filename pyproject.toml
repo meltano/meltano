@@ -279,10 +279,8 @@ ignore_errors = true
 module = [
   "meltano.cli.interactive.*",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.models",
   "meltano.core.project_files",
   "meltano.core.project_settings_service",
-  "meltano.core.sqlalchemy",
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   # Meltano Core submodules
