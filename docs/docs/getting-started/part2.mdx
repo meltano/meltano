@@ -48,12 +48,12 @@ The container will need a few seconds to initialize. You can test the connection
 
 ## Add the postgres loader
 
-Add the postgres loader using the `meltano add loader target-postgres --variant=meltanolabs` command.
+Add the postgres loader using the `meltano add target-postgres --variant=meltanolabs` command (plugin type is automatically detected).
 
 <Termy>
 
 ```console
-$ meltano add loader target-postgres --variant=meltanolabs
+$ meltano add target-postgres --variant=meltanolabs
 Added loader 'target-postgres' to your Meltano project
 Variant:        meltanolabs (default)
 Repository:     https://github.com/MeltanoLabs/target-postgres
