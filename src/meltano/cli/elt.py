@@ -5,11 +5,12 @@ from __future__ import annotations
 import logging
 import platform
 import typing as t
+import uuid
 from contextlib import asynccontextmanager, nullcontext, suppress
 from datetime import datetime, timezone
 
 import click
-from structlog import stdlib as structlog_stdlib
+import structlog
 
 from meltano.cli.params import (
     InstallPlugins,
@@ -33,9 +34,6 @@ from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
-    import uuid
-
-    import structlog
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.base import PluginDefinition
@@ -49,7 +47,7 @@ DUMPABLES = {
     "loader-config": (PluginType.LOADERS, "config"),
 }
 
-logger = structlog_stdlib.get_logger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -316,6 +314,10 @@ async def _run_el_command(
     transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
+
+    # Bind run_id at the start of the CLI entrypoint
+    run_id = run_id or uuid.uuid4()
+    structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     job = Job(
         job_name=state_id
