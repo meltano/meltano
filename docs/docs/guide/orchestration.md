@@ -65,7 +65,15 @@ and then run the following command to add the
 to your project and make Airflow available to use via `meltano invoke`:
 
 ```bash
-meltano add utility airflow
+# Simplified syntax - plugin type is automatically detected
+meltano add airflow  # Automatically detected as utility
+
+# Explicit plugin type for disambiguation:
+# meltano add --plugin-type utility airflow
+
+# Deprecated positional syntax:
+# meltano add utility airflow
+
 meltano invoke airflow:initialize
 meltano invoke airflow users create -u admin@localhost -p password --role Admin -e admin@localhost -f admin -l admin
 ```
