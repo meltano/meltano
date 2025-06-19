@@ -650,7 +650,6 @@ class ExtractLoadBlocks(BlockSet[SingerBlock]):
                 producer=block.producer,
                 string_id=block.string_id,
                 cmd_type="elb",
-                run_id=str(self.context.job.run_id) if self.context.job else None,
                 job_name=self.context.job.job_name if self.context.job else None,
             )
             if logger.isEnabledFor(logging.DEBUG):
