@@ -173,7 +173,7 @@ async def add(
             "and will be removed in Meltano v4. "
             "Please use the --plugin-type option instead.",
             DeprecationWarning,
-            stacklevel=2,
+            stacklevel=0,
         )
     else:
         plugin_names = plugin
