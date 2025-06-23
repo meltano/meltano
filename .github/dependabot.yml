@@ -8,7 +8,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    labels: [deps]
+    labels: [dependencies]
     groups:
       default:
         update-types:
@@ -23,7 +23,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    labels: [deps]
+    labels: [dependencies]
     groups:
       actions:
         patterns:
@@ -38,7 +38,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    labels: [deps]
+    labels: [dependencies]
     groups:
       development-dependencies:
         dependency-type: development
@@ -58,7 +58,7 @@ updates:
       time: "12:00"
       timezone: "Etc/UTC"
       day: monday
-    labels: [deps]
+    labels: [dependencies]
     groups:
       development-dependencies:
         dependency-type: development
