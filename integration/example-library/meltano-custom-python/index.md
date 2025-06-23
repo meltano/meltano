@@ -20,7 +20,7 @@ When this value isn't provided, Meltano will use the Python executable that was 
 In `meltano.yml` we have set the `python` property to `python3.X`, which will be used instead of the Python executable that was used to run Meltano itself.
 
 ```shell
-meltano add extractor tap-github
+meltano add tap-github
 ```
 
 In this case since we've used `python3.X`, we'll find that when we run the plugin's version of Python, it will use the `python3.X` executable.
@@ -32,7 +32,7 @@ In this case since we've used `python3.X`, we'll find that when we run the plugi
 Now we can add a different plugin that specifies the Python version it should use at the plugin level:
 
 ```shell
-meltano add extractor tap-gitlab --python python3.Y
+meltano add tap-gitlab --python python3.Y
 ```
 
 And then test that it uses the Python executable we expect, `python3.Y`, instead of `python3.X` or the Python version that was used to run Meltano:
