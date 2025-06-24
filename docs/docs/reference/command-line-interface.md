@@ -1360,7 +1360,7 @@ Selection rules will be stored in the extractor's [`select` extra](/concepts/plu
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-Use `--list` or `--json` to list the current selected tap attributes.
+Use `--list` or `--json` to list the currently selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
