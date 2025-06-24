@@ -64,7 +64,7 @@ def selection_mark(selection) -> str:  # noqa: ANN001
     "--list",
     "list_format",
     flag_value="text",
-    help="List the current selected tap attributes.",
+    help="List the current selected tap attributes in plain text format.",
 )
 @click.option(
     "--json",
@@ -204,7 +204,7 @@ def _show_json(
     for select_pattern in map(SelectPattern.parse, patterns):
         output["enabled_patterns"].append(select_pattern.raw)
 
-    for stream, prop in tuple(
+    for stream, prop in (
         (strm, prp)
         for strm in sorted(list_all.streams)
         for prp in sorted(list_all.properties[strm.key])
@@ -241,7 +241,7 @@ def _show_plain(
         click.secho(f"\t{select_pattern.raw}", fg=color)
 
     click.secho("\nSelected attributes:")
-    for stream, prop in tuple(
+    for stream, prop in (
         (strm, prp)
         for strm in sorted(list_all.streams)
         for prp in sorted(list_all.properties[strm.key])
