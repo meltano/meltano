@@ -23,7 +23,7 @@ This is easy to do! Following the instructions from above to discover and instal
 
 ```bash
 # install adapter-specific dbt, e.g. for snowflake
-meltano add utility dbt-snowflake
+meltano add dbt-snowflake
 ```
 
 #### Update your `dbt_project.yml`

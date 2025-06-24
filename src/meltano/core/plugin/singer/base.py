@@ -64,7 +64,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         return {
             "SINGER_SDK_LOG_CONFIG": str(plugin_invoker.files["singer_sdk_logging"]),
             "LOGGING_CONF_FILE": str(
-                plugin_invoker.files["pipelinewise_singer_logging"]
+                plugin_invoker.files["pipelinewise_singer_logging"],
             ),
         }
 

@@ -116,7 +116,14 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 1.  Add the GitHub extractor
 
 ```bash
-meltano add extractor tap-github
+# Simplified syntax - plugin type is automatically detected
+meltano add tap-github  # Automatically detected as extractor
+
+# Explicit plugin type for disambiguation:
+# meltano add --plugin-type extractor tap-github
+
+# Deprecated positional syntax:
+# meltano add extractor tap-github
 ```
 
 <br />
@@ -124,7 +131,7 @@ meltano add extractor tap-github
 <Termy>
 
 ```console
-$ meltano add extractor tap-github
+$ meltano add tap-github
 Added extractor 'tap-github' to your Meltano project
 Variant:        meltanolabs (default)
 Repository:     https://github.com/meltanolabs/tap-github
@@ -365,14 +372,14 @@ meltano select tap-github --list
 
 To test that the extraction process works, we add a JSON target.
 
-1. Add the JSON target using `meltano add loader target-jsonl`.
+1. Add the JSON target using `meltano add target-jsonl` (plugin type is automatically detected).
 
    <br />
 
 <Termy>
 
 ```console
-$ meltano add loader target-jsonl</span>
+$ meltano add target-jsonl</span>
 Added loader 'target-jsonl' to your Meltano project
 Variant:        andyh1203 (default)
 Repository:     https://github.com/andyh1203/target-jsonl

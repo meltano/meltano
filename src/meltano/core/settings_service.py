@@ -205,6 +205,7 @@ class SettingsService(metaclass=ABCMeta):
 
     def config_with_metadata(
         self,
+        *,
         prefix: str | None = None,
         extras: bool | None = None,
         source: SettingValueStore = SettingValueStore.AUTO,
@@ -609,7 +610,7 @@ class SettingsService(metaclass=ABCMeta):
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras: bool | None = None) -> Iterable[SettingDefinition]:
+    def definitions(self, *, extras: bool | None = None) -> Iterable[SettingDefinition]:
         """Return setting definitions along with extras.
 
         Args:

@@ -26,9 +26,10 @@ permissions:
 
 jobs:
   build:
-    name: Wheel and sdist
+    name: Wheel and SDist
     runs-on: ubuntu-latest
     outputs:
+      name: ${{ steps.baipp.outputs.package_name }}
       version: ${{ steps.baipp.outputs.package_version }}
 
     steps:
@@ -36,7 +37,7 @@ jobs:
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@f0ec1fc3b38f5e7cd731bb6ce540c5af426746bb # v6.1.0
+      uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
       with:
         version: ">=0.6.15"
 
@@ -67,7 +68,7 @@ jobs:
       run: touch src/meltano/core/tracking/.release_marker
 
     - name: Build distribution
-      uses: hynek/build-and-inspect-python-package@b5076c307dc91924a82ad150cdd1533b444d3310 # v2.12.0
+      uses: hynek/build-and-inspect-python-package@c52c3a4710070b50470d903818a7b25115dcd076 # v2.13.0
       id: baipp
 
   build_docker:
@@ -101,7 +102,7 @@ jobs:
         echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - name: Setup uv
-      uses: astral-sh/setup-uv@f0ec1fc3b38f5e7cd731bb6ce540c5af426746bb # v6.1.0
+      uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
       with:
         version: ">=0.6"
 
@@ -160,7 +161,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: publishing
-      url: https://pypi.org/project/meltano/${{ needs.build.outputs.version }}
+      url: https://pypi.org/project/${{ needs.build.outputs.name }}/${{ needs.build.outputs.version }}
 
     steps:
     - name: Check out the repository
@@ -173,7 +174,7 @@ jobs:
         path: dist
 
     - name: Upload wheel to release
-      uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # 2.9.0
+      uses: svenstaro/upload-release-action@ebd922b779f285dafcac6410a0710daee9c12b82 # 2.10.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: dist/*.whl
