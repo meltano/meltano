@@ -63,7 +63,7 @@ meltano run --dry-run gitlab-to-postgres
 The meltano.yml didn't include dbt, so let's install that and get it configured to use our database:
 
 ```shell
-meltano add utility dbt-postgres
+meltano add dbt-postgres
 meltano --environment=dev config dbt-postgres set host localhost
 meltano --environment=dev config dbt-postgres set user postgres
 meltano --environment=dev config dbt-postgres set password postgres
