@@ -1360,7 +1360,7 @@ Selection rules will be stored in the extractor's [`select` extra](/concepts/plu
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-Use `--list` to list the current selected tap attributes.
+Use `--list` or `--json` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
@@ -1375,6 +1375,9 @@ The `select` command can accept the `--environment` flag to target a specific [M
 ```bash
 # List all available entities and attributes
 meltano select tap-gitlab --list --all
+
+# List all available entities and attributes in JSON format
+meltano select tap-gitlab --json --all
 
 # Include all attributes of an entity
 meltano select tap-gitlab tags "*"
