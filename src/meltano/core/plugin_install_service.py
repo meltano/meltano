@@ -460,7 +460,6 @@ class PluginInstallService:
                     os.environ,
                     if_missing=EnvVarMissingBehavior(strict_env_var_mode),
                 ),
-                **plugin_settings_service.as_env(),
                 **plugin_settings_service.plugin.info_env,
                 **expand_env_vars(
                     plugin_settings_service.plugin.env,
@@ -546,8 +545,7 @@ def install_status_update(install_state: PluginInstallState) -> None:
     }:
         logger.info("%s %s '%s'", install_state.verb, desc, plugin.name)
     elif install_state.status is PluginInstallStatus.ERROR:
-        logger.error(install_state.message)
-        logger.info(install_state.details)
+        logger.error(install_state.message, details=install_state.details)
     elif install_state.status is PluginInstallStatus.WARNING:  # pragma: no cover
         logger.warning(install_state.message)
 

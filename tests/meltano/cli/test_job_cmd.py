@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 import typing as t
+from unittest import mock
 
-import mock
 import pytest
 
 from asserts import assert_cli_runner
@@ -228,6 +228,6 @@ class TestCliJob:
                 ["job", "list", "--format=json", "job-list-mock"],
             )
             assert_cli_runner(res)
-            output = json.loads(res.output)
+            output = json.loads(res.stdout)
             assert output["job_name"] == "job-list-mock"
             assert output["tasks"] == ["tap-mock target-mock"]

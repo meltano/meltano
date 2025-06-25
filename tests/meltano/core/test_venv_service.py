@@ -7,8 +7,8 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from pathlib import Path
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.core.error import AsyncSubprocessError, MeltanoError

@@ -63,7 +63,7 @@ def init(
     if no_usage_stats:
         ProjectSettingsService.config_override["send_anonymous_usage_stats"] = False
 
-    init_service = ProjectInitService(project_directory)  # type: ignore[arg-type]
+    init_service = ProjectInitService(project_directory)
 
     project = init_service.init(force=force)
     init_service.echo_instructions(project)

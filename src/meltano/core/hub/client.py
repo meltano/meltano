@@ -259,10 +259,8 @@ class MeltanoHubService(PluginRepository):
             HubPluginVariantNotFoundError: If the plugin variant could not be found.
             HubConnectionError: If the Hub API could not be reached.
         """
-        plugins = self.get_plugins_of_type(plugin_type)
-
         try:
-            plugin = plugins[plugin_name]
+            plugin = self.get_plugins_of_type(plugin_type)[plugin_name]
         except KeyError as plugins_key_err:
             raise PluginNotFoundError(
                 PluginRef(plugin_type, plugin_name),

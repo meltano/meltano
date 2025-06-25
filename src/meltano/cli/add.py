@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,7 +33,11 @@ if t.TYPE_CHECKING:
 install, no_install = get_install_options(include_only_install=False)
 
 
-def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
+def _load_yaml_from_ref(
+    ctx: click.Context,
+    param: click.Parameter,
+    value: str | None,
+) -> dict | None:
     if not value:
         return None
 
@@ -46,17 +51,43 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
             content = Path(value).read_text()
 
     except (ValueError, FileNotFoundError, IsADirectoryError) as e:
-        raise click.BadParameter(e) from e
+        raise click.BadParameter(str(e), ctx=ctx, param=param) from e
 
     return yaml.load(content) or {}
+
+
+class PluginTypeArg(click.Choice):
+    """A click parameter that converts a string to a PluginType."""
+
+    def __init__(self, *args: t.Any, **kwargs: t.Any) -> None:
+        """Initialize the PluginTypeArg."""
+        super().__init__(PluginType.cli_arguments(), *args, **kwargs)
+
+    def convert(
+        self,
+        value: str,
+        param: click.Parameter | None,  # noqa: ARG002
+        ctx: click.Context | None,  # noqa: ARG002
+    ) -> PluginType:
+        """Convert the value to a PluginType."""
+        return PluginType.from_cli_argument(value)
+
+
+def _infer_plugin_type(plugin_name: str) -> PluginType:
+    if plugin_name.startswith("tap-"):
+        return PluginType.EXTRACTORS
+    if plugin_name.startswith("target-"):
+        return PluginType.LOADERS
+
+    return PluginType.UTILITIES
 
 
 @click.command(
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )
-@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_name", nargs=-1, required=True)
+@click.argument("plugin", nargs=-1, required=True)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--inherit-from",
     help=(
@@ -115,17 +146,17 @@ def _load_yaml_from_ref(_ctx, _param, value: str | None) -> dict | None:
 @click.pass_context
 @run_async
 async def add(
-    ctx,  # noqa: ANN001
+    ctx: click.Context,
     project: Project,
-    plugin_type: str,
-    plugin_name: str,
+    plugin: tuple[str, ...],
     install_plugins: InstallPlugins,
+    plugin_type: PluginType | None = None,
     inherit_from: str | None = None,
     variant: str | None = None,
     as_name: str | None = None,
     plugin_yaml: dict | None = None,
     python: str | None = None,
-    **flags,  # noqa: ANN003
+    **flags: bool,
 ) -> None:
     """Add a plugin to your project.
 
@@ -134,15 +165,25 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    plugin_type = PluginType.from_cli_argument(plugin_type)
-    plugin_names = plugin_name  # nargs=-1
+    if plugin_type is None and plugin[0] in PluginType.cli_arguments():
+        plugin_type = PluginType.from_cli_argument(plugin[0])
+        plugin_names = plugin[1:]
+        warnings.warn(
+            "Passing the plugin type as the first positional argument is deprecated "
+            "and will be removed in Meltano v4. "
+            "Please use the --plugin-type option instead.",
+            DeprecationWarning,
+            stacklevel=0,
+        )
+    else:
+        plugin_names = plugin
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``
         # is equivalent to:
         # `add <type> <name> --inherit-from <inherit-from>``
         inherit_from = plugin_names[0]
-        plugin_names = [as_name]
+        plugin_names = (as_name,)
 
     if flags["custom"] and plugin_type in {
         PluginType.TRANSFORMS,
@@ -151,8 +192,14 @@ async def add(
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102
 
-    plugin_refs = [
-        PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
+    plugin_refs: list[PluginRef] = [
+        PluginRef(
+            plugin_type=_infer_plugin_type(name)
+            if plugin_type is None
+            else plugin_type,
+            name=name,
+        )
+        for name in plugin_names
     ]
     dependencies_met, err = check_dependencies_met(
         plugin_refs=plugin_refs,
@@ -165,12 +212,12 @@ async def add(
     add_service = ProjectAddService(project)
 
     plugins: list[ProjectPlugin] = []
-    for plugin in plugin_names:
+    for ref in plugin_refs:
         try:
             plugins.append(
                 add_plugin(
-                    plugin_type,
-                    plugin,
+                    ref.type,
+                    ref.name,
                     python=python,
                     inherit_from=inherit_from,
                     variant=variant,
@@ -213,7 +260,7 @@ async def add(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _print_plugins(plugins) -> None:  # noqa: ANN001
+def _print_plugins(plugins: list[ProjectPlugin]) -> None:
     printed_empty_line = False
     for plugin in plugins:
         docs_url = plugin.docs or plugin.repo

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import typing as t
+from unittest.mock import Mock
 
 import pytest
-from mock import Mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.validation_service import ValidationOutcome, ValidationsRunner

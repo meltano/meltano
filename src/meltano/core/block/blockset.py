@@ -8,6 +8,8 @@ from abc import ABCMeta, abstractmethod
 if t.TYPE_CHECKING:
     from meltano.core.block.ioblock import IOBlock
 
+_T = t.TypeVar("_T", bound="IOBlock")
+
 
 class BlockSetValidationError(Exception):
     """Base exception when a block in a BlockSet violates the sets requirements."""
@@ -22,7 +24,7 @@ class BlockSetValidationError(Exception):
         super().__init__(f"{message}: {error}")
 
 
-class BlockSet(metaclass=ABCMeta):
+class BlockSet(t.Generic[_T], metaclass=ABCMeta):
     """Currently the only complex block set is our `ExtractLoadBlocks` type.
 
     Theoretically, this is the bare minimum that we need to run and terminate
@@ -31,7 +33,7 @@ class BlockSet(metaclass=ABCMeta):
     interface.
     """
 
-    blocks: tuple[IOBlock, ...]
+    blocks: tuple[_T, ...]
 
     @abstractmethod
     async def run(self) -> None:

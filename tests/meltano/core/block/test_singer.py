@@ -3,11 +3,11 @@ from __future__ import annotations
 import asyncio
 import tempfile
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock, Mock
 
-import mock
 import pytest
 import structlog
-from mock import AsyncMock, Mock
 from structlog.testing import capture_logs
 
 from meltano.core.block.singer import SingerBlock

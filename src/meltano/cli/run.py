@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import typing as t
+import uuid
 
 import click
 import structlog
@@ -27,8 +28,6 @@ from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
-    import uuid
-
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
@@ -142,6 +141,10 @@ async def run(
     if dry_run and not ProjectSettingsService.config_override.get("cli.log_level"):
         logger.info("Setting 'console' handler log level to 'debug' for dry run")
         change_console_log_level()
+
+    # Bind run_id at the start of the CLI entrypoint
+    run_id = run_id or uuid.uuid4()
+    structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     tracker: Tracker = ctx.obj["tracker"]
 

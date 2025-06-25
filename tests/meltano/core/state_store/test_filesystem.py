@@ -252,7 +252,7 @@ class TestLocalFilesystemStateStoreManager:
                         {
                             "partial": expected_state,
                             "completed": expected_state,
-                        }
+                        },
                     ),
                 ) == MeltanoState.from_file(state_id, state_file)
 
@@ -506,7 +506,7 @@ class TestS3StateStoreManager:
                     MeltanoState(
                         state_id=state_id,
                         completed_state={},
-                    )
+                    ),
                 )
 
             exc = exc_info.value
@@ -529,7 +529,7 @@ class TestS3StateStoreManager:
                     MeltanoState(
                         state_id="state-id",
                         completed_state={},
-                    )
+                    ),
                 )
 
             assert exc_info.value.response["Error"]["Code"] == "NoSuchBucket"

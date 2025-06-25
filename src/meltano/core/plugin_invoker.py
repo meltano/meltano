@@ -34,15 +34,18 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.block.extract_load import ELBContext
+    from meltano.core.elt_context import ELTContext, PluginContext
     from meltano.core.logging.utils import SubprocessOutputWriter
     from meltano.core.plugin import PluginRef
+    from meltano.core.plugin.command import Command
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
     class InvokerInitKwargs(t.TypedDict, total=False):
         """Keyword arguments for the Invoker constructor."""
 
-        context: t.Any | None
+        context: ELTContext | ELBContext | PluginContext | None
         output_handlers: dict | None
         run_dir: Path | None
         config_dir: Path | None
@@ -108,7 +111,7 @@ class InvokerNotPreparedError(InvokerError):
 class UnknownCommandError(InvokerError):
     """Occurs when `invoke` is called in command mode with an undefined command."""
 
-    def __init__(self, plugin: PluginRef, command):  # noqa: ANN001
+    def __init__(self, plugin: PluginRef, command: str) -> None:
         """Initialize UnknownCommandError.
 
         Args:
@@ -155,7 +158,7 @@ class PluginInvoker:
         project: Project,
         plugin: ProjectPlugin,
         *,
-        context: t.Any | None = None,  # noqa: ANN401
+        context: ELTContext | ELBContext | PluginContext | None = None,
         output_handlers: dict | None = None,
         run_dir: Path | None = None,
         config_dir: Path | None = None,
@@ -209,7 +212,7 @@ class PluginInvoker:
         self.plugin_config_env: dict[str, str] = {}
 
     @property
-    def capabilities(self):  # noqa: ANN201
+    def capabilities(self) -> frozenset[str]:
         """Get plugin immutable capabilities.
 
         Makes sure the capabilities are immutable from the `PluginInvoker` interface.
@@ -217,7 +220,7 @@ class PluginInvoker:
         Returns:
             The set of plugin capabilities.
         """
-        return frozenset(self.plugin.capabilities)
+        return frozenset(self.plugin.capabilities)  # type: ignore[arg-type]
 
     @property
     def files(self) -> dict[str, Path]:
@@ -267,7 +270,7 @@ class PluginInvoker:
             self._prepared = False
 
     @asynccontextmanager
-    async def prepared(self, session: Session):  # noqa: ANN201
+    async def prepared(self, session: Session) -> t.AsyncGenerator[None, None]:
         """Context manager that prepares plugin config.
 
         Args:
@@ -305,7 +308,12 @@ class PluginInvoker:
         # Return executable within venv
         return self.venv_service.exec_path(executable)
 
-    def exec_args(self, *args, command=None, env=None):  # noqa: ANN001, ANN002, ANN201
+    def exec_args(
+        self,
+        *args: t.Any,
+        command: str | None = None,
+        env: dict[str, t.Any] | None = None,
+    ) -> list[str]:
         """Materialize the arguments to be passed to the executable.
 
         Args:
@@ -328,7 +336,7 @@ class PluginInvoker:
 
         return [str(arg) for arg in (executable, *plugin_args, *args)]
 
-    def find_command(self, name):  # noqa: ANN001, ANN201
+    def find_command(self, name: str) -> Command:
         """Find a Command by name.
 
         Args:
@@ -345,7 +353,7 @@ class PluginInvoker:
         except KeyError as err:
             raise UnknownCommandError(self.plugin, name) from err
 
-    def env(self):  # noqa: ANN201
+    def env(self) -> dict[str, t.Any]:
         """Environment variable mapping.
 
         Returns:
@@ -444,7 +452,7 @@ class PluginInvoker:
         require_preparation: bool = True,
         env: dict[str, t.Any] | None = None,
         command: str | None = None,
-        **kwargs,  # noqa: ANN003
+        **kwargs: t.Any,
     ) -> AsyncGenerator[tuple[list[str], dict[str, t.Any], dict[str, t.Any]], None]:
         """Invoke a command.
 
@@ -483,7 +491,11 @@ class PluginInvoker:
                     self.plugin.executable,
                 ) from err
 
-    async def invoke_async(self, *args, **kwargs) -> asyncio.subprocess.Process:  # noqa: ANN002, ANN003
+    async def invoke_async(
+        self,
+        *args: t.Any,
+        **kwargs: t.Any,
+    ) -> asyncio.subprocess.Process:
         """Invoke a command.
 
         Args:
@@ -507,8 +519,8 @@ class PluginInvoker:
     async def invoke_docker(
         self,
         plugin_command: str,
-        *args,  # noqa: ANN002
-        **kwargs,  # noqa: ANN003
+        *args: t.Any,
+        **kwargs: t.Any,
     ) -> int:
         """Invoke a containerized command.
 

@@ -28,7 +28,7 @@ class SelectService:  # noqa: D101
         self.project = project
         self._extractor = self.project.plugins.find_plugin(
             extractor,
-            PluginType.EXTRACTORS,
+            plugin_type=PluginType.EXTRACTORS,
         )
 
     @property

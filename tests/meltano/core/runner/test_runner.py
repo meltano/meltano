@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import typing as t
+from unittest import mock
+from unittest.mock import AsyncMock
 
-import mock
 import pytest
-from mock import AsyncMock
 
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output

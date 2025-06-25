@@ -58,7 +58,7 @@ class CliError(Exception):
         if self.printed:
             return
 
-        logger.debug(str(self), exc_info=True)
+        logger.error(str(self), exc_info=self)
         click.secho(str(self), fg="red", err=True)
 
         self.printed = True

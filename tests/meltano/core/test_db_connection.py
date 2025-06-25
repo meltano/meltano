@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import typing as t
+from unittest.mock import Mock
 
 import pytest
 import yaml
-from mock import Mock
 from sqlalchemy.exc import OperationalError
 
 from meltano.core.db import NullConnectionStringError, connect, project_engine

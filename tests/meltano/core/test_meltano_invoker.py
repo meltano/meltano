@@ -6,8 +6,8 @@ import subprocess
 import sys
 import typing as t
 from pathlib import Path
+from unittest import mock
 
-import mock
 import pytest
 
 import meltano

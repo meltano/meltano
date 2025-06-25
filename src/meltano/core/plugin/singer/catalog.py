@@ -5,7 +5,6 @@ import fnmatch
 import re
 import sys
 import typing as t
-from collections import OrderedDict
 from enum import Enum, auto
 from functools import singledispatch
 
@@ -562,7 +561,7 @@ class SchemaExecutor(CatalogExecutor):  # noqa: D101
 class ListExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self) -> None:  # noqa: D107
         # properties per stream
-        self.properties: dict[str, set[str]] = OrderedDict()
+        self.properties: dict[str, set[str]] = {}
 
         super().__init__()
 
@@ -598,7 +597,7 @@ class SelectedNode(t.NamedTuple):
 class ListSelectedExecutor(CatalogExecutor):  # noqa: D101
     def __init__(self) -> None:  # noqa: D107
         self.streams: set[SelectedNode] = set()
-        self.properties: dict[str, set[SelectedNode]] = OrderedDict()
+        self.properties: dict[str, set[SelectedNode]] = {}
         super().__init__()
 
     @property

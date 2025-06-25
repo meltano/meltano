@@ -4,9 +4,10 @@ import platform
 import sys
 import typing as t
 from importlib.util import module_from_spec, spec_from_file_location
+from unittest import mock
+from unittest.mock import AsyncMock
 
 import pytest
-from mock import AsyncMock, mock
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import PluginInstallService

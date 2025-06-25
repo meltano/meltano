@@ -33,7 +33,7 @@ def tmp_project(
 ) -> Generator[Project, None, None]:
     project_init_service = ProjectInitService(name)
     blank_project = project_init_service.init()
-    logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004, TID251
+    logging.debug(f"Created new project at {blank_project.root}")  # noqa: G004
     blank_project.meltanofile.unlink()
     compatible_copy_tree(source, blank_project.root)
     Project._default = None
@@ -44,4 +44,4 @@ def tmp_project(
             yield project
         finally:
             Project.deactivate()
-            logging.debug(f"Cleaned project at {project.root}")  # noqa: G004, TID251
+            logging.debug(f"Cleaned project at {project.root}")  # noqa: G004

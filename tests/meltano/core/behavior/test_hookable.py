@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from typing import NoReturn  # noqa: ICN003
+from unittest import mock
 
-import mock
 import pytest
 
 from meltano.core.behavior.hookable import HookObject, hook

@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import os
+import platform
+import re
+import sys
 import typing as t
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -149,6 +154,16 @@ class TestPluginInstallService:
             "target-csv",
         ]
 
+    @pytest.mark.xfail(
+        platform.system() == "Windows"
+        and sys.version_info >= (3, 13, 4)
+        and sys.version_info < (3, 13, 5),
+        reason=(
+            "The test fails on Windows with Python 3.13.4 because the build "
+            "is broken and points to a free-threaded binary."
+            "See https://github.com/python/cpython/issues/135151."
+        ),
+    )
     @pytest.mark.slow
     async def test_install_all(self, subject) -> None:
         all_plugins = await subject.install_all_plugins()
@@ -264,6 +279,29 @@ class TestPluginInstallService:
         assert state.skipped, (
             "Expected plugin with missing env var in pip URL to not be installed"
         )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_plugin_installation_env(
+        self,
+        project: Project,
+        tap: ProjectPlugin,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.setattr(os, "environ", {"EXTERNAL_VAR": "value"})
+
+        service = PluginInstallService(project)
+        env = service.plugin_installation_env(tap)
+        assert re.match(r"\d+\.\d+", env.pop("MELTANO__PYTHON_VERSION"))
+        assert re.match(r"Meltano/.*", env.pop("MELTANO_USER_AGENT"))
+        assert Path(env.pop("MELTANO_PROJECT_ROOT")).is_dir()
+        assert Path(env.pop("MELTANO_SYS_DIR_ROOT")).is_dir()
+        assert env == {
+            "MELTANO_ENVIRONMENT": "",
+            "MELTANO_EXTRACTOR_NAME": "tap-mock",
+            "MELTANO_EXTRACTOR_NAMESPACE": "tap_mock",
+            "MELTANO_EXTRACTOR_VARIANT": "meltano",
+            "EXTERNAL_VAR": "value",
+        }
 
     @patch("meltano.core.venv_service.VenvService.install_pip_args", AsyncMock())
     @pytest.mark.usefixtures("reset_project_context")

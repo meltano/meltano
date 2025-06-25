@@ -6,9 +6,9 @@ import platform
 import sys
 import tempfile
 import typing as t
+from unittest import mock
 
 import anyio
-import mock
 import pytest
 import structlog
 from structlog.testing import LogCapture
@@ -217,9 +217,9 @@ class TestOutputLogger:
             ),
             logging_out.redirect_logging(),
         ):
-            logging.info("info")  # noqa: TID251
-            logging.warning("warning")  # noqa: TID251
-            logging.error("error")  # noqa: TID251
+            logging.info("info")
+            logging.warning("warning")
+            logging.error("error")
 
         async with await anyio.open_file(subject.file) as logf:
             log_file_contents = [json.loads(line) for line in await logf.readlines()]

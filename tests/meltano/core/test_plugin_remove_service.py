@@ -5,8 +5,8 @@ import json
 import os
 import shutil
 import typing as t
+from unittest import mock
 
-import mock
 import pytest
 import yaml
 from sqlalchemy.exc import OperationalError

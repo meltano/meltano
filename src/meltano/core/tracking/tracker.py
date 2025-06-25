@@ -239,8 +239,8 @@ class Tracker:  # - too many (public) methods
             # Project ID has changed
             self.track_telemetry_state_change_event(
                 "project_id",
-                stored_telemetry_settings.project_id,
-                self.project_id,
+                from_value=stored_telemetry_settings.project_id,
+                to_value=self.project_id,
             )
 
         if (
@@ -251,8 +251,8 @@ class Tracker:  # - too many (public) methods
             # Telemetry state has changed
             self.track_telemetry_state_change_event(
                 "send_anonymous_usage_stats",
-                stored_telemetry_settings.send_anonymous_usage_stats,
-                self.send_anonymous_usage_stats,
+                from_value=stored_telemetry_settings.send_anonymous_usage_stats,
+                to_value=self.send_anonymous_usage_stats,
             )
 
     @cached_property
@@ -348,6 +348,7 @@ class Tracker:  # - too many (public) methods
     def track_telemetry_state_change_event(
         self,
         setting_name: str,
+        *,
         from_value: uuid.UUID | str | bool | None,
         to_value: uuid.UUID | str | bool | None,
     ) -> None:

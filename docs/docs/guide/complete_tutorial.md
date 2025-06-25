@@ -175,16 +175,23 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
     - If an extractor is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
     ```bash
-    meltano add extractor <plugin name>
+    # Simplified syntax - plugin type is automatically detected
+    meltano add <plugin name>
 
     # For example:
-    meltano add extractor tap-gitlab
+    meltano add tap-gitlab  # Automatically detected as extractor
 
     # If you have a preference for a non-default variant, select it using `--variant`:
-    meltano add extractor tap-gitlab --variant=singer-io
+    meltano add tap-gitlab --variant=singer-io
+
+    # Explicit plugin type for disambiguation:
+    meltano add --plugin-type extractor tap-gitlab
+
+    # Deprecated positional syntax:
+    meltano add extractor tap-gitlab
 
     # If you're using Docker, don't forget to mount the project directory:
-    docker run -v $(pwd):/project -w /project meltano/meltano add extractor tap-gitlab
+    docker run -v $(pwd):/project -w /project meltano/meltano add tap-gitlab
     ```
 
     This will add the new plugin to your [`meltano.yml` project file](/concepts/project#plugins):
@@ -568,14 +575,21 @@ _To learn more about adding plugins to your project, refer to the [Plugin Manage
             - If a loader is **supported out of the box**, add it to your project using [`meltano add`](/reference/command-line-interface#add):
 
                   ```bash
-                  meltano add loader <plugin name>
+                  # Simplified syntax - plugin type is automatically detected
+                  meltano add <plugin name>
 
                   # For this example, we'll use the default variant:
-                  meltano add loader target-postgres
+                  meltano add target-postgres  # Automatically detected as loader
 
                   # Or if you just want to use a non-default variant you can use this,
                   # selected using `--variant`:
-                  meltano add loader target-postgres --variant=datamill-co
+                  meltano add target-postgres --variant=datamill-co
+
+                  # Explicit plugin type for disambiguation:
+                  meltano add --plugin-type loader target-postgres
+
+                  # Deprecated positional syntax:
+                  meltano add loader target-postgres
                   ```
 
 :::info
@@ -880,6 +894,13 @@ schedules:
 1. Add the [Apache Airflow](https://airflow.apache.org/) utility to your project using [`meltano add`](/reference/command-line-interface#add), which will be responsible for managing the schedule and executing the appropriate `meltano run` commands:
 
    ```bash
+   # Simplified syntax - plugin type is automatically detected
+   meltano add airflow  # Automatically detected as utility
+
+   # Explicit plugin type for disambiguation:
+   meltano add --plugin-type utility airflow
+
+   # Deprecated positional syntax:
    meltano add utility airflow
    ```
 

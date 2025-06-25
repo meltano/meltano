@@ -9,8 +9,8 @@ import typing as t
 from collections import defaultdict, namedtuple
 from contextlib import contextmanager
 from pathlib import Path
+from unittest import mock
 
-import mock
 import pytest
 import structlog
 
@@ -2084,7 +2084,7 @@ def job_logging_service(project):
 @contextmanager
 def project_directory(project_init_service):
     project = project_init_service.init()
-    logging.debug(f"Created new project at {project.root}")  # noqa: G004, TID251
+    logging.debug(f"Created new project at {project.root}")  # noqa: G004
 
     # empty out the `plugins`
     with project.meltano_update() as meltano:
@@ -2099,7 +2099,7 @@ def project_directory(project_init_service):
         yield project
     finally:
         Project.deactivate()
-        logging.debug(f"Cleaned project at {project.root}")  # noqa: G004, TID251
+        logging.debug(f"Cleaned project at {project.root}")  # noqa: G004
 
 
 @pytest.fixture(scope="class")

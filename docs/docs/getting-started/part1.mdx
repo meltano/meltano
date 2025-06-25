@@ -116,7 +116,14 @@ Now that you have your very own Meltano project, it's time to add [plugins](/con
 1.  Add the GitHub extractor
 
 ```bash
-meltano add extractor tap-github
+# Simplified syntax - plugin type is automatically detected
+meltano add tap-github  # Automatically detected as extractor
+
+# Explicit plugin type for disambiguation:
+# meltano add --plugin-type extractor tap-github
+
+# Deprecated positional syntax:
+# meltano add extractor tap-github
 ```
 
 <br />
@@ -124,7 +131,7 @@ meltano add extractor tap-github
 <Termy>
 
 ```console
-$ meltano add extractor tap-github
+$ meltano add tap-github
 Added extractor 'tap-github' to your Meltano project
 Variant:        meltanolabs (default)
 Repository:     https://github.com/meltanolabs/tap-github
@@ -365,14 +372,14 @@ meltano select tap-github --list
 
 To test that the extraction process works, we add a JSON target.
 
-1. Add the JSON target using `meltano add loader target-jsonl`.
+1. Add the JSON target using `meltano add target-jsonl` (plugin type is automatically detected).
 
    <br />
 
 <Termy>
 
 ```console
-$ meltano add loader target-jsonl</span>
+$ meltano add target-jsonl</span>
 Added loader 'target-jsonl' to your Meltano project
 Variant:        andyh1203 (default)
 Repository:     https://github.com/andyh1203/target-jsonl
@@ -407,7 +414,6 @@ meltano run tap-github target-jsonl
 ```console
 $ meltano run tap-github target-jsonl
 2024-09-19T13:53:36.403099Z [info     ] Environment 'dev' is active
-2024-09-19T13:53:41.062802Z [info     ] Found state from 2024-09-19 13:53:17.415907.
 2024-09-19T13:53:41.071885Z [warning  ] No state was found, complete import.
 2024-09-19T13:53:43.054384Z [info     ] INFO Starting sync of repository: sbalnojan/meltano-lightdash cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github
 2024-09-19T13:53:43.553171Z [info     ] INFO METRIC: {"type": "timer", "metric": "http_request_duration", "value": 0.4796161651611328, "tags": {"endpoint": "commits", "http_status_code": 200, "status": "succeeded"}} cmd_type=elb consumer=False name=tap-github producer=True stdio=stderr string_id=tap-github

@@ -31,6 +31,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.orm import Session
 
+    from meltano.core.setting_definition import EnvVar
     from meltano.core.settings_service import SettingsService
 
 
@@ -398,6 +399,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
             reason = "Can not retrieve unknown setting from environment variables"
             raise StoreNotSupportedError(reason)
 
+        value: str | None
         vals_with_metadata = []
         for env_var in self.setting_env_vars(setting_def):
             with suppress(KeyError):
@@ -419,7 +421,7 @@ class BaseEnvStoreManager(SettingsStoreManager):
             else (value, metadata)
         )
 
-    def setting_env_vars(self, *args, **kwargs) -> dict:  # noqa: ANN002, ANN003
+    def setting_env_vars(self, *args: t.Any, **kwargs: t.Any) -> list[EnvVar]:
         """Return setting environment variables.
 
         Args:
@@ -1124,7 +1126,7 @@ class InheritedStoreManager(SettingsStoreManager):
         super().__init__(settings_service, *args, **kwargs)
         self._kwargs = {**kwargs, "expand_env_vars": False}
         self.bulk = bulk
-        self._config_with_metadata = None
+        self._config_with_metadata: dict | None = None
 
     def get(
         self,
@@ -1149,9 +1151,6 @@ class InheritedStoreManager(SettingsStoreManager):
         if not setting_def:
             raise StoreNotSupportedError("Setting definition is missing")  # noqa: EM101
 
-        if not self.inherited_settings_service:  # type: ignore[truthy-bool]
-            raise StoreNotSupportedError("Inherited settings service is missing")  # noqa: EM101
-
         value, metadata = self.get_with_metadata(setting_def.name)
         if value is None or metadata["source"] is SettingValueStore.DEFAULT:  # type: ignore[redundant-expr]
             return None, {}
@@ -1169,7 +1168,12 @@ class InheritedStoreManager(SettingsStoreManager):
         Returns:
             A SettingsService to inherit configuration from.
         """
-        return self.settings_service.inherited_settings_service  # type: ignore[return-value]
+        service = self.settings_service.inherited_settings_service
+        if service is None:
+            msg = "Inherited settings service is missing"
+            raise StoreNotSupportedError(msg)
+
+        return service
 
     @property
     def config_with_metadata(self) -> dict:
@@ -1182,7 +1186,7 @@ class InheritedStoreManager(SettingsStoreManager):
             self._config_with_metadata = (
                 self.inherited_settings_service.config_with_metadata(**self._kwargs)
             )
-        return self._config_with_metadata  # type: ignore[return-value]
+        return self._config_with_metadata
 
     def get_with_metadata(self, name: str) -> tuple[str, dict]:
         """Return inherited config and metadata for the named setting.

@@ -1,0 +1,29 @@
+title: "Meltano Office Hours - [DATE]"
+body:
+  - type: input
+    attributes:
+      label: Time
+      description: The time of the event in GMT, EST/EDT and PDT/PDT
+      value: 4pm GMT / 11am EDT / 9am PDT
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        * All are welcome to join and we record and each session for later reference.
+        * Participants must abide by our [Code of Conduct](https://github.com/meltano/meltano/?tab=coc-ov-file).
+        * We look forward to seeing you there, and please consider these acts of etiquette:
+          * Mute your microphone when not speaking.
+          * Blur your background to reduce visual distractions.
+
+  - type: textarea
+    attributes:
+      label: Agenda
+      description: A list of topics to discuss
+      value: |
+        | Topic   | Link   |
+        |:--------|:-------|
+        | [TOPIC] | [Link] |
+    validations:
+      required: true

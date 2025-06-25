@@ -12,11 +12,13 @@ from meltano.cli.utils import CliError, PartialInstrumentedCmd
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
+from meltano.core.schedule import ELTSchedule, JobSchedule
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
 from meltano.core.utils import run_async
 
 if t.TYPE_CHECKING:
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
 
@@ -118,21 +120,25 @@ async def install(
     tracker.track_command_event(CliEvent.completed)
 
 
-def _get_schedule_plugins(project: Project, schedule_name: str):  # noqa: ANN202
+def _get_schedule_plugins(project: Project, schedule_name: str) -> set[ProjectPlugin]:
     schedule_service = ScheduleService(project)
     schedule_obj = schedule_service.find_schedule(schedule_name)
     schedule_plugins = set()
-    if schedule_obj.elt_schedule:
+    if isinstance(schedule_obj, ELTSchedule):
         for plugin_name in (schedule_obj.extractor, schedule_obj.loader):
             schedule_plugins.add(project.plugins.find_plugin(plugin_name))
-    else:
+    elif isinstance(schedule_obj, JobSchedule):
         task_sets = schedule_service.task_sets_service.get(schedule_obj.job)
         for blocks in task_sets.flat_args_per_set:
             parser = BlockParser(logger, project, blocks)
             for plugin in parser.plugins:
                 schedule_plugins.add(
-                    project.plugins.find_plugin(plugin.info.get("name"))
+                    project.plugins.find_plugin(plugin.info["name"])
                     if plugin.type == PluginType.MAPPERS
                     else plugin,
                 )
+    else:  # pragma: no cover
+        msg = f"Invalid schedule type: {type(schedule_obj)}"
+        raise ValueError(msg)
+
     return schedule_plugins

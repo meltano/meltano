@@ -27,12 +27,10 @@ class JobState(SystemModel):
     __tablename__ = "state"
     state_id: Mapped[str] = mapped_column(unique=True, primary_key=True)
 
-    updated_at: Mapped[t.Optional[datetime]] = mapped_column(  # noqa: UP007
-        onupdate=datetime.now,
-    )
+    updated_at: Mapped[t.Optional[datetime]] = mapped_column(onupdate=datetime.now)  # noqa: UP045
 
-    partial_state: Mapped[t.Optional[StateType]]  # noqa: UP007
-    completed_state: Mapped[t.Optional[StateType]]  # noqa: UP007
+    partial_state: Mapped[t.Optional[StateType]]  # noqa: UP045
+    completed_state: Mapped[t.Optional[StateType]]  # noqa: UP045
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another JobState.
