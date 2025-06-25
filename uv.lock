@@ -1335,7 +1335,6 @@ dependencies = [
     { name = "structlog" },
     { name = "typing-extensions" },
     { name = "tzlocal" },
-    { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
     { name = "uv" },
     { name = "virtualenv" },
 ]
@@ -1466,7 +1465,6 @@ requires-dist = [
     { name = "structlog", specifier = ">=25.1.0,<26" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
     { name = "tzlocal", specifier = "~=5.3" },
-    { name = "urllib3", marker = "python_full_version < '3.10'", specifier = "<2" },
     { name = "uv", specifier = ">=0.1.24,<0.8" },
     { name = "virtualenv", specifier = ">=20.26.6,<21" },
 ]
