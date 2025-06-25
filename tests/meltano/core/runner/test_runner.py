@@ -6,6 +6,7 @@ from unittest.mock import AsyncMock
 
 import pytest
 
+from meltano.core._state import StateStrategy
 from meltano.core.job import Job, Payload, State
 from meltano.core.logging.utils import capture_subprocess_output
 from meltano.core.plugin_invoker import PluginInvoker
@@ -161,60 +162,65 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
-        ("full_refresh", "merge_state", "select_filter", "payload_flag"),
+        (
+            "full_refresh",
+            "state_strategy",
+            "select_filter",
+            "payload_flag",
+        ),
         (
             pytest.param(
                 False,
-                False,
+                StateStrategy.OVERWRITE,
                 [],
                 Payload.STATE,
-                id="incremental-no-merge-no-select--complete-state",
+                id="incremental-overwrite-no-select--complete-state",
             ),
             pytest.param(
                 True,
-                False,
+                StateStrategy.OVERWRITE,
                 [],
                 Payload.STATE,
-                id="full-refresh-no-merge-no-select--complete-state",
+                id="full-refresh-overwrite-no-select--complete-state",
             ),
             pytest.param(
                 False,
-                False,
+                StateStrategy.OVERWRITE,
                 ["entity"],
                 Payload.STATE,
-                id="incremental-no-merge-select--complete-state",
+                id="incremental-overwrite-select--complete-state",
             ),
             pytest.param(
                 True,
-                False,
+                StateStrategy.OVERWRITE,
                 ["entity"],
                 Payload.INCOMPLETE_STATE,
-                id="full-refresh-no-merge-select--incomplete-state",
+                id="full-refresh-overwrite-select--incomplete-state",
             ),
             pytest.param(
                 False,
-                True,
+                StateStrategy.MERGE,
                 [],
                 Payload.INCOMPLETE_STATE,
                 id="incremental-merge-no-select--incomplete-state",
             ),
             pytest.param(
                 True,
-                True,
+                StateStrategy.MERGE,
                 [],
                 Payload.INCOMPLETE_STATE,
                 id="full-refresh-merge-no-select--incomplete-state",
             ),
             pytest.param(
                 False,
-                True,
+                StateStrategy.MERGE,
                 ["entity"],
                 Payload.INCOMPLETE_STATE,
                 id="incremental-merge-select--incomplete-state",
             ),
             pytest.param(
                 True,
-                True,
+                StateStrategy.MERGE,
                 ["entity"],
                 Payload.INCOMPLETE_STATE,
                 id="full-refresh-merge-select--incomplete-state",
@@ -223,7 +229,7 @@ class TestSingerRunner:
     )
     async def test_bookmark(
         self,
-        subject,
+        subject: SingerRunner,
         session,
         target,
         target_config_dir,
@@ -233,7 +239,7 @@ class TestSingerRunner:
         select_filter,
         payload_flag,
         elt_context,
-        merge_state,
+        state_strategy,
     ) -> None:
         lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
@@ -245,7 +251,7 @@ class TestSingerRunner:
 
         subject.context.full_refresh = full_refresh
         subject.context.select_filter = select_filter
-        subject.context.merge_state = merge_state
+        subject.context.state_strategy = state_strategy
 
         target_invoker = plugin_invoker_factory(
             target,

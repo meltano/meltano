@@ -19,6 +19,7 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.core._state import StateStrategy
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContext, ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -319,6 +320,8 @@ async def _run_el_command(
     run_id = run_id or uuid.uuid4()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
+    state_strategy = StateStrategy.MERGE if merge_state else StateStrategy.OVERWRITE
+
     job = Job(
         job_name=state_id
         or (
@@ -343,7 +346,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            merge_state=merge_state,
+            state_strategy=state_strategy,
             run_id=run_id,
         )
 
@@ -382,7 +385,7 @@ def _elt_context_builder(
     select_filter: list[str] | None = None,
     catalog: str | None = None,
     state: str | None = None,
-    merge_state: bool = False,
+    state_strategy: StateStrategy,
     run_id: uuid.UUID | None = None,
 ) -> ELTContextBuilder:
     select_filter = select_filter or []
@@ -404,7 +407,7 @@ def _elt_context_builder(
         .with_select_filter(select_filter)
         .with_catalog(catalog)
         .with_state(state)
-        .with_merge_state(merge_state=merge_state)
+        .with_state_strategy(state_strategy=state_strategy)
         .with_run_id(run_id)
     )
 

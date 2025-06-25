@@ -7,7 +7,7 @@ import pytest
 
 from meltano.core.job import Job, Payload
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.singer.target import BookmarkWriter
+from meltano.core.plugin.singer.target import BookmarkWriter, SingerTarget
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
 from meltano.core.state_service import StateService
 
@@ -84,7 +84,7 @@ class TestSingerTarget:
     @pytest.mark.asyncio
     async def test_setup_bookmark_writer(
         self,
-        subject,
+        subject: SingerTarget,
         session,
         plugin_invoker_factory,
         elt_context_builder,

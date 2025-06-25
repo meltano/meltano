@@ -15,6 +15,7 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -148,6 +149,8 @@ async def run(
 
     tracker: Tracker = ctx.obj["tracker"]
 
+    state_strategy = StateStrategy.MERGE if merge_state else StateStrategy.OVERWRITE
+
     try:
         parser = BlockParser(
             logger,
@@ -158,7 +161,7 @@ async def run(
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,
-            merge_state=merge_state,
+            state_strategy=state_strategy,
             run_id=run_id,
         )
         parsed_blocks = list(parser.find_blocks(0))
