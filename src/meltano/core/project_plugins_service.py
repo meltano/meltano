@@ -207,6 +207,7 @@ class ProjectPluginsService:  # (too many methods, attributes)
     def find_plugin(
         self,
         plugin_name: str,
+        *,
         plugin_type: PluginType | None = None,
         invokable: bool | None = None,
         configurable: bool | None = None,
@@ -519,8 +520,8 @@ class ProjectPluginsService:  # (too many methods, attributes)
             try:
                 return (
                     self.find_plugin(
+                        plugin.inherit_from,
                         plugin_type=plugin.type,
-                        plugin_name=plugin.inherit_from,
                     ),
                     DefinitionSource.INHERITED,
                 )

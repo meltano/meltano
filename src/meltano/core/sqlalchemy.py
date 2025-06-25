@@ -10,6 +10,10 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
 
+if t.TYPE_CHECKING:
+    from sqlalchemy.engine.interfaces import Dialect
+    from sqlalchemy.types import TypeEngine
+
 
 class JSONEncodedDict(TypeDecorator):
     """Represents an immutable structure as a json-encoded string.
@@ -21,24 +25,31 @@ class JSONEncodedDict(TypeDecorator):
     impl = VARCHAR
     cache_ok = True
 
-    def process_bind_param(  # noqa: ANN201, D102
+    def process_bind_param(
         self,
-        value,  # noqa: ANN001
-        dialect,  # noqa: ANN001, ARG002
-    ):
-        if value is not None:
-            value = json.dumps(value)
+        value: dict | None,
+        _dialect: Dialect,
+    ) -> str | None:
+        """Process the bind parameter.
 
-        return value
+        Args:
+            value: The value to process.
+            dialect: The dialect to use.
+        """
+        return json.dumps(value) if value is not None else value
 
-    def process_result_value(  # noqa: ANN201, D102
+    def process_result_value(
         self,
-        value,  # noqa: ANN001
-        dialect,  # noqa: ANN001, ARG002
-    ):
-        if value is not None:
-            value = json.loads(value)
-        return value
+        value: str | None,
+        _dialect: Dialect,
+    ) -> dict | None:
+        """Process the result value.
+
+        Args:
+            value: The value to process.
+            dialect: The dialect to use.
+        """
+        return json.loads(value) if value is not None else value
 
 
 class IntFlag(TypeDecorator):  # noqa: D101
@@ -46,12 +57,18 @@ class IntFlag(TypeDecorator):  # noqa: D101
     cache_ok = True
 
     # force the cast to INTEGER
-    def process_bind_param(  # noqa: ANN201, D102
+    def process_bind_param(
         self,
-        value,  # noqa: ANN001
-        dialect,  # noqa: ANN001, ARG002
-    ):
-        return int(value)
+        value: int | str | None,
+        _dialect: Dialect,
+    ) -> int | None:
+        """Process the bind parameter.
+
+        Args:
+            value: The value to process.
+            dialect: The dialect to use.
+        """
+        return int(value) if value is not None else value
 
 
 class GUID(TypeDecorator):
@@ -67,13 +84,23 @@ class GUID(TypeDecorator):
     impl = CHAR
     cache_ok = True
 
-    def load_dialect_impl(self, dialect):  # noqa: ANN001, ANN201, D102
+    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:  # noqa: D102
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         type_descriptor_length = 32
         return dialect.type_descriptor(CHAR(type_descriptor_length))
 
-    def process_bind_param(self, value, dialect):  # noqa: ANN001, ANN201, D102
+    def process_bind_param(
+        self,
+        value: uuid.UUID | str | None,
+        dialect: Dialect,
+    ) -> uuid.UUID | str | None:
+        """Process the bind parameter.
+
+        Args:
+            value: The value to process.
+            dialect: The dialect to use.
+        """
         if value is None:
             return value
         if dialect.name == "postgresql":
@@ -82,11 +109,17 @@ class GUID(TypeDecorator):
             value = uuid.UUID(value)
         return value.hex
 
-    def process_result_value(  # noqa: ANN201, D102
+    def process_result_value(
         self,
-        value,  # noqa: ANN001
-        dialect,  # noqa: ANN001, ARG002
-    ):
+        value: uuid.UUID | str | None,
+        _dialect: Dialect,
+    ) -> uuid.UUID | str | None:
+        """Process the result value.
+
+        Args:
+            value: The value to process.
+            dialect: The dialect to use.
+        """
         if value is None:
             return value
         if not isinstance(value, uuid.UUID):
@@ -100,7 +133,11 @@ class DateTimeUTC(TypeDecorator):
     impl = DateTime
     cache_ok = True
 
-    def process_bind_param(self, value: datetime.datetime | None, _dialect: str):  # noqa: ANN201
+    def process_bind_param(
+        self,
+        value: datetime.datetime | None,
+        _dialect: Dialect,
+    ) -> datetime.datetime | None:
         """Convert the datetime value to UTC and remove the timezone.
 
         Args:
@@ -116,7 +153,11 @@ class DateTimeUTC(TypeDecorator):
             value = value.astimezone(datetime.timezone.utc)
         return value.replace(tzinfo=None)
 
-    def process_result_value(self, value: datetime.datetime | None, _dialect: str):  # noqa: ANN201
+    def process_result_value(
+        self,
+        value: datetime.datetime | None,
+        _dialect: Dialect,
+    ) -> datetime.datetime | None:
         """Convert the naive datetime value to UTC.
 
         Args:

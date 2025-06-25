@@ -22,6 +22,7 @@ from meltano.core.plugin_install_service import PluginInstallReason
 if t.TYPE_CHECKING:
     from click.testing import CliRunner
 
+    from fixtures.cli import MeltanoCliRunner
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
@@ -79,7 +80,10 @@ class TestCliAdd:
                 assert res.exit_code == 0, res.stdout
                 assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
-                plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+                plugin = project.plugins.find_plugin(
+                    plugin_name,
+                    plugin_type=plugin_type,
+                )
                 assert plugin
                 assert plugin.variant == default_variant
 
@@ -130,17 +134,17 @@ class TestCliAdd:
 
             tap_gitlab = project.plugins.find_plugin(
                 "tap-gitlab",
-                PluginType.EXTRACTORS,
+                plugin_type=PluginType.EXTRACTORS,
             )
             assert tap_gitlab
             tap_adwords = project.plugins.find_plugin(
                 "tap-adwords",
-                PluginType.EXTRACTORS,
+                plugin_type=PluginType.EXTRACTORS,
             )
             assert tap_adwords
             tap_facebook = project.plugins.find_plugin(
                 "tap-facebook",
-                PluginType.EXTRACTORS,
+                plugin_type=PluginType.EXTRACTORS,
             )
             assert tap_facebook
 
@@ -213,7 +217,10 @@ class TestCliAdd:
         assert_cli_runner(result)
 
         # Plugin has been added to meltano.yml
-        plugin = project.plugins.find_plugin("airflow", PluginType.FILES)
+        plugin = project.plugins.find_plugin(
+            "airflow",
+            plugin_type=PluginType.FILES,
+        )
         assert plugin
 
         # Automatic updating is enabled
@@ -239,7 +246,10 @@ class TestCliAdd:
 
         # Plugin has not been added to meltano.yml
         with pytest.raises(PluginNotFoundError):
-            project.plugins.find_plugin("docker-compose", PluginType.FILES)
+            project.plugins.find_plugin(
+                "docker-compose",
+                plugin_type=PluginType.FILES,
+            )
 
         # File has been created
         assert "Created docker-compose.yml" in output
@@ -278,7 +288,10 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
-            project.plugins.find_plugin("tap-unknown", PluginType.EXTRACTORS)
+            project.plugins.find_plugin(
+                "tap-unknown",
+                plugin_type=PluginType.EXTRACTORS,
+            )
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project: Project, cli_runner) -> None:
@@ -291,7 +304,10 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginNotFoundError):
-            project.plugins.find_plugin("tap-mock", PluginType.EXTRACTORS)
+            project.plugins.find_plugin(
+                "tap-mock",
+                plugin_type=PluginType.EXTRACTORS,
+            )
 
     def test_add_variant(self, project: Project, cli_runner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
@@ -309,8 +325,8 @@ class TestCliAdd:
             assert_cli_runner(res)
 
             plugin = project.plugins.find_plugin(
+                "mapper-mock",
                 plugin_type=PluginType.MAPPERS,
-                plugin_name="mapper-mock",
             )
             assert plugin.variant == "alternative"
 
@@ -539,7 +555,7 @@ class TestCliAdd:
                         os.linesep,  # default executable
                         os.linesep,  # default capabilities
                         os.linesep,  # default settings
-                    ]
+                    ],
                 ),
             )
             assert_cli_runner(res)
@@ -607,7 +623,10 @@ class TestCliAdd:
                 assert res.exit_code == 0, res.stdout
                 assert f"Added {plugin_type.descriptor} '{plugin_name}'" in res.stdout
 
-                plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+                plugin = project.plugins.find_plugin(
+                    plugin_name,
+                    plugin_type=plugin_type,
+                )
                 assert plugin
                 assert plugin.variant == default_variant
 
@@ -687,7 +706,10 @@ class TestCliAdd:
 
         assert f"Added {plugin_type.singular} '{plugin_name}'" in res.output
 
-        plugin = project.plugins.find_plugin(plugin_name, plugin_type)
+        plugin = project.plugins.find_plugin(
+            plugin_name,
+            plugin_type=plugin_type,
+        )
         assert plugin.name == plugin_name
         assert plugin.variant == "test"
 
@@ -811,7 +833,7 @@ class TestCliAdd:
             )
             tap_gitlab = project.plugins.find_plugin(
                 "tap-gitlab",
-                PluginType.EXTRACTORS,
+                plugin_type=PluginType.EXTRACTORS,
             )
 
         assert_cli_runner(res)
@@ -846,6 +868,7 @@ class TestCliAdd:
         assert res.exception
         assert str(res.exception) == "Extractor 'tap-mock' is not known to Meltano"
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_lockfile_exists(self, cli_runner) -> None:
         plugins_dir = Path("plugins/utilities")
         plugins_dir.mkdir(parents=True, exist_ok=True)
@@ -867,3 +890,75 @@ class TestCliAdd:
             assert res.exit_code == 0, res.stdout
             assert "Plugin definition is already locked at" in res.stdout
             assert "You can remove the file manually" in res.stdout
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_multiple_no_plugin_type(self, project: Project, cli_runner) -> None:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "tap-mock",
+                    "target-mock",
+                    "utility-mock",
+                ],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock'" in res.stdout
+            assert "Added loader 'target-mock'" in res.stdout
+            assert "Added utility 'utility-mock'" in res.stdout
+
+            tap_mock = project.plugins.find_plugin(
+                "tap-mock",
+                plugin_type=PluginType.EXTRACTORS,
+            )
+            assert tap_mock
+            target_mock = project.plugins.find_plugin(
+                "target-mock",
+                plugin_type=PluginType.LOADERS,
+            )
+            assert target_mock
+            utility_mock = project.plugins.find_plugin(
+                "utility-mock",
+                plugin_type=PluginType.UTILITIES,
+            )
+            assert utility_mock
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap_mock, target_mock, utility_mock],
+                reason=PluginInstallReason.ADD,
+                force=False,
+            )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_with_explicit_plugin_type(
+        self,
+        project: Project,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
+            install_plugin_mock.return_value = True
+            res = cli_runner.invoke(
+                cli,
+                [
+                    "add",
+                    "--plugin-type",
+                    "extractors",
+                    "tap-mock",
+                ],
+            )
+            assert res.exit_code == 0, res.stdout
+            assert "Added extractor 'tap-mock'" in res.stdout
+
+            tap_mock = project.plugins.find_plugin(
+                "tap-mock",
+                plugin_type=PluginType.EXTRACTORS,
+            )
+            assert tap_mock
+            install_plugin_mock.assert_called_once_with(
+                project,
+                [tap_mock],
+                reason=PluginInstallReason.ADD,
+                force=False,
+            )

@@ -59,7 +59,7 @@ class TestAirflow:
                 writer.seek(0)
 
                 handle_mock.communicate = AsyncMock(
-                    return_value=(writer.read().encode(), None)
+                    return_value=(writer.read().encode(), None),
                 )
             # check version
             elif "version" in popen_args:

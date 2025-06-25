@@ -266,6 +266,7 @@ class Variant(NameEq, Canonical):
     def __init__(
         self,
         name: str | None = None,
+        *,
         original: bool | None = None,
         deprecated: bool | None = None,
         docs: str | None = None,
