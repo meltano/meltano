@@ -605,7 +605,7 @@ meltano el <extractor> <loader> [--state-id TEXT]
 
 - A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
 
-- A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `merge` and `overwrite`.
+- A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`.
 
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
@@ -1081,6 +1081,7 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
 - `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`.
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
