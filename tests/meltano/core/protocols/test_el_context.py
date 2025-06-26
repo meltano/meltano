@@ -51,9 +51,13 @@ class TestELContextProtocol:
 
         with subtests.test("Refresh catalog & incremental → refresh catalog"):
             assert _(False, True).should_refresh_catalog()
+            assert _(None, True).should_refresh_catalog()
 
         with subtests.test("No refresh catalog & full refresh → refresh catalog"):
             assert _(True, False).should_refresh_catalog()
+            assert _(True, None).should_refresh_catalog()
 
         with subtests.test("No refresh catalog & incremental → use cached catalog"):
             assert not _(False, False).should_refresh_catalog()
+            assert not _(False, None).should_refresh_catalog()
+            assert not _(None, None).should_refresh_catalog()
