@@ -86,5 +86,5 @@ jobs:
         body: |
           Bump changelog for release v${{ steps.cz-bump.outputs.version }}
         branch: release/v${{ steps.cz-bump.outputs.version }}
-        base: main
         labels: release
+        assignees: "${{ github.actor }}"
