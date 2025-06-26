@@ -603,10 +603,12 @@ meltano el <extractor> <loader> [--state-id TEXT]
 - A `--state` option can be passed to manually provide a [state file](https://hub.meltano.com/singer/spec#state-files) for the extractor, as an alternative to letting state be [looked up based on the State ID](/guide/integration#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/concepts/plugins#state-extra).
 
+- A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`.
+
+- A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
+
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
-
-- A `--merge-state` flag can be passed to merge state with that of previous runs.
 
   Notes:
 
@@ -1078,7 +1080,8 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
@@ -1102,7 +1105,7 @@ meltano --environment=dev run --force tap-gitlab target-postgres tap-salesforce 
 meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-secrets target-postgres
 
 # run a pipeline, merging state with that of previous runs.
-meltano --environment=dev run --merge-state tap-gitlab target-postgres
+meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments

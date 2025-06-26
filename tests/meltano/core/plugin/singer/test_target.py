@@ -14,6 +14,8 @@ from meltano.core.state_service import StateService
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
+    from meltano.core.elt_context import ELTContextBuilder
+    from meltano.core.plugin.singer.target import SingerTarget
     from meltano.core.project_add_service import ProjectAddService
 
 
@@ -84,10 +86,10 @@ class TestSingerTarget:
     @pytest.mark.asyncio
     async def test_setup_bookmark_writer(
         self,
-        subject,
+        subject: SingerTarget,
         session,
         plugin_invoker_factory,
-        elt_context_builder,
+        elt_context_builder: ELTContextBuilder,
     ) -> None:
         job = Job(job_name="pytest_test_runner")
 
