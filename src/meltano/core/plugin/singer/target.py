@@ -179,7 +179,7 @@ class SingerTarget(SingerPlugin):
 
         payload_flag = (
             Payload.INCOMPLETE_STATE
-            if elt_context.incomplete_state()
+            if elt_context.should_merge_states()
             else Payload.STATE
         )
 

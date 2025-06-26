@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import typing as t
 
+from meltano.core._protocols.el_context import ELContextProtocol
 from meltano.core._state import StateStrategy
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
@@ -84,7 +85,7 @@ class PluginContext(t.NamedTuple):
         return {**self.plugin.info_env, **self.config_env()}
 
 
-class ELTContext:
+class ELTContext(ELContextProtocol):
     """ELT Context."""
 
     def __init__(
@@ -161,12 +162,6 @@ class ELTContext:
             return self.project.job_dir(self.job.job_name, str(self.job.run_id))
 
         return None
-
-    def incomplete_state(self) -> bool:
-        """Check whether the state is incomplete and should be merged."""
-        return (
-            self.full_refresh is True and len(self.select_filter) > 0
-        ) or self.state_strategy is StateStrategy.MERGE
 
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.

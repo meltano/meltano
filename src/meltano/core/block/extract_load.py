@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager, closing
 
 import structlog
 
+from meltano.core._protocols.el_context import ELContextProtocol
 from meltano.core._state import StateStrategy
 from meltano.core.constants import STATE_ID_COMPONENT_DELIMITER
 from meltano.core.db import project_engine
@@ -45,7 +46,7 @@ class BlockSetHasNoStateError(Exception):
     """Block has no state."""
 
 
-class ELBContext:
+class ELBContext(ELContextProtocol):
     """ELBContext holds the context for ELB BlockSets."""
 
     def __init__(
@@ -96,12 +97,6 @@ class ELBContext:
         self.catalog = None
 
         self.base_output_logger = base_output_logger
-
-    def incomplete_state(self) -> bool:
-        """Check whether the state is incomplete and should be merged."""
-        return (
-            self.full_refresh is True and len(self.select_filter) > 0
-        ) or self.state_strategy is StateStrategy.MERGE
 
 
 class ELBContextBuilder:
