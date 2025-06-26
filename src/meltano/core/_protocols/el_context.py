@@ -16,4 +16,4 @@ class ELContextProtocol(t.Protocol):
         """Check whether the EL state is incomplete and should be merged."""
         return (
             self.full_refresh is True and len(self.select_filter) > 0
-        ) or self.state_strategy is StateStrategy.MERGE
+        ) or self.state_strategy == StateStrategy.MERGE
