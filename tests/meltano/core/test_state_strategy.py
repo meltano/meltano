@@ -7,6 +7,7 @@ from meltano.core._state import StateStrategy
 
 
 class TestStateStrategy:
+    # TODO: Remove this test once we remove the `--merge-state` CLI flag
     def test_state_strategy_from_cli_args(self):
         assert (
             StateStrategy.from_cli_args(

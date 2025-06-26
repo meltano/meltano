@@ -401,13 +401,12 @@ def _elt_context_builder(
     dry_run: bool = False,
     full_refresh: bool = False,
     refresh_catalog: bool = False,
-    select_filter: list[str] | None = None,
+    select_filter: list[str],
     catalog: str | None = None,
     state: str | None = None,
     state_strategy: StateStrategy,
     run_id: uuid.UUID | None = None,
 ) -> ELTContextBuilder:
-    select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
         transform_name = _find_transform_for_extractor(project, extractor)

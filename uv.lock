@@ -1380,7 +1380,6 @@ dev = [
     { name = "pytest-order" },
     { name = "pytest-randomly" },
     { name = "pytest-structlog" },
-    { name = "pytest-subtests" },
     { name = "pytest-xdist" },
     { name = "requests-mock" },
     { name = "setproctitle" },
@@ -1408,7 +1407,6 @@ testing = [
     { name = "pytest-order" },
     { name = "pytest-randomly" },
     { name = "pytest-structlog" },
-    { name = "pytest-subtests" },
     { name = "pytest-xdist" },
     { name = "requests-mock" },
     { name = "setproctitle" },
@@ -1488,7 +1486,6 @@ dev = [
     { name = "pytest-order", specifier = "~=1.3" },
     { name = "pytest-randomly", specifier = "~=3.16" },
     { name = "pytest-structlog", specifier = "~=1.1" },
-    { name = "pytest-subtests", specifier = ">=0.14.2" },
     { name = "pytest-xdist", specifier = "~=3.6" },
     { name = "requests-mock", specifier = ">=1.12.1,<2" },
     { name = "setproctitle", specifier = "~=1.3" },
@@ -1513,7 +1510,6 @@ testing = [
     { name = "pytest-order", specifier = "~=1.3" },
     { name = "pytest-randomly", specifier = "~=3.16" },
     { name = "pytest-structlog", specifier = "~=1.1" },
-    { name = "pytest-subtests", specifier = ">=0.14.2" },
     { name = "pytest-xdist", specifier = "~=3.6" },
     { name = "requests-mock", specifier = ">=1.12.1,<2" },
     { name = "setproctitle", specifier = "~=1.3" },
@@ -2400,19 +2396,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/96/7c/3fb89ed643578c60f5d7192614f7feaf0dbc4a1cb4c786885b12672fed1f/pytest_structlog-1.1.tar.gz", hash = "sha256:440123b0a7f93482383995b3fb796ed8c1b9a37edf405683a34774993ef09543", size = 12642, upload-time = "2024-07-25T02:55:32.001Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/13/6d0e43e1f322f7b965a0e094754b66b76a137a86ab9bb1f2c1498efdc4e3/pytest_structlog-1.1-py3-none-any.whl", hash = "sha256:928475948f886bc027f1550dccb892fb46bfb8bb1ddb0c44ab4fa3c5b3f3079a", size = 8520, upload-time = "2024-07-25T02:55:30.481Z" },
-]
-
-[[package]]
-name = "pytest-subtests"
-version = "0.14.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "attrs" },
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/59/30/6ec8dfc678ddfd1c294212bbd7088c52d3f7fbf3f05e6d8a440c13b9741a/pytest_subtests-0.14.2.tar.gz", hash = "sha256:7154a8665fd528ee70a76d00216a44d139dc3c9c83521a0f779f7b0ad4f800de", size = 18083, upload-time = "2025-06-13T10:50:01.636Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/47/d4/9bf12e59fb882b0cf4f993871e1adbee094802224c429b00861acee1a169/pytest_subtests-0.14.2-py3-none-any.whl", hash = "sha256:8da0787c994ab372a13a0ad7d390533ad2e4385cac167b3ac501258c885d0b66", size = 9115, upload-time = "2025-06-13T10:50:00.543Z" },
 ]
 
 [[package]]

@@ -603,14 +603,12 @@ meltano el <extractor> <loader> [--state-id TEXT]
 - A `--state` option can be passed to manually provide a [state file](https://hub.meltano.com/singer/spec#state-files) for the extractor, as an alternative to letting state be [looked up based on the State ID](/guide/integration#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/concepts/plugins#state-extra).
 
-- One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
-  Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
-
-- A `--merge-state` flag can be passed to merge state with that of previous runs. DEPRECATED: Use `--state-strategy=merge` instead.
+- A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
 
 - A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `merge` and `overwrite`.
-  This is equivalent to setting the [`state_strategy` extractor extra](/concepts/plugins#state-strategy-extra).
-  The default is `overwrite`.
+
+- One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
+  Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
 
   Notes:
 

@@ -26,9 +26,9 @@ class StateStrategy(StrEnum):
         merge_state: bool,
         state_strategy: str | None,
     ) -> StateStrategy:
-        import click
-
         if merge_state and state_strategy is not None:
+            import click
+
             msg = "Cannot use both --merge-state and --state-strategy"
             raise click.UsageError(msg)
 

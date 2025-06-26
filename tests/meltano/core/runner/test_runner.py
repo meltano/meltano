@@ -163,67 +163,19 @@ class TestSingerRunner:
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         (
-            "full_refresh",
             "state_strategy",
-            "select_filter",
             "payload_flag",
         ),
         (
             pytest.param(
-                False,
+                StateStrategy.MERGE,
+                Payload.INCOMPLETE_STATE,
+                id="merge--incomplete-state",
+            ),
+            pytest.param(
                 StateStrategy.OVERWRITE,
-                [],
                 Payload.STATE,
-                id="incremental-overwrite-no-select--complete-state",
-            ),
-            pytest.param(
-                True,
-                StateStrategy.OVERWRITE,
-                [],
-                Payload.STATE,
-                id="full-refresh-overwrite-no-select--complete-state",
-            ),
-            pytest.param(
-                False,
-                StateStrategy.OVERWRITE,
-                ["entity"],
-                Payload.STATE,
-                id="incremental-overwrite-select--complete-state",
-            ),
-            pytest.param(
-                True,
-                StateStrategy.OVERWRITE,
-                ["entity"],
-                Payload.INCOMPLETE_STATE,
-                id="full-refresh-overwrite-select--incomplete-state",
-            ),
-            pytest.param(
-                False,
-                StateStrategy.MERGE,
-                [],
-                Payload.INCOMPLETE_STATE,
-                id="incremental-merge-no-select--incomplete-state",
-            ),
-            pytest.param(
-                True,
-                StateStrategy.MERGE,
-                [],
-                Payload.INCOMPLETE_STATE,
-                id="full-refresh-merge-no-select--incomplete-state",
-            ),
-            pytest.param(
-                False,
-                StateStrategy.MERGE,
-                ["entity"],
-                Payload.INCOMPLETE_STATE,
-                id="incremental-merge-select--incomplete-state",
-            ),
-            pytest.param(
-                True,
-                StateStrategy.MERGE,
-                ["entity"],
-                Payload.INCOMPLETE_STATE,
-                id="full-refresh-merge-select--incomplete-state",
+                id="overwrite--complete-state",
             ),
         ),
     )
@@ -235,8 +187,6 @@ class TestSingerRunner:
         target_config_dir,
         target_process,
         plugin_invoker_factory,
-        full_refresh,
-        select_filter,
         payload_flag,
         elt_context,
         state_strategy,
@@ -249,8 +199,6 @@ class TestSingerRunner:
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
         target_process.stdout.readline = AsyncMock(side_effect=lines)
 
-        subject.context.full_refresh = full_refresh
-        subject.context.select_filter = select_filter
         subject.context.state_strategy = state_strategy
 
         target_invoker = plugin_invoker_factory(
