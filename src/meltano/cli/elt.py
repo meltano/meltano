@@ -113,6 +113,15 @@ class ELOptions:
         "--merge-state",
         is_flag=True,
         help="Merges state with that of previous runs.",
+        hidden=True,
+    )
+    state_strategy = click.option(
+        "--state-strategy",
+        # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and
+        # use click 8.2+ exclusively
+        type=click.Choice([strategy.value for strategy in StateStrategy]),
+        help="Strategy to use for state updates.",
+        default=None,  # TODO: Default to MERGE after a deprecation period
     )
     run_id = click.option(
         "--run-id",
@@ -139,6 +148,7 @@ class ELOptions:
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@ELOptions.state_strategy
 @install
 @no_install
 @only_install
@@ -163,6 +173,7 @@ async def el(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str | None,
     run_id: uuid.UUID | None,
     install_plugins: InstallPlugins,
 ) -> None:
@@ -193,6 +204,7 @@ async def el(  # WPS408
         state_id=state_id,
         force=force,
         merge_state=merge_state,
+        state_strategy=state_strategy,
         install_plugins=install_plugins,
         run_id=run_id,
     )
@@ -217,6 +229,7 @@ async def el(  # WPS408
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@ELOptions.state_strategy
 @install
 @no_install
 @only_install
@@ -242,6 +255,7 @@ async def elt(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str | None,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
@@ -273,6 +287,7 @@ async def elt(  # WPS408
         state_id=state_id,
         force=force,
         merge_state=merge_state,
+        state_strategy=state_strategy,
         install_plugins=install_plugins,
         run_id=run_id,
     )
@@ -296,6 +311,7 @@ async def _run_el_command(
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str | None,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
@@ -320,7 +336,10 @@ async def _run_el_command(
     run_id = run_id or uuid.uuid4()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
-    state_strategy = StateStrategy.MERGE if merge_state else StateStrategy.OVERWRITE
+    _state_strategy = StateStrategy.from_cli_args(
+        merge_state=merge_state,
+        state_strategy=state_strategy,
+    )
 
     job = Job(
         job_name=state_id
@@ -346,7 +365,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            state_strategy=state_strategy,
+            state_strategy=_state_strategy,
             run_id=run_id,
         )
 

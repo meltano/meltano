@@ -85,6 +85,15 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     "--merge-state",
     is_flag=True,
     help="Merges state with that of previous runs.",
+    hidden=True,
+)
+@click.option(
+    "--state-strategy",
+    # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and use
+    # click 8.2+ exclusively
+    type=click.Choice([strategy.value for strategy in StateStrategy]),
+    default=None,  # TODO: Default to MERGE after a deprecation period
+    help="Strategy to use for state updates.",
 )
 @click.option(
     "--run-id",
@@ -112,6 +121,7 @@ async def run(
     force: bool,
     state_id_suffix: str,
     merge_state: bool,
+    state_strategy: str | None,
     run_id: uuid.UUID | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
@@ -149,7 +159,10 @@ async def run(
 
     tracker: Tracker = ctx.obj["tracker"]
 
-    state_strategy = StateStrategy.MERGE if merge_state else StateStrategy.OVERWRITE
+    _state_strategy = StateStrategy.from_cli_args(
+        merge_state=merge_state,
+        state_strategy=state_strategy,
+    )
 
     try:
         parser = BlockParser(
@@ -161,7 +174,7 @@ async def run(
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,
-            state_strategy=state_strategy,
+            state_strategy=_state_strategy,
             run_id=run_id,
         )
         parsed_blocks = list(parser.find_blocks(0))

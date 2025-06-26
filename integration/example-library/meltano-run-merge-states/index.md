@@ -24,7 +24,7 @@ Run a 'full refresh' pipeline of a single stream.
 ```shell
 TAP_WITH_STATE_TS='2023-01-01T01:00:00+00:00' \
 TAP_WITH_STATE__SELECT_FILTER='["stream_1"]' \
-meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=no-merge
+meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=no-merge --state-strategy=overwrite
 ```
 
 Note that the state will only contain the bookmark for `stream_1`.
@@ -61,7 +61,7 @@ Run a 'full refresh' pipeline of a single stream, but merge the current pipeline
 ```shell
 TAP_WITH_STATE_TS='2023-01-01T01:00:00+00:00' \
 TAP_WITH_STATE__SELECT_FILTER='["stream_1"]' \
-meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=merge --merge-state
+meltano run tap-with-state target-jsonl --full-refresh --state-id-suffix=merge --state-strategy=merge
 ```
 
 Note that the state will now contain both the new bookmark for `stream_1` and the old bookmarks for the other streams.

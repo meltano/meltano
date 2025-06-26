@@ -606,7 +606,11 @@ meltano el <extractor> <loader> [--state-id TEXT]
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
 
-- A `--merge-state` flag can be passed to merge state with that of previous runs.
+- A `--merge-state` flag can be passed to merge state with that of previous runs. DEPRECATED: Use `--state-strategy=merge` instead.
+
+- A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `merge` and `overwrite`.
+  This is equivalent to setting the [`state_strategy` extractor extra](/concepts/plugins#state-strategy-extra).
+  The default is `overwrite`.
 
   Notes:
 

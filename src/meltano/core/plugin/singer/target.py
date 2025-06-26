@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 
 from structlog.stdlib import get_logger
 
-from meltano.core._state import StateStrategy
 from meltano.core.behavior.hookable import hook
 from meltano.core.job import Job, Payload
 from meltano.core.setting_definition import SettingDefinition
@@ -178,10 +177,11 @@ class SingerTarget(SingerPlugin):
         if not elt_context or not elt_context.job or not elt_context.session:
             return
 
-        incomplete_state = (
-            elt_context.full_refresh and elt_context.select_filter
-        ) or elt_context.state_strategy is StateStrategy.MERGE
-        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
+        payload_flag = (
+            Payload.INCOMPLETE_STATE
+            if elt_context.incomplete_state()
+            else Payload.STATE
+        )
 
         plugin_invoker.add_output_handler(
             plugin_invoker.StdioSource.STDOUT,

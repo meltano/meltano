@@ -97,6 +97,12 @@ class ELBContext:
 
         self.base_output_logger = base_output_logger
 
+    def incomplete_state(self) -> bool:
+        """Check whether the state is incomplete and should be merged."""
+        return (
+            self.full_refresh is True and len(self.select_filter) > 0
+        ) or self.state_strategy is StateStrategy.MERGE
+
 
 class ELBContextBuilder:
     """Build up ELBContexts for ExtractLoadBlocks."""

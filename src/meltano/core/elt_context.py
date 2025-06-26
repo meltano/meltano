@@ -162,6 +162,12 @@ class ELTContext:
 
         return None
 
+    def incomplete_state(self) -> bool:
+        """Check whether the state is incomplete and should be merged."""
+        return (
+            self.full_refresh is True and len(self.select_filter) > 0
+        ) or self.state_strategy is StateStrategy.MERGE
+
     def invoker_for(self, plugin_type: PluginType) -> PluginInvoker:
         """Get invoker for given plugin type.
 

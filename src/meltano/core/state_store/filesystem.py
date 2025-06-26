@@ -312,7 +312,7 @@ class BaseFilesystemStateStoreManager(StateStoreManager):
                 return MeltanoState.from_file(state_id, reader)
         except Exception as e:
             if self.is_file_not_found_error(e):
-                logger.info("No state found for {%s.", state_id)
+                logger.info("No state found for %s.", state_id)
                 return None
             raise e
 
