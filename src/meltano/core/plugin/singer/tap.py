@@ -397,7 +397,7 @@ class SingerTap(SingerPlugin):
             return catalog_path
 
         use_cached_catalog = (
-            not (elt_context and elt_context.refresh_catalog)
+            not (elt_context and elt_context.should_refresh_catalog())
             and plugin_invoker.plugin_config_extras["_use_cached_catalog"]
         )
 
