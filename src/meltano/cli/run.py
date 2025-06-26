@@ -92,7 +92,7 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and use
     # click 8.2+ exclusively
     type=click.Choice([strategy.value for strategy in StateStrategy]),
-    default=None,  # TODO: Default to MERGE after a deprecation period
+    default=StateStrategy.AUTO.value,
     help="Strategy to use for state updates.",
 )
 @click.option(
@@ -121,7 +121,7 @@ async def run(
     force: bool,
     state_id_suffix: str,
     merge_state: bool,
-    state_strategy: str | None,
+    state_strategy: str,
     run_id: uuid.UUID | None,
     blocks: list[str],
     install_plugins: InstallPlugins,

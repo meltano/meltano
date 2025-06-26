@@ -16,6 +16,7 @@ logger = structlog.stdlib.get_logger()
 class StateStrategy(StrEnum):
     """Strategy to use for state management."""
 
+    AUTO = enum.auto()
     MERGE = enum.auto()
     OVERWRITE = enum.auto()
 
@@ -24,9 +25,9 @@ class StateStrategy(StrEnum):
         cls,
         *,
         merge_state: bool,
-        state_strategy: str | None,
+        state_strategy: str,
     ) -> StateStrategy:
-        if merge_state and state_strategy is not None:
+        if merge_state and state_strategy != StateStrategy.AUTO.value:
             import click
 
             msg = "Cannot use both --merge-state and --state-strategy"
@@ -38,12 +39,5 @@ class StateStrategy(StrEnum):
                 "future version. Use --state-strategy=merge instead.",
             )
             return StateStrategy.MERGE
-
-        if state_strategy is None:
-            logger.warning(
-                "No --state-strategy provided, defaulting to 'overwrite'. This will be "
-                "changed to 'merge' in a future version.",
-            )
-            return StateStrategy.OVERWRITE
 
         return StateStrategy(state_strategy)

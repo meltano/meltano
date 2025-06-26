@@ -121,7 +121,7 @@ class ELOptions:
         # use click 8.2+ exclusively
         type=click.Choice([strategy.value for strategy in StateStrategy]),
         help="Strategy to use for state updates.",
-        default=None,  # TODO: Default to MERGE after a deprecation period
+        default=StateStrategy.AUTO.value,
     )
     run_id = click.option(
         "--run-id",
@@ -173,7 +173,7 @@ async def el(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
-    state_strategy: str | None,
+    state_strategy: str,
     run_id: uuid.UUID | None,
     install_plugins: InstallPlugins,
 ) -> None:
@@ -255,7 +255,7 @@ async def elt(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
-    state_strategy: str | None,
+    state_strategy: str,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
@@ -311,7 +311,7 @@ async def _run_el_command(
     state_id: str | None,
     force: bool,
     merge_state: bool,
-    state_strategy: str | None,
+    state_strategy: str,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:

@@ -163,19 +163,46 @@ class TestSingerRunner:
     @pytest.mark.asyncio
     @pytest.mark.parametrize(
         (
+            "full_refresh",
             "state_strategy",
             "payload_flag",
         ),
         (
             pytest.param(
-                StateStrategy.MERGE,
+                True,
+                StateStrategy.AUTO,
                 Payload.INCOMPLETE_STATE,
-                id="merge--incomplete-state",
+                id="full-refresh-auto--incomplete-state",
             ),
             pytest.param(
+                False,
+                StateStrategy.AUTO,
+                Payload.STATE,
+                id="incremental-auto--complete-state",
+            ),
+            pytest.param(
+                True,
                 StateStrategy.OVERWRITE,
                 Payload.STATE,
-                id="overwrite--complete-state",
+                id="full-refresh-overwrite--complete-state",
+            ),
+            pytest.param(
+                False,
+                StateStrategy.OVERWRITE,
+                Payload.STATE,
+                id="incremental-overwrite--complete-state",
+            ),
+            pytest.param(
+                True,
+                StateStrategy.MERGE,
+                Payload.INCOMPLETE_STATE,
+                id="full-refresh-merge--incomplete-state",
+            ),
+            pytest.param(
+                False,
+                StateStrategy.MERGE,
+                Payload.INCOMPLETE_STATE,
+                id="incremental-merge--incomplete-state",
             ),
         ),
     )
@@ -187,6 +214,7 @@ class TestSingerRunner:
         target_config_dir,
         target_process,
         plugin_invoker_factory,
+        full_refresh,
         payload_flag,
         elt_context,
         state_strategy,
@@ -199,6 +227,7 @@ class TestSingerRunner:
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
         target_process.stdout.readline = AsyncMock(side_effect=lines)
 
+        subject.context.full_refresh = full_refresh
         subject.context.state_strategy = state_strategy
 
         target_invoker = plugin_invoker_factory(

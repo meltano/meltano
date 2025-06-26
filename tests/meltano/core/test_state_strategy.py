@@ -12,7 +12,7 @@ class TestStateStrategy:
         assert (
             StateStrategy.from_cli_args(
                 merge_state=True,
-                state_strategy=None,
+                state_strategy=StateStrategy.AUTO.value,
             )
             is StateStrategy.MERGE
         )
@@ -20,9 +20,9 @@ class TestStateStrategy:
         assert (
             StateStrategy.from_cli_args(
                 merge_state=False,
-                state_strategy=None,
+                state_strategy=StateStrategy.AUTO.value,
             )
-            is StateStrategy.OVERWRITE
+            is StateStrategy.AUTO
         )
 
         assert (
