@@ -32,16 +32,41 @@ refer to the ["Plugin inheritance" section](#plugin-inheritance).
 ### Discoverable plugins
 
 [Discoverable plugins](/concepts/plugins#discoverable-plugins) can be added to your project by simply providing
-[`meltano add`](/reference/command-line-interface#add) with their [type](/concepts/plugins#types) and name:
+[`meltano add`](/reference/command-line-interface#add) with their name. Meltano will automatically detect the plugin type:
 
 ```bash
+# Simplified syntax - plugin type is automatically detected
+meltano add <name>
+
+# For example:
+meltano add tap-gitlab        # Automatically detected as extractor
+meltano add target-postgres   # Automatically detected as loader
+meltano add dbt-snowflake     # Automatically detected as utility
+meltano add airflow           # Automatically detected as utility
+```
+
+You can explicitly specify the plugin type for disambiguation when needed:
+
+```bash
+# Explicit plugin type specification
+meltano add --plugin-type <type> <name>
+
+# For example:
+meltano add --plugin-type extractor tap-gitlab
+meltano add --plugin-type loader target-postgres
+meltano add --plugin-type utility dbt-snowflake
+meltano add --plugin-type utility airflow
+```
+
+The original positional syntax is still supported but deprecated:
+
+```bash
+# Deprecated syntax (will be removed in v4)
 meltano add <type> <name>
 
 # For example:
-meltano add extractor tap-gitlab
+meltano add extractor tap-gitlab  # Will show deprecation warning
 meltano add loader target-postgres
-meltano add utility dbt-snowflake
-meltano add utility airflow
 ```
 
 This will add a [shadowing plugin definition](/concepts/project#shadowing-plugin-definitions) to your [`meltano.yml` project file](/concepts/project#plugins) under the `plugins` property, inside an array named after the plugin type:
@@ -92,9 +117,16 @@ If multiple [variants](/concepts/plugins#variants) of a discoverable plugin are 
 you can choose a specific (non-default) variant using the `--variant` option on [`meltano add`](/reference/command-line-interface#add):
 
 ```bash
-meltano add <type> <name> --variant <variant>
+# With automatic type detection
+meltano add <name> --variant <variant>
 
 # For example:
+meltano add target-postgres --variant=transferwise  # Type automatically detected as loader
+
+# With explicit type specification for disambiguation
+meltano add --plugin-type loader target-postgres --variant=transferwise
+
+# Deprecated positional syntax
 meltano add loader target-postgres --variant=transferwise
 ```
 
@@ -124,6 +156,17 @@ you can use the `--inherit-from` (or `--as`) option on [`meltano add`](/referenc
 to explicitly inherit from the discoverable plugin instead:
 
 ```bash
+# With automatic type detection
+meltano add <name> --inherit-from <discoverable-name>
+# Or equivalently:
+meltano add <discoverable-name> --as <name>
+
+# With explicit type specification for disambiguation
+meltano add --plugin-type <type> <name> --inherit-from <discoverable-name>
+# Or equivalently:
+meltano add --plugin-type <type> <discoverable-name> --as <name>
+
+# Deprecated positional syntax
 meltano add <type> <name> --inherit-from <discoverable-name>
 # Or equivalently:
 meltano add <type> <discoverable-name> --as <name>

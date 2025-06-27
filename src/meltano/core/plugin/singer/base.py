@@ -64,7 +64,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         return {
             "SINGER_SDK_LOG_CONFIG": str(plugin_invoker.files["singer_sdk_logging"]),
             "LOGGING_CONF_FILE": str(
-                plugin_invoker.files["pipelinewise_singer_logging"]
+                plugin_invoker.files["pipelinewise_singer_logging"],
             ),
         }
 
@@ -93,7 +93,7 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     async def setup_logging_hook(
         self,
         plugin_invoker: PluginInvoker,
-        exec_args: tuple[str, ...] = (),
+        exec_args: tuple[str, ...] = (),  # noqa: ARG002
     ) -> None:
         """Set up logging before invoking tap.
 
@@ -104,9 +104,6 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         Returns:
             None
         """
-        if exec_args:
-            return
-
         singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
         pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
 

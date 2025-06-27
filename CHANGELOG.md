@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.7.9 (2025-06-26)
+
+### 🐛 Fixes
+
+- [#9331](https://github.com/meltano/meltano/issues/9331) Create Singer logging config regardless of any arguments passed to `meltano invoke <plugin> ...` (backport of #9330)
+
+## v3.7.8 (2025-06-05)
+
+### 🐛 Fixes
+
+- [#9300](https://github.com/meltano/meltano/issues/9300) Do not try to cast expandable inherited settings
+
 ## v3.7.7 (2025-05-29)
 
 ### 🐛 Fixes

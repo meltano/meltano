@@ -14,9 +14,6 @@ if t.TYPE_CHECKING:
     from meltano.core.setting_definition import EnvVar, SettingDefinition
 
 
-_T = t.TypeVar("_T", bound="PluginSettingsService")
-
-
 class PluginSettingsService(SettingsService):
     """Settings manager for Meltano plugins."""
 
@@ -212,7 +209,7 @@ class PluginSettingsService(SettingsService):
         self.project.plugins.update_environment_plugin(self.environment_plugin_config)
 
     @cached_property
-    def inherited_settings_service(self: _T) -> _T | None:
+    def inherited_settings_service(self) -> PluginSettingsService | None:
         """Return settings service to inherit configuration from.
 
         Returns:

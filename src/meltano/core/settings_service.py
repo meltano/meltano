@@ -205,6 +205,7 @@ class SettingsService(metaclass=ABCMeta):
 
     def config_with_metadata(
         self,
+        *,
         prefix: str | None = None,
         extras: bool | None = None,
         source: SettingValueStore = SettingValueStore.AUTO,
@@ -417,10 +418,13 @@ class SettingsService(metaclass=ABCMeta):
                     value = object_value  # type: ignore[assignment]
                     metadata["source"] = object_source
 
-            cast_value = setting_def.cast_value(value)
-            if cast_value != value:
-                metadata["uncast_value"] = value
-                value = cast_value
+            # Only cast if the setting is not expandable,
+            # since we can't cast e.g. $PORT to an integer
+            if not metadata.get("expandable", False):
+                cast_value = setting_def.cast_value(value)
+                if cast_value != value:
+                    metadata["uncast_value"] = value
+                    value = cast_value
 
             # we don't want to leak secure informations
             # so we redact all `passwords`
@@ -475,6 +479,7 @@ class SettingsService(metaclass=ABCMeta):
         store: SettingValueStore = SettingValueStore.AUTO,
         *,
         redacted_value: str = REDACTED_VALUE,
+        cast_value: bool = True,
         **kwargs: t.Any,
     ) -> tuple[t.Any, dict[str, t.Any]]:
         """Set the value and metadata for a setting.
@@ -484,6 +489,7 @@ class SettingsService(metaclass=ABCMeta):
             value: the value to set the setting to
             store: the store to set the value in
             redacted_value: the value to use when redacting the setting
+            cast_value: Whether to cast the setting value to its expected type
             **kwargs: additional keyword args to pass during
                 `SettingsStoreManager` instantiation
 
@@ -514,11 +520,11 @@ class SettingsService(metaclass=ABCMeta):
             metadata["redacted"] = True
             return None, metadata
 
-        if setting_def:
-            cast_value = setting_def.cast_value(value)
-            if cast_value != value:
+        if setting_def and cast_value:
+            new_value = setting_def.cast_value(value)
+            if new_value != value:
                 metadata["uncast_value"] = value
-                value = cast_value
+                value = new_value
 
         metadata.update(
             store.manager(self, **kwargs).set(
@@ -604,7 +610,7 @@ class SettingsService(metaclass=ABCMeta):
         self.log(f"Reset settings with metadata: {metadata}")
         return metadata
 
-    def definitions(self, extras: bool | None = None) -> Iterable[SettingDefinition]:
+    def definitions(self, *, extras: bool | None = None) -> Iterable[SettingDefinition]:
         """Return setting definitions along with extras.
 
         Args:

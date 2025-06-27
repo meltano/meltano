@@ -265,7 +265,7 @@ def to_env_var(*xs: str) -> str:
         >>> to_env_var("foo.bar")
         'FOO_BAR'
     """
-    return "_".join(re.sub("[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
+    return "_".join(re.sub(r"[^A-Za-z0-9]", "_", x).upper() for x in xs if x)
 
 
 def flatten(d: dict, reducer: str | Callable = "tuple", **kwargs):  # noqa: ANN003, ANN201

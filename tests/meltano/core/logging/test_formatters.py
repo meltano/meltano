@@ -23,7 +23,8 @@ if t.TYPE_CHECKING:
 
 ANSI_RE = re.compile(r"\033\[[;?0-9]*[a-zA-Z]")
 ExcInfo: TypeAlias = t.Union[
-    tuple[type[BaseException], BaseException, TracebackType], tuple[None, None, None]
+    tuple[type[BaseException], BaseException, TracebackType],
+    tuple[None, None, None],
 ]
 
 
@@ -134,6 +135,19 @@ class TestLogFormatters:
         message_dict = json.loads(output)
 
         assert "exception" not in message_dict
+
+    def test_json_formatter_utc(self, record_with_exception) -> None:
+        formatter = formatters.json_formatter(utc=True)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"].endswith("Z")
+
+        formatter = formatters.json_formatter(utc=False)
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert not message_dict["timestamp"].endswith("Z")
 
     def test_json_formatter_locals(self, record_with_exception) -> None:
         formatter = formatters.json_formatter(show_locals=True)

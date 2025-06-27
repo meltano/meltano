@@ -341,8 +341,8 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "project_id",
-            uuid.uuid4(),
-            uuid.uuid4(),
+            from_value=uuid.uuid4(),
+            to_value=uuid.uuid4(),
         )
         assert passed
 

@@ -33,6 +33,8 @@ A few key points to note:
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
    - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
+
+   All formatters support a `utc` parameter (defaults to `True`) that controls whether timestamps are rendered in UTC or local time.
 2. Different loggers can use different handlers and log at different log levels.
 3. We support all the [standard python logging handlers](https://docs.python.org/3/library/logging.handlers.html#) (e.g. rotating files, syslog, etc).
 4. If a logging config file is found, it will take precedence over the `--log-format` and `--log-level` CLI options.
@@ -57,6 +59,7 @@ formatters:
     (): meltano.core.logging.console_log_formatter
     colors: true # also enables traceback formatting with `rich`
     show_locals: true # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    utc: false # use local time instead of UTC for timestamps
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
     sort_keys: false

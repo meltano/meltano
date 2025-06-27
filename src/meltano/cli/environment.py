@@ -42,7 +42,7 @@ def add(ctx: click.Context, name: str) -> None:
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
     try:
         environment = environment_service.add(name)
-    except Exception:
+    except Exception:  # pragma: no cover
         tracker.track_command_event(CliEvent.failed)
         raise
     click.echo(f"Created new environment '{environment.name}'")
@@ -58,7 +58,7 @@ def remove(ctx: click.Context, name: str) -> None:
     environment_service: EnvironmentService = ctx.obj[ENVIRONMENT_SERVICE_KEY]
     try:
         environment_name = environment_service.remove(name)
-    except Exception:
+    except Exception:  # pragma: no cover
         tracker.track_command_event(CliEvent.failed)
         raise
     click.echo(f"Removed environment '{environment_name}'")
@@ -74,7 +74,7 @@ def list_environments(ctx: click.Context) -> None:
     try:
         for environment in environment_service.list_environments():
             click.echo(environment.name)
-    except Exception:
+    except Exception:  # pragma: no cover
         tracker.track_command_event(CliEvent.failed)
         raise
     tracker.track_command_event(CliEvent.completed)
