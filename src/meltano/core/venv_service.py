@@ -741,7 +741,7 @@ class UvVenvService(VenvService):
             extract_stderr=extract_stderr,
         )
 
-    async def list_installed(self, *args: str) -> list[str]:
+    async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
         proc = await exec_async(
             self.uv,

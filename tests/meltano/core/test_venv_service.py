@@ -13,7 +13,7 @@ from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_install_service import install_pip_plugin
-from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv, find_uv
+from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -347,13 +347,7 @@ class TestUvVenvService(TestVenvService):
 
     @pytest.fixture
     def subject(self, project):
-        find_uv.cache_clear()
         return UvVenvService(project=project, namespace="namespace", name="name")
-
-    def test_find_uv_builtin(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        find_uv.cache_clear()
-        monkeypatch.setattr("uv.find_uv_bin", lambda: "/usr/bin/uv")
-        assert find_uv() == "/usr/bin/uv"
 
     @pytest.mark.asyncio
     @pytest.mark.usefixtures("project")
