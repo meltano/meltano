@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import platform
+import stat
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -92,7 +93,7 @@ class TestVenvService:
         )
         venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
         # Don't allow writing to the venv dir
-        venv_dir.chmod(0o555)
+        venv_dir.chmod(stat.S_IREAD)
 
         with pytest.raises(
             AsyncSubprocessError,
