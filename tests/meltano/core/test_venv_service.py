@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import platform
-import stat
 import sys
 import typing as t
 from asyncio.subprocess import Process
@@ -80,6 +79,10 @@ class TestVenvService:
         )
 
     @pytest.mark.asyncio
+    @pytest.mark.skipif(
+        platform.system() == "Windows",
+        reason="chmod behavior is different on Windows",
+    )
     async def test_create_venv_dir_not_writable(
         self, project: Project, request: pytest.FixtureRequest
     ) -> None:
@@ -93,7 +96,7 @@ class TestVenvService:
         )
         venv_dir = project.venvs_dir(plugin_type, plugin_name, make_dirs=True)
         # Don't allow writing to the venv dir
-        venv_dir.chmod(stat.S_IREAD)
+        venv_dir.chmod(0o555)
 
         with pytest.raises(
             AsyncSubprocessError,
