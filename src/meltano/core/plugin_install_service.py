@@ -624,14 +624,14 @@ async def install_pip_plugin(
     pip_install_args = get_pip_install_args(project, plugin, env=env)
     backend = project.settings.get("venv.backend")
 
-    if backend == "virtualenv":
+    if backend == "virtualenv":  # pragma: no cover
         service = VenvService(
             project=project,
             python=plugin.python,
             namespace=plugin.type,
             name=plugin.plugin_dir_name,
         )
-    elif backend == "uv":  # pragma: no cover
+    elif backend == "uv":
         service = UvVenvService(
             project=project,
             python=plugin.python,

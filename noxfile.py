@@ -70,6 +70,7 @@ def _run_pytest(session: nox.Session) -> None:
             "--cov=tests",
             "--durations=10",
             "--order-scope=module",
+            "--timeout=300",
             "-n=auto",
             "--dist=loadfile",
             f"--randomly-seed={random_seed}",
