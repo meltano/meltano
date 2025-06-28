@@ -114,7 +114,7 @@ class TestVenvService:
 
         # ensure that pip is the latest version
         outdated = await subject.list_installed("--outdated")
-        assert not any(dep["name"] == "pip " for dep in outdated)
+        assert not any(dep["name"] == "pip" for dep in outdated)
 
         assert subject.exec_path("some_exe").parts[-6:] == (
             ".meltano",
