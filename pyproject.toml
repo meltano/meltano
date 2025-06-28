@@ -133,6 +133,7 @@ testing = [
   "pytest-randomly~=3.16",
   "pytest-structlog~=1.1",
   "pytest-subtests>=0.14.2",
+  "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
   "setproctitle~=1.3", # Used by pytest-xdist to aid with handling resource intensive processes.
