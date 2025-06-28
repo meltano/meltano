@@ -31,21 +31,6 @@ class TestVenvService:
             self.cls(project=project)
             venv_mock.assert_called_once_with(python)
 
-    async def _check_venv_created_with_python_for_plugin(
-        self,
-        project: Project,
-        plugin: ProjectPlugin,
-        python: str | None,
-    ) -> None:
-        with (
-            mock.patch(
-                "meltano.core.venv_service._resolve_python_path",
-            ) as venv_mock,
-            mock.patch("meltano.core.venv_service.VenvService.install"),
-        ):
-            await install_pip_plugin(project=project, plugin=plugin)
-            venv_mock.assert_called_once_with(python)
-
     def assert_pip_log_file(self, service: VenvService) -> None:
         assert service.pip_log_path.exists()
         assert service.pip_log_path.is_file()
@@ -210,54 +195,55 @@ class TestVenvService:
             python="test-python-executable-plugin-level",
         )
 
-        await self._check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-plugin-level",
-        )
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.VenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with("test-python-executable-plugin-level")
 
         # Setting the project-level `python` setting should have no effect at first
         # because the plugin-level setting takes precedence.
         project.settings.set("python", "test-python-executable-project-level")
 
-        await self._check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-plugin-level",
-        )
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.VenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with("test-python-executable-plugin-level")
 
         # The project-level setting should have an effect after the plugin-level
         # setting is unset
         plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
 
-        await self._check_venv_created_with_python_for_plugin(
-            project,
-            plugin,
-            "test-python-executable-project-level",
-        )
-
-        project.settings.unset("python")
-
-        # After both the project-level and plugin-level are unset, it should be None
-        await self._check_venv_created_with_python_for_plugin(project, plugin, None)
-
-
-class TestVirtualEnv:
-    async def _check_venv_created_with_python_for_plugin(
-        self,
-        project: Project,
-        plugin: ProjectPlugin,
-        python: str | None,
-    ) -> None:
         with (
             mock.patch(
                 "meltano.core.venv_service._resolve_python_path",
             ) as venv_mock,
-            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+            mock.patch("meltano.core.venv_service.VenvService.install"),
         ):
             await install_pip_plugin(project=project, plugin=plugin)
-            venv_mock.assert_called_once_with(python)
+            venv_mock.assert_called_once_with("test-python-executable-project-level")
 
+        project.settings.unset("python")
+
+        # After both the project-level and plugin-level are unset, it should be None
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.VenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with(None)
+
+
+class TestVirtualEnv:
     @pytest.mark.parametrize(
         ("system", "lib_dir"),
         (
@@ -381,3 +367,48 @@ class TestUvVenvService(TestVenvService):
             ),
         ):
             await subject.install(["cowsay"])
+
+    async def test_plugin_python_setting(self, project: Project) -> None:
+        plugin = ProjectPlugin(
+            PluginType.EXTRACTORS,
+            name="tap-mock",
+            python="test-python-executable-plugin-level",
+        )
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with("test-python-executable-plugin-level")
+
+        project.settings.set("python", "test-python-executable-project-level")
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with("test-python-executable-plugin-level")
+
+        plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with("test-python-executable-project-level")
+
+        project.settings.unset("python")
+        with (
+            mock.patch(
+                "meltano.core.venv_service._resolve_python_path",
+            ) as venv_mock,
+            mock.patch("meltano.core.venv_service.UvVenvService.install"),
+        ):
+            await install_pip_plugin(project=project, plugin=plugin)
+            venv_mock.assert_called_once_with(None)
