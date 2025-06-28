@@ -39,7 +39,7 @@ from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import merge
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Generator
 
     from requests.adapters import BaseAdapter
 
@@ -1675,7 +1675,7 @@ def discovery():
                 "namespace": "dbt",
                 "docs": "https://docs.meltano.com/guide/transformation",
                 "repo": "https://github.com/dbt-labs/dbt-core",
-                "pip_url": "dbt-core~=1.0.0 dbt-postgres~=1.0.0 dbt-redshift~=1.0.0 dbt-snowflake~=1.0.0 dbt-bigquery~=1.0.0",  # noqa: E501
+                "pip_url": "dbt-core~=1.9.0 dbt-postgres~=1.9.0 dbt-duckdb~=1.9.0 dbt-redshift~=1.9.0 dbt-snowflake~=1.9.0 dbt-bigquery~=1.9.0",  # noqa: E501
                 "variant": "dbt-labs",
                 "requires": {"files": [{"name": "dbt", "variant": "meltano"}]},
                 "settings": [
@@ -2082,7 +2082,7 @@ def job_logging_service(project):
 
 
 @contextmanager
-def project_directory(project_init_service):
+def project_directory(project_init_service) -> Generator[Project, None, None]:
     project = project_init_service.init()
     logging.debug(f"Created new project at {project.root}")  # noqa: G004
 
