@@ -144,7 +144,7 @@ jobs:
         docker ps -a
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
+      uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
       with:
         version: ">=0.6.15"
 
@@ -272,7 +272,7 @@ jobs:
         merge-multiple: true
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
+      uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
       with:
         version: ">=0.6.15"
 
@@ -312,7 +312,7 @@ jobs:
         python-version: "3.x"
 
     - name: Setup uv
-      uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
+      uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
       with:
         version: ">=0.6.15"
 
