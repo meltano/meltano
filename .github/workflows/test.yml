@@ -111,6 +111,8 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -158,7 +160,9 @@ jobs:
       env:
         SQLALCHEMY_WARN_20: 1
         COLUMNS: 160
+        # Pytest
         PYTEST_BACKEND: ${{ matrix.backend-db }}
+        PYTEST_MARKERS: ${{ env.PYTEST_MARKERS }}
         # Postgres backend
         POSTGRES_HOST_AUTH_METHOD: trust
         POSTGRES_ADDRESS: localhost
@@ -174,7 +178,7 @@ jobs:
         MSSQL_DB: pytest_warehouse
       shell: bash
       run: |
-        nox --verbose -t test -- -m "${{ env.PYTEST_MARKERS }}" 2>&1 | \
+        nox --verbose -t test -- -m "${PYTEST_MARKERS}" 2>&1 | \
           tee >( \
             tail | sed -r "s/[[:cntrl:]]\[([0-9]{1,3};)*[0-9]{1,3}m//g" | grep -E '^=+ [0-9].+ =+$' | \
             { read pytest_results; echo "pytest_results='${pytest_results}'" >> ${GITHUB_ENV}; } )
@@ -183,8 +187,8 @@ jobs:
       id: append-results
       shell: bash
       run: |
-        echo "pytest_results='${{ env.pytest_results }}'"
-        pytest_results_count () { pattern="([0-9]+) $1" && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
+        echo "pytest_results='${PYTEST_RESULTS}'"
+        pytest_results_count () { pattern="([0-9]+) $1" && [[ ${PYTEST_RESULTS} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" || echo 0; }
         echo "pytest-results-row-${{ matrix.id }}=| \
         ${{ matrix.python-version }} | \
         ${RUNNER_OS} ${RUNNER_ARCH,,} | \
@@ -197,7 +201,9 @@ jobs:
         $( pytest_results_count deselected ) | \
         $( pytest_results_count warning ) | \
         $( pytest_results_count error ) | \
-        $( pattern='in ([0-9]+)\.[0-9]+s' && [[ ${{ env.pytest_results }} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" )s |" >> $GITHUB_OUTPUT
+        $( pattern='in ([0-9]+)\.[0-9]+s' && [[ ${PYTEST_RESULTS} =~ $pattern ]] && echo "${BASH_REMATCH[1]}" )s |" >> $GITHUB_OUTPUT
+      env:
+        PYTEST_RESULTS: ${{ env.pytest_results }}
 
     - name: Upload coverage data
       if: always()
@@ -224,34 +230,61 @@ jobs:
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo '| PYTHON | OS     | DB     | PASSED | FAILED | XPASSED | XFAILED | SKIPPED | DESELECTED | WARNINGS | ERRORS | DURATION |' >> ${GITHUB_STEP_SUMMARY}
         echo '|--------|--------|--------|--------|--------|---------|---------|---------|------------|----------|--------|----------|' >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py314-ubuntu-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg2 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-mssql }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg3 }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py39-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py310-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py311-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py312-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "${{ needs.tests.outputs.pytest-results-row-py313-windows-sqlite }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY39_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY310_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY311_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY312_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY313_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY314_UBUNTU_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY39_UBUNTU_PSYCOPG2}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY310_UBUNTU_PSYCOPG2}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY311_UBUNTU_PSYCOPG2}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY312_UBUNTU_PSYCOPG2}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY313_UBUNTU_PSYCOPG2}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY39_UBUNTU_MSSQL}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY310_UBUNTU_MSSQL}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY311_UBUNTU_MSSQL}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY312_UBUNTU_MSSQL}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY313_UBUNTU_MSSQL}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY39_UBUNTU_PSYCOPG3}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY310_UBUNTU_PSYCOPG3}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY311_UBUNTU_PSYCOPG3}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY312_UBUNTU_PSYCOPG3}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY313_UBUNTU_PSYCOPG3}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY39_WINDOWS_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY310_WINDOWS_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY311_WINDOWS_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY312_WINDOWS_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
+        echo "${PY313_WINDOWS_SQLITE}" >> ${GITHUB_STEP_SUMMARY}
         echo '' >> ${GITHUB_STEP_SUMMARY}
         echo 'Please address any tests which have errored, failed, or xpassed, and any warnings emitted.' >> ${GITHUB_STEP_SUMMARY}
+      env:
+        PY39_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-sqlite }}
+        PY310_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-sqlite }}
+        PY311_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-sqlite }}
+        PY312_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-sqlite }}
+        PY313_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-sqlite }}
+        PY314_UBUNTU_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py314-ubuntu-sqlite }}
+        PY39_UBUNTU_PSYCOPG2: ${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg2 }}
+        PY310_UBUNTU_PSYCOPG2: ${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg2 }}
+        PY311_UBUNTU_PSYCOPG2: ${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg2 }}
+        PY312_UBUNTU_PSYCOPG2: ${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg2 }}
+        PY313_UBUNTU_PSYCOPG2: ${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg2 }}
+        PY39_UBUNTU_MSSQL: ${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-mssql }}
+        PY310_UBUNTU_MSSQL: ${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-mssql }}
+        PY311_UBUNTU_MSSQL: ${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-mssql }}
+        PY312_UBUNTU_MSSQL: ${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-mssql }}
+        PY313_UBUNTU_MSSQL: ${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-mssql }}
+        PY39_UBUNTU_PSYCOPG3: ${{ needs.tests.outputs.pytest-results-row-py39-ubuntu-psycopg3 }}
+        PY310_UBUNTU_PSYCOPG3: ${{ needs.tests.outputs.pytest-results-row-py310-ubuntu-psycopg3 }}
+        PY311_UBUNTU_PSYCOPG3: ${{ needs.tests.outputs.pytest-results-row-py311-ubuntu-psycopg3 }}
+        PY312_UBUNTU_PSYCOPG3: ${{ needs.tests.outputs.pytest-results-row-py312-ubuntu-psycopg3 }}
+        PY313_UBUNTU_PSYCOPG3: ${{ needs.tests.outputs.pytest-results-row-py313-ubuntu-psycopg3 }}
+        PY39_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py39-windows-sqlite }}
+        PY310_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py310-windows-sqlite }}
+        PY311_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py311-windows-sqlite }}
+        PY312_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py312-windows-sqlite }}
+        PY313_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py313-windows-sqlite }}
 
   coverage:
     runs-on: ubuntu-latest
@@ -259,6 +292,8 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -305,6 +340,8 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Setup Python
       uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0

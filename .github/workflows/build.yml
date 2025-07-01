@@ -35,6 +35,8 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Setup uv
       uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
@@ -50,7 +52,7 @@ jobs:
       if: github.event_name == 'release' && github.event.action == 'published'
       run: |
         version=$(uvx --from toml-cli toml get --toml-path=pyproject.toml project.version)
-        tag=$(echo "${{ github.ref }}" | awk '{split($0,p,"/"); print p[3]}')
+        tag=$(echo "${GITHUB_REF}" | awk '{split($0,p,"/"); print p[3]}')
         if [ "v$version" != $tag ]; then echo "Release tag ('$tag') and package version ('v$version') do not match!"; exit 1; fi;
 
     - name: uv install
@@ -101,6 +103,8 @@ jobs:
       run: |
         echo "registry=${{ github.event_name == 'release' && github.event.action == 'published' && 'docker.io' || 'ghcr.io' }}" >> $GITHUB_OUTPUT
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
     - name: Setup uv
       uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3.1
       with:
@@ -111,11 +115,14 @@ jobs:
       run: >
         python scripts/generate_docker_tags.py
         --git-sha ${{ github.sha }}
-        -v ${{ needs.build.outputs.version }}
+        -v ${NEEDS_BUILD_OUTPUTS_VERSION}
         -p ${{ matrix.python-version }}
         -d ${{ env.DEFAULT_PYTHON }}
-        -r ${{ steps.set-inputs.outputs.registry }}
+        -r ${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}
         > tags
+      env:
+        NEEDS_BUILD_OUTPUTS_VERSION: ${{ needs.build.outputs.version }}
+        STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Assemble image tags
       id: assemble-tags
@@ -130,14 +137,16 @@ jobs:
     - name: Set registry username and password
       id: user-and-pass
       run: |
-        if [[ "${{ steps.set-inputs.outputs.registry }}" == "ghcr.io" ]]; then
-          echo "username=${{ github.actor }}" >> $GITHUB_OUTPUT
+        if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "ghcr.io" ]]; then
+          echo "username=${GITHUB_ACTOR}" >> $GITHUB_OUTPUT
           echo "password=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
-        if [[ "${{ steps.set-inputs.outputs.registry }}" == "docker.io" ]]; then
+        if [[ "${STEPS_SET_INPUTS_OUTPUTS_REGISTRY}" == "docker.io" ]]; then
           echo "username=meltano" >> $GITHUB_OUTPUT
           echo "password=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_OUTPUT
         fi
+      env:
+        STEPS_SET_INPUTS_OUTPUTS_REGISTRY: ${{ steps.set-inputs.outputs.registry }}
 
     - name: Build, scan, then conditionally push the Docker image for a given Python version
       uses: ./.github/actions/docker-build-scan-push
@@ -166,6 +175,8 @@ jobs:
     steps:
     - name: Check out the repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
 
     - name: Download artifacts
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
