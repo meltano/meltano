@@ -45,6 +45,7 @@ const config = {
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
           postsPerPage: 20,
+          blogSidebarCount: 'ALL',
           showReadingTime: false,
         },
         theme: {
