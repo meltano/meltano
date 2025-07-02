@@ -18,6 +18,18 @@ for Meltano projects running in ephemeral environments or in circumstances where
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
 
+### Beyond Basic Storage
+
+With Meltano's flexible state backend architecture, you can store state in virtually any system that can persist data. Popular options include:
+
+- **Cloud Data Warehouses**: Snowflake, BigQuery, Redshift, Databricks
+- **Modern Data Formats**: Apache Iceberg tables, Delta Lake, Parquet files
+- **Database Systems**: PostgreSQL, MySQL, MongoDB, Redis
+- **Message Queues**: Apache Kafka, AWS Kinesis
+- **Custom Solutions**: Your own API endpoints, enterprise storage systems
+
+See our [Custom State Backends guide](/guide/custom-state-backend) to learn how to implement any of these options.
+
 ## Installation
 
 No extra work is needed to use the default system database or local filesystem as a state backend as they are already part of any base Meltano distribution.
