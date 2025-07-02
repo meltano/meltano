@@ -253,7 +253,9 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "All ExtractLoadBlocks validated, starting execution.",
             )
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -299,7 +301,9 @@ class TestCliRunScratchpadOne:
             assert target_stop_event[0]["name"] == target.name
             assert target_stop_event[0]["cmd_type"] == "elb"
             assert target_stop_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
         # Verify that a vanilla command plugin (dbt:run) run works
         invoke_async = AsyncMock(side_effect=(dbt_process,))  # dbt run
@@ -320,7 +324,9 @@ class TestCliRunScratchpadOne:
             assert dbt_start_event[0]["name"] == "dbt"
             assert dbt_start_event[0]["cmd_type"] == "command"
             assert dbt_start_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
@@ -350,7 +356,9 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:test-suffix",
@@ -428,7 +436,9 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:${expected_suffix}",
@@ -470,7 +480,9 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed")[0]["success"]
+            completion_event = matcher.find_by_event("Block run completed")[0]
+            assert completion_event["success"]
+            assert completion_event["duration_seconds"] > 0
 
             with pytest.raises(MissingJobLogException):
                 job_logging_service.get_latest_log(state_id)
@@ -517,8 +529,12 @@ class TestCliRunScratchpadOne:
             assert command_add_events[1]["command_name"] == "run"
             assert invoke_async.mock_calls[1][2]["command"] == "run"
 
-            assert matcher.find_by_event("Block run completed")[0]["success"]
-            assert matcher.find_by_event("Block run completed")[1]["success"]
+            completion_events = matcher.find_by_event("Block run completed")
+            assert len(completion_events) == 2
+            assert completion_events[0]["success"]
+            assert completion_events[0]["duration_seconds"] > 0
+            assert completion_events[1]["success"]
+            assert completion_events[1]["duration_seconds"] > 0
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -565,6 +581,7 @@ class TestCliRunScratchpadOne:
             assert len(completed_events) == 2
             for event in completed_events:
                 assert event["success"]
+                assert event["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -631,8 +648,10 @@ class TestCliRunScratchpadOne:
             for event in completed_events:
                 if event["block_type"] == "ExtractLoadBlocks":
                     assert event["success"]
+                    assert event["duration_seconds"] > 0
                 elif event["block_type"] == "InvokerCommand":
                     assert event["success"] is False
+                    assert event["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -700,6 +719,7 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert completed_events[0]["err"] == "RunnerError('Extractor failed')"
             assert completed_events[0]["exit_codes"]["extractors"] == 1
@@ -796,6 +816,7 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert completed_events[0]["err"] == "RunnerError('Loader failed')"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
@@ -869,6 +890,7 @@ class TestCliRunScratchpadOne:
             assert completed_events[0]["success"] is False
             assert completed_events[0]["err"] == "RunnerError('Loader failed')"
             assert completed_events[0]["exit_codes"]["loaders"] == 1
+            assert completed_events[0]["duration_seconds"] > 0
 
             tap_stop_event = matcher.find_by_event("tap done")
             assert len(tap_stop_event) == 1
@@ -942,6 +964,7 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert (
                 completed_events[0]["err"]
@@ -1028,6 +1051,7 @@ class TestCliRunScratchpadOne:
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             assert (
                 completed_events[0]["err"]
@@ -1235,6 +1259,7 @@ class TestCliRunScratchpadOne:
             completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
+            assert completed_events[0]["duration_seconds"] > 0
 
             # the tap should have completed successfully
             matcher.event_matches("tap done")

@@ -277,7 +277,7 @@ async def _run_blocks(
         logger.info(
             "Block run completed",
             set_number=idx,
-            block_type=blk.__class__.__name__,
+            block_type=blk_name,
             success=True,
             err=None,
             duration_seconds=round(block_duration, 3),
