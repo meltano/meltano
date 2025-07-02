@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 import typing as t
 import uuid
 
@@ -198,11 +199,19 @@ async def run(
         reason=PluginInstallReason.AUTO,
     )
 
+    run_start_time = time.perf_counter()
     try:
         await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
+    finally:
+        run_end_time = time.perf_counter()
+        total_duration = run_end_time - run_start_time
+        logger.info(
+            "Run completed",
+            duration_seconds=round(total_duration, 3),
+        )
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -233,16 +242,20 @@ async def _run_blocks(
                 )
             continue
 
+        block_start_time = time.perf_counter()
         try:
             await blk.run()
         except RunnerError as err:
+            block_end_time = time.perf_counter()
+            block_duration = block_end_time - block_start_time
             logger.error(
-                "Block run completed.",
+                "Block run completed",
                 set_number=idx,
                 block_type=blk_name,
                 success=False,
                 err=err,
                 exit_codes=err.exitcodes,
+                duration_seconds=round(block_duration, 3),
             )
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
@@ -255,12 +268,16 @@ async def _run_blocks(
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise bare_err
 
+        block_end_time = time.perf_counter()
+        block_duration = block_end_time - block_start_time
+
         logger.info(
-            "Block run completed.",
+            "Block run completed",
             set_number=idx,
             block_type=blk.__class__.__name__,
             success=True,
             err=None,
+            duration_seconds=round(block_duration, 3),
         )
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.completed)
