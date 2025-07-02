@@ -42,7 +42,7 @@ One additional factor is what stage of development the connector is in. We recom
 
 **Why is Silver the maximum rating for connectors not based on the Meltano SDK?**
 
-Connectors that are not based on the Meltano SDK typically do not use all the features and performance optimizations available in the Singer specification and the SDK implementation thereof. Even if they have high usage, their quality and feature and data coverage are harder to asses, they will not benefit from future improvements to the Singer spec and SDK, and that they are significantly harder to maintain and contribute to.
+Connectors that are not based on the Meltano SDK typically do not use all the features and performance optimizations available in the Singer specification and the SDK implementation thereof. Even if they have high usage, their quality and feature and data coverage are harder to assess, they will not benefit from future improvements to the Singer spec and SDK, and that they are significantly harder to maintain and contribute to.
 
 **What are the criteria for a connector to be considered an Official, Partner, or Community connector?**
 
