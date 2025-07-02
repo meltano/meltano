@@ -200,8 +200,10 @@ async def run(
     )
 
     run_start_time = time.perf_counter()
+    success = False
     try:
         await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        success = True
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
@@ -211,6 +213,7 @@ async def run(
         logger.info(
             "Run completed",
             duration_seconds=round(total_duration, 3),
+            status="success" if success else "failure",
         )
     tracker.track_command_event(CliEvent.completed)
 
