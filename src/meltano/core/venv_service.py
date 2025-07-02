@@ -677,7 +677,7 @@ class UvVenvService(VenvService):
             extract_stderr=extract_stderr,
             env={
                 **env,
-                "VIRTUAL_ENV": str(self.venv.root),
+                "VIRTUAL_ENV": self.venv.root.as_posix(),
             },
         )
 
@@ -697,7 +697,7 @@ class UvVenvService(VenvService):
             "uninstall",
             package,
             env={
-                "VIRTUAL_ENV": str(self.venv.root),
+                "VIRTUAL_ENV": self.venv.root.as_posix(),
             },
         )
 
@@ -755,7 +755,7 @@ class UvVenvService(VenvService):
             "--format=json",
             *args,
             env={
-                "VIRTUAL_ENV": str(self.venv.root),
+                "VIRTUAL_ENV": self.venv.root.as_posix(),
             },
         )
         stdout, _ = await proc.communicate()
