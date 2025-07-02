@@ -253,7 +253,7 @@ class TestCliRunScratchpadOne:
             assert matcher.event_matches(
                 "All ExtractLoadBlocks validated, starting execution.",
             )
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -299,7 +299,7 @@ class TestCliRunScratchpadOne:
             assert target_stop_event[0]["name"] == target.name
             assert target_stop_event[0]["cmd_type"] == "elb"
             assert target_stop_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
         # Verify that a vanilla command plugin (dbt:run) run works
         invoke_async = AsyncMock(side_effect=(dbt_process,))  # dbt run
@@ -320,7 +320,7 @@ class TestCliRunScratchpadOne:
             assert dbt_start_event[0]["name"] == "dbt"
             assert dbt_start_event[0]["cmd_type"] == "command"
             assert dbt_start_event[0]["stdio"] == "stderr"
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures("use_test_log_config", "project")
@@ -350,7 +350,7 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:test-suffix",
@@ -428,7 +428,7 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
             job_logging_service.get_latest_log(
                 f"dev:{tap.name}-to-{target.name}:${expected_suffix}",
@@ -470,7 +470,7 @@ class TestCliRunScratchpadOne:
             assert result.exit_code == 0
 
             matcher = EventMatcher(result.stderr)
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
 
             with pytest.raises(MissingJobLogException):
                 job_logging_service.get_latest_log(state_id)
@@ -517,8 +517,8 @@ class TestCliRunScratchpadOne:
             assert command_add_events[1]["command_name"] == "run"
             assert invoke_async.mock_calls[1][2]["command"] == "run"
 
-            assert matcher.find_by_event("Block run completed.")[0]["success"]
-            assert matcher.find_by_event("Block run completed.")[1]["success"]
+            assert matcher.find_by_event("Block run completed")[0]["success"]
+            assert matcher.find_by_event("Block run completed")[1]["success"]
 
     @pytest.mark.backend("sqlite")
     @pytest.mark.usefixtures(
@@ -561,7 +561,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 2
             for event in completed_events:
                 assert event["success"]
@@ -626,7 +626,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 2
             for event in completed_events:
                 if event["block_type"] == "ExtractLoadBlocks":
@@ -697,7 +697,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
 
@@ -792,7 +792,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
@@ -863,7 +863,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )  # dbt
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             # there should only be one completed event
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
@@ -939,7 +939,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
 
@@ -1023,7 +1023,7 @@ class TestCliRunScratchpadOne:
             # tap/target pair
             assert matcher.event_matches("found ExtractLoadBlocks set")
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
 
             # there should only be one completed event
             assert len(completed_events) == 1
@@ -1232,7 +1232,7 @@ class TestCliRunScratchpadOne:
                 == "transformers"
             )
 
-            completed_events = matcher.find_by_event("Block run completed.")
+            completed_events = matcher.find_by_event("Block run completed")
             assert len(completed_events) == 1
             assert completed_events[0]["success"] is False
 
@@ -1308,7 +1308,7 @@ class TestCliRunScratchpadOne:
             # completion log lines
             assert not matcher.find_by_event("tap done")
             assert not matcher.find_by_event("target done")
-            assert not matcher.find_by_event("Block run completed.")
+            assert not matcher.find_by_event("Block run completed")
             assert create_subprocess_exec.call_count == 0
             assert asyncio_mock.call_count == 0
 

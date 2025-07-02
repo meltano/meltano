@@ -41,7 +41,7 @@ You'll get quite a bit of output, two key lines near the end of the output that 
 
 ```
 <timestamps> [info     ] Incremental state has been updated at <timestamp>.
-<timestamps> [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
+<timestamps> [info     ] Block run completed            block_type=ExtractLoadBlocks err=None set_number=0 success=True
 ```
 
 ### Adding a job
