@@ -5,18 +5,11 @@ title: 2025 Q2 Updates and Changes
 
 ## Meltano
 
-We've released multiple versions of Meltano during Q2, from [3.7.2](https://github.com/meltano/meltano/releases/tag/v3.7.2) through [3.7.9](https://github.com/meltano/meltano/releases/tag/v3.7.9)!
+We've released multiple patch releases of Meltano during Q2, from [3.7.2](https://github.com/meltano/meltano/releases/tag/v3.7.2) through [3.7.9](https://github.com/meltano/meltano/releases/tag/v3.7.9).
 
-These releases include, among other things, the following changes:
+These releases included a number of bug fixes, under the hood adjustments, and documentation improvements.
 
-* [New unified `--state-strategy` CLI option](https://github.com/meltano/meltano/pull/9329) that provides clearer control over state handling in `run`, `el`, and `elt` commands, replacing the legacy `--merge-state` flag.
-* [Plugin type inference for `meltano add`](https://github.com/meltano/meltano/pull/9317) - users no longer need to specify plugin types explicitly. Commands like `meltano add tap-github` now work automatically.
-* [Automatic catalog refresh with `--full-refresh`](https://github.com/meltano/meltano/pull/9335) ensures data schema changes are properly detected when performing full refreshes.
-* [Local timezone support in logging](https://github.com/meltano/meltano/pull/9328) - new `utc` parameter in logging formatters allows timestamps to be displayed in local time.
-* [JSON output for `meltano select`](https://github.com/meltano/meltano/pull/9266) with the new `--json` flag provides machine-readable output for selection patterns.
-* Fixed state merging for incomplete/interrupted payloads and improved compatibility with Click 8.2.x and Airflow 2.7.0+.
-
-You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/tag/v3.7.9).
+You can read the complete release notes [on GitHub](https://github.com/meltano/meltano/releases/).
 
 ## MeltanoHub
 
