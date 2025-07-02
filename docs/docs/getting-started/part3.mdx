@@ -283,7 +283,7 @@ $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 [...]
 ---> 100%
 [info     ] Incremental state has been updated at 2024-09-22 12:42:58.260520.
-[info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
+[info     ] Block run completed            block_type=ExtractLoadBlocks err=None set_number=0 success=True
 [info     ] 12:43:19  Running with dbt=1.1.2 cmd_type=command name=dbt-postgres stdio=stderr
 
 [info     ] 12:43:20  Found 1 model, [...]
@@ -306,11 +306,11 @@ $ meltano run --full-refresh tap-github target-postgres dbt-postgres:run
 
 [info     ] 12:43:21  Completed successfully cmd_type=command name=dbt-postgres stdio=stderr
 
-info     ] 12:43:21                       cmd_type=command name=dbt-postgres stdio=stderr
+[info     ] 12:43:21                       cmd_type=command name=dbt-postgres stdio=stderr
 
 [info     ] 12:43:21  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1 cmd_type=command name=dbt-postgres stdio=stderr
 
-[info     ] Block run completed.           block_type=InvokerCommand err=None set_number=1 success=True
+[info     ] Block run completed            block_type=InvokerCommand err=None set_number=1 success=True
 ```
 
 </Termy>
