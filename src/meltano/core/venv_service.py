@@ -668,15 +668,17 @@ class UvVenvService(VenvService):
         Returns:
             The process running `pip install` with the provided args.
         """
+        env = env or {}
         return await exec_async(
             self.uv,
             "pip",
             "install",
-            "--python",
-            str(self.exec_path("python")),
             *pip_install_args,
             extract_stderr=extract_stderr,
-            env=env,
+            env={
+                **env,
+                "VIRTUAL_ENV": str(self.venv.root),
+            },
         )
 
     @override
@@ -693,9 +695,10 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "uninstall",
-            "--python",
-            str(self.exec_path("python")),
             package,
+            env={
+                "VIRTUAL_ENV": str(self.venv.root),
+            },
         )
 
     @override
@@ -741,6 +744,7 @@ class UvVenvService(VenvService):
             extract_stderr=extract_stderr,
         )
 
+    @override
     async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
         proc = await exec_async(
@@ -749,8 +753,10 @@ class UvVenvService(VenvService):
             "list",
             "--quiet",
             "--format=json",
-            f"--python={self.exec_path('python')}",
             *args,
+            env={
+                "VIRTUAL_ENV": str(self.venv.root),
+            },
         )
         stdout, _ = await proc.communicate()
         return json.loads(stdout)
