@@ -149,6 +149,12 @@ class TestLogFormatters:
         assert "frames hidden" not in output_unlimited
         assert output_unlimited.count("in level_") == 5
 
+        # Test that max_frames=0 shows all frames (unlimited)
+        formatter_zero = formatters.console_log_formatter(max_frames=0)
+        output_zero = formatter_zero.format(record_with_deep_exception)
+        assert "frames hidden" not in output_zero
+        assert output_zero.count("in level_") == 5
+
     def test_key_value_formatter(self, record):
         formatter = formatters.key_value_formatter()
         output = formatter.format(record)
