@@ -29,7 +29,7 @@ A logging.yaml contains a few key sections that you should be aware of.
 A few key points to note:
 
 1. Different handlers can use different formats. Meltano ships with [3 formatters](https://github.com/meltano/meltano/blob/main/src/meltano/core/logging/formatters.py):
-   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library.
+   - `meltano.core.logging.console_log_formatter` - A formatter that renders lines for the console, with optional colorization. When colorization is enabled, tracebacks are formatted with the `rich` python library. Supports `colors` (bool), `show_locals` (bool), `max_frames` (int, default: 2), and `utc` (bool) parameters.
    - `meltano.core.logging.json_log_formatter` - A formatter that renders lines in JSON format.
    - `meltano.core.logging.key_value` - A formatter that renders lines in key=value format.
    - `meltano.core.logging.plain_formatter` - A formatter that renders lines in a plain text format.
@@ -59,6 +59,7 @@ formatters:
     (): meltano.core.logging.console_log_formatter
     colors: true # also enables traceback formatting with `rich`
     show_locals: true # enables local variable logging in tracebacks (can be very verbose and leak sensitive data)
+    max_frames: 5 # maximum number of frames to show in tracebacks (default: 2)
     utc: false # use local time instead of UTC for timestamps
   key_value: # log format for traditional key=value style logs
     (): meltano.core.logging.key_value_formatter
