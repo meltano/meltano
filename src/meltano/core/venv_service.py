@@ -107,7 +107,7 @@ class VirtualEnv:
         if self._system not in self._SUPPORTED_PLATFORMS:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
-        self.python_path = python if python else sys.executable
+        self.python_path = python or sys.executable
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
 
     @cached_property
