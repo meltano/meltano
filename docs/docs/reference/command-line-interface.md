@@ -243,7 +243,7 @@ By default, plugins that use Python use the version of Python that was used to r
 When adding a new plugin, the Python version can be specified using the `--python` option:
 
 ```bash
-meltano add <type> <name> --python <Python executable name or path>
+meltano add <type> <name> --python <Python version or path>
 ```
 
 For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):

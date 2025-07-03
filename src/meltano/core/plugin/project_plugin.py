@@ -69,6 +69,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
     name: str
     variant: str | None
     executable: str
+    python: str | None
 
     config_files: dict[str, str]
 
@@ -161,7 +162,7 @@ class ProjectPlugin(PluginRef):  # too many attrs and methods
         self.set_presentation_attrs(extras)
         self.variant = variant
         self.pip_url = pip_url
-        self.python = python
+        self.python = str(python) if python else None
         self.executable = executable
         self.capabilities = capabilities
         self.settings_group_validation = settings_group_validation

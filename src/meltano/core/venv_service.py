@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-import os
 import platform
 import shlex
 import shutil
@@ -15,8 +14,6 @@ import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Awaitable, Callable
 from functools import cache, cached_property
-from numbers import Number
-from pathlib import Path
 
 import structlog
 
@@ -24,7 +21,9 @@ from meltano.core.error import AsyncSubprocessError, MeltanoError
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
+    from pathlib import Path
 
+    from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
 
 if sys.version_info < (3, 10):
@@ -36,6 +35,8 @@ if sys.version_info < (3, 12):
     from typing_extensions import override
 else:
     from typing import override  # noqa: ICN003
+
+_T = t.TypeVar("_T", bound="VenvService")
 
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -78,30 +79,6 @@ def find_uv() -> str:
     return find_uv_bin()
 
 
-def _resolve_python_path(python: Path | str | None) -> str:
-    python_path: str | None = None
-
-    if python is None:
-        python_path = sys.executable
-    elif isinstance(python, Path):
-        python_path = str(python.resolve())
-    elif isinstance(python, Number):
-        raise MeltanoError(
-            "Python must be specified as an executable name or path, "  # noqa: EM102
-            f"not the number {python!r}",
-        )
-    else:
-        python_path = python if os.path.exists(python) else shutil.which(python)  # noqa: PTH110
-
-    if python_path is None:
-        raise MeltanoError(f"Python executable {python!r} was not found")  # noqa: EM102
-
-    if not os.access(python_path, os.X_OK):
-        raise MeltanoError(f"{python_path!r} is not executable")  # noqa: EM102
-
-    return python_path
-
-
 class VirtualEnv:
     """Info about a single virtual environment."""
 
@@ -114,7 +91,7 @@ class VirtualEnv:
     def __init__(
         self,
         root: Path,
-        python: Path | str | None = None,
+        python: str | None = None,
     ):
         """Initialize the `VirtualEnv` instance.
 
@@ -130,7 +107,7 @@ class VirtualEnv:
         if self._system not in self._SUPPORTED_PLATFORMS:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
-        self.python_path = _resolve_python_path(python)
+        self.python_path = sys.executable if not python else str(python)
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
 
     @cached_property
@@ -290,7 +267,7 @@ class VenvService:
         self,
         *,
         project: Project,
-        python: Path | str | None = None,
+        python: str | None = None,
         namespace: str = "",
         name: str = "",
     ):
@@ -316,6 +293,24 @@ class VenvService:
             self.name,
             "pip.log",
         ).resolve()
+
+    @classmethod
+    def from_plugin(cls: type[_T], project: Project, plugin: ProjectPlugin) -> _T:
+        """Create a service instance from a project and plugin.
+
+        Args:
+            project: The Meltano project.
+            plugin: The plugin to create a service instance for.
+
+        Returns:
+            A service instance.
+        """
+        return cls(
+            project=project,
+            python=plugin.python,
+            namespace=plugin.type,
+            name=plugin.plugin_dir_name,
+        )
 
     async def install(
         self,
@@ -394,7 +389,7 @@ class VenvService:
     async def create_venv(
         self,
         *,
-        extract_stderr: StdErrExtractor,
+        extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
         """Create a new virtual environment.
 
@@ -721,7 +716,7 @@ class UvVenvService(VenvService):
     async def create_venv(
         self,
         *,
-        extract_stderr: StdErrExtractor,
+        extract_stderr: StdErrExtractor = _extract_stderr,
     ) -> Process:
         """Create a new virtual environment using `uv`.
 
@@ -741,6 +736,7 @@ class UvVenvService(VenvService):
             extract_stderr=extract_stderr,
         )
 
+    @override
     async def list_installed(self, *args: str) -> list[dict[str, t.Any]]:
         """List the installed dependencies."""
         proc = await exec_async(
