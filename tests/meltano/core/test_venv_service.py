@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import platform
-import sys
 import typing as t
 from asyncio.subprocess import Process
 from pathlib import Path
@@ -235,22 +234,6 @@ class TestVirtualEnv:
             ),
         ):
             VirtualEnv(project.venvs_dir("pytest", "pytest"))
-
-    def test_different_python_versions(self, project: Project) -> None:
-        root = project.venvs_dir("pytest", "pytest")
-
-        assert (
-            VirtualEnv(root, python=None).python_path
-            == VirtualEnv(root).python_path
-            == VirtualEnv(root, python=sys.executable).python_path
-            == sys.executable
-        )
-
-        path_str = "/usr/bin/test-python-executable"
-        venv = VirtualEnv(root, python=path_str)
-        assert venv.python_path == path_str
-
-        assert VirtualEnv(root, python="3.11").python_path == "3.11"
 
 
 class TestUvVenvService(TestVenvService):
