@@ -38,6 +38,36 @@ def exc_info() -> ExcInfo:
         return sys.exc_info()
 
 
+@pytest.fixture
+def deep_exc_info() -> ExcInfo:
+    """Create a deeper call stack for testing max_frames."""
+
+    def level_5():
+        local_var_5 = "level_5_value"  # noqa: F841
+        raise ValueError("Deep stack error")  # noqa: EM101
+
+    def level_4():
+        local_var_4 = "level_4_value"  # noqa: F841
+        level_5()
+
+    def level_3():
+        local_var_3 = "level_3_value"  # noqa: F841
+        level_4()
+
+    def level_2():
+        local_var_2 = "level_2_value"  # noqa: F841
+        level_3()
+
+    def level_1():
+        local_var_1 = "level_1_value"  # noqa: F841
+        level_2()
+
+    try:
+        level_1()
+    except ValueError:
+        return sys.exc_info()
+
+
 class TestLogFormatters:
     """Test the log formatters."""
 
@@ -74,6 +104,18 @@ class TestLogFormatters:
             exc_info=exc_info,
         )
 
+    @pytest.fixture
+    def record_with_deep_exception(self, deep_exc_info: ExcInfo):
+        return logging.LogRecord(
+            name="test",
+            level=logging.ERROR,
+            pathname="test",
+            lineno=1,
+            msg="deep stack test",
+            args=None,
+            exc_info=deep_exc_info,
+        )
+
     def test_console_log_formatter_colors(self, record, monkeypatch) -> None:
         monkeypatch.delenv("NO_COLOR", raising=False)
         formatter = formatters.console_log_formatter(colors=True)
@@ -94,6 +136,24 @@ class TestLogFormatters:
         output = formatter.format(record_with_exception)
         assert "locals" in output
         assert "my_var = 'my_value'" in output
+
+    def test_console_log_formatter_max_frames(self, record_with_deep_exception) -> None:
+        # Test that max_frames limits the number of frames shown
+        formatter_limited = formatters.console_log_formatter(max_frames=2)
+        output_limited = formatter_limited.format(record_with_deep_exception)
+        assert "frames hidden" in output_limited
+
+        # Test that high max_frames shows all frames
+        formatter_unlimited = formatters.console_log_formatter(max_frames=100)
+        output_unlimited = formatter_unlimited.format(record_with_deep_exception)
+        assert "frames hidden" not in output_unlimited
+        assert output_unlimited.count("in level_") == 5
+
+        # Test that max_frames=0 shows all frames (unlimited)
+        formatter_zero = formatters.console_log_formatter(max_frames=0)
+        output_zero = formatter_zero.format(record_with_deep_exception)
+        assert "frames hidden" not in output_zero
+        assert output_zero.count("in level_") == 5
 
     def test_key_value_formatter(self, record):
         formatter = formatters.key_value_formatter()
