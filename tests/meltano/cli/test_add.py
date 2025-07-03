@@ -806,9 +806,7 @@ class TestCliAdd:
         with (
             mock.patch("meltano.core.venv_service.exec_async") as exec_mock,
             mock.patch("meltano.core.venv_service.UvVenvService.install_pip_args"),
-            mock.patch(
-                "meltano.core.venv_service.VirtualEnv.write_fingerprint"
-            )
+            mock.patch("meltano.core.venv_service.VirtualEnv.write_fingerprint"),
         ):
             python = "python3.X"
             assert_cli_runner(
