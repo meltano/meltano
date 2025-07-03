@@ -1008,7 +1008,7 @@ The `lock` command does not run relative to a [Meltano Environment](https://docs
 
 ## `remove`
 
-`meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
+`meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) from your Meltano [project](/concepts/project).
 
 Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from the:
 
@@ -1020,6 +1020,11 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 ### How to Use
 
 ```bash
+# New syntax (recommended) - plugin type is automatically inferred
+meltano remove <name>
+meltano remove <name> <name_two>
+
+# Deprecated syntax - will be removed in v4
 meltano remove <type> <name>
 meltano remove <type> <name> <name_two>
 ```
@@ -1031,10 +1036,12 @@ The `remove` command does not run relative to a [Meltano Environment](https://do
 ### Examples
 
 ```bash
-# meltano will attempt to remove an extractor called tap-gitlab
-meltano remove extractor tap-gitlab
+# New syntax - plugin type is automatically inferred
+meltano remove tap-gitlab
+meltano remove target-postgres target-csv
 
-# meltano will attempt to remove two loaders; target-postgres and target-csv
+# Deprecated syntax - will be removed in v4
+meltano remove extractor tap-gitlab
 meltano remove loader target-postgres target-csv
 ```
 
