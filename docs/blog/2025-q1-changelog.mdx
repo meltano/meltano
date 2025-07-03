@@ -1,0 +1,50 @@
+---
+slug: 2025-q1-updates-and-changes
+title: 2025 Q1 Updates and Changes
+date: 2025-03-31
+---
+
+## Meltano
+
+We've released versions [3.7.0](https://github.com/meltano/meltano/releases/tag/v3.7.0) and [3.7.1](https://github.com/meltano/meltano/releases/tag/v3.7.1) of Meltano!
+
+These releases include, among other things, the following changes:
+
+* [Relative dates are now supported in plugin configuration](https://github.com/meltano/meltano/pull/9119), making it easier to configure date-based settings with values like `last week` or `yesterday`.
+* [Custom state backends can now be created as plugins](https://github.com/meltano/meltano/pull/8367), opening up possibilities for enterprise-grade state management solutions beyond the built-in options.
+* [The UV virtual environment backend is no longer experimental](https://github.com/meltano/meltano/pull/8991) and will become the default in a future release. Users can migrate now with `meltano config meltano set venv.backend uv`.
+* [Improved logging capabilities](https://github.com/meltano/meltano/pull/8975) including a new `--log-format` CLI option and automatic logging configuration for Singer-based plugins.
+* The project environment variables are now [passed to the installation environment](https://github.com/meltano/meltano/pull/9158), improving plugin installation flexibility.
+* [Switched from Poetry to UV](https://github.com/meltano/meltano/pull/9139) for faster dependency management and improved developer experience.
+
+## MeltanoHub
+
+### Extractors
+
+* Added the edgarrmondragon variant of tap-geekbot - [Hub Link](https://hub.meltano.com/extractors/tap-geekbot/)
+* Added the edgarrmondragon variant of tap-pypistats - [Hub Link](https://hub.meltano.com/extractors/tap-pypistats/)
+* Added the SpaceCondor variant of tap-mssql - [Hub Link](https://hub.meltano.com/extractors/tap-mssql--spacecondor/)
+
+### Plugin Updates
+
+* tap-salesforce was updated to v1.9.0
+* tap-googleads was updated to v0.9.0
+* target-duckdb was updated to v0.8
+* dbt-snowflake now supports keypair authentication settings
+* meltano-map-transform now uses PyPI distribution
+
+## SDK
+
+We shipped 2 minor releases of the SDK:
+
+* [v0.44.0](https://github.com/meltano/sdk/releases/tag/v0.44.0)
+* [v0.45.0](https://github.com/meltano/sdk/releases/tag/v0.45.0)
+
+Among other things, these releases shipped the following changes:
+
+* Experimental [msgspec-based IO interfaces](https://github.com/meltano/sdk/releases/tag/v0.45.0) for significantly improved performance in message processing.
+* The low-level Singer library is now [publicly available as `singer_sdk.singerlib`](https://github.com/meltano/sdk/releases/tag/v0.45.0), giving developers direct access to Singer protocol implementations.
+* Full support for the [`x-singer.decimal` JSON Schema extension](https://github.com/meltano/sdk/releases/tag/v0.45.0), preventing precision loss for financial and scientific data.
+* [Deprecation support](https://github.com/meltano/sdk/releases/tag/v0.44.0) for stream schemas and settings fields, enabling smoother API evolution.
+* [Custom SQL type handling](https://github.com/meltano/sdk/releases/tag/v0.44.0) with the new `x-sql-datatype` JSON Schema annotation for targets.
+* [SHA256 encryption method](https://github.com/meltano/sdk/releases/tag/v0.44.0) added to inline stream maps for enhanced data security.

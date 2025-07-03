@@ -44,7 +44,8 @@ const config = {
           blogTitle: 'Changelog',
           blogSidebarTitle: 'All Releases',
           blogDescription: '',
-          postsPerPage: 5,
+          postsPerPage: 20,
+          blogSidebarCount: 'ALL',
           showReadingTime: false,
         },
         theme: {
