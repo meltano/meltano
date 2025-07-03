@@ -107,7 +107,7 @@ class VirtualEnv:
         if self._system not in self._SUPPORTED_PLATFORMS:
             raise MeltanoError(f"Platform {self._system!r} not supported.")  # noqa: EM102
         self.root = root.resolve()
-        self.python_path = sys.executable if not python else python
+        self.python_path = python if python else sys.executable
         self.plugin_fingerprint_path = self.root / ".meltano_plugin_fingerprint"
 
     @cached_property
@@ -404,8 +404,7 @@ class VenvService:
             sys.executable,
             "-m",
             "virtualenv",
-            "--python",
-            self.venv.python_path,
+            f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
         )
@@ -667,8 +666,7 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "install",
-            "--python",
-            str(self.exec_path("python")),
+            f"--python={self.exec_path('python')}",
             *pip_install_args,
             extract_stderr=extract_stderr,
             env=env,
@@ -688,8 +686,7 @@ class UvVenvService(VenvService):
             self.uv,
             "pip",
             "uninstall",
-            "--python",
-            str(self.exec_path("python")),
+            f"--python={self.exec_path('python')}",
             package,
         )
 
@@ -730,8 +727,7 @@ class UvVenvService(VenvService):
         return await exec_async(
             self.uv,
             "venv",
-            "--python",
-            self.venv.python_path,
+            f"--python={self.venv.python_path}",
             str(self.venv.root),
             extract_stderr=extract_stderr,
         )

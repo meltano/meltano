@@ -169,27 +169,29 @@ class TestVenvService:
         assert subject.requires_clean_install(["example", "another-package"])
 
     async def test_python_setting(self, project: Project) -> None:
+        plugin_python = "test-python-executable-plugin-level"
         plugin = ProjectPlugin(
             PluginType.EXTRACTORS,
             name="tap-mock",
-            python="test-python-executable-plugin-level",
+            python=plugin_python,
         )
         subject = self.cls.from_plugin(project, plugin)
 
         with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
             await subject.create_venv()
             exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[4] == "test-python-executable-plugin-level"
+            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
 
         # Setting the project-level `python` setting should have no effect at first
         # because the plugin-level setting takes precedence.
-        project.settings.set("python", "test-python-executable-project-level")
+        project_python = "test-python-executable-project-level"
+        project.settings.set("python", project_python)
         subject = self.cls.from_plugin(project, plugin)
 
         with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
             await subject.create_venv()
             exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[4] == "test-python-executable-plugin-level"
+            assert exec_mock.call_args.args[-2] == f"--python={plugin_python}"
 
         # The project-level setting should have an effect after the plugin-level
         # setting is unset
@@ -199,7 +201,7 @@ class TestVenvService:
         with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
             await subject.create_venv()
             exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[4] == "test-python-executable-project-level"
+            assert exec_mock.call_args.args[-2] == f"--python={project_python}"
 
         project.settings.unset("python")
         subject = self.cls.from_plugin(project, plugin)
@@ -208,7 +210,7 @@ class TestVenvService:
         with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
             await subject.create_venv()
             exec_mock.assert_called_once()
-            assert Path(exec_mock.call_args.args[4]).is_absolute()
+            assert Path(exec_mock.call_args.args[-2].split("=")[1]).is_absolute()
 
 
 class TestVirtualEnv:
@@ -274,45 +276,3 @@ class TestUvVenvService(TestVenvService):
             ),
         ):
             await subject.install(["cowsay"])
-
-    async def test_python_setting(self, project: Project) -> None:
-        plugin = ProjectPlugin(
-            PluginType.EXTRACTORS,
-            name="tap-mock",
-            python="test-python-executable-plugin-level",
-        )
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[3] == "test-python-executable-plugin-level"
-
-        # Setting the project-level `python` setting should have no effect at first
-        # because the plugin-level setting takes precedence.
-        project.settings.set("python", "test-python-executable-project-level")
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[3] == "test-python-executable-plugin-level"
-
-        # The project-level setting should have an effect after the plugin-level
-        # setting is unset
-        plugin = ProjectPlugin(PluginType.EXTRACTORS, name="tap-mock")
-        subject = self.cls.from_plugin(project, plugin)
-
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert exec_mock.call_args.args[3] == "test-python-executable-project-level"
-
-        project.settings.unset("python")
-        subject = self.cls.from_plugin(project, plugin)
-
-        # After both the project-level and plugin-level are unset, it should be None
-        with mock.patch("meltano.core.venv_service.exec_async") as exec_mock:
-            await subject.create_venv()
-            exec_mock.assert_called_once()
-            assert Path(exec_mock.call_args.args[3]).is_absolute()

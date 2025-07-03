@@ -821,7 +821,7 @@ class TestCliAdd:
                     ),
                 ),
             )
-            assert exec_mock.call_args.args[3] == python
+            assert exec_mock.call_args.args[-2] == f"--python={python}"
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
