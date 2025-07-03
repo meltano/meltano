@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 
 import click
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import InstrumentedCmd
+from meltano.cli.utils import InstrumentedCmd, PluginTypeArg, infer_plugin_type
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.plugin_location_remove import (
@@ -23,21 +24,38 @@ if t.TYPE_CHECKING:
 
 
 @click.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
-@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_names", nargs=-1, required=True)
+# @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
+@click.argument("plugin", nargs=-1, required=True)
+@click.option("--plugin-type", type=PluginTypeArg())
 @pass_project()
 def remove(
     project: Project,
-    plugin_type: PluginType,
-    plugin_names: tuple[str, ...],
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
 ) -> None:
     """Remove plugins from your project.
 
     \b
     Read more at https://docs.meltano.com/reference/command-line-interface#remove
     """  # noqa: D301
+    if plugin_type is None and plugin[0] in PluginType.cli_arguments():
+        plugin_type = PluginType.from_cli_argument(plugin[0])
+        plugin_names = plugin[1:]
+        warnings.warn(
+            "Passing the plugin type as the first positional argument is deprecated "
+            "and will be removed in Meltano v4. "
+            "Please use the --plugin-type option instead.",
+            DeprecationWarning,
+            stacklevel=0,
+        )
+    else:
+        plugin_names = plugin
+
     plugins = [
-        ProjectPlugin(PluginType.from_cli_argument(plugin_type), plugin_name)
+        ProjectPlugin(
+            infer_plugin_type(plugin_name) if plugin_type is None else plugin_type,
+            plugin_name,
+        )
         for plugin_name in plugin_names
     ]
     remove_plugins(project, plugins)
