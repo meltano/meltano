@@ -77,18 +77,23 @@ class BookmarkWriter:
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
         job.payload_flags = Payload(max(self.payload_flag, job.payload_flags))
+
         try:
             job.save(self.session)
+        except Exception as e:  # pragma: no cover
+            logger.warning("Failed to persist job to the system database: %s", e)
+
+        try:
             self.state_service.add_state(
                 job,
                 json.dumps(job.payload),
                 job.payload_flags,
             )
         except Exception:  # pragma: no cover
-            logger.debug("Failed to persist state", exc_info=True)
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated",
+                "incremental state has not been updated: %s",
+                exc_info=True,
             )
         else:
             logger.info(
