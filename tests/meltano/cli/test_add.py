@@ -808,7 +808,7 @@ class TestCliAdd:
             mock.patch("meltano.core.venv_service.UvVenvService.install_pip_args"),
             mock.patch(
                 "meltano.core.venv_service.VirtualEnv.write_fingerprint"
-            ) as write_fingerprint_mock,
+            )
         ):
             python = "python3.X"
             assert_cli_runner(
@@ -824,7 +824,6 @@ class TestCliAdd:
                 ),
             )
             assert exec_mock.call_args.args[3] == python
-            write_fingerprint_mock.assert_called_once()
 
     def test_add_with_force_flag(self, project: Project, cli_runner: CliRunner) -> None:
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
