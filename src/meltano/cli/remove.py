@@ -24,7 +24,6 @@ if t.TYPE_CHECKING:
 
 
 @click.command(cls=InstrumentedCmd, short_help="Remove plugins from your project.")
-# @click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
 @click.argument("plugin", nargs=-1, required=True)
 @click.option("--plugin-type", type=PluginTypeArg())
 @pass_project()
