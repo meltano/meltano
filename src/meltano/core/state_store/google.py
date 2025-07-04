@@ -107,13 +107,24 @@ class GCSStateStoreManager(CloudStateStoreManager):
         Args:
             bucket: the bucket to store state in
             prefix: the prefix to store state at
-            application_credentials: application credentials to use in
-                authenticating to GCS (deprecated, use application_credentials_path)
-            application_credentials_path: path to the credential file to use in
-                authenticating to GCS
-            application_credentials_json: JSON string containing the service account
-                credentials for GCS
+            application_credentials_path: Path to a Google service account JSON file.
+            application_credentials_json: Raw JSON string of service account
+                credentials.
+            application_credentials: Deprecated. Use application_credentials_path
+                instead.
             kwargs: additional keyword args to pass to parent
+
+        Precedence:
+            1. If both application_credentials_path and application_credentials_json are
+               provided, raises an error.
+            2. If only application_credentials_json is provided, it is used.
+            3. If only application_credentials_path is provided, it is used.
+            4. If only application_credentials (deprecated) is provided, it is used as
+               application_credentials_path.
+
+        Raises:
+            ValueError: If both application_credentials_path and
+                application_credentials_json are provided.
         """
         super().__init__(**kwargs)
         self.bucket = bucket or self.parsed.hostname
@@ -129,6 +140,10 @@ class GCSStateStoreManager(CloudStateStoreManager):
             )
             if application_credentials_path is None:
                 application_credentials_path = application_credentials
+
+        if application_credentials_path and application_credentials_json:
+            msg = "Provide only one of 'application_credentials_path' or 'application_credentials_json', not both."  # noqa: E501
+            raise ValueError(msg)
 
         self.application_credentials_path = application_credentials_path
         self.application_credentials_json = application_credentials_json

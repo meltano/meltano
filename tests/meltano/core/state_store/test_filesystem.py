@@ -856,3 +856,13 @@ class TestGCSStateStoreManager:
             match="Invalid JSON in application_credentials_json",
         ):
             _ = subject.client
+
+    def test_mutual_exclusivity_of_json_and_path_credentials(self):
+        # Both provided should raise ValueError
+        with pytest.raises(ValueError, match="only one of"):
+            GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials_path="/some/path.json",
+                application_credentials_json='{"type": "service_account"}',
+                lock_timeout_seconds=10,
+            )
