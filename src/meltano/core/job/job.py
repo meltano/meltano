@@ -71,7 +71,7 @@ class State(Enum):
         return self.name
 
 
-class StateComparator(Comparator):
+class StateComparator(Comparator[State]):
     """Compare Job._state to State enums."""
 
     def __eq__(self, other: State) -> t.Any:  # type: ignore[override] # noqa: ANN401

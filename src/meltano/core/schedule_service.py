@@ -343,7 +343,7 @@ class ScheduleService:
         *args: str,
         env: dict | None = None,
         **kwargs: t.Any,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """Run a scheduled elt task or named job.
 
         Args:

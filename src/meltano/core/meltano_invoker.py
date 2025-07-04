@@ -38,7 +38,7 @@ class MeltanoInvoker:
         command: str = MELTANO_COMMAND,
         env: dict[str, str] | None = None,
         **kwargs: t.Any,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """Invoke meltano or other provided command.
 
         Args:

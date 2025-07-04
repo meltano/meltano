@@ -71,7 +71,7 @@ def _debug_logging_handler(
     plugin_invoker: PluginInvoker,
     stderr: StreamReader,
     *other_dsts,  # noqa: ANN002
-) -> asyncio.Task:
+) -> asyncio.Task[None]:
     """Route debug log lines.
 
     Routes to stderr, or an `OutputLogger` if one is present in our invocation
