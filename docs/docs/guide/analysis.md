@@ -47,7 +47,7 @@ utilities:
 3. Re-install the plugin:
 
 ```bash
-meltano install utility superset
+meltano install superset
 ```
 
 ### Secret Key
