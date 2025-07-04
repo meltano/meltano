@@ -483,7 +483,7 @@ class TestCliInstall:
         assert result.exit_code == 2
         assert (
             "Use only --plugin-type to install plugins of a specific type"
-            in result.output
+            in result.stderr
         )
 
         result = cli_runner.invoke(
@@ -493,7 +493,7 @@ class TestCliInstall:
         assert result.exit_code == 2
         assert (
             "Use only --plugin-type to install plugins of a specific type"
-            in result.output
+            in result.stderr
         )
 
 
