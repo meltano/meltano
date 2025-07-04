@@ -71,7 +71,7 @@ class IntFlag(TypeDecorator):  # noqa: D101
         return int(value) if value is not None else value
 
 
-class GUID(TypeDecorator[t.Union[uuid.UUID | str]]):
+class GUID(TypeDecorator[t.Union[uuid.UUID, str]]):
     """Platform-independent GUID type.
 
     Uses PostgreSQL's UUID type, otherwise uses
