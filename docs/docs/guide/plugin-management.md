@@ -529,13 +529,22 @@ RUN meltano install
 
 ## Removing a plugin from your project
 
-You can remove a [plugin](/concepts/project#plugins) from your Meltano [project](/concepts/project) by using [`meltano remove`](/reference/command-line-interface#remove). You have to specify a [type](/concepts/plugins#types) of plugin to remove, but you can remove multiple plugins of that type.
+You can remove a [plugin](/concepts/project#plugins) from your Meltano [project](/concepts/project) by using [`meltano remove`](/reference/command-line-interface#remove). The plugin type is automatically inferred from the plugin name, so you no longer need to specify the type explicitly.
 
 ```bash
+# New syntax (recommended) - plugin type is automatically inferred
+meltano remove <name>
+meltano remove <name> <name_two>
+
+# Deprecated syntax - will be removed in v4
 meltano remove <type> <name>
 meltano remove <type> <name> <name_two>
 
 # For example:
+meltano remove tap-gitlab
+meltano remove target-postgres target-csv
+
+# Deprecated syntax:
 meltano remove extractor tap-gitlab
 meltano remove loader target-postgres target-csv
 ```
