@@ -947,10 +947,87 @@ export MELTANO_STATE_BACKEND_S3_ENDPOINT_URL="https://play.min.io:9000"
 
 ---
 
-### <a name="state-backend-uri"></a>`state_backend.gcs.application_credentials`
+### <a name="state_backendgcsapplication_credentials_json"></a>`state_backend.gcs.application_credentials_json`
 
-- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_APPLICATION_CREDENTIALS`
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_JSON`
 - Default: None
+
+JSON string containing the service account credentials for Google Cloud Storage. This is the recommended approach for production deployments, especially in containerized environments.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_json '{
+  "type": "service_account",
+  "project_id": "my-project",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "..."
+}'
+```
+
+Or set it from a file:
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_json --from-file service-account-key.json
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_JSON='{"type":"service_account","project_id":"my-project",...}'
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+### <a name="state_backendgcsapplication_credentials_path"></a>`state_backend.gcs.application_credentials_path`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_PATH`
+- Default: None
+
+Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano config" label="meltano config" default>
+
+```bash
+meltano config meltano set state_backend.gcs.application_credentials_path "path/to/creds.json"
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS_PATH="path/to/creds.json"
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+### <a name="state_backendgcsapplication_credentials"></a>`state_backend.gcs.application_credentials` (deprecated)
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_STATE_BACKEND_GCS_APPLICATION_CREDENTIALS`
+- Default: None
+
+:::warning
+This setting is deprecated. Use [`state_backend.gcs.application_credentials_path`](#state_backendgcsapplication_credentials_path) instead.
+:::
 
 Path to the [credential file](https://cloud.google.com/docs/authentication/application-default-credentials#GAC) to use in authenticating to Google Cloud Storage
 

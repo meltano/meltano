@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import typing as t
+import warnings
 from contextlib import contextmanager
 from functools import cached_property
 
@@ -62,6 +64,29 @@ APPLICATION_CREDENTIALS = SettingDefinition(
     env_specific=True,
 )
 
+APPLICATION_CREDENTIALS_PATH = SettingDefinition(
+    name="state_backend.gcs.application_credentials_path",
+    label="Application Credentials Path",
+    description=(
+        "Path to the credential file to use in authenticating to Google Cloud Storage"
+    ),
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
+APPLICATION_CREDENTIALS_JSON = SettingDefinition(
+    name="state_backend.gcs.application_credentials_json",
+    label="Application Credentials JSON",
+    description=(
+        "JSON object containing the service account credentials for "
+        "Google Cloud Storage"
+    ),
+    kind=SettingKind.STRING,
+    sensitive=True,
+    env_specific=True,
+)
+
 
 class GCSStateStoreManager(CloudStateStoreManager):
     """State backend for Google Cloud Storage."""
@@ -73,6 +98,8 @@ class GCSStateStoreManager(CloudStateStoreManager):
         bucket: str | None = None,
         prefix: str | None = None,
         application_credentials: str | None = None,
+        application_credentials_path: str | None = None,
+        application_credentials_json: str | None = None,
         **kwargs: t.Any,
     ):
         """Initialize the BaseFilesystemStateStoreManager.
@@ -81,13 +108,30 @@ class GCSStateStoreManager(CloudStateStoreManager):
             bucket: the bucket to store state in
             prefix: the prefix to store state at
             application_credentials: application credentials to use in
+                authenticating to GCS (deprecated, use application_credentials_path)
+            application_credentials_path: path to the credential file to use in
                 authenticating to GCS
+            application_credentials_json: JSON string containing the service account
+                credentials for GCS
             kwargs: additional keyword args to pass to parent
         """
         super().__init__(**kwargs)
         self.bucket = bucket or self.parsed.hostname
         self.prefix = prefix or self.parsed.path
-        self.application_credentials = application_credentials
+
+        # Handle backwards compatibility and deprecation warning
+        if application_credentials is not None:
+            warnings.warn(
+                "The 'application_credentials' parameter is deprecated. "
+                "Use 'application_credentials_path' instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if application_credentials_path is None:
+                application_credentials_path = application_credentials
+
+        self.application_credentials_path = application_credentials_path
+        self.application_credentials_json = application_credentials_json
 
     @staticmethod
     @requires_gcs()
@@ -112,9 +156,16 @@ class GCSStateStoreManager(CloudStateStoreManager):
             A google.cloud.storage.Client.
         """
         with requires_gcs():
-            if self.application_credentials:
+            if self.application_credentials_json:
+                # Parse JSON string and create client from service account info
+                credentials_info = json.loads(self.application_credentials_json)
+                return google.cloud.storage.Client.from_service_account_info(
+                    credentials_info,
+                )
+            if self.application_credentials_path:
+                # Use existing file-based authentication
                 return google.cloud.storage.Client.from_service_account_json(
-                    self.application_credentials,
+                    self.application_credentials_path,
                 )
             # Use default authentication in environment
             return google.cloud.storage.Client()

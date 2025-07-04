@@ -152,12 +152,51 @@ For reference, read the [AWS documentation on service-specific endpoints](https:
 
 To store state remotely in Google Cloud Storage, set the `state_backend.uri` setting to `gs://<your bucket name>/<prefix for state JSON blobs>`.
 
-To authenticate to GCS, you must provide a path to a [service account credentials file](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
-These can be configured via the `state_backend.gcs.application_credentials` setting.
+To authenticate to GCS, you can provide service account credentials in one of the following ways:
 
-If credentials are not provided via these settings, Meltano will use the value the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
+#### Using a JSON credentials string
 
-If GCS credentials are not found via any of the methods described above, Meltano will not be able to authenticate to Google Cloud Storage and state operations will fail.
+You can provide service account credentials directly as a JSON string via the [`state_backend.gcs.application_credentials_json`](/reference/settings/#state_backendgcsapplication_credentials_json) setting. This is the most production-friendly approach, especially in containerized environments.
+
+```yaml
+state_backend:
+  uri: gs://my-bucket/state
+  gcs:
+    application_credentials_json: |
+      {
+        "type": "service_account",
+        "project_id": "my-project",
+        "private_key_id": "...",
+        "private_key": "...",
+        "client_email": "...",
+        "client_id": "...",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "..."
+      }
+```
+
+#### Using a credentials file path
+
+You can provide a path to a [service account credentials file](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) via the [`state_backend.gcs.application_credentials_path`](/reference/settings/#state_backendgcsapplication_credentials_path) setting.
+
+```yaml
+state_backend:
+  uri: gs://my-bucket/state
+  gcs:
+    application_credentials_path: /path/to/service-account-key.json
+```
+
+:::warning
+
+The legacy `state_backend.gcs.application_credentials` setting is still supported but deprecated. Use `state_backend.gcs.application_credentials_path` instead.
+
+:::
+
+#### Default authentication
+
+If credentials are not provided via any of the above settings, Meltano will use the value of the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
 
 ## Locking
 

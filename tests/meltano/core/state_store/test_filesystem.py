@@ -677,7 +677,7 @@ class TestGCSStateStoreManager:
     ):
         return GCSStateStoreManager(
             uri="gs://meltano/state/",
-            application_credentials="path/to/creds/file",
+            application_credentials_path="path/to/creds/file",
             lock_timeout_seconds=10,
         )
 
@@ -693,7 +693,7 @@ class TestGCSStateStoreManager:
         _ = subject.client
         _ = subject.client
         mock_client.from_service_account_json.assert_called_once_with(
-            subject.application_credentials,
+            subject.application_credentials_path,
         )
 
     @pytest.mark.usefixtures("mock_client")
@@ -771,3 +771,74 @@ class TestGCSStateStoreManager:
             bucket_or_name="meltano",
             prefix="state",
         )
+
+    @pytest.fixture
+    def subject_with_json_creds(self, function_scoped_test_dir):  # noqa: ARG002
+        return GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_json=(
+                '{"type": "service_account", "project_id": "test"}'
+            ),
+            lock_timeout_seconds=10,
+        )
+
+    @pytest.fixture
+    def subject_with_path_creds(self, function_scoped_test_dir):  # noqa: ARG002
+        return GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_path="path/to/creds/file",
+            lock_timeout_seconds=10,
+        )
+
+    def test_client_with_json_credentials(
+        self,
+        subject_with_json_creds: GCSStateStoreManager,
+        mock_client,
+    ) -> None:
+        # Call twice to assure memoization
+        _ = subject_with_json_creds.client
+        _ = subject_with_json_creds.client
+        mock_client.from_service_account_info.assert_called_once_with(
+            {"type": "service_account", "project_id": "test"},
+        )
+
+    def test_client_with_path_credentials(
+        self,
+        subject_with_path_creds: GCSStateStoreManager,
+        mock_client,
+    ) -> None:
+        # Call twice to assure memoization
+        _ = subject_with_path_creds.client
+        _ = subject_with_path_creds.client
+        mock_client.from_service_account_json.assert_called_once_with(
+            "path/to/creds/file",
+        )
+
+    def test_deprecation_warning_for_application_credentials(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ) -> None:
+        with pytest.warns(
+            DeprecationWarning, match="application_credentials.*deprecated"
+        ):
+            GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials="path/to/creds/file",
+                lock_timeout_seconds=10,
+            )
+
+    def test_application_credentials_precedence(
+        self,
+        function_scoped_test_dir,  # noqa: ARG002
+    ) -> None:
+        # Test that application_credentials_path takes precedence when both are provided
+        with pytest.warns(
+            DeprecationWarning, match="application_credentials.*deprecated"
+        ):
+            subject = GCSStateStoreManager(
+                uri="gs://meltano/state/",
+                application_credentials="old/path/to/creds",
+                application_credentials_path="new/path/to/creds",
+                lock_timeout_seconds=10,
+            )
+        assert subject.application_credentials_path == "new/path/to/creds"
