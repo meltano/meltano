@@ -171,6 +171,8 @@ class SettingDefinition(NameEq, Canonical):
     """Meltano SettingDefinition class."""
 
     name: str
+    aliases: list[str]
+    env: str | None
     kind: SettingKind | None
     hidden: bool
     sensitive: bool
