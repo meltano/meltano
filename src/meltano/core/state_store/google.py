@@ -158,7 +158,14 @@ class GCSStateStoreManager(CloudStateStoreManager):
         with requires_gcs():
             if self.application_credentials_json:
                 # Parse JSON string and create client from service account info
-                credentials_info = json.loads(self.application_credentials_json)
+                try:
+                    credentials_info = json.loads(self.application_credentials_json)
+                except json.JSONDecodeError as e:
+                    msg = (
+                        "Invalid JSON in application_credentials_json: "
+                        f"{e.doc[max(e.pos - 9, 0) : e.pos + 10]}"
+                    )
+                    raise ValueError(msg) from e
                 return google.cloud.storage.Client.from_service_account_info(
                     credentials_info,
                 )

@@ -842,3 +842,17 @@ class TestGCSStateStoreManager:
                 lock_timeout_seconds=10,
             )
         assert subject.application_credentials_path == "new/path/to/creds"
+
+    def test_client_with_invalid_json_credentials(self):
+        # Provide invalid JSON string
+        invalid_json = "{invalid_json: true,"
+        subject = GCSStateStoreManager(
+            uri="gs://meltano/state/",
+            application_credentials_json=invalid_json,
+            lock_timeout_seconds=10,
+        )
+        with pytest.raises(
+            ValueError,
+            match="Invalid JSON in application_credentials_json",
+        ):
+            _ = subject.client
