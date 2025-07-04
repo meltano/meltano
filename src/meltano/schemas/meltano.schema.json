@@ -25,6 +25,14 @@
       "type": "string",
       "description": "A globally unique project identifier. Defaults to a Meltano-generated unique GUID for each project."
     },
+    "requires_meltano": {
+      "type": "string",
+      "description": "A version speficier for the Meltano version required by this project. If the version of Meltano being used does not satisfy this requirement, Meltano will exit with an error.",
+      "examples": [
+        ">=3,<4",
+        ">=3.6,<3.7"
+      ]
+    },
     "database_uri": {
       "type": "string",
       "description": "A database URI for the project system database. Defaults to a SQLite file stored at .meltano/meltano.db",
