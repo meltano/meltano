@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import typing as t
+import warnings
 
 import click
 import structlog
 
 from meltano.cli.params import pass_project
-from meltano.cli.utils import CliError, PartialInstrumentedCmd
+from meltano.cli.utils import (
+    CliError,
+    PartialInstrumentedCmd,
+    PluginTypeArg,
+)
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_install_service import install_plugins
@@ -28,12 +33,8 @@ logger = structlog.getLogger(__name__)
 
 
 @click.command(cls=PartialInstrumentedCmd, short_help="Install project dependencies.")
-@click.argument(
-    "plugin_type",
-    type=click.Choice((*PluginType.cli_arguments(), ANY)),
-    required=False,
-)
-@click.argument("plugin_name", nargs=-1, required=False)
+@click.argument("plugin", nargs=-1, required=False)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--clean",
     is_flag=True,
@@ -68,8 +69,8 @@ async def install(
     project: Project,
     ctx: click.Context,
     *,
-    plugin_type: str,
-    plugin_name: str,
+    plugin: tuple[str, ...],
+    plugin_type: PluginType | None,
     clean: bool,
     parallelism: int,
     force: bool,
@@ -81,15 +82,46 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
+    plugin_names = plugin[:]
+    if plugin:
+        if plugin[0] in PluginType.cli_arguments():
+            if plugin_type is not None:
+                msg = "Use only --plugin-type to install plugins of a specific type"
+                raise click.UsageError(msg, ctx=ctx)
+
+            plugin_names = plugin[1:]
+            plugin_type = PluginType.from_cli_argument(plugin[0])
+            warnings.warn(
+                "Passing the plugin type as the first positional argument is "
+                "deprecated and will be removed in Meltano v4. "
+                "Please use the --plugin-type option instead.",
+                DeprecationWarning,
+                stacklevel=1,
+            )
+
+        elif plugin[0] == ANY:
+            if plugin_type is not None:
+                msg = "Use only --plugin-type to install plugins of a specific type"
+                raise click.UsageError(msg, ctx=ctx)
+
+            plugin_names = plugin[1:]
+            plugin_type = None
+            warnings.warn(
+                f"Using `{ANY}` to install plugins of any type is "
+                "deprecated and will be removed in Meltano v4. "
+                "It is no longer necessary to use this argument.",
+                DeprecationWarning,
+                stacklevel=1,
+            )
+
     try:
-        if plugin_type and plugin_type != ANY:
-            plugin_type = PluginType.from_cli_argument(plugin_type)
+        if plugin_type:
             plugins = project.plugins.get_plugins_of_type(plugin_type)
         else:
             plugins = [p for p in project.plugins.plugins() if not p.is_mapping()]
 
-        if plugin_name:
-            plugins = [plugin for plugin in plugins if plugin.name in plugin_name]
+        if plugin_names:
+            plugins = [plugin for plugin in plugins if plugin.name in plugin_names]
 
         if schedule_name:
             schedule_plugins = _get_schedule_plugins(
