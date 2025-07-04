@@ -45,7 +45,7 @@ def remove(
             "and will be removed in Meltano v4. "
             "Please use the --plugin-type option instead.",
             DeprecationWarning,
-            stacklevel=0,
+            stacklevel=1,
         )
     else:
         plugin_names = plugin
