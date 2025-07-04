@@ -27,6 +27,8 @@ const config = {
 
   plugins: ['docusaurus-plugin-sass'],
 
+  themes: ['docusaurus-json-schema-plugin'],
+
   presets: [
     [
       'classic',
