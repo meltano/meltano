@@ -853,10 +853,25 @@ The `init` command does not run relative to a [Meltano Environment](https://docs
 
 Installs dependencies of your project based on the **meltano.yml** file.
 
+You can install plugins by simply providing their names without specifying their type. Meltano will automatically detect the plugin type:
+
+```bash
+meltano install tap-github target-postgres
+```
+
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-To install a plugin without knowing its type, or to install multiple plugins of varying types, use the special `-` (any) character as the plugin type argument, followed by plugin name(s). `meltano install -` with no additional positional arguments has the same effect as `meltano install` (i.e. install all plugins).
+:::warning[Deprecated Syntax]
+
+The following syntax forms are deprecated and will be removed in Meltano v4:
+
+| Deprecated Syntax | Use Instead |
+| --- | --- |
+| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
+| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
+
+:::
 
 To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
@@ -876,15 +891,24 @@ Meltano stores package installation logs in `.meltano/logs/pip/{plugin_type}/{pl
 ### How to Use
 
 ```bash
+# Install all plugins
 meltano install
-meltano install -
 
-meltano install extractors
-meltano install extractor tap-gitlab
-meltano install extractors tap-gitlab tap-adwords
-meltano install - tap-gitlab target-postgres
+# Install specific plugins (recommended - automatically detects type)
+meltano install tap-github target-postgres
+meltano install tap-gitlab
+meltano install - tap-gitlab target-postgres  # Deprecated syntax
+
+# Install plugins by type
+meltano install --plugin-type=extractor tap-gitlab
+meltano install extractors  # Deprecated syntax
+meltano install --plugin-type=extractor tap-gitlab tap-adwords
+meltano install extractors tap-gitlab tap-adwords  # Deprecated syntax
+
+# Install plugins for a specific schedule
 meltano install --schedule=<schedule_name>
 
+# Install with additional options
 meltano install --parallelism=16
 meltano install --clean
 

@@ -368,7 +368,7 @@ The `pip_url`, `executable`, `capabilities`, and `settings` properties
 constitute the plugin's [base plugin description](/concepts/plugins#project-plugins):
 everything Meltano needs to know in order to be able to use the package as a plugin.
 
-:::caution
+:::tip
 
   <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">adding it to Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
 :::
@@ -434,7 +434,18 @@ by default, you'll need to explicitly run [`meltano install`](/reference/command
 before any other `meltano` commands whenever you clone or pull an existing Meltano project from version control,
 to install (or update) all plugins specified in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
 
-To install a specific plugin in your project, use [`meltano install [<type>|-] <name>`](/reference/command-line-interface#install), e.g. `meltano install extractor tap-gitlab` or `meltano install - tap-gitlab`. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+To install a specific plugin in your project, use [`meltano install <name>`](/reference/command-line-interface#install), e.g. `meltano install tap-gitlab target-postgres`. Meltano will automatically detect the plugin type. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
+
+:::warning[Deprecated Syntax]
+
+The following syntax forms are deprecated and will be removed in Meltano v4:
+
+| Deprecated Syntax | Use Instead |
+| --- | --- |
+| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
+| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
+
+:::
 
 ## Pinning a plugin to a specific version
 
@@ -601,10 +612,10 @@ If you've forked a plugin's repository and made changes to it, you can update yo
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
    ```bash
-   meltano install [<type>|-] <name>
+   meltano install [--plugin-type=<type>] <name>
 
    # For example:
-   meltano install extractor tap-gitlab
+   meltano install tap-gitlab
    ```
 
 If your fork supports additional settings, you can set them as [custom settings](/guide/configuration#custom-settings).
@@ -643,10 +654,10 @@ you can [add the new variant as a separate plugin](#multiple-variants) or switch
 1. Reinstall the plugin from the new `pip_url` using [`meltano install`](/reference/command-line-interface#install):
 
    ```bash
-   meltano install [<type>|-] <name>
+   meltano install [--plugin-type=<type>] <name>
 
    # For example:
-   meltano install loader target-postgres
+   meltano install target-postgres
    ```
 
 1. View the current configuration using [`meltano config <name> list`](/reference/command-line-interface#config) to see if it is still valid:
