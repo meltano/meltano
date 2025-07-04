@@ -32,11 +32,12 @@
     },
     "python": {
       "type": "string",
-      "description": "The python version to use for plugins, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment). This can be overridden on a per-plugin basis by setting the `python` property for the plugin.",
+      "description": "The python version to use for plugins, specified as a path, as the name of an executable to find within a directory in $PATH, or as a version number (e.g. '3.11'). If not specified, the python executable that was used to run Meltano will be used (within a separate virtual environment). This can be overridden on a per-plugin basis by setting the `python` property for the plugin.",
       "examples": [
         "/usr/bin/python3.10",
         "python",
-        "python3.11"
+        "python3.11",
+        "3.11"
       ]
     },
     "state_backend": {
@@ -404,11 +405,12 @@
           },
           "python": {
             "type": "string",
-            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "description": "The python version to use for this plugin, specified as a path, as the name of an executable to find within a directory in $PATH, or as a version number (e.g. '3.11'). If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
             "examples": [
               "/usr/bin/python3.10",
               "python",
-              "python3.11"
+              "python3.11",
+              "3.11"
             ]
           },
           "executable": {
@@ -518,19 +520,7 @@
                           }
                         },
                         "env": {
-                          "type": "object",
-                          "description": "Mapping to environment variable to set inside the container. These take precedence over Meltano own runtime environment variables.",
-                          "propertyNames": {
-                            "type": "string"
-                          },
-                          "additionalProperties": {
-                            "type": "string"
-                          },
-                          "examples": [
-                            {
-                              "DBT_PROFILES_DIR": "/usr/app/profile/"
-                            }
-                          ]
+                          "$ref": "#/$defs/env"
                         }
                       }
                     }
@@ -874,7 +864,7 @@
         },
         "env": {
           "type": "string",
-          "description": "An alternative environment variable name to populate with this settings value in the plugin environment.",
+          "description": "An alternative environment variable name to populate with this settings value in the plugin environment. Meltano takes the value of the setting and injects it into the plugin's runtime environment as this environment variable, in addition to the default environment variable (of the form `<PLUGIN_NAME>_<SETTING_NAME>`, etc.).",
           "examples": [
             "GITLAB_API_TOKEN",
             "FACEBOOK_ADS_ACCESS_TOKEN"
@@ -1231,6 +1221,7 @@
       },
       "examples": [
         {
+          "DBT_PROFILES_DIR": "/usr/app/profile/",
           "SNOWFLAKE_ACCOUNT": "my.snowflake.account.com"
         }
       ]
