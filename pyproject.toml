@@ -98,7 +98,9 @@ s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
 azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
 azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
 # Google Cloud Storage state backend settings
-google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"
+google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"  # Deprecated! Remove in Meltano v4
+google_application_credentials_path = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_PATH"
+google_application_credentials_json = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_JSON"
 
 [project.entry-points."meltano.state_backends"]
 # These keys should match the expected scheme for URIs of
