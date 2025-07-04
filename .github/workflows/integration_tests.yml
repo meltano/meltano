@@ -29,6 +29,7 @@ concurrency:
 
 jobs:
   validate:
+    name: Integration Tests
     strategy:
       matrix:
         include:

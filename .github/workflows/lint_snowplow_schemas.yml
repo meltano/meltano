@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   iglulint:
+    name: Schema Linting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository

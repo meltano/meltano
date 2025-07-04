@@ -221,6 +221,7 @@ jobs:
         path: pytest.log
 
   summary:
+    name: Test summary table
     runs-on: ubuntu-latest
     needs: tests
     steps:
@@ -287,6 +288,7 @@ jobs:
         PY313_WINDOWS_SQLITE: ${{ needs.tests.outputs.pytest-results-row-py313-windows-sqlite }}
 
   coverage:
+    name: Code coverage
     runs-on: ubuntu-latest
     needs: tests
     steps:
