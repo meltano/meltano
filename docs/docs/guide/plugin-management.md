@@ -368,7 +368,7 @@ The `pip_url`, `executable`, `capabilities`, and `settings` properties
 constitute the plugin's [base plugin description](/concepts/plugins#project-plugins):
 everything Meltano needs to know in order to be able to use the package as a plugin.
 
-:::caution
+:::tip
 
   <p>Once you've got the plugin working in your project, please consider <a href="/contribute/plugins#discoverable-plugins">adding it to Meltano Hub</a> to make it discoverable and supported out of the box for new users!</p>
 :::
@@ -436,9 +436,14 @@ to install (or update) all plugins specified in your [`meltano.yml` project file
 
 To install a specific plugin in your project, use [`meltano install <name>`](/reference/command-line-interface#install), e.g. `meltano install tap-gitlab target-postgres`. Meltano will automatically detect the plugin type. Subsequent calls to `meltano install` will upgrade a plugin to its latest version, if any. To completely uninstall and reinstall a plugin, use `--clean`.
 
-:::info
+:::warning[Deprecated Syntax]
 
-You can still use the legacy syntax `meltano install extractor tap-gitlab` or `meltano install - tap-gitlab`, but these forms are deprecated and will be removed in Meltano v4.
+The following syntax forms are deprecated and will be removed in Meltano v4:
+
+| Deprecated Syntax | Use Instead |
+| --- | --- |
+| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
+| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
 
 :::
 

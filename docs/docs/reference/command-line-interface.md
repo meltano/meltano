@@ -862,12 +862,14 @@ meltano install tap-github target-postgres
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-:::warning Deprecated Syntax
+:::warning[Deprecated Syntax]
 
 The following syntax forms are deprecated and will be removed in Meltano v4:
 
-- `meltano install <plugin_type> <plugin_name>` - Use `meltano install <plugin_name>` or `--plugin-type` instead
-- `meltano install - <plugin_name>` - Use `meltano install <plugin_name>` instead
+| Deprecated Syntax | Use Instead |
+| --- | --- |
+| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
+| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
 
 :::
 
