@@ -64,7 +64,7 @@ def parse_log_level(log_level: str) -> int:
     return LEVELS.get(log_level, LEVELS[DEFAULT_LEVEL])
 
 
-def read_config(config_file: os.PathLike | None = None) -> dict | None:
+def read_config(config_file: os.PathLike[str] | None = None) -> dict | None:
     """Read a logging config yaml from disk.
 
     Args:
@@ -211,7 +211,7 @@ def default_config(
 def setup_logging(
     project: Project | None = None,
     log_level: str = DEFAULT_LEVEL,
-    log_config: os.PathLike | None = None,
+    log_config: os.PathLike[str] | None = None,
     log_format: LogFormat = LogFormat.colored,
 ) -> None:
     """Configure logging for a meltano project.

@@ -28,7 +28,7 @@ class ProjectInitServiceError(Exception):
 class ProjectInitService:
     """New Project Initialization Service."""
 
-    def __init__(self, project_directory: os.PathLike):
+    def __init__(self, project_directory: os.PathLike[str]):
         """Create a new ProjectInitService instance.
 
         Args:

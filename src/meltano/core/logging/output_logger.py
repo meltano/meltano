@@ -28,7 +28,7 @@ if t.TYPE_CHECKING:
     else:
         from typing_extensions import TypeAlias
 
-StrPath: TypeAlias = t.Union[str, os.PathLike]
+StrPath: TypeAlias = t.Union[str, os.PathLike[str]]
 
 
 class OutputLogger:

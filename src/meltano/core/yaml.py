@@ -32,10 +32,10 @@ class CachedCommentedMap:
     data: CommentedMap
 
 
-cache: dict[os.PathLike, CachedCommentedMap] = {}
+cache: dict[os.PathLike[str], CachedCommentedMap] = {}
 
 
-def load(path: os.PathLike) -> CommentedMap:
+def load(path: os.PathLike[str]) -> CommentedMap:
     """Load the specified YAML file with caching.
 
     The cache is used if both the file path and its content hash match what is stored.

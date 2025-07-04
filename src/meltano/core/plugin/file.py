@@ -80,7 +80,7 @@ class FilePlugin(BasePlugin):
             and path != bundle_dir.joinpath("__init__.py")
         }
 
-    def update_file_header(self, relative_path: PathLike) -> str:
+    def update_file_header(self, relative_path: PathLike[str]) -> str:
         """Return the header to be added to the top of the file.
 
         Args:
@@ -138,7 +138,7 @@ class FilePlugin(BasePlugin):
     def write_file(
         self,
         project: Project,
-        relative_path: PathLike,
+        relative_path: PathLike[str],
         content: str,
     ) -> bool:
         """Write the file to the project.
