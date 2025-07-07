@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.8.0 (2025-07-07)
+
+### ✨ New
+
+- [#9353](https://github.com/meltano/meltano/issues/9353) Accept JSON string to configure the GCS state backend
+- [#9351](https://github.com/meltano/meltano/issues/9351) `meltano install` no longer requires specifying a plugin type, i.e. `meltano install tap-github target-postgres` works too
+- [#9350](https://github.com/meltano/meltano/issues/9350) `meltano remove` no longer requires specifying a plugin type, i.e. `meltano remove tap-github` works too
+- [#9347](https://github.com/meltano/meltano/issues/9347) Limit the traceback in console logs format to two frames
+- [#9348](https://github.com/meltano/meltano/issues/9348) For the `python` project and plugin setting, rely on the `venv.backend` to discover the correct Python executable
+- [#9344](https://github.com/meltano/meltano/issues/9344) Log execution time at the end of a `meltano run` invocation
+- [#9293](https://github.com/meltano/meltano/issues/9293) Make uv the default venv backend
+- [#9335](https://github.com/meltano/meltano/issues/9335) Catalog is now refreshed when `--full-refresh` is used
+- [#9329](https://github.com/meltano/meltano/issues/9329) New `--state-strategy` CLI option to control the behavior of state updates in `run` and `el`/`elt` commands
+- [#9328](https://github.com/meltano/meltano/issues/9328) Support emitting logs with timestamps in local time
+- [#9266](https://github.com/meltano/meltano/issues/9266) New CLI option `meltano select EXTRACTOR --json`
+- [#9317](https://github.com/meltano/meltano/issues/9317) `meltano add` no longer requires specifying a plugin type, i.e. `meltano add tap-github` works too
+- [#9012](https://github.com/meltano/meltano/issues/9012) Add `run_id` key to all logs for `meltano run` and `meltano el`
+
+### 🐛 Fixes
+
+- [#9330](https://github.com/meltano/meltano/issues/9330) Create Singer logging config regardless of any arguments passed to `meltano invoke <plugin> ...`
+
+### ⚙️ Under the Hood
+
+- [#9355](https://github.com/meltano/meltano/issues/9355) Make generic error message more log-friendly
+- [#9354](https://github.com/meltano/meltano/issues/9354) Update the JSON schema to reflect recent changes
+- [#9345](https://github.com/meltano/meltano/issues/9345) Split error handling for persisting state to the system database and to the configured state backend, and log details of the state backend failure
+
+### 📚 Documentation Improvements
+
+- [#9352](https://github.com/meltano/meltano/issues/9352) Improve reference description of `settings[*].aliases` and `settings[*].env`
+- [#9343](https://github.com/meltano/meltano/issues/9343) Add more context around custom state backends
+- [#9342](https://github.com/meltano/meltano/issues/9342) Add connector contribution and Q1/Q2 Changelogs
+
+### 📦 Packaging changes
+
+- [#9357](https://github.com/meltano/meltano/issues/9357) Allow boto3 1.39.x
+- [#9325](https://github.com/meltano/meltano/issues/9325) Remove urllib3<2 constraint for Python 3.9
+- [#9272](https://github.com/meltano/meltano/issues/9272) Remove `setuptools` constraint
+
 ## v3.7.9 (2025-06-26)
 
 ### 🐛 Fixes
