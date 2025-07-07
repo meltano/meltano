@@ -46,7 +46,7 @@ logger = structlog.stdlib.get_logger(__name__)
 class CliError(Exception):
     """CLI Error."""
 
-    def __init__(self, *args, exit_code: int = 1, **kwargs) -> None:  # noqa: ANN002, ANN003
+    def __init__(self, *args: t.Any, exit_code: int = 1, **kwargs: t.Any) -> None:
         """Instantiate custom CLI Error exception."""
         super().__init__(*args, **kwargs)
 
@@ -58,8 +58,7 @@ class CliError(Exception):
         if self.printed:
             return
 
-        logger.error(str(self), exc_info=self)
-        click.secho(str(self), fg="red", err=True)
+        logger.error(str(self), exc_info=self.__cause__)
 
         self.printed = True
 
