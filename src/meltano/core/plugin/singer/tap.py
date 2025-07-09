@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import logging
 import shutil
@@ -60,7 +61,7 @@ async def _stream_redirect(
     while stream and not stream.at_eof():
         data = await stream.readline()
         for file_like_obj in file_like_objs:
-            if asyncio.iscoroutinefunction(file_like_obj.write):
+            if inspect.iscoroutinefunction(file_like_obj.write):
                 await file_like_obj.write(data.decode(encoding) if write_str else data)
             else:
                 file_like_obj.write(data.decode(encoding) if write_str else data)
