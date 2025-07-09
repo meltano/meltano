@@ -59,6 +59,7 @@ dependencies = [
   "structlog>=25.1.0,<26",
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
+  "urllib3>=1.26.20",
   "uv>=0.1.24,<0.8",
   "virtualenv>=20.26.6,<21",
 ]
@@ -124,7 +125,6 @@ pre-commit = [
 ]
 testing = [
   { include-group = "coverage" },
-  "backoff>=2.1.2,<3",
   "colorama>=0.4.4,<0.5",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
@@ -179,7 +179,6 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
   "ignore:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning",  # https://github.com/meltano/meltano/issues/7066
 ]
 log_cli = true
