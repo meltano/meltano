@@ -367,7 +367,8 @@ class ProjectFiles:
             original_schedules.copy_attributes(schedules)
 
     def _write_file(self, file_path: str | os.PathLike[str], contents: Mapping) -> None:
-        fd, tmp_name = tempfile.mkstemp(suffix=".tmp.yml")
+        dirname = os.path.dirname(file_path)  # noqa: PTH120
+        fd, tmp_name = tempfile.mkstemp(dir=dirname, suffix=".tmp.yml")
         try:
             with os.fdopen(fd, "w") as tmp_file:
                 yaml.dump(contents, tmp_file)
