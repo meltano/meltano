@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
+import os
+import tempfile
 import typing as t
 from copy import copy
 
 import structlog
-from atomicwrites import atomic_write
 from ruamel.yaml import CommentedMap, CommentedSeq, YAMLError
 
 from meltano.core import yaml
@@ -14,7 +16,6 @@ from meltano.core.utils import deep_merge
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
-    from os import PathLike
     from pathlib import Path
 
 logger = structlog.stdlib.get_logger(__name__)
@@ -51,7 +52,7 @@ class ProjectFiles:
         """
         self.root = root.resolve()
         self._meltano_file_path = meltano_file_path.resolve()
-        self._plugin_file_map = {}
+        self._plugin_file_map: dict[tuple[str, ...], str] = {}
         self._raw_contents_map: dict[str, CommentedMap] = {}
         self._cached_loaded: CommentedMap | None = None
 
@@ -165,7 +166,7 @@ class ProjectFiles:
         # Deduplicate entries
         return list(dict.fromkeys(include_paths))
 
-    def _add_to_index(self, key: tuple, include_path: Path) -> None:
+    def _add_to_index(self, key: tuple[str, ...], include_path: Path) -> None:
         """Add a new key:path to the `_plugin_file_map`.
 
         Args:
@@ -365,6 +366,18 @@ class ProjectFiles:
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
-    def _write_file(self, file_path: PathLike, contents: Mapping) -> None:
-        with atomic_write(file_path, overwrite=True) as fl:
-            yaml.dump(contents, fl)
+    def _write_file(self, file_path: str | os.PathLike[str], contents: Mapping) -> None:
+        dirname = os.path.dirname(file_path)  # noqa: PTH120
+        fd, tmp_name = tempfile.mkstemp(dir=dirname, suffix=".tmp.yml")
+        try:
+            with os.fdopen(fd, "w") as tmp_file:
+                yaml.dump(contents, tmp_file)
+                tmp_file.flush()
+                os.fsync(tmp_file.fileno())
+            # Atomically replace the target file
+            os.replace(tmp_name, file_path)  # noqa: PTH105
+        except Exception:  # pragma: no cover
+            # Clean up temp file if write or replace fails
+            with contextlib.suppress(OSError):
+                os.unlink(tmp_name)  # noqa: PTH108
+            raise
