@@ -215,6 +215,24 @@ class TestLogFormatters:
         assert "timestamp" in message_dict
         assert not message_dict["timestamp"].endswith("Z")
 
+        # Test with NO_UTC set to an unexpected value ("foobar")
+        monkeypatch.setenv("NO_UTC", "foobar")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        # Should fallback to UTC, so endswith("Z") should be True
+        assert message_dict["timestamp"].endswith("Z")
+
+        # Test with NO_UTC set to "0"
+        monkeypatch.setenv("NO_UTC", "0")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        # Should fallback to UTC, so endswith("Z") should be True
+        assert message_dict["timestamp"].endswith("Z")
+
     def test_json_formatter_locals(self, record_with_exception) -> None:
         formatter = formatters.json_formatter(show_locals=True)
         output = formatter.format(record_with_exception)
