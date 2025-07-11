@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import datetime
 import json
 import logging
 import os
 import re
 import sys
 import typing as t
+import zoneinfo
 from types import TracebackType
 
 import pytest
 import structlog.exceptions
+import time_machine
 
 from meltano.core.logging import formatters
 
@@ -196,6 +199,10 @@ class TestLogFormatters:
 
         assert "exception" not in message_dict
 
+    @time_machine.travel(
+        datetime.datetime(2025, 7, 5, 15, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+        tick=False,
+    )
     def test_json_formatter_utc(
         self,
         record_with_exception,
@@ -206,14 +213,14 @@ class TestLogFormatters:
         output = formatter.format(record_with_exception)
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
-        assert message_dict["timestamp"].endswith("Z")
+        assert message_dict["timestamp"] == "2025-07-05T19:00:00Z"
 
         monkeypatch.setenv("NO_UTC", "1")
         formatter = formatters.json_formatter()
         output = formatter.format(record_with_exception)
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
-        assert not message_dict["timestamp"].endswith("Z")
+        assert message_dict["timestamp"] == "2025-07-05T15:00:00"
 
         # Test with NO_UTC set to an unexpected value ("foobar")
         monkeypatch.setenv("NO_UTC", "foobar")
