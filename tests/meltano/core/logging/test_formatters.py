@@ -4,6 +4,7 @@ import datetime
 import json
 import logging
 import os
+import platform
 import re
 import sys
 import typing as t
@@ -202,6 +203,11 @@ class TestLogFormatters:
     @time_machine.travel(
         datetime.datetime(2025, 7, 5, 15, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
         tick=False,
+    )
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="time-machine can't mock the timezone on Windows",
+        strict=True,
     )
     def test_json_formatter_utc(
         self,
