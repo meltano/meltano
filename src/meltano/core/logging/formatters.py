@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 import typing as t
 
@@ -12,7 +11,7 @@ import structlog.typing
 from rich.console import Console
 from rich.traceback import Traceback, install
 
-from meltano.core.utils import get_no_color_flag, strtobool
+from meltano.core.utils import get_boolean_env_var, get_no_color_flag
 
 if sys.version_info < (3, 11):
     from typing_extensions import Unpack
@@ -37,7 +36,7 @@ def get_default_foreign_pre_chain() -> t.Sequence[Processor]:
         structlog.stdlib.add_log_level,
         structlog.processors.TimeStamper(
             fmt="iso",
-            utc=not strtobool(os.getenv("NO_UTC", "false")),
+            utc=not get_boolean_env_var("NO_UTC", default=False),
         ),
     )
 
