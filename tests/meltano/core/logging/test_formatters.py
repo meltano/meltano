@@ -208,19 +208,22 @@ class TestLogFormatters:
         record_with_exception,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
+        value_utc = "2025-07-05T19:00:00Z"
+        value_local = "2025-07-05T15:00:00"
+
         monkeypatch.delenv("NO_UTC", raising=False)
         formatter = formatters.json_formatter()
         output = formatter.format(record_with_exception)
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
-        assert message_dict["timestamp"] == "2025-07-05T19:00:00Z"
+        assert message_dict["timestamp"] == value_utc
 
         monkeypatch.setenv("NO_UTC", "1")
         formatter = formatters.json_formatter()
         output = formatter.format(record_with_exception)
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
-        assert message_dict["timestamp"] == "2025-07-05T15:00:00"
+        assert message_dict["timestamp"] == value_local
 
         # Test with NO_UTC set to an unexpected value ("foobar")
         monkeypatch.setenv("NO_UTC", "foobar")
@@ -229,7 +232,7 @@ class TestLogFormatters:
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
         # Should fallback to UTC, so endswith("Z") should be True
-        assert message_dict["timestamp"].endswith("Z")
+        assert message_dict["timestamp"] == value_utc
 
         # Test with NO_UTC set to "0"
         monkeypatch.setenv("NO_UTC", "0")
@@ -238,7 +241,15 @@ class TestLogFormatters:
         message_dict = json.loads(output)
         assert "timestamp" in message_dict
         # Should fallback to UTC, so endswith("Z") should be True
-        assert message_dict["timestamp"].endswith("Z")
+        assert message_dict["timestamp"] == value_utc
+
+        # Test with NO_UTC set to ""
+        monkeypatch.setenv("NO_UTC", "")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"] == value_utc
 
     def test_json_formatter_locals(self, record_with_exception) -> None:
         formatter = formatters.json_formatter(show_locals=True)
