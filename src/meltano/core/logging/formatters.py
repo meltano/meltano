@@ -138,7 +138,9 @@ def _process_formatter(
     """
     return structlog.stdlib.ProcessorFormatter(
         processors=processors,
-        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,  # FYI: this needs to be kept consistent between all `ProcessorFormatter` instances
+        # FYI: this needs to be kept consistent between all `ProcessorFormatter`
+        # instances
+        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
         **kwargs,
     )
 
