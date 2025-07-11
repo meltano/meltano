@@ -196,6 +196,25 @@ class TestLogFormatters:
 
         assert "exception" not in message_dict
 
+    def test_json_formatter_utc(
+        self,
+        record_with_exception,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.delenv("NO_UTC", raising=False)
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"].endswith("Z")
+
+        monkeypatch.setenv("NO_UTC", "1")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert not message_dict["timestamp"].endswith("Z")
+
     def test_json_formatter_locals(self, record_with_exception) -> None:
         formatter = formatters.json_formatter(show_locals=True)
         output = formatter.format(record_with_exception)
