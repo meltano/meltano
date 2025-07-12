@@ -76,7 +76,7 @@ onto a production environment is to
 [use `uv` to install the `meltano` package from PyPI](/getting-started/installation).
 
 If you add `meltano` (or `meltano==<version>`) to your project's `requirements.txt`
-file, you can choose to automatically run `pip install -r requirements.txt` on your
+file, you can choose to automatically run `uv pip install -r requirements.txt` on your
 production environment whenever your Meltano project is updated to ensure you're always
 on the latest (or requested) version.
 
