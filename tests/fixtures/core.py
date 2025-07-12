@@ -21,7 +21,7 @@ from meltano.core.environment_service import EnvironmentService
 from meltano.core.job import Job, Payload, State
 from meltano.core.job_state import JobState
 from meltano.core.locked_definition_service import LockedDefinitionService
-from meltano.core.logging.formatters import LEVELED_TIMESTAMPED_PRE_CHAIN
+from meltano.core.logging.formatters import get_default_foreign_pre_chain
 from meltano.core.logging.job_logging_service import JobLoggingService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -2416,7 +2416,7 @@ test_log_config = {
         "test": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.processors.JSONRenderer(),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": get_default_foreign_pre_chain(),
         },
     },
     "handlers": {

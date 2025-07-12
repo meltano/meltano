@@ -11,7 +11,7 @@ import structlog.typing
 from rich.console import Console
 from rich.traceback import Traceback, install
 
-from meltano.core.utils import get_no_color_flag
+from meltano.core.utils import get_boolean_env_var, get_no_color_flag
 
 if sys.version_info < (3, 11):
     from typing_extensions import Unpack
@@ -26,14 +26,19 @@ if t.TYPE_CHECKING:
 
 install(suppress=[click])
 
-TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
-LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
-    # Add the log level and a timestamp to the event_dict if the log entry
-    # is not from structlog.
-    structlog.stdlib.add_log_level,
-    TIMESTAMPER,
-)
+def get_default_foreign_pre_chain() -> t.Sequence[Processor]:
+    """Get the default foreign pre-chain for a ProcessorFormatter.
+
+    This is the pre-chain that will be used for all ProcessorFormatter instances.
+    """
+    return (
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(
+            fmt="iso",
+            utc=not get_boolean_env_var("NO_UTC", default=False),
+        ),
+    )
 
 
 class LoggingFeatures(t.TypedDict, total=False):
@@ -140,7 +145,7 @@ def _process_formatter(
         processors=processors,
         # FYI: this needs to be kept consistent between all `ProcessorFormatter`
         # instances
-        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+        foreign_pre_chain=get_default_foreign_pre_chain(),
         **kwargs,
     )
 
