@@ -233,3 +233,12 @@ class TestSettingDefinition:
             match="missing 1 required keyword-only argument: 'name'",
         ):
             SettingDefinition()
+
+    def test_is_deprecated(self) -> None:
+        setting_definition = SettingDefinition(
+            name="test_setting",
+            kind=SettingKind.STRING,
+            deprecated=True,
+        )
+
+        assert setting_definition.is_deprecated
