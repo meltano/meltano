@@ -1458,11 +1458,11 @@ requires-dist = [
 provides-extras = ["azure", "gcs", "mssql", "postgres", "psycopg2", "s3"]
 
 [package.metadata.requires-dev]
-coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.8" }]
+coverage = [{ name = "coverage", extras = ["toml"], specifier = ">=7.9" }]
 dev = [
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.39" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
-    { name = "coverage", extras = ["toml"], specifier = ">=7.8" },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
@@ -1488,7 +1488,7 @@ dev = [
 pre-commit = [{ name = "pre-commit", specifier = ">=4.0.1,<5" }]
 testing = [
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
-    { name = "coverage", extras = ["toml"], specifier = ">=7.8" },
+    { name = "coverage", extras = ["toml"], specifier = ">=7.9" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
     { name = "pytest-asyncio", specifier = ">=1" },
