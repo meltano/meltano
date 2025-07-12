@@ -263,6 +263,7 @@ def path_property(path: str) -> str:
     Examples:
       stream[0].properties.list_items.properties.account → list_items.account
       stream[0].properties.name                          → name
+      stream[0].properties.properties.properties.amount  → properties.amount
     """
     prop_regex = r"properties\.([^.]+)+"
     components = re.findall(prop_regex, path)
@@ -282,12 +283,9 @@ def property_breadcrumb(props: list[str]) -> list[str]:
     >>> property_breadcrumb(["payload", "content"])
     ['properties', 'payload', 'properties', 'content']
     """
-    if len(props) >= 2 and props[0] == "properties":
-        breadcrumb = props
-    else:
-        breadcrumb = []
-        for prop in props:
-            breadcrumb.extend(["properties", prop])
+    breadcrumb = []
+    for prop in props:
+        breadcrumb.extend(["properties", prop])
 
     return breadcrumb
 

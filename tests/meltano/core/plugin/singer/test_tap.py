@@ -20,12 +20,15 @@ from meltano.core.plugin.singer import SingerTap
 from meltano.core.plugin.singer.catalog import (
     CatalogDict,
     ListSelectedExecutor,
+    MetadataRule,
+    SchemaRule,
+    property_breadcrumb,
     select_metadata_rules,
 )
 from meltano.core.state_service import InvalidJobStateError, StateService
 
 if t.TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
 
     from sqlalchemy.orm import Session
 
@@ -462,14 +465,23 @@ class TestSingerTap:
         def reset_catalog() -> None:
             catalog_path.write_text('{"rules": []}')
 
-        def assert_rules(*rules) -> None:
+        def assert_rules(*rules: Sequence) -> None:
             with catalog_path.open() as catalog_file:
                 catalog = json.load(catalog_file)
 
-            assert catalog["rules"] == list(rules)
+            transformed_rules = [
+                [
+                    rule[0],
+                    property_breadcrumb(rule[1]),
+                    *rule[2:],
+                ]
+                for rule in rules
+            ]
 
-        def mock_metadata_executor(rules):
-            def visit(catalog) -> None:
+            assert catalog["rules"] == transformed_rules
+
+        def mock_metadata_executor(rules: t.Iterable[MetadataRule]):
+            def visit(catalog: dict) -> None:
                 for rule in rules:
                     catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.key, rule.value],
@@ -489,9 +501,9 @@ class TestSingerTap:
             # When `select` isn't set in meltano.yml or the plugin def, select all
             assert_rules(
                 ["*", [], "selected", False],
-                ["*", ["properties", "*"], "selected", False],
+                ["*", ["*"], "selected", False],
                 ["*", [], "selected", True],
-                ["*", ["properties", "*"], "selected", True],
+                ["*", ["*"], "selected", True],
             )
 
             reset_catalog()
@@ -509,9 +521,9 @@ class TestSingerTap:
             # When `select` is set in the plugin definition, use the selection
             assert_rules(
                 ["*", [], "selected", False],
-                ["*", ["properties", "*"], "selected", False],
+                ["*", ["*"], "selected", False],
                 ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "name"], "selected", True],
+                ["UniqueEntitiesName", ["name"], "selected", True],
             )
 
             reset_catalog()
@@ -529,9 +541,9 @@ class TestSingerTap:
             # `select` set in meltano.yml takes precedence over the plugin definition
             assert_rules(
                 ["*", [], "selected", False],
-                ["*", ["properties", "*"], "selected", False],
+                ["*", ["*"], "selected", False],
                 ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                ["UniqueEntitiesName", ["code"], "selected", True],
             )
 
     @pytest.mark.asyncio
@@ -550,14 +562,23 @@ class TestSingerTap:
         def reset_catalog() -> None:
             catalog_path.write_text('{"rules": []}')
 
-        def assert_rules(*rules) -> None:
+        def assert_rules(*rules: Sequence) -> None:
             with catalog_path.open() as catalog_file:
                 catalog = json.load(catalog_file)
 
-            assert catalog["rules"] == list(rules)
+            transformed_rules = [
+                [
+                    rule[0],
+                    property_breadcrumb(rule[1]),
+                    *rule[2:],
+                ]
+                for rule in rules
+            ]
 
-        def mock_metadata_executor(rules):
-            def visit(catalog) -> None:
+            assert catalog["rules"] == transformed_rules
+
+        def mock_metadata_executor(rules: t.Iterable[MetadataRule]):
+            def visit(catalog: dict) -> None:
                 for rule in rules:
                     rule_list = [
                         rule.tap_stream_id,
@@ -571,8 +592,8 @@ class TestSingerTap:
 
             return mock.Mock(visit=visit)
 
-        def mock_schema_executor(rules):
-            def visit(catalog) -> None:
+        def mock_schema_executor(rules: t.Iterable[SchemaRule]):
+            def visit(catalog: dict) -> None:
                 for rule in rules:
                     catalog["rules"].append(
                         [rule.tap_stream_id, rule.breadcrumb, rule.payload],
@@ -598,7 +619,7 @@ class TestSingerTap:
                     "UniqueEntitiesName": {"replication-key": "created_at"},
                     "UniqueEntitiesName.created_at": {"is-replication-key": True},
                 },
-                "metadata.UniqueEntitiesName.properties.payload.properties.hash.custom-metadata": "custom-value",  # noqa: E501
+                "metadata.UniqueEntitiesName.payload.hash.custom-metadata": "custom-value",  # noqa: E501
                 "_schema": {
                     "UniqueEntitiesName": {
                         "code": {"anyOf": [{"type": "string"}, {"type": "null"}]},
@@ -632,12 +653,12 @@ class TestSingerTap:
                 # Schema rules
                 [
                     "UniqueEntitiesName",
-                    ["properties", "code"],
+                    ["code"],
                     {"anyOf": [{"type": "string"}, {"type": "null"}]},
                 ],
                 [
                     "UniqueEntitiesName",
-                    ["properties", "payload"],
+                    ["payload"],
                     {
                         "type": "object",
                         "properties": {
@@ -648,21 +669,21 @@ class TestSingerTap:
                 ],
                 # Clean slate selection metadata rules
                 ["*", [], "selected", False],
-                ["*", ["properties", "*"], "selected", False],
+                ["*", ["*"], "selected", False],
                 # Selection metadata rules
                 ["UniqueEntitiesName", [], "selected", True],
-                ["UniqueEntitiesName", ["properties", "code"], "selected", True],
+                ["UniqueEntitiesName", ["code"], "selected", True],
                 # Metadata rules
                 ["UniqueEntitiesName", [], "replication-key", "created_at"],
                 [
                     "UniqueEntitiesName",
-                    ["properties", "created_at"],
+                    ["created_at"],
                     "is-replication-key",
                     True,
                 ],
                 [
                     "UniqueEntitiesName",
-                    ["properties", "payload", "properties", "hash"],
+                    ["payload", "hash"],
                     "custom-metadata",
                     "custom-value",
                 ],
