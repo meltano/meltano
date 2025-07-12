@@ -1414,7 +1414,7 @@ typing = [
 [package.metadata]
 requires-dist = [
     { name = "aiodocker", specifier = ">=0.24.0,<0.25" },
-    { name = "alembic", specifier = ">=1.14.0,<2" },
+    { name = "alembic", specifier = ">=1.16.0,<2" },
     { name = "anyio", specifier = ">=4.4.0,<5" },
     { name = "azure-common", marker = "extra == 'azure'", specifier = ">=1.1.28,<2" },
     { name = "azure-core", marker = "extra == 'azure'", specifier = ">=1.32.0,<2" },
