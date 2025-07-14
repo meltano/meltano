@@ -961,3 +961,22 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
                 force=False,
             )
+
+    def test_add_conflicting_plugin_type_and_positional_argument(
+        self,
+        tap,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["add", "--plugin-type=extractors", "extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
+
+        result = cli_runner.invoke(
+            cli,
+            ["add", "extractors", "--plugin-type=extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
