@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import typing as t
 from unittest import mock
 
 import pytest
@@ -25,13 +24,13 @@ class TestSnowflakeStateStoreManager:
         with mock.patch("snowflake.connector.connect") as mock_connect:
             mock_conn = mock.Mock()
             mock_cursor = mock.Mock()
-            
+
             # Mock the context manager for cursor
             mock_cursor_context = mock.Mock()
             mock_cursor_context.__enter__ = mock.Mock(return_value=mock_cursor)
             mock_cursor_context.__exit__ = mock.Mock(return_value=None)
             mock_conn.cursor.return_value = mock_cursor_context
-            
+
             mock_connect.return_value = mock_conn
             yield mock_conn, mock_cursor
 
@@ -210,15 +209,24 @@ class TestSnowflakeStateStoreManager:
         manager, mock_cursor = subject
 
         # Mock cursor response - need to make cursor itself iterable
-        mock_cursor.__iter__ = mock.Mock(return_value=iter([("job1",), ("job2",), ("job3",)]))
+        mock_cursor.__iter__ = mock.Mock(
+            return_value=iter([("job1",), ("job2",), ("job3",)])
+        )
 
         # Get state IDs
         state_ids = list(manager.get_state_ids())
 
         # Verify query with fully qualified table name (skip table creation calls)
-        select_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT state_id FROM" in call[0][0]]
+        select_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "SELECT state_id FROM" in call[0][0]
+        ]
         assert len(select_calls) == 1
-        assert "SELECT state_id FROM testdb.testschema.meltano_state" in select_calls[0][0][0]
+        assert (
+            "SELECT state_id FROM testdb.testschema.meltano_state"
+            in select_calls[0][0][0]
+        )
 
         # Verify returned IDs
         assert state_ids == ["job1", "job2", "job3"]
@@ -228,15 +236,24 @@ class TestSnowflakeStateStoreManager:
         manager, mock_cursor = subject
 
         # Mock cursor response - need to make cursor itself iterable
-        mock_cursor.__iter__ = mock.Mock(return_value=iter([("test_job_1",), ("test_job_2",)]))
+        mock_cursor.__iter__ = mock.Mock(
+            return_value=iter([("test_job_1",), ("test_job_2",)])
+        )
 
         # Get state IDs with pattern
         state_ids = list(manager.get_state_ids("test_*"))
 
         # Verify query with LIKE and fully qualified table name (skip table creation calls)
-        select_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT state_id FROM" in call[0][0]]
+        select_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "SELECT state_id FROM" in call[0][0]
+        ]
         assert len(select_calls) == 1
-        assert "SELECT state_id FROM testdb.testschema.meltano_state WHERE state_id LIKE" in select_calls[0][0][0]
+        assert (
+            "SELECT state_id FROM testdb.testschema.meltano_state WHERE state_id LIKE"
+            in select_calls[0][0][0]
+        )
         assert select_calls[0][0][1] == ("test_%",)
 
         # Verify returned IDs
@@ -253,13 +270,26 @@ class TestSnowflakeStateStoreManager:
         count = manager.clear_all()
 
         # Verify queries with fully qualified table names (skip table creation calls)
-        count_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT COUNT(*)" in call[0][0]]
-        truncate_calls = [call for call in mock_cursor.execute.call_args_list if "TRUNCATE TABLE" in call[0][0]]
-        
+        count_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "SELECT COUNT(*)" in call[0][0]
+        ]
+        truncate_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "TRUNCATE TABLE" in call[0][0]
+        ]
+
         assert len(count_calls) == 1
         assert len(truncate_calls) == 1
-        assert "SELECT COUNT(*) FROM testdb.testschema.meltano_state" in count_calls[0][0][0]
-        assert "TRUNCATE TABLE testdb.testschema.meltano_state" in truncate_calls[0][0][0]
+        assert (
+            "SELECT COUNT(*) FROM testdb.testschema.meltano_state"
+            in count_calls[0][0][0]
+        )
+        assert (
+            "TRUNCATE TABLE testdb.testschema.meltano_state" in truncate_calls[0][0][0]
+        )
 
         # Verify returned count
         assert count == 5
@@ -271,9 +301,16 @@ class TestSnowflakeStateStoreManager:
         # Test successful lock acquisition
         with manager.acquire_lock("test_job", retry_seconds=0):
             # Verify INSERT query for lock with fully qualified table name (skip table creation calls)
-            insert_calls = [call for call in mock_cursor.execute.call_args_list if "INSERT INTO" in call[0][0] and "meltano_state_locks" in call[0][0]]
+            insert_calls = [
+                call
+                for call in mock_cursor.execute.call_args_list
+                if "INSERT INTO" in call[0][0] and "meltano_state_locks" in call[0][0]
+            ]
             assert len(insert_calls) >= 1
-            assert "INSERT INTO testdb.testschema.meltano_state_locks" in insert_calls[0][0][0]
+            assert (
+                "INSERT INTO testdb.testschema.meltano_state_locks"
+                in insert_calls[0][0][0]
+            )
 
         # Verify DELETE queries for lock release and cleanup with fully qualified table names
         delete_calls = [

@@ -293,14 +293,14 @@ class SnowflakeStateStoreManager(StateStoreManager):
             # Additionally, VARIANT columns might return JSON strings that need parsing
             partial_state = row[0]
             completed_state = row[1]
-            
+
             # Handle None values
             if partial_state is None:
                 partial_state = {}
             # Parse JSON string if Snowflake returns string instead of dict
             elif isinstance(partial_state, str):
                 partial_state = json.loads(partial_state)
-                
+
             if completed_state is None:
                 completed_state = {}
             # Parse JSON string if Snowflake returns string instead of dict
