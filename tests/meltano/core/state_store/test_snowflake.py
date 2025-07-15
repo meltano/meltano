@@ -38,12 +38,12 @@ class TestSnowflakeStateStoreManager:
         mock_conn, mock_cursor = mock_connection
 
         # Mock the SNOWFLAKE_INSTALLED check to avoid import issues
-        with mock.patch("meltano.core.state_store.snowflake.SNOWFLAKE_INSTALLED", True):
+        with mock.patch("meltano.core.state_store.snowflake.SNOWFLAKE_INSTALLED", True):  # noqa: FBT003
             manager = SnowflakeStateStoreManager(
                 uri="snowflake://testuser:testpass@testaccount/testdb/testschema",
                 account="testaccount",
                 user="testuser",
-                password="testpass",
+                password="testpass",  # noqa: S106
                 warehouse="testwarehouse",
                 database="testdb",
                 schema="testschema",
@@ -54,18 +54,20 @@ class TestSnowflakeStateStoreManager:
 
     def test_missing_snowflake_connector(self):
         """Test error when snowflake-connector-python is not installed."""
-        with mock.patch(
-            "meltano.core.state_store.snowflake.SNOWFLAKE_INSTALLED",
-            False,
+        with (
+            mock.patch(
+                "meltano.core.state_store.snowflake.SNOWFLAKE_INSTALLED",
+                False,  # noqa: FBT003
+            ),
+            pytest.raises(MissingSnowflakeConnectorError),
         ):
-            with pytest.raises(MissingSnowflakeConnectorError):
-                SnowflakeStateStoreManager(
-                    uri="snowflake://test@account/db",
-                    account="account",
-                    user="test",
-                    password="pass",
-                    warehouse="warehouse",
-                )
+            SnowflakeStateStoreManager(
+                uri="snowflake://test@account/db",
+                account="account",
+                user="test",
+                password="pass",  # noqa: S106
+                warehouse="warehouse",
+            )
 
     def test_set_state(self, subject):
         """Test setting state."""
@@ -226,7 +228,7 @@ class TestSnowflakeStateStoreManager:
         # Get state IDs with pattern
         state_ids = list(manager.get_state_ids("test_*"))
 
-        # Verify query with LIKE and fully qualified table name (skip table creation calls)
+        # Verify query with LIKE and fully qualified table name (skip table creation calls)  # noqa: E501
         select_calls = [
             call
             for call in mock_cursor.execute.call_args_list
@@ -283,7 +285,7 @@ class TestSnowflakeStateStoreManager:
 
         # Test successful lock acquisition
         with manager.acquire_lock("test_job", retry_seconds=0):
-            # Verify INSERT query for lock with fully qualified table name (skip table creation calls)
+            # Verify INSERT query for lock with fully qualified table name (skip table creation calls)  # noqa: E501
             insert_calls = [
                 call
                 for call in mock_cursor.execute.call_args_list
@@ -295,7 +297,7 @@ class TestSnowflakeStateStoreManager:
                 in insert_calls[0][0][0]
             )
 
-        # Verify DELETE queries for lock release and cleanup with fully qualified table names
+        # Verify DELETE queries for lock release and cleanup with fully qualified table names  # noqa: E501
         delete_calls = [
             call
             for call in mock_cursor.execute.call_args_list
@@ -319,12 +321,14 @@ class TestSnowflakeStateStoreManager:
         ]
 
         # Mock the ProgrammingError class used in the implementation
-        with mock.patch(
-            "meltano.core.state_store.snowflake.ProgrammingError",
-            Exception,
+        with (
+            mock.patch(
+                "meltano.core.state_store.snowflake.ProgrammingError",
+                Exception,
+            ),
+            manager.acquire_lock("test_job", retry_seconds=0.1),
         ):
-            with manager.acquire_lock("test_job", retry_seconds=0.1):
-                pass
+            pass
 
         # Verify it retried
         assert mock_cursor.execute.call_count >= 2
