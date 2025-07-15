@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import importlib.resources
 import json
 
 import pytest
+from jsonschema import ValidationError, validate
 
+from meltano import schemas
 from meltano.core.plugin.base import (
     PluginDefinition,
     PluginType,
@@ -278,3 +281,50 @@ class TestPluginCompatibility:
 
         canonical_data = plugin.canonical()
         assert canonical_data["requires_meltano"] == ">=1.0.0"
+
+    def test_json_schema_validates_plugin_requires_meltano(self):
+        """Test that the JSON schema validates plugin-level requires_meltano."""
+        # Load the Meltano JSON schema
+        schema_resource = importlib.resources.files(schemas) / "meltano.schema.json"
+        with schema_resource.open("r") as f:
+            schema = json.load(f)
+
+        # Test valid configuration with plugin-level requires_meltano
+        valid_config = {
+            "version": 1,
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-gitlab",
+                        "variant": "meltanolabs",
+                        "requires_meltano": ">=3.0.0",
+                    }
+                ],
+                "loaders": [
+                    {
+                        "name": "target-jsonl",
+                        "requires_meltano": ">=2.5.0,<4.0.0",
+                    }
+                ],
+            },
+        }
+
+        # Should not raise ValidationError
+        validate(instance=valid_config, schema=schema)
+
+        # Test invalid configuration (non-string requires_meltano)
+        invalid_config = {
+            "version": 1,
+            "plugins": {
+                "extractors": [
+                    {
+                        "name": "tap-gitlab",
+                        "requires_meltano": 123,  # Invalid: should be string
+                    }
+                ]
+            },
+        }
+
+        # Should raise ValidationError
+        with pytest.raises(ValidationError):
+            validate(instance=invalid_config, schema=schema)
