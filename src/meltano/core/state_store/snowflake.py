@@ -162,9 +162,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
             # Extract connection details from URI and parameters
             self.account = account or parsed.hostname
             if not self.account:
-                raise MissingStateBackendSettingsError(
-                    "Snowflake account is required"
-                )
+                raise MissingStateBackendSettingsError("Snowflake account is required")
 
             self.user = user or parsed.username
             if not self.user:
@@ -172,9 +170,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
 
             self.password = password or parsed.password
             if not self.password:
-                raise MissingStateBackendSettingsError(
-                    "Snowflake password is required"
-                )
+                raise MissingStateBackendSettingsError("Snowflake password is required")
 
             self.warehouse = warehouse
             if not self.warehouse:
@@ -186,9 +182,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
             path_parts = parsed.path.strip("/").split("/") if parsed.path else []
             self.database = database or (path_parts[0] if path_parts else None)
             if not self.database:
-                raise MissingStateBackendSettingsError(
-                    "Snowflake database is required"
-                )
+                raise MissingStateBackendSettingsError("Snowflake database is required")
 
             self.schema = schema or (path_parts[1] if len(path_parts) > 1 else "PUBLIC")
             self.role = role
@@ -322,9 +316,13 @@ class SnowflakeStateStoreManager(StateStoreManager):
             The number of states cleared from the store.
         """
         with self.connection.cursor() as cursor:
-            cursor.execute(f"SELECT COUNT(*) FROM {self.database}.{self.schema}.{self.table_name}")
+            cursor.execute(
+                f"SELECT COUNT(*) FROM {self.database}.{self.schema}.{self.table_name}"
+            )
             count = cursor.fetchone()[0]
-            cursor.execute(f"TRUNCATE TABLE {self.database}.{self.schema}.{self.table_name}")
+            cursor.execute(
+                f"TRUNCATE TABLE {self.database}.{self.schema}.{self.table_name}"
+            )
             return count
 
     def get_state_ids(self, pattern: str | None = None) -> Iterable[str]:
@@ -345,7 +343,9 @@ class SnowflakeStateStoreManager(StateStoreManager):
                     (sql_pattern,),
                 )
             else:
-                cursor.execute(f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name}")
+                cursor.execute(
+                    f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name}"
+                )
 
             for row in cursor:
                 yield row[0]
