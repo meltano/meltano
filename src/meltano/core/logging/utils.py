@@ -14,8 +14,7 @@ import structlog
 import yaml
 
 from meltano.core.logging.formatters import (
-    LEVELED_TIMESTAMPED_PRE_CHAIN,
-    TIMESTAMPER,
+    get_default_foreign_pre_chain,
     rich_exception_formatter_factory,
 )
 from meltano.core.utils import get_no_color_flag
@@ -96,6 +95,7 @@ def default_config(
     """
     log_level = log_level.upper()
     max_frames = 100 if log_level == "DEBUG" else 2
+    foreign_pre_chain = get_default_foreign_pre_chain()
 
     if log_format == LogFormat.colored:
         no_color = get_no_color_flag()
@@ -116,7 +116,7 @@ def default_config(
                 colors=not no_color,
                 exception_formatter=formatter,
             ),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": foreign_pre_chain,
         }
 
     elif log_format == LogFormat.json:
@@ -127,7 +127,7 @@ def default_config(
                 structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                 structlog.processors.JSONRenderer(),
             ],
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": foreign_pre_chain,
         }
     elif log_format == LogFormat.key_value:
         formatter_config = {
@@ -135,7 +135,7 @@ def default_config(
             "processor": structlog.processors.KeyValueRenderer(
                 key_order=["timestamp", "level", "event", "logger"],
             ),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": foreign_pre_chain,
         }
     elif log_format == LogFormat.uncolored:
         formatter_config = {
@@ -147,7 +147,7 @@ def default_config(
                     max_frames=max_frames,
                 ),
             ),
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": foreign_pre_chain,
         }
     elif log_format == LogFormat.plain:
         formatter_config = {
@@ -162,7 +162,7 @@ def default_config(
                 structlog.processors.UnicodeDecoder(),
                 lambda _logger, _name, event_dict: event_dict["event"],
             ],
-            "foreign_pre_chain": LEVELED_TIMESTAMPED_PRE_CHAIN,
+            "foreign_pre_chain": foreign_pre_chain,
         }
     else:
         t.assert_never(log_format)
@@ -235,9 +235,8 @@ def setup_logging(
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
-            structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
-            TIMESTAMPER,
+            *get_default_foreign_pre_chain(),
             structlog.processors.StackInfoRenderer(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
         ],

@@ -29,6 +29,10 @@ The no color configuration is available for all meltano subcommands via an envir
 
 - `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
+### UTC timestamps in logs
+
+- `NO_UTC` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable UTC timestamps in logs and use local time instead.
+
 ##### <a name="auto-install-behavior"></a>Auto-install behavior
 
 There's three possible auto-install behaviors for commands that support the `--install/--no-install/--only-install` switch:
