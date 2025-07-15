@@ -338,7 +338,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
             cursor.execute(
                 f"SELECT COUNT(*) FROM {self.database}.{self.schema}.{self.table_name}"  # noqa: S608
             )
-            count = cursor.fetchone()[0]
+            count = cursor.fetchone()[0]  # type: ignore[index]
             cursor.execute(
                 f"TRUNCATE TABLE {self.database}.{self.schema}.{self.table_name}"
             )
