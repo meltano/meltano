@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-import warnings
 
 import click
 import structlog
@@ -13,6 +12,7 @@ from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
     PluginTypeArg,
+    validate_plugin_type_args,
 )
 from meltano.core.block.block_parser import BlockParser
 from meltano.core.plugin import PluginType
@@ -26,8 +26,6 @@ if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
     from meltano.core.project import Project
     from meltano.core.tracking import Tracker
-
-ANY = "-"
 
 logger = structlog.getLogger(__name__)
 
@@ -82,37 +80,12 @@ async def install(
     Read more at https://docs.meltano.com/reference/command-line-interface#install
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
-    plugin_names = plugin[:]
-    if plugin:
-        if plugin[0] in PluginType.cli_arguments():
-            if plugin_type is not None:
-                msg = "Use only --plugin-type to install plugins of a specific type"
-                raise click.UsageError(msg, ctx=ctx)
-
-            plugin_names = plugin[1:]
-            plugin_type = PluginType.from_cli_argument(plugin[0])
-            warnings.warn(
-                "Passing the plugin type as the first positional argument is "
-                "deprecated and will be removed in Meltano v4. "
-                "Please use the --plugin-type option instead.",
-                DeprecationWarning,
-                stacklevel=1,
-            )
-
-        elif plugin[0] == ANY:
-            if plugin_type is not None:
-                msg = "Use only --plugin-type to install plugins of a specific type"
-                raise click.UsageError(msg, ctx=ctx)
-
-            plugin_names = plugin[1:]
-            plugin_type = None
-            warnings.warn(
-                f"Using `{ANY}` to install plugins of any type is "
-                "deprecated and will be removed in Meltano v4. "
-                "It is no longer necessary to use this argument.",
-                DeprecationWarning,
-                stacklevel=1,
-            )
+    plugin_names, plugin_type = validate_plugin_type_args(
+        plugin,
+        plugin_type,
+        ctx,
+        support_any=True,
+    )
 
     try:
         if plugin_type:

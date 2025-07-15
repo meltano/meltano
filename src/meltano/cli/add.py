@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-import warnings
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -19,6 +18,7 @@ from meltano.cli.utils import (
     add_required_plugins,
     check_dependencies_met,
     infer_plugin_type,
+    validate_plugin_type_args,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -141,18 +141,7 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    if plugin_type is None and plugin[0] in PluginType.cli_arguments():
-        plugin_type = PluginType.from_cli_argument(plugin[0])
-        plugin_names = plugin[1:]
-        warnings.warn(
-            "Passing the plugin type as the first positional argument is deprecated "
-            "and will be removed in Meltano v4. "
-            "Please use the --plugin-type option instead.",
-            DeprecationWarning,
-            stacklevel=0,
-        )
-    else:
-        plugin_names = plugin
+    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``

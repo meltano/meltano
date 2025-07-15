@@ -99,3 +99,22 @@ class TestCliRemove:
             assert_cli_runner(result)
 
             remove_plugins_mock.assert_called_once_with(project, [tap, tap_gitlab])
+
+    def test_remove_conflicting_plugin_type_and_positional_argument(
+        self,
+        tap,
+        cli_runner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["remove", "--plugin-type=extractors", "extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
+
+        result = cli_runner.invoke(
+            cli,
+            ["remove", "extractors", "--plugin-type=extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr

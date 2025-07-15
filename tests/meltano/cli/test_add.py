@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import platform
@@ -337,7 +338,8 @@ class TestCliAdd:
         cli_runner,
     ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
-        project.plugins.remove_from_file(tap)
+        with contextlib.suppress(PluginNotFoundError):
+            project.plugins.remove_from_file(tap)
 
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
@@ -961,3 +963,23 @@ class TestCliAdd:
                 reason=PluginInstallReason.ADD,
                 force=False,
             )
+
+    @pytest.mark.usefixtures("reset_project_context")
+    def test_add_conflicting_plugin_type_and_positional_argument(
+        self,
+        tap,
+        cli_runner: MeltanoCliRunner,
+    ) -> None:
+        result = cli_runner.invoke(
+            cli,
+            ["add", "--plugin-type=extractors", "extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
+
+        result = cli_runner.invoke(
+            cli,
+            ["add", "extractors", "--plugin-type=extractors", tap.name],
+        )
+        assert result.exit_code == 2
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
