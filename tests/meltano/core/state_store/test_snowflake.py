@@ -19,7 +19,9 @@ class TestSnowflakeStateStoreManager:
     @pytest.fixture
     def mock_connection(self):
         """Mock Snowflake connection."""
-        with mock.patch("meltano.core.state_store.snowflake.snowflake.connector.connect") as mock_connect:
+        with mock.patch(
+            "meltano.core.state_store.snowflake.snowflake.connector.connect"
+        ) as mock_connect:
             mock_conn = mock.Mock()
             mock_cursor = mock.Mock()
 
@@ -36,7 +38,7 @@ class TestSnowflakeStateStoreManager:
     def subject(self, mock_connection):
         """Create SnowflakeStateStoreManager instance with mocked connection."""
         mock_conn, mock_cursor = mock_connection
-        
+
         # Mock the SNOWFLAKE_INSTALLED check to avoid import issues
         with mock.patch("meltano.core.state_store.snowflake.SNOWFLAKE_INSTALLED", True):
             manager = SnowflakeStateStoreManager(
@@ -145,7 +147,6 @@ class TestSnowflakeStateStoreManager:
         assert state.state_id == "test_job"
         assert state.partial_state == {}
         assert state.completed_state == {"singer_state": {"complete": 1}}
-
 
     def test_get_state_not_found(self, subject):
         """Test getting state that doesn't exist."""
@@ -310,7 +311,7 @@ class TestSnowflakeStateStoreManager:
 
         # Create a mock exception that mimics ProgrammingError
         mock_programming_error = Exception("Duplicate key")
-        
+
         # Mock lock conflict on first attempt, success on second
         mock_cursor.execute.side_effect = [
             mock_programming_error,  # First attempt fails
