@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+import datetime
 import json
 import logging
 import os
+import platform
 import re
 import sys
 import typing as t
+import zoneinfo
 from types import TracebackType
 
 import pytest
 import structlog.exceptions
+import time_machine
 
 from meltano.core.logging import formatters
 
@@ -195,6 +199,63 @@ class TestLogFormatters:
         message_dict = json.loads(output)
 
         assert "exception" not in message_dict
+
+    @time_machine.travel(
+        datetime.datetime(2025, 7, 5, 15, tzinfo=zoneinfo.ZoneInfo("America/New_York")),
+        tick=False,
+    )
+    @pytest.mark.xfail(
+        platform.system() == "Windows",
+        reason="time-machine can't mock the timezone on Windows",
+        strict=True,
+    )
+    def test_json_formatter_utc(
+        self,
+        record_with_exception,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        value_utc = "2025-07-05T19:00:00Z"
+        value_local = "2025-07-05T15:00:00"
+
+        monkeypatch.delenv("NO_UTC", raising=False)
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"] == value_utc
+
+        monkeypatch.setenv("NO_UTC", "1")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"] == value_local
+
+        # Test with NO_UTC set to an unexpected value ("foobar")
+        monkeypatch.setenv("NO_UTC", "foobar")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        # Should fallback to UTC, so endswith("Z") should be True
+        assert message_dict["timestamp"] == value_utc
+
+        # Test with NO_UTC set to "0"
+        monkeypatch.setenv("NO_UTC", "0")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        # Should fallback to UTC, so endswith("Z") should be True
+        assert message_dict["timestamp"] == value_utc
+
+        # Test with NO_UTC set to ""
+        monkeypatch.setenv("NO_UTC", "")
+        formatter = formatters.json_formatter()
+        output = formatter.format(record_with_exception)
+        message_dict = json.loads(output)
+        assert "timestamp" in message_dict
+        assert message_dict["timestamp"] == value_utc
 
     def test_json_formatter_locals(self, record_with_exception) -> None:
         formatter = formatters.json_formatter(show_locals=True)
