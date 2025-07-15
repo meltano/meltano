@@ -162,27 +162,30 @@ class SnowflakeStateStoreManager(StateStoreManager):
             # Extract connection details from URI and parameters
             self.account = account or parsed.hostname
             if not self.account:
-                raise MissingStateBackendSettingsError("Snowflake account is required")
+                msg = "Snowflake account is required"
+                raise MissingStateBackendSettingsError(msg)
 
             self.user = user or parsed.username
             if not self.user:
-                raise MissingStateBackendSettingsError("Snowflake user is required")
+                msg = "Snowflake user is required"
+                raise MissingStateBackendSettingsError(msg)
 
             self.password = password or parsed.password
             if not self.password:
-                raise MissingStateBackendSettingsError("Snowflake password is required")
+                msg = "Snowflake password is required"
+                raise MissingStateBackendSettingsError(msg)
 
             self.warehouse = warehouse
             if not self.warehouse:
-                raise MissingStateBackendSettingsError(
-                    "Snowflake warehouse is required"
-                )
+                msg = "Snowflake warehouse is required"
+                raise MissingStateBackendSettingsError(msg)
 
             # Extract database from path
             path_parts = parsed.path.strip("/").split("/") if parsed.path else []
             self.database = database or (path_parts[0] if path_parts else None)
             if not self.database:
-                raise MissingStateBackendSettingsError("Snowflake database is required")
+                msg = "Snowflake database is required"
+                raise MissingStateBackendSettingsError(msg)
 
             self.schema = schema or (path_parts[1] if len(path_parts) > 1 else "PUBLIC")
             self.role = role
@@ -221,7 +224,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                     completed_state VARIANT,
                     updated_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
                 )
-                """
+                """  # noqa: E501
             )
 
             # Create lock table
@@ -232,7 +235,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                     locked_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
                     lock_id VARCHAR
                 )
-                """
+                """  # noqa: E501
             )
 
     def set(self, state: MeltanoState) -> None:
@@ -261,7 +264,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                 WHEN NOT MATCHED THEN
                     INSERT (state_id, partial_state, completed_state)
                     VALUES (source.state_id, source.partial_state, source.completed_state)
-                """,
+                """,  # noqa: E501, S608
                 (state.state_id, partial_json, completed_json),
             )
 
@@ -280,7 +283,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                 SELECT partial_state, completed_state
                 FROM {self.database}.{self.schema}.{self.table_name}
                 WHERE state_id = %s
-                """,
+                """,  # noqa: S608
                 (state_id,),
             )
             row = cursor.fetchone()
@@ -321,7 +324,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
         """
         with self.connection.cursor() as cursor:
             cursor.execute(
-                f"DELETE FROM {self.database}.{self.schema}.{self.table_name} WHERE state_id = %s",
+                f"DELETE FROM {self.database}.{self.schema}.{self.table_name} WHERE state_id = %s",  # noqa: E501, S608
                 (state_id,),
             )
 
@@ -333,7 +336,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
         """
         with self.connection.cursor() as cursor:
             cursor.execute(
-                f"SELECT COUNT(*) FROM {self.database}.{self.schema}.{self.table_name}"
+                f"SELECT COUNT(*) FROM {self.database}.{self.schema}.{self.table_name}"  # noqa: S608
             )
             count = cursor.fetchone()[0]
             cursor.execute(
@@ -355,12 +358,12 @@ class SnowflakeStateStoreManager(StateStoreManager):
                 # Convert glob pattern to SQL LIKE pattern
                 sql_pattern = pattern.replace("*", "%").replace("?", "_")
                 cursor.execute(
-                    f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name} WHERE state_id LIKE %s",
+                    f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name} WHERE state_id LIKE %s",  # noqa: E501, S608
                     (sql_pattern,),
                 )
             else:
                 cursor.execute(
-                    f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name}"
+                    f"SELECT state_id FROM {self.database}.{self.schema}.{self.table_name}"  # noqa: E501, S608
                 )
 
             for row in cursor:
@@ -399,7 +402,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                         f"""
                         INSERT INTO {self.database}.{self.schema}.{self.lock_table_name} (state_id, lock_id)
                         VALUES (%s, %s)
-                        """,
+                        """,  # noqa: E501, S608
                         (state_id, lock_id),
                     )
                     break
@@ -408,9 +411,8 @@ class SnowflakeStateStoreManager(StateStoreManager):
                 if "Duplicate key" in str(e):
                     retries += 1
                     if retries >= max_retries:
-                        raise StateIDLockedError(
-                            f"Could not acquire lock for state_id: {state_id}"
-                        )
+                        msg = f"Could not acquire lock for state_id: {state_id}"
+                        raise StateIDLockedError(msg) from e
                     sleep(retry_seconds)
                 else:
                     raise
@@ -424,7 +426,7 @@ class SnowflakeStateStoreManager(StateStoreManager):
                     f"""
                     DELETE FROM {self.database}.{self.schema}.{self.lock_table_name}
                     WHERE state_id = %s AND lock_id = %s
-                    """,
+                    """,  # noqa: S608
                     (state_id, lock_id),
                 )
 
@@ -434,5 +436,5 @@ class SnowflakeStateStoreManager(StateStoreManager):
                     f"""
                     DELETE FROM {self.database}.{self.schema}.{self.lock_table_name}
                     WHERE locked_at < DATEADD(minute, -5, CURRENT_TIMESTAMP())
-                    """
+                    """  # noqa: S608
                 )
