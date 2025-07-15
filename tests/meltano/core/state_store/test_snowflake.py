@@ -12,8 +12,10 @@ from meltano.core.state_store.snowflake import (
     SnowflakeStateStoreManager,
 )
 
-if t.TYPE_CHECKING:
+try:
     from snowflake.connector import SnowflakeConnection
+except ImportError:
+    SnowflakeConnection = None
 
 
 class TestSnowflakeStateStoreManager:
@@ -21,10 +23,15 @@ class TestSnowflakeStateStoreManager:
     def mock_connection(self):
         """Mock Snowflake connection."""
         with mock.patch("snowflake.connector.connect") as mock_connect:
-            mock_conn = mock.Mock(spec=SnowflakeConnection)
+            mock_conn = mock.Mock()
             mock_cursor = mock.Mock()
-            mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
-            mock_conn.cursor.return_value.__exit__.return_value = None
+            
+            # Mock the context manager for cursor
+            mock_cursor_context = mock.Mock()
+            mock_cursor_context.__enter__ = mock.Mock(return_value=mock_cursor)
+            mock_cursor_context.__exit__ = mock.Mock(return_value=None)
+            mock_conn.cursor.return_value = mock_cursor_context
+            
             mock_connect.return_value = mock_conn
             yield mock_conn, mock_cursor
 
@@ -72,10 +79,10 @@ class TestSnowflakeStateStoreManager:
         )
         manager.set(state)
 
-        # Verify MERGE query was executed
+        # Verify MERGE query was executed with fully qualified table name
         mock_cursor.execute.assert_called()
         call_args = mock_cursor.execute.call_args
-        assert "MERGE INTO" in call_args[0][0]
+        assert "MERGE INTO testdb.testschema.meltano_state" in call_args[0][0]
         assert call_args[0][1] == (
             "test_job",
             json.dumps({"singer_state": {"partial": 1}}),
@@ -86,7 +93,7 @@ class TestSnowflakeStateStoreManager:
         """Test getting state."""
         manager, mock_cursor = subject
 
-        # Mock cursor response
+        # Mock cursor response - Snowflake VARIANT columns return Python dicts
         mock_cursor.fetchone.return_value = (
             {"singer_state": {"partial": 1}},
             {"singer_state": {"complete": 1}},
@@ -95,13 +102,64 @@ class TestSnowflakeStateStoreManager:
         # Get state
         state = manager.get("test_job")
 
-        # Verify query
+        # Verify query with fully qualified table name
         mock_cursor.execute.assert_called()
         call_args = mock_cursor.execute.call_args
-        assert "SELECT partial_state, completed_state" in call_args[0][0]
+        assert "FROM testdb.testschema.meltano_state" in call_args[0][0]
         assert call_args[0][1] == ("test_job",)
 
         # Verify returned state
+        assert state.state_id == "test_job"
+        assert state.partial_state == {"singer_state": {"partial": 1}}
+        assert state.completed_state == {"singer_state": {"complete": 1}}
+
+    def test_get_state_with_json_strings(self, subject):
+        """Test getting state when Snowflake returns JSON strings."""
+        manager, mock_cursor = subject
+
+        # Mock cursor response with JSON strings (as Snowflake might return)
+        mock_cursor.fetchone.return_value = (
+            '{"singer_state": {"partial": 1}}',
+            '{"singer_state": {"complete": 1}}',
+        )
+
+        # Get state
+        state = manager.get("test_job")
+
+        # Verify returned state is properly parsed
+        assert state.state_id == "test_job"
+        assert state.partial_state == {"singer_state": {"partial": 1}}
+        assert state.completed_state == {"singer_state": {"complete": 1}}
+
+    def test_get_state_with_null_values(self, subject):
+        """Test getting state with NULL VARIANT columns."""
+        manager, mock_cursor = subject
+
+        # Mock cursor response with None values
+        mock_cursor.fetchone.return_value = (None, '{"singer_state": {"complete": 1}}')
+
+        # Get state
+        state = manager.get("test_job")
+
+        # Verify returned state handles None correctly
+        assert state.state_id == "test_job"
+        assert state.partial_state == {}
+        assert state.completed_state == {"singer_state": {"complete": 1}}
+
+    def test_get_state_with_json_strings(self, subject):
+        """Test getting state when Snowflake returns JSON strings."""
+        manager, mock_cursor = subject
+
+        # Mock cursor response - sometimes Snowflake might return JSON strings
+        mock_cursor.fetchone.return_value = (
+            '{"singer_state": {"partial": 1}}',
+            '{"singer_state": {"complete": 1}}',
+        )
+
+        # Get state
+        state = manager.get("test_job")
+
+        # Verify returned state is properly parsed
         assert state.state_id == "test_job"
         assert state.partial_state == {"singer_state": {"partial": 1}}
         assert state.completed_state == {"singer_state": {"complete": 1}}
@@ -119,6 +177,21 @@ class TestSnowflakeStateStoreManager:
         # Verify it returns None
         assert state is None
 
+    def test_get_state_with_none_values(self, subject):
+        """Test getting state with None values (NULL in Snowflake)."""
+        manager, mock_cursor = subject
+
+        # Mock cursor response with None values
+        mock_cursor.fetchone.return_value = (None, None)
+
+        # Get state
+        state = manager.get("test_job")
+
+        # Verify returned state has empty dicts for None values
+        assert state.state_id == "test_job"
+        assert state.partial_state == {}
+        assert state.completed_state == {}
+
     def test_delete_state(self, subject):
         """Test deleting state."""
         manager, mock_cursor = subject
@@ -126,26 +199,26 @@ class TestSnowflakeStateStoreManager:
         # Delete state
         manager.delete("test_job")
 
-        # Verify DELETE query
+        # Verify DELETE query with fully qualified table name
         mock_cursor.execute.assert_called()
         call_args = mock_cursor.execute.call_args
-        assert "DELETE FROM" in call_args[0][0]
+        assert "DELETE FROM testdb.testschema.meltano_state" in call_args[0][0]
         assert call_args[0][1] == ("test_job",)
 
     def test_get_state_ids(self, subject):
         """Test getting all state IDs."""
         manager, mock_cursor = subject
 
-        # Mock cursor response
-        mock_cursor.__iter__.return_value = iter([("job1",), ("job2",), ("job3",)])
+        # Mock cursor response - need to make cursor itself iterable
+        mock_cursor.__iter__ = mock.Mock(return_value=iter([("job1",), ("job2",), ("job3",)]))
 
         # Get state IDs
         state_ids = list(manager.get_state_ids())
 
-        # Verify query
-        mock_cursor.execute.assert_called()
-        call_args = mock_cursor.execute.call_args
-        assert "SELECT state_id FROM" in call_args[0][0]
+        # Verify query with fully qualified table name (skip table creation calls)
+        select_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT state_id FROM" in call[0][0]]
+        assert len(select_calls) == 1
+        assert "SELECT state_id FROM testdb.testschema.meltano_state" in select_calls[0][0][0]
 
         # Verify returned IDs
         assert state_ids == ["job1", "job2", "job3"]
@@ -154,17 +227,17 @@ class TestSnowflakeStateStoreManager:
         """Test getting state IDs with pattern."""
         manager, mock_cursor = subject
 
-        # Mock cursor response
-        mock_cursor.__iter__.return_value = iter([("test_job_1",), ("test_job_2",)])
+        # Mock cursor response - need to make cursor itself iterable
+        mock_cursor.__iter__ = mock.Mock(return_value=iter([("test_job_1",), ("test_job_2",)]))
 
         # Get state IDs with pattern
         state_ids = list(manager.get_state_ids("test_*"))
 
-        # Verify query with LIKE
-        mock_cursor.execute.assert_called()
-        call_args = mock_cursor.execute.call_args
-        assert "WHERE state_id LIKE" in call_args[0][0]
-        assert call_args[0][1] == ("test_%",)
+        # Verify query with LIKE and fully qualified table name (skip table creation calls)
+        select_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT state_id FROM" in call[0][0]]
+        assert len(select_calls) == 1
+        assert "SELECT state_id FROM testdb.testschema.meltano_state WHERE state_id LIKE" in select_calls[0][0][0]
+        assert select_calls[0][0][1] == ("test_%",)
 
         # Verify returned IDs
         assert state_ids == ["test_job_1", "test_job_2"]
@@ -179,11 +252,14 @@ class TestSnowflakeStateStoreManager:
         # Clear all
         count = manager.clear_all()
 
-        # Verify queries
-        assert mock_cursor.execute.call_count == 2
-        calls = mock_cursor.execute.call_args_list
-        assert "SELECT COUNT(*)" in calls[0][0][0]
-        assert "TRUNCATE TABLE" in calls[1][0][0]
+        # Verify queries with fully qualified table names (skip table creation calls)
+        count_calls = [call for call in mock_cursor.execute.call_args_list if "SELECT COUNT(*)" in call[0][0]]
+        truncate_calls = [call for call in mock_cursor.execute.call_args_list if "TRUNCATE TABLE" in call[0][0]]
+        
+        assert len(count_calls) == 1
+        assert len(truncate_calls) == 1
+        assert "SELECT COUNT(*) FROM testdb.testschema.meltano_state" in count_calls[0][0][0]
+        assert "TRUNCATE TABLE testdb.testschema.meltano_state" in truncate_calls[0][0][0]
 
         # Verify returned count
         assert count == 5
@@ -194,17 +270,16 @@ class TestSnowflakeStateStoreManager:
 
         # Test successful lock acquisition
         with manager.acquire_lock("test_job", retry_seconds=0):
-            # Verify INSERT query for lock
-            assert mock_cursor.execute.call_count >= 1
-            insert_call = mock_cursor.execute.call_args_list[0]
-            assert "INSERT INTO" in insert_call[0][0]
-            assert "meltano_state_locks" in insert_call[0][0]
+            # Verify INSERT query for lock with fully qualified table name (skip table creation calls)
+            insert_calls = [call for call in mock_cursor.execute.call_args_list if "INSERT INTO" in call[0][0] and "meltano_state_locks" in call[0][0]]
+            assert len(insert_calls) >= 1
+            assert "INSERT INTO testdb.testschema.meltano_state_locks" in insert_calls[0][0][0]
 
-        # Verify DELETE queries for lock release and cleanup
+        # Verify DELETE queries for lock release and cleanup with fully qualified table names
         delete_calls = [
             call
             for call in mock_cursor.execute.call_args_list
-            if "DELETE FROM" in call[0][0]
+            if "DELETE FROM testdb.testschema.meltano_state_locks" in call[0][0]
         ]
         assert len(delete_calls) >= 1
 

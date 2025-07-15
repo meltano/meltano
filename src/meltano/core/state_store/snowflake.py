@@ -288,8 +288,24 @@ class SnowflakeStateStoreManager(StateStoreManager):
             if not row:
                 return None
 
-            partial_state = row[0] if row[0] else None
-            completed_state = row[1] if row[1] else None
+            # Snowflake returns None for NULL VARIANT columns
+            # but MeltanoState expects empty dicts
+            # Additionally, VARIANT columns might return JSON strings that need parsing
+            partial_state = row[0]
+            completed_state = row[1]
+            
+            # Handle None values
+            if partial_state is None:
+                partial_state = {}
+            # Parse JSON string if Snowflake returns string instead of dict
+            elif isinstance(partial_state, str):
+                partial_state = json.loads(partial_state)
+                
+            if completed_state is None:
+                completed_state = {}
+            # Parse JSON string if Snowflake returns string instead of dict
+            elif isinstance(completed_state, str):
+                completed_state = json.loads(completed_state)
 
             return MeltanoState(
                 state_id=state_id,
