@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import platform
@@ -337,7 +338,8 @@ class TestCliAdd:
         cli_runner,
     ) -> None:
         # Make sure tap-mock is not in the project as a project plugin
-        project.plugins.remove_from_file(tap)
+        with contextlib.suppress(PluginNotFoundError):
+            project.plugins.remove_from_file(tap)
 
         with mock.patch("meltano.cli.params.install_plugins") as install_plugin_mock:
             install_plugin_mock.return_value = True
