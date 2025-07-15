@@ -19,9 +19,7 @@ class TestSnowflakeStateStoreManager:
     @pytest.fixture
     def mock_connection(self):
         """Mock Snowflake connection."""
-        with mock.patch(
-            "meltano.core.state_store.snowflake.snowflake.connector.connect"
-        ) as mock_connect:
+        with mock.patch("snowflake.connector.connect") as mock_connect:
             mock_conn = mock.Mock()
             mock_cursor = mock.Mock()
 
