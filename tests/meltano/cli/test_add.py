@@ -962,6 +962,7 @@ class TestCliAdd:
                 force=False,
             )
 
+    @pytest.mark.usefixtures("reset_project_context")
     def test_add_conflicting_plugin_type_and_positional_argument(
         self,
         tap,
