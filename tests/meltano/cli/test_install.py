@@ -45,7 +45,7 @@ class TestCliInstall:
 
             with pytest.warns(
                 DeprecationWarning,
-                match="Using `-` to install plugins of any type is deprecated",
+                match='Using "-" to specify plugins of any type is deprecated',
             ):
                 result = cli_runner.invoke(cli, ["install", "-"])
 
@@ -277,7 +277,7 @@ class TestCliInstall:
 
             with pytest.warns(
                 DeprecationWarning,
-                match="Using `-` to install plugins of any type is deprecated",
+                match='Using "-" to specify plugins of any type is deprecated',
             ):
                 result = cli_runner.invoke(
                     cli,
@@ -481,20 +481,14 @@ class TestCliInstall:
             ["install", "--plugin-type=extractors", "extractors", tap.name],
         )
         assert result.exit_code == 2
-        assert (
-            "Use only --plugin-type to install plugins of a specific type"
-            in result.stderr
-        )
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
 
         result = cli_runner.invoke(
             cli,
             ["install", "extractors", "--plugin-type=extractors", "-", tap.name],
         )
         assert result.exit_code == 2
-        assert (
-            "Use only --plugin-type to install plugins of a specific type"
-            in result.stderr
-        )
+        assert "Use only --plugin-type to specify plugin type" in result.stderr
 
 
 # un_engine_uri forces us to create a new project, we must do this before the
