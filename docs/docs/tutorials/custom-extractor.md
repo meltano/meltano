@@ -5,6 +5,11 @@ layout: doc
 sidebar_position: 2
 ---
 
+```mdx-code-block
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+```
+
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
 ## What Are Custom Extractors?
@@ -208,8 +213,36 @@ Navigate to your project root directory on your shell and run the following comm
 
 ```bash
 meltano install
+```
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
+```bash
 meltano add loader target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 This command installs your newly created tap, tap-jsonplaceholder, and a loader, target-jsonl, to the default Meltano project. It also creates an output directory where the extracted data will be loaded.
@@ -293,8 +326,34 @@ There are two ways you can do this:
 
 Run the command below to add the extractor as a custom extractor not hosted on MeltanoHub registry:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --custom tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --custom extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 You will be prompted to input the namespace URL. Choose `tap-jsonplaceholder`.
@@ -326,8 +385,34 @@ Alternatively, you can create a [plugin definition](/concepts/project#custom-plu
 
 </details>
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 :::info
@@ -341,16 +426,68 @@ As you develop your custom extractor, it is possible that its settings will chan
 
 In this case, you will need to update the extractor in your project - by maintaining your plugin definiton YAML file in line with changes to the tap as you go, this is a simple process of running the previous command along with the `--update` flag:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add --update --from-ref tap-jsonplaceholder.yml tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add --update --from-ref tap-jsonplaceholder.yml extractor tap-jsonplaceholder
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 ### Add a JSONL target
 
 Run the command below to add the JSONL loader that will contain the extracted data stream:
 
+```mdx-code-block
+<Tabs
+  groupId="meltano-version"
+  defaultValue="3.8"
+  values={[
+    { label: '3.8+', value: '3.8', },
+    { label: '3.7 and earlier', value: '3.7', },
+  ]}
+>
+<TabItem value="3.8">
+```
+
+```bash
+meltano add target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+<TabItem value="3.7">
+```
+
 ```bash
 meltano add loader target-jsonl
+```
+
+```mdx-code-block
+</TabItem>
+</Tabs>
 ```
 
 ### Run an ELT Pipeline That Loads Data into a JSONL File
