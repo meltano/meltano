@@ -17,7 +17,7 @@ for Meltano projects running in ephemeral environments or in circumstances where
 - [Amazon AWS S3](#aws-s3)
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
-- [Snowflake](#snowflake)
+- [Snowflake (External)](#snowflake-external)
 
 ### Beyond Basic Storage
 
@@ -38,7 +38,6 @@ To use a cloud storage backend, install Meltano using one of the following [extr
 - `meltano[s3]` to use the AWS S3 state backend.
 - `meltano[azure]` to use the Azure Blob Storage state backend.
 - `meltano[gcs]` to use the Google Cloud Storage state backend.
-- `meltano[snowflake]` to use the Snowflake state backend.
 
 If the base Meltano distribution is already installed in your environment, install the relevant extra and `pip` will install only the missing requirements.
 
@@ -200,64 +199,48 @@ The legacy `state_backend.gcs.application_credentials` setting is still supporte
 
 If credentials are not provided via any of the above settings, Meltano will use the value of the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
 
-### Snowflake
+### Snowflake (External)
+
+Snowflake state backend support is available as a separate package: [`meltano-state-backend-snowflake`](https://github.com/meltano/meltano-state-backend-snowflake).
+
+#### Installation
+
+Install Meltano with the Snowflake state backend extension using one of these methods:
+
+**Using uv:**
+```bash
+uv tool install --with meltano-state-backend-snowflake meltano
+```
+
+**Using pipx:**
+```bash
+pipx install meltano
+pipx inject meltano 'meltano-state-backend-snowflake'
+```
+
+#### Configuration
 
 To store state in Snowflake, set the `state_backend.uri` setting to `snowflake://<user>:<password>@<account>/<database>/<schema>`.
 
-State will be stored in two tables that Meltano will create automatically:
+State will be stored in two tables that the extension will create automatically:
 - `meltano_state` - Stores the actual state data
 - `meltano_state_locks` - Manages concurrency locks
 
-To authenticate to Snowflake, you'll need to provide:
-
-```yaml
-state_backend:
-  uri: snowflake://my_user:my_password@my_account/my_database/my_schema
-  snowflake:
-    warehouse: my_warehouse  # Required: The compute warehouse to use
-    role: my_role           # Optional: The role to use for the connection
-```
-
-Alternatively, you can provide credentials via individual settings:
-
-```yaml
-state_backend:
-  uri: snowflake://my_account/my_database/my_schema
-  snowflake:
-    account: my_account
-    user: my_user
-    password: my_password
-    warehouse: my_warehouse
-    database: my_database
-    schema: my_schema      # Defaults to PUBLIC if not specified
-    role: my_role          # Optional
-```
-
-#### Connection Parameters
-
-- **account**: Your Snowflake account identifier (e.g., `myorg-account123`)
-- **user**: The username for authentication
-- **password**: The password for authentication
-- **warehouse**: The compute warehouse to use (required)
-- **database**: The database where state will be stored
-- **schema**: The schema where state tables will be created (defaults to PUBLIC)
-- **role**: Optional role to use for the connection
-
-#### Security Considerations
-
-When storing credentials:
-- Use environment variables for sensitive values in production
-- Consider using Snowflake key-pair authentication (future enhancement)
-- Ensure the user has CREATE TABLE, INSERT, UPDATE, DELETE, and SELECT privileges
-
-Example using environment variables:
+Example configuration using environment variables:
 
 ```bash
-export MELTANO_STATE_BACKEND_SNOWFLAKE_PASSWORD='my_secure_password'
-
-meltano config meltano set state_backend.uri 'snowflake://my_user@my_account/my_database'
-meltano config meltano set state_backend.snowflake.warehouse 'my_warehouse'
+export MELTANO_STATE_BACKEND_URI='snowflake://my_user:my_password@my_account/my_database/my_schema'
 ```
+
+#### Features
+
+- Automatic table creation and management
+- Concurrency control using database-level locking
+- Support for JSON state data using Snowflake's VARIANT data type
+- Flexible connection configuration with support for account, user, password, warehouse, database, schema, and role parameters
+- Security best practices with environment variable configuration
+
+For detailed configuration options and advanced features, see the [meltano-state-backend-snowflake documentation](https://github.com/meltano/meltano-state-backend-snowflake).
 
 ## Locking
 
