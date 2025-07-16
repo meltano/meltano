@@ -316,7 +316,7 @@ A setting kind can be specified alongside the name (key) by using the `:` delimi
 e.g. `port:integer` to set the kind `integer` for the name `port`
 
 Supported setting kinds:
-string | integer | boolean | date_iso8601 | email | password | oauth | options | file | array | object | hidden
+string | integer | boolean | decimal | date_iso8601 | email | password | oauth | options | file | array | object | hidden
 
 - Credentials and other sensitive setting types should use the password kind.
 - If not specified, setting kind defaults to string.
