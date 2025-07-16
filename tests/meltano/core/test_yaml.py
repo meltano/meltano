@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import io
-import tempfile
+import typing as t
 from decimal import Decimal
-from pathlib import Path
 
 from ruamel.yaml import YAML, CommentedMap
 
 from meltano.core import yaml
 from meltano.core.yaml import _represent_decimal
 
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
-def test_decimal_representation():
+
+def test_decimal_representation() -> None:
     """Test that Decimal values are properly represented in YAML."""
     data = CommentedMap()
     data["decimal_value"] = Decimal("123.45")
@@ -29,7 +31,7 @@ def test_decimal_representation():
     assert "100" in output
 
 
-def test_decimal_in_nested_structure():
+def test_decimal_in_nested_structure() -> None:
     """Test that Decimal values work in nested YAML structures."""
     data = CommentedMap()
     data["config"] = CommentedMap()
@@ -47,10 +49,9 @@ def test_decimal_in_nested_structure():
     assert "42.0" in output
 
 
-def test_load_and_dump_with_decimals():
+def test_load_and_dump_with_decimals(tmp_path: Path):
     """Test loading and dumping YAML files with decimal values."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
-        yaml_content = """
+    yaml_content = """
 config:
   settings:
     price: 123.45
@@ -63,57 +64,48 @@ plugins:
         batch_size: 1000.0
         timeout: 30.5
 """
-        f.write(yaml_content)
-        temp_path = Path(f.name)
+    temp_file = tmp_path / "test.yml"
+    temp_file.write_text(yaml_content)
 
-    try:
-        # Load the YAML file
-        loaded_data = yaml.load(temp_path)
+    # Load the YAML file
+    loaded_data = yaml.load(temp_file)
 
-        # Modify with decimal values
-        loaded_data["config"]["settings"]["price"] = Decimal("456.78")
-        loaded_data["config"]["settings"]["new_decimal"] = Decimal("99.99")
+    # Modify with decimal values
+    loaded_data["config"]["settings"]["price"] = Decimal("456.78")
+    loaded_data["config"]["settings"]["new_decimal"] = Decimal("99.99")
 
-        # Dump back to string
-        stream = io.StringIO()
-        yaml.dump(loaded_data, stream)
-        output = stream.getvalue()
+    # Dump back to string
+    stream = io.StringIO()
+    yaml.dump(loaded_data, stream)
+    output = stream.getvalue()
 
-        # Verify decimal values are properly represented
-        assert "456.78" in output
-        assert "99.99" in output
-
-    finally:
-        temp_path.unlink()
+    # Verify decimal values are properly represented
+    assert "456.78" in output
+    assert "99.99" in output
 
 
-def test_yaml_cache_with_decimals():
+def test_yaml_cache_with_decimals(tmp_path: Path):
     """Test that YAML caching works correctly with decimal values."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
-        yaml_content = """
+    yaml_content = """
 settings:
   decimal_setting: 123.45
 """
-        f.write(yaml_content)
-        temp_path = Path(f.name)
+    temp_file = tmp_path / "test.yml"
+    temp_file.write_text(yaml_content)
 
-    try:
-        # Load twice to test caching
-        data1 = yaml.load(temp_path)
-        data2 = yaml.load(temp_path)
+    # Load twice to test caching
+    data1 = yaml.load(temp_file)
+    data2 = yaml.load(temp_file)
 
-        # Both should be the same object due to caching
-        assert data1 is data2
+    # Both should be the same object due to caching
+    assert data1 is data2
 
-        # Verify content
-        assert "decimal_setting" in data1["settings"]
-        assert data1["settings"]["decimal_setting"] == 123.45
-
-    finally:
-        temp_path.unlink()
+    # Verify content
+    assert "decimal_setting" in data1["settings"]
+    assert data1["settings"]["decimal_setting"] == 123.45
 
 
-def test_decimal_representer_function():
+def test_decimal_representer_function() -> None:
     """Test the _represent_decimal function directly."""
     yaml_instance = YAML()
     decimal_value = Decimal("123.456")
@@ -125,7 +117,7 @@ def test_decimal_representer_function():
     assert result.value == "123.456"
 
 
-def test_mixed_numeric_types():
+def test_mixed_numeric_types() -> None:
     """Test YAML handling with mixed numeric types including decimals."""
     data = CommentedMap()
     data["values"] = [
