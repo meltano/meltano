@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import typing as t
 from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
 
-from ruamel.yaml import YAML, CommentedMap
+from ruamel.yaml import YAML
 
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
@@ -16,12 +17,21 @@ from meltano.core.utils import hash_sha256
 if t.TYPE_CHECKING:
     import os
 
+    from ruamel.yaml import CommentedMap, Dumper, ScalarNode
+
 yaml = YAML()
 yaml.default_flow_style = False
+
+
+def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
+    """Represent a decimal.Decimal instance in YAML."""
+    return dumper.represent_scalar("tag:yaml.org,2002:float", str(node))
+
 
 yaml.register_class(Canonical)
 yaml.register_class(PluginType)
 yaml.register_class(SettingKind)
+yaml.representer.add_representer(Decimal, _represent_decimal)
 
 
 @dataclass
