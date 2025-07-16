@@ -17,6 +17,7 @@ for Meltano projects running in ephemeral environments or in circumstances where
 - [Amazon AWS S3](#aws-s3)
 - [Azure Blob Storage](#azure-blob-storage)
 - [Google Cloud Storage](#google-cloud-storage)
+- [Snowflake (External)](#snowflake-external)
 
 ### Beyond Basic Storage
 
@@ -197,6 +198,49 @@ The legacy `state_backend.gcs.application_credentials` setting is still supporte
 #### Default authentication
 
 If credentials are not provided via any of the above settings, Meltano will use the value of the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, if it is set.
+
+### Snowflake (External)
+
+Snowflake state backend support is available as a separate package: [`meltano-state-backend-snowflake`](https://github.com/meltano/meltano-state-backend-snowflake).
+
+#### Installation
+
+Install Meltano with the Snowflake state backend extension using one of these methods:
+
+**Using uv:**
+```bash
+uv tool install --with meltano-state-backend-snowflake meltano
+```
+
+**Using pipx:**
+```bash
+pipx install meltano
+pipx inject meltano 'meltano-state-backend-snowflake'
+```
+
+#### Configuration
+
+To store state in Snowflake, set the `state_backend.uri` setting to `snowflake://<user>:<password>@<account>/<database>/<schema>`.
+
+State will be stored in two tables that the extension will create automatically:
+- `meltano_state` - Stores the actual state data
+- `meltano_state_locks` - Manages concurrency locks
+
+Example configuration using environment variables:
+
+```bash
+export MELTANO_STATE_BACKEND_URI='snowflake://my_user:my_password@my_account/my_database/my_schema'
+```
+
+#### Features
+
+- Automatic table creation and management
+- Concurrency control using database-level locking
+- Support for JSON state data using Snowflake's VARIANT data type
+- Flexible connection configuration with support for account, user, password, warehouse, database, schema, and role parameters
+- Security best practices with environment variable configuration
+
+For detailed configuration options and advanced features, see the [meltano-state-backend-snowflake documentation](https://github.com/meltano/meltano-state-backend-snowflake).
 
 ## Locking
 

@@ -5,7 +5,7 @@ layout: doc
 sidebar_position: 20
 ---
 
-Meltano's state backend system is highly extensible, allowing you to store pipeline state in virtually any system that can be a key-value store. This includes cloud data warehouses like Snowflake and BigQuery or modern data stores like PostreSQL or MongoDB.
+Meltano's state backend system is highly extensible, allowing you to store pipeline state in virtually any system that can be a key-value store. This includes cloud data warehouses like Redshift and BigQuery or modern data stores like PostgreSQL or MongoDB.
 
 To create a custom state backend, you need to implement the `StateStoreManager` interface and any settings required to configure the backend. This guide shows you how to build a custom state backend that can integrate with any storage system.
 

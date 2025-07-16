@@ -831,6 +831,7 @@
                 "file",
                 "email",
                 "integer",
+                "decimal",
                 "options",
                 "object",
                 "array",

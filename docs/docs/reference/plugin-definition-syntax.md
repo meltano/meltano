@@ -500,7 +500,7 @@ settings:
 
 ### `settings[*].kind`
 
-Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `date_iso8601`, `options`, `file`, `array`, and `object`.
+Optional. Use for a first-class input control. Default is `string`, others are `integer`, `boolean`, `decimal`, `date_iso8601`, `options`, `file`, `array`, and `object`.
 
 ```yaml
 settings:
