@@ -92,7 +92,7 @@ def pytest_meltano(session: nox.Session) -> None:
         session: Nox session.
     """
     backend_db = os.environ.get("PYTEST_BACKEND", "sqlite")
-    extras = ["azure", "gcs", "s3", "snowflake"]
+    extras = ["azure", "gcs", "s3"]
 
     if backend_db == "mssql":
         extras.append("mssql")
@@ -168,7 +168,6 @@ def mypy(session: nox.Session) -> None:
         "--extra=azure",
         "--extra=gcs",
         "--extra=s3",
-        "--extra=snowflake",
         env={"UV_PROJECT_ENVIRONMENT": session.virtualenv.location},
     )
     session.run("mypy", *session.posargs)
