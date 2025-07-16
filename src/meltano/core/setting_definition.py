@@ -9,6 +9,7 @@ import sys
 import typing as t
 from collections.abc import Mapping, Sequence
 from datetime import date, datetime
+from decimal import Decimal
 from functools import cached_property
 
 from meltano.core import utils
@@ -141,6 +142,7 @@ class SettingKind(YAMLEnum):
     STRING = enum.auto()
     INTEGER = enum.auto()
     BOOLEAN = enum.auto()
+    DECIMAL = enum.auto()
     DATE_ISO8601 = enum.auto()
     EMAIL = enum.auto()
     PASSWORD = enum.auto()
@@ -342,6 +344,8 @@ class SettingDefinition(NameEq, Canonical):
             kind = SettingKind.BOOLEAN
         elif isinstance(value, int):
             kind = SettingKind.INTEGER
+        elif isinstance(value, (Decimal, float)):
+            kind = SettingKind.DECIMAL
         elif isinstance(value, dict):
             kind = SettingKind.OBJECT
         elif isinstance(value, list):
@@ -480,6 +484,8 @@ class SettingDefinition(NameEq, Canonical):
                 return utils.truthy(value)
             if self.kind == SettingKind.INTEGER:
                 return int(value)
+            if self.kind == SettingKind.DECIMAL:
+                return Decimal(value)
             if self.kind == SettingKind.OBJECT:
                 value = dict(
                     self._parse_value(value, "object", Mapping),  # type: ignore[type-abstract]
@@ -539,7 +545,7 @@ class SettingDefinition(NameEq, Canonical):
         if isinstance(value, str):
             return value
 
-        if not self.kind or self.kind == SettingKind.STRING:
+        if not self.kind or self.kind in (SettingKind.STRING, SettingKind.DECIMAL):
             return str(value)
 
         return json.dumps(value)
