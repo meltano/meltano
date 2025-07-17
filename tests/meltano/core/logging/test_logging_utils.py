@@ -3,8 +3,8 @@ from __future__ import annotations
 import asyncio
 import datetime
 import logging
-import zoneinfo
 import typing
+import zoneinfo
 
 import pytest
 import time_machine
@@ -122,7 +122,6 @@ def test_setup_logging_yml_extension_fallback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that setup_logging supports both .yaml and .yml extensions via fallback."""
-    from pathlib import Path
     from unittest.mock import Mock, patch
 
     import yaml
@@ -163,7 +162,6 @@ def test_setup_logging_yml_extension_fallback(
                 f"(fallback from {config_file})"
             )
             mock_logger.info.assert_called_with(expected_message)
-
 
     # Test .yaml -> .yml fallback
     yml_path.write_text(yaml.dump(log_config_dict))
