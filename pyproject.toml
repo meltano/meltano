@@ -37,7 +37,6 @@ dependencies = [
   "click>=8.1,<9",
   "click-default-group>=1.2.4,<2",
   "click-didyoumean>=0.3.1,<0.4",
-  "croniter>=6.0.0,<7",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.20",
   "flatten-dict>=0,<1",
@@ -143,7 +142,6 @@ testing = [
 typing = [
   "boto3-stubs[essential]>=1.35,<1.39",
   "mypy>=1.16.0,<2",
-  "types-croniter==5.0.1.20241205",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
