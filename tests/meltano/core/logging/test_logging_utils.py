@@ -119,6 +119,8 @@ def test_setup_logging_yml_extension_fallback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that setup_logging supports both .yaml and .yml extensions via fallback."""
+    from unittest.mock import patch
+
     import yaml
 
     log_config_dict = {
@@ -134,27 +136,53 @@ def test_setup_logging_yml_extension_fallback(
     yml_path = tmp_path / "logging.yml"
     original_cwd = Path.cwd()
 
+    # Test .yaml -> .yml fallback
     yml_path.write_text(yaml.dump(log_config_dict))
     monkeypatch.chdir(tmp_path)
 
+    logged_messages = []
+
+    def capture_log_call(*args, **kwargs):
+        logged_messages.append(str(args[0]) if args else str(kwargs))
+
     try:
-        setup_logging(log_config="logging.yaml")
-        root_logger = logging.getLogger()  # noqa: TID251
-        assert len(root_logger.handlers) > 0
-        handler = root_logger.handlers[0]
-        assert hasattr(handler, "formatter")
+        with patch("meltano.core.logging.utils.logger.info", capture_log_call):
+            setup_logging(log_config="logging.yaml")
+            root_logger = logging.getLogger()  # noqa: TID251
+            assert len(root_logger.handlers) > 0
+            handler = root_logger.handlers[0]
+            assert hasattr(handler, "formatter")
+
+            expected_message = (
+                "Using logging config from logging.yml (fallback from logging.yaml)"
+            )
+            assert any(expected_message in msg for msg in logged_messages), (
+                f"Expected fallback message '{expected_message}' not found in logs: "
+                + "\n".join(logged_messages)
+            )
     finally:
         monkeypatch.chdir(original_cwd)
 
+    # Test .yml -> .yaml fallback
+    logged_messages.clear()
     yml_path.unlink()
     yaml_path.write_text(yaml.dump(log_config_dict))
     monkeypatch.chdir(tmp_path)
 
     try:
-        setup_logging(log_config="logging.yml")
-        root_logger = logging.getLogger()  # noqa: TID251
-        assert len(root_logger.handlers) > 0
-        handler = root_logger.handlers[0]
-        assert hasattr(handler, "formatter")
+        with patch("meltano.core.logging.utils.logger.info", capture_log_call):
+            setup_logging(log_config="logging.yml")
+            root_logger = logging.getLogger()  # noqa: TID251
+            assert len(root_logger.handlers) > 0
+            handler = root_logger.handlers[0]
+            assert hasattr(handler, "formatter")
+
+            expected_message = (
+                "Using logging config from logging.yaml (fallback from logging.yml)"
+            )
+            assert any(expected_message in msg for msg in logged_messages), (
+                f"Expected fallback message '{expected_message}' not found in logs: "
+                + "\n".join(logged_messages)
+            )
     finally:
         monkeypatch.chdir(original_cwd)
