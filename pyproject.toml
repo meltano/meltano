@@ -18,6 +18,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
@@ -37,10 +38,10 @@ dependencies = [
   "click>=8.1,<9",
   "click-default-group>=1.2.4,<2",
   "click-didyoumean>=0.3.1,<0.4",
-  "croniter>=6.0.0,<7",
+  "croniter>=3,<7",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.20",
-  "flatten-dict>=0,<1",
+  "flatten-dict>=0.4.1,<1",
   "importlib-metadata>=5 ; python_version < '3.12'",
   "jinja2>=3.1.4,<4",
   "jsonschema>=4.23,<5",
@@ -59,7 +60,7 @@ dependencies = [
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
   "urllib3>=1.26.20",
-  "uv>=0.1.24,<0.8",
+  "uv>=0.6.15,<0.8",
   "virtualenv>=20.26.6,<21",
 ]
 
@@ -70,7 +71,7 @@ azure = [
   "azure-core>=1.32.0,<2",
   "azure-identity>=1.19.0,<2",
 ]
-gcs = ["google-cloud-storage>=1.31.0"]
+gcs = ["google-cloud-storage>=3"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]

@@ -106,7 +106,7 @@ jobs:
     timeout-minutes: 20
     env:
       PYTEST_MARKERS: ${{ matrix.markers || 'not concurrent' }}
-      NOXFORCEPYTHON: ${{ matrix.python-version }}
+      NOXPYTHON: ${{ matrix.python-version }}
 
     steps:
     - name: Check out the repository
