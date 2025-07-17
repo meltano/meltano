@@ -4,7 +4,7 @@ import asyncio
 import datetime
 import logging
 import zoneinfo
-from pathlib import Path
+import typing
 
 import pytest
 import time_machine
@@ -15,6 +15,9 @@ from meltano.core.logging.utils import (
     default_config,
     setup_logging,
 )
+
+if typing.TYPE_CHECKING:
+    from pathlib import Path
 
 
 class AsyncReader(asyncio.StreamReader):
@@ -119,7 +122,8 @@ def test_setup_logging_yml_extension_fallback(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Test that setup_logging supports both .yaml and .yml extensions via fallback."""
-    from unittest.mock import patch
+    from pathlib import Path
+    from unittest.mock import Mock, patch
 
     import yaml
 
@@ -134,58 +138,43 @@ def test_setup_logging_yml_extension_fallback(
 
     yaml_path = tmp_path / "logging.yaml"
     yml_path = tmp_path / "logging.yml"
-    original_cwd = Path.cwd()
-
-    # Save original logging state
-    original_handlers = logging.root.handlers[:]
-    original_level = logging.root.level
-
-    logged_messages = []
-
-    def capture_log_call(*args, **kwargs):
-        logged_messages.append(str(args[0]) if args else str(kwargs))
 
     def test_fallback(config_file: str, expected_fallback: Path):
         """Test logging config fallback from one extension to another."""
-        monkeypatch.chdir(tmp_path)
+        mock_dict_config = Mock()
+        mock_logger = Mock()
 
-        try:
-            with patch("meltano.core.logging.utils.logger.info", capture_log_call):
-                setup_logging(log_config=config_file)
-                root_logger = logging.getLogger()  # noqa: TID251
-                assert len(root_logger.handlers) > 0
-                handler = root_logger.handlers[0]
-                assert hasattr(handler, "formatter")
+        with (
+            monkeypatch.context() as m,
+            patch(
+                "meltano.core.logging.utils.logging.config.dictConfig", mock_dict_config
+            ),
+            patch("meltano.core.logging.utils.logger", mock_logger),
+        ):
+            m.chdir(tmp_path)
+            setup_logging(log_config=config_file)
 
-                expected_message = (
-                    f"Using logging config from {expected_fallback.name} "
-                    f"(fallback from {config_file})"
-                )
-                assert any(expected_message in msg for msg in logged_messages), (
-                    f"Expected fallback message '{expected_message}' not found in "
-                    f"logs: {logged_messages}"
-                )
-        finally:
-            monkeypatch.chdir(original_cwd)
-            logged_messages.clear()
-            # Clean up logging handlers
-            logging.root.handlers = []
+            # Verify dictConfig was called (logging configuration happened)
+            mock_dict_config.assert_called_once()
 
-    try:
-        # Test .yaml -> .yml fallback
-        yml_path.write_text(yaml.dump(log_config_dict))
-        test_fallback("logging.yaml", yml_path)
+            # Verify the fallback message was logged
+            expected_message = (
+                f"Using logging config from {expected_fallback.name} "
+                f"(fallback from {config_file})"
+            )
+            mock_logger.info.assert_called_with(expected_message)
 
-        # Test .yml -> .yaml fallback
-        yml_path.unlink()
-        yaml_path.write_text(yaml.dump(log_config_dict))
-        test_fallback("logging.yml", yaml_path)
 
-        # Test case-insensitive extension (.YAML -> .yml)
-        yaml_path.unlink()
-        yml_path.write_text(yaml.dump(log_config_dict))
-        test_fallback("logging.YAML", yml_path)
-    finally:
-        # Restore original logging state
-        logging.root.handlers = original_handlers
-        logging.root.setLevel(original_level)
+    # Test .yaml -> .yml fallback
+    yml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.yaml", yml_path)
+
+    # Test .yml -> .yaml fallback
+    yml_path.unlink()
+    yaml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.yml", yaml_path)
+
+    # Test case-insensitive extension (.YAML -> .yml)
+    yaml_path.unlink()
+    yml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.YAML", yml_path)
