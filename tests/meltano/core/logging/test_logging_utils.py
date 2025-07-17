@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import datetime
 import logging
-import typing
+import typing as t
 import zoneinfo
 
 import pytest
@@ -16,7 +16,7 @@ from meltano.core.logging.utils import (
     setup_logging,
 )
 
-if typing.TYPE_CHECKING:
+if t.TYPE_CHECKING:
     from pathlib import Path
 
 
