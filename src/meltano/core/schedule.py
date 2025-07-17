@@ -108,7 +108,7 @@ def _is_valid_field(field: str, field_index: int, /) -> bool:
 
     # Handle question mark (only valid for day and dow fields)
     if field == "?":
-        return field_index in (2, 4)  # day or dow
+        return field_index in {2, 4}  # day or dow
 
     # Handle "L" (last day of month, only valid for day field)
     if field == "l":
