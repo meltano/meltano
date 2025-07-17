@@ -116,11 +116,10 @@ def _is_valid_field(field: str, field_index: int, /) -> bool:
 
     # Split by commas for multiple values
     min_val, max_val = FIELD_RANGES[field_index]
-    for part in field.split(","):
-        if not _is_valid_field_part(part, field_index, min_val, max_val):
-            return False
-
-    return True
+    return any(
+        _is_valid_field_part(part, field_index, min_val, max_val)
+        for part in field.split(",")
+    )
 
 
 def _is_valid_field_part(
