@@ -241,8 +241,8 @@ def setup_logging(
         log_path = Path(log_config)
         config = read_config(log_path)
 
-        if config is None and log_path.suffix in {".yaml", ".yml"}:
-            fallback_ext = ".yml" if log_path.suffix == ".yaml" else ".yaml"
+        if config is None and log_path.suffix.lower() in {".yaml", ".yml"}:
+            fallback_ext = ".yml" if log_path.suffix.lower() == ".yaml" else ".yaml"
             fallback_path = log_path.with_suffix(fallback_ext)
             config = read_config(fallback_path)
             if config:

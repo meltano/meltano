@@ -173,3 +173,8 @@ def test_setup_logging_yml_extension_fallback(
     yml_path.unlink()
     yaml_path.write_text(yaml.dump(log_config_dict))
     test_fallback("logging.yml", yaml_path)
+
+    # Test case-insensitive extension (.YAML -> .yml)
+    yaml_path.unlink()
+    yml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.YAML", yml_path)
