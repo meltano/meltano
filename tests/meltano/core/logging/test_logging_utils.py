@@ -136,6 +136,10 @@ def test_setup_logging_yml_extension_fallback(
     yml_path = tmp_path / "logging.yml"
     original_cwd = Path.cwd()
 
+    # Save original logging state
+    original_handlers = logging.root.handlers[:]
+    original_level = logging.root.level
+
     logged_messages = []
 
     def capture_log_call(*args, **kwargs):
@@ -164,17 +168,24 @@ def test_setup_logging_yml_extension_fallback(
         finally:
             monkeypatch.chdir(original_cwd)
             logged_messages.clear()
+            # Clean up logging handlers
+            logging.root.handlers = []
 
-    # Test .yaml -> .yml fallback
-    yml_path.write_text(yaml.dump(log_config_dict))
-    test_fallback("logging.yaml", yml_path)
+    try:
+        # Test .yaml -> .yml fallback
+        yml_path.write_text(yaml.dump(log_config_dict))
+        test_fallback("logging.yaml", yml_path)
 
-    # Test .yml -> .yaml fallback
-    yml_path.unlink()
-    yaml_path.write_text(yaml.dump(log_config_dict))
-    test_fallback("logging.yml", yaml_path)
+        # Test .yml -> .yaml fallback
+        yml_path.unlink()
+        yaml_path.write_text(yaml.dump(log_config_dict))
+        test_fallback("logging.yml", yaml_path)
 
-    # Test case-insensitive extension (.YAML -> .yml)
-    yaml_path.unlink()
-    yml_path.write_text(yaml.dump(log_config_dict))
-    test_fallback("logging.YAML", yml_path)
+        # Test case-insensitive extension (.YAML -> .yml)
+        yaml_path.unlink()
+        yml_path.write_text(yaml.dump(log_config_dict))
+        test_fallback("logging.YAML", yml_path)
+    finally:
+        # Restore original logging state
+        logging.root.handlers = original_handlers
+        logging.root.setLevel(original_level)
