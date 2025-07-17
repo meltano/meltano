@@ -15,7 +15,7 @@ meltano --log-format=json run my-job
 
 Logging in meltano can also be controlled in more detail via a standard yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema).
 
-By default, meltano will look for this in a `logging.yaml` file in the project root. However, you can override this by
+By default, meltano will look for this in a `logging.yaml` file in the project root. Both `.yaml` and `.yml` file extensions are supported. However, you can override this by
 setting the [environment variable](/guide/configuration#configuring-settings) `MELTANO_CLI_LOG_CONFIG` or by using the
 `meltano` CLI option `--log-config`. e.g. `meltano --log-config=my-prod-logging.yaml ...`.
 

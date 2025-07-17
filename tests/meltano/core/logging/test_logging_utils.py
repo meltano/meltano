@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import logging
 import zoneinfo
+from pathlib import Path
 
 import pytest
 import time_machine
@@ -12,6 +13,7 @@ from meltano.core.logging.utils import (
     LogFormat,
     capture_subprocess_output,
     default_config,
+    setup_logging,
 )
 
 
@@ -110,3 +112,49 @@ def test_default_logging_config_format(
         # Test the formatted message
         formatted = formatter.format(record)
         assert formatted == expected
+
+
+def test_setup_logging_yml_extension_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that setup_logging supports both .yaml and .yml extensions via fallback."""
+    import yaml
+
+    log_config_dict = {
+        "version": 1,
+        "formatters": {"simple": {"format": "%(levelname)s - %(message)s"}},
+        "handlers": {
+            "console": {"class": "logging.StreamHandler", "formatter": "simple"}
+        },
+        "root": {"level": "INFO", "handlers": ["console"]},
+    }
+
+    yaml_path = tmp_path / "logging.yaml"
+    yml_path = tmp_path / "logging.yml"
+    original_cwd = Path.cwd()
+
+    yml_path.write_text(yaml.dump(log_config_dict))
+    monkeypatch.chdir(tmp_path)
+
+    try:
+        setup_logging(log_config="logging.yaml")
+        root_logger = logging.getLogger()  # noqa: TID251
+        assert len(root_logger.handlers) > 0
+        handler = root_logger.handlers[0]
+        assert hasattr(handler, "formatter")
+    finally:
+        monkeypatch.chdir(original_cwd)
+
+    yml_path.unlink()
+    yaml_path.write_text(yaml.dump(log_config_dict))
+    monkeypatch.chdir(tmp_path)
+
+    try:
+        setup_logging(log_config="logging.yml")
+        root_logger = logging.getLogger()  # noqa: TID251
+        assert len(root_logger.handlers) > 0
+        handler = root_logger.handlers[0]
+        assert hasattr(handler, "formatter")
+    finally:
+        monkeypatch.chdir(original_cwd)

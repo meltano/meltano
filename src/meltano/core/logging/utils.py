@@ -19,6 +19,8 @@ from meltano.core.logging.formatters import (
 )
 from meltano.core.utils import get_no_color_flag
 
+logger = structlog.getLogger(__name__)
+
 if sys.version_info < (3, 11):
     from backports.strenum import StrEnum
 else:
@@ -230,7 +232,26 @@ def setup_logging(
         log_format = LogFormat(project.settings.get("cli.log_format"))
 
     log_level = log_level.upper()
-    config = read_config(log_config) or default_config(log_level, log_format=log_format)
+
+    config = None
+    fallback_message = None
+    if log_config:
+        from pathlib import Path
+
+        log_path = Path(log_config)
+        config = read_config(log_path)
+
+        if config is None and log_path.suffix in {".yaml", ".yml"}:
+            fallback_ext = ".yml" if log_path.suffix == ".yaml" else ".yaml"
+            fallback_path = log_path.with_suffix(fallback_ext)
+            config = read_config(fallback_path)
+            if config:
+                fallback_message = (
+                    f"Using logging config from {fallback_path} "
+                    f"(fallback from {log_path})"
+                )
+
+    config = config or default_config(log_level, log_format=log_format)
     logging_config.dictConfig(config)
     structlog.configure(
         processors=[
@@ -245,14 +266,17 @@ def setup_logging(
         cache_logger_on_first_use=True,
     )
 
+    if fallback_message:
+        logger.info(fallback_message)
+
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:
     """Change the log level for the root logger, but only on the 'console' handler.
 
     Most useful when you want change the log level on the fly for console
-    output, but want to respect other aspects of any potential `logging.yaml`
-    sourced configs. Note that if a `logging.yaml` config without a 'console'
-    handler is used, this will not override the log level.
+    output, but want to respect other aspects of any potential logging config
+    sourced configs (logging.yaml/logging.yml). Note that if a logging config
+    without a 'console' handler is used, this will not override the log level.
 
     Args:
         log_level: set log levels to provided level.
