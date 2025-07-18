@@ -78,11 +78,11 @@ def print_added_plugin(
         descriptor = f"required {descriptor}"
 
     if flags == AddedPluginFlags.ADDED:
-        action, preposition = "Added", "in"
+        action, preposition = "Added", "to"
     elif flags == AddedPluginFlags.UPDATED:
         action, preposition = "Updated", "in"
     elif flags == AddedPluginFlags.NOT_ADDED:
-        action, preposition = "Not added", "to"
+        action, preposition = "Initialized", "in"
     else:  # pragma: no cover
         t.assert_never(flags)
 
