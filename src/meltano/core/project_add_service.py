@@ -95,10 +95,7 @@ class ProjectAddService:
             )
 
             if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(
-                    plugin,
-                    exists_ok=update or plugin.inherit_from is not None,
-                )
+                self.project.plugins.lock_service.save(plugin, exists_ok=True)
 
             return plugin, flags
 
