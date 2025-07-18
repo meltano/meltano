@@ -39,6 +39,14 @@ class DefinitionSource(enum.Flag):
     LOCAL = ~HUB  # type: ignore[operator]  # https://github.com/python/mypy/issues/18410
 
 
+class AddedPluginFlags(enum.Flag):
+    """Flags for added plugins."""
+
+    ADDED = enum.auto()
+    NOT_ADDED = enum.auto()
+    UPDATED = enum.auto()
+
+
 class PluginAlreadyAddedException(Exception):
     """Raised when a plugin is already added to the project."""
 
@@ -140,17 +148,24 @@ class ProjectPluginsService:  # (too many methods, attributes)
         with self.project.config_service.update_meltano_yml() as meltano_yml:
             yield meltano_yml.plugins
 
-    def add_to_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
+    def add_to_file_with_flags(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> tuple[ProjectPlugin, AddedPluginFlags]:
         """Add plugin to `meltano.yml`.
 
         Args:
             plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant.
 
         Raises:
             PluginAlreadyAddedException: If the plugin is already added.
 
         Returns:
-            The added plugin.
+            The added plugin and flags.
         """
         # FIXME: `should_add_to_file` is a method from `BasePlugin`, which is
         #        not a subclass of `ProjectPlugin`. I've left this call to it
@@ -158,11 +173,15 @@ class ProjectPluginsService:  # (too many methods, attributes)
         #        that relies on it, but something is definitely wrong here.
         #        We default to `True` for `ProjectPlugin` objects.
         if not getattr(plugin, "should_add_to_file", lambda: True)():
-            return plugin
+            return plugin, AddedPluginFlags.NOT_ADDED
 
         with suppress(PluginNotFoundError):
             existing_plugin = self.get_plugin(plugin)
-            raise PluginAlreadyAddedException(existing_plugin, plugin)
+            if not update or existing_plugin.variant != plugin.variant:
+                raise PluginAlreadyAddedException(existing_plugin, plugin)
+
+            updated, _ = self.update_plugin(plugin, keep_config=True)
+            return updated, AddedPluginFlags.UPDATED
 
         with self.update_plugins() as plugins:
             if plugin.type not in plugins:
@@ -170,7 +189,25 @@ class ProjectPluginsService:  # (too many methods, attributes)
 
             plugins[plugin.type].append(plugin)
 
-        return plugin
+        return plugin, AddedPluginFlags.ADDED
+
+    def add_to_file(
+        self,
+        plugin: ProjectPlugin,
+        *,
+        update: bool = False,
+    ) -> ProjectPlugin:
+        """Add plugin to `meltano.yml`.
+
+        Args:
+            plugin: The plugin to add.
+            update: Whether to update the plugin if it already exists in the file
+                and it is the same variant.
+
+        Returns:
+            The added plugin.
+        """
+        return self.add_to_file_with_flags(plugin, update=update)[0]
 
     def remove_from_file(self, plugin: ProjectPlugin) -> ProjectPlugin:
         """Remove plugin from `meltano.yml`.

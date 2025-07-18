@@ -8,7 +8,10 @@ import pytest
 from asserts import assert_cli_runner
 from meltano.cli import cli
 from meltano.core.plugin import PluginType
-from meltano.core.project_add_service import PluginAlreadyAddedException
+from meltano.core.project_add_service import (
+    PluginAlreadyAddedException,
+    ProjectAddService,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.plugin.project_plugin import ProjectPlugin
@@ -16,7 +19,7 @@ if t.TYPE_CHECKING:
 
 class TestCliRemove:
     @pytest.fixture(scope="class")
-    def tap_gitlab(self, project_add_service):
+    def tap_gitlab(self, project_add_service: ProjectAddService):
         try:
             return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
         except PluginAlreadyAddedException as err:
