@@ -9,6 +9,7 @@ import os
 import sys
 import typing as t
 from logging import config as logging_config
+from pathlib import Path
 
 import structlog
 import yaml
@@ -234,22 +235,22 @@ def setup_logging(
     log_level = log_level.upper()
 
     config = None
-    fallback_message = None
+    which_config: str | None = None
     if log_config:
-        from pathlib import Path
-
         log_path = Path(log_config)
         config = read_config(log_path)
+        suffix = log_path.suffix.lower()
 
-        if config is None and log_path.suffix.lower() in {".yaml", ".yml"}:
-            fallback_ext = ".yml" if log_path.suffix.lower() == ".yaml" else ".yaml"
-            fallback_path = log_path.with_suffix(fallback_ext)
-            config = read_config(fallback_path)
+        if config is None and suffix in {".yaml", ".yml"}:
+            fallback = log_path.with_suffix(".yml" if suffix == ".yaml" else ".yaml")
+            config = read_config(fallback)
             if config:
-                fallback_message = (
-                    f"Using logging config from {fallback_path} "
+                which_config = (
+                    f"Using logging configuration from {fallback} "
                     f"(fallback from {log_path})"
                 )
+        else:
+            which_config = f"Using logging configuration from {log_path}"
 
     config = config or default_config(log_level, log_format=log_format)
     logging_config.dictConfig(config)
@@ -266,8 +267,8 @@ def setup_logging(
         cache_logger_on_first_use=True,
     )
 
-    if fallback_message:
-        logger.info(fallback_message)
+    if which_config:
+        logger.info(which_config)
 
 
 def change_console_log_level(log_level: int = logging.DEBUG) -> None:

@@ -158,7 +158,7 @@ def test_setup_logging_yml_extension_fallback(
 
             # Verify the fallback message was logged
             expected_message = (
-                f"Using logging config from {expected_fallback.name} "
+                f"Using logging configuration from {expected_fallback.name} "
                 f"(fallback from {config_file})"
             )
             mock_logger.info.assert_called_with(expected_message)
