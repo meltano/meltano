@@ -71,7 +71,7 @@ def env_var():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project: Project):
     expected = {"test": "custom", "start_date": None, "secure": None}
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,

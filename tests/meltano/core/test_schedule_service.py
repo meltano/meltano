@@ -21,6 +21,7 @@ from meltano.core.schedule_service import (
 )
 
 if t.TYPE_CHECKING:
+    from meltano.core.project import Project
     from meltano.core.schedule_service import ScheduleService
 
 
@@ -58,7 +59,7 @@ def create_job_schedule():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project: Project):
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",

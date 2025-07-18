@@ -45,9 +45,9 @@ If the flag is not provided, the behavior is determined by the boolean [`auto_in
 
 ## `add`
 
-`meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
+`meltano add` lets you add or update [plugins](/concepts/plugins#project-plugins) in your Meltano project. The command is idempotent - running it on an existing plugin will update the plugin instead of failing.
 
-Specifically, it will:
+When adding a new plugin, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
 1. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
@@ -56,6 +56,8 @@ Specifically, it will:
   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
   1. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
+
+When running on an existing plugin, it will update the plugin definition and lock file without overwriting user-defined configuration. To prevent this update behavior and fail when a plugin already exists, use the `--no-update` flag.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -200,9 +202,6 @@ meltano add this-will-be-ignored --from-ref tap-shopify--matatika.yml
 
 # The above also applies to the plugin variant, if provided
 meltano add this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-shopify--matatika.yml
-
-# Once added, the custom plugin definition can be updated with the `--update` option
-meltano add --update tap-shopify --from-ref tap-shopify--matatika.yml
 ```
 
 Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
@@ -211,27 +210,9 @@ Using `--from-ref` allows you to add a plugin before it is available on [Meltano
   Meltano will throw an error if the referenced plugin definition is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
 
-A plugin can be updated using the `--update` option
+A plugin can be updated by simply running `meltano add` again, as updating is now the default behavior.
 
-```bash
-# With automatic type detection
-meltano add --update <name>
-
-# For example:
-# Update from Meltano Hub - type automatically detected
-meltano add --update tap-shopify
-
-# Update from ref
-meltano add --update tap-shopify --from-ref tap-shopify--matatika.yml
-
-# With explicit type specification for disambiguation
-meltano add --update --plugin-type extractor tap-shopify
-
-# Deprecated positional syntax
-meltano add --update extractor tap-shopify
-```
-
-This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
+This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Running `meltano add` on a plugin that does not already exist in a project will add it normally.
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
@@ -269,7 +250,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--install/--no-install`: Whether or not to install the plugin after adding it to the project. See the [Auto-install behavior](#auto-install-behavior) section for more information.
-- `--update`: Update a plugin in the project.
+- `--update/--no-update`: Whether to update an existing plugin in the project. Default is `--update` (enabled), making the command idempotent. Use `--no-update` to fail when a plugin already exists.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
