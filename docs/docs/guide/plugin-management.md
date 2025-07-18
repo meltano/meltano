@@ -584,6 +584,10 @@ You can update a plugin in your project using the `--update` option. Updating a 
 - Update the plugin lock file (the same as [`meltano lock --update`](/reference/command-line-interface#lock) would)
 - Update the plugin entry in the `meltano.yml`, without overwriting any user-defined [config](/concepts/project#plugin-configuration) or [extras](/guide/configuration#plugin-extras)
 
+:::note
+Plugin lock files may include a `requires_meltano` field that specifies the minimum Meltano version required by that plugin. If your current Meltano version doesn't meet the plugin's requirements, Meltano will exit with an error when trying to invoke the plugin.
+:::
+
 
 ```bash
 meltano add --update <type> <name>
