@@ -111,6 +111,7 @@ def _load_yaml_from_ref(
     is_flag=True,
     default=True,
     help="Update an existing plugin.",
+    hidden=True,
 )
 @install
 @no_install
