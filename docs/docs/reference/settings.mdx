@@ -598,7 +598,7 @@ meltano --log-format=json ...
 - `meltano` CLI option: `--log-config`
 - Default: `logging.yaml`
 
-The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_.
+The path of a valid yaml formatted [python logging dict config file](https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema) to use to configure logging _if present_. Supports both `.yaml` and `.yml` file extensions.
 
 #### How to use
 
@@ -607,6 +607,8 @@ The path of a valid yaml formatted [python logging dict config file](https://doc
 
 ```bash
 meltano config meltano set cli log_config /path/to/logging.yaml
+# or
+meltano config meltano set cli log_config /path/to/logging.yml
 ```
 
   </TabItem>
@@ -614,6 +616,8 @@ meltano config meltano set cli log_config /path/to/logging.yaml
 
 ```bash
 export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
+# or
+export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yml
 ```
 
   </TabItem>
@@ -621,6 +625,8 @@ export MELTANO_CLI_LOG_CONFIG=/path/to/logging.yaml
 
 ```bash
 meltano --log-config=/path/to/logging.yaml ...
+# or
+meltano --log-config=/path/to/logging.yml ...
 ```
 
   </TabItem>
