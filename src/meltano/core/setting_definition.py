@@ -179,6 +179,7 @@ class SettingDefinition(NameEq, Canonical):
     hidden: bool
     sensitive: bool
     value_post_processor: str | Callable | None
+    deprecated: bool
     _custom: bool
 
     def __init__(
@@ -200,6 +201,7 @@ class SettingDefinition(NameEq, Canonical):
         env_specific: bool | None = None,
         hidden: bool | None = None,
         sensitive: bool | None = None,
+        deprecated: bool | None = None,
         custom: bool = False,
         value_processor=None,  # noqa: ANN001
         value_post_processor: str | Callable | None = None,
@@ -225,6 +227,7 @@ class SettingDefinition(NameEq, Canonical):
             env_specific: Flag for environment-specific setting.
             hidden: Hidden setting.
             sensitive: Sensitive setting.
+            deprecated: Deprecated setting.
             custom: Custom setting flag.
             value_processor: Used with `kind: object` to pre-process the keys
                 in a particular way.
@@ -249,7 +252,7 @@ class SettingDefinition(NameEq, Canonical):
             hidden = True
 
         # Handle deprecated SettingKind.PASSWORD and SettingKind.OAUTH
-        if kind and kind.is_sensitive:
+        if kind is not None and kind.is_sensitive:
             # Override kind if sensitive flag is set
             if sensitive:
                 kind = SettingKind.STRING
@@ -275,6 +278,7 @@ class SettingDefinition(NameEq, Canonical):
             env_specific=env_specific,
             hidden=hidden,
             sensitive=sensitive,
+            deprecated=deprecated,
             value_processor=value_processor,
             value_post_processor=value_post_processor,
             _custom=custom,
@@ -381,6 +385,15 @@ class SettingDefinition(NameEq, Canonical):
             True if setting value is redacted.
         """
         return self.sensitive
+
+    @property
+    def is_deprecated(self) -> bool:
+        """Return whether the setting is deprecated.
+
+        Returns:
+            True if the setting is deprecated.
+        """
+        return self.deprecated
 
     def env_vars(
         self,
