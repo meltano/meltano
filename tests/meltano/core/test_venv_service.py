@@ -204,7 +204,7 @@ class TestVenvService:
 
         original_python = subject.venv.python_path
         try:
-            subject.venv.python_path = "/usr/bin/python3.11"
+            subject.venv.python_path = "/fake/test/python"
             assert subject.requires_clean_install(["example"])
 
             subject.venv.python_path = original_python
