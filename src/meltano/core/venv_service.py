@@ -735,7 +735,9 @@ class UvVenvService(VenvService):
 
             stderr_result = err.stderr
             stderr_content = (
-                await stderr_result if hasattr(stderr_result, "__await__") else stderr_result
+                await stderr_result
+                if hasattr(stderr_result, "__await__")
+                else stderr_result
             )
             if stderr_content:
                 log_file.write(f"Error output:\n{stderr_content}\n")
