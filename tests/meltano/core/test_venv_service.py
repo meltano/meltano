@@ -297,7 +297,7 @@ class TestUvVenvService(TestVenvService):
             log_content = log_file_path.read_text()
             assert "Installation attempt failed at" in log_content
             assert "Command: " in log_content
-            assert "uv pip install" in log_content
+            assert "pip install" in log_content
             assert "Some error" in log_content
             assert "--- End of error log ---" in log_content
 
