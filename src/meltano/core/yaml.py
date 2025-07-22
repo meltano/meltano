@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 import typing as t
 from dataclasses import dataclass
 from decimal import Decimal
@@ -21,6 +22,7 @@ if t.TYPE_CHECKING:
 
 yaml = YAML()
 yaml.default_flow_style = False
+yaml.width = sys.maxsize  # Prevent line wrapping entirely
 
 
 def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
