@@ -19,12 +19,12 @@ from meltano.core.error import MeltanoConfigurationError
 from meltano.core.logging import setup_logging
 from meltano.core.plugin.base import PluginDefinition, PluginType
 from meltano.core.plugin.error import InvalidPluginDefinitionError, PluginNotFoundError
-from meltano.core.plugin_lock_service import LockfileAlreadyExistsError
 from meltano.core.project_add_service import (
     PluginAddedReason,
     PluginAlreadyAddedException,
     ProjectAddService,
 )
+from meltano.core.project_plugins_service import AddedPluginFlags
 from meltano.core.setting_definition import SettingKind
 from meltano.core.tracking.contexts import CliContext, CliEvent, ProjectContext
 
@@ -68,7 +68,7 @@ def print_added_plugin(
     plugin: ProjectPlugin,
     reason: PluginAddedReason = PluginAddedReason.USER_REQUEST,
     *,
-    update: bool = False,
+    flags: AddedPluginFlags = AddedPluginFlags.ADDED,
 ) -> None:
     """Print added plugin."""
     descriptor = plugin.type.descriptor
@@ -77,17 +77,14 @@ def print_added_plugin(
     elif reason is PluginAddedReason.REQUIRED:
         descriptor = f"required {descriptor}"
 
-    action, preposition = (
-        (
-            "Updated" if plugin.should_add_to_file() else "Updating",
-            "in",
-        )
-        if update
-        else (
-            "Added" if plugin.should_add_to_file() else "Adding",
-            "to",
-        )
-    )
+    if flags == AddedPluginFlags.ADDED:
+        action, preposition = "Added", "to"
+    elif flags == AddedPluginFlags.UPDATED:
+        action, preposition = "Updated", "in"
+    elif flags == AddedPluginFlags.NOT_ADDED:
+        action, preposition = "Initialized", "in"
+    else:  # pragma: no cover
+        t.assert_never(flags)
 
     click.secho(
         f"{action} {descriptor} '{plugin.name}' {preposition} your project",
@@ -310,10 +307,8 @@ def add_plugin(  # noqa: ANN201
         plugin_name = plugin_attrs.pop("name")
         variant = plugin_attrs.pop("variant", variant)
 
-    plugin: ProjectContext | PluginRef
-
     try:
-        plugin = add_service.add(
+        plugin, flags = add_service.add_with_flags(
             plugin_type,
             plugin_name,
             variant=variant,
@@ -323,9 +318,9 @@ def add_plugin(  # noqa: ANN201
             python=python,
             **plugin_attrs,
         )
-        print_added_plugin(plugin, update=update)
+        print_added_plugin(plugin, flags=flags)
     except PluginAlreadyAddedException as err:
-        plugin = err.plugin
+        plugin = err.plugin  # type: ignore[assignment]
         click.secho(
             (
                 f"{plugin_type.descriptor.capitalize()} '{plugin_name}' "
@@ -369,17 +364,6 @@ def add_plugin(  # noqa: ANN201
                 f"\tmeltano add {plugin_type.singular} {plugin.name}--new "
                 f"--inherit-from {plugin.name}",
             )
-    except LockfileAlreadyExistsError as exc:
-        # TODO: This is a BasePlugin, not a ProjectPlugin, as this method
-        # should return! Results in `KeyError: venv_name`
-        plugin = exc.plugin
-        click.secho(
-            f"Plugin definition is already locked at {exc.path}.",
-            fg="yellow",
-        )
-        click.echo(
-            "You can remove the file manually to avoid using a stale definition.",
-        )
 
     click.echo()
 
