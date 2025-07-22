@@ -283,23 +283,57 @@ class TestUvVenvService(TestVenvService):
         """Test that error handling creates log file with details."""
         log_file_path = tmp_path / "pip.log"
         with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock()
+            process.args = ["uv", "pip", "install", "some-package"]
             original_err = AsyncSubprocessError(
-                "Something went wrong", None, stderr="Some error"
+                "Something went wrong", process, stderr="Some error"
             )
             result_err = await subject.handle_installation_error(original_err)
 
-            # Should return wrapped error with our message
             assert isinstance(result_err, AsyncSubprocessError)
             assert "Failed to install plugin 'name'" in str(result_err)
 
-            # Check that the log file was created and contains expected content
             assert log_file_path.exists()
             log_content = log_file_path.read_text()
             assert "Installation attempt failed at" in log_content
-            assert "Command: " in log_content
-            assert "pip install" in log_content
+            assert "pip install some-package" in log_content
             assert "Some error" in log_content
             assert "--- End of error log ---" in log_content
+
+    async def test_error_logging_no_process_args(
+        self, subject: UvVenvService, tmp_path
+    ) -> None:
+        """Test error logging when process has no args."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock()
+            process.args = None
+            original_err = AsyncSubprocessError(
+                "Another error", process, stderr="Different error"
+            )
+            await subject.handle_installation_error(original_err)
+
+            assert log_file_path.exists()
+            log_content = log_file_path.read_text()
+            assert f"Command: {subject.uv} pip install --python" in log_content
+
+    def test_error_logging_sync_empty_stderr(
+        self, subject: UvVenvService, tmp_path
+    ) -> None:
+        """Test sync error logging when stderr is empty."""
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            process = mock.Mock()
+            process.args = ["uv", "pip", "install", "some-package"]
+            original_err = AsyncSubprocessError("Another error", process)
+
+            # Test the sync method directly with empty stderr
+            subject._write_error_log_sync(original_err, None)
+
+            assert log_file_path.exists()
+            log_content = log_file_path.read_text()
+            assert "Installation attempt failed at" in log_content
+            assert "Error output:" not in log_content
 
     async def test_error_logging_handles_write_failure(
         self, subject: UvVenvService
