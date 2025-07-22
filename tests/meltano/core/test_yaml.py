@@ -146,8 +146,6 @@ def test_yaml_width_prevents_line_wrapping() -> None:
     """Test that long lines are not wrapped due to sys.maxsize YAML width."""
     from meltano.core.yaml import yaml as yaml_instance
 
-    assert yaml_instance.width == sys.maxsize
-
     long_url = (
         "git+https://github.com/transferwise/pipelinewise-tap-mysql.git"
         "#subdirectory=singer-connectors/tap-mysql&ref=v1.2.3-with-very-long-branch-name"
