@@ -1399,6 +1399,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ddobrinskiy",
+      "name": "David Dobrinskiy",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29500178?v=4",
+      "profile": "https://linkedin.com/in/ddobrinskiy",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
