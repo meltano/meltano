@@ -726,19 +726,26 @@ class UvVenvService(VenvService):
 
     async def _write_error_log(self, err: AsyncSubprocessError) -> None:
         """Write error details to the log file."""
+        stderr_content = await err.stderr
+        await asyncio.to_thread(self._write_error_log_sync, err, stderr_content)
+
+    def _write_error_log_sync(
+        self, err: AsyncSubprocessError, stderr_content: str | None
+    ) -> None:
+        """Synchronous helper for writing error details to the log file."""
         with self.pip_log_path.open("a", encoding="utf-8") as log_file:
             timestamp = datetime.now(timezone.utc).isoformat()
             python_path = self.exec_path("python")
 
             log_file.write(f"\n--- Installation attempt failed at {timestamp} ---\n")
-            log_file.write(f"Command: {self.uv} pip install --python={python_path}\n")
+            if hasattr(err.process, "args") and err.process.args:
+                command_str = " ".join(str(arg) for arg in err.process.args)
+                log_file.write(f"Command: {command_str}\n")
+            else:
+                log_file.write(
+                    f"Command: {self.uv} pip install --python={python_path}\n"
+                )
 
-            stderr_result = err.stderr
-            stderr_content = (
-                await stderr_result
-                if hasattr(stderr_result, "__await__")
-                else stderr_result
-            )
             if stderr_content:
                 log_file.write(f"Error output:\n{stderr_content}\n")
 
