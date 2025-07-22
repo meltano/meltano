@@ -277,17 +277,29 @@ class TestUvVenvService(TestVenvService):
         ):
             await subject.install(["cowsay"])
 
-    async def test_error_logging_creates_log_file(self, subject: UvVenvService) -> None:
+    async def test_error_logging_creates_log_file(
+        self, subject: UvVenvService, tmp_path
+    ) -> None:
         """Test that error handling creates log file with details."""
-        # Just test that the error handling doesn't crash and returns proper error
-        original_err = AsyncSubprocessError(
-            "Something went wrong", None, stderr="Some error"
-        )
-        result_err = await subject.handle_installation_error(original_err)
+        log_file_path = tmp_path / "pip.log"
+        with mock.patch.object(subject, "pip_log_path", log_file_path):
+            original_err = AsyncSubprocessError(
+                "Something went wrong", None, stderr="Some error"
+            )
+            result_err = await subject.handle_installation_error(original_err)
 
-        # Should return wrapped error with our message
-        assert isinstance(result_err, AsyncSubprocessError)
-        assert "Failed to install plugin 'name'" in str(result_err)
+            # Should return wrapped error with our message
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)
+
+            # Check that the log file was created and contains expected content
+            assert log_file_path.exists()
+            log_content = log_file_path.read_text()
+            assert "Installation attempt failed at" in log_content
+            assert "Command: " in log_content
+            assert "uv pip install" in log_content
+            assert "Some error" in log_content
+            assert "--- End of error log ---" in log_content
 
     async def test_error_logging_handles_write_failure(
         self, subject: UvVenvService
