@@ -9,6 +9,7 @@ import typing as t
 from meltano.core.plugin import BasePlugin, PluginType, Variant
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import (
+    AddedPluginFlags,
     DefinitionSource,
     PluginAlreadyAddedException,
 )
@@ -50,7 +51,7 @@ class ProjectAddService:
         """
         self.project = project
 
-    def add(
+    def add_with_flags(
         self,
         plugin_type: PluginType,
         plugin_name: str,
@@ -58,7 +59,7 @@ class ProjectAddService:
         lock: bool = True,
         update: bool = False,
         **attrs: t.Any,
-    ) -> ProjectPlugin:
+    ) -> tuple[ProjectPlugin, AddedPluginFlags]:
         """Add a new plugin to the project.
 
         Args:
@@ -69,7 +70,7 @@ class ProjectAddService:
             attrs: Additional attributes to add to the plugin.
 
         Returns:
-            The added plugin.
+            The added plugin and flags.
         """
         plugin = ProjectPlugin(
             plugin_type,
@@ -88,21 +89,45 @@ class ProjectAddService:
                 plugin.variant = parent.variant
                 plugin.pip_url = parent.pip_url
 
-            if update:
-                plugin, _outdated = self.project.plugins.update_plugin(
-                    plugin,
-                    keep_config=True,
-                )
-            else:
-                plugin = self.project.plugins.add_to_file(plugin)
+            plugin, flags = self.project.plugins.add_to_file_with_flags(
+                plugin,
+                update=update,
+            )
 
             if lock and not plugin.is_custom():
-                self.project.plugins.lock_service.save(
-                    plugin,
-                    exists_ok=update or plugin.inherit_from is not None,
-                )
+                self.project.plugins.lock_service.save(plugin, exists_ok=True)
 
-            return plugin
+            return plugin, flags
+
+    def add(
+        self,
+        plugin_type: PluginType,
+        plugin_name: str,
+        *,
+        lock: bool = True,
+        update: bool = False,
+        **attrs: t.Any,
+    ) -> ProjectPlugin:
+        """Add a plugin to the project.
+
+        Args:
+            plugin_type: The type of the plugin to add.
+            plugin_name: The name of the plugin to add.
+            lock: Whether to generate a lockfile for the plugin.
+            update: Whether to update the plugin.
+            attrs: Additional attributes to add to the plugin.
+
+        Returns:
+            The added plugin.
+        """
+        plugin, _flags = self.add_with_flags(
+            plugin_type,
+            plugin_name,
+            lock=lock,
+            update=update,
+            **attrs,
+        )
+        return plugin
 
     def add_required(
         self,
