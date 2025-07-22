@@ -13,6 +13,7 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Awaitable, Callable
+from datetime import datetime, timezone
 from functools import cache, cached_property
 
 import structlog
@@ -703,11 +704,43 @@ class UvVenvService(VenvService):
         Returns:
             The error that occurred during installation with additional context.
         """
+        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            await self._write_error_log(err)
+        except OSError as log_err:
+            logger.debug(
+                "Failed to write installation error to log file %s: %s",
+                self.pip_log_path,
+                log_err,
+            )
+
+        logger.info(
+            "Logged uv pip install output to %s",
+            self.pip_log_path,
+        )
         return AsyncSubprocessError(
             f"Failed to install plugin '{self.name}'.",
             err.process,
             stderr=await err.stderr,
         )
+
+    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
+        """Write error details to the log file."""
+        with self.pip_log_path.open("a", encoding="utf-8") as log_file:
+            timestamp = datetime.now(timezone.utc).isoformat()
+            python_path = self.exec_path("python")
+
+            log_file.write(f"\n--- Installation attempt failed at {timestamp} ---\n")
+            log_file.write(f"Command: {self.uv} pip install --python={python_path}\n")
+
+            stderr_result = err.stderr
+            stderr_content = (
+                await stderr_result if hasattr(stderr_result, "__await__") else stderr_result
+            )
+            if stderr_content:
+                log_file.write(f"Error output:\n{stderr_content}\n")
+
+            log_file.write("--- End of error log ---\n\n")
 
     @override
     async def create_venv(

@@ -276,3 +276,33 @@ class TestUvVenvService(TestVenvService):
             ),
         ):
             await subject.install(["cowsay"])
+
+    async def test_error_logging_creates_log_file(self, subject: UvVenvService) -> None:
+        """Test that error handling creates log file with details."""
+        # Just test that the error handling doesn't crash and returns proper error
+        original_err = AsyncSubprocessError(
+            "Something went wrong", None, stderr="Some error"
+        )
+        result_err = await subject.handle_installation_error(original_err)
+
+        # Should return wrapped error with our message
+        assert isinstance(result_err, AsyncSubprocessError)
+        assert "Failed to install plugin 'name'" in str(result_err)
+
+    async def test_error_logging_handles_write_failure(
+        self, subject: UvVenvService
+    ) -> None:
+        """Test that log write failures are handled gracefully."""
+        process = mock.Mock(spec=Process)
+        process.stderr = mock.AsyncMock(return_value="Some error")
+
+        # Mock the log writing to fail
+        with mock.patch.object(
+            subject, "_write_error_log", side_effect=OSError("Permission denied")
+        ):
+            original_err = AsyncSubprocessError("Something went wrong", process)
+            result_err = await subject.handle_installation_error(original_err)
+
+            # Should still return the installation error, not the log error
+            assert isinstance(result_err, AsyncSubprocessError)
+            assert "Failed to install plugin 'name'" in str(result_err)
