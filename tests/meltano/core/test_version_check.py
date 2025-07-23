@@ -177,7 +177,7 @@ class TestVersionCheckService:
             with mock.patch("pathlib.Path.exists", mock_exists_none):
                 command = version_service._get_upgrade_command()
                 assert "--user" in command
-                assert "pip install --user --upgrade meltano" == command
+                assert command == "pip install --user --upgrade meltano"
 
     @responses.activate
     def test_check_version_outdated(self, version_service, monkeypatch):
