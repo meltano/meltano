@@ -317,18 +317,24 @@ class TestUvVenvService(TestVenvService):
             log_content = log_file_path.read_text()
             assert f"Command: {subject.uv} pip install --python" in log_content
 
-    def test_error_logging_sync_empty_stderr(
+    async def test_error_logging_empty_stderr(
         self, subject: UvVenvService, tmp_path
     ) -> None:
-        """Test sync error logging when stderr is empty."""
+        """Test error logging when stderr is empty."""
         log_file_path = tmp_path / "pip.log"
         with mock.patch.object(subject, "pip_log_path", log_file_path):
             process = mock.Mock()
             process.args = ["uv", "pip", "install", "some-package"]
-            original_err = AsyncSubprocessError("Another error", process)
+            process.stderr = None
 
-            # Test the sync method directly with empty stderr
-            subject._write_error_log_sync(original_err, None)
+            # Create AsyncSubprocessError and simulate empty stderr
+            # Note: We need to set _stderr=None directly because AsyncSubprocessError
+            # constructor uses `stderr or process.stderr`, so empty strings are falsy
+            # and fall back to process.stderr (which would be a Mock)
+            original_err = AsyncSubprocessError("Another error", process)
+            original_err._stderr = None
+
+            await subject.handle_installation_error(original_err)
 
             assert log_file_path.exists()
             log_content = log_file_path.read_text()
