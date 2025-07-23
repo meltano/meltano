@@ -612,8 +612,8 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
             return
 
         # Skip if project not available or version check disabled
-        project: Project = ctx.obj.get("project")
-        if not project or not ctx.obj.get("version_check_enabled", False):
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
             return
 
         try:
@@ -660,8 +660,8 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             return
 
         # Skip if project not available or version check disabled
-        project = ctx.obj.get("project")
-        if not project or not ctx.obj.get("version_check_enabled", False):
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
             return
 
         try:
