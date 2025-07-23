@@ -250,7 +250,6 @@ tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
 version_files = [
   "pyproject.toml:^version =",
-  "src/meltano/__init__.py:^__version__ =",
   'docs/package.json:^  "version":',
   ".github/ISSUE_TEMPLATE/bug.yml:^      placeholder:",
 ]
