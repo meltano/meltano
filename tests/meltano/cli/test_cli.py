@@ -572,7 +572,7 @@ class TestVersionCheck:
         # Mock the service instance and its check_version method
         mock_service = mock.Mock()
         mock_version_service_class.return_value = mock_service
-        
+
         # Mock an outdated version scenario
         mock_result = VersionCheckResult(
             current_version="3.7.0",
@@ -594,7 +594,7 @@ class TestVersionCheck:
 
         # Verify version check service was instantiated
         mock_version_service_class.assert_called_once()
-        
+
         # Verify check_version was called
         mock_service.check_version.assert_called_once()
 

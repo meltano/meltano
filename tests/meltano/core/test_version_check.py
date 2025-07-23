@@ -36,7 +36,9 @@ class TestVersionCheckService:
         mock_service.get.return_value = False  # version check enabled by default
         return mock_service
 
-    def test_should_check_version_environment_variable(self, version_service, monkeypatch):
+    def test_should_check_version_environment_variable(
+        self, version_service, monkeypatch
+    ):
         """Test that environment variable disables version check."""
         # Test various truthy values
         for value in ["1", "true", "yes", "True", "YES"]:
@@ -52,7 +54,9 @@ class TestVersionCheckService:
         monkeypatch.delenv("MELTANO_CLI_DISABLE_VERSION_CHECK", raising=False)
         assert version_service.should_check_version()
 
-    def test_should_check_version_project_setting(self, tmp_path, mock_settings_service):
+    def test_should_check_version_project_setting(
+        self, tmp_path, mock_settings_service
+    ):
         """Test that project setting disables version check."""
         cache_dir = tmp_path / "cache"
         cache_dir.mkdir()
@@ -112,7 +116,7 @@ class TestVersionCheckService:
         """Test cache save and load operations."""
         # Test saving cache
         version_service._save_cache("3.9.0")
-        
+
         # Test loading valid cache
         cache_data = version_service._load_cache()
         assert cache_data is not None
@@ -122,7 +126,9 @@ class TestVersionCheckService:
         # Test cache expiration
         # Manually modify cache to be expired
         cache_file = version_service._cache_file
-        old_timestamp = datetime.now(timezone.utc) - CACHE_DURATION - timedelta(minutes=1)
+        old_timestamp = (
+            datetime.now(timezone.utc) - CACHE_DURATION - timedelta(minutes=1)
+        )
         expired_cache = {
             "latest_version": "3.8.0",
             "check_timestamp": old_timestamp.isoformat(),
@@ -150,13 +156,15 @@ class TestVersionCheckService:
 
         # Test pipx detection
         monkeypatch.setenv("PIPX_HOME", str(Path.home() / ".local/pipx"))
-        
+
         def mock_exists_pipx(self):
             # Mock pipx home directory to exist
             return str(self) == str(Path.home() / ".local/pipx")
 
         # Mock sys.executable to be in a pipx path
-        with mock.patch("sys.executable", str(Path.home() / ".local/pipx/venvs/meltano/bin/python")):
+        with mock.patch(
+            "sys.executable", str(Path.home() / ".local/pipx/venvs/meltano/bin/python")
+        ):
             with mock.patch("pathlib.Path.exists", mock_exists_pipx):
                 command = version_service._get_upgrade_command()
                 assert command == "pipx upgrade meltano"
@@ -165,7 +173,7 @@ class TestVersionCheckService:
     def test_check_version_outdated(self, version_service, monkeypatch):
         """Test version check when current version is outdated."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
-        
+
         pypi_response = {
             "info": {
                 "version": "3.9.0",
@@ -191,7 +199,7 @@ class TestVersionCheckService:
     def test_check_version_up_to_date(self, version_service, monkeypatch):
         """Test version check when current version is up to date."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.9.0")
-        
+
         pypi_response = {
             "info": {
                 "version": "3.9.0",
@@ -215,14 +223,14 @@ class TestVersionCheckService:
     def test_check_version_disabled(self, version_service, monkeypatch):
         """Test version check when disabled."""
         monkeypatch.setenv("MELTANO_CLI_DISABLE_VERSION_CHECK", "1")
-        
+
         result = version_service.check_version()
         assert result is None
 
     def test_check_version_development(self, version_service, monkeypatch):
         """Test version check skips development versions."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "0.0.0")
-        
+
         result = version_service.check_version()
         assert result is None
 
@@ -254,7 +262,7 @@ class TestVersionCheckService:
     def test_check_version_uses_cache(self, version_service, monkeypatch):
         """Test that version check uses cached data when available."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
-        
+
         # First check - should hit PyPI
         pypi_response = {
             "info": {

@@ -23,7 +23,6 @@ from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.tracking import Tracker
 from meltano.core.tracking.contexts import CliContext
 from meltano.core.utils import get_no_color_flag
-from meltano.core.version_check import VersionCheckService
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -143,7 +142,7 @@ def cli(
         ctx.obj["project"] = project
         ctx.obj["tracker"] = Tracker(project)
         ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
-        
+
         # Store project and setup for version check in subcommands
         ctx.obj["version_check_enabled"] = True
     except ProjectNotFound:

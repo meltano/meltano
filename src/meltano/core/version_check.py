@@ -5,14 +5,13 @@ from __future__ import annotations
 import json
 import logging
 import os
-import platform
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 import requests
-from packaging.version import InvalidVersion, Version, parse
+from packaging.version import InvalidVersion, parse
 
 from meltano import __version__
 from meltano.core.project_settings_service import ProjectSettingsService
@@ -146,8 +145,7 @@ class VersionCheckService:
         # Default to pip
         if in_venv:
             return "pip install --upgrade meltano"
-        else:
-            return "pip install --user --upgrade meltano"
+        return "pip install --user --upgrade meltano"
 
     def check_version(self) -> VersionCheckResult | None:
         """Check if a newer version of Meltano is available."""
