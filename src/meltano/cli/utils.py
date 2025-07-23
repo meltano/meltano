@@ -577,7 +577,39 @@ class InstrumentedGroup(InstrumentedGroupMixin, DYMGroup):
     """Click group with telemetry instrumentation."""
 
 
-class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class _BaseMeltanoCommand(click.Command):
+    """Base class for all Meltano commands."""
+
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
+            return
+
+        # Skip if project not available or version check disabled
+        project: Project | None = ctx.obj.get("project")
+        if project is None or not ctx.obj.get("version_check_enabled", False):
+            return
+
+        try:
+            from meltano.core.project_settings_service import ProjectSettingsService
+            from meltano.core.version_check import VersionCheckService
+
+            settings_service = ProjectSettingsService(project)
+            version_service = VersionCheckService(settings_service, project.run_dir())
+
+            result = version_service.check_version()
+            if result and result.is_outdated:
+                # Display version update message
+                click.echo()  # Empty line for better formatting
+                click.echo(version_service.format_update_message(result))
+                click.echo()  # Empty line for better formatting
+        except Exception:
+            # Don't let version check errors block CLI execution
+            logger.debug("Failed to perform version check", exc_info=True)
+
+
+class InstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command that automatically fires telemetry events when invoked.
 
     Both starting and ending events are fired. The ending event fired is
@@ -605,36 +637,8 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
         else:
             super().invoke(ctx)
 
-    def _perform_version_check(self, ctx: click.Context) -> None:
-        """Perform version check if conditions are met."""
-        # Skip version check for certain commands
-        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
-            return
 
-        # Skip if project not available or version check disabled
-        project: Project | None = ctx.obj.get("project")
-        if project is None or not ctx.obj.get("version_check_enabled", False):
-            return
-
-        try:
-            from meltano.core.project_settings_service import ProjectSettingsService
-            from meltano.core.version_check import VersionCheckService
-
-            settings_service = ProjectSettingsService(project)
-            version_service = VersionCheckService(settings_service, project.run_dir())
-
-            result = version_service.check_version()
-            if result and result.is_outdated:
-                # Display version update message
-                click.echo()  # Empty line for better formatting
-                click.echo(version_service.format_update_message(result))
-                click.echo()  # Empty line for better formatting
-        except Exception:
-            # Don't let version check errors block CLI execution
-            logger.debug("Failed to perform version check", exc_info=True)
-
-
-class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
+class PartialInstrumentedCmd(InstrumentedCmdMixin, _BaseMeltanoCommand):
     """Click command with partial telemetry instrumentation.
 
     Only automatically fires a 'start' event.
@@ -652,34 +656,6 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
-
-    def _perform_version_check(self, ctx: click.Context) -> None:
-        """Perform version check if conditions are met."""
-        # Skip version check for certain commands
-        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
-            return
-
-        # Skip if project not available or version check disabled
-        project: Project | None = ctx.obj.get("project")
-        if project is None or not ctx.obj.get("version_check_enabled", False):
-            return
-
-        try:
-            from meltano.core.project_settings_service import ProjectSettingsService
-            from meltano.core.version_check import VersionCheckService
-
-            settings_service = ProjectSettingsService(project)
-            version_service = VersionCheckService(settings_service, project.run_dir())
-
-            result = version_service.check_version()
-            if result and result.is_outdated:
-                # Display version update message
-                click.echo()  # Empty line for better formatting
-                click.echo(version_service.format_update_message(result))
-                click.echo()  # Empty line for better formatting
-        except Exception:
-            # Don't let version check errors block CLI execution
-            logger.debug("Failed to perform version check", exc_info=True)
 
 
 class AutoInstallBehavior(StrEnum):
