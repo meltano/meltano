@@ -10,7 +10,7 @@ from unittest import mock
 import pytest
 import responses
 
-from meltano.core.project_settings_service import ProjectSettingsService
+from meltano.core.project import Project
 from meltano.core.version_check import (
     CACHE_DURATION,
     PYPI_URL,
@@ -23,21 +23,16 @@ class TestVersionCheckService:
     """Test the VersionCheckService class."""
 
     @pytest.fixture
-    def version_service(self, tmp_path):
+    def version_service(self, tmp_path: Path) -> VersionCheckService:
         """Create a VersionCheckService instance for testing."""
         cache_dir = tmp_path / "cache"
         cache_dir.mkdir()
         return VersionCheckService(cache_dir=cache_dir)
 
-    @pytest.fixture
-    def mock_settings_service(self):
-        """Create a mock ProjectSettingsService."""
-        mock_service = mock.Mock(spec=ProjectSettingsService)
-        mock_service.get.return_value = False  # version check enabled by default
-        return mock_service
-
     def test_should_check_version_environment_variable(
-        self, version_service, monkeypatch
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         """Test that environment variable disables version check."""
         # Test various truthy values
@@ -54,26 +49,27 @@ class TestVersionCheckService:
         monkeypatch.delenv("MELTANO_CLI_DISABLE_VERSION_CHECK", raising=False)
         assert version_service.should_check_version()
 
-    def test_should_check_version_project_setting(
-        self, tmp_path, mock_settings_service
-    ):
+    def test_should_check_version_project_setting(self, tmp_path: Path):
         """Test that project setting disables version check."""
+        project = mock.Mock(spec=Project)
+        project.settings.get.return_value = False
+
         cache_dir = tmp_path / "cache"
         cache_dir.mkdir()
         version_service = VersionCheckService(
-            project_settings_service=mock_settings_service,
+            project=project,
             cache_dir=cache_dir,
         )
 
         # Setting is False (check enabled)
-        mock_settings_service.get.return_value = False
+        project.settings.get.return_value = False
         assert version_service.should_check_version()
 
         # Setting is True (check disabled)
-        mock_settings_service.get.return_value = True
+        project.settings.get.return_value = True
         assert not version_service.should_check_version()
 
-    def test_is_development_version(self, version_service):
+    def test_is_development_version(self, version_service: VersionCheckService):
         """Test detection of development versions."""
         assert version_service._is_development_version("0.0.0")
         assert version_service._is_development_version("3.8.0.dev0")
@@ -82,7 +78,7 @@ class TestVersionCheckService:
         assert not version_service._is_development_version("3.8.0rc1")
 
     @responses.activate
-    def test_fetch_latest_version_success(self, version_service):
+    def test_fetch_latest_version_success(self, version_service: VersionCheckService):
         """Test successful fetching of latest version from PyPI."""
         pypi_response = {
             "info": {
@@ -101,7 +97,7 @@ class TestVersionCheckService:
         assert latest_version == "3.9.0"
 
     @responses.activate
-    def test_fetch_latest_version_failure(self, version_service):
+    def test_fetch_latest_version_failure(self, version_service: VersionCheckService):
         """Test handling of PyPI API failure."""
         responses.add(
             responses.GET,
@@ -141,7 +137,11 @@ class TestVersionCheckService:
         cache_data = version_service._load_cache()
         assert cache_data is None
 
-    def test_get_upgrade_command(self, version_service, monkeypatch):
+    def test_get_upgrade_command(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test detection of appropriate upgrade command."""
         # Test default (pip)
         command = version_service._get_upgrade_command()
@@ -187,7 +187,11 @@ class TestVersionCheckService:
             assert command == "pip install --user --upgrade meltano"
 
     @responses.activate
-    def test_check_version_outdated(self, version_service, monkeypatch):
+    def test_check_version_outdated(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test version check when current version is outdated."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
 
@@ -213,7 +217,11 @@ class TestVersionCheckService:
         assert result.upgrade_command is not None
 
     @responses.activate
-    def test_check_version_up_to_date(self, version_service, monkeypatch):
+    def test_check_version_up_to_date(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test version check when current version is up to date."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.9.0")
 
@@ -237,21 +245,29 @@ class TestVersionCheckService:
         assert not result.is_outdated
         assert result.upgrade_command is None
 
-    def test_check_version_disabled(self, version_service, monkeypatch):
+    def test_check_version_disabled(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test version check when disabled."""
         monkeypatch.setenv("MELTANO_CLI_DISABLE_VERSION_CHECK", "1")
 
         result = version_service.check_version()
         assert result is None
 
-    def test_check_version_development(self, version_service, monkeypatch):
+    def test_check_version_development(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test version check skips development versions."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "0.0.0")
 
         result = version_service.check_version()
         assert result is None
 
-    def test_format_update_message(self, version_service):
+    def test_format_update_message(self, version_service: VersionCheckService):
         """Test formatting of update message."""
         result = VersionCheckResult(
             current_version="3.7.0",
@@ -276,7 +292,11 @@ class TestVersionCheckService:
         assert message == ""
 
     @responses.activate
-    def test_check_version_uses_cache(self, version_service, monkeypatch):
+    def test_check_version_uses_cache(
+        self,
+        version_service: VersionCheckService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
         """Test that version check uses cached data when available."""
         monkeypatch.setattr("meltano.core.version_check.__version__", "3.7.0")
 

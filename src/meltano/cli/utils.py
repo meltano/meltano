@@ -592,11 +592,9 @@ class _BaseMeltanoCommand(click.Command):
             return
 
         try:
-            from meltano.core.project_settings_service import ProjectSettingsService
             from meltano.core.version_check import VersionCheckService
 
-            settings_service = ProjectSettingsService(project)
-            version_service = VersionCheckService(settings_service, project.run_dir())
+            version_service = VersionCheckService(project)
 
             result = version_service.check_version()
             if result and result.is_outdated:

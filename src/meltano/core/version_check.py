@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -10,6 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import platformdirs
 import requests
 import structlog.stdlib
 from packaging.version import InvalidVersion, parse
@@ -18,7 +20,7 @@ from meltano import __version__
 from meltano.core.utils import get_no_color_flag
 
 if t.TYPE_CHECKING:
-    from meltano.core.project_settings_service import ProjectSettingsService
+    from meltano.core.project import Project
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -37,20 +39,29 @@ class VersionCheckResult:
     upgrade_command: str | None = None
 
 
+def _get_cache_dir() -> Path:
+    """Get the cache directory for the version check.
+
+    This should be unique per Meltano executable, so
+    we hash the Python executable path and use that as the subdirectory.
+    """
+    unique_id = hashlib.sha256(sys.executable.encode()).hexdigest()
+    return platformdirs.user_cache_path("meltano") / "version_check" / unique_id
+
+
 class VersionCheckService:
     """Service for checking if Meltano is up to date."""
 
     def __init__(
         self,
-        project_settings_service: ProjectSettingsService | None = None,
+        project: Project | None = None,
+        *,
         cache_dir: Path | None = None,
     ):
         """Initialize the version check service."""
-        self.settings_service = project_settings_service
-        self.cache_dir = cache_dir
-        self._cache_file = None
-        if cache_dir:
-            self._cache_file = cache_dir / "version_check_cache.json"
+        self.project = project
+        cache_dir = cache_dir or _get_cache_dir()
+        self._cache_file = cache_dir / "version_check_cache.json"
 
     def should_check_version(self) -> bool:
         """Determine if version check should be performed."""
@@ -63,9 +74,9 @@ class VersionCheckService:
             return False
 
         # Check project setting if available
-        if self.settings_service:
+        if self.project is not None:
             try:
-                return not self.settings_service.get("cli.disable_version_check")
+                return not self.project.settings.get("cli.disable_version_check")
             except Exception:
                 # If setting doesn't exist or error, default to checking
                 logger.debug("Failed to get version check setting", exc_info=True)
@@ -78,7 +89,7 @@ class VersionCheckService:
 
     def _load_cache(self) -> dict[str, t.Any] | None:
         """Load cached version check data."""
-        if not self._cache_file or not self._cache_file.exists():
+        if not self._cache_file.exists():
             return None
 
         try:
@@ -97,9 +108,6 @@ class VersionCheckService:
 
     def _save_cache(self, latest_version: str) -> None:
         """Save version check data to cache."""
-        if not self._cache_file:
-            return
-
         cache_data = {
             "latest_version": latest_version,
             "check_timestamp": datetime.now(timezone.utc).isoformat(),
