@@ -2,5 +2,9 @@
 
 from __future__ import annotations
 
+from importlib.metadata import version
+
 # Managed by commitizen
-__version__ = "3.9.1"
+__version__ = version("meltano")
+
+del annotations, version
