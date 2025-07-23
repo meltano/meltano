@@ -25,6 +25,7 @@
   "env": {
     "HUB_METRICS_S3_PATH": "s3://prod-meltano-bucket-01/hub_metrics/staging/",
     "MELTANO_AUTO_INSTALL": "true",
+    "MELTANO_CLI_DISABLE_VERSION_CHECK": "false",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
     "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",

@@ -44,6 +44,7 @@
     "AIRFLOW__CORE__PLUGINS_FOLDER": "$MELTANO_PROJECT_ROOT/orchestrate/plugins_local",
     "HUB_METRICS_S3_PATH": "s3://devtest-meltano-bucket-01/hub_metrics/",
     "MELTANO_AUTO_INSTALL": "true",
+    "MELTANO_CLI_DISABLE_VERSION_CHECK": "false",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
     "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",
