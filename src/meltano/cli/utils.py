@@ -43,6 +43,9 @@ setup_logging()
 
 logger = structlog.stdlib.get_logger(__name__)
 
+# Commands that should skip version check
+EXCLUDED_VERSION_CHECK_COMMANDS = {"version", "upgrade", "init"}
+
 
 class CliError(Exception):
     """CLI Error."""
@@ -605,8 +608,7 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
     def _perform_version_check(self, ctx: click.Context) -> None:
         """Perform version check if conditions are met."""
         # Skip version check for certain commands
-        excluded_commands = {"version", "upgrade", "init"}
-        if self.name in excluded_commands:
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
             return
 
         # Skip if project not available or version check disabled
@@ -655,8 +657,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
     def _perform_version_check(self, ctx: click.Context) -> None:
         """Perform version check if conditions are met."""
         # Skip version check for certain commands
-        excluded_commands = {"version", "upgrade", "init"}
-        if self.name in excluded_commands:
+        if self.name in EXCLUDED_VERSION_CHECK_COMMANDS:
             return
 
         # Skip if project not available or version check disabled

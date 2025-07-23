@@ -169,6 +169,16 @@ class TestVersionCheckService:
                 command = version_service._get_upgrade_command()
                 assert command == "pipx upgrade meltano"
 
+        # Test when not in venv and no pipx/uv present
+        def mock_exists_none(self):
+            return False
+
+        with mock.patch("sys.prefix", "/usr"), mock.patch("sys.base_prefix", "/usr"):
+            with mock.patch("pathlib.Path.exists", mock_exists_none):
+                command = version_service._get_upgrade_command()
+                assert "--user" in command
+                assert "pip install --user --upgrade meltano" == command
+
     @responses.activate
     def test_check_version_outdated(self, version_service, monkeypatch):
         """Test version check when current version is outdated."""

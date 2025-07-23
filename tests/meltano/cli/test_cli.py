@@ -635,6 +635,21 @@ class TestVersionCheck:
         # Verify no version check message appears
         assert "A new version of Meltano is available" not in result.output
 
+    def test_version_check_disabled_by_project_setting(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check can be disabled by project setting."""
+        with cd(project.root_dir()):
+            # Set the project setting to disable version check
+            result = cli_runner.invoke(cli, ["config", "meltano", "set", "cli.disable_version_check", "true"])
+            assert result.exit_code == 0
+
+            # Run a command and verify no version check message appears
+            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+            assert "A new version of Meltano is available" not in result.output
+
     @mock.patch("meltano.core.version_check.VersionCheckService")
     def test_version_check_error_handling(
         self,
