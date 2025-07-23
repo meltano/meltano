@@ -203,7 +203,9 @@ class VirtualEnv:
         Args:
             pip_install_args: The arguments being passed to `pip install`.
         """
-        self.plugin_fingerprint_path.write_text(fingerprint(pip_install_args))
+        self.plugin_fingerprint_path.write_text(
+            fingerprint(pip_install_args, self.python_path)
+        )
 
 
 async def _extract_stderr(_) -> None:
@@ -243,18 +245,24 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
     return run
 
 
-def fingerprint(pip_install_args: Iterable[str]) -> str:
-    """Generate a hash identifying pip install args.
+def fingerprint(pip_install_args: Iterable[str], interpreter: str | None = None) -> str:
+    """Generate a hash identifying pip install args and Python interpreter.
 
     Arguments are sorted and deduplicated before the hash is generated.
 
     Args:
         pip_install_args: Arguments for `pip install`.
+        interpreter: Python interpreter (path or command name).
 
     Returns:
-        The SHA256 hash hex digest of the sorted set of pip install args.
+        The SHA256 hash hex digest of the sorted set of pip install args and Python.
     """
-    return hashlib.sha256(" ".join(sorted(set(pip_install_args))).encode()).hexdigest()
+    components = sorted(set(pip_install_args))
+    # Only include Python interpreter in fingerprint if it's different from default
+    # This ensures backward compatibility while detecting Python version changes
+    if interpreter and interpreter != sys.executable:
+        components.append(f"python:{interpreter}")
+    return hashlib.sha256(" ".join(components).encode()).hexdigest()
 
 
 class VenvService:
@@ -356,7 +364,9 @@ class VenvService:
             # The fingerprint of the venv does not match the pip install args
             existing_fingerprint = self.venv.read_fingerprint()
             yield existing_fingerprint is None
-            yield existing_fingerprint != fingerprint(pip_install_args)
+            yield existing_fingerprint != fingerprint(
+                pip_install_args, self.venv.python_path
+            )
 
         return any(checks())
 
