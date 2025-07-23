@@ -669,8 +669,7 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
             from meltano.core.version_check import VersionCheckService
 
             settings_service = ProjectSettingsService(project)
-            cache_dir = project.sys_dir_path / "run"
-            version_service = VersionCheckService(settings_service, cache_dir)
+            version_service = VersionCheckService(settings_service, project.run_dir())
 
             result = version_service.check_version()
             if result and result.is_outdated:
