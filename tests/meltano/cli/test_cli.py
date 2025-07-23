@@ -554,3 +554,104 @@ class TestUUIDParamType:
         value = "zzz"
         with pytest.raises(click.BadParameter, match="is not a valid UUID"):
             param.convert(value, None, None)
+
+
+class TestVersionCheck:
+    """Test version check functionality in CLI."""
+
+    @mock.patch("meltano.core.version_check.VersionCheckService")
+    def test_version_check_on_command(
+        self,
+        mock_version_service_class,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check runs on CLI commands."""
+        from meltano.core.version_check import VersionCheckResult
+
+        # Mock the service instance and its check_version method
+        mock_service = mock.Mock()
+        mock_version_service_class.return_value = mock_service
+        
+        # Mock an outdated version scenario
+        mock_result = VersionCheckResult(
+            current_version="3.7.0",
+            latest_version="3.9.0",
+            is_outdated=True,
+            upgrade_command="pip install --upgrade meltano",
+        )
+        mock_service.check_version.return_value = mock_result
+        mock_service.format_update_message.return_value = (
+            "A new version of Meltano is available (v3.9.0)!\n"
+            "You are currently running v3.7.0.\n\n"
+            "To upgrade:\n"
+            "  pip install --upgrade meltano\n\n"
+            "For more information, visit: https://docs.meltano.com/guide/installation"
+        )
+
+        with cd(project.root_dir()):
+            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+
+        # Verify version check service was instantiated
+        mock_version_service_class.assert_called_once()
+        
+        # Verify check_version was called
+        mock_service.check_version.assert_called_once()
+
+        # Verify update message appears in output
+        assert "A new version of Meltano is available (v3.9.0)!" in result.output
+        assert "You are currently running v3.7.0." in result.output
+        assert "pip install --upgrade meltano" in result.output
+
+    @mock.patch("meltano.core.version_check.VersionCheckService")
+    def test_version_check_excluded_commands(
+        self,
+        mock_version_service_class,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check is skipped for excluded commands."""
+        with cd(project.root_dir()):
+            # Test 'version' command
+            cli_runner.invoke(cli, ["--version"])
+            mock_version_service_class.assert_not_called()
+
+            # Test 'upgrade' command
+            cli_runner.invoke(cli, ["upgrade"])
+            mock_version_service_class.assert_not_called()
+
+    def test_version_check_disabled_by_env(
+        self,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+        monkeypatch,
+    ) -> None:
+        """Test that version check can be disabled by environment variable."""
+        monkeypatch.setenv("MELTANO_CLI_DISABLE_VERSION_CHECK", "1")
+
+        with cd(project.root_dir()):
+            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+
+        # Verify no version check message appears
+        assert "A new version of Meltano is available" not in result.output
+
+    @mock.patch("meltano.core.version_check.VersionCheckService")
+    def test_version_check_error_handling(
+        self,
+        mock_version_service_class,
+        cli_runner: MeltanoCliRunner,
+        project: Project,
+    ) -> None:
+        """Test that version check errors don't block CLI execution."""
+        # Mock a version check failure
+        mock_service = mock.Mock()
+        mock_version_service_class.return_value = mock_service
+        mock_service.check_version.side_effect = Exception("Network error")
+
+        with cd(project.root_dir()):
+            result = cli_runner.invoke(cli, ["config", "meltano", "list"])
+
+        # Command should still succeed
+        assert result.exit_code == 0
+        # No version message should appear
+        assert "A new version of Meltano is available" not in result.output

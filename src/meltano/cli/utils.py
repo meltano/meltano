@@ -585,6 +585,10 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing start and events accordingly."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+        
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+        
         if ctx.obj.get("tracker"):
             tracker = ctx.obj["tracker"]
             tracker.add_contexts(CliContext.from_click_context(ctx))
@@ -597,6 +601,36 @@ class InstrumentedCmd(InstrumentedCmdMixin, click.Command):
             tracker.track_command_event(CliEvent.completed)
         else:
             super().invoke(ctx)
+    
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        excluded_commands = {"version", "upgrade", "init"}
+        if self.name in excluded_commands:
+            return
+            
+        # Skip if project not available or version check disabled
+        project = ctx.obj.get("project")
+        if not project or not ctx.obj.get("version_check_enabled", False):
+            return
+            
+        try:
+            from meltano.core.project_settings_service import ProjectSettingsService
+            from meltano.core.version_check import VersionCheckService
+            
+            settings_service = ProjectSettingsService(project)
+            cache_dir = project.sys_dir_path / "run"
+            version_service = VersionCheckService(settings_service, cache_dir)
+            
+            result = version_service.check_version()
+            if result and result.is_outdated:
+                # Display version update message
+                click.echo()  # Empty line for better formatting
+                click.echo(version_service.format_update_message(result))
+                click.echo()  # Empty line for better formatting
+        except Exception:
+            # Don't let version check errors block CLI execution
+            pass
 
 
 class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
@@ -609,10 +643,44 @@ class PartialInstrumentedCmd(InstrumentedCmdMixin, click.Command):
         """Invoke the requested command firing only a start event."""
         ctx.ensure_object(dict)
         enact_environment_behavior(self.environment_behavior, ctx)
+        
+        # Perform version check for actual commands (not excluded ones)
+        self._perform_version_check(ctx)
+        
         if ctx.obj.get("tracker"):
             ctx.obj["tracker"].add_contexts(CliContext.from_click_context(ctx))
             ctx.obj["tracker"].track_command_event(CliEvent.started)
         super().invoke(ctx)
+    
+    def _perform_version_check(self, ctx: click.Context) -> None:
+        """Perform version check if conditions are met."""
+        # Skip version check for certain commands
+        excluded_commands = {"version", "upgrade", "init"}
+        if self.name in excluded_commands:
+            return
+            
+        # Skip if project not available or version check disabled
+        project = ctx.obj.get("project")
+        if not project or not ctx.obj.get("version_check_enabled", False):
+            return
+            
+        try:
+            from meltano.core.project_settings_service import ProjectSettingsService
+            from meltano.core.version_check import VersionCheckService
+            
+            settings_service = ProjectSettingsService(project)
+            cache_dir = project.sys_dir_path / "run"
+            version_service = VersionCheckService(settings_service, cache_dir)
+            
+            result = version_service.check_version()
+            if result and result.is_outdated:
+                # Display version update message
+                click.echo()  # Empty line for better formatting
+                click.echo(version_service.format_update_message(result))
+                click.echo()  # Empty line for better formatting
+        except Exception:
+            # Don't let version check errors block CLI execution
+            pass
 
 
 class AutoInstallBehavior(StrEnum):
