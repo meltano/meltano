@@ -245,23 +245,23 @@ async def exec_async(*args, extract_stderr=_extract_stderr, **kwargs) -> Process
     return run
 
 
-def fingerprint(pip_install_args: Iterable[str], python_path: str | None = None) -> str:
+def fingerprint(pip_install_args: Iterable[str], interpreter: str | None = None) -> str:
     """Generate a hash identifying pip install args and Python interpreter.
 
     Arguments are sorted and deduplicated before the hash is generated.
 
     Args:
         pip_install_args: Arguments for `pip install`.
-        python_path: Path to the Python interpreter.
+        interpreter: Python interpreter (path or command name).
 
     Returns:
         The SHA256 hash hex digest of the sorted set of pip install args and Python.
     """
     components = sorted(set(pip_install_args))
-    # Only include Python path in fingerprint if it's different from default
+    # Only include Python interpreter in fingerprint if it's different from default
     # This ensures backward compatibility while detecting Python version changes
-    if python_path and python_path != sys.executable:
-        components.append(f"python:{python_path}")
+    if interpreter and interpreter != sys.executable:
+        components.append(f"python:{interpreter}")
     return hashlib.sha256(" ".join(components).encode()).hexdigest()
 
 
