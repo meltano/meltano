@@ -570,7 +570,8 @@ class TestVersionCheck:
         with cd(project.root_dir()):
             result = cli_runner.invoke(cli, ["config", "meltano", "list"])
 
-        # The command should execute successfully (version check doesn't block execution)
+        # The command should execute successfully
+        # (version check doesn't block execution)
         assert result.exit_code == 0
 
         # Note: Due to test environment complexities, we test the actual version check
@@ -630,7 +631,7 @@ class TestVersionCheck:
         cli_runner: MeltanoCliRunner,
         project: Project,
     ) -> None:
-        """Test that CLI commands execute successfully even with version check errors."""
+        """Test that CLI commands execute successfully even with version check errors."""  # noqa: E501
         with cd(project.root_dir()):
             result = cli_runner.invoke(cli, ["config", "meltano", "list"])
 

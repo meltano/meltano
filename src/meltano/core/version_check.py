@@ -3,42 +3,38 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import sys
+import typing as t
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
 
 import requests
+import structlog.stdlib
 from packaging.version import InvalidVersion, parse
 
 from meltano import __version__
-from meltano.core.project_settings_service import ProjectSettingsService
 from meltano.core.utils import get_no_color_flag
 
-logger = logging.getLogger(__name__)
+if t.TYPE_CHECKING:
+    from meltano.core.project_settings_service import ProjectSettingsService
+
+logger = structlog.stdlib.get_logger(__name__)
 
 PYPI_URL = "https://pypi.org/pypi/meltano/json"
 CACHE_DURATION = timedelta(hours=24)
 REQUEST_TIMEOUT = 5  # seconds
 
 
+@dataclass
 class VersionCheckResult:
     """Result of a version check."""
 
-    def __init__(
-        self,
-        current_version: str,
-        latest_version: str,
-        is_outdated: bool,
-        upgrade_command: str | None = None,
-    ):
-        """Initialize version check result."""
-        self.current_version = current_version
-        self.latest_version = latest_version
-        self.is_outdated = is_outdated
-        self.upgrade_command = upgrade_command
+    current_version: str
+    latest_version: str
+    is_outdated: bool
+    upgrade_command: str | None = None
 
 
 class VersionCheckService:
@@ -72,7 +68,7 @@ class VersionCheckService:
                 return not self.settings_service.get("cli.disable_version_check")
             except Exception:
                 # If setting doesn't exist or error, default to checking
-                pass
+                logger.debug("Failed to get version check setting", exc_info=True)
 
         return True
 
@@ -80,13 +76,13 @@ class VersionCheckService:
         """Check if this is a development version."""
         return "dev" in version_str or version_str == "0.0.0"
 
-    def _load_cache(self) -> dict[str, Any] | None:
+    def _load_cache(self) -> dict[str, t.Any] | None:
         """Load cached version check data."""
         if not self._cache_file or not self._cache_file.exists():
             return None
 
         try:
-            with open(self._cache_file, encoding="utf-8") as f:
+            with self._cache_file.open(encoding="utf-8") as f:
                 cache_data = json.load(f)
 
             # Check if cache is still valid
@@ -94,8 +90,8 @@ class VersionCheckService:
             if datetime.now(timezone.utc) - check_time < CACHE_DURATION:
                 return cache_data
 
-        except Exception as e:
-            logger.debug(f"Failed to load version cache: {e}")
+        except Exception:
+            logger.debug("Failed to load version cache", exc_info=True)
 
         return None
 
@@ -111,10 +107,10 @@ class VersionCheckService:
 
         try:
             self._cache_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(self._cache_file, "w", encoding="utf-8") as f:
+            with self._cache_file.open("w", encoding="utf-8") as f:
                 json.dump(cache_data, f)
-        except Exception as e:
-            logger.debug(f"Failed to save version cache: {e}")
+        except Exception:
+            logger.debug("Failed to save version cache", exc_info=True)
 
     def _fetch_latest_version(self) -> str | None:
         """Fetch the latest version from PyPI."""
@@ -123,8 +119,8 @@ class VersionCheckService:
             response.raise_for_status()
             data = response.json()
             return data["info"]["version"]
-        except Exception as e:
-            logger.debug(f"Failed to fetch latest version from PyPI: {e}")
+        except Exception:
+            logger.debug("Failed to fetch latest version from PyPI", exc_info=True)
             return None
 
     def _get_upgrade_command(self) -> str:
@@ -178,7 +174,9 @@ class VersionCheckService:
             is_outdated = current < latest
         except InvalidVersion:
             logger.debug(
-                f"Invalid version comparison: {current_version} vs {latest_version}"
+                "Invalid version comparison: %s vs %s",
+                current_version,
+                latest_version,
             )
             return None
 

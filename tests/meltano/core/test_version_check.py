@@ -112,7 +112,7 @@ class TestVersionCheckService:
         latest_version = version_service._fetch_latest_version()
         assert latest_version is None
 
-    def test_cache_operations(self, version_service):
+    def test_cache_operations(self, version_service: VersionCheckService):
         """Test cache save and load operations."""
         # Test saving cache
         version_service._save_cache("3.9.0")
@@ -133,7 +133,8 @@ class TestVersionCheckService:
             "latest_version": "3.8.0",
             "check_timestamp": old_timestamp.isoformat(),
         }
-        with open(cache_file, "w") as f:
+        assert cache_file is not None
+        with cache_file.open("w") as f:
             json.dump(expired_cache, f)
 
         # Should return None for expired cache
@@ -162,22 +163,28 @@ class TestVersionCheckService:
             return str(self) == str(Path.home() / ".local/pipx")
 
         # Mock sys.executable to be in a pipx path
-        with mock.patch(
-            "sys.executable", str(Path.home() / ".local/pipx/venvs/meltano/bin/python")
+        with (
+            mock.patch(
+                "sys.executable",
+                str(Path.home() / ".local/pipx/venvs/meltano/bin/python"),
+            ),
+            mock.patch("pathlib.Path.exists", mock_exists_pipx),
         ):
-            with mock.patch("pathlib.Path.exists", mock_exists_pipx):
-                command = version_service._get_upgrade_command()
-                assert command == "pipx upgrade meltano"
+            command = version_service._get_upgrade_command()
+            assert command == "pipx upgrade meltano"
 
         # Test when not in venv and no pipx/uv present
-        def mock_exists_none(self):
+        def mock_exists_none(self):  # noqa: ARG001
             return False
 
-        with mock.patch("sys.prefix", "/usr"), mock.patch("sys.base_prefix", "/usr"):
-            with mock.patch("pathlib.Path.exists", mock_exists_none):
-                command = version_service._get_upgrade_command()
-                assert "--user" in command
-                assert command == "pip install --user --upgrade meltano"
+        with (
+            mock.patch("sys.prefix", "/usr"),
+            mock.patch("sys.base_prefix", "/usr"),
+            mock.patch("pathlib.Path.exists", mock_exists_none),
+        ):
+            command = version_service._get_upgrade_command()
+            assert "--user" in command
+            assert command == "pip install --user --upgrade meltano"
 
     @responses.activate
     def test_check_version_outdated(self, version_service, monkeypatch):
