@@ -569,11 +569,11 @@ class TestVersionCheck:
         # The actual version check logic is thoroughly tested in test_version_check.py
         with cd(project.root_dir()):
             result = cli_runner.invoke(cli, ["config", "meltano", "list"])
-            
+
         # The command should execute successfully (version check doesn't block execution)
         assert result.exit_code == 0
-        
-        # Note: Due to test environment complexities, we test the actual version check 
+
+        # Note: Due to test environment complexities, we test the actual version check
         # logic in unit tests rather than integration tests. The version check service
         # is thoroughly tested in tests/meltano/core/test_version_check.py
 
@@ -637,4 +637,6 @@ class TestVersionCheck:
         # Command should succeed regardless of version check status
         assert result.exit_code == 0
         # Verify the command actually ran
-        assert "meltano" in result.output or result.output == ""  # May have empty output
+        assert (
+            "meltano" in result.output or result.output == ""
+        )  # May have empty output
