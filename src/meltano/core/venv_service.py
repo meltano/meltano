@@ -13,7 +13,6 @@ import sys
 import typing as t
 from asyncio.subprocess import Process
 from collections.abc import Awaitable, Callable
-from datetime import datetime, timezone
 from functools import cache, cached_property
 
 import structlog
@@ -739,23 +738,12 @@ class UvVenvService(VenvService):
         import anyio
 
         stderr_content = await err.stderr
-        timestamp = datetime.now(timezone.utc).isoformat()
-        python_path = self.exec_path("python")
 
         async with await anyio.open_file(
             self.pip_log_path, "a", encoding="utf-8"
         ) as log_file:
-            await log_file.write(
-                f"\n--- Installation attempt failed at {timestamp} ---\n"
-            )
-            await log_file.write(
-                f"Command: {self.uv} pip install --python={python_path}\n"
-            )
-
             if stderr_content:
-                await log_file.write(f"Error output:\n{stderr_content}\n")
-
-            await log_file.write("--- End of error log ---\n\n")
+                await log_file.write(stderr_content)
 
     @override
     async def create_venv(

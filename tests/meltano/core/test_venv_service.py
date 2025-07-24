@@ -337,11 +337,7 @@ class TestUvVenvService(TestVenvService):
             assert "Failed to install plugin 'name'" in str(result_err)
 
             assert log_file_path.exists()
-            log_content = log_file_path.read_text()
-            assert "Installation attempt failed at" in log_content
-            assert f"Command: {subject.uv} pip install --python" in log_content
-            assert "Some error" in log_content
-            assert "--- End of error log ---" in log_content
+            assert "Some error" in log_file_path.read_text()
 
     async def test_error_logging_empty_stderr(
         self, subject: UvVenvService, tmp_path
@@ -351,20 +347,12 @@ class TestUvVenvService(TestVenvService):
         with mock.patch.object(subject, "pip_log_path", log_file_path):
             process = mock.Mock(spec=Process)
             process.stderr = None
-
-            # Create AsyncSubprocessError and simulate empty stderr
-            # Note: We need to set _stderr=None directly because AsyncSubprocessError
-            # constructor uses `stderr or process.stderr`, so empty strings are falsy
-            # and fall back to process.stderr (which would be a Mock)
             original_err = AsyncSubprocessError("Another error", process)
-            original_err._stderr = None
 
             await subject.handle_installation_error(original_err)
 
             assert log_file_path.exists()
-            log_content = log_file_path.read_text()
-            assert "Installation attempt failed at" in log_content
-            assert "Error output:" not in log_content
+            assert log_file_path.read_text() == ""
 
     async def test_error_logging_handles_write_failure(
         self, subject: UvVenvService
