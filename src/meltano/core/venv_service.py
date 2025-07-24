@@ -740,7 +740,9 @@ class UvVenvService(VenvService):
         stderr_content = await err.stderr
 
         async with await anyio.open_file(
-            self.pip_log_path, "a", encoding="utf-8"
+            self.pip_log_path,
+            "a",
+            encoding="utf-8",
         ) as log_file:
             if stderr_content:
                 await log_file.write(stderr_content)

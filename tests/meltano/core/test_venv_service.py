@@ -322,14 +322,18 @@ class TestUvVenvService(TestVenvService):
             await subject.install(["cowsay"])
 
     async def test_error_logging_creates_log_file(
-        self, subject: UvVenvService, tmp_path
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
     ) -> None:
         """Test that error handling creates log file with details."""
         log_file_path = tmp_path / "pip.log"
         with mock.patch.object(subject, "pip_log_path", log_file_path):
             process = mock.Mock(spec=Process)
             original_err = AsyncSubprocessError(
-                "Something went wrong", process, stderr="Some error"
+                "Something went wrong",
+                process,
+                stderr="Some error",
             )
             result_err = await subject.handle_installation_error(original_err)
 
@@ -340,7 +344,9 @@ class TestUvVenvService(TestVenvService):
             assert "Some error" in log_file_path.read_text()
 
     async def test_error_logging_empty_stderr(
-        self, subject: UvVenvService, tmp_path
+        self,
+        subject: UvVenvService,
+        tmp_path: Path,
     ) -> None:
         """Test error logging when stderr is empty."""
         log_file_path = tmp_path / "pip.log"
@@ -355,7 +361,8 @@ class TestUvVenvService(TestVenvService):
             assert log_file_path.read_text() == ""
 
     async def test_error_logging_handles_write_failure(
-        self, subject: UvVenvService
+        self,
+        subject: UvVenvService,
     ) -> None:
         """Test that log write failures are handled gracefully."""
         process = mock.Mock(spec=Process)
@@ -363,7 +370,9 @@ class TestUvVenvService(TestVenvService):
 
         # Mock the log writing to fail
         with mock.patch.object(
-            subject, "_write_error_log", side_effect=OSError("Permission denied")
+            subject,
+            "_write_error_log",
+            side_effect=OSError("Permission denied"),
         ):
             original_err = AsyncSubprocessError("Something went wrong", process)
             result_err = await subject.handle_installation_error(original_err)
