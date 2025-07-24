@@ -748,13 +748,9 @@ class UvVenvService(VenvService):
             await log_file.write(
                 f"\n--- Installation attempt failed at {timestamp} ---\n"
             )
-            if hasattr(err.process, "args") and err.process.args:
-                command_str = " ".join(str(arg) for arg in err.process.args)
-                await log_file.write(f"Command: {command_str}\n")
-            else:
-                await log_file.write(
-                    f"Command: {self.uv} pip install --python={python_path}\n"
-                )
+            await log_file.write(
+                f"Command: {self.uv} pip install --python={python_path}\n"
+            )
 
             if stderr_content:
                 await log_file.write(f"Error output:\n{stderr_content}\n")
