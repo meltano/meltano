@@ -343,8 +343,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO meltano_u
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO meltano_user;
 
 -- Set default privileges for future objects created by other users
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO meltano_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO meltano_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO meltano_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO meltano_user;
 ```
 
 ##### Tables Created by Meltano
@@ -362,7 +362,7 @@ Meltano uses [Alembic](https://alembic.sqlalchemy.org/) to manage database schem
 
 ##### Security Considerations
 
-- Use a dedicated database user for Meltano operations
+- Use a dedicated database user for Meltano operations, granting it only the minimum privileges required to function. This follows the principle of least privilege and helps reduce security risks.
 - Consider using environment variables or a `.env` file to store database credentials securely
 - Enable SSL connections by adding appropriate parameters to your `database_uri`
 - Regularly review and audit database access logs
