@@ -18,7 +18,7 @@ SINGER_STATE_KEY = "singer_state"
 class JobState(SystemModel):
     """Model class that represents the current state of a given job.
 
-    Modified during `meltano el`, `meltano elt, or `meltano run` runs whenever a
+    Modified during `meltano el`, `meltano elt`, or `meltano run` runs whenever a
     STATE message is emitted by a Singer target. Also written and read
     by `meltano state` CLI invocations. Only holds the _current_ state
     for a given state_id. Full job run history is held by the Job model.
