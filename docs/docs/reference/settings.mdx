@@ -526,10 +526,12 @@ These settings can be used to modify the behavior of the [`meltano` CLI](/refere
 
 - [Environment variable](/guide/configuration#configuring-settings): `MELTANO_CLI_LOG_LEVEL`.
 - `meltano` CLI option: `--log-level`
-- Options: `debug`, `info`, `warning`, `error`, `critical`
+- Options: `debug`, `info`, `warning`, `error`, `critical`, `disabled`
 - Default: `info`
 
 The granularity of CLI logging. Ignored if a local logging config is found.
+
+The `disabled` option completely suppresses all logging output, which is useful for scripts that need to parse Meltano output or for running commands in completely silent mode.
 
 #### How to use
 
