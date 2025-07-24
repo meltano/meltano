@@ -11,10 +11,40 @@ import pytest
 from meltano.core.error import AsyncSubprocessError, MeltanoError
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
-from meltano.core.venv_service import UvVenvService, VenvService, VirtualEnv
+from meltano.core.venv_service import (
+    UvVenvService,
+    VenvService,
+    VirtualEnv,
+    fingerprint,
+)
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
+
+
+def test_fingerprint_with_python_path():
+    """Test that fingerprint includes Python path when provided."""
+    import sys
+
+    pip_args = ["package==1.0.0", "another-package"]
+
+    fp1 = fingerprint(pip_args)
+    fp2 = fingerprint(pip_args, "/usr/bin/python3.11")
+
+    assert fp1 != fp2
+
+    fp3 = fingerprint(pip_args, "/usr/bin/python3.11")
+    assert fp2 == fp3
+
+    fp4 = fingerprint(pip_args, "/usr/bin/python3.12")
+    assert fp2 != fp4
+
+    fp5 = fingerprint(pip_args, None)
+    assert fp1 == fp5
+
+    # Test that sys.executable doesn't change fingerprint
+    fp6 = fingerprint(pip_args, sys.executable)
+    assert fp1 == fp6
 
 
 class TestVenvService:
@@ -115,12 +145,9 @@ class TestVenvService:
         )
 
         # ensure a fingerprint file was created
-        fingerprint = (venv_dir / ".meltano_plugin_fingerprint").read_text()
-        assert (
-            fingerprint
-            # sha256 of "example"
-            == "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
-        )
+        fingerprint_content = (venv_dir / ".meltano_plugin_fingerprint").read_text()
+        expected_fingerprint = fingerprint(["example"], subject.venv.python_path)
+        assert fingerprint_content == expected_fingerprint
 
         # ensure that log file was created and is not empty
         self.assert_pip_log_file(subject)
@@ -167,6 +194,23 @@ class TestVenvService:
         assert not subject.requires_clean_install(["example"])
         assert subject.requires_clean_install(["example==0.1.0"])
         assert subject.requires_clean_install(["example", "another-package"])
+
+    @pytest.mark.asyncio
+    async def test_requires_clean_install_python_change(
+        self, subject: VenvService
+    ) -> None:
+        await subject.install(["example"], clean=True)
+        assert not subject.requires_clean_install(["example"])
+
+        original_python = subject.venv.python_path
+        try:
+            subject.venv.python_path = "/fake/test/python"
+            assert subject.requires_clean_install(["example"])
+
+            subject.venv.python_path = original_python
+            assert not subject.requires_clean_install(["example"])
+        finally:
+            subject.venv.python_path = original_python
 
     async def test_python_setting(self, project: Project) -> None:
         plugin_python = "test-python-executable-plugin-level"
