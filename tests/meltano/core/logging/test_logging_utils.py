@@ -184,14 +184,14 @@ def test_disabled_log_level():
     """Test that 'disabled' log level is properly defined and parsed."""
     # Test that 'disabled' is in LEVELS
     assert "disabled" in LEVELS
-    
+
     # Test that 'disabled' has a higher value than CRITICAL
     assert LEVELS["disabled"] > logging.CRITICAL
     assert LEVELS["disabled"] == logging.CRITICAL + 1
-    
+
     # Test that parse_log_level correctly parses 'disabled'
     assert parse_log_level("disabled") == logging.CRITICAL + 1
-    
+
     # Test that default_config accepts 'disabled' log level
     config = default_config("disabled")
     # When disabled, the numeric value should be used
