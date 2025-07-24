@@ -288,6 +288,85 @@ meltano run --database-uri=mssql+pymssql://<username>:<password>@<host>:<port>/<
 Using databases other than SQLite requires installing Meltano with [extra components](/guide/advanced-topics#installing-optional-components).
 :::
 
+#### PostgreSQL Database Privileges and Requirements
+
+When using PostgreSQL as your system database, the database user must have sufficient privileges to create and manage the tables that Meltano uses for storing metadata, job execution history, and incremental state.
+
+##### Minimum PostgreSQL Version
+- **PostgreSQL 13 or higher** is required
+
+##### Installation with PostgreSQL Support
+Install Meltano with PostgreSQL support using one of these options:
+
+```bash
+# Recommended for new installations (uses psycopg3)
+pip install "meltano[postgres]"
+
+# For existing installations (uses psycopg2)
+pip install "meltano[psycopg2]"
+```
+
+##### Required Database Privileges
+
+The PostgreSQL user specified in your `database_uri` must have the following privileges:
+
+**Database-level privileges:**
+- `CONNECT` - To connect to the database
+- `CREATE` - To create schemas during initialization
+- `TEMPORARY` - To create temporary tables during operations
+
+**Schema-level privileges** (on the target schema, typically `public`):
+- `CREATE` - To create tables and other database objects
+- `USAGE` - To access and use the schema
+
+**Object-level privileges:**
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` on all Meltano tables
+- `USAGE`, `SELECT` on all sequences used by Meltano tables
+
+##### Setting Up Database Privileges
+
+To grant the necessary privileges to your Meltano database user:
+
+```sql
+-- Connect as a superuser or database owner
+-- Replace 'meltano_user' with your actual username
+-- Replace 'your_database' with your actual database name
+
+-- Grant database-level privileges
+GRANT CONNECT, CREATE, TEMPORARY ON DATABASE your_database TO meltano_user;
+
+-- Grant schema-level privileges (assuming 'public' schema)
+GRANT CREATE, USAGE ON SCHEMA public TO meltano_user;
+
+-- Grant privileges on existing tables and sequences
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO meltano_user;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO meltano_user;
+
+-- Set default privileges for future objects created by other users
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO meltano_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO meltano_user;
+```
+
+##### Tables Created by Meltano
+
+Meltano will automatically create several tables in your PostgreSQL database:
+- `runs` - Stores job execution history and metadata
+- `state` - Stores incremental state for pipeline runs
+- `plugin_settings` - Stores plugin configuration
+- `alembic_version` - Tracks database schema version for migrations
+- Additional tables for subscriptions, tokens, and other features
+
+##### Database Migration Support
+
+Meltano uses [Alembic](https://alembic.sqlalchemy.org/) to manage database schema changes. The system will automatically run migrations when needed, which requires the user to have `ALTER TABLE` privileges on existing tables.
+
+##### Security Considerations
+
+- Use a dedicated database user for Meltano operations
+- Consider using environment variables or a `.env` file to store database credentials securely
+- Enable SSL connections by adding appropriate parameters to your `database_uri`
+- Regularly review and audit database access logs
+
 #### Targeting a PostgreSQL Schema
 
 When using PostgreSQL as your [system database](/concepts/project#system-database), you can choose the target schema within that database by adding
