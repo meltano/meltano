@@ -567,7 +567,7 @@
           },
           "state": {
             "type": "string",
-            "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano elt."
+            "description": "A path to a state file (relative to the project directory) to be provided to the extractor when it is run as part of a pipeline using meltano el or meltano elt."
           },
           "select": {
             "type": "array",
