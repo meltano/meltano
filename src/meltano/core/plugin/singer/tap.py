@@ -586,7 +586,7 @@ class SingerTap(SingerPlugin):
             metadata_rules.extend(select_metadata_rules(config["_select"]))
             metadata_rules.extend(config_metadata_rules(config["_metadata"]))
 
-        # Always apply select filters (`meltano elt` `--select` and `--exclude` options)
+        # Always apply select filters (`meltano el` or `meltano elt` `--select` and `--exclude` options)
         metadata_rules.extend(select_filter_metadata_rules(config["_select_filter"]))
 
         if not schema_rules and not metadata_rules:

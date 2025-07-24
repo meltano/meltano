@@ -1267,9 +1267,9 @@ meltano job remove simple-demo
 
 Use the `schedule` command to define EL or Job pipelines to be run by an orchestrator at regular intervals.
 These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
-You can schedule both [jobs](#job) or legacy [`meltano el`](#el) and [`meltano elt`](#elt) tasks.
+You can schedule both [jobs](#job) or legacy [`meltano el`](#el) tasks.
 
-You can run a specific scheduled pipeline's corresponding [`meltano run`](#run), [`meltano el`](#el) or [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+You can run a specific scheduled pipeline's corresponding [`meltano run`](#run) or [`meltano el`](#el) command as a one-off using `meltano schedule run <schedule_name>`.
 Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passed on to the underlying commands.
 
 Note that the state ID generated under the hood when invoking `meltano schedule run` will differ depending on the type of schedule:
@@ -1562,7 +1562,7 @@ Merge new state onto existing state for a state ID.
 :::info
 
   <p><strong>Not seeing merged state in the system database?</strong></p>
-  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
+  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
 :::
 
 #### How to use

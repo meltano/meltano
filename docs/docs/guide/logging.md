@@ -260,7 +260,7 @@ See https://docs.datadoghq.com/logs/log_collection/python/?tab=jsonlogformatter 
 ## Google Cloud logging config
 
 For Google Cloud Logging (stackdriver) the default json log format is sufficient. That means when capturing `meltano run`,
-`meltano invoke` and `meltano elt` console output directly via something like CloudRun the built-in json format is
+`meltano invoke` and `meltano el` console output directly via something like CloudRun the built-in json format is
 sufficient:
 
 ```yaml

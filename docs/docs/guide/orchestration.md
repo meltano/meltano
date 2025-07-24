@@ -98,12 +98,12 @@ meltano add files files-airflow
 Now, you'll want to copy the DAG generator in to your Airflow installation's `dags_folder`,
 or reconfigure it to look in your project's `orchestrate/dags` directory instead.
 
-This setup assumes you'll use `meltano schedule` to schedule your `meltano elt`
+This setup assumes you'll use `meltano schedule` to schedule your `meltano el`
 pipelines, as described above, since the DAG generator iterates over the result of
 `meltano schedule list --format=json` and creates DAGs for each.
 However, you can also create your own Airflow DAGs for any pipeline you fancy
 by using [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/2.10.5/howto/operator/bash.html)
-with the [`meltano elt` command](/reference/command-line-interface#elt), or
+with the [`meltano el` command](/reference/command-line-interface#el), or
 [`DockerOperator`](https://airflow.apache.org/docs/apache-airflow-providers-docker/4.3.0/_api/airflow/providers/docker/operators/docker/index.html#module-airflow.providers.docker.operators.docker)
 with a [project-specific Docker image](/guide/production#containerized-meltano-project).
 
