@@ -103,7 +103,7 @@ class Payload(IntEnum):
 
 
 class Job(SystemModel):
-    """Model class that represents a `meltano el` or `meltano elt` run in the system database.
+    """Model class that represents a `meltano el` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
     `meltano state` command which wrote state to the db. Queries that are
