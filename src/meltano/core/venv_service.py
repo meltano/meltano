@@ -722,11 +722,11 @@ class UvVenvService(VenvService):
                 self.pip_log_path,
                 log_err,
             )
-
-        logger.info(
-            "Logged uv pip install output to %s",
-            self.pip_log_path,
-        )
+        else:
+            logger.info(
+                "Logged uv pip install output to %s",
+                self.pip_log_path,
+            )
         return AsyncSubprocessError(
             f"Failed to install plugin '{self.name}'.",
             err.process,
