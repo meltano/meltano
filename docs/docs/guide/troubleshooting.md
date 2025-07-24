@@ -195,8 +195,6 @@ Instead of `meltano run ... --dump=state`, use:
 meltano state get <STATE_ID>
 ```
 
-This will output the current state for the given state ID.
-
 #### Dumping Extractor Configuration
 
 Instead of `meltano run ... --dump=extractor-config`, use:
@@ -226,8 +224,6 @@ Instead of `meltano run ... --dump=catalog`, use:
 ```bash
 meltano invoke <EXTRACTOR_NAME> --dump=catalog
 ```
-
-Note: In the future, this may be replaced with a native `meltano catalog` command.
 
 ### Meltano UI
 
