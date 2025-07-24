@@ -183,6 +183,48 @@ meltano elt tap-gitlab target-postgres --exclude project_members
 meltano elt tap-gitlab target-postgres --state-id=gitlab-to-postgres --dump=state > extract/tap-gitlab.state.json
 ```
 
+### Alternatives to `meltano run --dump`
+
+While the `--dump` flag is not supported with `meltano run`, you can achieve the same outcomes using other Meltano commands:
+
+#### Dumping State
+
+Instead of `meltano run ... --dump=state`, use:
+
+```bash
+meltano state get <STATE_ID>
+```
+
+#### Dumping Extractor Configuration
+
+Instead of `meltano run ... --dump=extractor-config`, use:
+
+```bash
+meltano config <EXTRACTOR_NAME> list
+```
+
+Alternatively, you can use:
+
+```bash
+meltano invoke <EXTRACTOR_NAME> --dump=config
+```
+
+#### Dumping Loader Configuration
+
+Instead of `meltano run ... --dump=loader-config`, use:
+
+```bash
+meltano config <LOADER_NAME> list
+```
+
+#### Dumping Catalog
+
+Instead of `meltano run ... --dump=catalog`, use:
+
+```bash
+meltano invoke <EXTRACTOR_NAME> --dump=catalog
+```
+
 ### Meltano UI
 
 Early versions of Meltano promoted a simple UI feature that was used for setting up basic pipelines and viewing basic logs. Due to a refocusing of the product on the command line interface, the UI was deprioritized for continued feature enhancements. For [interactive plugin configuration](/reference/command-line-interface#how-to-use-interactive-config), we now recommend our `--interactive` config option in the CLI.

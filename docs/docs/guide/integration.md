@@ -204,6 +204,24 @@ Meltano stores this pipeline state in its [state backend](/concepts/state_backen
 
 If you'd like to manually inspect a job's state for debugging purposes, or so that you can store it somewhere other than the system database you can use the [`meltano state`](/reference/command-line-interface#state) command to do things like list all states, get state by name, set state, etc.
 
+### Start date and incremental replication
+
+When using incremental replication, it's important to understand that the bookmark dates stored in the state take precedence over the `start_date` configuration setting. This means that if you change the `start_date` to an earlier date hoping to pull more historical data, the extractor will still start from where it left off according to the saved state.
+
+To pull historical data from before the bookmarked date, you need to perform a full refresh using the `--full-refresh` flag:
+
+```bash
+# This will ignore the saved state and use the configured start_date
+meltano run --full-refresh tap-gitlab target-postgres
+
+# Or with meltano el
+meltano el tap-gitlab target-postgres --full-refresh
+```
+
+The `--full-refresh` flag tells Meltano to ignore any previously saved state and start fresh from the configured `start_date`. After the full refresh completes, the state will be updated with the new bookmarks, and subsequent runs will continue incrementally from that point.
+
+Alternatively, you can directly manage the state using the [`meltano state`](/reference/command-line-interface#state) command.
+
 ### Internal State Merge Logic
 
 When running Extract and Load pipelines via [`run`](/reference/command-line-interface#run), Meltano will retrieve your pipeline state (see the [state backends docs](/concepts/state_backends) for details on where it's stored) for the most recently completed pipeline based on State ID.
