@@ -1042,9 +1042,6 @@ meltano logs list --format json
 # Show log content for a specific run
 meltano logs show <log_id>
 
-# Follow log output in real-time
-meltano logs show <log_id> --follow
-
 # Show only the last N lines
 meltano logs show <log_id> --tail 50
 
@@ -1061,9 +1058,6 @@ meltano logs list
 # Show log for a specific run (get log_id from list command)
 meltano logs show 550e8400-e29b-41d4-a716-446655440000
 
-# Follow logs of a currently running job
-meltano logs show 550e8400-e29b-41d4-a716-446655440000 --follow
-
 # Show last 50 lines of a log
 meltano logs show 550e8400-e29b-41d4-a716-446655440000 --tail 50
 
@@ -1078,7 +1072,6 @@ meltano logs list --format json
 
 ### Options for `show`
 
-- `--follow` / `-f` - Follow log output in real-time (like tail -f)
 - `--tail` / `-n` - Show only the last N lines of the log
 - `--format` - Output format for job metadata (`text` or `json`)
 
