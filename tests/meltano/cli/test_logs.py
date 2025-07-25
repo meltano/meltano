@@ -70,7 +70,7 @@ class TestLogsShow:
         """Test showing the latest log for a job."""
         job = create_test_job(log_content="Latest log content\nWith multiple lines")
 
-        result = cli_runner.invoke(logs.show, [job.job_name])
+        result = cli_runner.invoke(logs.show_log, [str(job.run_id)])
 
         assert result.exit_code == 0
         assert "Latest log content" in result.output
@@ -92,8 +92,8 @@ class TestLogsShow:
 
         # Show specific run
         result = cli_runner.invoke(
-            logs.show,
-            [job1.job_name, "--run-id", str(job1.run_id)],
+            logs.show_log,
+            [str(job1.run_id)],
         )
 
         assert result.exit_code == 0
@@ -112,10 +112,10 @@ class TestLogsShow:
         job2 = create_test_job(state=State.FAIL)
         job3 = create_test_job(state=State.RUNNING)
 
-        result = cli_runner.invoke(logs.show, [job1.job_name, "--list"])
+        result = cli_runner.invoke(logs.list_logs)
 
         assert result.exit_code == 0
-        assert f"Runs for job '{job1.job_name}':" in result.output
+        assert "Recent job runs" in result.output
         assert str(job1.run_id) in result.output
         assert str(job2.run_id) in result.output
         assert str(job3.run_id) in result.output
@@ -133,16 +133,16 @@ class TestLogsShow:
         job = create_test_job()
 
         result = cli_runner.invoke(
-            logs.show,
-            [job.job_name, "--list", "--format", "json"],
+            logs.list_logs,
+            ["--format", "json"],
         )
 
         assert result.exit_code == 0
         data = json.loads(result.output)
-        assert data["job_name"] == job.job_name
-        assert len(data["runs"]) == 1
-        assert data["runs"][0]["run_id"] == str(job.run_id)
-        assert data["runs"][0]["state"] == "SUCCESS"
+        assert "runs" in data
+        assert len(data["runs"]) >= 1
+        run_ids = [run["log_id"] for run in data["runs"]]
+        assert str(job.run_id) in run_ids
 
     def test_tail_option(
         self,
@@ -154,7 +154,7 @@ class TestLogsShow:
         log_content = "\n".join([f"Line {i}" for i in range(1, 101)])
         job = create_test_job(log_content=log_content)
 
-        result = cli_runner.invoke(logs.show, [job.job_name, "--tail", "5"])
+        result = cli_runner.invoke(logs.show_log, [str(job.run_id), "--tail", "5"])
 
         assert result.exit_code == 0
         assert "Line 96" in result.output
@@ -170,21 +170,24 @@ class TestLogsShow:
         cli_runner: MeltanoCliRunner,
     ):
         """Test error when no logs are found."""
-        result = cli_runner.invoke(logs.show, ["non-existent-job"])
+        fake_uuid = str(uuid.uuid4())
+        result = cli_runner.invoke(logs.show_log, [fake_uuid])
 
         assert result.exit_code == 1
-        assert "No logs found for job 'non-existent-job'" in result.output
+        assert f"No job found with log ID '{fake_uuid}'" in result.output
 
     def test_no_runs_found(
         self,
         project: Project,
         cli_runner: MeltanoCliRunner,
     ):
-        """Test error when no runs are found for list."""
-        result = cli_runner.invoke(logs.show, ["non-existent-job", "--list"])
+        """Test when no runs are found for list."""
+        # Clear any existing jobs by testing with empty DB
+        result = cli_runner.invoke(logs.list_logs)
 
-        assert result.exit_code == 1
-        assert "No runs found for job 'non-existent-job'" in result.output
+        # Should succeed but show no runs message
+        assert result.exit_code == 0
+        assert "No job runs found." in result.output
 
     def test_missing_run_id(
         self,
@@ -197,15 +200,12 @@ class TestLogsShow:
         fake_run_id = str(uuid.uuid4())
 
         result = cli_runner.invoke(
-            logs.show,
-            [job.job_name, "--run-id", fake_run_id],
+            logs.show_log,
+            [fake_run_id],
         )
 
         assert result.exit_code == 1
-        assert (
-            f"Log file not found for job '{job.job_name}' with run ID '{fake_run_id}'"
-            in result.output
-        )
+        assert f"No job found with log ID '{fake_run_id}'" in result.output
 
     def test_large_log_confirmation(
         self,
@@ -219,7 +219,7 @@ class TestLogsShow:
         job = create_test_job(log_content=large_content)
 
         # Test declining confirmation
-        result = cli_runner.invoke(logs.show, [job.job_name], input="n\n")
+        result = cli_runner.invoke(logs.show_log, [str(job.run_id)], input="n\n")
 
         assert result.exit_code == 0
         assert "Log file is large" in result.output
@@ -227,7 +227,7 @@ class TestLogsShow:
         assert "Log file path:" in result.output
 
         # Test accepting confirmation
-        result = cli_runner.invoke(logs.show, [job.job_name], input="y\n")
+        result = cli_runner.invoke(logs.show_log, [str(job.run_id)], input="y\n")
 
         assert result.exit_code == 0
         assert "Log file is large" in result.output
@@ -243,8 +243,8 @@ class TestLogsShow:
         job = create_test_job()
 
         result = cli_runner.invoke(
-            logs.show,
-            [job.job_name, "--format", "json"],
+            logs.show_log,
+            [str(job.run_id), "--format", "json"],
         )
 
         assert result.exit_code == 0
