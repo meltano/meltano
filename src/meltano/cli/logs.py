@@ -72,29 +72,6 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
         return [line.decode("utf-8", errors="replace") for line in result_lines]
 
 
-def _follow_file(file_path: Path) -> None:
-    """Follow a file and print new lines as they appear.
-
-    Args:
-        file_path: Path to the file to follow.
-    """
-    import time
-
-    with file_path.open("r") as f:
-        # Move to end of file
-        f.seek(0, 2)
-
-        try:
-            while True:
-                line = f.readline()
-                if line:
-                    click.echo(line, nl=False)
-                else:
-                    time.sleep(0.1)
-        except KeyboardInterrupt:
-            pass
-
-
 def _format_job_info(job: Job, format_type: str = "text") -> str:
     """Format job information for display.
 
@@ -296,12 +273,6 @@ def list_logs(
 )
 @click.argument("log_id", required=True)
 @click.option(
-    "--follow",
-    "-f",
-    is_flag=True,
-    help="Follow log output in real-time (like tail -f).",
-)
-@click.option(
     "--tail",
     "-n",
     type=int,
@@ -320,7 +291,6 @@ def show_log(
     ctx: click.Context,
     project: Project,
     log_id: str,
-    follow: bool,
     tail: int | None,
     output_format: str,
 ) -> None:
@@ -331,9 +301,6 @@ def show_log(
     Examples:
         # Show full log for a run
         meltano logs show 550e8400-e29b-41d4-a716-446655440000
-
-        # Follow log output in real-time
-        meltano logs show 550e8400-e29b-41d4-a716-446655440000 --follow
 
         # Show last 50 lines
         meltano logs show 550e8400-e29b-41d4-a716-446655440000 --tail 50
@@ -363,14 +330,6 @@ def show_log(
                 raise CliError(
                     f"Log file not found for job run '{log_id}'. The log may have been cleaned up or the job may not have generated logs."
                 )
-
-            # Handle follow mode
-            if follow:
-                click.echo(f"Following log file: {log_file_path}")
-                click.echo("-" * 80)
-                _follow_file(log_file_path)
-                tracker.track_command_event(CliEvent.completed)
-                return
 
             # Handle tail mode
             if tail:

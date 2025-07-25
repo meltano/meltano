@@ -265,23 +265,6 @@ class TestLogsShow:
         assert data["run_id"] == str(job.run_id)
         assert data["state"] == "SUCCESS"
 
-    @mock.patch("meltano.cli.logs._follow_file")
-    def test_follow_option(
-        self,
-        mock_follow,
-        project: Project,
-        cli_runner: MeltanoCliRunner,
-        create_test_job,
-    ):
-        """Test following log file with --follow option."""
-        job = create_test_job()
-
-        result = cli_runner.invoke(logs.show, [job.job_name, "--follow"])
-
-        assert result.exit_code == 0
-        assert "Following log file:" in result.output
-        mock_follow.assert_called_once()
-
     def test_legacy_log_location(
         self,
         project: Project,
