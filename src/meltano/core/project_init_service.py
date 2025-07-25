@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import contextlib
 import typing as t
-import uuid
 from pathlib import Path
 
 import click
@@ -14,6 +13,7 @@ from meltano.core.db import project_engine
 from meltano.core.plugin.meltano_file import MeltanoFilePlugin
 from meltano.core.project import Project
 from meltano.core.project_settings_service import SettingValueStore
+from meltano.core.utils import uuidv7
 
 if t.TYPE_CHECKING:
     import os
@@ -82,7 +82,7 @@ class ProjectInitService:
 
         project.settings.set(
             "project_id",
-            str(uuid.uuid4()),
+            str(uuidv7()),
             store=SettingValueStore.MELTANO_YML,
         )
         self.set_send_anonymous_usage_stats(project)

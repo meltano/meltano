@@ -30,7 +30,7 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception
+from meltano.core.utils import format_exception, uuidv7
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
@@ -206,7 +206,7 @@ class Tracker:  # - too many (public) methods
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
-        return uuid.uuid4()
+        return uuidv7()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-import uuid
 
 import structlog
 from snowplow_tracker import SelfDescribingJson
@@ -11,7 +10,7 @@ from snowplow_tracker import SelfDescribingJson
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.tracking.schemas import PluginsContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr
+from meltano.core.utils import hash_sha256, safe_hasattr, uuidv7
 
 if t.TYPE_CHECKING:
     from meltano.core.elt_context import ELTContext
@@ -59,7 +58,7 @@ class PluginsTrackingContext(SelfDescribingJson):
         super().__init__(
             PluginsContextSchema.url,
             {
-                "context_uuid": str(uuid.uuid4()),
+                "context_uuid": str(uuidv7()),
                 "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
             },
         )
