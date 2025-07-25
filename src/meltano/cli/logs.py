@@ -60,7 +60,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
             # Count lines in this block
             all_content = b"".join(reversed(blocks))
             lines_found = all_content.split(b"\n")
-            
+
             # Remove empty line at end if file ends with newline
             if lines_found and not lines_found[-1]:
                 lines_found = lines_found[:-1]
