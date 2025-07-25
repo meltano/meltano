@@ -48,7 +48,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
         block_size = 1024
         blocks = []
 
-        while len(lines_found) <= lines and file_length > 0:
+        while len(lines_found) < lines and file_length > 0:
             # Calculate how much to read
             if file_length < block_size:
                 block_size = file_length
@@ -58,16 +58,18 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
             blocks.append(f.read(block_size))
 
             # Count lines in this block
-            lines_found = b"".join(reversed(blocks)).split(b"\n")
+            all_content = b"".join(reversed(blocks))
+            lines_found = all_content.split(b"\n")
+            
+            # Remove empty line at end if file ends with newline
+            if lines_found and not lines_found[-1]:
+                lines_found = lines_found[:-1]
 
             file_length -= block_size
 
-        # Return the last N lines
-        return [
-            line.decode("utf-8", errors="replace")
-            for line in lines_found[-lines:]
-            if line
-        ]
+        # Return the last N lines, ensuring we get exactly N lines (or fewer if file is shorter)
+        result_lines = lines_found[-lines:] if lines_found else []
+        return [line.decode("utf-8", errors="replace") for line in result_lines]
 
 
 def _follow_file(file_path: Path) -> None:
