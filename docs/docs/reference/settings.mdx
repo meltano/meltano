@@ -686,6 +686,97 @@ Specify path to a directory which contains a valid [`meltano.yml` project file](
 meltano --cwd '/path/containing/meltano_yml'
 ```
 
+## YAML Styling
+
+These settings allow you to customize how Meltano formats YAML files, including `meltano.yml`.
+
+### `yaml.indent.mapping`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_INDENT_MAPPING`
+- Default: `2`
+
+Number of spaces to use for mapping (dictionary) indentation in YAML files.
+
+### `yaml.indent.sequence`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_INDENT_SEQUENCE`
+- Default: `4`
+
+Number of spaces to use for sequence (list) indentation in YAML files.
+
+### `yaml.indent.offset`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_INDENT_OFFSET`
+- Default: `2`
+
+Additional offset for nested elements in YAML files.
+
+### `yaml.width`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_WIDTH`
+- Default: `80`
+
+Maximum line width for YAML formatting before wrapping.
+
+### `yaml.preserve_quotes`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_PRESERVE_QUOTES`
+- Default: `true`
+
+Whether to preserve quotes around string values in YAML files.
+
+### `yaml.compact_sequences`
+
+- [Environment variable](/guide/configuration#configuring-settings): `MELTANO_YAML_COMPACT_SEQUENCES`
+- Default: `false`
+
+Whether to use compact formatting for sequences in YAML files.
+
+#### How to use
+
+<Tabs className="meltano-tabs" queryString="meltano-tabs">
+  <TabItem className="meltano-tab-content" value="meltano.yml" label="meltano.yml" default>
+
+```yaml
+yaml_style:
+  indent:
+    mapping: 4
+    sequence: 6
+    offset: 2
+  width: 120
+  preserve_quotes: true
+  compact_sequences: false
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="user config" label="~/.meltanorc" default>
+
+```yaml
+yaml:
+  indent:
+    mapping: 4
+    sequence: 6
+    offset: 2
+  width: 120
+  preserve_quotes: true
+  compact_sequences: false
+```
+
+  </TabItem>
+  <TabItem className="meltano-tab-content" value="env" label="env" default>
+
+```bash
+export MELTANO_YAML_INDENT_MAPPING=4
+export MELTANO_YAML_INDENT_SEQUENCE=6
+export MELTANO_YAML_INDENT_OFFSET=2
+export MELTANO_YAML_WIDTH=120
+export MELTANO_YAML_PRESERVE_QUOTES=true
+export MELTANO_YAML_COMPACT_SEQUENCES=false
+```
+
+  </TabItem>
+</Tabs>
+
 ## `meltano elt`
 
 These settings can be used to modify the behavior of [`meltano el`](/reference/command-line-interface#el) and [`meltano elt`](/reference/command-line-interface#elt).

@@ -23,7 +23,7 @@ Meltano itself can be configured as well. To learn more, refer to the [Settings 
 
 ## Configuration layers
 
-To determine the values of settings, Meltano will look in 4 main places (and one optional one), with each taking precedence over the next:
+To determine the values of settings, Meltano will look in 5 main places (and one optional one), with each taking precedence over the next:
 
 1. [**Environment variables**](#configuring-settings), set through [your shell at `meltano run` runtime](/guide/integration#pipeline-specific-configuration), your project's [`.env` file](/concepts/project#env), a [scheduled pipeline's `env` dictionary](/concepts/project#schedules), or any other method.
    - You can use [`meltano config <plugin> list`](/reference/command-line-interface#config) to list the available variable names, which typically have the format `<PLUGIN_NAME>_<SETTING_NAME>`.
@@ -31,10 +31,14 @@ To determine the values of settings, Meltano will look in 4 main places (and one
    - Inside values, [environment variables can be referenced](#expansion-in-setting-values) as `$VAR` (as a single word) or `${VAR}` (inside a word).
    - Note that configuration for Meltano itself is stored at the root level of `meltano.yml`.
    - You can use [Meltano Environments](/concepts/environments) to manage different configurations depending on your testing and deployment strategy. If values for plugin settings are provided in both the top-level plugin configuration _and_ the environment-level plugin configuration, the value at the environment level will take precedence.
-3. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) when the project is [deployed as read-only](/reference/settings#project-readonly).
+3. **User configuration file** (`~/.meltanorc` or `~/.config/meltano/config.yml`), which allows for user-level configuration that applies across all projects.
+   - Plugin settings can be configured under a `plugins` key with the same structure as `meltano.yml`.
+   - YAML styling preferences can be configured under a `yaml` key.
+   - The location can be overridden with the `MELTANO_CONFIG_FILE` environment variable.
+4. **Your project's [system database](/concepts/project#system-database)**, which (among other things) stores configuration set using [`meltano config <plugin> set`](/reference/command-line-interface#config) when the project is [deployed as read-only](/reference/settings#project-readonly).
    - Note that configuration for Meltano itself cannot be stored in the system database.
-4. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
-5. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
+5. _If the plugin [inherits from another plugin](/concepts/plugins#plugin-inheritance) in your project_: **The parent plugin's own configuration**
+6. **The default `value`s** set in the plugin's [`settings` metadata](/reference/settings).
    - Definitions of [discoverable plugins](/concepts/plugins#discoverable-plugins) can be found on [Meltano Hub](/contribute/plugins#discoverable-plugins).
    - [Custom plugin definitions](/concepts/project#plugins) can be found in your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
    - `meltano config <plugin> list` will list the default values.
@@ -65,6 +69,53 @@ plugins:
 ```
 
 All overrides replace the values stored in the [lockfile](/concepts/plugins#lock-artifacts), except for `settings`, which extend the base definitions. If there is a collision on name, then the setting is taken from the override definition in `meltano.yml` and used at runtime, while the token setting definition in the lockfile is discarded.
+
+## User configuration file
+
+Meltano supports a user-level configuration file that applies across all projects on your system. This file can be located at:
+
+- `~/.meltanorc` (primary location)
+- `~/.config/meltano/config.yml` (fallback location)
+- Custom location specified by the `MELTANO_CONFIG_FILE` environment variable
+
+The user configuration file uses the same YAML structure as `meltano.yml` and supports:
+
+### Plugin configuration
+
+You can configure plugin settings that will be used across all your Meltano projects:
+
+```yaml
+plugins:
+  extractors:
+    tap-postgres:
+      host: localhost
+      port: 5432
+      dbname: analytics
+    tap-github:
+      repository: my-org/my-repo
+  loaders:
+    target-postgres:
+      host: localhost
+      port: 5432
+      dbname: warehouse
+```
+
+### YAML styling configuration
+
+Customize how Meltano formats YAML files:
+
+```yaml
+yaml:
+  indent:
+    mapping: 4
+    sequence: 6
+    offset: 2
+  width: 120
+  preserve_quotes: true
+  compact_sequences: false
+```
+
+User configuration has higher precedence than project-level configuration for plugin settings, but lower precedence than environment variables and environment-specific configuration.
 
 ## Environment variables
 
