@@ -134,6 +134,7 @@ class SettingValueStore(StrEnum):
     CONFIG_OVERRIDE = enum.auto()
     ENV = enum.auto()
     DOTENV = enum.auto()
+    USER_CONFIG = enum.auto()
     MELTANO_ENVIRONMENT = enum.auto()
     MELTANO_YML = enum.auto()
     DB = enum.auto()
@@ -172,6 +173,7 @@ class SettingValueStore(StrEnum):
             self.CONFIG_OVERRIDE: ConfigOverrideStoreManager,  # type: ignore[dict-item]
             self.ENV: EnvStoreManager,  # type: ignore[dict-item]
             self.DOTENV: DotEnvStoreManager,  # type: ignore[dict-item]
+            self.USER_CONFIG: UserConfigStoreManager,  # type: ignore[dict-item]
             self.MELTANO_ENVIRONMENT: MeltanoEnvStoreManager,  # type: ignore[dict-item]
             self.MELTANO_YML: MeltanoYmlStoreManager,  # type: ignore[dict-item]
             self.DB: DbStoreManager,  # type: ignore[dict-item]
@@ -648,6 +650,84 @@ class DotEnvStoreManager(BaseEnvStoreManager):
             raise StoreNotSupportedError(err) from err
 
         self._env = None
+
+
+class UserConfigStoreManager(SettingsStoreManager):
+    """User configuration store manager."""
+
+    label = "user configuration"
+    writable = True
+
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+        """Initialise a user config store manager instance."""
+        super().__init__(*args, **kwargs)
+
+    def ensure_supported(self, method: str = "get") -> None:
+        """Ensure named method is supported.
+
+        Args:
+            method: Setting method (get, set, etc.)
+
+        Raises:
+            StoreNotSupportedError: If the method is not supported yet.
+        """
+        if method != "get":
+            msg = f"User config store does not yet support '{method}' operations"
+            raise StoreNotSupportedError(msg)
+
+    def get(
+        self,
+        name: str,
+        setting_def: SettingDefinition | None = None,
+        *,
+        cast_value: bool = False,
+    ) -> tuple[str | None, dict]:
+        """Get value by name from user configuration."""
+        self.ensure_supported("get")
+
+        # Check if this is a plugin settings service
+        if not hasattr(self.settings_service, "plugin"):
+            return None, {}
+
+        plugin = self.settings_service.plugin
+
+        # Import here to avoid circular import
+        from meltano.core.yaml_config import get_user_plugin_config
+
+        plugin_config = get_user_plugin_config(plugin.type.value, plugin.name)
+
+        if name not in plugin_config:
+            return None, {}
+
+        value = plugin_config[name]
+
+        # Cast the value if requested
+        if cast_value and setting_def:
+            value = cast_setting_value(value, setting_def.as_dict())
+
+        return str(value) if value is not None else None, {
+            "source": f"user config for {plugin.type.value}.{plugin.name}",
+            "auto_store_src": self.__class__,
+        }
+
+    def set(
+        self, name: str, value: str, setting_def: SettingDefinition | None = None
+    ) -> dict:  # noqa: ARG002
+        """Set a setting value."""
+        self.ensure_supported("set")
+        return {}
+
+    def unset(
+        self, name: str, path: list[str], setting_def: SettingDefinition | None = None
+    ) -> dict:  # noqa: ARG002
+        """Unset a setting value."""
+        self.ensure_supported("unset")
+        return {}
+
+    def reset(self) -> dict:
+        """Reset all Setting values in this store."""
+        self.ensure_supported("reset")
+        return {}
 
 
 class MeltanoYmlStoreManager(SettingsStoreManager):

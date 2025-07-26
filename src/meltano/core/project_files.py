@@ -366,7 +366,19 @@ class ProjectFiles:
             schedules = file_dict.get("schedules", CommentedSeq())
             original_schedules.copy_attributes(schedules)
 
+    def _ensure_yaml_configured(self, contents: Mapping) -> None:
+        """Ensure YAML is configured with proper style settings before writing."""
+        from meltano.core.yaml import ensure_yaml_configured
+
+        project_data = (
+            contents if isinstance(contents, dict) and "version" in contents else None
+        )
+        ensure_yaml_configured(project_data, os.environ.get("MELTANO_ENVIRONMENT"))
+
     def _write_file(self, file_path: str | os.PathLike[str], contents: Mapping) -> None:
+        # Apply YAML styling configuration if available
+        self._ensure_yaml_configured(contents)
+
         dirname = os.path.dirname(file_path)  # noqa: PTH120
         fd, tmp_name = tempfile.mkstemp(dir=dirname, suffix=".tmp.yml")
         try:

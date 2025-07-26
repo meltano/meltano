@@ -112,6 +112,9 @@
         }
       }
     },
+    "yaml_style": {
+      "$ref": "#/$defs/yaml_style"
+    },
     "environments": {
       "type": "array",
       "description": "An array of environments (i.e. dev, stage, prod) with override configs for plugins based on the environment its run in.",
@@ -1150,6 +1153,9 @@
                   }
                 }
               }
+            },
+            "yaml_style": {
+              "$ref": "#/$defs/yaml_style"
             }
           }
         },
@@ -1208,6 +1214,58 @@
         "variant": {
           "type": "string",
           "description": "The variant of the required plugin"
+        }
+      }
+    },
+    "yaml_style": {
+      "type": "object",
+      "description": "YAML formatting and style configuration",
+      "additionalProperties": false,
+      "properties": {
+        "indent": {
+          "type": "object",
+          "description": "Indentation settings for YAML output",
+          "additionalProperties": false,
+          "properties": {
+            "mapping": {
+              "type": "integer",
+              "description": "Number of spaces for mapping indentation",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 2
+            },
+            "sequence": {
+              "type": "integer",
+              "description": "Number of spaces for sequence indentation",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 4
+            },
+            "offset": {
+              "type": "integer",
+              "description": "Additional offset for nested indentation",
+              "minimum": 1,
+              "maximum": 10,
+              "default": 2
+            }
+          }
+        },
+        "width": {
+          "type": "integer",
+          "description": "Maximum line width for YAML output",
+          "minimum": 40,
+          "maximum": 200,
+          "default": 80
+        },
+        "preserve_quotes": {
+          "type": "boolean",
+          "description": "Whether to preserve existing quote styles in YAML",
+          "default": true
+        },
+        "compact_sequences": {
+          "type": "boolean",
+          "description": "Whether to use compact formatting for sequences",
+          "default": false
         }
       }
     },

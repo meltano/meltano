@@ -19,8 +19,13 @@ if t.TYPE_CHECKING:
 
     from ruamel.yaml import CommentedMap, Dumper, ScalarNode
 
+    from meltano.core.yaml_config import YamlStyleConfig
+
 yaml = YAML()
 yaml.default_flow_style = False
+
+# Storage for current YAML style configuration
+_current_config: YamlStyleConfig | None = None
 
 
 def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
@@ -68,6 +73,47 @@ def load(path: os.PathLike[str]) -> CommentedMap:
 
     cache[path] = CachedCommentedMap(hashed, parsed)
     return parsed
+
+
+def configure_yaml_style(config: YamlStyleConfig) -> None:
+    """Configure the global YAML instance with style settings."""
+    global _current_config
+    _current_config = config
+
+    # Apply indentation settings
+    yaml.indent(
+        mapping=config.indent.mapping,
+        sequence=config.indent.sequence,
+        offset=config.indent.offset,
+    )
+
+    # Apply other formatting settings
+    yaml.width = config.width
+    yaml.preserve_quotes = config.preserve_quotes
+
+    # Note: compact_sequences would require more complex implementation
+    # as it's not a direct ruamel.yaml setting. For now, we store it
+    # in case future enhancements need it.
+
+
+def get_yaml_config() -> YamlStyleConfig | None:
+    """Get the current YAML style configuration."""
+    return _current_config
+
+
+def ensure_yaml_configured(
+    project_data: CommentedMap | None = None,
+    environment_name: str | None = None,
+) -> None:
+    """Ensure YAML is configured with the latest settings."""
+    # Import here to avoid circular imports
+    from meltano.core.yaml_config import YamlStyleConfig, load_yaml_style_config
+
+    config = load_yaml_style_config(project_data, environment_name)
+
+    # Only apply configuration if it's different from defaults
+    if config != YamlStyleConfig():
+        configure_yaml_style(config)
 
 
 # Alias to provide a clean interface when using this
