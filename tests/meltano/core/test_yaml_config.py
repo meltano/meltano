@@ -260,7 +260,9 @@ class TestYamlConfigLoader:
         config_none = loader.load_config(project_data, "staging")
         # When no environment config exists, should use project config
         # Currently using 70 (ruamel.yaml default) - TODO: investigate precedence
-        assert config_none.width == 70  # current behavior - project config not applied correctly
+        assert (
+            config_none.width == 70
+        )  # current behavior - project config not applied correctly
 
     def test_environment_variables(self):
         """Test loading configuration from environment variables."""

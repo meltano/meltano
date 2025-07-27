@@ -712,14 +712,14 @@ class UserConfigStoreManager(SettingsStoreManager):
 
     def set(
         self, name: str, value: str, setting_def: SettingDefinition | None = None
-    ) -> dict:  # noqa: ARG002
+    ) -> dict:
         """Set a setting value."""
         self.ensure_supported("set")
         return {}
 
     def unset(
         self, name: str, path: list[str], setting_def: SettingDefinition | None = None
-    ) -> dict:  # noqa: ARG002
+    ) -> dict:
         """Unset a setting value."""
         self.ensure_supported("unset")
         return {}

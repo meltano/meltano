@@ -17,7 +17,7 @@ class TestPluginUserConfigEndToEnd:
         self,
         session,
         tap,
-        plugin_settings_service_factory,  # noqa: ARG002
+        plugin_settings_service_factory,
     ):
         """Test that PluginSettingsService reads from user config."""
         with tempfile.NamedTemporaryFile(
@@ -61,7 +61,7 @@ class TestPluginUserConfigEndToEnd:
         session,
         tap,
         plugin_settings_service_factory,
-        monkeypatch,  # noqa: ARG002
+        monkeypatch,
     ):
         """Test that plugin settings follow the correct precedence order."""
         with tempfile.NamedTemporaryFile(
@@ -173,7 +173,7 @@ class TestPluginUserConfigEndToEnd:
         self,
         session,
         tap,
-        plugin_settings_service_factory,  # noqa: ARG002
+        plugin_settings_service_factory,
     ):
         """Test plugin settings with complex configuration values."""
         with tempfile.NamedTemporaryFile(

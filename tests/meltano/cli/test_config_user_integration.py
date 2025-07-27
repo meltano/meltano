@@ -14,7 +14,11 @@ class TestCliConfigUserIntegration:
     """CLI integration tests for user config with meltano config."""
 
     def test_config_list_includes_user_config_values(
-        self, cli_runner, project, tap, target  # noqa: ARG002
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,  # noqa: ARG002
     ):
         """Test that meltano config list shows values from user config."""
         with tempfile.NamedTemporaryFile(
@@ -53,7 +57,11 @@ class TestCliConfigUserIntegration:
                 Path(temp_file.name).unlink()
 
     def test_config_set_with_user_config_precedence(
-        self, cli_runner, project, tap, target  # noqa: ARG002
+        self,
+        cli_runner,
+        project,
+        tap,
+        target,  # noqa: ARG002
     ):
         """Test that setting config values works when user config exists."""
         with tempfile.NamedTemporaryFile(
@@ -107,7 +115,7 @@ class TestCliConfigUserIntegration:
         project,
         tap,
         target,
-        monkeypatch,  # noqa: ARG002
+        monkeypatch,
     ):
         """Test that environment variables override user config values."""
         with tempfile.NamedTemporaryFile(
