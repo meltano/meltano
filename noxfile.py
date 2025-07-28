@@ -64,9 +64,10 @@ def _run_pytest(session: nox.Session) -> None:
         )
 
         session.run(
+            "coverage",
+            "run",
+            "-m",
             "pytest",
-            "--cov=meltano",
-            "--cov=tests",
             "--durations=10",
             "--order-scope=module",
             "--timeout=300",
