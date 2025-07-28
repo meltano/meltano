@@ -382,7 +382,7 @@ class TestTracker:
         """
 
         class HTTPRequestHandler(server_lib.SimpleHTTPRequestHandler):
-            def do_POST(self) -> None:  # noqa: N802
+            def do_POST(self) -> None:
                 sleep(sleep_duration)
                 self.send_response(200, "OK")
                 self.end_headers()
