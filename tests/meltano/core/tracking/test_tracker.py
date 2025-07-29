@@ -143,7 +143,7 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", uuid.uuid4())
         Tracker(project).save_telemetry_settings()
 
         project.settings.set("send_anonymous_usage_stats", value=False)
@@ -151,7 +151,7 @@ class TestTracker:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 1
 
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", uuid.uuid4())
         with mock.patch.object(Tracker, method_name) as mocked:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 0
@@ -163,11 +163,11 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuid.uuid4()))
+        project.settings.set("project_id", uuid.uuid4())
         Tracker(project).save_telemetry_settings()
 
         with delete_analytics_json(project):
-            project.settings.set("project_id", str(uuid.uuid4()))
+            project.settings.set("project_id", uuid.uuid4())
             with mock.patch.object(Tracker, method_name) as mocked:
                 Tracker(project)
                 assert mocked.call_count == 0
