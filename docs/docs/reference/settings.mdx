@@ -293,18 +293,10 @@ Using databases other than SQLite requires installing Meltano with [extra compon
 When using PostgreSQL as your system database, the database user must have sufficient privileges to create and manage the tables that Meltano uses for storing metadata, job execution history, and incremental state.
 
 ##### Minimum PostgreSQL Version
-- **PostgreSQL 13 or higher** is required
+- **PostgreSQL 13 or higher** is recommended
 
 ##### Installation with PostgreSQL Support
-Install Meltano with PostgreSQL support using one of these options:
-
-```bash
-# Recommended for new installations (uses psycopg3)
-pip install "meltano[postgres]"
-
-# For existing installations (uses psycopg2)
-pip install "meltano[psycopg2]"
-```
+See the guide for how to install [optional components](/guide/advanced-topics/#installing-optional-components).
 
 ##### Required Database Privileges
 
@@ -354,7 +346,6 @@ Meltano will automatically create several tables in your PostgreSQL database:
 - `state` - Stores incremental state for pipeline runs
 - `plugin_settings` - Stores plugin configuration
 - `alembic_version` - Tracks database schema version for migrations
-- Additional tables for subscriptions, tokens, and other features
 
 ##### Database Migration Support
 
