@@ -964,3 +964,12 @@ def new_project_id() -> uuid.UUID:
         A new project ID.
     """
     return uuid7()
+
+
+def new_run_id() -> uuid.UUID:
+    """Generate a new run ID.
+
+    Returns:
+        A new run ID.
+    """
+    return uuid7()
