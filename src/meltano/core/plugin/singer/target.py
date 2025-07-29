@@ -41,7 +41,7 @@ class BookmarkWriter:
         """Initialize the `BookmarkWriter`.
 
         Args:
-            job: meltano elt job associated with this invocation and whose
+            job: meltano el or meltano elt job associated with this invocation and whose
                 state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: A payload flag.

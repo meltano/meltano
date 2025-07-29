@@ -49,7 +49,7 @@ dependencies = [
   "python-dotenv>=1.0.1,<2",
   "pyyaml>=6.0.2,<7",
   "requests>=2.32.3,<3",
-  "rich~=14.0.0",
+  "rich>=14.0,<14.2",
   "ruamel.yaml>=0.18.6,<0.19",
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
@@ -112,7 +112,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
-  "coverage[toml]>=7.9",
+  "coverage[toml]>=7.10",
 ]
 dev = [
   { include-group = "testing" },
@@ -124,10 +124,10 @@ pre-commit = [
 testing = [
   { include-group = "coverage" },
   "colorama>=0.4.4,<0.5",
+  "faker>=37.4.2",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
   "pytest-asyncio>=1",
-  "pytest-cov>=6.0.0,<7",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
   "pytest-randomly~=3.16",
@@ -209,6 +209,9 @@ disable_warnings = [
   "no-sysmon",
 ]
 parallel = true
+patch = [
+  "subprocess",
+]
 relative_files = true  # This allows coverage to be measured in Windows
 sigterm = true
 source = [

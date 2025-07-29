@@ -198,7 +198,7 @@ To learn more about how Full-Table Replication works and its limitations, refer 
 
 ## Incremental replication state
 
-Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (handled automatically for [`meltano run`](/reference/command-line-interface#run) and with the `--state-id` argument for `meltano elt`).
+Most extractors (Singer taps) generate [state](https://hub.meltano.com/singer/spec#state) when they are run, that can be passed along with a subsequent invocation to have the extractor pick up where it left off the previous time (handled automatically for [`meltano run`](/reference/command-line-interface#run) and with the `--state-id` argument for `meltano el`).
 
 Meltano stores this pipeline state in its [state backend](/concepts/state_backends), identified by the [`meltano run`](/reference/command-line-interface#run) State ID automatically generated based on the extractor name, loader name, and active environment name (see more about [incremental state for elt](/guide/integration#incremental-replication-state-elt)).
 
@@ -271,9 +271,9 @@ Although for some use cases using the `elt` command is still preferred because i
 
 ### Incremental replication state (elt)
 
-For [`meltano elt`](/reference/command-line-interface#elt) the State ID has to be created and set manually using the `--state-id` argument, make sure to use a unique string identifier for the pipeline always include it since it must be present in each execution in order for incremental replication to work.
+For [`meltano el`](/reference/command-line-interface#el) the State ID has to be created and set manually using the `--state-id` argument, make sure to use a unique string identifier for the pipeline always include it since it must be present in each execution in order for incremental replication to work.
 
-Also note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano elt`](/reference/command-line-interface#elt)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
+Also note that if you already have a state file you'd like to use, it can be provided explicitly using [`meltano el`](/reference/command-line-interface#el)'s `--state` option or the [`state` extractor extra](/concepts/plugins#state-extra).
 
 ### Pipeline-specific schedule configuration
 
@@ -300,7 +300,7 @@ Airflow's [`BashOperator`](https://airflow.apache.org/docs/apache-airflow/2.10.5
 ```python
 BashOperator(
     # ...
-    bash_command="meltano elt ...",
+    bash_command="meltano el ...",
     env={
         "TAP_FOO_BAR": "bar",
         "TAP_FOO_BAZ": "baz",
@@ -311,7 +311,7 @@ BashOperator(
 ### Pipeline environment variables
 
 To allow [loaders](/concepts/plugins#loaders) and [transformers](/concepts/plugins#transformers) to adapt their configuration and behavior based on the extractor and loader they are run with,
-[`meltano elt`](/reference/command-line-interface#elt) dynamically sets a number of pipeline-specific [environment variables](/guide/configuration#environment-variables) before [compiling their configuration](/guide/configuration#expansion-in-setting-values) and [invoking their executables](/guide/configuration#accessing-from-plugins).
+[`meltano el`](/reference/command-line-interface#el) dynamically sets a number of pipeline-specific [environment variables](/guide/configuration#environment-variables) before [compiling their configuration](/guide/configuration#expansion-in-setting-values) and [invoking their executables](/guide/configuration#accessing-from-plugins).
 
 #### Extractor variables
 

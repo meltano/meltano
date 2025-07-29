@@ -56,7 +56,11 @@ class NoWindowsGlobbingGroup(InstrumentedGroup):
     # NOTE: This CLI option normalization applies to all subcommands.
     context_settings={"token_normalize_func": lambda x: x.replace("_", "-")},
 )
-@click.option("--log-level", type=click.Choice(tuple(LEVELS)))
+@click.option(
+    "--log-level",
+    type=click.Choice(tuple(LEVELS)),
+    help="Set the log level. 'disabled' will suppress all logging output.",
+)
 @click.option(
     "--log-format",
     type=click.Choice(tuple(LogFormat)),

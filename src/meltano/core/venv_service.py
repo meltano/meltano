@@ -713,11 +713,39 @@ class UvVenvService(VenvService):
         Returns:
             The error that occurred during installation with additional context.
         """
+        self.pip_log_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            await self._write_error_log(err)
+        except OSError as log_err:
+            logger.debug(
+                "Failed to write installation error to log file %s: %s",
+                self.pip_log_path,
+                log_err,
+            )
+        else:
+            logger.info(
+                "Logged uv pip install output to %s",
+                self.pip_log_path,
+            )
         return AsyncSubprocessError(
             f"Failed to install plugin '{self.name}'.",
             err.process,
             stderr=await err.stderr,
         )
+
+    async def _write_error_log(self, err: AsyncSubprocessError) -> None:
+        """Write error details to the log file."""
+        import anyio
+
+        stderr_content = await err.stderr
+
+        async with await anyio.open_file(
+            self.pip_log_path,
+            "a",
+            encoding="utf-8",
+        ) as log_file:
+            if stderr_content:
+                await log_file.write(stderr_content)
 
     @override
     async def create_venv(
