@@ -18,7 +18,7 @@ from meltano.core.tracking.contexts.environment import EnvironmentContext
 from meltano.core.tracking.contexts.exception import ExceptionContext
 from meltano.core.tracking.contexts.project import ProjectContext
 from meltano.core.tracking.tracker import TelemetrySettings, Tracker
-from meltano.core.utils import hash_sha256, uuidv7
+from meltano.core.utils import hash_sha256, uuid7
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
@@ -143,7 +143,7 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuidv7()))
+        project.settings.set("project_id", str(uuid7()))
         Tracker(project).save_telemetry_settings()
 
         project.settings.set("send_anonymous_usage_stats", value=False)
@@ -151,7 +151,7 @@ class TestTracker:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 1
 
-        project.settings.set("project_id", str(uuidv7()))
+        project.settings.set("project_id", str(uuid7()))
         with mock.patch.object(Tracker, method_name) as mocked:
             Tracker(project).save_telemetry_settings()
             assert mocked.call_count == 0
@@ -163,11 +163,11 @@ class TestTracker:
         method_name = "track_telemetry_state_change_event"
 
         project.settings.set("send_anonymous_usage_stats", value=True)
-        project.settings.set("project_id", str(uuidv7()))
+        project.settings.set("project_id", str(uuid7()))
         Tracker(project).save_telemetry_settings()
 
         with delete_analytics_json(project):
-            project.settings.set("project_id", str(uuidv7()))
+            project.settings.set("project_id", str(uuid7()))
             with mock.patch.object(Tracker, method_name) as mocked:
                 Tracker(project)
                 assert mocked.call_count == 0
@@ -182,11 +182,11 @@ class TestTracker:
     @pytest.mark.parametrize(
         "analytics_json_content",
         (
-            f'{{"clientId":"{uuidv7()!s}","project_id":"{uuidv7()!s}","send_anonymous_usage_stats":true}}',
-            f'{{"client_id":"{uuidv7()!s}","projectId":"{uuidv7()!s}","send_anonymous_usage_stats":true}}',
-            f'{{"client_id":"{uuidv7()!s}","project_id":"{uuidv7()!s}","send_anon_usage_stats":true}}',
-            f'["{uuidv7()!s}","{uuidv7()!s}", true]',
-            f'client_id":"{uuidv7()!s}","project_id":"{uuidv7()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"clientId":"{uuid7()!s}","project_id":"{uuid7()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{uuid7()!s}","projectId":"{uuid7()!s}","send_anonymous_usage_stats":true}}',
+            f'{{"client_id":"{uuid7()!s}","project_id":"{uuid7()!s}","send_anon_usage_stats":true}}',
+            f'["{uuid7()!s}","{uuid7()!s}", true]',
+            f'client_id":"{uuid7()!s}","project_id":"{uuid7()!s}","send_anonymous_usage_stats":true}}',
         ),
         ids=(0, 1, 2, 3, 4),
     )
@@ -341,8 +341,8 @@ class TestTracker:
 
         tracker.track_telemetry_state_change_event(
             "project_id",
-            from_value=uuidv7(),
-            to_value=uuidv7(),
+            from_value=uuid7(),
+            to_value=uuid7(),
         )
         assert passed
 
@@ -419,7 +419,7 @@ class TestTracker:
         monkeypatch,
     ) -> None:
         def get_source():
-            return ProjectContext(project, uuidv7()).to_json()["data"][
+            return ProjectContext(project, uuid7()).to_json()["data"][
                 "send_anonymous_usage_stats_source"
             ]
 
@@ -483,7 +483,7 @@ class TestTracker:
                 # Ensure it generated a random UUID as a fallback
                 uuid.UUID(str(Tracker(project).client_id))
 
-            ctx_id = uuidv7()
+            ctx_id = uuid7()
             monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id))
             # Ensure it takes the client ID from the env var
             assert Tracker(project).client_id == ctx_id
@@ -492,7 +492,7 @@ class TestTracker:
             # Ensure it uses the client ID stored in `analytics.json`
             assert Tracker(project).client_id == ctx_id
 
-            ctx_id_2 = uuidv7()
+            ctx_id_2 = uuid7()
             monkeypatch.setenv("MELTANO_CLIENT_ID", str(ctx_id_2))
             # Ensure the env var takes priority over `analytics.json`
             assert Tracker(project).client_id == ctx_id_2

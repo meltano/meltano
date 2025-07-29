@@ -24,7 +24,7 @@ from meltano.core.sqlalchemy import (
     IntPK,
     JSONEncodedDict,
 )
-from meltano.core.utils import uuidv7
+from meltano.core.utils import uuid7
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
@@ -132,7 +132,7 @@ class Job(SystemModel):
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id") or uuidv7()
+        kwargs["run_id"] = kwargs.get("run_id") or uuid7()
         super().__init__(**kwargs)
 
     @hybrid_property

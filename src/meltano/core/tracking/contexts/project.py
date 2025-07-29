@@ -11,7 +11,7 @@ from snowplow_tracker import SelfDescribingJson
 from structlog.stdlib import get_logger
 
 from meltano.core.tracking.schemas import ProjectContextSchema
-from meltano.core.utils import hash_sha256, uuidv7
+from meltano.core.utils import hash_sha256, uuid7
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
@@ -51,7 +51,7 @@ class ProjectContext(SelfDescribingJson):
         super().__init__(
             ProjectContextSchema.url,
             {
-                "context_uuid": str(uuidv7()),
+                "context_uuid": str(uuid7()),
                 "project_uuid": str(self.project_uuid),
                 "project_uuid_source": self.project_uuid_source.name,
                 "client_uuid": str(client_id),
@@ -117,7 +117,7 @@ class ProjectContext(SelfDescribingJson):
             else:
                 self._project_uuid_source = ProjectUUIDSource.explicit
         else:
-            project_id = uuidv7()
+            project_id = uuid7()
             self._project_uuid_source = ProjectUUIDSource.random
 
         return project_id

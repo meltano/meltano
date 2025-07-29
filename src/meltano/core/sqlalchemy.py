@@ -10,7 +10,7 @@ from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.types import CHAR, INTEGER, VARCHAR, DateTime, TypeDecorator
 
-from meltano.core.utils import uuidv7
+from meltano.core.utils import uuid7
 
 if t.TYPE_CHECKING:
     from sqlalchemy.engine.interfaces import Dialect
@@ -173,7 +173,7 @@ class DateTimeUTC(TypeDecorator[datetime.datetime]):
         return value
 
 
-GUIDType = t.Annotated[uuid.UUID, mapped_column(GUID, default=uuidv7)]
+GUIDType = t.Annotated[uuid.UUID, mapped_column(GUID, default=uuid7)]
 StateType = t.Annotated[
     dict[str, str],
     mapped_column(MutableDict.as_mutable(JSONEncodedDict)),

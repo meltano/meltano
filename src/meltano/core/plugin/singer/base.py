@@ -10,7 +10,7 @@ import structlog
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin import BasePlugin
-from meltano.core.utils import nest_object, uuidv7
+from meltano.core.utils import nest_object, uuid7
 
 if t.TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -167,5 +167,5 @@ class SingerPlugin(BasePlugin):  # noqa: D101
     def instance_uuid(self) -> str:
         """Multiple processes running at the same time have a unique value to use."""
         if not self._instance_uuid:
-            self._instance_uuid = str(uuidv7())
+            self._instance_uuid = str(uuid7())
         return self._instance_uuid

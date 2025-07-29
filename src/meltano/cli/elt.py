@@ -31,7 +31,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import run_async, uuidv7
+from meltano.core.utils import run_async, uuid7
 
 if t.TYPE_CHECKING:
     import uuid
@@ -334,7 +334,7 @@ async def _run_el_command(
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
 
     # Bind run_id at the start of the CLI entrypoint
-    run_id = run_id or uuidv7()
+    run_id = run_id or uuid7()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     _state_strategy = StateStrategy.from_cli_args(

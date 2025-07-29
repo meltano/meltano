@@ -34,7 +34,7 @@ from meltano.core.state_store.filesystem import (
 )
 from meltano.core.state_store.google import GCSStateStoreManager
 from meltano.core.state_store.s3 import S3StateStoreManager
-from meltano.core.utils import uuidv7
+from meltano.core.utils import uuid7
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterator
@@ -473,7 +473,7 @@ class TestS3StateStoreManager:
     def test_set_first_time(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
         monkeypatch.delenv("AWS_PROFILE", raising=False)
-        state_id = uuidv7().hex
+        state_id = uuid7().hex
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
                 uri="s3://test_access_key_id:test_secret_access_key@meltano/state",
@@ -488,7 +488,7 @@ class TestS3StateStoreManager:
     ) -> None:
         monkeypatch.delenv("AWS_DEFAULT_REGION", raising=False)
         monkeypatch.delenv("AWS_PROFILE", raising=False)
-        state_id = uuidv7().hex
+        state_id = uuid7().hex
         with moto.mock_aws():
             store_manager = S3StateStoreManager(
                 uri="s3://test_access_key_id:test_secret_access_key@meltano/state",

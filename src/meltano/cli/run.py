@@ -26,7 +26,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
-from meltano.core.utils import run_async, uuidv7
+from meltano.core.utils import run_async, uuid7
 
 if t.TYPE_CHECKING:
     import uuid
@@ -156,7 +156,7 @@ async def run(
         change_console_log_level()
 
     # Bind run_id at the start of the CLI entrypoint
-    run_id = run_id or uuidv7()
+    run_id = run_id or uuid7()
     structlog.contextvars.bind_contextvars(run_id=str(run_id))
 
     tracker: Tracker = ctx.obj["tracker"]

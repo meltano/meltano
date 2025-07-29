@@ -24,7 +24,7 @@ from meltano.core.utils import (
     hash_sha256,
     safe_hasattr,
     strtobool,
-    uuidv7,
+    uuid7,
 )
 
 if t.TYPE_CHECKING:
@@ -93,7 +93,7 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             EnvironmentContextSchema.url,
             {
-                "context_uuid": str(uuidv7()),
+                "context_uuid": str(uuid7()),
                 "parent_context_uuid": _get_parent_context_uuid_str(),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.is_file(),

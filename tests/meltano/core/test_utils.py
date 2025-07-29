@@ -10,7 +10,7 @@ from meltano.core.utils import (
     nest,
     pop_at_path,
     set_at_path,
-    uuidv7,
+    uuid7,
 )
 
 
@@ -292,9 +292,9 @@ def test_uuidv7() -> None:
     import uuid
 
     # Generate multiple UUIDs
-    uuid1 = uuidv7()
+    uuid1 = uuid7()
     time.sleep(0.001)  # Wait 1ms to ensure different timestamps
-    uuid2 = uuidv7()
+    uuid2 = uuid7()
 
     # Test that they are valid UUIDs
     assert isinstance(uuid1, uuid.UUID)
@@ -328,7 +328,7 @@ def test_uuidv7_time_ordering() -> None:
 
     uuids = []
     for _ in range(10):
-        uuids.append(uuidv7())
+        uuids.append(uuid7())
         time.sleep(0.001)
 
     # Convert to strings and verify they are in ascending order
