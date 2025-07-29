@@ -955,3 +955,12 @@ def parse_date(date_string: str) -> str:
         return _parsed.isoformat()
 
     return date_string
+
+
+def new_project_id() -> uuid.UUID:
+    """Generate a new project ID.
+
+    Returns:
+        A new project ID.
+    """
+    return uuid7()

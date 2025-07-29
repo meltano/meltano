@@ -19,13 +19,9 @@ from structlog.stdlib import get_logger
 
 import meltano
 from meltano.core.tracking.schemas import EnvironmentContextSchema
-from meltano.core.utils import (
-    get_boolean_env_var,
-    hash_sha256,
-    safe_hasattr,
-    strtobool,
-    uuid7,
-)
+from meltano.core.utils import get_boolean_env_var, hash_sha256, safe_hasattr, strtobool
+
+from .base import new_context_uuid
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -93,7 +89,7 @@ class EnvironmentContext(SelfDescribingJson):
         super().__init__(
             EnvironmentContextSchema.url,
             {
-                "context_uuid": str(uuid7()),
+                "context_uuid": str(new_context_uuid()),
                 "parent_context_uuid": _get_parent_context_uuid_str(),
                 "meltano_version": meltano.__version__,
                 "is_dev_build": not release_marker_path.is_file(),

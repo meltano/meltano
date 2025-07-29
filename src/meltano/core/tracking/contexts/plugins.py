@@ -10,7 +10,9 @@ from snowplow_tracker import SelfDescribingJson
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
 from meltano.core.tracking.schemas import PluginsContextSchema
-from meltano.core.utils import hash_sha256, safe_hasattr, uuid7
+from meltano.core.utils import hash_sha256, safe_hasattr
+
+from .base import new_context_uuid
 
 if t.TYPE_CHECKING:
     from meltano.core.elt_context import ELTContext
@@ -58,7 +60,7 @@ class PluginsTrackingContext(SelfDescribingJson):
         super().__init__(
             PluginsContextSchema.url,
             {
-                "context_uuid": str(uuid7()),
+                "context_uuid": str(new_context_uuid()),
                 "plugins": [_from_plugin(plugin, cmd) for plugin, cmd in plugins],
             },
         )

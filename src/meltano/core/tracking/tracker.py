@@ -75,6 +75,15 @@ def check_url(url: str) -> bool:
     return bool(re.match(URL_REGEX, url))
 
 
+def new_client_id() -> uuid.UUID:
+    """Generate a new client ID.
+
+    Returns:
+        A new client ID.
+    """
+    return uuid7()
+
+
 class TelemetrySettings(t.NamedTuple):
     """Settings which control telemetry and anonymous usage stats.
 
@@ -206,7 +215,7 @@ class Tracker:  # - too many (public) methods
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
-        return uuid7()
+        return new_client_id()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:

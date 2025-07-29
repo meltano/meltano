@@ -124,6 +124,7 @@ pre-commit = [
 testing = [
   { include-group = "coverage" },
   "colorama>=0.4.4,<0.5",
+  "faker>=37.4.2",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
   "pytest-asyncio>=1",

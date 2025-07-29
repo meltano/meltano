@@ -777,6 +777,18 @@ wheels = [
 ]
 
 [[package]]
+name = "faker"
+version = "37.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tzdata" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/65/95/da573e055608e180086e2ac3208f8c15d8b44220912f565a9821b9bff33a/faker-37.4.2.tar.gz", hash = "sha256:8e281bbaea30e5658895b8bea21cc50d27aaf3a43db3f2694409ca5701c56b0a", size = 1902890, upload-time = "2025-07-15T16:38:24.803Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/26/1c/b909a055be556c11f13cf058cfa0e152f9754d803ff3694a937efe300709/faker-37.4.2-py3-none-any.whl", hash = "sha256:b70ed1af57bfe988cbcd0afd95f4768c51eaf4e1ce8a30962e127ac5c139c93f", size = 1943179, upload-time = "2025-07-15T16:38:23.053Z" },
+]
+
+[[package]]
 name = "fasteners"
 version = "0.19"
 source = { registry = "https://pypi.org/simple" }
@@ -1371,6 +1383,7 @@ dev = [
     { name = "boto3-stubs", extra = ["essential"] },
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
+    { name = "faker" },
     { name = "moto" },
     { name = "mypy" },
     { name = "pytest" },
@@ -1398,6 +1411,7 @@ pre-commit = [
 testing = [
     { name = "colorama" },
     { name = "coverage", extra = ["toml"] },
+    { name = "faker" },
     { name = "moto" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -1474,6 +1488,7 @@ dev = [
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35,<1.39" },
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
+    { name = "faker", specifier = ">=37.4.2" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "mypy", specifier = ">=1.16.0,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
@@ -1498,6 +1513,7 @@ pre-commit = [{ name = "pre-commit", specifier = ">=4.0.1,<5" }]
 testing = [
     { name = "colorama", specifier = ">=0.4.4,<0.5" },
     { name = "coverage", extras = ["toml"], specifier = ">=7.10" },
+    { name = "faker", specifier = ">=37.4.2" },
     { name = "moto", specifier = ">=5.0.21,<6" },
     { name = "pytest", specifier = ">=8.3.3,<9" },
     { name = "pytest-asyncio", specifier = ">=1" },
