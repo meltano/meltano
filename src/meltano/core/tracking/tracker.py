@@ -30,7 +30,7 @@ from meltano.core.tracking.schemas import (
     ExitEventSchema,
     TelemetryStateChangeEventSchema,
 )
-from meltano.core.utils import format_exception
+from meltano.core.utils import format_exception, uuid7
 
 if t.TYPE_CHECKING:
     from collections.abc import Mapping
@@ -73,6 +73,15 @@ def check_url(url: str) -> bool:
         True if the URL is valid, False otherwise.
     """
     return bool(re.match(URL_REGEX, url))
+
+
+def new_client_id() -> uuid.UUID:
+    """Generate a new client ID.
+
+    Returns:
+        A new client ID.
+    """
+    return uuid7()
 
 
 class TelemetrySettings(t.NamedTuple):
@@ -206,7 +215,7 @@ class Tracker:  # - too many (public) methods
                 )
         if stored_telemetry_settings.client_id is not None:
             return stored_telemetry_settings.client_id
-        return uuid.uuid4()
+        return new_client_id()
 
     @property
     def contexts(self) -> tuple[SelfDescribingJson]:
