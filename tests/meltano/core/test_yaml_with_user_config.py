@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import tempfile
 import uuid
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from decimal import Decimal
 from pathlib import Path
 from unittest import mock
@@ -22,6 +22,17 @@ class TestYAMLWithUserConfig:
     def teardown_method(self):
         _reset_user_config_service()
 
+    def _create_test_data(self, **kwargs) -> CommentedMap:
+        """Create a CommentedMap with test data."""
+        data = CommentedMap()
+        for key, value in kwargs.items():
+            data[key] = value
+        return data
+
+    def _setup_mock_config(self, mock_get_config, config_path: Path):
+        """Setup mock configuration service."""
+        mock_get_config.return_value = UserConfigService(config_path)
+
     @contextmanager
     def _mock_user_config_service(self, config_path: Path):
         """Mock the user config service with the given config path."""
@@ -31,7 +42,7 @@ class TestYAMLWithUserConfig:
                 "meltano.core.yaml.get_user_config_service",
             ) as mock_get_config,
         ):
-            mock_get_config.return_value = UserConfigService(config_path)
+            self._setup_mock_config(mock_get_config, config_path)
             yield
 
     def test_yaml_indent_from_user_config(self):
@@ -41,14 +52,15 @@ class TestYAMLWithUserConfig:
             config_path = Path(tmp.name)
 
             with self._mock_user_config_service(config_path):
-                data = CommentedMap()
-                data["project_id"] = "test"
-                data["environments"] = [
-                    {
-                        "name": "dev",
-                        "config": {"database": "dev_db", "host": "localhost"},
-                    }
-                ]
+                data = self._create_test_data(
+                    project_id="test",
+                    environments=[
+                        {
+                            "name": "dev",
+                            "config": {"database": "dev_db", "host": "localhost"},
+                        }
+                    ],
+                )
 
                 with tempfile.NamedTemporaryFile(
                     mode="w", delete=False, suffix=".yml"
@@ -66,15 +78,15 @@ class TestYAMLWithUserConfig:
                 assert lines[4] == "        database: dev_db"
                 assert lines[5] == "        host: localhost"
 
-                out_path.unlink()
+                with suppress(PermissionError):
+                    out_path.unlink()
 
-            config_path.unlink()
+            with suppress(PermissionError):
+                config_path.unlink()
 
     def test_default_yaml_indent(self):
         with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
-            data = CommentedMap()
-            data["name"] = "test"
-            data["items"] = ["a", "b", "c"]
+            data = self._create_test_data(name="test", items=["a", "b", "c"])
 
             with tempfile.NamedTemporaryFile(
                 mode="w", delete=False, suffix=".yml"
@@ -107,11 +119,9 @@ class TestYAMLWithUserConfig:
                     "meltano.core.yaml.get_user_config_service",
                 ) as mock_get_config,
             ):
-                mock_get_config.return_value = UserConfigService(config_path)
+                self._setup_mock_config(mock_get_config, config_path)
 
-                data = CommentedMap()
-                data["name"] = "test"
-                data["nested"] = {"key": "value"}
+                data = self._create_test_data(name="test", nested={"key": "value"})
 
                 with tempfile.NamedTemporaryFile(
                     mode="w", delete=False, suffix=".yml"
@@ -126,9 +136,11 @@ class TestYAMLWithUserConfig:
                 assert lines[1] == "nested:"
                 assert lines[2] == "  key: value"
 
-                out_path.unlink()
+                with suppress(PermissionError):
+                    out_path.unlink()
 
-            config_path.unlink()
+            with suppress(PermissionError):
+                config_path.unlink()
 
     def test_yaml_handles_config_read_error_gracefully(self):
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
@@ -139,8 +151,7 @@ class TestYAMLWithUserConfig:
             config_path.chmod(0o000)
 
             with self._mock_user_config_service(config_path):
-                data = CommentedMap()
-                data["name"] = "test"
+                data = self._create_test_data(name="test")
 
                 with tempfile.NamedTemporaryFile(
                     mode="w", delete=False, suffix=".yml"
@@ -151,10 +162,12 @@ class TestYAMLWithUserConfig:
                 output = out_path.read_text()
                 assert output.strip() == "name: test"
 
-                out_path.unlink()
+                with suppress(PermissionError):
+                    out_path.unlink()
 
             config_path.chmod(0o644)
-            config_path.unlink()
+            with suppress(PermissionError):
+                config_path.unlink()
 
     def test_yaml_instance_isolation(self):
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
@@ -163,16 +176,14 @@ class TestYAMLWithUserConfig:
             config_path = Path(tmp.name)
 
             with self._mock_user_config_service(config_path):
-                data1 = CommentedMap()
-                data1["test"] = "first"
+                data1 = self._create_test_data(test="first")
                 from io import StringIO
 
                 output1 = StringIO()
                 yaml.dump(data1, output1)
                 result1 = output1.getvalue()
 
-                data2 = CommentedMap()
-                data2["test"] = "second"
+                data2 = self._create_test_data(test="second")
                 output2 = StringIO()
                 yaml.dump(data2, output2)
                 result2 = output2.getvalue()
@@ -180,7 +191,8 @@ class TestYAMLWithUserConfig:
                 assert result1 == "---\ntest: first\n"
                 assert result2 == "---\ntest: second\n"
 
-            config_path.unlink()
+            with suppress(PermissionError):
+                config_path.unlink()
 
     def test_yaml_decimal_and_uuid_types(self):
         """Test that Decimal and UUID types are properly represented in YAML."""
@@ -190,9 +202,10 @@ class TestYAMLWithUserConfig:
             config_path = Path(tmp.name)
 
             with self._mock_user_config_service(config_path):
-                data = CommentedMap()
-                data["decimal_value"] = Decimal("123.45")
-                data["uuid_value"] = uuid.UUID("12345678-1234-5678-9012-123456789abc")
+                data = self._create_test_data(
+                    decimal_value=Decimal("123.45"),
+                    uuid_value=uuid.UUID("12345678-1234-5678-9012-123456789abc"),
+                )
 
                 from io import StringIO
 
@@ -203,7 +216,8 @@ class TestYAMLWithUserConfig:
                 assert "decimal_value: 123.45" in result
                 assert "uuid_value: 12345678-1234-5678-9012-123456789abc" in result
 
-            config_path.unlink()
+            with suppress(PermissionError):
+                config_path.unlink()
 
     def test_yaml_load_with_caching(self):
         """Test the yaml.load function with file caching."""
@@ -220,4 +234,5 @@ class TestYAMLWithUserConfig:
             result2 = yaml.load(yaml_path)
             assert result2["test_key"] == "test_value"
 
-            yaml_path.unlink()
+            with suppress(PermissionError):
+                yaml_path.unlink()

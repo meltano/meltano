@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import tempfile
-from contextlib import contextmanager
+import threading
+import time
+from contextlib import contextmanager, suppress
 from pathlib import Path
 
 import pytest
@@ -37,7 +39,8 @@ class TestUserConfigService:
                 try:
                     yield config_path
                 finally:
-                    config_path.unlink()
+                    with suppress(PermissionError):
+                        config_path.unlink()
 
     def test_default_config(self):
         with self._config_file() as config_path:
@@ -130,9 +133,6 @@ block_seq_indent = -5
 
     def test_threading_safety(self):
         """Test thread-safe singleton access."""
-        import threading
-        import time
-
         results = []
 
         def create_service():
@@ -142,23 +142,21 @@ block_seq_indent = -5
             results.append(service)
 
         threads = [threading.Thread(target=create_service) for _ in range(10)]
+
         for thread in threads:
             thread.start()
+
         for thread in threads:
             thread.join()
 
-        # All services should be the same instance
         assert len({id(service) for service in results}) == 1
 
     def test_get_user_config_service_with_different_path(self):
         """Test that providing different config_path creates new instance."""
-        # Get default service
         service1 = get_user_config_service()
 
-        # Get service with different path
         with self._config_file("[yaml]\nindent = 4\n") as config_path:
             service2 = get_user_config_service(config_path)
 
-            # Should be different instances
             assert service1 is not service2
             assert service2.config_path == config_path
