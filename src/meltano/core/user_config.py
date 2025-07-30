@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -154,6 +155,7 @@ class UserConfigService:
 
 
 _user_config_service: UserConfigService | None = None
+_user_config_service_lock = threading.Lock()
 
 
 def get_user_config_service(config_path: Path | None = None) -> UserConfigService:
@@ -169,5 +171,9 @@ def get_user_config_service(config_path: Path | None = None) -> UserConfigServic
     if _user_config_service is None or (
         config_path and config_path != _user_config_service.config_path
     ):
-        _user_config_service = UserConfigService(config_path)
+        with _user_config_service_lock:
+            if _user_config_service is None or (
+                config_path and config_path != _user_config_service.config_path
+            ):
+                _user_config_service = UserConfigService(config_path)
     return _user_config_service

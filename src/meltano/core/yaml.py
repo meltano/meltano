@@ -98,11 +98,20 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> Non
             user_config_service = get_user_config_service()
             settings = user_config_service.yaml_settings()
 
-            indent = settings.get("indent", 2)
-            block_seq_indent = settings.get("block_seq_indent", 0)
-            sequence_dash_offset = settings.get(
-                "sequence_dash_offset", max(0, indent - 2)
+            indent_raw = settings.get("indent", 2)
+            block_seq_indent_raw = settings.get("block_seq_indent", 0)
+            sequence_dash_offset_raw = settings.get("sequence_dash_offset")
+
+            indent = indent_raw if isinstance(indent_raw, int) else 2
+            block_seq_indent = (
+                block_seq_indent_raw if isinstance(block_seq_indent_raw, int) else 0
             )
+            sequence_dash_offset = (
+                sequence_dash_offset_raw
+                if isinstance(sequence_dash_offset_raw, int)
+                else max(0, indent - 2)
+            )
+
             yaml_instance.indent(
                 mapping=indent,
                 sequence=indent + block_seq_indent,
