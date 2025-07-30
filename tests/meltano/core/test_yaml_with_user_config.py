@@ -189,6 +189,7 @@ class TestYAMLWithUserConfig:
                 data["uuid_value"] = uuid.UUID("12345678-1234-5678-9012-123456789abc")
 
                 from io import StringIO
+
                 output = StringIO()
                 yaml.dump(data, output)
                 result = output.getvalue()

@@ -95,9 +95,7 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str
     yaml_instance.width = yaml.width
 
     # Copy representers from global yaml instance
-    yaml_instance.representer.yaml_representers = (
-        yaml.representer.yaml_representers
-    )
+    yaml_instance.representer.yaml_representers = yaml.representer.yaml_representers
     yaml_instance.representer.yaml_multi_representers = (
         yaml.representer.yaml_multi_representers
     )
@@ -129,10 +127,11 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str
             )
 
             for key, value in settings.items():
-                if (
-                    key not in {"indent", "block_seq_indent", "sequence_dash_offset"}
-                    and hasattr(yaml_instance, key)
-                ):
+                if key not in {
+                    "indent",
+                    "block_seq_indent",
+                    "sequence_dash_offset",
+                } and hasattr(yaml_instance, key):
                     setattr(yaml_instance, key, value)
         except UserConfigReadError:
             pass
