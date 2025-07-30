@@ -37,6 +37,7 @@ LEVELS: dict[str, int] = {
     "warning": logging.WARNING,
     "error": logging.ERROR,
     "critical": logging.CRITICAL,
+    "disabled": logging.CRITICAL + 1,
 }
 DEFAULT_LEVEL = "info"
 FORMAT = (
@@ -96,6 +97,8 @@ def default_config(
     Returns:
          A logging config suitable for use with `logging.config.dictConfig`.
     """
+    # Convert log level to numeric value for disabled level
+    numeric_level = parse_log_level(log_level.lower())
     log_level = log_level.upper()
     max_frames = 100 if log_level == "DEBUG" else 2
     foreign_pre_chain = get_default_foreign_pre_chain()
@@ -179,7 +182,7 @@ def default_config(
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "level": log_level,
+                "level": numeric_level if log_level == "DISABLED" else log_level,
                 "formatter": log_format,
                 "stream": "ext://sys.stderr",
             },
@@ -187,7 +190,7 @@ def default_config(
         "loggers": {
             "": {
                 "handlers": ["console"],
-                "level": log_level.upper(),
+                "level": numeric_level if log_level == "DISABLED" else log_level,
                 "propagate": True,
             },
             "snowplow_tracker.emitters": {

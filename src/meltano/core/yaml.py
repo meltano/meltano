@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+import sys
 import typing as t
+import uuid
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -21,6 +23,7 @@ if t.TYPE_CHECKING:
 
 yaml = YAML()
 yaml.default_flow_style = False
+yaml.width = sys.maxsize  # Prevent line wrapping entirely
 
 
 def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
@@ -28,10 +31,16 @@ def _represent_decimal(dumper: Dumper, node: Decimal) -> ScalarNode:
     return dumper.represent_scalar("tag:yaml.org,2002:float", str(node))
 
 
+def _represent_uuid(dumper: Dumper, node: uuid.UUID) -> ScalarNode:
+    """Represent a uuid.UUID instance in YAML."""
+    return dumper.represent_scalar("tag:yaml.org,2002:str", str(node))
+
+
 yaml.register_class(Canonical)
 yaml.register_class(PluginType)
 yaml.register_class(SettingKind)
 yaml.representer.add_representer(Decimal, _represent_decimal)
+yaml.representer.add_representer(uuid.UUID, _represent_uuid)
 
 
 @dataclass

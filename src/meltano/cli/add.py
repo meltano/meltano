@@ -107,9 +107,11 @@ def _load_yaml_from_ref(
     ),
 )
 @click.option(
-    "--update",
+    "--update/--no-update",
     is_flag=True,
+    default=True,
     help="Update an existing plugin.",
+    hidden=True,
 )
 @install
 @no_install
@@ -126,12 +128,12 @@ async def add(
     project: Project,
     plugin: tuple[str, ...],
     install_plugins: InstallPlugins,
-    plugin_type: PluginType | None = None,
-    inherit_from: str | None = None,
-    variant: str | None = None,
-    as_name: str | None = None,
-    plugin_yaml: dict | None = None,
-    python: str | None = None,
+    plugin_type: PluginType | None,
+    inherit_from: str | None,
+    variant: str | None,
+    as_name: str | None,
+    plugin_yaml: dict | None,
+    python: str | None,
     **flags: bool,
 ) -> None:
     """Add a plugin to your project.

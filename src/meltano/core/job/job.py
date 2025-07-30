@@ -6,7 +6,6 @@ import asyncio
 import os
 import signal
 import typing as t
-import uuid
 from contextlib import asynccontextmanager, contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntEnum
@@ -25,6 +24,7 @@ from meltano.core.sqlalchemy import (
     IntPK,
     JSONEncodedDict,
 )
+from meltano.core.utils import new_run_id
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator, Generator
@@ -103,7 +103,7 @@ class Payload(IntEnum):
 
 
 class Job(SystemModel):
-    """Model class that represents a `meltano elt` run in the system database.
+    """Model class that represents a `meltano el` run in the system database.
 
     Includes State.STATE_EDIT rows which represent CLI invocations of the
     `meltano state` command which wrote state to the db. Queries that are
@@ -132,7 +132,7 @@ class Job(SystemModel):
         """
         kwargs["_state"] = kwargs.pop("state", State.IDLE).name
         kwargs["payload"] = kwargs.get("payload", {})
-        kwargs["run_id"] = kwargs.get("run_id") or uuid.uuid4()
+        kwargs["run_id"] = kwargs.get("run_id") or new_run_id()
         super().__init__(**kwargs)
 
     @hybrid_property

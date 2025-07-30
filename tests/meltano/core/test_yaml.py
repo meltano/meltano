@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import typing as t
+import uuid
 from decimal import Decimal
 
 from ruamel.yaml import YAML, CommentedMap
@@ -47,6 +48,16 @@ def test_decimal_in_nested_structure() -> None:
     assert "99.99" in output
     assert "0.15" in output
     assert "42.0" in output
+
+
+def test_uuid_representation() -> None:
+    """Test that UUID values are properly represented in YAML."""
+    data = CommentedMap()
+    data["uuid_value"] = uuid.uuid4()
+
+    stream = io.StringIO()
+    yaml.dump(data, stream)
+    assert str(data["uuid_value"]) in stream.getvalue()
 
 
 def test_load_and_dump_with_decimals(tmp_path: Path):
@@ -139,3 +150,43 @@ def test_mixed_numeric_types() -> None:
     assert "789" in output
     assert "0.001" in output
     assert "999999999.999999999" in output
+
+
+def test_yaml_width_prevents_line_wrapping() -> None:
+    """Test that long lines are not wrapped due to sys.maxsize YAML width."""
+    long_url = (
+        "git+https://github.com/transferwise/pipelinewise-tap-mysql.git"
+        "#subdirectory=singer-connectors/tap-mysql&ref=v1.2.3-with-very-long-branch-name"
+        "&commit=abcdef1234567890abcdef1234567890abcdef12&parameter=very-long-parameter-value"
+        "&another_param=another-very-long-parameter-value-to-test-extreme-lengths"
+        "&more_params=additional-configuration-options-and-settings-for-comprehensive-testing"
+    )
+
+    data = CommentedMap(
+        {
+            "plugins": CommentedMap(
+                {
+                    "extractors": [
+                        CommentedMap(
+                            [
+                                ("name", "tap-mysql"),
+                                ("variant", "transferwise"),
+                                ("pip_url", long_url),
+                            ]
+                        )
+                    ]
+                }
+            )
+        }
+    )
+
+    stream = io.StringIO()
+    yaml.dump(data, stream)
+    output = stream.getvalue()
+    lines = output.strip().split("\n")
+
+    pip_url_line = next((line for line in lines if "pip_url:" in line), None)
+
+    assert pip_url_line is not None
+    assert long_url in pip_url_line
+    assert sum(1 for line in lines if long_url in line) == 1
