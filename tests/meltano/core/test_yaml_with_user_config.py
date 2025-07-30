@@ -241,10 +241,10 @@ class TestYAMLWithUserConfig:
         """Test that yaml.dump() returns string when no stream provided."""
         with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
             data = self._create_test_data(name="test", value=123)
-            
+
             # Test dump without stream (should return string)
             result = yaml.dump(data)
-            
+
             assert isinstance(result, str)
             assert "name: test" in result
             assert "value: 123" in result
@@ -253,13 +253,14 @@ class TestYAMLWithUserConfig:
         """Test that yaml.dump() returns None when stream is provided."""
         with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
             data = self._create_test_data(name="test", value=456)
-            
+
             from io import StringIO
+
             stream = StringIO()
-            
+
             # Test dump with stream (should return None)
             result = yaml.dump(data, stream)
-            
+
             assert result is None
             assert "name: test" in stream.getvalue()
             assert "value: 456" in stream.getvalue()

@@ -166,23 +166,25 @@ block_seq_indent = -5
         """Test _parse_value method with various edge cases."""
         with self._config_file("[yaml]\ntest = value\n") as config_path:
             service = UserConfigService(config_path)
-            
+
             # Test None values
             assert service._parse_value("none") is None
             assert service._parse_value("null") is None
             assert service._parse_value("") is None
             assert service._parse_value("NONE") is None  # Case insensitive
-            
+
             # Test boolean values
             assert service._parse_value("true") is True
             assert service._parse_value("false") is False
             assert service._parse_value("1") is True
             assert service._parse_value("0") is False
-            
+
             # Test integer values
             assert service._parse_value("123") == 123
             assert service._parse_value("-456") == -456
-            
+
             # Test string values (fallback)
             assert service._parse_value("not_a_bool_or_int") == "not_a_bool_or_int"
-            assert service._parse_value("12.34") == "12.34"  # Float strings remain strings
+            assert (
+                service._parse_value("12.34") == "12.34"
+            )  # Float strings remain strings
