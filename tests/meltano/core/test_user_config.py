@@ -1,0 +1,88 @@
+"""Tests for user configuration service."""
+
+from __future__ import annotations
+
+import tempfile
+from contextlib import contextmanager
+from pathlib import Path
+
+from meltano.core.user_config import UserConfigService, get_user_config_service
+
+
+class TestUserConfigService:
+    """Test UserConfigService class."""
+
+    @contextmanager
+    def _config_file(self, content: str | None = None):
+        if content is None:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                config_path = Path(tmpdir) / "nonexistent.ini"
+                yield config_path
+        else:
+            with tempfile.NamedTemporaryFile(
+                mode="w", delete=False, suffix=".ini"
+            ) as tmp:
+                tmp.write(content)
+                tmp.flush()
+                config_path = Path(tmp.name)
+                try:
+                    yield config_path
+                finally:
+                    config_path.unlink()
+
+    def test_default_config(self):
+        with self._config_file() as config_path:
+            assert UserConfigService(config_path).yaml_indent == 2
+
+    def test_read_yaml_indent(self):
+        with self._config_file("[yaml]\nindent = 4\n") as config_path:
+            assert UserConfigService(config_path).yaml_indent == 4
+
+    def test_invalid_yaml_indent(self):
+        with self._config_file("[yaml]\nindent = not_a_number\n") as config_path:
+            assert UserConfigService(config_path).yaml_indent == 2
+
+    def test_missing_yaml_section(self):
+        with self._config_file("[other]\nsetting = value\n") as config_path:
+            assert UserConfigService(config_path).yaml_indent == 2
+
+    def test_get_user_config_service_singleton(self):
+        config1 = get_user_config_service()
+        config2 = get_user_config_service()
+        assert config1 is config2
+
+    def test_get_user_config_service_with_path(self):
+        with self._config_file("[yaml]\nindent = 8\n") as config_path:
+            user_config_service = get_user_config_service(config_path)
+            assert user_config_service.yaml_indent == 8
+            assert user_config_service.config_path == config_path
+
+    def test_yaml_settings_all_types(self):
+        config = """[yaml]
+indent = 4
+width = 120
+preserve_quotes = true
+explicit_start = yes
+explicit_end = false
+allow_unicode = no
+default_flow_style = 1
+line_break = \\n
+encoding = utf-8
+map_indent = none
+"""
+        with self._config_file(config) as config_path:
+            settings = UserConfigService(config_path).yaml_settings()
+            assert settings["indent"] == 4
+            assert settings["width"] == 120
+            assert settings["preserve_quotes"] is True
+            assert settings["explicit_start"] is True
+            assert settings["explicit_end"] is False
+            assert settings["allow_unicode"] is False
+            assert settings["default_flow_style"] is True
+            assert settings["line_break"] == "\\n"
+            assert settings["encoding"] == "utf-8"
+            assert settings["map_indent"] is None
+
+    def test_yaml_settings_empty(self):
+        with self._config_file("[other]\nkey = value\n") as config_path:
+            assert UserConfigService(config_path).yaml_settings() == {}

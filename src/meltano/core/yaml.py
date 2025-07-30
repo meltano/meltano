@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import typing as t
 from dataclasses import dataclass
 from decimal import Decimal
@@ -12,11 +13,10 @@ from ruamel.yaml import YAML
 from meltano.core.behavior.canonical import Canonical
 from meltano.core.plugin import PluginType
 from meltano.core.setting_definition import SettingKind
-from meltano.core.utils import hash_sha256
+from meltano.core.user_config import UserConfigReadError, get_user_config_service
+from meltano.core.utils import hash_sha256, truthy
 
 if t.TYPE_CHECKING:
-    import os
-
     from ruamel.yaml import CommentedMap, Dumper, ScalarNode
 
 yaml = YAML()
@@ -70,6 +70,41 @@ def load(path: os.PathLike[str]) -> CommentedMap:
     return parsed
 
 
-# Alias to provide a clean interface when using this
-# module via `from meltano.core import yaml`
-dump = yaml.dump
+def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> None:
+    """Dump YAML with user-configured formatting.
+
+    Args:
+        data: The data to dump.
+        stream: The stream to dump to.
+        **kwargs: Additional keyword arguments passed to yaml.dump.
+
+    Returns:
+        The result of yaml.dump.
+    """
+    yaml_instance = YAML()
+    yaml_instance.default_flow_style = False
+
+    if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
+        try:
+            user_config_service = get_user_config_service()
+            settings = user_config_service.yaml_settings()
+
+            indent = settings.get("indent", 2)
+            block_seq_indent = settings.get("block_seq_indent", 0)
+            sequence_dash_offset = settings.get(
+                "sequence_dash_offset", max(0, indent - 2)
+            )
+            yaml_instance.indent(
+                mapping=indent,
+                sequence=indent + block_seq_indent,
+                offset=sequence_dash_offset,
+            )
+
+            skip_keys = ("indent", "block_seq_indent", "sequence_dash_offset")
+            for key, value in settings.items():
+                if key not in skip_keys and hasattr(yaml_instance, key):
+                    setattr(yaml_instance, key, value)
+        except UserConfigReadError:
+            pass
+
+    return yaml_instance.dump(data, stream, **kwargs)
