@@ -84,8 +84,7 @@ def _apply_user_configuration(yaml_instance: YAML) -> None:
     """Apply user configuration to YAML instance if enabled."""
     if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
         try:
-            user_config_service = get_user_config_service()
-            settings = user_config_service.yaml_settings()
+            settings = get_user_config_service().yaml_settings()
 
             indent = settings.get("indent", 2)
             indent = indent if isinstance(indent, int) else 2
