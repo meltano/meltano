@@ -6,6 +6,7 @@ import os
 import sys
 import typing as t
 import uuid
+from copy import deepcopy
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -79,24 +80,20 @@ def load(path: os.PathLike[str]) -> CommentedMap:
     return parsed
 
 
-def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str | None:
-    """Dump YAML with user-configured formatting.
-
-    Args:
-        data: The data to dump.
-        stream: The stream to dump to. If None, returns YAML as string.
-        **kwargs: Additional keyword arguments passed to yaml.dump.
+def _create_configured_yaml_instance() -> YAML:
+    """Create a YAML instance with user configuration applied.
 
     Returns:
-        YAML string if stream is None, otherwise None.
+        A configured YAML instance.
     """
     yaml_instance = YAML()
     yaml_instance.default_flow_style = False
     yaml_instance.width = yaml.width
 
-    # Copy representers from global yaml instance
-    yaml_instance.representer.yaml_representers = yaml.representer.yaml_representers
-    yaml_instance.representer.yaml_multi_representers = (
+    yaml_instance.representer.yaml_representers = deepcopy(
+        yaml.representer.yaml_representers
+    )
+    yaml_instance.representer.yaml_multi_representers = deepcopy(
         yaml.representer.yaml_multi_representers
     )
 
@@ -135,5 +132,28 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str
                     setattr(yaml_instance, key, value)
         except UserConfigReadError:
             pass
+
+    return yaml_instance
+
+
+def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str | None:
+    """Dump YAML with user-configured formatting.
+
+    Args:
+        data: The data to dump.
+        stream: The stream to dump to. If None, returns YAML as string.
+        **kwargs: Additional keyword arguments passed to yaml.dump.
+
+    Returns:
+        YAML string if stream is None, otherwise None.
+    """
+    yaml_instance = _create_configured_yaml_instance()
+
+    if stream is None:
+        from io import StringIO
+
+        stream = StringIO()
+        yaml_instance.dump(data, stream, **kwargs)
+        return stream.getvalue()
 
     return yaml_instance.dump(data, stream, **kwargs)

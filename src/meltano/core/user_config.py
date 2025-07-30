@@ -96,11 +96,40 @@ class UserConfigService:
         if not self.config.has_section("yaml"):
             return {}
 
+        known_settings = {
+            "indent",
+            "width",
+            "block_seq_indent",
+            "sequence_dash_offset",
+            "preserve_quotes",
+            "map_indent",
+            "sequence_indent",
+            "offset",
+            "explicit_start",
+            "explicit_end",
+            "version",
+            "tags",
+            "canonical",
+            "default_flow_style",
+            "default_style",
+            "allow_unicode",
+            "line_break",
+            "encoding",
+        }
+
         settings: dict[str, bool | int | str | None] = {}
         for key, value in self.config.items("yaml"):
+            if key not in known_settings:
+                logger.warning(
+                    "Unrecognized YAML setting, ignoring",
+                    config_path=str(self.config_path),
+                    setting=key,
+                    value=value,
+                )
+                continue
+
             parsed_value = self._parse_value(value)
 
-            # Add basic validation for common settings
             if key == "indent" and isinstance(parsed_value, int) and parsed_value < 1:
                 logger.warning(
                     "YAML indent must be >= 1, using default",
@@ -181,3 +210,13 @@ def get_user_config_service(config_path: Path | None = None) -> UserConfigServic
             ):
                 _user_config_service = UserConfigService(config_path)
     return _user_config_service
+
+
+def _reset_user_config_service() -> None:
+    """Reset the global user configuration service instance.
+
+    This function is intended for testing purposes only.
+    """
+    global _user_config_service
+    with _user_config_service_lock:
+        _user_config_service = None

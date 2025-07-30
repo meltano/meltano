@@ -11,12 +11,16 @@ import pytest
 from meltano.core.user_config import (
     UserConfigReadError,
     UserConfigService,
+    _reset_user_config_service,
     get_user_config_service,
 )
 
 
 class TestUserConfigService:
     """Test UserConfigService class."""
+
+    def teardown_method(self):
+        _reset_user_config_service()
 
     @contextmanager
     def _config_file(self, content: str | None = None):

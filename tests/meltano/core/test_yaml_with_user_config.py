@@ -13,18 +13,24 @@ from unittest import mock
 from ruamel.yaml import CommentedMap
 
 from meltano.core import yaml
-from meltano.core.user_config import UserConfigService
+from meltano.core.user_config import UserConfigService, _reset_user_config_service
 
 
 class TestYAMLWithUserConfig:
     """Test YAML formatting with user configuration."""
 
+    def teardown_method(self):
+        _reset_user_config_service()
+
     @contextmanager
     def _mock_user_config_service(self, config_path: Path):
         """Mock the user config service with the given config path."""
-        with mock.patch(
-            "meltano.core.yaml.get_user_config_service",
-        ) as mock_get_config:
+        with (
+            mock.patch.dict(os.environ, {"MELTANO_DISABLE_USER_YAML_CONFIG": "false"}),
+            mock.patch(
+                "meltano.core.yaml.get_user_config_service",
+            ) as mock_get_config,
+        ):
             mock_get_config.return_value = UserConfigService(config_path)
             yield
 
