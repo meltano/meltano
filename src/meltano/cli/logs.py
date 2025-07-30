@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import typing as t
-from pathlib import Path
 
 import click
 import structlog
@@ -23,6 +22,8 @@ from meltano.core.logging.job_logging_service import (
 from meltano.core.tracking.contexts import CliEvent
 
 if t.TYPE_CHECKING:
+    from pathlib import Path
+
     from meltano.core.project import Project
 
 logger = structlog.getLogger(__name__)
@@ -67,7 +68,7 @@ def _tail_file(file_path: Path, lines: int) -> list[str]:
 
             file_length -= block_size
 
-        # Return the last N lines, ensuring we get exactly N lines (or fewer if file is shorter)
+        # Return the last N lines, ensuring we get exactly N lines (or fewer if file is shorter)  # noqa: E501
         result_lines = lines_found[-lines:] if lines_found else []
         return [line.decode("utf-8", errors="replace") for line in result_lines]
 
@@ -181,34 +182,34 @@ def list_logs(
                 return
 
             if output_format == "json":
-                runs = []
-                for job in jobs:
-                    runs.append(
-                        {
-                            "log_id": str(job.run_id),
-                            "job_name": job.job_name,
-                            "state": job.state.name,
-                            "started_at": job.started_at.isoformat()
-                            if job.started_at
-                            else None,
-                            "ended_at": job.ended_at.isoformat()
-                            if job.ended_at
-                            else None,
-                            "duration_seconds": (
-                                (job.ended_at - job.started_at).total_seconds()
-                                if job.ended_at and job.started_at
-                                else None
-                            ),
-                            "trigger": job.trigger,
-                        }
-                    )
+                runs = [
+                    {
+                        "log_id": str(job.run_id),
+                        "job_name": job.job_name,
+                        "state": job.state.name,
+                        "started_at": job.started_at.isoformat()
+                        if job.started_at
+                        else None,
+                        "ended_at": job.ended_at.isoformat() if job.ended_at else None,
+                        "duration_seconds": (
+                            (job.ended_at - job.started_at).total_seconds()
+                            if job.ended_at and job.started_at
+                            else None
+                        ),
+                        "trigger": job.trigger,
+                    }
+                    for job in jobs
+                ]
                 click.echo(json.dumps({"runs": runs, "total": len(runs)}, indent=2))
             else:
                 # Text table format
                 click.echo(f"Recent job runs (showing {len(jobs)} of last {limit}):\n")
 
                 # Header
-                header = f"{'STATUS':<8} {'LOG ID':<36} {'JOB NAME':<30} {'STARTED':<20} {'DURATION':<10}"
+                header = (
+                    f"{'STATUS':<8} {'LOG ID':<36} {'JOB NAME':<30} "
+                    f"{'STARTED':<20} {'DURATION':<10} {'TRIGGER':<10}"
+                )
                 click.echo(header)
                 click.echo("-" * len(header))
 
@@ -254,14 +255,16 @@ def list_logs(
                     )
 
                     click.echo(
-                        f"{status:<8} {job.run_id!s:<36} {job_display:<30} {started:<20} {duration:<10}"
+                        f"{status:<8} {job.run_id!s:<36} {job_display:<30} "
+                        f"{started:<20} {duration:<10} {job.trigger:<10}"
                     )
 
                 click.echo("\nUse 'meltano logs show <LOG_ID>' to view a specific log.")
 
     except Exception as e:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError(f"Error listing logs: {e}") from e
+        msg = f"Error listing logs: {e}"
+        raise CliError(msg) from e
 
     tracker.track_command_event(CliEvent.completed)
 
@@ -314,7 +317,8 @@ def show_log(
             job = session.query(Job).filter(Job.run_id == log_id).first()
 
             if not job:
-                raise CliError(f"No job found with log ID '{log_id}'")
+                msg = f"No job found with log ID '{log_id}'"
+                raise CliError(msg)
 
             # Display job metadata
             click.echo(_format_job_info(job, output_format))
@@ -327,9 +331,11 @@ def show_log(
             )
 
             if not log_file_path.exists():
-                raise CliError(
-                    f"Log file not found for job run '{log_id}'. The log may have been cleaned up or the job may not have generated logs."
+                msg = (
+                    f"Log file not found for job run '{log_id}'. The log may have "
+                    "been cleaned up or the job may not have generated logs."
                 )
+                raise CliError(msg)
 
             # Handle tail mode
             if tail:
@@ -342,14 +348,16 @@ def show_log(
                 return
 
             # Show full log
-            if log_file_path.stat().st_size > 2097152:  # 2MB
-                if not click.confirm(
-                    f"Log file is large ({log_file_path.stat().st_size / 1024 / 1024:.1f}MB). "
+            if (
+                log_file_path.stat().st_size > 2097152  # 2MB
+                and not click.confirm(
+                    f"Log file is large ({log_file_path.stat().st_size / 1024 / 1024:.1f}MB). "  # noqa: E501
                     "Do you want to display it anyway?"
-                ):
-                    click.echo(f"Log file path: {log_file_path}")
-                    tracker.track_command_event(CliEvent.completed)
-                    return
+                )
+            ):
+                click.echo(f"Log file path: {log_file_path}")
+                tracker.track_command_event(CliEvent.completed)
+                return
 
             click.echo("Log content:")
             click.echo("-" * 40)
@@ -362,6 +370,7 @@ def show_log(
         raise
     except Exception as e:
         tracker.track_command_event(CliEvent.failed)
-        raise CliError(f"Error reading log: {e}") from e
+        msg = f"Error reading log: {e}"
+        raise CliError(msg) from e
 
     tracker.track_command_event(CliEvent.completed)

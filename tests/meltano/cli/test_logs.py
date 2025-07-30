@@ -6,15 +6,20 @@ import json
 import typing as t
 import uuid
 from datetime import datetime, timezone
+from unittest import mock
 
 import pytest
 
 from meltano.cli import cli
-from meltano.core.db import project_engine
+from meltano.cli.utils import CliError
 from meltano.core.job import Job, State
 from meltano.core.logging.job_logging_service import JobLoggingService
 
 if t.TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from sqlalchemy.orm import Session
+
     from fixtures.cli import MeltanoCliRunner
     from meltano.core.project import Project
 
@@ -24,6 +29,7 @@ def create_test_job(project: Project):
     """Create a test job with logs."""
 
     def _create(
+        session: Session,
         job_name: str = "tap-gitlab target-postgres",
         state: State = State.SUCCESS,
         run_id: str | None = None,
@@ -43,9 +49,7 @@ def create_test_job(project: Project):
         if state in (State.SUCCESS, State.FAIL):
             job.ended_at = datetime.now(timezone.utc)
 
-        _, make_session = project_engine(project)
-        with make_session() as session:
-            job.save(session)
+        job.save(session)
 
         # Create log file
         job_logging_service = JobLoggingService(project)
@@ -63,14 +67,21 @@ class TestLogsShow:
 
     def test_show_latest_log(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test showing the latest log for a job."""
-        job = create_test_job(log_content="Latest log content\nWith multiple lines")
+        job = create_test_job(
+            session,
+            log_content="Latest log content\nWith multiple lines",
+        )
 
-        result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)])
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)])
 
         assert result.exit_code == 0
         assert "Latest log content" in result.output
@@ -81,20 +92,24 @@ class TestLogsShow:
 
     def test_show_specific_run(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test showing log for a specific run ID."""
         # Create multiple runs
-        job1 = create_test_job(log_content="First run log")
-        create_test_job(log_content="Second run log")
+        job1 = create_test_job(session, log_content="First run log")
+        create_test_job(session, log_content="Second run log")
 
         # Show specific run
-        result = cli_runner.invoke(
-            cli,
-            ["logs", "show", str(job1.run_id)],
-        )
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["logs", "show", str(job1.run_id)],
+            )
 
         assert result.exit_code == 0
         assert "First run log" in result.output
@@ -102,17 +117,21 @@ class TestLogsShow:
 
     def test_list_runs(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test listing available runs for a job."""
         # Create multiple runs with different states
-        job1 = create_test_job(state=State.SUCCESS)
-        job2 = create_test_job(state=State.FAIL)
-        job3 = create_test_job(state=State.RUNNING)
+        job1 = create_test_job(session, state=State.SUCCESS)
+        job2 = create_test_job(session, state=State.FAIL)
+        job3 = create_test_job(session, state=State.RUNNING)
 
-        result = cli_runner.invoke(cli, ["logs", "list"])
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(cli, ["logs", "list"])
 
         assert result.exit_code == 0
         assert "Recent job runs" in result.output
@@ -125,17 +144,21 @@ class TestLogsShow:
 
     def test_list_runs_json_format(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test listing runs in JSON format."""
-        job = create_test_job()
+        job = create_test_job(session)
 
-        result = cli_runner.invoke(
-            cli,
-            ["logs", "list", "--format", "json"],
-        )
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["logs", "list", "--format", "json"],
+            )
 
         assert result.exit_code == 0
         data = json.loads(result.output)
@@ -146,17 +169,21 @@ class TestLogsShow:
 
     def test_tail_option(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test showing last N lines with --tail."""
         log_content = "\n".join([f"Line {i}" for i in range(1, 101)])
-        job = create_test_job(log_content=log_content)
+        job = create_test_job(session, log_content=log_content)
 
-        result = cli_runner.invoke(
-            cli, ["logs", "show", str(job.run_id), "--tail", "5"]
-        )
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli, ["logs", "show", str(job.run_id), "--tail", "5"]
+            )
 
         assert result.exit_code == 0
         assert "Line 96" in result.output
@@ -168,19 +195,30 @@ class TestLogsShow:
 
     def test_no_logs_found(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
     ):
         """Test error when no logs are found."""
-        fake_uuid = str(uuid.uuid4())
-        result = cli_runner.invoke(cli, ["logs", "show", fake_uuid])
+        job = Job(
+            job_name="tap-gitlab target-postgres",
+            state=State.SUCCESS,
+            started_at=datetime.now(timezone.utc),
+        )
+        job.save(session)
+
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)])
 
         assert result.exit_code == 1
-        assert f"No job found with log ID '{fake_uuid}'" in result.output
+        exc = result.exception
+        assert isinstance(exc, CliError)
+        assert f"Log file not found for job run '{job.run_id}'" in exc.args[0]
 
     def test_no_runs_found(
         self,
-        project: Project,
         cli_runner: MeltanoCliRunner,
     ):
         """Test when no runs are found for list."""
@@ -191,36 +229,38 @@ class TestLogsShow:
         assert result.exit_code == 0
         assert "No job runs found." in result.output
 
-    def test_missing_run_id(
-        self,
-        project: Project,
-        cli_runner: MeltanoCliRunner,
-        create_test_job,
-    ):
+    def test_missing_run_id(self, cli_runner: MeltanoCliRunner):
         """Test error when specific run ID is not found."""
         fake_run_id = str(uuid.uuid4())
 
-        result = cli_runner.invoke(
-            cli,
-            ["logs", "show", fake_run_id],
-        )
+        result = cli_runner.invoke(cli, ["logs", "show", fake_run_id])
 
         assert result.exit_code == 1
-        assert f"No job found with log ID '{fake_run_id}'" in result.output
+        exc = result.exception
+        assert isinstance(exc, CliError)
+        assert f"No job found with log ID '{fake_run_id}'" in exc.args[0]
 
     def test_large_log_confirmation(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test confirmation prompt for large log files."""
         # Create a log larger than 2MB
         large_content = "x" * (2 * 1024 * 1024 + 1)
-        job = create_test_job(log_content=large_content)
+        job = create_test_job(session, log_content=large_content)
 
         # Test declining confirmation
-        result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)], input="n\n")
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["logs", "show", str(job.run_id)],
+                input="n\n",
+            )
 
         assert result.exit_code == 0
         assert "Log file is large" in result.output
@@ -228,7 +268,15 @@ class TestLogsShow:
         assert "Log file path:" in result.output
 
         # Test accepting confirmation
-        result = cli_runner.invoke(cli, ["logs", "show", str(job.run_id)], input="y\n")
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["logs", "show", str(job.run_id)],
+                input="y\n",
+            )
 
         assert result.exit_code == 0
         assert "Log file is large" in result.output
@@ -236,17 +284,21 @@ class TestLogsShow:
 
     def test_json_format_with_log_display(
         self,
-        project: Project,
+        session: Session,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test JSON format for job info when showing logs."""
-        job = create_test_job()
+        job = create_test_job(session)
 
-        result = cli_runner.invoke(
-            cli,
-            ["logs", "show", str(job.run_id), "--format", "json"],
-        )
+        with mock.patch(
+            "meltano.cli.logs.project_engine",
+            return_value=(None, lambda: session),
+        ):
+            result = cli_runner.invoke(
+                cli,
+                ["logs", "show", str(job.run_id), "--format", "json"],
+            )
 
         assert result.exit_code == 0
         # Job info should be in JSON format
@@ -267,9 +319,8 @@ class TestLogsShow:
 
     def test_legacy_log_location(
         self,
-        project: Project,
         cli_runner: MeltanoCliRunner,
-        create_test_job,
+        create_test_job: Callable[[...], Job],
     ):
         """Test reading logs from legacy location."""
         # This would require mocking the legacy_logs_dir method
