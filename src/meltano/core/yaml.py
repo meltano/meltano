@@ -80,23 +80,8 @@ def load(path: os.PathLike[str]) -> CommentedMap:
     return parsed
 
 
-def _create_configured_yaml_instance() -> YAML:
-    """Create a YAML instance with user configuration applied.
-
-    Returns:
-        A configured YAML instance.
-    """
-    yaml_instance = YAML()
-    yaml_instance.default_flow_style = False
-    yaml_instance.width = yaml.width
-
-    yaml_instance.representer.yaml_representers = deepcopy(
-        yaml.representer.yaml_representers
-    )
-    yaml_instance.representer.yaml_multi_representers = deepcopy(
-        yaml.representer.yaml_multi_representers
-    )
-
+def _apply_user_configuration(yaml_instance: YAML) -> None:
+    """Apply user configuration to YAML instance if enabled."""
     if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
         try:
             user_config_service = get_user_config_service()
@@ -133,6 +118,26 @@ def _create_configured_yaml_instance() -> YAML:
         except UserConfigReadError:
             pass
 
+
+def _create_configured_yaml_instance() -> YAML:
+    """Create a YAML instance with user configuration applied.
+
+    Returns:
+        A configured YAML instance.
+    """
+    yaml_instance = YAML()
+    yaml_instance.default_flow_style = False
+    yaml_instance.width = yaml.width
+
+    yaml_instance.representer.yaml_representers = deepcopy(
+        yaml.representer.yaml_representers
+    )
+    yaml_instance.representer.yaml_multi_representers = deepcopy(
+        yaml.representer.yaml_multi_representers
+    )
+
+    _apply_user_configuration(yaml_instance)
+
     return yaml_instance
 
 
@@ -156,4 +161,5 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str
         yaml_instance.dump(data, stream, **kwargs)
         return stream.getvalue()
 
-    return yaml_instance.dump(data, stream, **kwargs)
+    yaml_instance.dump(data, stream, **kwargs)
+    return None
