@@ -79,36 +79,46 @@ def load(path: os.PathLike[str]) -> CommentedMap:
     return parsed
 
 
-def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> None:
+def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> str | None:
     """Dump YAML with user-configured formatting.
 
     Args:
         data: The data to dump.
-        stream: The stream to dump to.
+        stream: The stream to dump to. If None, returns YAML as string.
         **kwargs: Additional keyword arguments passed to yaml.dump.
 
     Returns:
-        The result of yaml.dump.
+        YAML string if stream is None, otherwise None.
     """
     yaml_instance = YAML()
     yaml_instance.default_flow_style = False
+    yaml_instance.width = yaml.width
+
+    # Copy representers from global yaml instance
+    yaml_instance.representer.yaml_representers = (
+        yaml.representer.yaml_representers
+    )
+    yaml_instance.representer.yaml_multi_representers = (
+        yaml.representer.yaml_multi_representers
+    )
 
     if not truthy(os.getenv("MELTANO_DISABLE_USER_YAML_CONFIG", "false")):
         try:
             user_config_service = get_user_config_service()
             settings = user_config_service.yaml_settings()
 
-            indent_raw = settings.get("indent", 2)
-            block_seq_indent_raw = settings.get("block_seq_indent", 0)
-            sequence_dash_offset_raw = settings.get("sequence_dash_offset")
+            indent = settings.get("indent", 2)
+            indent = indent if isinstance(indent, int) else 2
 
-            indent = indent_raw if isinstance(indent_raw, int) else 2
+            block_seq_indent = settings.get("block_seq_indent", 0)
             block_seq_indent = (
-                block_seq_indent_raw if isinstance(block_seq_indent_raw, int) else 0
+                block_seq_indent if isinstance(block_seq_indent, int) else 0
             )
+
+            sequence_dash_offset = settings.get("sequence_dash_offset")
             sequence_dash_offset = (
-                sequence_dash_offset_raw
-                if isinstance(sequence_dash_offset_raw, int)
+                sequence_dash_offset
+                if isinstance(sequence_dash_offset, int)
                 else max(0, indent - 2)
             )
 
@@ -118,9 +128,11 @@ def dump(data: object, stream: t.IO[str] | None = None, **kwargs: object) -> Non
                 offset=sequence_dash_offset,
             )
 
-            skip_keys = ("indent", "block_seq_indent", "sequence_dash_offset")
             for key, value in settings.items():
-                if key not in skip_keys and hasattr(yaml_instance, key):
+                if (
+                    key not in {"indent", "block_seq_indent", "sequence_dash_offset"}
+                    and hasattr(yaml_instance, key)
+                ):
                     setattr(yaml_instance, key, value)
         except UserConfigReadError:
             pass

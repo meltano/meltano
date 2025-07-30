@@ -57,7 +57,10 @@ class UserConfigService:
             self._config = ConfigParser()
             if self.config_path.exists():
                 try:
-                    self._config.read(self.config_path)
+                    with self.config_path.open() as config_file:
+                        self._config.read_file(
+                            config_file, source=str(self.config_path)
+                        )
                 except Exception as err:
                     logger.error(
                         "Failed to read user config",
@@ -144,7 +147,8 @@ class UserConfigService:
             return None
 
         try:
-            return strtobool(value)
+            bool_val = strtobool(value)
+            return bool(bool_val)
         except ValueError:
             pass
 

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import os
 import tempfile
+import uuid
 from contextlib import contextmanager
+from decimal import Decimal
 from pathlib import Path
 from unittest import mock
 
@@ -173,3 +175,42 @@ class TestYAMLWithUserConfig:
                 assert result2 == "---\ntest: second\n"
 
             config_path.unlink()
+
+    def test_yaml_decimal_and_uuid_types(self):
+        """Test that Decimal and UUID types are properly represented in YAML."""
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
+            tmp.write("[yaml]\nindent = 2\n")
+            tmp.flush()
+            config_path = Path(tmp.name)
+
+            with self._mock_user_config_service(config_path):
+                data = CommentedMap()
+                data["decimal_value"] = Decimal("123.45")
+                data["uuid_value"] = uuid.UUID("12345678-1234-5678-9012-123456789abc")
+
+                from io import StringIO
+                output = StringIO()
+                yaml.dump(data, output)
+                result = output.getvalue()
+
+                assert "decimal_value: 123.45" in result
+                assert "uuid_value: 12345678-1234-5678-9012-123456789abc" in result
+
+            config_path.unlink()
+
+    def test_yaml_load_with_caching(self):
+        """Test the yaml.load function with file caching."""
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".yml") as tmp:
+            tmp.write("test_key: test_value\nnested:\n  item: value\n")
+            tmp.flush()
+            yaml_path = Path(tmp.name)
+
+            result = yaml.load(yaml_path)
+            assert result["test_key"] == "test_value"
+            assert result["nested"]["item"] == "value"
+
+            # Test cache hit
+            result2 = yaml.load(yaml_path)
+            assert result2["test_key"] == "test_value"
+
+            yaml_path.unlink()

@@ -6,7 +6,13 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
-from meltano.core.user_config import UserConfigService, get_user_config_service
+import pytest
+
+from meltano.core.user_config import (
+    UserConfigReadError,
+    UserConfigService,
+    get_user_config_service,
+)
 
 
 class TestUserConfigService:
@@ -85,3 +91,70 @@ map_indent = none
     def test_yaml_settings_empty(self):
         with self._config_file("[other]\nkey = value\n") as config_path:
             assert UserConfigService(config_path).yaml_settings() == {}
+
+    def test_config_read_error(self):
+        """Test UserConfigReadError is raised for invalid config files."""
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
+            tmp.write("invalid ini content\nwithout proper format")
+            tmp.flush()
+            config_path = Path(tmp.name)
+
+            service = UserConfigService(config_path)
+            try:
+                with pytest.raises(UserConfigReadError) as exc_info:
+                    _ = service.config
+                assert exc_info.value.config_path == config_path
+                assert exc_info.value.original_error is not None
+            finally:
+                config_path.unlink()
+
+    def test_yaml_settings_validation(self):
+        """Test validation of YAML settings."""
+        config = """[yaml]
+indent = -1
+width = 0
+block_seq_indent = -5
+"""
+        with self._config_file(config) as config_path:
+            service = UserConfigService(config_path)
+            settings = service.yaml_settings()
+
+            # Should use defaults for invalid values
+            assert settings["indent"] == 2
+            assert settings["width"] == 80
+            assert settings["block_seq_indent"] == 0
+
+    def test_threading_safety(self):
+        """Test thread-safe singleton access."""
+        import threading
+        import time
+
+        results = []
+
+        def create_service():
+            # Add small delay to increase chance of race condition
+            time.sleep(0.01)
+            service = get_user_config_service()
+            results.append(service)
+
+        threads = [threading.Thread(target=create_service) for _ in range(10)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+        # All services should be the same instance
+        assert len({id(service) for service in results}) == 1
+
+    def test_get_user_config_service_with_different_path(self):
+        """Test that providing different config_path creates new instance."""
+        # Get default service
+        service1 = get_user_config_service()
+
+        # Get service with different path
+        with self._config_file("[yaml]\nindent = 4\n") as config_path:
+            service2 = get_user_config_service(config_path)
+
+            # Should be different instances
+            assert service1 is not service2
+            assert service2.config_path == config_path
