@@ -140,7 +140,7 @@ class UserConfigService:
         Returns:
             The parsed value as the appropriate type.
         """
-        if value.lower() in ("none", "null", ""):
+        if value.lower() in {"none", "null", ""}:
             return None
 
         try:

@@ -16,8 +16,7 @@ class TestUserConfigService:
     def _config_file(self, content: str | None = None):
         if content is None:
             with tempfile.TemporaryDirectory() as tmpdir:
-                config_path = Path(tmpdir) / "nonexistent.ini"
-                yield config_path
+                yield Path(tmpdir) / "nonexistent.ini"
         else:
             with tempfile.NamedTemporaryFile(
                 mode="w", delete=False, suffix=".ini"

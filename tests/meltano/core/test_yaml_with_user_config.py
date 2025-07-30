@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from unittest import mock
 
@@ -16,17 +17,22 @@ from meltano.core.user_config import UserConfigService
 class TestYAMLWithUserConfig:
     """Test YAML formatting with user configuration."""
 
+    @contextmanager
+    def _mock_user_config_service(self, config_path: Path):
+        """Mock the user config service with the given config path."""
+        with mock.patch(
+            "meltano.core.yaml.get_user_config_service",
+        ) as mock_get_config:
+            mock_get_config.return_value = UserConfigService(config_path)
+            yield
+
     def test_yaml_indent_from_user_config(self):
         with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".ini") as tmp:
             tmp.write("[yaml]\nindent = 4\n")
             tmp.flush()
             config_path = Path(tmp.name)
 
-            with mock.patch(
-                "meltano.core.yaml.get_user_config_service",
-            ) as mock_get_config:
-                mock_get_config.return_value = UserConfigService(config_path)
-
+            with self._mock_user_config_service(config_path):
                 data = CommentedMap()
                 data["project_id"] = "test"
                 data["environments"] = [
@@ -57,13 +63,7 @@ class TestYAMLWithUserConfig:
             config_path.unlink()
 
     def test_default_yaml_indent(self):
-        with mock.patch(
-            "meltano.core.yaml.get_user_config_service",
-        ) as mock_get_config:
-            mock_get_config.return_value = UserConfigService(
-                Path("/nonexistent/.meltanorc"),
-            )
-
+        with self._mock_user_config_service(Path("/nonexistent/.meltanorc")):
             data = CommentedMap()
             data["name"] = "test"
             data["items"] = ["a", "b", "c"]
@@ -130,12 +130,7 @@ class TestYAMLWithUserConfig:
 
             config_path.chmod(0o000)
 
-            with mock.patch(
-                "meltano.core.yaml.get_user_config_service",
-            ) as mock_get_config:
-                service = UserConfigService(config_path)
-                mock_get_config.return_value = service
-
+            with self._mock_user_config_service(config_path):
                 data = CommentedMap()
                 data["name"] = "test"
 
@@ -159,11 +154,7 @@ class TestYAMLWithUserConfig:
             tmp.flush()
             config_path = Path(tmp.name)
 
-            with mock.patch(
-                "meltano.core.yaml.get_user_config_service",
-            ) as mock_get_config:
-                mock_get_config.return_value = UserConfigService(config_path)
-
+            with self._mock_user_config_service(config_path):
                 data1 = CommentedMap()
                 data1["test"] = "first"
                 from io import StringIO
