@@ -113,7 +113,8 @@ map_indent = none
                 assert exc_info.value.config_path == config_path
                 assert exc_info.value.original_error is not None
             finally:
-                config_path.unlink()
+                with suppress(PermissionError):
+                    config_path.unlink()
 
     def test_yaml_settings_validation(self):
         """Test validation of YAML settings."""
