@@ -273,6 +273,7 @@ dependencies = [
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
+sdist = { url = "https://files.pythonhosted.org/packages/70/15/8c2f455fccd6253ae2a95d7d872fcce27adab8c719218027b7c31a48542b/boto3-1.39.17.tar.gz", hash = "sha256:a6904a40b1c61f6a1766574b3155ec75a6020399fb570be2b51bf93a2c0a2b3d", size = 111831, upload-time = "2025-07-30T19:27:05.162Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f0/45/8321081d478881779551692a185bbe19574a2ac87294f5096c549837292c/boto3-1.39.17-py3-none-any.whl", hash = "sha256:6af9f7d6db7b5e72d6869ae22ebad1b0c6602591af2ef5d914b331a055953df5", size = 139901, upload-time = "2025-07-30T19:27:04.001Z" },
 ]
@@ -1448,7 +1449,7 @@ requires-dist = [
     { name = "backports-strenum", marker = "python_full_version < '3.11'", specifier = ">=1.3.1,<2" },
     { name = "boto3", marker = "extra == 's3'", specifier = ">=1.35,<1.40" },
     { name = "check-jsonschema", specifier = "~=0.33.0" },
-    { name = "click", specifier = ">=8.1,<9" },
+    { name = "click", specifier = ">=8.1,!=8.2.2,<9" },
     { name = "click-default-group", specifier = ">=1.2.4,<2" },
     { name = "click-didyoumean", specifier = ">=0.3.1,<0.4" },
     { name = "dateparser", specifier = ">=1.2.1" },
@@ -3350,11 +3351,11 @@ wheels = [
 
 [[package]]
 name = "types-psutil"
-version = "7.0.0.20250601"
+version = "7.0.0.20250801"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c8/af/767b92be7de4105f5e2e87a53aac817164527c4a802119ad5b4e23028f7c/types_psutil-7.0.0.20250601.tar.gz", hash = "sha256:71fe9c4477a7e3d4f1233862f0877af87bff057ff398f04f4e5c0ca60aded197", size = 20297, upload-time = "2025-06-01T03:25:16.698Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e1/5d/32fe570f7e22bf638a49c881c5e2142beeda9dad6b21a15805af66571cd8/types_psutil-7.0.0.20250801.tar.gz", hash = "sha256:0230b56234252cc6f59c361dccbaaa08f3088ea3569367abe6900485d388c97d", size = 20238, upload-time = "2025-08-01T03:47:39.309Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8d/85/864c663a924a34e0d87bd10ead4134bb4ab6269fa02daaa5dd644ac478c5/types_psutil-7.0.0.20250601-py3-none-any.whl", hash = "sha256:0c372e2d1b6529938a080a6ba4a9358e3dfc8526d82fabf40c1ef9325e4ca52e", size = 23106, upload-time = "2025-06-01T03:25:15.386Z" },
+    { url = "https://files.pythonhosted.org/packages/45/84/d18c8d2b53ba2024d110494483b7bdcc9741b7285cd396307b2941353b4d/types_psutil-7.0.0.20250801-py3-none-any.whl", hash = "sha256:751842baf9e0efa31b3a7722a38a3f9afeb5a7132b146a1960cd472db362faa0", size = 23058, upload-time = "2025-08-01T03:47:38.151Z" },
 ]
 
 [[package]]
