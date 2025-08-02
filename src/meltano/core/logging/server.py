@@ -157,6 +157,30 @@ class LoggingServer(contextlib.AbstractContextManager):
         self.server_thread.join()
 
 
+def is_logging_server_available(
+    host: str = "localhost",
+    port: int = logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+    timeout: float = 0.1,
+) -> bool:
+    """Check if a logging server is available at the given host and port.
+
+    Args:
+        host: The host to check.
+        port: The port to check.
+        timeout: Connection timeout in seconds.
+
+    Returns:
+        True if server is available, False otherwise.
+    """
+    import socket
+
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
 def main() -> None:
     """Run the TCP server."""
     logging.basicConfig(format="%(asctime)s %(message)s")

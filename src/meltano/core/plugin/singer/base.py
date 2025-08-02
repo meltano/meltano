@@ -2,6 +2,7 @@ from __future__ import annotations  # noqa: D100
 
 import json
 import logging
+import logging.handlers
 import typing as t
 from textwrap import dedent
 
@@ -9,6 +10,7 @@ import anyio
 import structlog
 
 from meltano.core.behavior.hookable import hook
+from meltano.core.logging.server import is_logging_server_available
 from meltano.core.plugin import BasePlugin
 from meltano.core.utils import nest_object, uuid7
 
@@ -106,7 +108,32 @@ class SingerPlugin(BasePlugin):  # noqa: D101
         singer_sdk_logging = plugin_invoker.files["singer_sdk_logging"]
         pipelinewise_logging = plugin_invoker.files["pipelinewise_singer_logging"]
 
-        log_level = logging.getLevelName(logger.getEffectiveLevel())
+        # Get the effective log level from the root logger since structlog doesn't have
+        # getEffectiveLevel
+        log_level = logging.getLevelName(logging.getLogger().getEffectiveLevel())  # noqa: TID251
+
+        # Check if logging server is available for centralized logging
+        use_logging_server = is_logging_server_available()
+        handlers = ["console"]
+        handler_configs = {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "default",
+                "stream": "ext://sys.stderr",
+                "level": log_level,
+            },
+        }
+
+        # Add logging server handler if available
+        if use_logging_server:
+            handlers.append("meltano_server")
+            handler_configs["meltano_server"] = {
+                "class": "logging.handlers.SocketHandler",
+                "host": "localhost",
+                "port": logging.handlers.DEFAULT_TCP_LOGGING_PORT,
+                "formatter": "default",
+                "level": log_level,
+            }
 
         # https://sdk.meltano.com/en/v0.44.3/implementation/logging.html
         async with await anyio.open_file(singer_sdk_logging, mode="w") as f:
@@ -120,16 +147,9 @@ class SingerPlugin(BasePlugin):  # noqa: D101
                                 "format": "%(message)s",
                             },
                         },
-                        "handlers": {
-                            "console": {
-                                "class": "logging.StreamHandler",
-                                "formatter": "default",
-                                "stream": "ext://sys.stderr",
-                                "level": log_level,
-                            },
-                        },
+                        "handlers": handler_configs,
                         "root": {
-                            "handlers": ["console"],
+                            "handlers": handlers,
                         },
                     },
                     indent=2,
@@ -137,6 +157,25 @@ class SingerPlugin(BasePlugin):  # noqa: D101
             )
 
         # https://github.com/transferwise/pipelinewise-singer-python/blob/da64a10cdbcad48ab373d4dab3d9e6dd6f58556b/singer/logger.py#L9C9-L9C26
+        pipelinewise_handlers = "console"
+        pipelinewise_handler_configs = f"""
+                [handler_console]
+                class=StreamHandler
+                level={log_level}
+                formatter=default
+                args=(sys.stderr,)"""
+
+        # Add logging server handler for Pipelinewise if available
+        if use_logging_server:
+            pipelinewise_handlers = "console,meltano_server"
+            pipelinewise_handler_configs += f"""
+
+                [handler_meltano_server]
+                class=logging.handlers.SocketHandler
+                level={log_level}
+                formatter=default
+                args=('localhost', {logging.handlers.DEFAULT_TCP_LOGGING_PORT})"""
+
         async with await anyio.open_file(pipelinewise_logging, mode="w") as f:
             await f.write(
                 dedent(f"""\
@@ -144,19 +183,14 @@ class SingerPlugin(BasePlugin):  # noqa: D101
                 keys=root
 
                 [handlers]
-                keys=console
+                keys={pipelinewise_handlers}
 
                 [formatters]
                 keys=default
 
                 [logger_root]
-                handlers=console
-
-                [handler_console]
-                class=StreamHandler
-                level={log_level}
-                formatter=default
-                args=(sys.stderr,)
+                handlers={pipelinewise_handlers}
+{pipelinewise_handler_configs}
 
                 [formatter_default]
                 format=%(message)s
