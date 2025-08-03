@@ -114,8 +114,8 @@ class SingerPlugin(BasePlugin):  # noqa: D101
 
         # Check if logging server is available for centralized logging
         use_logging_server = is_logging_server_available()
-        handlers = ["console"]
-        handler_configs = {
+        handlers: list[str] = ["console"]
+        handler_configs: dict[str, dict[str, t.Any]] = {
             "console": {
                 "class": "logging.StreamHandler",
                 "formatter": "default",
