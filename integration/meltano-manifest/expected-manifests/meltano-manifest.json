@@ -24,6 +24,7 @@
   "default_environment": "userdev",
   "env": {
     "MELTANO_AUTO_INSTALL": "true",
+    "MELTANO_CLI_DISABLE_VERSION_CHECK": "false",
     "MELTANO_CLI_LOG_CONFIG": "logging.yaml",
     "MELTANO_CLI_LOG_FORMAT": "colored",
     "MELTANO_CLI_LOG_LEVEL": "info",
