@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+## v3.9.0 (2025-08-04)
+
+### ✨ New
+
+- [#9411](https://github.com/meltano/meltano/issues/9411) Implement UUIDv7 for time-ordered job run IDs
+- [#9404](https://github.com/meltano/meltano/issues/9404) Add 'disabled' log level to suppress all logging output
+- [#9400](https://github.com/meltano/meltano/issues/9400) Add log file support for uv venv backend installation errors -- _**Thanks @mahangu!**_
+- [#9391](https://github.com/meltano/meltano/issues/9391) `meltano add` now updates existing plugins by default
+- [#9374](https://github.com/meltano/meltano/issues/9374) Add decimal setting kind -- _**Thanks @mahangu!**_
+- [#9366](https://github.com/meltano/meltano/issues/9366) Use `NO_UTC=1` environment variable to emit logs with timestamps in your local timezone
+
+### 🐛 Fixes
+
+- [#9394](https://github.com/meltano/meltano/issues/9394) Recreate venv when plugin Python version is changed -- _**Thanks @mahangu!**_
+- [#9393](https://github.com/meltano/meltano/issues/9393) Increase YAML width to prevent wrapping long lines -- _**Thanks @mahangu!**_
+- [#9386](https://github.com/meltano/meltano/issues/9386) Support both .yaml and .yml extensions for logging config files -- _**Thanks @mahangu!**_
+- [#9368](https://github.com/meltano/meltano/issues/9368) Honor valid `properties` field name in `select` values
+
+### ⚙️ Under the Hood
+
+- [#9419](https://github.com/meltano/meltano/issues/9419) Represent UUID instances in YAML as strings
+- [#9388](https://github.com/meltano/meltano/issues/9388) Remove dependency on croniter
+- [#9378](https://github.com/meltano/meltano/issues/9378) Standardize how the positional plugin type parameter and the `--plugin-type` option are handled in `meltano add`, `meltano install` and `meltano remove`
+- [#9364](https://github.com/meltano/meltano/issues/9364) Replace `atomicwrites` with stdlib functions
+- [#9362](https://github.com/meltano/meltano/issues/9362) Replace deprecated `asyncio.iscoroutinefunction` with `inspect.iscoroutinefunction`
+
+### 📚 Documentation Improvements
+
+- [#9410](https://github.com/meltano/meltano/issues/9410) Document PostgreSQL database privileges and requirements
+- [#9409](https://github.com/meltano/meltano/issues/9409) Update `meltano elt` references to `meltano el`
+- [#9406](https://github.com/meltano/meltano/issues/9406) Document alternatives to meltano run --dump flag
+- [#9408](https://github.com/meltano/meltano/issues/9408) Document that moving start_date to the past has no effect with incremental state
+- [#9401](https://github.com/meltano/meltano/issues/9401) Fix typo in `meltano --version` example -- _**Thanks @ddobrinskiy!**_
+- [#9385](https://github.com/meltano/meltano/issues/9385) Use tabs to exemplify new and legacy syntax for `meltano add`
+- [#9381](https://github.com/meltano/meltano/issues/9381) Document that Snowflake is a supported state backend
+- [#9370](https://github.com/meltano/meltano/issues/9370) The "most straightforward" way to install Meltano now is uv
+
+### 📦 Packaging changes
+
+- [#9426](https://github.com/meltano/meltano/issues/9426) Allow boto 1.40.x
+- [#9425](https://github.com/meltano/meltano/issues/9425) Disallow click 8.2.2
+- [#9392](https://github.com/meltano/meltano/issues/9392) Test with uv 0.8.0
+
 ## v3.8.0 (2025-07-07)
 
 ### ✨ New
