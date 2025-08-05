@@ -23,7 +23,7 @@ from .formatters import get_default_foreign_pre_chain
 from .utils import capture_subprocess_output
 
 if t.TYPE_CHECKING:
-    if sys.version_info < (3, 10):
+    if sys.version_info >= (3, 10):
         from typing import TypeAlias  # noqa: ICN003
     else:
         from typing_extensions import TypeAlias
