@@ -12,10 +12,12 @@ import structlog
 
 from meltano.core.behavior.visitor import visit_with
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+    from typing import Self  # noqa: ICN003
+else:
+    from backports.strenum import StrEnum
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -23,7 +25,6 @@ if t.TYPE_CHECKING:
 logger = structlog.stdlib.get_logger(__name__)
 
 Node = dict[str, t.Any]
-T = t.TypeVar("T", bound="_CatalogRuleProtocol")
 
 
 UNESCAPED_DOT = re.compile(r"(?<!\\)\.")
@@ -44,11 +45,11 @@ class _CatalogRuleProtocol(t.Protocol):
 
     @classmethod
     def matching(
-        cls: type[T],
-        rules: list[T],
+        cls,
+        rules: list[Self],
         tap_stream_id: str,
         breadcrumb: list[str] | None = None,
-    ) -> list[T]:
+    ) -> list[Self]:
         """Filter rules that match a given breadcrumb."""
         return [rule for rule in rules if rule.match(tap_stream_id, breadcrumb)]
 

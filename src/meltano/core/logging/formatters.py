@@ -67,7 +67,7 @@ class LoggingFeatures(t.TypedDict, total=False):
 def _processors_from_kwargs(
     **features: Unpack[LoggingFeatures],
 ) -> t.Generator[Processor, None, None]:
-    if features.get("callsite_parameters", False):
+    if features.get("callsite_parameters"):
         yield structlog.processors.CallsiteParameterAdder(
             parameters=(
                 structlog.processors.CallsiteParameter.PATHNAME,

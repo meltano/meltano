@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import sys
 import typing as t
 
 from meltano.core.behavior import NameEq
@@ -12,6 +13,11 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.base import PluginRef
 from meltano.core.setting_definition import SettingDefinition
 from meltano.core.utils import NotFound
+
+if sys.version_info >= (3, 11):
+    from typing import Self  # noqa: ICN003
+else:
+    from typing_extensions import Self
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -190,7 +196,7 @@ class Environment(NameEq, Canonical):
         self.state_id_suffix = state_id_suffix
 
     @classmethod
-    def find(cls: type[TEnv], objects: Iterable[TEnv], name: str) -> TEnv:
+    def find(cls, objects: Iterable[Self], name: str) -> Self:
         """Lookup an environment by name from an iterable.
 
         Args:
