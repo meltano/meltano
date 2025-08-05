@@ -13,9 +13,12 @@ from meltano.cli.params import InstallPlugins, get_install_options, pass_project
 from meltano.cli.utils import (
     CliError,
     PartialInstrumentedCmd,
+    PluginTypeArg,
     add_plugin,
     add_required_plugins,
     check_dependencies_met,
+    infer_plugin_type,
+    validate_plugin_type_args,
 )
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin_install_service import PluginInstallReason
@@ -59,8 +62,8 @@ def _load_yaml_from_ref(
     cls=PartialInstrumentedCmd,
     short_help="Add a plugin to your project.",
 )
-@click.argument("plugin_type", type=click.Choice(PluginType.cli_arguments()))
-@click.argument("plugin_name", nargs=-1, required=True)
+@click.argument("plugin", nargs=-1, required=True)
+@click.option("--plugin-type", type=PluginTypeArg())
 @click.option(
     "--inherit-from",
     help=(
@@ -104,9 +107,11 @@ def _load_yaml_from_ref(
     ),
 )
 @click.option(
-    "--update",
+    "--update/--no-update",
     is_flag=True,
+    default=True,
     help="Update an existing plugin.",
+    hidden=True,
 )
 @install
 @no_install
@@ -121,14 +126,14 @@ def _load_yaml_from_ref(
 async def add(
     ctx: click.Context,
     project: Project,
-    plugin_type: str,
-    plugin_name: tuple[str, ...],
+    plugin: tuple[str, ...],
     install_plugins: InstallPlugins,
-    inherit_from: str | None = None,
-    variant: str | None = None,
-    as_name: str | None = None,
-    plugin_yaml: dict | None = None,
-    python: str | None = None,
+    plugin_type: PluginType | None,
+    inherit_from: str | None,
+    variant: str | None,
+    as_name: str | None,
+    plugin_yaml: dict | None,
+    python: str | None,
     **flags: bool,
 ) -> None:
     """Add a plugin to your project.
@@ -138,8 +143,7 @@ async def add(
     """  # noqa: D301
     tracker: Tracker = ctx.obj["tracker"]
 
-    plugin_type = PluginType.from_cli_argument(plugin_type)
-    plugin_names = plugin_name  # nargs=-1
+    plugin_names, plugin_type = validate_plugin_type_args(plugin, plugin_type, ctx)
 
     if as_name:
         # `add <type> <inherit-from> --as <name>``
@@ -155,8 +159,12 @@ async def add(
         tracker.track_command_event(CliEvent.aborted)
         raise CliError(f"--custom is not supported for {plugin_type}")  # noqa: EM102
 
-    plugin_refs = [
-        PluginRef(plugin_type=plugin_type, name=name) for name in plugin_names
+    plugin_refs: list[PluginRef] = [
+        PluginRef(
+            plugin_type=infer_plugin_type(name) if plugin_type is None else plugin_type,
+            name=name,
+        )
+        for name in plugin_names
     ]
     dependencies_met, err = check_dependencies_met(
         plugin_refs=plugin_refs,
@@ -169,12 +177,12 @@ async def add(
     add_service = ProjectAddService(project)
 
     plugins: list[ProjectPlugin] = []
-    for plugin in plugin_names:
+    for ref in plugin_refs:
         try:
             plugins.append(
                 add_plugin(
-                    plugin_type,
-                    plugin,
+                    ref.type,
+                    ref.name,
                     python=python,
                     inherit_from=inherit_from,
                     variant=variant,

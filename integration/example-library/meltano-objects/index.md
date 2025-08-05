@@ -9,8 +9,7 @@ To begin, download or copy the [meltano.yml](/integration/example-library/meltan
 ## Add a few plugins
 
 ```shell
-meltano add extractor tap-gitlab
-meltano add loader target-jsonl
+meltano add tap-gitlab target-jsonl
 ```
 
 ## Add some environments
@@ -35,5 +34,5 @@ meltano schedule add run_gitlab --job gitlab_to_jsonl --interval "@daily"
 ## Remove a plugin
 
 ```shell
-meltano remove extractor tap-gitlab
+meltano remove tap-gitlab
 ```

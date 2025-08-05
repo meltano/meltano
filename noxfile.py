@@ -55,7 +55,6 @@ def _run_pytest(session: nox.Session) -> None:
     try:
         session.env.update(
             {
-                "COVERAGE_CORE": "sysmon",
                 "COVERAGE_RCFILE": str(root_path / "pyproject.toml"),
                 "COVERAGE_FILE": str(
                     root_path / f".coverage.{random_seed:010}.{session.name}",
@@ -65,11 +64,13 @@ def _run_pytest(session: nox.Session) -> None:
         )
 
         session.run(
+            "coverage",
+            "run",
+            "-m",
             "pytest",
-            "--cov=meltano",
-            "--cov=tests",
             "--durations=10",
             "--order-scope=module",
+            "--timeout=300",
             "-n=auto",
             "--dist=loadfile",
             f"--randomly-seed={random_seed}",

@@ -28,17 +28,22 @@ runs:
   using: 'composite'
   steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        persist-credentials: false
     - name: Set up QEMU
       uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@18ce135bb5112fa8ce4ed6c17ab05699d7f3a5e0 # v3.11.0
+      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
     - name: Prepare the tags
       id: prepare-tags
       shell: bash
       run: |
-        echo "tags=$(echo "${{ inputs.tags }}" | sed "s/^/${{ inputs.registry }}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
+        echo "tags=$(echo "${INPUTS_TAGS}" | sed "s/^/${INPUTS_REGISTRY}\/meltano\/meltano:/" | tr '\n' ',')" >> $GITHUB_OUTPUT
+      env:
+        INPUTS_TAGS: ${{ inputs.tags }}
+        INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Download artifacts
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -79,11 +84,13 @@ runs:
       shell: bash
       run: |
         docker images
-        echo "id=$(docker images -q --no-trunc ${{ inputs.registry }}/meltano/meltano | head -n 1)" >> $GITHUB_OUTPUT
+        echo "id=$(docker images -q --no-trunc ${INPUTS_REGISTRY}/meltano/meltano | head -n 1)" >> $GITHUB_OUTPUT
+      env:
+        INPUTS_REGISTRY: ${{ inputs.registry }}
 
     - name: Scan the image with 'anchore/scan-action'
       id: anchore-scan
-      uses: anchore/scan-action@be7a22da4f22dde446c4c4c099887ff5b256526c # v6.3.0
+      uses: anchore/scan-action@16910ac423301c6d30554b83a7f71ac6ff4a51f3 # v6.4.0
       with:
         image: ${{ steps.get-image-id.outputs.id }}
         # The job will be failed in a later step if necessary so as to provide a link to the results
@@ -91,7 +98,7 @@ runs:
         severity-cutoff: "critical"
 
     - name: Upload Anchore scan SARIF report
-      uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
+      uses: github/codeql-action/upload-sarif@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
       with:
         sarif_file: ${{ steps.anchore-scan.outputs.sarif }}
         category: python-${{ inputs.python-version }}
@@ -101,12 +108,14 @@ runs:
       continue-on-error: true
       run: |
         echo "View scan results at:"
-        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${{ github.ref }}+tool:Grype"
+        echo "https://github.com/meltano/meltano/security/code-scanning?query=ref:${GITHUB_REF}+tool:Grype"
         sleep 10 # Give GitHub some time to process the uploaded report
-        NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${{ inputs.token }}" \
-            "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${{ github.ref }}" \
+        NUM_ISSUES="$(curl --no-progress-meter -H "Authorization: token ${INPUTS_TOKEN}" \
+            "https://api.github.com/repos/meltano/meltano/code-scanning/alerts?tool_name=Grype&state=open&ref=${GITHUB_REF}" \
             | jq length)"
         [ "$NUM_ISSUES" = '0' ] # Error if there are any alerts that are neither fixed nor dismissed
+      env:
+        INPUTS_TOKEN: ${{ inputs.token }}
 
     - name: Login to the registry
       uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0

@@ -6,6 +6,7 @@ import logging
 import os
 import sys
 import typing as t
+import warnings
 
 import structlog
 
@@ -76,7 +77,7 @@ setup_logging()
 logger = structlog.stdlib.get_logger(__name__)
 
 troubleshooting_message = """\
-Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to
+Need help fixing this problem? Visit http://melta.no/ for troubleshooting steps, or to \
 join our friendly Slack community.
 """
 
@@ -121,6 +122,7 @@ def main() -> None:
     """Entry point for the meltano CLI."""
     # Mark the current process as executed via the CLI
     logging.captureWarnings(capture=True)
+    warnings.filterwarnings("once", category=DeprecationWarning)
     os.environ["MELTANO_JOB_TRIGGER"] = os.getenv("MELTANO_JOB_TRIGGER", "cli")
     try:
         _run_cli()

@@ -1,6 +1,6 @@
 [project]
 name = "meltano"
-version = "3.7.8"
+version = "3.9.0"
 description = "Meltano is your CLI for ELT+: Open Source, Flexible, and Scalable. Move, transform, and test your data with confidence using a streamlined data engineering workflow you’ll love."
 authors = [{ name = "Meltano", email = "hello@meltano.com" }]
 requires-python = ">=3.9,<3.15"
@@ -32,37 +32,33 @@ dependencies = [
   "aiodocker>=0.24.0,<0.25",
   "alembic>=1.14.0,<2",
   "anyio>=4.4.0,<5",
-  "atomicwrites>=1.2.1,<2",
   "backports-strenum>=1.3.1,<2 ; python_version < '3.11'",
   "check-jsonschema~=0.33.0",
-  "click~=8.1",
+  "click>=8.1,<9,!=8.2.2",
   "click-default-group>=1.2.4,<2",
   "click-didyoumean>=0.3.1,<0.4",
-  "croniter>=6.0.0,<7",
   "dateparser>=1.2.1",
   "fasteners>=0.19,<0.20",
   "flatten-dict>=0,<1",
   "importlib-metadata>=5 ; python_version < '3.12'",
   "jinja2>=3.1.4,<4",
-  "jsonschema~=4.23",
+  "jsonschema>=4.23,<5",
   "packaging>=24.2,<26.0",
   "pip~=25.1",
   "psutil>=7.0.0,<8",
   "python-dotenv>=1.0.1,<2",
   "pyyaml>=6.0.2,<7",
   "requests>=2.32.3,<3",
-  "rich~=14.0.0",
+  "rich>=14.0,<14.2",
   "ruamel.yaml>=0.18.6,<0.19",
-  "setuptools>=76.0.0,<81 ; python_version >= '3.12'",
   "smart-open>=7.0.5,<8",
   "snowplow-tracker>=1.0.4,<2",
   "sqlalchemy>=2.0.35,<3",
   "structlog>=25.1.0,<26",
   "typing-extensions>=4.12.2,<5",
   "tzlocal~=5.3",
-  # Compatibility issues with boto: https://github.com/boto/botocore/pull/3034
-  "urllib3<2 ; python_version < '3.10'",
-  "uv>=0.1.24,<0.8",
+  "urllib3>=1.26.20",
+  "uv>=0.1.24,<0.9",
   "virtualenv>=20.26.6,<21",
 ]
 
@@ -77,7 +73,7 @@ gcs = ["google-cloud-storage>=1.31.0"]
 mssql = ["pymssql>=2.3.2,<3"]
 postgres = ["psycopg[binary]>=3.2.3,<4"]
 psycopg2 = ["psycopg2-binary>=2.9.9,<3"]
-s3 = ["boto3>=1.35,<1.39"]
+s3 = ["boto3>=1.35,<1.41"]
 
 [project.urls]
 Homepage = "https://meltano.com"
@@ -101,7 +97,9 @@ s3_endpoint_url = "meltano.core.state_store.s3:ENDPOINT_URL"
 azure_connection_string = "meltano.core.state_store.azure:CONNECTION_STRING"
 azure_storage_account_url = "meltano.core.state_store.azure:STORAGE_ACCOUNT_URL"
 # Google Cloud Storage state backend settings
-google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"
+google_application_credentials = "meltano.core.state_store.google:APPLICATION_CREDENTIALS"  # Deprecated! Remove in Meltano v4
+google_application_credentials_path = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_PATH"
+google_application_credentials_json = "meltano.core.state_store.google:APPLICATION_CREDENTIALS_JSON"
 
 [project.entry-points."meltano.state_backends"]
 # These keys should match the expected scheme for URIs of
@@ -114,7 +112,7 @@ s3 = "meltano.core.state_store.s3:S3StateStoreManager"
 
 [dependency-groups]
 coverage = [
-  "coverage[toml]>=7.8",
+  "coverage[toml]>=7.10",
 ]
 dev = [
   { include-group = "testing" },
@@ -125,25 +123,25 @@ pre-commit = [
 ]
 testing = [
   { include-group = "coverage" },
-  "backoff>=2.1.2,<3",
   "colorama>=0.4.4,<0.5",
+  "faker>=37.4.2",
   "moto>=5.0.21,<6",
   "pytest>=8.3.3,<9",
   "pytest-asyncio>=1",
-  "pytest-cov>=6.0.0,<7",
   "pytest-docker~=3.1",
   "pytest-order~=1.3",
   "pytest-randomly~=3.16",
   "pytest-structlog~=1.1",
+  "pytest-subtests>=0.14.2",
+  "pytest-timeout>=2.4.0",
   "pytest-xdist~=3.6",
   "requests-mock>=1.12.1,<2",
-  "setproctitle~=1.3",  # Used by pytest-xdist to aid with handling resource intensive processes.
+  "setproctitle~=1.3", # Used by pytest-xdist to aid with handling resource intensive processes.
   "time-machine>=2.15.0,<3",
 ]
 typing = [
   "boto3-stubs[essential]>=1.35,<1.39",
   "mypy>=1.16.0,<2",
-  "types-croniter==5.0.1.20241205",
   "types-dateparser>=1.2.0.20250208",
   "types-jsonschema>=4.23.0.20240813,<5",
   "types-psutil>=7.0.0.20250218,<8",
@@ -178,7 +176,8 @@ filterwarnings = [
   "ignore:datetime.datetime.utcnow.* is deprecated:DeprecationWarning:botocore.auth.*", # https://github.com/boto/boto3/issues/3889
   "ignore: Parsing dates involving a day of month without a year specified is:DeprecationWarning:dateparser.*",  # https://github.com/scrapinghub/dateparser/issues/1246
   "ignore::pytest.PytestUnraisableExceptionWarning",
-  "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/litl/backoff/pull/220
+  "ignore::ResourceWarning",
+  "ignore:Passing the plugin type as the first positional argument is deprecated and will be removed in Meltano v4:DeprecationWarning",  # https://github.com/meltano/meltano/issues/7066
 ]
 log_cli = true
 log_cli_format = "%(message)s"
@@ -201,6 +200,7 @@ xfail_strict = true
 
 [tool.coverage.run]
 branch = true
+core = "sysmon"
 concurrency = [
   "multiprocessing",
   "thread",
@@ -209,6 +209,9 @@ disable_warnings = [
   "no-sysmon",
 ]
 parallel = true
+patch = [
+  "subprocess",
+]
 relative_files = true  # This allows coverage to be measured in Windows
 sigterm = true
 source = [
@@ -244,7 +247,7 @@ skip_covered = true
 
 [tool.commitizen]
 name = "cz_version_bump"
-version = "3.7.8"
+version = "3.9.0"
 prerelease_offset = 1
 tag_format = "v$major.$minor.$patch$prerelease"
 changelog_merge_prerelease = true
@@ -279,10 +282,7 @@ ignore_errors = true
 module = [
   "meltano.cli.interactive.*",
   # Way too many modules at the root of meltano.core to tackle them all at once  # so listing them individually here.
-  "meltano.core.models",
-  "meltano.core.project_files",
   "meltano.core.project_settings_service",
-  "meltano.core.sqlalchemy",
   "meltano.core.task_sets_service",
   "meltano.core.transform_add_service",
   # Meltano Core submodules
@@ -319,6 +319,7 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
+target-version = "py39"
 
 [tool.ruff.lint]
 ignore = [
@@ -348,6 +349,7 @@ select = [
   "ICN",   # flake8-import-conventions
   "INP",   # flake8-no-pep420
   "ISC",   # flake8-implicit-str-concat
+  "LOG",   # flake8-logging
   "N",     # pep8-naming
   "PERF",  # Perflint
   "PGH",   # pygrep-hooks
@@ -379,8 +381,9 @@ unfixable = [
 "tests/**" = [
   "ANN",
   "D1",
-  "S101", # Allow 'assert' in tests
-  "INP",  # Don't require __init__.py files in tests directories
+  "S101",    # Allow 'assert' in tests
+  "INP",     # Don't require __init__.py files in tests directories
+  "LOG015",  # Allow `logging.<level>` in tests
 ]
 "src/meltano/migrations/versions/*" = [
   "D103",
@@ -412,15 +415,6 @@ convention = "google"
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 "logging.getLogger".msg = "Use `structlog.stdlib.get_logger` instead"
-"logging.critical".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.fatal".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.error".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.exception".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.warning".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.warn".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.info".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.debug".msg = "Create a logger with `structlog.stdlib.get_logger`"
-"logging.log".msg = "Create a logger with `structlog.stdlib.get_logger`"
 "meltano.cli.cli.command".msg = "Use `click.command` and `meltano.cli.cli.add_command` instead"
 "meltano.cli.cli.group".msg = "Use `click.group` and `meltano.cli.cli.add_command` instead"
 

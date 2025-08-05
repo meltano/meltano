@@ -41,7 +41,7 @@ You'll get quite a bit of output, two key lines near the end of the output that 
 
 ```
 <timestamps> [info     ] Incremental state has been updated at <timestamp>.
-<timestamps> [info     ] Block run completed.           block_type=ExtractLoadBlocks err=None set_number=0 success=True
+<timestamps> [info     ] Block run completed            block_type=ExtractLoadBlocks err=None set_number=0 success=True
 ```
 
 ### Adding a job
@@ -63,7 +63,7 @@ meltano run --dry-run gitlab-to-postgres
 The meltano.yml didn't include dbt, so let's install that and get it configured to use our database:
 
 ```shell
-meltano add utility dbt-postgres
+meltano add dbt-postgres
 meltano --environment=dev config dbt-postgres set host localhost
 meltano --environment=dev config dbt-postgres set user postgres
 meltano --environment=dev config dbt-postgres set password postgres

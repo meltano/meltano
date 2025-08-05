@@ -9,4 +9,4 @@ if sys.version_info < (3, 10):
 else:
     from typing_extensions import TypeAlias
 
-StrPath: TypeAlias = t.Union[str, os.PathLike]
+StrPath: TypeAlias = t.Union[str, os.PathLike[str]]

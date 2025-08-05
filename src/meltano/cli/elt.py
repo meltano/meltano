@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager, nullcontext, suppress
 from datetime import datetime, timezone
 
 import click
-from structlog import stdlib as structlog_stdlib
+import structlog
 
 from meltano.cli.params import (
     InstallPlugins,
@@ -18,6 +18,7 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.core._state import StateStrategy
 from meltano.core.db import project_engine
 from meltano.core.elt_context import ELTContext, ELTContextBuilder
 from meltano.core.job import Job, JobFinder
@@ -30,12 +31,11 @@ from meltano.core.runner import RunnerError
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.tracking.contexts import CliEvent, PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import new_run_id, run_async
 
 if t.TYPE_CHECKING:
     import uuid
 
-    import structlog
     from sqlalchemy.orm import Session
 
     from meltano.core.plugin.base import PluginDefinition
@@ -49,7 +49,7 @@ DUMPABLES = {
     "loader-config": (PluginType.LOADERS, "config"),
 }
 
-logger = structlog_stdlib.get_logger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 install, no_install, only_install = get_install_options(include_only_install=True)
 
@@ -114,6 +114,15 @@ class ELOptions:
         "--merge-state",
         is_flag=True,
         help="Merges state with that of previous runs.",
+        hidden=True,
+    )
+    state_strategy = click.option(
+        "--state-strategy",
+        # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and
+        # use click 8.2+ exclusively
+        type=click.Choice([strategy.value for strategy in StateStrategy]),
+        help="Strategy to use for state updates.",
+        default=StateStrategy.AUTO.value,
     )
     run_id = click.option(
         "--run-id",
@@ -140,6 +149,7 @@ class ELOptions:
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@ELOptions.state_strategy
 @install
 @no_install
 @only_install
@@ -164,6 +174,7 @@ async def el(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str,
     run_id: uuid.UUID | None,
     install_plugins: InstallPlugins,
 ) -> None:
@@ -194,6 +205,7 @@ async def el(  # WPS408
         state_id=state_id,
         force=force,
         merge_state=merge_state,
+        state_strategy=state_strategy,
         install_plugins=install_plugins,
         run_id=run_id,
     )
@@ -218,6 +230,7 @@ async def el(  # WPS408
 @ELOptions.state_id
 @ELOptions.force
 @ELOptions.merge_state
+@ELOptions.state_strategy
 @install
 @no_install
 @only_install
@@ -243,6 +256,7 @@ async def elt(  # WPS408
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
@@ -274,6 +288,7 @@ async def elt(  # WPS408
         state_id=state_id,
         force=force,
         merge_state=merge_state,
+        state_strategy=state_strategy,
         install_plugins=install_plugins,
         run_id=run_id,
     )
@@ -297,6 +312,7 @@ async def _run_el_command(
     state_id: str | None,
     force: bool,
     merge_state: bool,
+    state_strategy: str,
     install_plugins: InstallPlugins,
     run_id: uuid.UUID | None,
 ) -> None:
@@ -316,6 +332,15 @@ async def _run_el_command(
     transform = transform or "skip"
 
     select_filter = [*select, *(f"!{entity}" for entity in exclude)]
+
+    # Bind run_id at the start of the CLI entrypoint
+    run_id = run_id or new_run_id()
+    structlog.contextvars.bind_contextvars(run_id=str(run_id))
+
+    _state_strategy = StateStrategy.from_cli_args(
+        merge_state=merge_state,
+        state_strategy=state_strategy,
+    )
 
     job = Job(
         job_name=state_id
@@ -341,7 +366,7 @@ async def _run_el_command(
             select_filter=select_filter,
             catalog=catalog,
             state=state,
-            merge_state=merge_state,
+            state_strategy=_state_strategy,
             run_id=run_id,
         )
 
@@ -377,13 +402,12 @@ def _elt_context_builder(
     dry_run: bool = False,
     full_refresh: bool = False,
     refresh_catalog: bool = False,
-    select_filter: list[str] | None = None,
+    select_filter: list[str],
     catalog: str | None = None,
     state: str | None = None,
-    merge_state: bool = False,
+    state_strategy: StateStrategy,
     run_id: uuid.UUID | None = None,
 ) -> ELTContextBuilder:
-    select_filter = select_filter or []
     transform_name = None
     if transform != "skip":
         transform_name = _find_transform_for_extractor(project, extractor)
@@ -402,7 +426,7 @@ def _elt_context_builder(
         .with_select_filter(select_filter)
         .with_catalog(catalog)
         .with_state(state)
-        .with_merge_state(merge_state=merge_state)
+        .with_state_strategy(state_strategy=state_strategy)
         .with_run_id(run_id)
     )
 

@@ -29,6 +29,10 @@ The no color configuration is available for all meltano subcommands via an envir
 
 - `NO_COLOR` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable colored output on the command line. See [`no-color.org`](https://no-color.org/) for more information.
 
+### UTC timestamps in logs
+
+- `NO_UTC` - Set this environment variable to a truthy value (`1`, `TRUE`, `t`) to disable UTC timestamps in logs and use local time instead.
+
 ##### <a name="auto-install-behavior"></a>Auto-install behavior
 
 There's three possible auto-install behaviors for commands that support the `--install/--no-install/--only-install` switch:
@@ -41,9 +45,9 @@ If the flag is not provided, the behavior is determined by the boolean [`auto_in
 
 ## `add`
 
-`meltano add` lets you add [plugins](/concepts/plugins#project-plugins) to your Meltano project.
+`meltano add` lets you add or update [plugins](/concepts/plugins#project-plugins) in your Meltano project. The command is idempotent - running it on an existing plugin will update the plugin instead of failing.
 
-Specifically, it will:
+When adding a new plugin, it will:
 
 1. Look for the [plugin definition](/concepts/project#plugins) in [Meltano Hub](https://hub.meltano.com/)
 1. Add it to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file) under `plugins: <type>s:`, e.g. `plugins: extractors`
@@ -52,6 +56,8 @@ Specifically, it will:
   1. Create a dedicated [Python virtual environment](https://docs.python.org/3/glossary.html#term-virtual-environment) for the plugin inside the [`.meltano` directory](/concepts/project#meltano-directory) at `.meltano/<type>s/<name>/venv`, e.g. `.meltano/extractors/tap-gitlab/venv`
   1. Install the plugin's [pip package](https://pip.pypa.io/en/stable/) into the virtual environment using `pip install <pip_url>` (given `--no-install` is not provided)
 5. If the plugin you are trying to install declares that it does not support the version of Python you are using, but you want to attempt to use it anyway, you can override the Python version restriction by providing the --force-install flag to `meltano add`.
+
+When running on an existing plugin, it will update the plugin definition and lock file without overwriting user-defined configuration. To prevent this update behavior and fail when a plugin already exists, use the `--no-update` flag.
 
 (Some plugin types have slightly different or additional behavior; refer to the [plugin type documentation](/concepts/plugins#types) for more details.)
 
@@ -64,17 +70,51 @@ To learn more about adding a plugin to your project, refer to the [Plugin Manage
 
 ### How to use
 
-The only required arguments are the new plugin's [type](/concepts/plugins#types) and unique name:
+The only required argument is the new plugin's unique name. Meltano will automatically detect the plugin type based on the name:
 
 ```bash
+# Simplified syntax - plugin type is automatically detected
+meltano add <name>
+
+# For example:
+meltano add tap-gitlab      # Automatically detected as extractor
+meltano add target-postgres # Automatically detected as loader
+meltano add dbt-postgres    # Automatically detected as utility
+
+# You can ignore the required Python declared by a plugin by using --force-install flag
+meltano add tap-gitlab --force-install
+```
+
+If you need to explicitly specify the plugin type (for disambiguation or when automatic detection fails), use the `--plugin-type` option:
+
+```bash
+# Explicit plugin type specification
+meltano add --plugin-type <type> <name>
+
+# For example:
+meltano add --plugin-type extractor tap-gitlab
+meltano add --plugin-type loader target-postgres
+```
+
+The original positional syntax is still supported but deprecated:
+
+```bash
+# Deprecated syntax (still works but will be removed in v4)
 meltano add <type> <name>
 
 # For example:
-meltano add extractor tap-gitlab
-# You can ignore the required Python declared by a plugin by using --force-install flag
-meltano add extractor tap-gitlab --force-install
+meltano add extractor tap-gitlab  # Will show deprecation warning
 meltano add loader target-postgres
 ```
+
+:::info Automatic Plugin Type Detection
+Meltano automatically detects plugin types based on naming conventions:
+- Names starting with `tap-` are detected as **extractors**
+- Names starting with `target-` are detected as **loaders**
+- All other names default to **utilities**
+
+If automatic detection fails or you need to override it, use the `--plugin-type` option.
+:::
 
 Without a `--custom`, `--inherit-from` or `--from-ref` option, this will add the
 [discoverable plugin](/concepts/plugins#discoverable-plugins) with the provided name
@@ -84,59 +124,84 @@ using a [shadowing plugin definition](/concepts/project#shadowing-plugin-definit
 If multiple [variants](/concepts/plugins#variants) of the discoverable plugin are available, the specific variant to add can be identified using the `--variant` option:
 
 ```bash
-meltano add <type> <name> --variant <variant>
+# With automatic type detection
+meltano add <name> --variant <variant>
 
 # For example:
+meltano add target-postgres --variant transferwise
+
+# With explicit type specification for disambiguation
+meltano add --plugin-type loader target-postgres --variant transferwise
+
+# Deprecated positional syntax
 meltano add loader target-postgres --variant transferwise
 ```
 
 To add a [custom plugin](/concepts/plugins#custom-plugins) using a [custom plugin definition](/concepts/project#custom-plugin-definitions), use the `--custom` flag:
 
 ```bash
-meltano add --custom <type> <name>
+# With automatic type detection
+meltano add --custom <name>
 
 # For example:
+meltano add --custom tap-covid-19  # Automatically detected as extractor
+
+# With explicit type specification for disambiguation
+meltano add --custom --plugin-type extractor tap-covid-19
+
+# Deprecated positional syntax
 meltano add --custom extractor tap-covid-19
 
 # If you're using Docker, don't forget to mount the project directory,
 # and ensure that interactive mode is enabled so that Meltano can ask you
 # additional questions about the plugin and get your answers over STDIN:
-docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom extractor tap-covid-19
+docker run --interactive -v $(pwd):/project -w /project meltano/meltano add --custom tap-covid-19
 ```
 
 To add a plugin [inheriting from](/concepts/plugins#plugin-inheritance) an existing one using an [inheriting plugin definition](/concepts/project#inheriting-plugin-definitions), use the `--inherit-from` option:
 
 ```bash
-meltano add <type> <name> --inherit-from <existing-name>
+# With automatic type detection
+meltano add <name> --inherit-from <existing-name>
 
 # For example:
+meltano add tap-ga--client-foo --inherit-from tap-google-analytics  # Automatically detected as extractor
+
+# With explicit type specification for disambiguation
+meltano add --plugin-type extractor tap-ga--client-foo --inherit-from tap-google-analytics
+
+# Deprecated positional syntax
 meltano add extractor tap-ga--client-foo --inherit-from tap-google-analytics
 ```
 
 To add a plugin from a [plugin definition](/concepts/project#custom-plugin-definitions) YAML file as a [custom plugin](/concepts/plugins#custom-plugins), use the `--from-ref` option referencing a URL or local path:
 
 ```bash
-meltano add --from-ref <ref> <type> <name>
+# With automatic type detection
+meltano add --from-ref <ref> <name>
 
 # For example:
-# URL
-meltano add extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
+# URL - type automatically detected from plugin name
+meltano add tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
 
 # Absolute local path
-meltano add extractor tap-shopify --from-ref /path/to/my/meltano/project/tap-shopify--matatika.yml
+meltano add tap-shopify --from-ref /path/to/my/meltano/project/tap-shopify--matatika.yml
 
 # Relative local path
-meltano add extractor tap-shopify --from-ref tap-shopify--matatika.yml
+meltano add tap-shopify --from-ref tap-shopify--matatika.yml
+
+# With explicit type specification for disambiguation
+meltano add --plugin-type extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
+
+# Deprecated positional syntax
+meltano add extractor tap-shopify --from-ref https://raw.githubusercontent.com/meltano/hub/main/_data/meltano/extractors/tap-shopify/matatika.yml
 
 # The plugin name specified in the command is superseded by the value in the
 # plugin definition file - using the same name is just a formality
-meltano add extractor this-will-be-ignored --from-ref tap-shopify--matatika.yml
+meltano add this-will-be-ignored --from-ref tap-shopify--matatika.yml
 
 # The above also applies to the plugin variant, if provided
-meltano add extractor this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-shopify--matatika.yml
-
-# Once added, the custom plugin definition can be updated with the `--update` option
-meltano add --update extractor tap-shopify --from-ref tap-shopify--matatika.yml
+meltano add this-will-be-ignored --variant this-will-also-be-ignored --from-ref tap-shopify--matatika.yml
 ```
 
 Using `--from-ref` allows you to add a plugin before it is available on [Meltano Hub](https://hub.meltano.com/), such as during development or testing of a plugin. It can also be used to try out plugins that have their [definition](/concepts/project#custom-plugin-definitions) published an accessible at a public URL, external to the Hub.
@@ -145,20 +210,9 @@ Using `--from-ref` allows you to add a plugin before it is available on [Meltano
   Meltano will throw an error if the referenced plugin definition is invalid or missing any required properties - see the [Meltano Hub plugin definition syntax](/reference/plugin-definition-syntax) for more information.
 :::
 
-A plugin can be updated using the `--update` option
+A plugin can be updated by simply running `meltano add` again, as updating is now the default behavior.
 
-```bash
-meltano add --update <type> <name>
-
-# For example:
-# Update from Meltano Hub
-meltano add --update extractor tap-shopify
-
-# Update from ref
-meltano add --update extractor tap-shopify --from-ref tap-shopify--matatika.yml
-```
-
-This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Supplying `--update` for a plugin that does not already exist in a project has no additional effect.
+This will update the plugin lock file and `meltano.yml` entry, without overwriting user-defined configuration - see [Updating plugins](/guide/plugin-management#updating-plugins) for more information. Running `meltano add` on a plugin that does not already exist in a project will add it normally.
 
 By default, `meltano add` will attempt to install the plugin after adding it. Use `--no-install` to skip this behavior:
 
@@ -174,7 +228,7 @@ By default, plugins that use Python use the version of Python that was used to r
 When adding a new plugin, the Python version can be specified using the `--python` option:
 
 ```bash
-meltano add <type> <name> --python <Python executable name or path>
+meltano add <type> <name> --python <Python version or path>
 ```
 
 For example, to add `tap-github` using Python 3.12 (assuming `python3.12` is installed and on your `$PATH`):
@@ -196,7 +250,7 @@ Then regardless of the Python version used when the plugin is installed, `tap-gi
 - `--variant=<variant>`: Add a specific (non-default) [variant](/concepts/plugins#variants) of the identified [discoverable plugin](/concepts/plugins#discoverable-plugins).
 
 - `--install/--no-install`: Whether or not to install the plugin after adding it to the project. See the [Auto-install behavior](#auto-install-behavior) section for more information.
-- `--update`: Update a plugin in the project.
+- `--update/--no-update`: Whether to update an existing plugin in the project. Default is `--update` (enabled), making the command idempotent. Use `--no-update` to fail when a plugin already exists.
 - `--from-ref=<ref>`: Add a plugin from a URL or local path as a [custom plugin](/concepts/plugins#custom-plugins)
 
 - `--force-install`: Ignore the required Python version declared by the plugins.
@@ -534,10 +588,12 @@ meltano el <extractor> <loader> [--state-id TEXT]
 - A `--state` option can be passed to manually provide a [state file](https://hub.meltano.com/singer/spec#state-files) for the extractor, as an alternative to letting state be [looked up based on the State ID](/guide/integration#incremental-replication-state).
   This is equivalent to setting the [`state` extractor extra](/concepts/plugins#state-extra).
 
+- A `--state-strategy` option can be passed to control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`.
+
+- A `--merge-state` flag can be passed to merge state with that of previous runs. **DEPRECATED**: Use `--state-strategy=merge` instead.
+
 - One or more `--select <entity>` options can be passed to only extract records for matching [selected entities](#select).
   Similarly, `--exclude <entity>` can be used to extract records for all selected entities _except_ for those specified.
-
-- A `--merge-state` flag can be passed to merge state with that of previous runs.
 
   Notes:
 
@@ -782,10 +838,25 @@ The `init` command does not run relative to a [Meltano Environment](https://docs
 
 Installs dependencies of your project based on the **meltano.yml** file.
 
+You can install plugins by simply providing their names without specifying their type. Meltano will automatically detect the plugin type:
+
+```bash
+meltano install tap-github target-postgres
+```
+
 Optionally, provide a plugin type argument to only (re)install plugins of a certain type.
 Additionally, plugin names can be provided to only (re)install those specific plugins.
 
-To install a plugin without knowing its type, or to install multiple plugins of varying types, use the special `-` (any) character as the plugin type argument, followed by plugin name(s). `meltano install -` with no additional positional arguments has the same effect as `meltano install` (i.e. install all plugins).
+:::warning[Deprecated Syntax]
+
+The following syntax forms are deprecated and will be removed in Meltano v4:
+
+| Deprecated Syntax | Use Instead |
+| --- | --- |
+| `meltano install <plugin_type> <plugin_name>` | `meltano install --plugin-type <plugin_type> <plugin_name>` |
+| `meltano install - <plugin_name>` | `meltano install <plugin_name>` |
+
+:::
 
 To only install plugins for a particular schedule specify the `--schedule` argument.
 This can be useful in CI test workflows or for deployments that need to install plugins before every run.
@@ -805,15 +876,24 @@ Meltano stores package installation logs in `.meltano/logs/pip/{plugin_type}/{pl
 ### How to Use
 
 ```bash
+# Install all plugins
 meltano install
-meltano install -
 
-meltano install extractors
-meltano install extractor tap-gitlab
-meltano install extractors tap-gitlab tap-adwords
-meltano install - tap-gitlab target-postgres
+# Install specific plugins (recommended - automatically detects type)
+meltano install tap-github target-postgres
+meltano install tap-gitlab
+meltano install - tap-gitlab target-postgres  # Deprecated syntax
+
+# Install plugins by type
+meltano install --plugin-type=extractor tap-gitlab
+meltano install extractors  # Deprecated syntax
+meltano install --plugin-type=extractor tap-gitlab tap-adwords
+meltano install extractors tap-gitlab tap-adwords  # Deprecated syntax
+
+# Install plugins for a specific schedule
 meltano install --schedule=<schedule_name>
 
+# Install with additional options
 meltano install --parallelism=16
 meltano install --clean
 
@@ -937,7 +1017,7 @@ The `lock` command does not run relative to a [Meltano Environment](https://docs
 
 ## `remove`
 
-`meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) of the same [type](/concepts/plugins#types) from your Meltano [project](/concepts/project).
+`meltano remove` removes one or more [plugins](/concepts/plugins#project-plugins) from your Meltano [project](/concepts/project).
 
 Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from the:
 
@@ -949,6 +1029,11 @@ Specifically, [plugins](/concepts/plugins#project-plugins) will be removed from 
 ### How to Use
 
 ```bash
+# New syntax (recommended) - plugin type is automatically inferred
+meltano remove <name>
+meltano remove <name> <name_two>
+
+# Deprecated syntax - will be removed in v4
 meltano remove <type> <name>
 meltano remove <type> <name> <name_two>
 ```
@@ -960,10 +1045,12 @@ The `remove` command does not run relative to a [Meltano Environment](https://do
 ### Examples
 
 ```bash
-# meltano will attempt to remove an extractor called tap-gitlab
-meltano remove extractor tap-gitlab
+# New syntax - plugin type is automatically inferred
+meltano remove tap-gitlab
+meltano remove target-postgres target-csv
 
-# meltano will attempt to remove two loaders; target-postgres and target-csv
+# Deprecated syntax - will be removed in v4
+meltano remove extractor tap-gitlab
 meltano remove loader target-postgres target-csv
 ```
 
@@ -1009,7 +1096,8 @@ meltano run --refresh-catalog tap-salesforce target-postgres
 - `--full-refresh` will force a full refresh and ignore the prior state. The new state after completion will still be updated with the execution results, unless `--no-state-update` is also specified. The `MELTANO_RUN_FULL_REFRESH` environment variable can be used to set this behavior.
 - `--force` will force a job run even if a conflicting job with the same generated ID is in progress.
 - `--state-id-suffix` define a custom suffix to generate a state ID with for each EL pair.
-- `--merge-state` will merge state with that of previous runs. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--state-strategy` will control how state is merged with that of previous runs. Valid values are `auto`, `merge`, and `overwrite`. The default is `auto`. See the [example in the Meltano repository](https://github.com/meltano/meltano/blob/main/integration/example-library/meltano-run-merge-states/index.md).
+- `--merge-state` will merge state with that of previous runs. **Deprecated**: use `--state-strategy` instead.
 - `--run-id` will use the provided UUID for the current run. This is useful when your workflow is managed by an external system and you want to track the run in Meltano.
 - `--refresh-catalog` will force a refresh of the catalog, ignoring any existing cached catalog from previous runs.
 - The `--install/--no-install/--only-install` switch controls auto-install behavior. See the [Auto-install behavior](#auto-install-behavior) section for more information.
@@ -1033,7 +1121,7 @@ meltano --environment=dev run --force tap-gitlab target-postgres tap-salesforce 
 meltano --environment=dev --state-id-suffix pipeline-alias run tap-gitlab hide-secrets target-postgres
 
 # run a pipeline, merging state with that of previous runs.
-meltano --environment=dev run --merge-state tap-gitlab target-postgres
+meltano --environment=dev run --state-strategy=merge tap-gitlab target-postgres
 ```
 
 ### Using `run` with Environments
@@ -1179,9 +1267,9 @@ meltano job remove simple-demo
 
 Use the `schedule` command to define EL or Job pipelines to be run by an orchestrator at regular intervals.
 These scheduled pipelines will be added to your [`meltano.yml` project file](/concepts/project#meltano-yml-project-file).
-You can schedule both [jobs](#job) or legacy [`meltano el`](#el) and [`meltano elt`](#elt) tasks.
+You can schedule both [jobs](#job) or legacy [`meltano el`](#el) tasks.
 
-You can run a specific scheduled pipeline's corresponding [`meltano run`](#run), [`meltano el`](#el) or [`meltano elt`](#elt) command as a one-off using `meltano schedule run <schedule_name>`.
+You can run a specific scheduled pipeline's corresponding [`meltano run`](#run) or [`meltano el`](#el) command as a one-off using `meltano schedule run <schedule_name>`.
 Any command line options (e.g. `--select=<entity>` or `--dry-run`) will be passed on to the underlying commands.
 
 Note that the state ID generated under the hood when invoking `meltano schedule run` will differ depending on the type of schedule:
@@ -1291,7 +1379,7 @@ Selection rules will be stored in the extractor's [`select` extra](/concepts/plu
 - `[abc]`: matches either `a`, `b`, or `c`
 - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-Use `--list` to list the current selected tap attributes.
+Use `--list` or `--json` to list the currently selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
@@ -1306,6 +1394,9 @@ The `select` command can accept the `--environment` flag to target a specific [M
 ```bash
 # List all available entities and attributes
 meltano select tap-gitlab --list --all
+
+# List all available entities and attributes in JSON format
+meltano select tap-gitlab --json --all
 
 # Include all attributes of an entity
 meltano select tap-gitlab tags "*"
@@ -1471,7 +1562,7 @@ Merge new state onto existing state for a state ID.
 :::info
 
   <p><strong>Not seeing merged state in the system database?</strong></p>
-  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano elt</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
+  <p>Merged state is computed at <em>execution</em> time. The <samp>merge</samp> command merely adds a new <samp>payload</samp> to the database which is merged together with existing payloads the next time state is read via <samp>meltano el</samp>, <samp>meltano run</samp>, or <samp>meltano state get</samp>.</p>
 :::
 
 #### How to use

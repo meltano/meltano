@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 import typing as t
 
 import click
@@ -14,6 +15,7 @@ from meltano.cli.params import (
     pass_project,
 )
 from meltano.cli.utils import CliEnvironmentBehavior, CliError, PartialInstrumentedCmd
+from meltano.core._state import StateStrategy
 from meltano.core.block.block_parser import BlockParser, validate_block_sets
 from meltano.core.block.blockset import BlockSet
 from meltano.core.block.plugin_command import PluginCommandBlock
@@ -24,7 +26,7 @@ from meltano.core.runner import RunnerError
 from meltano.core.tracking import BlockEvents, Tracker
 from meltano.core.tracking.contexts import CliEvent
 from meltano.core.tracking.contexts.plugins import PluginsTrackingContext
-from meltano.core.utils import run_async
+from meltano.core.utils import new_run_id, run_async
 
 if t.TYPE_CHECKING:
     import uuid
@@ -85,6 +87,15 @@ install, no_install, only_install = get_install_options(include_only_install=Tru
     "--merge-state",
     is_flag=True,
     help="Merges state with that of previous runs.",
+    hidden=True,
+)
+@click.option(
+    "--state-strategy",
+    # TODO: use click.Choice(StateStrategy) once we drop support for Python 3.9 and use
+    # click 8.2+ exclusively
+    type=click.Choice([strategy.value for strategy in StateStrategy]),
+    default=StateStrategy.AUTO.value,
+    help="Strategy to use for state updates.",
 )
 @click.option(
     "--run-id",
@@ -112,6 +123,7 @@ async def run(
     force: bool,
     state_id_suffix: str,
     merge_state: bool,
+    state_strategy: str,
     run_id: uuid.UUID | None,
     blocks: list[str],
     install_plugins: InstallPlugins,
@@ -143,7 +155,16 @@ async def run(
         logger.info("Setting 'console' handler log level to 'debug' for dry run")
         change_console_log_level()
 
+    # Bind run_id at the start of the CLI entrypoint
+    run_id = run_id or new_run_id()
+    structlog.contextvars.bind_contextvars(run_id=str(run_id))
+
     tracker: Tracker = ctx.obj["tracker"]
+
+    _state_strategy = StateStrategy.from_cli_args(
+        merge_state=merge_state,
+        state_strategy=state_strategy,
+    )
 
     try:
         parser = BlockParser(
@@ -155,7 +176,7 @@ async def run(
             no_state_update=no_state_update,
             force=force,
             state_id_suffix=state_id_suffix,
-            merge_state=merge_state,
+            state_strategy=_state_strategy,
             run_id=run_id,
         )
         parsed_blocks = list(parser.find_blocks(0))
@@ -179,11 +200,22 @@ async def run(
         reason=PluginInstallReason.AUTO,
     )
 
+    run_start_time = time.perf_counter()
+    success = False
     try:
         await _run_blocks(tracker, parsed_blocks, dry_run=dry_run)
+        success = True
     except Exception as err:
         tracker.track_command_event(CliEvent.failed)
         raise err
+    finally:
+        run_end_time = time.perf_counter()
+        total_duration = run_end_time - run_start_time
+        logger.info(
+            "Run completed",
+            duration_seconds=round(total_duration, 3),
+            status="success" if success else "failure",
+        )
     tracker.track_command_event(CliEvent.completed)
 
 
@@ -214,16 +246,20 @@ async def _run_blocks(
                 )
             continue
 
+        block_start_time = time.perf_counter()
         try:
             await blk.run()
         except RunnerError as err:
+            block_end_time = time.perf_counter()
+            block_duration = block_end_time - block_start_time
             logger.error(
-                "Block run completed.",
+                "Block run completed",
                 set_number=idx,
                 block_type=blk_name,
                 success=False,
                 err=err,
                 exit_codes=err.exitcodes,
+                duration_seconds=round(block_duration, 3),
             )
             with tracker.with_contexts(tracking_ctx):
                 tracker.track_block_event(blk_name, BlockEvents.failed)
@@ -236,12 +272,16 @@ async def _run_blocks(
                 tracker.track_block_event(blk_name, BlockEvents.failed)
             raise bare_err
 
+        block_end_time = time.perf_counter()
+        block_duration = block_end_time - block_start_time
+
         logger.info(
-            "Block run completed.",
+            "Block run completed",
             set_number=idx,
-            block_type=blk.__class__.__name__,
+            block_type=blk_name,
             success=True,
             err=None,
+            duration_seconds=round(block_duration, 3),
         )
         with tracker.with_contexts(tracking_ctx):
             tracker.track_block_event(blk_name, BlockEvents.completed)

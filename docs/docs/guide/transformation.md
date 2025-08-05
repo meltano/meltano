@@ -25,7 +25,14 @@ To install a dbt utility to your project, run:
 
 ```bash
 # install adapter-specific dbt, e.g. for snowflake
-meltano add utility dbt-snowflake
+# Simplified syntax - plugin type is automatically detected
+meltano add dbt-snowflake  # Automatically detected as utility
+
+# Explicit plugin type for disambiguation:
+# meltano add --plugin-type utility dbt-snowflake
+
+# Deprecated positional syntax:
+# meltano add utility dbt-snowflake
 ```
 
 After dbt is installed you can configure it using `config` CLI commands, [Meltano environments](/concepts/environments) or environment variables:
@@ -196,7 +203,13 @@ The two main ways to run your dbt transforms using Meltano are by calling them i
 
 #### Transform in your ELT pipeline
 
-When `melatno elt` runs with the `--transform run` option, Meltano uses the convention that the transform has the same namespace as the extractor in its pipeline, except with snake_case (tap-gitlab -> tap_gitlab).
+:::danger
+
+  <p> <b>WARNING</b>: `meltano elt` is a deprecated and will eventually be removed.</p>
+  <p>We recommend users use `meltano run` for the most up-to-date way to run data pipelines.</p>
+:::
+
+When `meltano elt` runs with the `--transform run` option, Meltano uses the convention that the transform has the same namespace as the extractor in its pipeline, except with snake_case (tap-gitlab -> tap_gitlab).
 As an example, assume that the following command runs:
 
 ```bash

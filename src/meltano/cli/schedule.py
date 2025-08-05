@@ -7,7 +7,6 @@ import sys
 import typing as t
 
 import click
-from croniter import croniter
 
 from meltano.cli.params import pass_project
 from meltano.cli.utils import (
@@ -17,7 +16,12 @@ from meltano.cli.utils import (
 )
 from meltano.core.db import project_engine
 from meltano.core.job.stale_job_failer import fail_stale_jobs
-from meltano.core.schedule import CRON_INTERVALS, ELTSchedule, JobSchedule
+from meltano.core.schedule import (
+    CRON_INTERVALS,
+    ELTSchedule,
+    JobSchedule,
+    is_valid_cron,
+)
 from meltano.core.schedule_service import (
     BadCronError,
     ScheduleAlreadyExistsError,
@@ -114,7 +118,7 @@ class CronParam(click.ParamType):
 
     def convert(self, value: str, *_) -> str:
         """Validate and con interval."""
-        if value not in CRON_INTERVALS and not croniter.is_valid(value):
+        if value not in CRON_INTERVALS and not is_valid_cron(value):
             raise BadCronError(value)
 
         return value

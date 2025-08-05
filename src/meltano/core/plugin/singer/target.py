@@ -41,7 +41,7 @@ class BookmarkWriter:
         """Initialize the `BookmarkWriter`.
 
         Args:
-            job: meltano elt job associated with this invocation and whose
+            job: meltano el or meltano elt job associated with this invocation and whose
                 state will be updated.
             session: SQLAlchemy session/engine object to be used to update state.
             payload_flag: A payload flag.
@@ -77,18 +77,23 @@ class BookmarkWriter:
         job = self.job
         job.payload[SINGER_STATE_KEY] = new_state
         job.payload_flags = Payload(max(self.payload_flag, job.payload_flags))
+
         try:
             job.save(self.session)
+        except Exception as e:  # pragma: no cover
+            logger.warning("Failed to persist job to the system database: %s", e)
+
+        try:
             self.state_service.add_state(
                 job,
                 json.dumps(job.payload),
                 job.payload_flags,
             )
         except Exception:  # pragma: no cover
-            logger.debug("Failed to persist state", exc_info=True)
             logger.warning(
                 "Unable to persist state, or received state is invalid, "
-                "incremental state has not been updated",
+                "incremental state has not been updated: %s",
+                exc_info=True,
             )
         else:
             logger.info(
@@ -177,10 +182,11 @@ class SingerTarget(SingerPlugin):
         if not elt_context or not elt_context.job or not elt_context.session:
             return
 
-        incomplete_state = (
-            elt_context.full_refresh and elt_context.select_filter
-        ) or elt_context.merge_state
-        payload_flag = Payload.INCOMPLETE_STATE if incomplete_state else Payload.STATE
+        payload_flag = (
+            Payload.INCOMPLETE_STATE
+            if elt_context.should_merge_states()
+            else Payload.STATE
+        )
 
         plugin_invoker.add_output_handler(
             plugin_invoker.StdioSource.STDOUT,

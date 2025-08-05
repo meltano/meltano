@@ -3,16 +3,23 @@ from __future__ import annotations
 import asyncio
 import datetime
 import logging
+import typing as t
 import zoneinfo
 
 import pytest
 import time_machine
 
 from meltano.core.logging.utils import (
+    LEVELS,
     LogFormat,
     capture_subprocess_output,
     default_config,
+    parse_log_level,
+    setup_logging,
 )
+
+if t.TYPE_CHECKING:
+    from pathlib import Path
 
 
 class AsyncReader(asyncio.StreamReader):
@@ -110,3 +117,83 @@ def test_default_logging_config_format(
         # Test the formatted message
         formatted = formatter.format(record)
         assert formatted == expected
+
+
+def test_setup_logging_yml_extension_fallback(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test that setup_logging supports both .yaml and .yml extensions via fallback."""
+    from unittest.mock import Mock, patch
+
+    import yaml
+
+    log_config_dict = {
+        "version": 1,
+        "formatters": {"simple": {"format": "%(levelname)s - %(message)s"}},
+        "handlers": {
+            "console": {"class": "logging.StreamHandler", "formatter": "simple"}
+        },
+        "root": {"level": "INFO", "handlers": ["console"]},
+    }
+
+    yaml_path = tmp_path / "logging.yaml"
+    yml_path = tmp_path / "logging.yml"
+
+    def test_fallback(config_file: str, expected_fallback: Path):
+        """Test logging config fallback from one extension to another."""
+        mock_dict_config = Mock()
+        mock_logger = Mock()
+
+        with (
+            monkeypatch.context() as m,
+            patch(
+                "meltano.core.logging.utils.logging.config.dictConfig", mock_dict_config
+            ),
+            patch("meltano.core.logging.utils.logger", mock_logger),
+        ):
+            m.chdir(tmp_path)
+            setup_logging(log_config=config_file)
+
+            # Verify dictConfig was called (logging configuration happened)
+            mock_dict_config.assert_called_once()
+
+            # Verify the fallback message was logged
+            expected_message = (
+                f"Using logging configuration from {expected_fallback.name} "
+                f"(fallback from {config_file})"
+            )
+            mock_logger.info.assert_called_with(expected_message)
+
+    # Test .yaml -> .yml fallback
+    yml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.yaml", yml_path)
+
+    # Test .yml -> .yaml fallback
+    yml_path.unlink()
+    yaml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.yml", yaml_path)
+
+    # Test case-insensitive extension (.YAML -> .yml)
+    yaml_path.unlink()
+    yml_path.write_text(yaml.dump(log_config_dict))
+    test_fallback("logging.YAML", yml_path)
+
+
+def test_disabled_log_level():
+    """Test that 'disabled' log level is properly defined and parsed."""
+    # Test that 'disabled' is in LEVELS
+    assert "disabled" in LEVELS
+
+    # Test that 'disabled' has a higher value than CRITICAL
+    assert LEVELS["disabled"] > logging.CRITICAL
+    assert LEVELS["disabled"] == logging.CRITICAL + 1
+
+    # Test that parse_log_level correctly parses 'disabled'
+    assert parse_log_level("disabled") == logging.CRITICAL + 1
+
+    # Test that default_config accepts 'disabled' log level
+    config = default_config("disabled")
+    # When disabled, the numeric value should be used
+    assert config["handlers"]["console"]["level"] == logging.CRITICAL + 1
+    assert config["loggers"][""]["level"] == logging.CRITICAL + 1

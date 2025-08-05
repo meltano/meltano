@@ -11,7 +11,7 @@ import structlog.typing
 from rich.console import Console
 from rich.traceback import Traceback, install
 
-from meltano.core.utils import get_no_color_flag
+from meltano.core.utils import get_boolean_env_var, get_no_color_flag
 
 if sys.version_info < (3, 11):
     from typing_extensions import Unpack
@@ -26,14 +26,19 @@ if t.TYPE_CHECKING:
 
 install(suppress=[click])
 
-TIMESTAMPER = structlog.processors.TimeStamper(fmt="iso")
 
-LEVELED_TIMESTAMPED_PRE_CHAIN: t.Sequence[Processor] = (
-    # Add the log level and a timestamp to the event_dict if the log entry
-    # is not from structlog.
-    structlog.stdlib.add_log_level,
-    TIMESTAMPER,
-)
+def get_default_foreign_pre_chain() -> t.Sequence[Processor]:
+    """Get the default foreign pre-chain for a ProcessorFormatter.
+
+    This is the pre-chain that will be used for all ProcessorFormatter instances.
+    """
+    return (
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(
+            fmt="iso",
+            utc=not get_boolean_env_var("NO_UTC", default=False),
+        ),
+    )
 
 
 class LoggingFeatures(t.TypedDict, total=False):
@@ -84,6 +89,7 @@ def rich_exception_formatter_factory(
     *,
     no_color: bool | None = None,
     show_locals: bool = False,
+    max_frames: int = 100,
 ) -> Callable[[t.TextIO, structlog.types.ExcInfo], None]:
     """Create an exception formatter for logging using the rich package.
 
@@ -95,6 +101,7 @@ def rich_exception_formatter_factory(
         color_system: The color system supported by your terminal.
         no_color: Enabled no color mode, or None to auto detect. Defaults to None.
         show_locals: Whether to show local variables in the traceback.
+        max_frames: Maximum number of frames to show in a traceback, 0 for no maximum.
 
     Returns:
         Exception formatter function.
@@ -109,6 +116,7 @@ def rich_exception_formatter_factory(
             Traceback.from_exception(
                 *exc_info,
                 show_locals=show_locals,
+                max_frames=max_frames,
             ),
         )
 
@@ -135,7 +143,9 @@ def _process_formatter(
     """
     return structlog.stdlib.ProcessorFormatter(
         processors=processors,
-        foreign_pre_chain=LEVELED_TIMESTAMPED_PRE_CHAIN,
+        # FYI: this needs to be kept consistent between all `ProcessorFormatter`
+        # instances
+        foreign_pre_chain=get_default_foreign_pre_chain(),
         **kwargs,
     )
 
@@ -145,6 +155,7 @@ def console_log_formatter(
     colors: bool = False,
     callsite_parameters: bool = False,
     show_locals: bool = False,
+    max_frames: int = 2,
 ) -> structlog.stdlib.ProcessorFormatter:
     """Create a logging formatter for console rendering that supports colorization.
 
@@ -152,6 +163,7 @@ def console_log_formatter(
         colors: Add color to output.
         callsite_parameters: Whether to include callsite parameters in the output.
         show_locals: Whether to show local variables in the traceback.
+        max_frames: Maximum number of frames to show in a traceback, 0 for no maximum.
 
     Returns:
         A configured console log formatter.
@@ -162,11 +174,13 @@ def console_log_formatter(
         exception_formatter = rich_exception_formatter_factory(
             color_system="truecolor",
             show_locals=show_locals,
+            max_frames=max_frames,
         )
     else:
         exception_formatter = rich_exception_formatter_factory(
             no_color=True,
             show_locals=show_locals,
+            max_frames=max_frames,
         )
 
     return _process_formatter(

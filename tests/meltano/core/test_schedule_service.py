@@ -10,7 +10,7 @@ import pytest
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.project_plugin import ProjectPlugin
 from meltano.core.project_plugins_service import PluginAlreadyAddedException
-from meltano.core.schedule import ELTSchedule, JobSchedule
+from meltano.core.schedule import ELTSchedule, JobSchedule, is_valid_cron
 from meltano.core.schedule_service import (
     BadCronError,
     Schedule,
@@ -21,6 +21,7 @@ from meltano.core.schedule_service import (
 )
 
 if t.TYPE_CHECKING:
+    from meltano.core.project import Project
     from meltano.core.schedule_service import ScheduleService
 
 
@@ -58,7 +59,7 @@ def create_job_schedule():
 
 
 @pytest.fixture(scope="class")
-def custom_tap(project):
+def custom_tap(project: Project):
     tap = ProjectPlugin(
         PluginType.EXTRACTORS,
         name="tap-custom",
@@ -74,6 +75,53 @@ class TestScheduleService:
     @pytest.fixture
     def subject(self, schedule_service):
         return schedule_service
+
+    @pytest.mark.parametrize(
+        "cron",
+        (
+            pytest.param("@yearly", id="yearly"),
+            pytest.param("@annually", id="annually"),
+            pytest.param("@monthly", id="monthly"),
+            pytest.param("@weekly", id="weekly"),
+            pytest.param("@daily", id="daily"),
+            pytest.param("@midnight", id="midnight"),
+            pytest.param("@hourly", id="hourly"),
+            pytest.param("0 0 1 1 0", id="New Year's Day at midnight"),
+            pytest.param("30 14 * * 1-5", id="2:30 PM weekdays"),
+            pytest.param("0 22 * * 7", id="10 PM every Sunday"),
+            pytest.param("0 0 * jan-jun *", id="every day in January through June"),
+            pytest.param("0 0 * dec mon", id="every Monday in December"),
+            pytest.param("0 0 ? * *", id="special character ? for day field"),
+            pytest.param("0 0 * * ?", id="special character ? for dow field"),
+            pytest.param("0 0 L * *", id="last day of month"),
+            pytest.param("0 0 3,13,23 * *", id="3rd, 13th, and 23rd day of month"),
+            pytest.param("0 0 20-L * *", id="20th through last day of month"),
+            pytest.param("0 0 * * 5-7", id="every Friday through Sunday"),
+            pytest.param("0 0 * * fri-tue", id="every Friday through Tuesday"),
+            pytest.param("0 0 */3 * *", id="every 3 hours"),
+            pytest.param("0 0 6-14/2 * *", id="every 2 hours from 6 AM to 2 PM"),
+        ),
+    )
+    def test_valid_cron(self, cron: str):
+        assert is_valid_cron(cron)
+
+    @pytest.mark.parametrize(
+        "cron",
+        (
+            pytest.param("0 0 /3 * *", id="empty base"),
+            pytest.param("0 0 */x * *", id="invalid step"),
+            pytest.param("0 0 * ? *", id="special character ? in other places"),
+            pytest.param("0 a * * *", id="invalid hour part"),
+            pytest.param("0 0 a-31 * *", id="invalid range parts"),
+            pytest.param("0 0 -31 * *", id="invalid range parts"),
+            pytest.param("* * * ene-dic *", id="unknown month aliases"),
+            pytest.param("0 0 * * dec dom", id="unknown day of week aliases"),
+            pytest.param("0 0 1 1 0 0", id="6-field format"),
+            pytest.param("0 0 1 1 0 0 2025", id="7-field format"),
+        ),
+    )
+    def test_invalid_cron(self, cron: str):
+        assert not is_valid_cron(cron)
 
     @pytest.mark.order(0)
     def test_add_schedules(

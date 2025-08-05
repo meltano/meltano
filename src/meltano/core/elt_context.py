@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import typing as t
 
+from meltano.core._protocols.el_context import ELContextProtocol
+from meltano.core._state import StateStrategy
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.plugin.error import PluginNotFoundError
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -83,7 +85,7 @@ class PluginContext(t.NamedTuple):
         return {**self.plugin.info_env, **self.config_env()}
 
 
-class ELTContext:
+class ELTContext(ELContextProtocol):
     """ELT Context."""
 
     def __init__(
@@ -104,7 +106,7 @@ class ELTContext:
         catalog: str | None = None,
         state: str | None = None,
         base_output_logger: OutputLogger | None = None,
-        merge_state: bool | None = False,
+        state_strategy: StateStrategy = StateStrategy.AUTO,
         run_id: uuid.UUID | None = None,
     ):
         """Initialise ELT Context instance.
@@ -125,7 +127,7 @@ class ELTContext:
             catalog: Catalog to pass to extractor.
             state: State to pass to extractor.
             base_output_logger: OutputLogger to use.
-            merge_state: Flag. Merges State at the end of run
+            state_strategy: State strategy to use.
             run_id: Run ID.
         """
         self.project = project
@@ -146,7 +148,7 @@ class ELTContext:
         self.state = state
 
         self.base_output_logger = base_output_logger
-        self.merge_state = merge_state
+        self.state_strategy = state_strategy
         self.run_id = run_id
 
     @property
@@ -244,7 +246,7 @@ class ELTContextBuilder:
         self._catalog: str | None = None
         self._state: str | None = None
         self._base_output_logger: OutputLogger | None = None
-        self._merge_state: bool = False
+        self._state_strategy: StateStrategy = StateStrategy.AUTO
 
     def with_session(self, session: Session) -> ELTContextBuilder:
         """Include session when building context.
@@ -372,16 +374,16 @@ class ELTContextBuilder:
         self._refresh_catalog = refresh_catalog
         return self
 
-    def with_merge_state(self, *, merge_state: bool):  # noqa: ANN201
+    def with_state_strategy(self, *, state_strategy: StateStrategy):  # noqa: ANN201
         """Set whether the state is to be merged or overwritten.
 
         Args:
-            merge_state: Merges the state at the end of run.
+            state_strategy: State strategy to use.
 
         Returns:
             Updated ELTContextBuilder instance.
         """
-        self._merge_state = merge_state
+        self._state_strategy = state_strategy
         return self
 
     def with_select_filter(self, select_filter: list[str]) -> ELTContextBuilder:
@@ -551,5 +553,5 @@ class ELTContextBuilder:
             catalog=self._catalog,
             state=self._state,
             base_output_logger=self._base_output_logger,
-            merge_state=self._merge_state,
+            state_strategy=self._state_strategy,
         )

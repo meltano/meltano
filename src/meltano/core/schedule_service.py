@@ -6,14 +6,19 @@ import typing as t
 from datetime import date, datetime, timezone
 
 import structlog
-from croniter import croniter
 
 from meltano.core.error import MeltanoError
 from meltano.core.locked_definition_service import PluginNotFoundError
 from meltano.core.meltano_invoker import MeltanoInvoker
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
-from meltano.core.schedule import CRON_INTERVALS, ELTSchedule, JobSchedule, Schedule
+from meltano.core.schedule import (
+    CRON_INTERVALS,
+    ELTSchedule,
+    JobSchedule,
+    Schedule,
+    is_valid_cron,
+)
 from meltano.core.setting_definition import SettingMissingError
 from meltano.core.task_sets_service import TaskSetsService
 from meltano.core.utils import NotFound, coerce_datetime, find_named, iso8601_datetime
@@ -227,7 +232,7 @@ class ScheduleService:
         if (
             schedule.interval is not None
             and schedule.interval not in CRON_INTERVALS
-            and not croniter.is_valid(schedule.interval)
+            and not is_valid_cron(schedule.interval)
         ):
             raise BadCronError(schedule.interval)
 
@@ -343,7 +348,7 @@ class ScheduleService:
         *args: str,
         env: dict | None = None,
         **kwargs: t.Any,
-    ) -> subprocess.CompletedProcess:
+    ) -> subprocess.CompletedProcess[str]:
         """Run a scheduled elt task or named job.
 
         Args:

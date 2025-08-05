@@ -421,7 +421,7 @@ class Canonical(metaclass=AnnotationsMeta):  # (too many methods)
         )
 
     @classmethod
-    def parse_json_file(cls: type[T], path: PathLike) -> T:
+    def parse_json_file(cls: type[T], path: PathLike[str]) -> T:
         """Parse a plugin definition from a JSON file.
 
         Args:
