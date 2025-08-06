@@ -14,10 +14,10 @@ from meltano.core.project_plugins_service import (
     PluginAlreadyAddedException,
 )
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 if t.TYPE_CHECKING:
     from meltano.core.project import Project
