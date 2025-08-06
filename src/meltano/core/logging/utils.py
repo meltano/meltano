@@ -22,10 +22,10 @@ from meltano.core.utils import get_no_color_flag
 
 logger = structlog.getLogger(__name__)
 
-if sys.version_info < (3, 11):
-    from backports.strenum import StrEnum
-else:
+if sys.version_info >= (3, 11):
     from enum import StrEnum
+else:
+    from backports.strenum import StrEnum
 
 
 if t.TYPE_CHECKING:

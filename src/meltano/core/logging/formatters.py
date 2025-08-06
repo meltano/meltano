@@ -13,10 +13,10 @@ from rich.traceback import Traceback, install
 
 from meltano.core.utils import get_boolean_env_var, get_no_color_flag
 
-if sys.version_info < (3, 11):
-    from typing_extensions import Unpack
-else:
+if sys.version_info >= (3, 11):
     from typing import Unpack  # noqa: ICN003
+else:
+    from typing_extensions import Unpack
 
 if t.TYPE_CHECKING:
     from collections.abc import Callable, Sequence

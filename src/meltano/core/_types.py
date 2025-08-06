@@ -4,7 +4,7 @@ import os
 import sys
 import typing as t
 
-if sys.version_info < (3, 10):
+if sys.version_info >= (3, 10):
     from typing import TypeAlias  # noqa: ICN003
 else:
     from typing_extensions import TypeAlias
