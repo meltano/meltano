@@ -22,8 +22,6 @@ else:
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
 
-TEnv = t.TypeVar("TEnv", bound="Environment")
-
 
 class NoActiveEnvironment(Exception):
     """Exception raised when invocation has no active environment."""
