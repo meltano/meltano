@@ -1204,6 +1204,79 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert len(filter_rules) == 1
         assert filter_rules[0].breadcrumb == []  # Stream level only
 
+    def test_nested_property_selection_not_affected_by_stream_only_enhancement(
+        self,
+    ) -> None:
+        """Test that nested property selections work correctly and aren't affected by stream-only enhancement."""  # noqa: E501
+        # Test various depths of nested property selection
+        patterns = [
+            "users.address",  # Single-level nesting
+            "users.address.city",  # Two-level nesting
+            "users.address.geo.lat",  # Three-level nesting
+            "orders.items.product.sku",  # Three-level nesting in different stream
+        ]
+
+        rules = select_metadata_rules(patterns)
+
+        # Verify the correct number of rules (2 per pattern: stream + property)
+        assert len(rules) == 8  # 4 patterns x 2 rules each
+
+        # Check that nested selections create proper breadcrumbs
+        # For users.address (single-level)
+        address_rules = [
+            r for r in rules if r.tap_stream_id == "users" and "address" in r.breadcrumb
+        ]
+        assert len(address_rules) == 3  # One for each nested pattern with users.address
+
+        # Verify breadcrumb for users.address
+        simple_address = [
+            r for r in address_rules if r.breadcrumb == ["properties", "address"]
+        ]
+        assert len(simple_address) == 1
+        assert simple_address[0].key == "selected"
+        assert simple_address[0].value is True
+
+        # Verify breadcrumb for users.address.city (two-level)
+        city_rule = [
+            r
+            for r in address_rules
+            if r.breadcrumb == ["properties", "address", "properties", "city"]
+        ]
+        assert len(city_rule) == 1
+        assert city_rule[0].key == "selected"
+        assert city_rule[0].value is True
+
+        # Verify breadcrumb for users.address.geo.lat (three-level)
+        lat_rule = [
+            r
+            for r in rules
+            if r.breadcrumb
+            == ["properties", "address", "properties", "geo", "properties", "lat"]
+        ]
+        assert len(lat_rule) == 1
+        assert lat_rule[0].tap_stream_id == "users"
+        assert lat_rule[0].key == "selected"
+        assert lat_rule[0].value is True
+
+        # Verify orders.items.product.sku (three-level in different stream)
+        sku_rule = [
+            r
+            for r in rules
+            if r.breadcrumb
+            == ["properties", "items", "properties", "product", "properties", "sku"]
+        ]
+        assert len(sku_rule) == 1
+        assert sku_rule[0].tap_stream_id == "orders"
+        assert sku_rule[0].key == "selected"
+        assert sku_rule[0].value is True
+
+        # Important: Verify that NONE of these created wildcard rules
+        # (they should NOT behave like stream.* patterns)
+        wildcard_rules = [r for r in rules if "*" in str(r.breadcrumb)]
+        assert len(wildcard_rules) == 0, (
+            "Nested property patterns should not create wildcard rules"
+        )
+
 
 class TestSelectionType:
     def test_selection_type_addition(self) -> None:
