@@ -1414,6 +1414,11 @@ meltano select tap-gitlab commits created_at
 meltano select tap-gitlab commits author_name
 meltano select tap-gitlab commits message
 
+# Select nested properties (for streams with nested JSON structures)
+meltano select tap-gitlab users address         # Select entire address object
+meltano select tap-gitlab users address city    # Select only city within address
+meltano select tap-gitlab users address geo lat # Select only latitude within geo within address
+
 # Note: These selections define what properties are available.
 # To filter which streams are processed at runtime, use:
 # meltano el tap-gitlab target-jsonl --select commits tags
@@ -1436,6 +1441,9 @@ Enabled patterns:
     commits.created_at
     commits.author_name
     commits.message
+    users.address
+    users.address.city
+    users.address.geo.lat
     !*.*_url
 
 Selected attributes:
@@ -1449,6 +1457,9 @@ Selected attributes:
     [automatic] tags.name
     [automatic] tags.project_id
     [selected ] tags.target
+    [selected ] users.address
+    [selected ] users.address.city
+    [selected ] users.address.geo.lat
 ```
 
 Remove patterns (`--rm` or `--remove`):
