@@ -209,7 +209,7 @@ def select_metadata_rules(patterns: Iterable[str]) -> list[MetadataRule]:
             if selected and "*" in props:
                 rules.extend(
                     MetadataRule(
-                        tap_stream_id=pattern.stream_pattern,
+                        tap_stream_id=parsed_pattern.stream_pattern,
                         breadcrumb=property_breadcrumb(props[:idx]),
                         key="selected",
                         value=selected,
