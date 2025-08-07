@@ -15,6 +15,8 @@ from meltano.core.plugin.singer.catalog import (
     SelectExecutor,
     SelectionType,
     path_property,
+    select_filter_metadata_rules,
+    select_metadata_rules,
     visit,
 )
 
@@ -1091,6 +1093,116 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     def test_node_selection(self, node: dict, selection_type: SelectionType) -> None:
         """Test that selection metadata produces the expected selection type member."""
         assert ListSelectedExecutor.node_selection(node) == selection_type
+
+    def test_select_metadata_rules_stream_only_behaves_like_stream_star(self) -> None:
+        """Test that stream-only patterns behave like stream.*."""
+        stream_only_rules = select_metadata_rules(["users"])
+        stream_star_rules = select_metadata_rules(["users.*"])
+
+        assert len(stream_only_rules) == len(stream_star_rules) == 2
+
+        # Both should create identical rules
+        for rule1, rule2 in zip(stream_only_rules, stream_star_rules):
+            assert rule1.tap_stream_id == rule2.tap_stream_id
+            assert rule1.breadcrumb == rule2.breadcrumb
+            assert rule1.key == rule2.key
+            assert rule1.value == rule2.value
+            assert rule1.negated == rule2.negated
+
+    def test_select_metadata_rules_stream_property_creates_both_rules(self) -> None:
+        """Test that stream.property creates both stream and property rules."""
+        rules = select_metadata_rules(["users.name"])
+
+        assert len(rules) == 2
+
+        # Find stream and property rules
+        stream_rule = next(r for r in rules if r.breadcrumb == [])
+        prop_rule = next(r for r in rules if r.breadcrumb != [])
+
+        # Stream rule
+        assert stream_rule.tap_stream_id == "users"
+        assert stream_rule.breadcrumb == []
+        assert stream_rule.key == "selected"
+        assert stream_rule.value is True
+
+        # Property rule
+        assert prop_rule.tap_stream_id == "users"
+        assert prop_rule.breadcrumb == ["properties", "name"]
+        assert prop_rule.key == "selected"
+        assert prop_rule.value is True
+
+    def test_cli_select_exclude_integration_stream_patterns(self) -> None:
+        """Test CLI --select/--exclude integration with stream-only patterns."""
+        # Simulate CLI: --select users --exclude admins
+        # This becomes select_filter = ["users", "!admins"]
+        cli_patterns = ["users", "!admins"]
+        rules = select_filter_metadata_rules(cli_patterns)
+
+        # Should create stream-level filtering rules
+        assert len(rules) == 2
+
+        # Find include and exclude rules
+        include_rule = next(r for r in rules if r.negated)
+        exclude_rule = next(r for r in rules if not r.negated)
+
+        # Include rule: streams NOT matching ["users"] get selected: false
+        assert include_rule.tap_stream_id == ["users"]
+        assert include_rule.breadcrumb == []
+        assert include_rule.key == "selected"
+        assert include_rule.value is False
+        assert include_rule.negated is True
+
+        # Exclude rule: streams matching ["admins"] get selected: false
+        assert exclude_rule.tap_stream_id == ["admins"]
+        assert exclude_rule.breadcrumb == []
+        assert exclude_rule.key == "selected"
+        assert exclude_rule.value is False
+        assert exclude_rule.negated is False
+
+    def test_select_vs_select_filter_behavior_difference(self) -> None:
+        """Test that select treats stream-only patterns as stream.* while select_filter works at stream level."""  # noqa: E501
+        # select with stream-only pattern creates stream + property rules
+        select_rules = select_metadata_rules(["users"])
+        assert len(select_rules) == 2
+        stream_rule = next(r for r in select_rules if r.breadcrumb == [])
+        prop_rule = next(r for r in select_rules if r.breadcrumb != [])
+
+        assert stream_rule.tap_stream_id == "users"
+        assert stream_rule.breadcrumb == []
+        assert prop_rule.tap_stream_id == "users"
+        assert prop_rule.breadcrumb == ["properties", "*"]
+
+        # select_filter with stream-only pattern creates only stream-level rules
+        filter_rules = select_filter_metadata_rules(["users"])
+        assert len(filter_rules) == 1
+        filter_rule = filter_rules[0]
+
+        assert filter_rule.tap_stream_id == ["users"]
+        assert filter_rule.breadcrumb == []
+        assert filter_rule.negated is True  # This is an inclusion rule
+
+    def test_select_filter_preserves_existing_property_selections(self) -> None:
+        """Test that select_filter operates at stream level and preserves property selections made by select."""  # noqa: E501
+        # This conceptual test shows the intended behavior:
+        # 1. select: ["users.name", "users.email", "orders.*"] selects properties  # noqa: E501
+        # 2. select_filter: ["users"] then filters to only include the users stream
+        # 3. Result should be users stream with only name,email properties (select chose)  # noqa: E501
+
+        # This is demonstrated in the existing test_apply_catalog_rules_select_filter
+        # where _select: ["one.one", "three.three", "five.*"] sets property selections
+        # and _select_filter: ["three"] filters to only the three stream
+        # resulting in {"three": {"one", "three"}} - preserving original selection  # noqa: E501
+
+        # The behavior is already tested in test_tap.py, this test documents the intent
+        select_rules = select_metadata_rules(["users.name", "users.email"])
+        filter_rules = select_filter_metadata_rules(["users"])
+
+        # select creates specific property selections
+        assert len(select_rules) == 4  # 2 stream rules + 2 property rules
+
+        # select_filter creates stream-level filtering only
+        assert len(filter_rules) == 1
+        assert filter_rules[0].breadcrumb == []  # Stream level only
 
 
 class TestSelectionType:
